@@ -665,7 +665,7 @@ void Esp::drawLocalInfo()
 	render::text(1200, 80, fonts::tahoma, std::format("Kills: {}", game::getLocalKills()), false, Colors::Yellow);
 	render::text(1200, 90, fonts::tahoma, std::format("Deaths: {}", game::getLocalDeaths()), false, Colors::Yellow);
 	// escape divide by zero exceptions by using this trick:
-	float kd = game::getLocalKills() / game::getLocalDeaths() == 0 ? 1 : game::getLocalDeaths();
+	float kd = game::getLocalKills() / (game::getLocalDeaths() == 0) ? 1 : game::getLocalDeaths();
 	render::text(1200, 100, fonts::tahoma, std::format("KD: {:.2f}", kd), false, Colors::Yellow);
 	render::text(1200, 110, fonts::tahoma, std::format("Ping: {}", game::getLocalPing()), false, Colors::Yellow);
 }
