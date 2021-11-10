@@ -1,7 +1,7 @@
 # Csgo
 Very short and commented source aimed for legit gameplay
 
-![Bartis internal CSGO](https://i.imgur.com/DawJQkz.png)
+![Bartis internal CSGO](https://imgur.com/a/gps2UFw)
 
 # Information
 The cheat may drop FPS with menu opened, it's not critical, this case is due to running getasynckeystate every frame with many statements.
