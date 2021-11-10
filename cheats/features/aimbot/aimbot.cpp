@@ -200,6 +200,7 @@ Vector legitbot::getBestBonePos(CUserCmd* cmd)
                 bestHitbox = hitbox;
                 bestEnt = ent;
             }
+            // will not hit this though, since loop has always valid ranged size
             if (vars::iAimbot != NEAREST)
                 break;
         }

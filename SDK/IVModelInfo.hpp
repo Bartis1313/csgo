@@ -32,9 +32,9 @@ struct mstudiobone_t
 {
 	int m_nameIndex;
 	int m_parent;
-	PAD(168);
+	PAD(152);
 	int m_flags;
-	PAD(24);
+	PAD(52);
 };
 
 struct mstudiobbox_t
@@ -110,9 +110,9 @@ struct studiohdr_t
 	{
 		return (i > m_hitboxSetsCount) ? nullptr : reinterpret_cast<mstudiohitboxset_t*>((uint8_t*)this + m_hitboxSetIndex) + i;
 	}
-	mstudiobbox_t* bone(int i) const
+	mstudiobone_t* bone(int i) const
 	{
-		return (i > m_bonesCount) ? nullptr : reinterpret_cast<mstudiobbox_t*>((uint8_t*)this + m_boneIndex) + i;
+		return (i > m_bonesCount) ? nullptr : reinterpret_cast<mstudiobone_t*>((uint8_t*)this + m_boneIndex) + i;
 	}
 };
 

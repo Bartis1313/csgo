@@ -29,7 +29,7 @@ namespace render
 		interfaces::surface->setFontGlyph(fonts::tahoma, "Tahoma", 14, 800, 0, 0, FONTFLAG_OUTLINE);
 
 		fonts::smalle = interfaces::surface->fontCreate();
-		interfaces::surface->setFontGlyph(fonts::smalle, "Tahoma", 7, 800, 0, 0, FONTFLAG_OUTLINE);
+		interfaces::surface->setFontGlyph(fonts::smalle, "Tahoma", 9, 800, 0, 0, FONTFLAG_ANTIALIAS);
 		CONSOLE_INFO();
 		LOG("[init] render success\n");
 		CONSOLE_RESET();
@@ -185,15 +185,9 @@ namespace render
 		interfaces::surface->drawTextFont(font);
 		int width, height;
 
-		if (centered)
-		{
-			interfaces::surface->getTextSize(font, text, width, height);
-			interfaces::surface->drawTextPos(x - width / 2, y);
-		}
-		else
-			interfaces::surface->drawTextPos(x, y);
-
+		interfaces::surface->getTextSize(font, text, width, height);
 		interfaces::surface->setTextColor(color);
+		interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
 		interfaces::surface->drawRenderText(text, wcslen(text));
 	}
 
@@ -208,9 +202,8 @@ namespace render
 		interfaces::surface->drawTextFont(font);
 		interfaces::surface->getTextSize(font, converted.c_str(), width, height);
 		interfaces::surface->setTextColor(color);
-		interfaces::surface->drawTextPos((centered) ? (x - width / 2, y) : x, y);
+		interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
 		interfaces::surface->drawRenderText(converted.c_str(), wcslen(converted.c_str()));
-
 	}
 
 	void textf(const int x, const int y, const unsigned long font, const bool centered, Color color, const char* fmt, ...)
@@ -229,35 +222,13 @@ namespace render
 		buf[IM_ARRAYSIZE(buf) - 1] = 0;
 		va_end(args);
 
-		wchar_t wbuf[256];
-		MultiByteToWideChar(CP_UTF8, 0, buf, IM_ARRAYSIZE(wbuf), wbuf, IM_ARRAYSIZE(wbuf));
-
-		int width, height;
-		interfaces::surface->getTextSize(font, wbuf, width, height);
-
-		if (centered)
-		{
-			interfaces::surface->getTextSize(font, wbuf, width, height);
-			interfaces::surface->drawTextPos(x - width / 2, y);
-		}
-		else
-			interfaces::surface->drawTextPos(x, y);
-
-		interfaces::surface->drawTextFont(font);
-		interfaces::surface->setTextColor(color);
-		interfaces::surface->drawRenderText(wbuf, wcslen(wbuf));
+		text(x, y, font, buf, centered, color);
 	}
 
-	int getTextSize(const unsigned long font, const char* fmt, ...)
+	int getTextSize(const unsigned long font, const std::string& text)
 	{
-		va_list va_alist;
-		char buf[256] = {};
-		va_start(va_alist, fmt);
-		_vsnprintf(buf, sizeof(buf), fmt, va_alist);
-		va_end(va_alist);
-
-		wchar_t wbuf[256] = {};
-		MultiByteToWideChar(CP_UTF8, 0, buf, IM_ARRAYSIZE(buf), wbuf, IM_ARRAYSIZE(wbuf));
+		std::wstring wtext(text.begin(), text.end());
+		const wchar_t* wbuf = wtext.c_str();
 
 		int width, height;
 		interfaces::surface->getTextSize(font, wbuf, width, height);

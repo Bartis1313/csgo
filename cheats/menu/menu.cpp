@@ -142,5 +142,7 @@ void Menu::draw()
 	drawBool(16, width, 15);
 	drawBool(17, width, 30);
 	drawBool(18, width, 45);
-	drawVec(19, width, 60);
+	drawBool(19, width, 60);
+	drawBool(20, width, 75);
+	drawVec(21, width, 90);
 }

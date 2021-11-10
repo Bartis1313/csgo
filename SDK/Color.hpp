@@ -152,8 +152,6 @@ private:
 	static float hue;
 };
 
-float Rainbow::hue = 0.0f;
-
 namespace Colors
 {
 	inline Color White = Color(255, 255, 255, 255);
@@ -165,4 +163,5 @@ namespace Colors
 	inline Color Grey = Color(128, 128, 128, 128);
 	inline Color Yellow = Color(255, 255, 0, 255);
 	inline Color Purple = Color(140, 20, 252, 255);
+	inline Color Turquoise = Color(60, 210, 200, 255);
 }

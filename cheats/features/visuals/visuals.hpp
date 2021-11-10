@@ -11,12 +11,17 @@ namespace Esp
 	void draw();
 	void drawMisc();
 	void drawSound(IGameEvent* event);
-	void drawInfo(Player_t* ent);
+	void drawInfo(Player_t* ent, const Box& box);
 	void drawPlayer(Player_t* ent);
 	void drawCrosshair();
 	void drawProjectiles(Entity_t* ent);
 	void drawBomb(Entity_t* ent);
 	void drawBombDropped(Entity_t* ent);
+
+	void drawHealth(Player_t* ent, const Box& box);
+	void drawArmor(Player_t* ent, const Box& box);
+	void drawWeapon(Player_t* ent, const Box& box);
+	void drawSkeleton(Player_t* ent);
 
 	// TODO:
 	void drawSmoke(Entity_t* ent);
@@ -37,8 +42,8 @@ namespace Esp
 	void renderBox3D(Entity_t* ent, bool fill = false);
 
 	// boxes stuff
-	void drawBox2D(const Box& box, Player_t* ent);
-	void drawBox2DFilled(const Box& box, Player_t* ent);
+	void drawBox2D(Player_t* ent, const Box& box);
+	void drawBox2DFilled(Player_t* ent, const Box& box);
 	
 
 

@@ -145,6 +145,7 @@ public:
 	[[nodiscard]] Vector getHitboxPos(int id);
 	[[nodiscard]] Vector getBonePosition(int id);
 	[[nodiscard]] bool isC4Owner();
+	[[nodiscard]] std::string getName();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

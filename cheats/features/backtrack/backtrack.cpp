@@ -149,6 +149,9 @@ void backtrack::run(CUserCmd* cmd)
 	if (!game::localPlayer->isAlive())
 		return;
 
+	if (!(cmd->m_buttons & IN_ATTACK))
+		return;
+
 	float bestFov = 180.0f;
 	Player_t* bestPlayer = nullptr;
 	int bestPlayerIdx = -1;
@@ -184,7 +187,7 @@ void backtrack::run(CUserCmd* cmd)
 		}
 	}
 
-	if (bestPlayer && bestPlayerIdx != -1 && cmd->m_buttons & IN_ATTACK)
+	if (bestPlayer && bestPlayerIdx != -1)
 	{
 		if (records.at(bestPlayerIdx).size() <= 3)
 			return;

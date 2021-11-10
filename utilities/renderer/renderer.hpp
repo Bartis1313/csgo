@@ -41,7 +41,7 @@ namespace render
 	void drawBox3D(Vector* box, const Color& color, bool filled = false);
 
 	// get text size, it responses for esp distance format and more options
-	int getTextSize(unsigned long font, const char* fmt, ...);
+	int getTextSize(unsigned long font, const std::string& text);
 
 	// for hack
 	bool WorldToScreen(const Vector& in, Vector& out);

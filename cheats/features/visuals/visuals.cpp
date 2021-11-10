@@ -61,7 +61,6 @@ void Esp::draw()
 		if (entity)
 		{
 			drawPlayer(entity);
-			drawInfo(entity);
 		}
 
 		const auto cl = entity->clientClass();
@@ -91,8 +90,8 @@ bool Esp::getBox(Entity_t* ent, Box& box)
 	if (!col)
 		return false;
 
-	const Vector min = col->OBBMins();
-	const Vector max = col->OBBMaxs();
+	const auto& min = col->OBBMins();
+	const auto& max = col->OBBMaxs();
 
 	std::array<Vector, 8> points =
 	{
@@ -109,7 +108,7 @@ bool Esp::getBox(Entity_t* ent, Box& box)
 	if (!points.data())
 		return false;
 
-	const matrix3x4_t& tranFrame = ent->m_rgflCoordinateFrame();
+	const auto& tranFrame = ent->m_rgflCoordinateFrame();
 
 	float left = std::numeric_limits<float>::max();
 	float top = std::numeric_limits<float>::max();
@@ -143,8 +142,8 @@ void Esp::renderBox3D(Entity_t* ent, bool fill)
 	if (!col)
 		return;
 
-	const Vector min = col->OBBMins();
-	const Vector max = col->OBBMaxs();
+	const auto& min = col->OBBMins();
+	const auto& max = col->OBBMaxs();
 
 	std::array<Vector, 8> points =
 	{
@@ -159,7 +158,7 @@ void Esp::renderBox3D(Entity_t* ent, bool fill)
 		Vector(max.x, min.y, max.z)
 	};
 
-	const matrix3x4_t& tranFrame = ent->m_rgflCoordinateFrame();
+	const auto& tranFrame = ent->m_rgflCoordinateFrame();
 
 	Vector transformed[8] = {};
 
@@ -173,15 +172,14 @@ void Esp::renderBox3D(Entity_t* ent, bool fill)
 * store best ent index in aimbot, then go back there and add  ? : chain to see if ent->getIndex() is same
 */
 
-
-void Esp::drawBox2D(const Box& box, Player_t* ent)
+void Esp::drawBox2D(Player_t* ent, const Box& box)
 {
 	render::drawOutlineRect(box.x - 1, box.y - 1, box.w + 2, box.h + 2, Color(0, 0, 0,  200));
 	render::drawOutlineRect(box.x, box.y, box.w, box.h, healthBased(ent));
 	render::drawOutlineRect(box.x + 1, box.y + 1, box.w - 2, box.h - 2, Color(0, 0, 0, 200));
 }
 
-void Esp::drawBox2DFilled(const Box& box, Player_t* ent)
+void Esp::drawBox2DFilled(Player_t* ent, const Box& box)
 {
 	const uint8_t alphaOutline = static_cast<uint8_t>(255 * 0.6f);
 	const Color fill{ 0, 0, 0, alphaOutline };
@@ -189,38 +187,168 @@ void Esp::drawBox2DFilled(const Box& box, Player_t* ent)
 	// first create rectangle then do outlines
 
 	render::drawFilledRect(box.x - 1, box.y - 1, box.w + 2, box.h + 2, fill);
-	drawBox2D(box, ent);
+	drawBox2D(ent, box);
 }
 
-void Esp::drawInfo(Player_t* ent)
+void Esp::drawHealth(Player_t* ent, const Box& box)
+{
+	auto health = ent->m_iHealth() > 100 ? 100 : ent->m_iHealth();
+	if (health)
+	{
+		auto offset = health * box.h / 100;
+		auto pad = box.h - offset;
+
+		Box newBox =
+		{
+			box.x - 7,
+			box.y - 1,
+			4,
+			box.h + 2,
+		};
+
+		// fill first
+		render::drawFilledRect(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
+		render::drawFilledRect(newBox.x + 1, newBox.y + pad + 1, 2, offset, healthBased(ent));
+		// if the player has health below max, then draw HP info
+		// also 12 val is pretty hardcoded here, I don't use calcsize function for such small texts
+		if (health < 100)
+			render::text(newBox.x - 16, newBox.y + 1 + pad + 8, fonts::tahoma, std::to_string(health), false, Colors::White);
+	}
+}
+
+// same as health with how it works, but different pos only, only difference is small math with x,y 
+// why not 6 and 7 here too? should be easy to answer, in graphics in this case I start from left side and end on right, use logic
+void Esp::drawArmor(Player_t* ent, const Box& box)
+{
+	auto armor = ent->m_ArmorValue() > 100 ? 100 : ent->m_ArmorValue();
+	if (armor)
+	{
+		auto offset = armor * box.h / 100;
+		auto pad = box.h - offset;
+
+		Box newBox =
+		{
+			box.x + box.w + 2,
+			box.y - 1,
+			4,
+			box.h + 2
+		};
+
+		render::drawFilledRect(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
+		Color armorCol = Color(0, armor * 1.4f, 250, 255); // light to blue, something simple
+		render::drawFilledRect(newBox.x + 1, newBox.y + pad + 1, 2, offset, armorCol);
+
+		if (armor < 100)
+			render::text(newBox.x + 2, newBox.y + 1 + pad + 12, fonts::tahoma, std::to_string(armor), false, Colors::White);
+	}
+}
+
+// TODO: Smooth reload time, or even detect time of reload
+void Esp::drawWeapon(Player_t* ent, const Box& box)
+{
+	auto weapon = ent->getActiveWeapon();
+	if (!weapon)
+		return;
+
+	render::text(box.x + box.w + 5, box.y - 1, fonts::tahoma, ent->getActiveWeapon()->getWpnName(), false, Colors::White);
+
+	// skip useless trash for calculations
+	if (weapon->isNonAimable())
+		return;
+
+	auto maxAmmo = weapon->getWpnInfo()->m_maxClip1;
+	auto currentAmmo = weapon->m_iClip1();
+
+	Box newBox =
+	{
+		box.x,
+		box.y + box.h + 3,
+		box.w + 2,
+		2
+	};
+
+	auto offset = currentAmmo * box.w / maxAmmo;
+	render::drawFilledRect(newBox.x - 1, newBox.y - 1, newBox.w, 4, Colors::Black);
+	render::drawFilledRect(newBox.x, newBox.y, offset, 2, Colors::Purple);
+	
+	if (maxAmmo != currentAmmo)
+		render::text(newBox.x + offset, newBox.y + 1, fonts::tahoma, std::to_string(currentAmmo), false, Colors::White);
+}
+
+void Esp::drawInfo(Player_t* ent, const Box& box)
 {
 	if (!vars::bShowFlags)
 		return;
 
-	// TODO: recode this at all
-	Box box;
-	if (getBox(ent, box))
+	render::text(box.x + (box.w / 2), box.y - 15, fonts::tahoma, ent->getName(), true, healthBased(ent));
+
+	if (ent->isC4Owner())
+		render::text(box.x - 25 + box.w, box.y + 5 + box.h, fonts::tahoma, "C4", false, healthBased(ent));
+}
+// yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
+void Esp::drawSkeleton(Player_t* ent)
+{
+	if (!vars::bDrawSkeleton)
+		return;
+
+	auto model = ent->getModel();
+	if (!model)
+		return;
+
+	auto studio = interfaces::modelInfo->getStudioModel(model);
+	if (!studio)
+		return;
+
+	for (int i = 0; i < studio->m_bonesCount; i++)
 	{
-		playerInfo_t pInfo;
-		interfaces::engine->getPlayerInfo(ent->getIndex(), &pInfo);
+		auto bone = studio->bone(i);
+		if (!bone)
+			return;
 
-		int size = render::getTextSize(fonts::tahoma, pInfo.name);
+		if (bone->m_parent == -1)
+			continue;
 
-		render::text(box.x + box.w / 2 - size / 2, box.y - 5, fonts::tahoma, pInfo.name, false, healthBased(ent));
+		if (!(bone->m_flags & BONE_USED_BY_HITBOX))
+			continue;
 
-		render::text(box.x + 3 + box.w, box.y - 20 + box.h, fonts::tahoma, std::format("HP {}", ent->m_iHealth()), false, healthBased(ent));
+		auto child = ent->getBonePosition(i);
+		auto parent = ent->getBonePosition(bone->m_parent);
 
-		if (ent->isC4Owner())
-			render::text(box.x - 25 + box.w, box.y + 5 + box.h, fonts::tahoma, "C4", false, healthBased(ent));
+		auto chest = 6;
 
-		render::text(box.x + 3 + box.w, box.y - 10 + box.h, fonts::tahoma, std::format("Armor {}", ent->m_ArmorValue()), false, healthBased(ent));
+		auto upper = ent->getBonePosition(chest + 1) - ent->getBonePosition(chest);
+		auto breast = ent->getBonePosition(chest) + upper / 2;
 
-		if (ent->getActiveWeapon())
-		{
-			render::text(box.x + 3 + box.w, box.y + box.h + 10, fonts::tahoma, ent->getActiveWeapon()->getWpnName(), false, Colors::White);
-			render::text(box.x + 3 + box.w, box.y + box.h + 20, fonts::tahoma, std::format("Ammo {}", ent->getActiveWeapon()->m_iClip1()), false, Colors::White);
-		}
+		auto deltachild = child - breast;
+		auto deltaparent = parent - breast;
+
+		if (deltaparent.Length() < 9.0f && deltachild.Length() < 9.0f)
+			parent = breast;
+
+		if (i == 5)
+			child = breast;
+
+		if (abs(deltachild.z) < 5.0f && deltaparent.Length() < 5.0f && deltachild.Length() < 5.0f || i == 6)
+			continue;
+
+		Vector screenp, screenc;
+
+		if (render::WorldToScreen(parent, screenp) && render::WorldToScreen(child, screenc))
+			render::drawLine(screenp[0], screenp[1], screenc[0], screenc[1], Colors::White);
 	}
+}
+
+// for infos
+static void combineDraws(Player_t* ent, const Box& box)
+{
+	if (!vars::bDrawInfos)
+		return;
+
+	Esp::drawHealth(ent, box);
+	Esp::drawArmor(ent, box);
+	Esp::drawWeapon(ent, box);
+	Esp::drawInfo(ent, box);
+	Esp::drawSkeleton(ent);
 }
 
 void Esp::drawPlayer(Player_t* ent)
@@ -229,22 +357,26 @@ void Esp::drawPlayer(Player_t* ent)
 		return;
 
 	Box box;
+	if (!getBox(ent, box))
+		return;
 
 	switch (vars::iEsp)
 	{
 	case BOX2D:
-		if (getBox(ent, box))
-			drawBox2D(box, ent);
+		drawBox2D(ent, box);
+		combineDraws(ent, box);
 		break;
 	case FILLED2D:
-		if (getBox(ent, box))
-			drawBox2DFilled(box, ent);
+		drawBox2DFilled(ent, box);
+		combineDraws(ent, box);
 		break;
-	case BOX3D:		
+	case BOX3D:
 		renderBox3D(ent, false);
+		combineDraws(ent, box);
 		break;
 	case FILLED3D:
 		renderBox3D(ent, true);
+		combineDraws(ent, box);
 		break;
 	default:
 		return;
@@ -344,7 +476,7 @@ void Esp::drawBombDropped(Entity_t* ent)
 	}
 }
 
-void Esp::drawBomb(Entity_t* const ent)
+void Esp::drawBomb(Entity_t* ent)
 {
 	const auto tickbomb = interfaces::console->FindVar(XOR("mp_c4timer"))->getFloat();
 	const auto bombent = reinterpret_cast<Bomb_t*>(ent);
@@ -378,7 +510,7 @@ inline bool Esp::isNade(const int classid)
 	return false;
 }
 
-void Esp::drawProjectiles(Entity_t* const ent)
+void Esp::drawProjectiles(Entity_t* ent)
 {
 	if (!vars::bShowFlags)
 		return;
@@ -482,6 +614,9 @@ void Esp::drawSound(IGameEvent* event)
 		return;
 
 	if (!entity->isAlive())
+		return;
+
+	if (entity->m_bGunGameImmunity())
 		return;
 
 	auto modelIndex = interfaces::modelInfo->getModelIndex(XOR("sprites/physbeam.vmt"));
@@ -635,6 +770,8 @@ void Esp::radar()
 		{
 			render::drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, Colors::White);
 			render::drawCircle(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, Color(254, 24, 110, 255));
+			// magic - 4 due to text, and - 3 to correction
+			render::text(entRotatedPos.x - 4, entRotatedPos.y - dotThickness - 3, fonts::smalle, std::format("{:.2f}m", utilities::distToMeters(game::localPlayer->absOrigin().DistTo(ent->absOrigin()))), false, Color(100, 20, 70, 255));
 		}		
 	}
 }
@@ -665,7 +802,7 @@ void Esp::drawLocalInfo()
 	render::text(1200, 80, fonts::tahoma, std::format("Kills: {}", game::getLocalKills()), false, Colors::Yellow);
 	render::text(1200, 90, fonts::tahoma, std::format("Deaths: {}", game::getLocalDeaths()), false, Colors::Yellow);
 	// escape divide by zero exceptions by using this trick:
-	float kd = game::getLocalKills() / (game::getLocalDeaths() == 0) ? 1 : game::getLocalDeaths();
+	float kd = game::getLocalKills() / (game::getLocalDeaths() == 0 ? 1 : game::getLocalDeaths());
 	render::text(1200, 100, fonts::tahoma, std::format("KD: {:.2f}", kd), false, Colors::Yellow);
 	render::text(1200, 110, fonts::tahoma, std::format("Ping: {}", game::getLocalPing()), false, Colors::Yellow);
 }

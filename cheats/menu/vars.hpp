@@ -39,6 +39,9 @@ namespace vars
 	inline bool bShowInfo = false;
 
 	inline bool bShowFlags = false;
+	inline bool bDrawInfos = false;
+
+	inline bool bDrawSkeleton = false;
 
 	inline int iBacktrackChams = 0;
 	
@@ -63,7 +66,9 @@ namespace vars
 		Item{ "Radar 2D", &bRadar }, // 16
 		Item{ "Local Info", &bShowInfo }, // 17
 		Item{ "Draw Flags", &bShowFlags }, // 18
-		Item{ "BT Chams", &iBacktrackChams, {"OFF", "Stable", "Last tick", "Rainbow" } }, // 19
+		Item{ "Draw Infos", &bDrawInfos }, // 19
+		Item{ "Skeleton", &bDrawSkeleton}, // 20
+		Item{ "BT Chams", &iBacktrackChams, {"OFF", "Stable", "Last tick", "Rainbow"} }, // 21
 	};
 	// additionally to move very smoothly by names you can use: 
 	// you can aswell use int for index, will be good for my draw method

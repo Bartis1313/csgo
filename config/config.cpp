@@ -36,6 +36,8 @@ namespace config
 			ini.SetBoolValue(XOR("HACK"), XOR("SHOW INFO"), vars::bShowInfo, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("SHOW ESP FLAGS"), vars::bShowFlags, "", false);
 			ini.SetLongValue(XOR("HACK"), XOR("BT CHAMS TYPE"), vars::iBacktrackChams, "", false);
+			ini.SetBoolValue(XOR("HACK"), XOR("ESP INFO"), vars::bDrawInfos, "", false);
+			ini.SetBoolValue(XOR("HACK"), XOR("ESP SKELETON"), vars::bDrawSkeleton, "", false);
 			auto check = ini.SaveFile(location.c_str());
 			if (!check)
 				LOG("[info] Saved the config without error\n");
@@ -78,6 +80,8 @@ namespace config
 				vars::bShowInfo = ini.GetBoolValue(XOR("HACK"), XOR("SHOW INFO"));
 				vars::bShowFlags = ini.GetBoolValue(XOR("HACK"), XOR("SHOW ESP FLAGS"));
 				vars::iBacktrackChams = ini.GetLongValue(XOR("HACK"), XOR("BT CHAMS TYPE"));
+				vars::bDrawInfos = ini.GetBoolValue(XOR("HACK"), XOR("ESP INFO"));
+				vars::bDrawSkeleton = ini.GetBoolValue(XOR("HACK"), XOR("ESP SKELETON"));
 				CONSOLE_INFO();
 				LOG("[init] Config loaded success\n");
 				CONSOLE_RESET();

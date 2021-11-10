@@ -53,6 +53,8 @@ namespace chams
 			if (!ent || !ent->isAlive() || ent->isDormant())
 				return;
 
+			// TODO: if ent->m_bGunGameImmunity then draw invisible, I think the best option and easy
+
 			if (ent->m_iTeamNum() != game::localPlayer->m_iTeamNum())
 			{
 				switch (vars::iBacktrackChams)

@@ -160,7 +160,6 @@ bool Weapon_t::isNonAimable()
 
 /////////////////////////////////////////////////////////////////////////////////
 
-
 void Player_t::setAbsOrigin(const Vector& origin)
 {
 	using fn = void(__thiscall*)(void*, const Vector&);
@@ -198,7 +197,7 @@ Vector Player_t::getBonePosition(int id)
 {
 	if (matrix3x4_t matBone[BONE_USED_BY_HITBOX]; setupBones(matBone, BONE_USED_BY_HITBOX, BONE_USED_BY_HITBOX, 0.0f))
 		return matBone[id].origin();
-
+	
 	return NOTHING;
 }
 
@@ -207,6 +206,13 @@ bool Player_t::isC4Owner()
 	using fn = bool(__thiscall*)(void*);
 	const static auto isc4 = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, HASC4));
 	return isc4(this);
+}
+
+std::string Player_t::getName()
+{
+	playerInfo_t info;
+	interfaces::engine->getPlayerInfo(getIndex(), &info);
+	return info.name;
 }
 
 ////////////////////////////////////////////////////////////////
