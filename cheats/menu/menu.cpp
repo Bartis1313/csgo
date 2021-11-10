@@ -27,6 +27,12 @@ void Menu::handleKeys(Item* set) const
 			index = Item::count - 1;
 	}
 
+	if (LF(GetAsyncKeyState)(VK_INSERT) & 1)
+	{
+		vars::bMenuOpen = !vars::bMenuOpen;
+		config::save();
+	}
+
 	if (LF(GetAsyncKeyState)(VK_RIGHT) & 1)
 	{
 		if (set[index].isBoolOption())
@@ -98,18 +104,8 @@ void Menu::drawVec(int idx, int x, int y)
 
 void Menu::draw()
 {
-	// have to do this here
-	if (LF(GetAsyncKeyState)(VK_INSERT) & 1)
-	{
-		vars::bMenuOpen = !vars::bMenuOpen;
-		config::save();
-	}
-
 	if (!vars::bMenuOpen)
 		return;
-
-	// first run handle
-	handleKeys(settings);
 
 	int x, y;
 	interfaces::surface->getScreenSize(x, y);
