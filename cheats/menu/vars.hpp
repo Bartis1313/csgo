@@ -59,7 +59,7 @@ namespace vars
 		Item{ "Triggerbot", &bTriggerbot }, // 12
 		Item{ "Trigger Delay", &iTriggerDelay, {0, 1000} }, // 13
 		Item{ "Backtrack", &bBacktrack}, // 14
-		Item{ "Backtrack tick", &iBacktrackTick, {1, 200} }, // 15
+		Item{ "Backtrack ms", &iBacktrackTick, {1, 200} }, // 15
 		Item{ "Radar 2D", &bRadar }, // 16
 		Item{ "Local Info", &bShowInfo }, // 17
 		Item{ "Draw Flags", &bShowFlags }, // 18

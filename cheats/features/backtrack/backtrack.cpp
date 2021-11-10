@@ -56,6 +56,9 @@ bool backtrack::isValid(float simtime)
 		return false;
 	// from my experience making it with game::serverTime() works slightly better
 	auto delta = std::clamp(network->getLatency(0) + network->getLatency(1) + getLerp(), 0.f, cvarsRatios.maxUnlag) - (game::serverTime() - simtime);
+	// this is not used, that's why this is commented, feel free to use it and config it yourself
+	// auto limit = std::clamp(vars::iBacktrackTick, 0.0f, 2.0f);
+	// if limit is used return looks like: return std::abs(delta) <= limit;
 	return std::abs(delta) <= 0.2f;
 }
 
@@ -181,15 +184,18 @@ void backtrack::run(CUserCmd* cmd)
 		}
 	}
 
-	if (bestPlayer && bestPlayerIdx != -1)
+	if (bestPlayer && bestPlayerIdx != -1 && cmd->m_buttons & IN_ATTACK)
 	{
 		if (records.at(bestPlayerIdx).size() <= 3)
 			return;
 
 		bestFov = 180.0f;
 
-		for (int i = 0; i < records.at(bestPlayerIdx).size(); i++)
+		// if ticks method used
+		// auto ticksPassed = 0;
+		for (int i = 0; i < records.at(bestPlayerIdx).size(); /* && ticksPassed < vars::iBacktrackTick*/ i++)
 		{
+			// ticksPassed++;
 			const auto& record = records.at(bestPlayerIdx).at(i);
 			if (!isValid(record.simTime))
 				continue;
@@ -204,7 +210,7 @@ void backtrack::run(CUserCmd* cmd)
 		}
 	}
 
-	if (bestRecordIdx != -1 && cmd->m_buttons & IN_ATTACK)
+	if (bestRecordIdx != -1)
 	{
 		const auto& record = records.at(bestPlayerIdx).at(bestRecordIdx);
 		cmd->m_tickcount = TIME_TO_TICKS(record.simTime);
