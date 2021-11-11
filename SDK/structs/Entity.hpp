@@ -146,6 +146,9 @@ public:
 	[[nodiscard]] Vector getBonePosition(int id);
 	[[nodiscard]] bool isC4Owner();
 	[[nodiscard]] std::string getName();
+	[[nodiscard]] int getKills(int id);
+	[[nodiscard]] int getDeaths(int id);
+	[[nodiscard]] int getPing(int id);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

@@ -48,7 +48,7 @@ void Esp::draw()
 		if (game::localPlayer == entity)
 			continue;
 
-		if (!entity->isPlayer())
+		if (entity->isDormant())
 			continue;
 
 		if (!entity->isAlive())
@@ -165,7 +165,7 @@ void Esp::renderBox3D(Entity_t* ent, bool fill)
 	for (int i = 0; i < 8; i++)
 		VectorTransform(points.at(i), tranFrame, transformed[i]);
 	
-	render::drawBox3D(transformed, healthBased(reinterpret_cast<Player_t*>(ent)), (fill) ? true : false);
+	render::drawBox3D(transformed, healthBased(reinterpret_cast<Player_t*>(ent)), fill ? true : false);
 }
 
 /* HINT FOR SELECTED TARGET AIMBOT HIGHLIGHT :
@@ -192,6 +192,9 @@ void Esp::drawBox2DFilled(Player_t* ent, const Box& box)
 
 void Esp::drawHealth(Player_t* ent, const Box& box)
 {
+	if (!vars::bDrawInfos)
+		return;
+
 	auto health = ent->m_iHealth() > 100 ? 100 : ent->m_iHealth();
 	if (health)
 	{
@@ -220,6 +223,9 @@ void Esp::drawHealth(Player_t* ent, const Box& box)
 // why not 6 and 7 here too? should be easy to answer, in graphics in this case I start from left side and end on right, use logic
 void Esp::drawArmor(Player_t* ent, const Box& box)
 {
+	if (!vars::bDrawInfos)
+		return;
+
 	auto armor = ent->m_ArmorValue() > 100 ? 100 : ent->m_ArmorValue();
 	if (armor)
 	{
@@ -246,6 +252,9 @@ void Esp::drawArmor(Player_t* ent, const Box& box)
 // TODO: Smooth reload time, or even detect time of reload
 void Esp::drawWeapon(Player_t* ent, const Box& box)
 {
+	if (!vars::bDrawInfos)
+		return;
+
 	auto weapon = ent->getActiveWeapon();
 	if (!weapon)
 		return;
@@ -338,24 +347,8 @@ void Esp::drawSkeleton(Player_t* ent)
 	}
 }
 
-// for infos
-static void combineDraws(Player_t* ent, const Box& box)
-{
-	if (!vars::bDrawInfos)
-		return;
-
-	Esp::drawHealth(ent, box);
-	Esp::drawArmor(ent, box);
-	Esp::drawWeapon(ent, box);
-	Esp::drawInfo(ent, box);
-	Esp::drawSkeleton(ent);
-}
-
 void Esp::drawPlayer(Player_t* ent)
 {
-	if (!vars::iEsp)
-		return;
-
 	Box box;
 	if (!getBox(ent, box))
 		return;
@@ -364,24 +357,25 @@ void Esp::drawPlayer(Player_t* ent)
 	{
 	case BOX2D:
 		drawBox2D(ent, box);
-		combineDraws(ent, box);
 		break;
 	case FILLED2D:
 		drawBox2DFilled(ent, box);
-		combineDraws(ent, box);
 		break;
 	case BOX3D:
 		renderBox3D(ent, false);
-		combineDraws(ent, box);
 		break;
 	case FILLED3D:
 		renderBox3D(ent, true);
-		combineDraws(ent, box);
 		break;
 	default:
 		return;
 	}
-	return;
+
+	Esp::drawHealth(ent, box);
+	Esp::drawArmor(ent, box);
+	Esp::drawWeapon(ent, box);
+	Esp::drawInfo(ent, box);
+	Esp::drawSkeleton(ent);
 }
 
 enum CrossHairTypes
@@ -712,7 +706,7 @@ void Esp::radar()
 	int centery = y - 110;
 	int size = 90;
 
-	render::drawTrapezFilled(Vector2D(centerx - size, centery - size), Vector2D(centerx + size, centery - size),
+	/*render::drawTrapezFilled(Vector2D(centerx - size, centery - size), Vector2D(centerx + size, centery - size),
 		Vector2D(centerx + size, centery + size), Vector2D(centerx - size, centery + size), Colors::Grey);
 
 	render::drawTrapezOutline(Vector2D(centerx - size - 1, centery - size - 1), Vector2D(centerx + size + 1, centery - size - 1),
@@ -722,12 +716,11 @@ void Esp::radar()
 	render::text(centerx - toAlign / 2, centery - size - 10, fonts::tahoma, "Radar", false, Colors::LightBlue);
 
 	render::drawFilledRect(centerx, centery - size, 1, 2 * size, Color(0, 0, 0, 120));
-	render::drawFilledRect(centerx - size, centery, 2 * size, 1, Color(0, 0, 0, 120));
+	render::drawFilledRect(centerx - size, centery, 2 * size, 1, Color(0, 0, 0, 120));*/
 
 	const auto myEye = game::localPlayer->getEyePos();
 	Vector ang = {};
 	interfaces::engine->getViewAngles(ang);
-
 
 	for (int i = 1; i < interfaces::globalVars->m_maxClients; i++)
 	{
@@ -740,6 +733,9 @@ void Esp::radar()
 			continue;
 
 		if (ent->isDormant())
+			continue;
+
+		if (!ent->isPlayer())
 			continue;
 
 		if (ent == game::localPlayer)
@@ -769,7 +765,7 @@ void Esp::radar()
 		if (check)
 		{
 			render::drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, Colors::White);
-			render::drawCircle(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, Color(254, 24, 110, 255));
+			render::drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, Color(254, 24, 110, 255));
 			// magic - 4 due to text, and - 3 to correction
 			render::text(entRotatedPos.x - 4, entRotatedPos.y - dotThickness - 3, fonts::smalle, std::format("{:.2f}m", utilities::distToMeters(game::localPlayer->absOrigin().DistTo(ent->absOrigin()))), false, Color(100, 20, 70, 255));
 		}		

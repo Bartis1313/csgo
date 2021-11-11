@@ -71,7 +71,7 @@ namespace chams
 							{
 								if (backtrack::isValid(record->at(i).simTime))
 								{
-									ovverride(false, false, Color(255 - (i * (255 / record->size())), i * (255 / record->size()), 255, 30));
+									ovverride(true, false, Color(255 - (i * (255 / record->size())), i * (255 / record->size()), 255, 30));
 									CALL(ctx, state, info, record->at(i).matrix);
 								}
 							}
@@ -84,17 +84,10 @@ namespace chams
 					auto record = &backtrack::records[info.m_entIndex];
 					if (record)
 					{
-						int size = record->size();
-						if (size > 0)
+						if (backtrack::isValid(record->front().simTime))
 						{
-							for (int i = 0; i < size; i++)
-							{
-								if (backtrack::isValid(record->at(i).simTime))
-								{
-									ovverride(false, false, Colors::Grey);
-									CALL(ctx, state, info, record->back().matrix);
-								}
-							}
+							ovverride(true, false, Colors::Grey);
+							CALL(ctx, state, info, record->back().matrix);
 						}
 					}
 					break;
@@ -112,7 +105,7 @@ namespace chams
 								if (backtrack::isValid(record->at(i).simTime))
 								{
 									Rainbow color;
-									ovverride(false, false, color.drawRainbow(interfaces::globalVars->m_frametime, 0.70f, 0.8f, 0.01f));
+									ovverride(true, false, color.drawRainbow(interfaces::globalVars->m_frametime, 0.70f, 0.8f, 0.01f));
 									CALL(ctx, state, info, record->at(i).matrix);
 								}
 							}

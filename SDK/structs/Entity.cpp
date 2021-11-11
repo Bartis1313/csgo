@@ -211,8 +211,41 @@ bool Player_t::isC4Owner()
 std::string Player_t::getName()
 {
 	playerInfo_t info;
-	interfaces::engine->getPlayerInfo(getIndex(), &info);
+	interfaces::engine->getPlayerInfo(this->getIndex(), &info);
 	return info.name;
+}
+
+int Player_t::getKills(int id)
+{
+	auto res = *interfaces::resource;
+	if (res)
+	{
+		auto kills = res->getKills(this->getIndex());
+		return kills;
+	}
+	return 0;
+}
+
+int Player_t::getDeaths(int id)
+{
+	auto res = *interfaces::resource;
+	if (res)
+	{
+		auto deaths = res->getDeaths(this->getIndex());
+		return deaths;
+	}
+	return 0;
+}
+
+int Player_t::getPing(int id)
+{
+	auto res = *interfaces::resource;
+	if (res)
+	{
+		auto ping = res->getPing(this->getIndex());
+		return ping;
+	}
+	return 0;
 }
 
 ////////////////////////////////////////////////////////////////

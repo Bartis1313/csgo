@@ -13,6 +13,10 @@ void glow::run()
 	if (!game::localPlayer)
 		return;
 
+	auto material = interfaces::matSys->findMaterial(XOR("dev/glow_color"), TEXTURE_GROUP_OTHER, true);
+	interfaces::modelRender->overrideMaterial(material);
+
+
 	for (int i = 0; i < interfaces::glowManager->m_size; i++)
 	{
 		auto& glow = interfaces::glowManager->m_objects[i];
@@ -25,16 +29,27 @@ void glow::run()
 		if (!ent)
 			continue;
 
-		if (!ent->isPlayer())
-			continue;
-
-		if (ent->isDormant() || !ent->isAlive())
+		if (ent->isDormant())
 			continue;
 		
-		if (ent->m_iTeamNum() != game::localPlayer->m_iTeamNum())
+		auto cl = ent->clientClass();
+
+		if (!cl)
+			continue;
+
+		switch (cl->m_classID)
 		{
-			glow.set(Colors::Purple);
-			glow.m_fullBloom = false;
+		case CCSPlayer:
+		{
+			if (ent->m_iTeamNum() != game::localPlayer->m_iTeamNum())
+			{
+				glow.set(Colors::Purple);
+				glow.m_fullBloom = false;
+			}
+			break;
+		}
+		default:
+			break;
 		}
 	}
 }

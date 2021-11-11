@@ -50,6 +50,7 @@ void console::shutdown()
 	return;
 }
 
+// redo this with std::format, simple and better
 void console::log(const char* fmt, ...)
 {
 	if (!fmt)

@@ -19,7 +19,6 @@ inline void** ORIGINAL(T& arg)
 
 bool hooks::init()
 {
-	__time.start();
 	const auto paintTraverseTarget = TARGET(interfaces::panel, paintTraverse::index);
 	const auto creteMoveTarget = TARGET(interfaces::clientMode, createMove::index);
 	const auto drawModelTarget = TARGET(interfaces::modelRender, drawModel::index);
@@ -72,11 +71,8 @@ bool hooks::init()
 	if (const auto hk = MH_EnableHook(MH_ALL_HOOKS); hk != MH_OK)
 		throw std::runtime_error(XOR("MH_EnableHook hook error"));
 
-	__time.end();
-
 	CONSOLE_INFO();
 	LOG("[init] hooks initialized!\n");
-	LOG("[info] hooks took %0.6f sec\n", __time.getSec());
 	CONSOLE_RESET();
 
 	return true;

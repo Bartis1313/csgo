@@ -94,7 +94,6 @@ RecvTable* NetvarManager::getTable(const char* tableName)
 
 void NetvarManager::dump(RecvTable* recvTable)
 {
-	__time.start();
 	for (int i = 0; i < recvTable->m_propsNum; i++)
 	{
 		auto recvProp = &recvTable->m_props[i];
@@ -135,11 +134,5 @@ void NetvarManager::dump()
 		client = client->m_next;
 	} while (client != 0);
 
-	__time.end();
-	
-	file << XOR("\nOffsets took: ") << std::to_string(__time.getSec()) << XOR("sec\n");
-	console::setColor(CONSOLE_GREEN);
-	LOG("[info] netvars dump took: %0.6f sec\n", __time.getSec());
-	CONSOLE_RESET();
 	file.close();
 }

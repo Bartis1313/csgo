@@ -43,13 +43,14 @@ I will try to implement it in a short time perioid, eventually people who commit
 
 # Log
 <details>
-- 1.0.0 - initial commit
-- 1.0.1 - small fixes in code + rainbow chams
-- 1.0.2 - improved a bit performance, changed render text function to modern wstring, aimbot big drops fixed, aimbot now uses ranged loop for hitboxes
-- 1.0.3 - added PlayerResource class which contain kills deaths and ping. Improved some of the features again
-- 1.0.4 - fixed typo for backtrack and added in comments ticks option to backtrack, I personally don't need it, hence why it's commented
-- 1.0.5 - cleaned up the source in visuals and render. Added new player visuals. Fixed padding in one SDK class, added skeleton ESP. In utils there is a new conventer function which you can very easily use to get distance to enemy in meters (unit to meters)
-- 1.0.6 - small update with removing fps drops while menu is opened
+
+* 1.0.0 - initial commit
+* 1.0.1 - small fixes in code + rainbow chams
+* 1.0.2 - improved a bit performance, changed render text function to modern wstring, aimbot big drops fixed, aimbot now uses ranged loop for hitboxes
+* 1.0.3 - added PlayerResource class which contain kills deaths and ping. Improved some of the features again
+* 1.0.4 - fixed typo for backtrack and added in comments ticks option to backtrack, I personally don't need it, hence why it's commented
+* 1.0.5 - cleaned up the source in visuals and render. Added new player visuals. Fixed padding in one SDK class, added skeleton ESP. In utils there is a new conventer function which you can very easily use to get distance to enemy in meters (unit to meters)
+* 1.0.6 - small update with removing fps drops while menu is opened
 </details>
 
 # People who helped

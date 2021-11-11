@@ -111,7 +111,7 @@ void backtrack::update()
 
 		// useless fix
 		// TODO: rebuild bones
-		//entity->invalidateBoneCache();
+		// entity->invalidateBoneCache();
 
 		// setup bones for us, will be needed for basically get good matrix, can draw backtrack'ed models etc...
 		entity->setupBones(record.matrix, BONE_USED_BY_HITBOX, BONE_USED_MASK, interfaces::globalVars->m_curtime);
