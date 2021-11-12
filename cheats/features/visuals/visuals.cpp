@@ -62,24 +62,6 @@ void Esp::draw()
 		if (entity)
 		{
 			drawPlayer(entity);
-
-			const auto cl = entity->clientClass();
-
-			if (!cl)
-				continue;
-
-			switch (cl->m_classID)
-			{
-			case CC4:
-				drawBombDropped(entity);
-				break;
-			case CPlantedC4:
-				drawBomb(entity);
-				break;
-			default:
-				drawProjectiles(entity);
-				break;
-			}
 		}
 	}
 }
@@ -104,18 +86,21 @@ void Esp::drawMisc()
 		if (!cl)
 			continue;
 
-		switch (cl->m_classID)
+		if (entity)
 		{
-		case CC4:
-			drawBombDropped(entity);
-			break;
-		case CPlantedC4:
-			drawBomb(entity);
-			break;
-		default:
-			drawProjectiles(entity);
-			break;
-		}
+			switch (cl->m_classID)
+			{
+			case CC4:
+				drawBombDropped(entity);
+				break;
+			case CPlantedC4:
+				drawBomb(entity);
+				break;
+			default:
+				drawProjectiles(entity);
+				break;
+			}
+		}		
 	}
 }
 
