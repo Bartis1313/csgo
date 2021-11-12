@@ -69,7 +69,7 @@ void Esp::draw()
 bool Esp::getBox(Entity_t* ent, Box& box)
 {
 	// pretty much nothing to explain here, using engine and detect mins/maxs
-	const auto col = ent->colliedable();
+	const auto col = ent->collideable();
 	if (!col)
 		return false;
 
@@ -121,7 +121,7 @@ bool Esp::getBox(Entity_t* ent, Box& box)
 
 void Esp::renderBox3D(Entity_t* ent, bool fill)
 {
-	const auto col = ent->colliedable();
+	const auto col = ent->collideable();
 	if (!col)
 		return;
 

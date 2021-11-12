@@ -43,7 +43,7 @@ public:
 	VFUNC(Vector&, absOrigin, 10, (), (this));
 	VFUNC(Vector&, absAngles, 11, (), (this));
 	VFUNC(ClientClass*, clientClass, 2, (), (this + 0x8));
-	VFUNC(ICollideable*, colliedable, 3, (), (this));
+	VFUNC(ICollideable*, collideable, 3, (), (this));
 	VFUNC(int, getIndex, 10, (), (this + 0x8));
 	VFUNC(bool, isPlayer, ISPLAYER, (), (this));
 	VFUNC(bool, isWeapon, ISWEAPON, (), (this));
