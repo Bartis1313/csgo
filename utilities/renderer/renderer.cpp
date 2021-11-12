@@ -30,9 +30,7 @@ namespace render
 
 		fonts::smalle = interfaces::surface->fontCreate();
 		interfaces::surface->setFontGlyph(fonts::smalle, "Tahoma", 9, 800, 0, 0, FONTFLAG_ANTIALIAS);
-		CONSOLE_INFO();
-		LOG("[init] render success\n");
-		CONSOLE_RESET();
+		LOG(LOG_INFO, "render success\n");
 	}
 
 	void drawLine(const int x, const int y, const int x2, const int y2, Color color)
@@ -218,8 +216,8 @@ namespace render
 		char buf[256] = {};
 
 		va_start(args, fmt);
-		vsnprintf(buf, IM_ARRAYSIZE(buf), fmt, args);
-		buf[IM_ARRAYSIZE(buf) - 1] = 0;
+		vsnprintf(buf, sizeof(buf), fmt, args);
+		buf[sizeof(buf) - 1] = 0;
 		va_end(args);
 
 		text(x, y, font, buf, centered, color);

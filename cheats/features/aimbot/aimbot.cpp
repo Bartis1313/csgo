@@ -81,15 +81,6 @@ Vector legitbot::getBestBonePos(CUserCmd* cmd)
         if (!ent)
             continue;
 
-        if (!game::localPlayer)
-            continue;
-
-        if (!interfaces::engine->isConnected() || !interfaces::engine->isInGame())
-            continue;
-
-        if (!ent->isPlayer())
-            continue;
-
         if (!ent->isAlive() || !game::localPlayer->isAlive())
             continue;
 
@@ -163,7 +154,7 @@ void legitbot::run(CUserCmd* cmd)
     if (weapon->isNonAimable())
         return;
 
-    if (weapon->isSniper() && game::localPlayer->m_bIsScoped())
+    if (weapon->isSniper() && !game::localPlayer->m_bIsScoped())
         return;
 
     if (vars::iRCS)

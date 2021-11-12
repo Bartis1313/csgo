@@ -1,3 +1,4 @@
+#include <filesystem>
 #include "config.hpp"
 #include "../utilities/utilities.hpp"
 #include "../cheats/menu/vars.hpp"
@@ -40,12 +41,10 @@ namespace config
 			ini.SetBoolValue(XOR("HACK"), XOR("ESP SKELETON"), vars::bDrawSkeleton, "", false);
 			auto check = ini.SaveFile(location.c_str());
 			if (!check)
-				LOG("[info] Saved the config without error\n");
+				LOG(LOG_INFO, "Saved the config without error\n");
 			else
 			{
-				CONSOLE_ERR();
-				LOG("[err] Config save failed\n");
-				CONSOLE_RESET();
+				LOG(LOG_ERR, "Config save failed\n");
 			}
 		}
 	}
@@ -82,9 +81,7 @@ namespace config
 				vars::iBacktrackChams = ini.GetLongValue(XOR("HACK"), XOR("BT CHAMS TYPE"));
 				vars::bDrawInfos = ini.GetBoolValue(XOR("HACK"), XOR("ESP INFO"));
 				vars::bDrawSkeleton = ini.GetBoolValue(XOR("HACK"), XOR("ESP SKELETON"));
-				CONSOLE_INFO();
-				LOG("[init] Config loaded success\n");
-				CONSOLE_RESET();
+				LOG(LOG_INFO, "Config loaded success\n");
 
 				return true;
 			}

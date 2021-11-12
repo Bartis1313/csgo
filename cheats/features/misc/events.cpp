@@ -2,17 +2,16 @@
 #include "../../menu/vars.hpp"
 #include "../../game.hpp"
 #include "../visuals/visuals.hpp"
+#include "../../../SDK/IGameEvent.hpp"
 
-void Events::init()
+void Events::init() const
 {
 	interfaces::eventManager->addListener(&Events::g(), XOR("player_footstep"));
 	interfaces::eventManager->addListener(&Events::g(), XOR("player_death"));
 	interfaces::eventManager->addListener(&Events::g(), XOR("round_start"));
-	LOG("[init] events hooked\n");
+	LOG(LOG_INFO, "events hooked\n");
 }
 
-// TODO: add more events and shots fired global intiger for our local player
-// this will be needed to display current accuracy since there is no netvar or anything for this as I could not find
 void Events::FireGameEvent(IGameEvent* event)
 {
 	if (!strcmp(event->getName(), XOR("player_footstep")))
@@ -30,8 +29,7 @@ void Events::FireGameEvent(IGameEvent* event)
 	}
 }
 
-void Events::shutdown()
+void Events::shutdown() const
 {
 	interfaces::eventManager->removeListener(&Events::g());
-
 }

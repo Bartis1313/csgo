@@ -6,7 +6,7 @@
 class Events : public IGameEventListener2, public singleton<Events>
 {
 public:
-	void init();
-	void shutdown();
-	void FireGameEvent(IGameEvent* event);
+	void init() const;
+	void shutdown() const;
+	void FireGameEvent(IGameEvent* event) override;
 };

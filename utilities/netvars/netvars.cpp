@@ -1,3 +1,4 @@
+#include <iomanip>
 #include "netvars.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 

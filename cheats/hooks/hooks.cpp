@@ -71,9 +71,7 @@ bool hooks::init()
 	if (const auto hk = MH_EnableHook(MH_ALL_HOOKS); hk != MH_OK)
 		throw std::runtime_error(XOR("MH_EnableHook hook error"));
 
-	CONSOLE_INFO();
-	LOG("[init] hooks initialized!\n");
-	CONSOLE_RESET();
+	LOG(LOG_INFO, "hooks initialized!\n");
 
 	return true;
 }

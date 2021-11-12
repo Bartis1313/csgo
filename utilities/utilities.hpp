@@ -2,7 +2,7 @@
 #include "../dependencies/lazy_importer.hpp"
 #include "../dependencies/xorstr.hpp"
 #include "console/console.hpp"
-#include <chrono>
+#include <string>
 
 #define SECURE
 
@@ -17,16 +17,7 @@
     #define XOR(s) (s)
 #endif
 
-#define IM_ARRAYSIZE(_ARR) ((int)(sizeof(_ARR)/sizeof(*_ARR)))
-template<typename... args_t>
-constexpr inline void LOG(const char* fmt, args_t... ca_list) {
-    console::log(fmt, ca_list...);
-}
-//#define LOG(s, ...) console::log(XOR(s), __VA_ARGS__)
-#define CONSOLE_INFO() console::setColor(CONSOLE_GREEN)
-#define CONSOLE_WELCOME() console::setColor(CONSOLE_CYAN)
-#define CONSOLE_ERR() console::setColor(CONSOLE_RED)
-#define CONSOLE_RESET() console::reset()
+inline void LOG(const short type, const std::string& str) { console::log(type, std::cref(str)); }
 
 namespace utilities
 {

@@ -1,3 +1,4 @@
+#include <format>
 #include "visuals.hpp"
 #include "../../menu/vars.hpp"
 #include "../../game.hpp"
@@ -35,14 +36,14 @@ inline Color healthBased(Player_t* ent)
 
 void Esp::draw()
 {
-	for (int i = 1; i < interfaces::engine->getMaxClients(); i++)
+	if (!game::localPlayer)
+		return;
+
+	for (int i = 1; i < interfaces::globalVars->m_maxClients; i++)
 	{
 		auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
 
 		if (!entity)
-			continue;
-
-		if (!game::localPlayer)
 			continue;
 
 		if (game::localPlayer == entity)
@@ -61,24 +62,6 @@ void Esp::draw()
 		if (entity)
 		{
 			drawPlayer(entity);
-		}
-
-		const auto cl = entity->clientClass();
-
-		if (!cl)
-			continue;
-
-		switch (cl->m_classID)
-		{
-		case CC4:
-			drawBombDropped(entity);
-			break;
-		case CPlantedC4:
-			drawBomb(entity);
-			break;
-		default:
-			drawProjectiles(entity);
-			break;
 		}
 	}
 }
@@ -368,7 +351,7 @@ void Esp::drawPlayer(Player_t* ent)
 		renderBox3D(ent, true);
 		break;
 	default:
-		return;
+		break;
 	}
 
 	Esp::drawHealth(ent, box);
@@ -407,7 +390,7 @@ void Esp::drawCrosshair()
 	Vector punch = {};
 
 	const auto crosshair = interfaces::console->FindVar(XOR("cl_crosshair_recoil"));
-	crosshair->setValue((vars::iCrosshair == ENGINE) ? true : false);
+	crosshair->setValue(vars::iCrosshair == ENGINE ? true : false);
 
 	switch (vars::iCrosshair)
 	{
@@ -706,7 +689,7 @@ void Esp::radar()
 	int centery = y - 110;
 	int size = 90;
 
-	/*render::drawTrapezFilled(Vector2D(centerx - size, centery - size), Vector2D(centerx + size, centery - size),
+	render::drawTrapezFilled(Vector2D(centerx - size, centery - size), Vector2D(centerx + size, centery - size),
 		Vector2D(centerx + size, centery + size), Vector2D(centerx - size, centery + size), Colors::Grey);
 
 	render::drawTrapezOutline(Vector2D(centerx - size - 1, centery - size - 1), Vector2D(centerx + size + 1, centery - size - 1),
@@ -716,7 +699,7 @@ void Esp::radar()
 	render::text(centerx - toAlign / 2, centery - size - 10, fonts::tahoma, "Radar", false, Colors::LightBlue);
 
 	render::drawFilledRect(centerx, centery - size, 1, 2 * size, Color(0, 0, 0, 120));
-	render::drawFilledRect(centerx - size, centery, 2 * size, 1, Color(0, 0, 0, 120));*/
+	render::drawFilledRect(centerx - size, centery, 2 * size, 1, Color(0, 0, 0, 120));
 
 	const auto myEye = game::localPlayer->getEyePos();
 	Vector ang = {};
@@ -729,13 +712,7 @@ void Esp::radar()
 		if (!ent)
 			continue;
 
-		if (!game::localPlayer)
-			continue;
-
 		if (ent->isDormant())
-			continue;
-
-		if (!ent->isPlayer())
 			continue;
 
 		if (ent == game::localPlayer)
@@ -789,7 +766,7 @@ void Esp::drawLocalInfo()
 		return;
 
 	render::text(1200, 20, fonts::tahoma, std::format("Map: {}", interfaces::engine->getLevelName()), false, Colors::Green);
-	render::text(1200, 30, fonts::tahoma, std::format("Weapon {} [{} / {}]", weapon->getWpnName().c_str(), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
+	render::text(1200, 30, fonts::tahoma, std::format("Weapon {} [{} / {}]", weapon->getWpnName(), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
 	render::text(1200, 40, fonts::tahoma, std::format("Current In-accuracy {:.2f}", weapon->getInaccuracy()), false, Colors::Yellow);
 	render::text(1200, 50, fonts::tahoma, std::format("Zoom level {}", weapon->m_zoomLevel()), false, Colors::Yellow);
 	render::text(1200, 60, fonts::tahoma, std::format("POS: x: {:.2f} y: {:.2f} z: {:.2f}", game::localPlayer->absOrigin().x, game::localPlayer->m_vecOrigin().y, game::localPlayer->m_vecOrigin().z), false, Colors::Yellow);

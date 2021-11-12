@@ -5,8 +5,92 @@
 
 static short index = 0;
 
+#ifndef _DEBUG
 void Menu::handleKeys(Item* set) const
 {
+	// let insert to be controlled 24/7, others only if menu is opened,
+	// TODO: add guards for debug detection since writing dummy cached is an overkill
+	if (LF(GetAsyncKeyState).cached()(VK_INSERT) & 1)
+	{
+		vars::bMenuOpen = !vars::bMenuOpen;
+		config::save();
+	}
+
+	if (!vars::bMenuOpen)
+		return;
+
+	if (LF(GetAsyncKeyState).cached()(VK_DOWN) & 1)
+	{
+		if (index != Item::count - 1)
+		{
+			index++;
+		}
+		else
+			index = 0;
+	}
+
+	if (LF(GetAsyncKeyState).cached()(VK_UP) & 1)
+	{
+		if (index != 0)
+		{
+			index--;
+		}
+		else
+			index = Item::count - 1;
+	}
+
+	if (LF(GetAsyncKeyState).cached()(VK_RIGHT) & 1)
+	{
+		if (set[index].isBoolOption())
+		{
+			set[index].changeBoolRef();
+			config::save();
+		}
+		if (set[index].isAddable())
+		{
+			set[index].chnageAddableRefp();
+			config::save();
+		}
+		if (set[index].isVectorOption())
+		{
+			set[index].chnageIntRefp();
+			config::save();
+		}
+	}
+
+	if (LF(GetAsyncKeyState).cached()(VK_LEFT) & 1)
+	{
+		if (set[index].isBoolOption())
+		{
+			set[index].changeBoolRef();
+			config::save();
+		}
+		if (set[index].isAddable())
+		{
+			set[index].chnageAddableRefm();
+			config::save();
+		}
+		if (set[index].isVectorOption())
+		{
+			set[index].chnageIntRefm();
+			config::save();
+		}
+	}
+}
+#else
+void Menu::handleKeys(Item* set) const
+{
+	// let insert to be controlled 24/7, others only if menu is opened,
+	// TODO: add guards for debug detection since writing dummy cached is an overkill
+	if (LF(GetAsyncKeyState)(VK_INSERT) & 1)
+	{
+		vars::bMenuOpen = !vars::bMenuOpen;
+		config::save();
+	}
+
+	if (!vars::bMenuOpen)
+		return;
+
 	if (LF(GetAsyncKeyState)(VK_DOWN) & 1)
 	{
 		if (index != Item::count - 1)
@@ -25,12 +109,6 @@ void Menu::handleKeys(Item* set) const
 		}
 		else
 			index = Item::count - 1;
-	}
-
-	if (LF(GetAsyncKeyState)(VK_INSERT) & 1)
-	{
-		vars::bMenuOpen = !vars::bMenuOpen;
-		config::save();
 	}
 
 	if (LF(GetAsyncKeyState)(VK_RIGHT) & 1)
@@ -71,11 +149,12 @@ void Menu::handleKeys(Item* set) const
 		}
 	}
 }
+#endif
 
 Color handleWhite(int id, int curridx) // so we know when to show darker
 {
 	if (id == curridx)
-		return Color(128, 128, 128, 128);
+		return Colors::Grey;
 	return Colors::White;
 }
 

@@ -2,14 +2,14 @@
 #include <DbgHelp.h>
 #include <WIndows.h>
 #include "utilities/utilities.hpp"
-#pragma comment(lib, "libMinHook.x86.lib")
 
+// 0x{:X} used because there is no actual syntax for 0xF450 printing for example, it's either like 0xf450 or 0XF450
 
 #define TRACE_MAX_STACK_FRAMES 1024
 #define TRACE_MAX_FUNCTION_NAME_LENGTH 1024
 //#define SYSTEM_FRAMES_TO_SKIP 4
 
-void printStack(void)
+void printStack()
 {
 	void* stack[TRACE_MAX_FUNCTION_NAME_LENGTH];
 	const auto process = LF(GetCurrentProcess)();
@@ -31,7 +31,7 @@ void printStack(void)
 #else
 		SymFromAddr(process, (DWORD64)(stack[i]), 0, symbol);
 #endif
-		LOG("%i: %s - 0x%0p\n", frames - i - 1, symbol->Name, symbol->Address);
+		LOG(LOG_NO, std::format(XOR("{}: {} - 0x{:X}\n"), frames - i - 1, symbol->Name, symbol->Address));
 	}
 
 	free(symbol);
@@ -82,30 +82,31 @@ LONG WINAPI memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 #else
 				SymInitialize(process, NULL, TRUE);
 #endif
-				char log[1024] = {};
+				std::stringstream ss;
 
 				const auto addr = pExceptionInfo->ExceptionRecord->ExceptionAddress;
 				const auto name = symbol->Name;
 				const auto flag = pExceptionInfo->ExceptionRecord->ExceptionFlags;
 				const auto params = pExceptionInfo->ExceptionRecord->NumberParameters;
 
-				sprintf_s(log, XOR("Exception (fatal) %s at address %p (%s), flags - %i, params - %i\n"), crashNames[code], addr, name, flag, params);
+				ss << std::format(XOR("Exception (fatal) {} at address {} ({}), flags - {}, params - {}\n"), crashNames[code], addr, name, flag, params);
 				// x86
-				LOG("EAX - %p\n", pExceptionInfo->ContextRecord->Eax);
-				LOG("EBP - %p\n", pExceptionInfo->ContextRecord->Ebp);
-				LOG("EBX - %p\n", pExceptionInfo->ContextRecord->Ebx);
-				LOG("ECX - %p\n", pExceptionInfo->ContextRecord->Ecx);
-				LOG("EDI - %p\n", pExceptionInfo->ContextRecord->Edi);
-				LOG("EDX - %p\n", pExceptionInfo->ContextRecord->Edx);
-				LOG("EIP - %p\n", pExceptionInfo->ContextRecord->Eip);
-				LOG("ESI - %p\n", pExceptionInfo->ContextRecord->Esi);
-				LOG("ESP - %p\n", pExceptionInfo->ContextRecord->Esp);
+				LOG(LOG_NO, std::format(XOR("EAX - 0x{:X}\n"), pExceptionInfo->ContextRecord->Eax));
+				LOG(LOG_NO, std::format(XOR("EBP - 0x{:X}\n"), pExceptionInfo->ContextRecord->Ebp));
+				LOG(LOG_NO, std::format(XOR("EBX - 0x{:X}\n"), pExceptionInfo->ContextRecord->Ebx));
+				LOG(LOG_NO, std::format(XOR("ECX - 0x{:X}\n"), pExceptionInfo->ContextRecord->Ecx));
+				LOG(LOG_NO, std::format(XOR("EDI - 0x{:X}\n"), pExceptionInfo->ContextRecord->Edi));
+				LOG(LOG_NO, std::format(XOR("EDX - 0x{:X}\n"), pExceptionInfo->ContextRecord->Edx));
+				LOG(LOG_NO, std::format(XOR("EIP - 0x{:X}\n"), pExceptionInfo->ContextRecord->Eip));
+				LOG(LOG_NO, std::format(XOR("ESI - 0x{:X}\n"), pExceptionInfo->ContextRecord->Esi));
+				LOG(LOG_NO, std::format(XOR("ESP - 0x{:X}\n"), pExceptionInfo->ContextRecord->Esp));
 
-				LOG("%s", log);
+				LOG(LOG_NO, ss.str());
 				printStack();
-				LF(MessageBoxA)(nullptr, log, XOR("Fatal error!"), MB_ICONERROR | MB_OK);
+				LF(MessageBoxA)(nullptr, ss.str().c_str(), XOR("Fatal error!"), MB_ICONERROR | MB_OK);
 				bOnce = true;
 				free(symbol);
+				ss.clear();
 
 				return true;
 			} ();

@@ -67,7 +67,7 @@ namespace vars
 		Item{ "Local Info", &bShowInfo }, // 17
 		Item{ "Draw Flags", &bShowFlags }, // 18
 		Item{ "Draw Infos", &bDrawInfos }, // 19
-		Item{ "Skeleton", &bDrawSkeleton}, // 20
+		Item{ "Skeleton", &bDrawSkeleton }, // 20
 		Item{ "BT Chams", &iBacktrackChams, {"OFF", "Stable", "Last tick", "Rainbow"} }, // 21
 	};
 	// additionally to move very smoothly by names you can use: 

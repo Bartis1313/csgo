@@ -32,9 +32,7 @@ bool interfaces::init()
 	input = *reinterpret_cast<Input**>((*reinterpret_cast<uintptr_t**>(client))[16] + 0x1);
 	resource = *reinterpret_cast<PlayerResource***>(utilities::patternScan(CLIENT_DLL, PLAYER_RESOURCE) + 0x2);
 
-	CONSOLE_INFO();	
-	LOG("[init] interfaces success\n");
-	CONSOLE_RESET();
+	LOG(LOG_INFO, "interfaces success\n");
 
 	return true;
 }

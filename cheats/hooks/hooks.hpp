@@ -1,6 +1,6 @@
 #pragma once
 #include "../../SDK/interfaces/interfaces.hpp"
-#include "../../dependencies/minhook.h"
+#include "../../dependencies/minhook/Minhook.h"
 
 enum hookIndexes
 {

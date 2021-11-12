@@ -48,7 +48,7 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST VOID* rese
 	{
 	case DLL_PROCESS_ATTACH:
 	{
-		if (auto handle = LF(CreateThread)(nullptr, NULL, init, instance, NULL, nullptr))
+		if (const auto handle = LF(CreateThread)(nullptr, NULL, init, instance, NULL, nullptr))
 			LF(CloseHandle)(handle);
 
 		break;
@@ -56,7 +56,6 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST VOID* rese
 
 	case DLL_PROCESS_DETACH:
 	{
-
 		shutdown();
 		break;
 	}

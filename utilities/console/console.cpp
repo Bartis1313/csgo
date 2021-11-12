@@ -1,7 +1,30 @@
 #include "console.hpp"
+#include <iostream>
 #include <fstream>
 #include <sstream>
+#include <format>
+#include <map>
 #include "../utilities.hpp"
+
+enum consoleColors
+{
+	CONSOLE_WHITE = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE, // white on top applies here too, you did not understand this
+	CONSOLE_BLACK = 0,
+	CONSOLE_DARKBLUE = FOREGROUND_BLUE,
+	CONSOLE_DARKGREEN = FOREGROUND_GREEN,
+	CONSOLE_DARKCYAN = FOREGROUND_GREEN | FOREGROUND_BLUE,
+	CONSOLE_DARKRED = FOREGROUND_RED,
+	CONSOLE_DARKMAGENTA = FOREGROUND_RED | FOREGROUND_BLUE,
+	CONSOLE_DARKYELLOW = FOREGROUND_RED | FOREGROUND_GREEN,
+	CONSOLE_DARKGRAY = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
+	CONSOLE_GRAY = FOREGROUND_INTENSITY,
+	CONSOLE_BLUE = FOREGROUND_INTENSITY | FOREGROUND_BLUE,
+	CONSOLE_GREEN = FOREGROUND_INTENSITY | FOREGROUND_GREEN,
+	CONSOLE_CYAN = FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE,
+	CONSOLE_RED = FOREGROUND_INTENSITY | FOREGROUND_RED,
+	CONSOLE_MAGENTA = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
+	CONSOLE_YELLOW = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN,
+};
 
 void console::setColor(WORD color)
 {
@@ -50,32 +73,43 @@ void console::shutdown()
 	return;
 }
 
-// redo this with std::format, simple and better
-void console::log(const char* fmt, ...)
+static std::map<short, WORD> colors =
 {
-	if (!fmt)
+	{LOG_NO, CONSOLE_WHITE},
+	{LOG_INFO, CONSOLE_GREEN},
+	{LOG_WELCOME, CONSOLE_CYAN},
+	{LOG_ERR, CONSOLE_RED}
+};
+
+// I have no idea how to name variables sometimes
+static std::map<short, const char*> consoleStrings =
+{
+	{LOG_NO, ""},
+	{LOG_INFO, "[info] "},
+	{LOG_WELCOME, "[welcome] "},
+	{LOG_ERR, "[err] "}
+};
+
+void console::log(const short type, const std::string& str)
+{
+	if (str.empty())
 		return;
-
-	if (strlen(fmt) < 2)
-		return;
-
-	char buf[256]{};
-
-	va_list args;
-	va_start(args, fmt);
-
-	vsnprintf(buf, IM_ARRAYSIZE(buf), fmt, args);
-
-	buf[IM_ARRAYSIZE(buf) - 1] = 0;
-	va_end(args);
+	
 	std::ofstream log(__PATH + XOR("\\hack.log"), std::ofstream::out | std::ofstream::app);
 	std::stringstream ss;
-	ss << "[" << utilities::getTime().c_str() << "] " << buf;
 
-	log << ss.str();
+#ifdef _DEBUG
+	console::setColor(colors[type]);
+	std::cout << consoleStrings[type];
+	console::reset();
+#endif	
+
+	ss << "[" << utilities::getTime() << "] " << str;
+
+	log << consoleStrings[type] << ss.str();
 	log.close();
 #ifdef _DEBUG
-	printf("%s", ss.str().c_str());
+	std::cout << ss.str();
 #endif
 	ss.clear();
 	return;	
