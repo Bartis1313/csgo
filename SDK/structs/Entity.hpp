@@ -146,9 +146,9 @@ public:
 	_NODISCARD Vector getBonePosition(int id);
 	_NODISCARD bool isC4Owner();
 	_NODISCARD std::string getName();
-	_NODISCARD int getKills(int id);
-	_NODISCARD int getDeaths(int id);
-	_NODISCARD int getPing(int id);
+	_NODISCARD int getKills();
+	_NODISCARD int getDeaths();
+	_NODISCARD int getPing();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

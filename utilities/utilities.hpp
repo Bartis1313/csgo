@@ -29,7 +29,7 @@ namespace utilities
 
     std::string getTime();
 
-	uintptr_t patternScan(const char* mod, const char* mask);
+    uintptr_t patternScan(const char* mod, const char* mask);
 
     // TODO: make it in verctor class later
     inline float distToMeters(float dist) { return dist * 0.0254f; }

@@ -215,7 +215,7 @@ std::string Player_t::getName()
 	return info.name;
 }
 
-int Player_t::getKills(int id)
+int Player_t::getKills()
 {
 	auto res = *interfaces::resource;
 	if (res)
@@ -226,7 +226,7 @@ int Player_t::getKills(int id)
 	return 0;
 }
 
-int Player_t::getDeaths(int id)
+int Player_t::getDeaths()
 {
 	auto res = *interfaces::resource;
 	if (res)
@@ -237,7 +237,7 @@ int Player_t::getDeaths(int id)
 	return 0;
 }
 
-int Player_t::getPing(int id)
+int Player_t::getPing()
 {
 	auto res = *interfaces::resource;
 	if (res)
