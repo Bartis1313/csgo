@@ -47,7 +47,7 @@ namespace utilities
 	{
 		auto m_mask = mask;
 		uintptr_t first = 0;
-		
+
 		MODULEINFO modInfo;
 #ifndef _DEBUG
 		LF(K32GetModuleInformation).cached()(LF(GetCurrentProcess).cached()(), LF(GetModuleHandleA).cached()(mod), &modInfo, sizeof(MODULEINFO));

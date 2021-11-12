@@ -105,7 +105,8 @@ namespace chams
 								if (backtrack::isValid(record->at(i).simTime))
 								{
 									Rainbow color;
-									ovverride(true, false, color.drawRainbow(interfaces::globalVars->m_frametime, 0.70f, 0.8f, 0.01f));
+									// fine effect: (float)i / (float)size as saturation arg
+									ovverride(true, false, color.drawRainbow(interfaces::globalVars->m_frametime, 0.7f, 0.8f, 0.01f));
 									CALL(ctx, state, info, record->at(i).matrix);
 								}
 							}

@@ -52,6 +52,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.0.5 - cleaned up the source in visuals and render. Added new player visuals. Fixed padding in one SDK class, added skeleton ESP. In utils there is a new conventer function which you can very easily use to get distance to enemy in meters (unit to meters)
 * 1.0.6 - small update with removing fps drops while menu is opened
 * 1.0.7 - big update for performance and cleanup in code, a lot of useless defines have been removed. Changed console::log function to take only one string and log type, string can be easily used with std::format
+* 1.0.8 - small update with making menu usage more easier, items are now in map and features can be passed as name for vars::names map
 </details>
 
 # People who helped

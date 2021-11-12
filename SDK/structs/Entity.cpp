@@ -164,7 +164,7 @@ void Player_t::setAbsOrigin(const Vector& origin)
 {
 	using fn = void(__thiscall*)(void*, const Vector&);
 	static auto setabs = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, SETABSORIGIN));
-	setabs(this, origin);
+	setabs(this, std::cref(origin));
 }
 
 Weapon_t* Player_t::getActiveWeapon()

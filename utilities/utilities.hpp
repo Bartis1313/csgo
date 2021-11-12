@@ -21,11 +21,11 @@ inline void LOG(const short type, const std::string& str) { console::log(type, s
 
 namespace utilities
 {
-	std::string getFolder();
+    std::string getFolder();
 
-	bool prepareDirectories();
+    bool prepareDirectories();
 
-	std::string getHackPath();
+    std::string getHackPath();
 
     std::string getTime();
 

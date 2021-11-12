@@ -163,22 +163,28 @@ void Menu::drawText(int x, int y, Color color, const std::string& text)
 	render::text(x, y, fonts::tahoma, std::cref(text), false, color);
 }
 
-void Menu::drawBool(int idx, int x, int y)
+void Menu::drawBool(int idx, int x, int& y)
 {
 	drawText(x, y, handleWhite(idx, index), settings[idx].getName());
 	drawText(x + 100, y, (settings[idx].getBool()) ? Colors::LightBlue : Colors::White, (settings[idx].getBool()) ? "ON" : "OFF");
+
+	y += 15;
 }
 
-void Menu::drawInt(int idx, int x, int y)
+void Menu::drawInt(int idx, int x, int& y)
 {
 	drawText(x, y, handleWhite(idx, index), settings[idx].getName());
 	drawText(x + 100, y, Colors::White, std::to_string(settings[idx].getInt()));
+
+	y += 15;
 }
 
-void Menu::drawVec(int idx, int x, int y)
+void Menu::drawVec(int idx, int x, int& y)
 {
 	drawText(x, y, handleWhite(idx, index), settings[idx].getName());
 	drawText(x + 100, y, (settings[idx].getInt() != 0) ? Colors::LightBlue : Colors::White, settings[idx].getVec().at(settings[idx].getInt()));
+
+	y += 15;
 }
 
 void Menu::draw()
@@ -192,32 +198,34 @@ void Menu::draw()
 	// this is on the left, garbage scaling
 	// TODO: some proper, fast and easy scaling with using cvar hudscale iirc
 	int width = x * 0.16f;
+	int height = 15;
 
 	// must have something unique to catch index selected
 	// practise with static index for menu is just not good,
 	// maybe you want selected index option
-	drawBool(0, width, 15);
-	drawVec(1, width, 30);
-	drawVec(2, width, 45);
-	drawBool(3, width, 60);
-	drawBool(4, width, 75);
-	drawInt(5, width, 90);
-	drawBool(6, width, 105);
-	drawVec(7, width, 120);
-	drawInt(8, width, 135);
-	drawInt(9, width, 150);
-	drawInt(10, width, 165);
-	drawVec(11, width, 180);
-	drawBool(12, width, 195);
-	drawInt(13, width, 210);
-	drawBool(14, width, 225);
-	drawInt(15, width, 240);
+	drawBool(vars::names["bunnyhop"], width, height);
+	drawVec(vars::names["chams"], width, height);
+	drawVec(vars::names["esp"], width, height);
+	drawBool(vars::names["glow"], width, height);
+	drawBool(vars::names["soundesp"], width, height);
+	drawInt(vars::names["fov"], width, height);
+	drawBool(vars::names["thirdp"], width, height);
+	drawVec(vars::names["aimbot"], width, height);
+	drawInt(vars::names["aimbot_fov"], width, height);
+	drawInt(vars::names["smooth"], width, height);
+	drawInt(vars::names["rcs"], width, height);
+	drawVec(vars::names["xhair"], width, height);
+	drawBool(vars::names["triggerbot"], width, height);
+	drawInt(vars::names["triggerbot_delay"], width, height);
+	drawBool(vars::names["backtrack"], width, height);
+	drawInt(vars::names["backtrack_ms"], width, height);
 
 	width = x * 0.26f;
-	drawBool(16, width, 15);
-	drawBool(17, width, 30);
-	drawBool(18, width, 45);
-	drawBool(19, width, 60);
-	drawBool(20, width, 75);
-	drawVec(21, width, 90);
+	height = 15;
+	drawBool(vars::names["radar"], width, height);
+	drawBool(vars::names["local_info"], width, height);
+	drawBool(vars::names["esp_flags"], width, height);
+	drawBool(vars::names["esp_info"], width, height);
+	drawBool(vars::names["esp_skeleton"], width, height);
+	drawVec(vars::names["bt_chams"], width, height);
 }

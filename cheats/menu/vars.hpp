@@ -1,6 +1,6 @@
 #pragma once
 #include "Item.hpp"
-//#include <map>
+#include <map>
 
 namespace vars
 {
@@ -70,14 +70,30 @@ namespace vars
 		Item{ "Skeleton", &bDrawSkeleton }, // 20
 		Item{ "BT Chams", &iBacktrackChams, {"OFF", "Stable", "Last tick", "Rainbow"} }, // 21
 	};
-	// additionally to move very smoothly by names you can use: 
-	// you can aswell use int for index, will be good for my draw method
-	//std::map<std::string, Item> featuresNames =
-	//{
-	//	{"Bunnyhop", options[0]},
-	//	// and so on ...
-	//};
-
-	//// to call it easily: 
-	//auto b = featuresNames["bunnyhop"];
+	
+	inline std::map<std::string, int> names =
+	{
+		{"bunnyhop", 0},
+		{"chams", 1},
+		{"esp", 2},
+		{"glow", 3},
+		{"soundesp", 4},
+		{"fov", 5},
+		{"thirdp", 6},
+		{"aimbot", 7},
+		{"aimbot_fov", 8},
+		{"smooth", 9},
+		{"rcs", 10},
+		{"xhair", 11},
+		{"triggerbot", 12},
+		{"triggerbot_delay", 13},
+		{"backtrack", 14},
+		{"backtrack_ms", 15},
+		{"radar", 16},
+		{"local_info", 17},
+		{"esp_flags", 18},
+		{"esp_info", 19},
+		{"esp_skeleton", 20},
+		{"bt_chams", 21}
+	};
 };
