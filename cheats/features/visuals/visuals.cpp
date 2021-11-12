@@ -62,6 +62,59 @@ void Esp::draw()
 		if (entity)
 		{
 			drawPlayer(entity);
+
+			const auto cl = entity->clientClass();
+
+			if (!cl)
+				continue;
+
+			switch (cl->m_classID)
+			{
+			case CC4:
+				drawBombDropped(entity);
+				break;
+			case CPlantedC4:
+				drawBomb(entity);
+				break;
+			default:
+				drawProjectiles(entity);
+				break;
+			}
+		}
+	}
+}
+
+void Esp::drawMisc()
+{
+	for (int i = 1; i < interfaces::entList->getHighestIndex(); i++)
+	{
+		auto entity = reinterpret_cast<Entity_t*>(interfaces::entList->getClientEntity(i));
+
+		if (!entity)
+			continue;
+
+		if (entity->isDormant())
+			continue;
+
+		if (entity->isPlayer())
+			continue;
+
+		const auto cl = entity->clientClass();
+
+		if (!cl)
+			continue;
+
+		switch (cl->m_classID)
+		{
+		case CC4:
+			drawBombDropped(entity);
+			break;
+		case CPlantedC4:
+			drawBomb(entity);
+			break;
+		default:
+			drawProjectiles(entity);
+			break;
 		}
 	}
 }
@@ -439,9 +492,6 @@ void Esp::drawCrosshair()
 
 void Esp::drawBombDropped(Entity_t* ent)
 {
-	if (!vars::bShowFlags)
-		return;
-
 	auto ownerHandle = ent->m_hOwnerEntity();
 	auto ownerEntity = interfaces::entList->getClientFromHandle(ownerHandle);
 
@@ -489,9 +539,6 @@ inline bool Esp::isNade(const int classid)
 
 void Esp::drawProjectiles(Entity_t* ent)
 {
-	if (!vars::bShowFlags)
-		return;
-
 	auto cl = ent->clientClass();
 
 	if (!cl)
@@ -631,13 +678,13 @@ void Esp::drawSound(IGameEvent* event)
 static constexpr auto dotThickness = 5;
 static constexpr auto dotRad = 20.0f;
 
-Vector2D Esp::entToRadar(Vector eye, Vector angles, Vector EntityPos, Vector2D pos, Vector2D size, float scale, bool& check)
+Vector2D Esp::entToRadar(Vector eye, Vector angles, Vector entPos, Vector2D pos, Vector2D size, float scale, bool& check)
 {
 	float directionX, directionY;
 	float dotX, dotY;
 
-	directionX = -(EntityPos.y - eye.y);
-	directionY = EntityPos.x - eye.x;
+	directionX = -(entPos.y - eye.y);
+	directionY = entPos.x - eye.x;
 
 	auto yawDeg = angles.y - 90.0f;
 	// calculate dots of radian and return correct view

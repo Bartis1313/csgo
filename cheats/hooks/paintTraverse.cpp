@@ -14,6 +14,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		Menu::g().draw();
 		Menu::g().handleKeys(vars::options);
 		Esp::draw();
+		Esp::drawMisc();
 		Esp::radar();
 		Esp::drawCrosshair();
 		Esp::drawLocalInfo();
