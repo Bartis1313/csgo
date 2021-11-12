@@ -4,9 +4,9 @@
 namespace game
 {
 	inline Player_t* localPlayer = nullptr;
-	[[nodiscard]] bool isAvailable();
+	_NODISCARD bool isAvailable();
 	float serverTime(CUserCmd* cmd = nullptr);
-	[[nodiscard]] int getLocalKills();
-	[[nodiscard]] int getLocalDeaths();
-	[[nodiscard]] int getLocalPing();
+	_NODISCARD int getLocalKills();
+	_NODISCARD int getLocalDeaths();
+	_NODISCARD int getLocalPing();
 }

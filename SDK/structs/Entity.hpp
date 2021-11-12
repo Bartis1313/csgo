@@ -52,8 +52,8 @@ public:
 	VFUNC(int, drawModel, 9, (int flags, uint8_t alpha), (this + 0x4, flags, alpha));
 	VFUNC(bool, isDormant, 9, (), (this + 0x8));
 
-	[[nodiscard]] Vector getAimPunch();
-	[[nodiscard]] matrix3x4_t& m_rgflCoordinateFrame();
+	_NODISCARD Vector getAimPunch();
+	_NODISCARD matrix3x4_t& m_rgflCoordinateFrame();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -87,17 +87,17 @@ public:
 	VFUNC(float, getSpread, SPREAD, (), (this));
 	VFUNC(WeaponInfo*, getWpnInfo, WEAPONINFO, (), (this))
 
-	[[nodiscard]]  std::string getWpnName();
+	_NODISCARD std::string getWpnName();
 
-	[[nodiscard]] bool isEmpty() { return m_iClip1() <= 0; }
-	[[nodiscard]] bool isRifle();
-	[[nodiscard]] bool isSmg();
-	[[nodiscard]] bool isShotgun();
-	[[nodiscard]] bool isPistol();
-	[[nodiscard]] bool isSniper();
-	[[nodiscard]] bool isGrenade();
-	[[nodiscard]] bool isKnife();
-	[[nodiscard]] bool isNonAimable();
+	_NODISCARD bool isEmpty() { return m_iClip1() <= 0; }
+	_NODISCARD bool isRifle();
+	_NODISCARD bool isSmg();
+	_NODISCARD bool isShotgun();
+	_NODISCARD bool isPistol();
+	_NODISCARD bool isSniper();
+	_NODISCARD bool isGrenade();
+	_NODISCARD bool isKnife();
+	_NODISCARD bool isNonAimable();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,19 +136,19 @@ public:
 	NETVAR(int, m_hActiveWeapon,"DT_CSPlayer", "m_hActiveWeapon");
 
 	void setAbsOrigin(const Vector& origin);
-	[[nodiscard]] Weapon_t* getActiveWeapon();
-	[[nodiscard]] Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); } // there is some vtable iirc, but this is safer when it comes with updates
-	[[nodiscard]] bool isAlive() { return m_iHealth() > 0; }
-	[[nodiscard]] bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
-	[[nodiscard]] bool IsValid() { return (isAlive() && !isDormant()); }
+	_NODISCARD Weapon_t* getActiveWeapon();
+	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); } // there is some vtable iirc, but this is safer when it comes with updates
+	_NODISCARD bool isAlive() { return m_iHealth() > 0; }
+	_NODISCARD bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
+	_NODISCARD bool IsValid() { return (isAlive() && !isDormant()); }
 
-	[[nodiscard]] Vector getHitboxPos(int id);
-	[[nodiscard]] Vector getBonePosition(int id);
-	[[nodiscard]] bool isC4Owner();
-	[[nodiscard]] std::string getName();
-	[[nodiscard]] int getKills(int id);
-	[[nodiscard]] int getDeaths(int id);
-	[[nodiscard]] int getPing(int id);
+	_NODISCARD Vector getHitboxPos(int id);
+	_NODISCARD Vector getBonePosition(int id);
+	_NODISCARD bool isC4Owner();
+	_NODISCARD std::string getName();
+	_NODISCARD int getKills(int id);
+	_NODISCARD int getDeaths(int id);
+	_NODISCARD int getPing(int id);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

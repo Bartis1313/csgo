@@ -9,29 +9,29 @@
 
 // generate netvar, easy to find in client.dll
 #define NETVAR(type, name, table, prop) \
-[[nodiscard]] type& name() { \
-      static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
-      return *reinterpret_cast<type*>((uintptr_t)this + offset ); \
+_NODISCARD type& name() { \
+	static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
+	return *reinterpret_cast<type*>((uintptr_t)this + offset ); \
     }
 
 // generate netvar, but address as the pointer
 #define PTRNETVAR(type, name, table, prop) \
-[[nodiscard]] type* name() { \
-      static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
-      return reinterpret_cast<type*>((uintptr_t)this + offset); \
+_NODISCARD type* name() { \
+	static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
+	return reinterpret_cast<type*>((uintptr_t)this + offset); \
     }
 
 // define literal offset
 #define OFFSET(type, name, offset) \
-[[nodiscard]] type& name() { \
-		return *reinterpret_cast<type*>((uintptr_t)this + offset); \
+_NODISCARD type& name() { \
+	return *reinterpret_cast<type*>((uintptr_t)this + offset); \
 	}
 
 // use like normal netvar, with bytes to add as last argument
 #define NETVAR_ADDR(type, name, table, prop, addr) \
-[[nodiscard]] type& name() { \
-		static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
-		return *reinterpret_cast<type*>((uintptr_t)this + offset + addr); \
+_NODISCARD type& name() { \
+	static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
+	return *reinterpret_cast<type*>((uintptr_t)this + offset + addr); \
 	}
 
 class NetvarManager : public singleton<NetvarManager>
