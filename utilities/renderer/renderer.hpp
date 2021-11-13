@@ -35,10 +35,9 @@ namespace render
 	void drawPolygonOutline(const int count, Vertex_t* verts, Color color);
 	void text(const int x, const int y, const unsigned long font, const wchar_t *text, const bool centered, Color color);
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, Color color);
-	[[deprecated("use render::text with std::format instead")]]
 	void textf(const int x, const int y, const unsigned long font, const bool centered, Color color, const char* fmt, ...);
 
-	void drawBox3D(Vector* box, const Color& color, bool filled = false);
+	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
 
 	// get text size, it responses for esp distance format and more options
 	int getTextSize(unsigned long font, const std::string& text);

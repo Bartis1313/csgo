@@ -1,6 +1,6 @@
 #pragma once
 
-// 01:49 08.11.2021
+// 17:09 13.11.2021
 // Bartis: updated
 
 enum VTableIndexes
@@ -25,7 +25,7 @@ enum VTableIndexes
 #define STUDIORENDER_DLL	XOR("studiorender.dll")
 
 #define GLOWMANAGER				XOR("0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00")
-#define BEAMS					XOR("B9 ?? ?? ?? ?? A1 ?? ?? ?? ?? FF 10 A1 ?? ?? ?? ?? B9")
+#define BEAMS					XOR("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")
 #define MOVEHELPER				XOR("8B 0D ? ? ? ? 8B 45 ? 51 8B D4 89 02 8B 01")
 #define PREDICTIONRANDOMSEED	XOR("8B 0D ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 83 C4 04")
 #define SETABSANGLES			XOR("55 8B EC 83 E4 F8 83 EC 64 53 56 57 8B F1 E8")

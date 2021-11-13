@@ -1,6 +1,9 @@
 #include "renderer.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 
+#define STRING2(x) #x
+#define STRING(x) STRING2(x)
+
 enum FontFlags
 {
 	FONTFLAG_NONE,
@@ -206,6 +209,8 @@ namespace render
 
 	void textf(const int x, const int y, const unsigned long font, const bool centered, Color color, const char* fmt, ...)
 	{
+#pragma message ("use render::text with std::format rather than render::textf if possible, line: " STRING(__LINE__) " in: " __FUNCTION__)
+
 		if (!fmt)
 			return;
 
@@ -271,32 +276,32 @@ namespace render
 
 	*/
 
-	void drawBox3D(Vector* box, const Color& color, bool filled)
+	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled)
 	{
-		const unsigned int SIZE = 8;
+		constexpr unsigned int SIZE = 8;
 		// transormed points to get pos.x/.y
-		Vector points[SIZE] = {};
+		std::array<Vector, SIZE> points = {};
 
-		if (WorldToScreen(box[0], points[0]) &&
-			WorldToScreen(box[1], points[1]) &&
-			WorldToScreen(box[2], points[2]) &&
-			WorldToScreen(box[3], points[3]) &&
-			WorldToScreen(box[4], points[4]) &&
-			WorldToScreen(box[5], points[5]) &&
-			WorldToScreen(box[6], points[6]) &&
-			WorldToScreen(box[7], points[7]))
+		static bool check = true;
+		for (size_t i = 0; i < box.size(); i++)
+		{
+			if(!WorldToScreen(box.at(i), points.at(i)))
+				check = false;
+		}
+
+		if (check)
 		{
 			// anything with low alpha
 			Color fill{ color.r(), color.g(), color.b(), 30 };
 
 			// lines to draw
-			Vector2D lines[SIZE] = {};
-			for (int i = 0; i < SIZE; i++)
+			std::array<Vector2D, SIZE> lines = {};
+			for (size_t i = 0; i < SIZE; i++)
 			{
-				lines[i] = { points[i].x, points[i].y };
+				lines.at(i) = { points.at(i).x, points.at(i).y };
 
 #ifdef DEBUG_RENDER
-				textf(lines[i].x, lines[i].y, fonts::tahoma, false, Color(100, 20, 100, 255), "[%i] posX: %0.2f, posY: %0.2f", i, lines[i].x, lines[i].y);
+				textf(lines.at(i).x, lines.at(i).y, fonts::tahoma, false, Color(100, 20, 100, 255), "[%i] posX: %0.2f, posY: %0.2f", i, lines.at(i).x, lines.at(i).y);
 #endif // DEBUG_RENDER
 			}
 			// first fill then draw lines
@@ -304,73 +309,73 @@ namespace render
 			{
 #ifdef TRIANGLE_METHOD
 				// bottom
-				drawTriangle(lines[0], lines[1], lines[2], fill);
-				drawTriangle(lines[2], lines[0], lines[3], fill);
+				drawTriangle(lines.at(0), lines.at(1), lines.at(2), fill);
+				drawTriangle(lines.at(2), lines.at(0), lines.at(3), fill);
 				// top
-				drawTriangle(lines[4], lines[5], lines[6], fill);
-				drawTriangle(lines[6], lines[4], lines[7], fill);
+				drawTriangle(lines.at(4), lines.at(5), lines.at(6), fill);
+				drawTriangle(lines.at(6), lines.at(4), lines.at(7), fill);
 
 				for (int i = 0; i < 3; i++)
 				{
-					drawTriangle(lines[i], lines[i + 1], lines[i + 4], fill);
-					drawTriangle(lines[i + 4], lines[i + 5], lines[i + 1], fill);
+					drawTriangle(lines.at(i), lines.at(i + 1), lines.at(i + 4), fill);
+					drawTriangle(lines.at(i + 4), lines.at(i + 5), lines.at(i + 1), fill);
 				}
 				// manually render left 
-				drawTriangle(lines[3], lines[4], lines[7], fill);
-				drawTriangle(lines[0], lines[3], lines[4], fill);
+				drawTriangle(lines.at(3), lines.at(4), lines.at(7), fill);
+				drawTriangle(lines.at(0), lines.at(3), lines.at(4), fill);
 #endif // TRIANGLE_METHOD
 
 #ifdef POLYGON_METHOD			 
 				// bottom
-				drawTrapezFilled(lines[0], lines[1], lines[2], lines[3], fill);
+				drawTrapezFilled(lines.at(0), lines.at(1), lines.at(2), lines.at(3), fill);
 				// top
-				drawTrapezFilled(lines[4], lines[5], lines[6], lines[7], fill);
+				drawTrapezFilled(lines.at(4), lines.at(5), lines.at(6), lines.at(7), fill);
 				// front
-				drawTrapezFilled(lines[3], lines[2], lines[6], lines[7], fill);
+				drawTrapezFilled(lines.at(3), lines.at(2), lines.at(6), lines.at(7), fill);
 				// back
-				drawTrapezFilled(lines[0], lines[1], lines[5], lines[4], fill);
+				drawTrapezFilled(lines.at(0), lines.at(1), lines.at(5), lines.at(4), fill);
 				// right
-				drawTrapezFilled(lines[2], lines[1], lines[5], lines[6], fill);
+				drawTrapezFilled(lines.at(2), lines.at(1), lines.at(5), lines.at(6), fill);
 				// left
-				drawTrapezFilled(lines[3], lines[0], lines[4], lines[7], fill);
+				drawTrapezFilled(lines.at(3), lines.at(0), lines.at(4), lines.at(7), fill);
 #endif // POLYGON_METHOD
 			}
 #ifdef CLASSIC_LINE
 			// bottom parts
 			for (int i = 0; i < 3; i++)
 			{
-				drawLine(lines[i], lines[i + 1], color);
+				drawLine(lines.at(i), lines.at(i + 1), color);
 			}
 			// missing part at the bottom
-			drawLine(lines[0], lines[3], color);
+			drawLine(lines.at(0), lines.at(3), color);
 			// top parts
 			for (int i = 4; i < 7; i++)
 			{
-				drawLine(lines[i], lines[i + 1], color);
+				drawLine(lines.at(i), lines.at(i + 1), color);
 			}
 			// missing part at the top
-			drawLine(lines[4], lines[7], color);
+			drawLine(lines.at(4), lines.at(7), color);
 
 			// now all 4 lines missing parts for 3d box
 			for (int i = 0; i < 4; i++)
 			{
-				drawLine(lines[i], lines[i + 4], color);
+				drawLine(lines.at(i), lines.at(i + 4), color);
 			}
 #endif // CLASSIC_LINE
 
 #ifdef POLYGON_METHOD
 			// bottom
-			drawTrapezOutline(lines[0], lines[1], lines[2], lines[3], color);
+			drawTrapezOutline(lines.at(0), lines.at(1), lines.at(2), lines.at(3), fill);
 			// top
-			drawTrapezOutline(lines[4], lines[5], lines[6], lines[7], color);
+			drawTrapezOutline(lines.at(4), lines.at(5), lines.at(6), lines.at(7), fill);
 			// front
-			drawTrapezOutline(lines[3], lines[2], lines[6], lines[7], color);
+			drawTrapezOutline(lines.at(3), lines.at(2), lines.at(6), lines.at(7), fill);
 			// back
-			drawTrapezOutline(lines[0], lines[1], lines[5], lines[4], color);
+			drawTrapezOutline(lines.at(0), lines.at(1), lines.at(5), lines.at(4), fill);
 			// right
-			drawTrapezOutline(lines[2], lines[1], lines[5], lines[6], color);
+			drawTrapezOutline(lines.at(2), lines.at(1), lines.at(5), lines.at(6), fill);
 			// left
-			drawTrapezOutline(lines[3], lines[0], lines[4], lines[7], color);
+			drawTrapezOutline(lines.at(3), lines.at(0), lines.at(4), lines.at(7), fill);
 #endif // POLYGON_METHOD
 		}
 	}

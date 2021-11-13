@@ -3,7 +3,7 @@
 
 int Item::count = 0;
 
-Item::Item(const std::string& id, int* ref, std::array<int, 2> limits) : 
+Item::Item(const std::string& id, int* ref, const std::array<int, 2>& limits) : 
 	m_ID{std::cref(id)},
 	m_iVal{ref},
 	m_Limits{limits}

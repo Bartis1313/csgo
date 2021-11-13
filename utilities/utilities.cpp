@@ -2,6 +2,11 @@
 #include <Psapi.h>
 #include <filesystem>
 #include <ShlObj_core.h>
+#include "renderer/renderer.hpp"
+#include "../SDK/structs/Entity.hpp"
+
+#undef max
+#undef min
 
 namespace fs = std::filesystem;
 
@@ -89,5 +94,58 @@ namespace utilities
 		LF(MessageBoxA)(nullptr, XOR("Pattern scanning failed!"), XOR("Bartis hack"), MB_OK | MB_ICONWARNING);
 
 		return 0;
+	}
+
+	bool getBox(Entity_t* ent, Box& box)
+	{
+		// pretty much nothing to explain here, using engine and detect mins/maxs
+		const auto col = ent->collideable();
+		if (!col)
+			return false;
+
+		const auto& min = col->OBBMins();
+		const auto& max = col->OBBMaxs();
+
+		std::array<Vector, 8> points =
+		{
+			Vector(min.x, min.y, min.z),
+			Vector(min.x, max.y, min.z),
+			Vector(max.x, max.y, min.z),
+			Vector(max.x, min.y, min.z),
+			Vector(max.x, max.y, max.z),
+			Vector(min.x, max.y, max.z),
+			Vector(min.x, min.y, max.z),
+			Vector(max.x, min.y, max.z)
+		};
+
+		if (!points.data())
+			return false;
+
+		const auto& tranFrame = ent->m_rgflCoordinateFrame();
+
+		float left = std::numeric_limits<float>::max();
+		float top = std::numeric_limits<float>::max();
+		float right = -std::numeric_limits<float>::max();
+		float bottom = -std::numeric_limits<float>::max();
+
+		std::array<Vector, 8> screen = {};
+
+		for (int i = 0; i < 8; i++)
+		{
+			if (!render::WorldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
+				return false;
+
+			left = std::min(left, screen.at(i).x);
+			top = std::min(top, screen.at(i).y);
+			right = std::max(right, screen.at(i).x);
+			bottom = std::max(bottom, screen.at(i).y);
+		}
+
+		box.x = left;
+		box.y = top;
+		box.w = right - left;
+		box.h = bottom - top;
+
+		return true;
 	}
 }

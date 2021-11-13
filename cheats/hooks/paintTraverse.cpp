@@ -1,7 +1,10 @@
 #include "hooks.hpp"
 #include "../menu/menu.hpp"
-#include "../features/visuals/visuals.hpp"
+#include "../features/visuals/player.hpp"
 #include "../features/aimbot/aimbot.hpp"
+#include "../features/visuals/world.hpp"
+#include "../features/visuals/radar.hpp"
+#include "../features/misc/misc.hpp"
 
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
 {
@@ -13,10 +16,10 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	{
 		Menu::g().draw();
 		Menu::g().handleKeys(vars::options);
-		Esp::draw();
-		Esp::drawMisc();
-		Esp::radar();
-		Esp::drawCrosshair();
-		Esp::drawLocalInfo();
+		esp::run();
+		world::drawMisc();
+		radar::run();
+		misc::drawCrosshair();
+		misc::drawLocalInfo();
 	}
 }

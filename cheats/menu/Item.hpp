@@ -14,7 +14,7 @@ public:
 
 	Item() = delete;
 	// arr[0] - min, arr[1] - max
-	Item(const std::string& id, int* ref, std::array<int, 2>);
+	Item(const std::string& id, int* ref, const std::array<int, 2>& limits);
 	Item(const std::string& id, bool* ref);
 	Item(const std::string& id, int* ref, const std::vector<std::string>& vec);
 	// constructor with variant example, put it in cpp file if you want to use/practise it

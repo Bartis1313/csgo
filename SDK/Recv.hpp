@@ -29,6 +29,9 @@ public:
     SendPropType  m_type;
 };
 
+// to this line those can be used in netvar dump
+// TODO: add types in dumper
+
 class RecvTable;
 class RecvProp;
 
@@ -41,9 +44,7 @@ public:
     int	m_objectID;
 };
 
-typedef void(*RecvVarProxyFn)(const CRecvProxyData* pData, void* pStruct, void* pOut);
-typedef void(*ArrayLengthRecvProxyFn)(void* pStruct, int objectID, int currentArrayLength);
-typedef void(*DataTableRecvVarProxyFn)(const RecvProp* pProp, void** pOut, void* pData, int objectID);
+using RecvVarProxyFn = void(*)(CRecvProxyData&, void*, void*); // cdecl
 
 class RecvProp
 {
@@ -55,9 +56,9 @@ public:
     int m_insideArray;
     const void* m_extraData;
     RecvProp* m_arrayProp;
-    ArrayLengthRecvProxyFn  m_arrayLengthProxy;
+    void* m_arrayLengthProxy;
     RecvVarProxyFn m_proxyFn;
-    DataTableRecvVarProxyFn m_dataTableProxyFn;
+    void* m_dataTableProxyFn;
     RecvTable* m_dataTable;
     int m_offset;
     int m_elementStride;

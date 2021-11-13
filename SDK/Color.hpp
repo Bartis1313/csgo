@@ -164,4 +164,5 @@ namespace Colors
 	inline Color Yellow = Color(255, 255, 0, 255);
 	inline Color Purple = Color(140, 20, 252, 255);
 	inline Color Turquoise = Color(60, 210, 200, 255);
+	inline Color Palevioletred = Color(220, 110, 150, 255);
 }

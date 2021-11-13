@@ -7,7 +7,7 @@
 
 class Player_t;
 
-struct ray_t
+struct Ray_t
 {
 	Vector m_start;
 	PAD(4);
@@ -23,22 +23,22 @@ struct ray_t
 		m_isSwept = m_delta.x || m_delta.y || m_delta.z;
 	}
 
-	ray_t(const Vector& src, const Vector& dest) :
+	Ray_t(const Vector& src, const Vector& dest) :
 		m_start(src), m_delta(dest - src)
 	{
 		m_isSwept = m_delta.x || m_delta.y || m_delta.z;
 	}
-	ray_t() = default;
+	Ray_t() = default;
 };
 
-struct csurface_t
+struct Csurface_t
 {
 	const char* m_name;
 	short m_props;
 	unsigned short m_flags;
 };
 
-struct cplane_t
+struct Cplane_t
 {
 	Vector m_normal;
 	float m_distance;
@@ -47,31 +47,31 @@ struct cplane_t
 	PAD(2);
 };
 
-struct trace_t
+struct Trace_t
 {
 	Vector m_start;
 	Vector m_end;
-	cplane_t m_plane;
+	Cplane_t m_plane;
 	float m_fraction;
 	int m_contents;
 	unsigned short m_flags;
 	bool m_allSolid;
 	bool m_startSolid;
 	float m_fractionLeftSolid;
-	csurface_t m_surface;
+	Csurface_t m_surface;
 	int m_hitgroup;
 	short m_physicsBone;
 	Player_t* m_entity;
 	int m_hitbox;
 };
 
-struct traceFilter
+struct TraceFilter
 {
 public:
-	traceFilter(Player_t* entity) :
+	TraceFilter(Player_t* entity) :
 		m_skip{ entity }
 	{}
-	traceFilter() = default;
+	TraceFilter() = default;
 	virtual bool shouldHitEntity(Player_t* ent, int) const
 	{
 		return ent != m_skip;
@@ -88,5 +88,5 @@ class IEngineTrace
 {
 public:
 	VFUNC(int, getPointContents, 0, (const Vector& absPosition, int contentsMask), (this, std::cref(absPosition), contentsMask, nullptr));
-	VFUNC(void, traceRay, 5, (const ray_t& ray, unsigned int mask, const traceFilter* filter, trace_t* trace), (this, std::cref(ray), mask, filter, trace));
+	VFUNC(void, traceRay, 5, (const Ray_t& ray, unsigned int mask, const TraceFilter* filter, Trace_t* trace), (this, std::cref(ray), mask, filter, trace));
 };

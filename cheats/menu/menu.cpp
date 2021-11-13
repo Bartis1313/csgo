@@ -2,6 +2,7 @@
 #include "../../utilities/renderer/renderer.hpp"
 #include "../../config/config.hpp"
 #include "../game.hpp"
+#include <format>
 
 static short index = 0;
 
@@ -200,6 +201,15 @@ void Menu::draw()
 	int width = x * 0.16f;
 	int height = 15;
 
+	drawText(20, height + 15, Colors::Palevioletred, XOR("Bartis internal"));
+
+	// for your name, add raw localplayer check, game::localPlayer might be not fast enough, so check in body, it's due to few frames might be called faster
+	if (interfaces::engine->isInGame())
+	{
+		drawText(width, height, Colors::Yellow, game::localPlayer ? XOR("Hello Bartis :)") : XOR("Hello Undefined :)"));
+		height += 15;
+	}
+
 	// must have something unique to catch index selected
 	// practise with static index for menu is just not good,
 	// maybe you want selected index option
@@ -222,6 +232,17 @@ void Menu::draw()
 
 	width = x * 0.26f;
 	height = 15;
+
+	if (interfaces::engine->isInGame())
+	{
+		// I quite escape the usage of printf formatting in this project, but this is just breaking my head, I can't format it nicely with format
+		if(game::localPlayer)
+			render::textf(width, height, fonts::tahoma, false, Colors::Yellow, XOR("Local Player %p"), game::localPlayer);
+		else
+			render::textf(width, height, fonts::tahoma, false, Colors::Yellow, XOR("Local Player 0x0"));
+		height += 15;
+	}
+
 	drawBool(vars::names["radar"], width, height);
 	drawBool(vars::names["local_info"], width, height);
 	drawBool(vars::names["esp_flags"], width, height);

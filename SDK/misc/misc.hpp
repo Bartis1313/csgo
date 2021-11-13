@@ -1,6 +1,6 @@
 #pragma once
 
-// this is a tricky hack for classes in SDK I used in C
+// this is a tricky hack for classes in SDK I used in C structs
 // since this is not so good for C++ I leave it commented
 
 //#define SDK_START(name) \
@@ -18,7 +18,7 @@
 //
 //SDK_END(ok);
 
-//class meme : public ok
+//class meme : public ok -> is error
 //{
 //
 //};

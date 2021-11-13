@@ -20,7 +20,7 @@ namespace hooks
 	struct paintTraverse
 	{
 		using fn = void(__thiscall*)(IPanel*, unsigned int, bool, bool);
-		static void __stdcall hooked(unsigned int panel, bool force_repaint, bool allow_force);
+		static void __stdcall hooked(unsigned int panel, bool forceRepaint, bool allowForce);
 		inline static fn original = nullptr;
 		static const int index = PAINTTRAVERSE;
 	};

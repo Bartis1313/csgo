@@ -21,7 +21,7 @@ bool interfaces::init()
 	localize = getInterface<ILocalize>(LOCALIZE_DLL, XOR("Localize_001"));
 	modelRender = getInterface<IVModelRender>(ENGINE_DLL, XOR("VEngineModel016"));
 	studioRender = getInterface<IVStudioRender>(STUDIORENDER_DLL, XOR("VStudioRender026"));
-	eventManager = getInterface<IGameEventManager2>(ENGINE_DLL, XOR("GAMEEVENTSMANAGER002"));
+	eventManager = getInterface<IGameEventManager>(ENGINE_DLL, XOR("GAMEEVENTSMANAGER002"));
 	
 	globalVars = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(client))[0] + 0x1F);
 	clientMode = **reinterpret_cast<ClientMode***>((*reinterpret_cast<uintptr_t**>(client))[10] + 0x5);

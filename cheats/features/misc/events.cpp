@@ -1,7 +1,7 @@
 #include "events.hpp"
 #include "../../menu/vars.hpp"
 #include "../../game.hpp"
-#include "../visuals/visuals.hpp"
+#include "../visuals/player.hpp"
 #include "../../../SDK/IGameEvent.hpp"
 
 void Events::init() const
@@ -16,12 +16,12 @@ void Events::FireGameEvent(IGameEvent* event)
 {
 	if (!strcmp(event->getName(), XOR("player_footstep")))
 	{
-		Esp::drawSound(event);
+		esp::drawSound(event);
 	}
 	else if (!strcmp(event->getName(), XOR("player_death")))
 	{
 		// testing
-		interfaces::console->ConsolePrintf("Died\n");
+		interfaces::console->consolePrintf("Died\n");
 	}
 	else if (!strcmp(event->getName(), XOR("round_start")))
 	{

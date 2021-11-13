@@ -4,6 +4,9 @@
 #include "console/console.hpp"
 #include <string>
 
+class Entity_t;
+struct Box;
+
 #define SECURE
 
 #if defined(_DEBUG) // debug mode
@@ -29,10 +32,13 @@ namespace utilities
 
     std::string getTime();
 
+    // old style: "A0 15 ?? FF A3"
     uintptr_t patternScan(const char* mod, const char* mask);
 
     // TODO: make it in verctor class later
-    inline float distToMeters(float dist) { return dist * 0.0254f; }
+    inline float distToMeters(const float dist) { return dist * 0.0254f; }
+
+    bool getBox(Entity_t* ent, Box& box);
 }
 
 inline std::string __DOCUMENTS = utilities::getFolder();

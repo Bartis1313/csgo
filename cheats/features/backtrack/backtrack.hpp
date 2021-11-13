@@ -10,8 +10,9 @@ namespace backtrack
 	struct StoredRecord
 	{
 		float simTime = 0.0f;
-		Vector head = {0, 0, 0};
-		Vector origin = {0, 0, 0};
+		Vector head = { 0, 0, 0 };
+		// use origin to set abs or for whatever need
+		Vector origin = { 0, 0 , 0 };
 		matrix3x4_t matrix[BONE_USED_BY_HITBOX] = {};
 	};
 

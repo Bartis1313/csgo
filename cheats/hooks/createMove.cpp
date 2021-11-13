@@ -17,8 +17,11 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 
 	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
+	// thanks for reminding me https://github.com/Bartis1313/csgo/issues/4
+	if(original(inputFrame, cmd))
+		interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
+
 	game::serverTime(cmd);
-	triggerbot::run(cmd);
 
 	bunnyhop::run(cmd);
 	bunnyhop::strafe(cmd);
@@ -27,6 +30,7 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 	{
 		backtrack::run(cmd);
 		legitbot::run(cmd);
+		triggerbot::run(cmd);
 	}	
 	prediction::end();
 

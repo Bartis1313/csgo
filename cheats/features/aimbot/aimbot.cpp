@@ -2,7 +2,6 @@
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../globals.hpp"
 
-
 enum AimbotID
 {
     NEAREST = 1,
@@ -157,6 +156,7 @@ void legitbot::run(CUserCmd* cmd)
     if (weapon->isSniper() && !game::localPlayer->m_bIsScoped())
         return;
 
+    // TODO: add some detection for recoil, eg: tec9 is a pistol but rcs is okay to add for it, simple checking isRifle() is not enough
     if (vars::iRCS)
         RCS(cmd);
 
@@ -180,5 +180,11 @@ void legitbot::run(CUserCmd* cmd)
 
             interfaces::engine->setViewAngles(cmd->m_viewangles);
         }
+    }
+    // so selected esp aimbot will be accurate
+    else
+    {
+        bestEnt = nullptr;
+        bestPoint = Vector{ 0, 0, 0 };
     }
 }

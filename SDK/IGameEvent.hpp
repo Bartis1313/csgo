@@ -12,18 +12,18 @@ public:
     VFUNC(void, setString, 16, (const char* keyName, const char* value), (this, keyName, value));
 };
 
-class IGameEventListener2
+class IGameEventListener
 {
 public:
-    virtual ~IGameEventListener2() {}
+    virtual ~IGameEventListener() {}
 
     virtual void FireGameEvent(IGameEvent* event) = 0;
     virtual int  GetEventDebugID(void) { return 42; };
 };
 
-class IGameEventManager2
+class IGameEventManager
 {
 public:
-    VFUNC(bool, addListener, 3, (IGameEventListener2* listener, const char* name), (this, listener, name, false));
-    VFUNC(void, removeListener, 5, (IGameEventListener2* listener), (this, listener));
+    VFUNC(bool, addListener, 3, (IGameEventListener* listener, const char* name), (this, listener, name, false));
+    VFUNC(void, removeListener, 5, (IGameEventListener* listener), (this, listener));
 };

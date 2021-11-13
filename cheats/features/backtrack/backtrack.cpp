@@ -31,15 +31,15 @@ struct convarRatios
 
 void backtrack::init()
 {
-	cvars.updateRate = interfaces::console->FindVar(XOR("cl_updaterate"));
-	cvars.maxUpdateRate = interfaces::console->FindVar(XOR("sv_maxupdaterate"));
-	cvars.minUpdateRate = interfaces::console->FindVar(XOR("sv_minupdaterate"));
+	cvars.updateRate = interfaces::console->findVar(XOR("cl_updaterate"));
+	cvars.maxUpdateRate = interfaces::console->findVar(XOR("sv_maxupdaterate"));
+	cvars.minUpdateRate = interfaces::console->findVar(XOR("sv_minupdaterate"));
 
-	cvarsRatios.interp = interfaces::console->FindVar(XOR("cl_interp"))->getFloat();
-	cvarsRatios.interpRatio = interfaces::console->FindVar(XOR("cl_interp_ratio"))->getFloat();
-	cvarsRatios.minInterpRatio = interfaces::console->FindVar(XOR("sv_client_min_interp_ratio"))->getFloat();
-	cvarsRatios.maxInterpRatio = interfaces::console->FindVar(XOR("sv_client_max_interp_ratio"))->getFloat();
-	cvarsRatios.maxUnlag = interfaces::console->FindVar(XOR("sv_maxunlag"))->getFloat();
+	cvarsRatios.interp = interfaces::console->findVar(XOR("cl_interp"))->getFloat();
+	cvarsRatios.interpRatio = interfaces::console->findVar(XOR("cl_interp_ratio"))->getFloat();
+	cvarsRatios.minInterpRatio = interfaces::console->findVar(XOR("sv_client_min_interp_ratio"))->getFloat();
+	cvarsRatios.maxInterpRatio = interfaces::console->findVar(XOR("sv_client_max_interp_ratio"))->getFloat();
+	cvarsRatios.maxUnlag = interfaces::console->findVar(XOR("sv_maxunlag"))->getFloat();
 };
 
 float backtrack::getLerp()
@@ -108,10 +108,6 @@ void backtrack::update()
 		record.origin = entity->absOrigin();
 		record.simTime = entity->m_flSimulationTime();
 		record.head = entity->getBonePosition(8);
-
-		// useless fix
-		// TODO: rebuild bones
-		// entity->invalidateBoneCache();
 
 		// setup bones for us, will be needed for basically get good matrix, can draw backtrack'ed models etc...
 		entity->setupBones(record.matrix, BONE_USED_BY_HITBOX, BONE_USED_MASK, interfaces::globalVars->m_curtime);

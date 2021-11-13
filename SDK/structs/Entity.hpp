@@ -5,6 +5,7 @@
 #include "IDXandPaterrns.hpp"
 #include "../../utilities/math/math.hpp"
 
+
 class Weapon_t;
 class Player_t;
 

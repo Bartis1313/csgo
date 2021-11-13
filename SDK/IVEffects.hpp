@@ -22,7 +22,7 @@ enum
 };
 */
 
-struct dlight_t
+struct DLight_t
 {
 	int	m_flags;
 	Vector m_origin;
@@ -41,7 +41,7 @@ struct dlight_t
 class IVEfx
 {
 public:
-	VFUNC(dlight_t*, clAllocDlight, 4, (int key), (this, key));
-	VFUNC(dlight_t*, clAllocElight, 5, (int key), (this, key));
-	VFUNC(dlight_t*, getElightbyKey, 8, (int key), (this, key));
+	VFUNC(DLight_t*, clAllocDlight, 4, (int key), (this, key));
+	VFUNC(DLight_t*, clAllocElight, 5, (int key), (this, key));
+	VFUNC(DLight_t*, getElightbyKey, 8, (int key), (this, key));
 };

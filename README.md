@@ -1,7 +1,7 @@
 # Csgo
 Very short and commented source aimed for legit gameplay
 
-![Bartis internal CSGO](https://i.imgur.com/H6DEwIh.png)
+![Bartis internal CSGO](https://i.imgur.com/G3xVmB0.png)
 
 # Information
 In development, not every feature may work perfectly.
@@ -53,7 +53,9 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.0.6 - small update with removing fps drops while menu is opened
 * 1.0.7 - big update for performance and cleanup in code, a lot of useless defines have been removed. Changed console::log function to take only one string and log type, string can be easily used with std::format
 * 1.0.8 - small update with making menu usage more easier, items are now in map and features can be passed as name for vars::names map
+* 1.0.9 - big update for performance, recode, and code style. All functions are camel case. I seperated visuals to be in few files since it's better to read and move in code. Added even more visuals once again. Fixed prediction, thanks: [kaposzta99](https://github.com/Bartis1313/csgo/issues/4)
 </details>
 
 # People who helped
 [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs15 leak which made reversing even easier.
+[UC Wiki](https://www.unknowncheats.me/wiki/UnKnoWnCheaTs_Game_Hacking_Wiki) - for very helpful sources.

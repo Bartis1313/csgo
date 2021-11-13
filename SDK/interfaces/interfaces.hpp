@@ -108,7 +108,7 @@ namespace interfaces
 	inline IMaterialSystem* matSys;
 	inline IVModelInfo* modelInfo;
 	inline IVDebugOverlay* debugOverlay;
-	inline IGameEventManager2* eventManager;
+	inline IGameEventManager* eventManager;
 	inline IViewRender* renderView;
 	inline CGlowManager* glowManager;
 	inline CGameMovement* gameMovement;
