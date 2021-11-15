@@ -16,7 +16,7 @@ public:
 	void drawInt(int idx, int x, int& y);
 	void drawVec(int idx, int x, int& y);
 	void drawOption(int idx, int x, int& y);
-	void handleKeys(Item* set) const;
+	void handleKeys() const;
 private:
 	Item* settings = vars::options;
 };

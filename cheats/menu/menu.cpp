@@ -8,7 +8,7 @@
 static short index = 0;
 
 #ifndef _DEBUG
-void Menu::handleKeys(Item* set) const
+void Menu::handleKeys() const
 {
 	// let insert to be controlled 24/7, others only if menu is opened
 	if (LF(GetAsyncKeyState).cached()(VK_INSERT) & 1)
@@ -42,38 +42,38 @@ void Menu::handleKeys(Item* set) const
 
 	if (LF(GetAsyncKeyState).cached()(VK_RIGHT) & 1)
 	{
-		if (set[index].isBoolOption())
+		if (settings[index].isBoolOption())
 		{
-			set[index].changeBoolRef();
+			settings[index].changeBoolRef();
 			config::save();
 		}
-		if (set[index].isAddable())
+		if (settings[index].isAddable())
 		{
-			set[index].chnageAddableRefp();
+			settings[index].chnageAddableRefp();
 			config::save();
 		}
-		if (set[index].isVectorOption())
+		if (settings[index].isVectorOption())
 		{
-			set[index].chnageIntRefp();
+			settings[index].chnageIntRefp();
 			config::save();
 		}
 	}
 
 	if (LF(GetAsyncKeyState).cached()(VK_LEFT) & 1)
 	{
-		if (set[index].isBoolOption())
+		if (settings[index].isBoolOption())
 		{
-			set[index].changeBoolRef();
+			settings[index].changeBoolRef();
 			config::save();
 		}
-		if (set[index].isAddable())
+		if (settings[index].isAddable())
 		{
-			set[index].chnageAddableRefm();
+			settings[index].chnageAddableRefm();
 			config::save();
 		}
-		if (set[index].isVectorOption())
+		if (settings[index].isVectorOption())
 		{
-			set[index].chnageIntRefm();
+			settings[index].chnageIntRefm();
 			config::save();
 		}
 	}
@@ -113,38 +113,38 @@ void Menu::handleKeys(Item* set) const
 
 	if (LF(GetAsyncKeyState)(VK_RIGHT) & 1)
 	{
-		if (set[index].isBoolOption())
+		if (settings[index].isBoolOption())
 		{
-			set[index].changeBoolRef();
+			settings[index].changeBoolRef();
 			config::save();
 		}
-		if (set[index].isAddable())
+		if (settings[index].isAddable())
 		{
-			set[index].chnageAddableRefp();
+			settings[index].chnageAddableRefp();
 			config::save();
 		}
-		if (set[index].isVectorOption())
+		if (settings[index].isVectorOption())
 		{
-			set[index].chnageIntRefp();
+			settings[index].chnageIntRefp();
 			config::save();
 		}
 	}
 
 	if (LF(GetAsyncKeyState)(VK_LEFT) & 1)
 	{
-		if (set[index].isBoolOption())
+		if (settings[index].isBoolOption())
 		{
-			set[index].changeBoolRef();
+			settings[index].changeBoolRef();
 			config::save();
 		}
-		if (set[index].isAddable())
+		if (settings[index].isAddable())
 		{
-			set[index].chnageAddableRefm();
+			settings[index].chnageAddableRefm();
 			config::save();
 		}
-		if (set[index].isVectorOption())
+		if (settings[index].isVectorOption())
 		{
-			set[index].chnageIntRefm();
+			settings[index].chnageIntRefm();
 			config::save();
 		}
 	}

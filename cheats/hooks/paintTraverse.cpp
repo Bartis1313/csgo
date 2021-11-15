@@ -15,7 +15,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	if (strstr(toDraw, XOR("MatSystemTopPanel")))
 	{
 		Menu::g().draw();
-		Menu::g().handleKeys(vars::options);
+		Menu::g().handleKeys();
 		esp::run();
 		world::drawMisc();
 		radar::run();
