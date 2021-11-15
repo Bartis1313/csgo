@@ -1,12 +1,13 @@
 #include "hooks.hpp"
 #include "../game.hpp"
-#include <cstdint>
 #include "../menu/vars.hpp"
 #include "../features/aimbot/aimbot.hpp"
 #include "../features/prediction/prediction.hpp"
 #include "../features/backtrack/backtrack.hpp"
 #include "../features/misc/bunnyhop.hpp"
 #include "../features/aimbot/triggerbot.hpp"
+#include "../globals.hpp"
+#include ".././features/visuals/world.hpp"
 
 bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 {	
@@ -26,6 +27,12 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 	bunnyhop::run(cmd);
 	bunnyhop::strafe(cmd);
 
+	uintptr_t* framePtr;
+	__asm { \
+		__asm mov framePtr, ebp \
+	}
+	auto& sendPacket = *reinterpret_cast<bool*>(*framePtr - 0x1C);
+
 	prediction::start(cmd);
 	{
 		backtrack::run(cmd);
@@ -33,6 +40,11 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 		triggerbot::run(cmd);
 	}	
 	prediction::end();
+
+	if (sendPacket)
+		globals::realAngle = cmd->m_viewangles;
+	else
+		globals::fakeAngle = cmd->m_viewangles;
 
 	return false;
 }

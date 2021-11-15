@@ -1,6 +1,5 @@
 #pragma once
 #include "math/Vector.hpp"
-#include "Color.hpp"
 
 enum
 {
@@ -15,27 +14,27 @@ enum
 	DLIGHT_DISPLACEMENT_MASK = (DLIGHT_ADD_DISPLACEMENT_ALPHA | DLIGHT_SUBTRACT_DISPLACEMENT_ALPHA),
 };
 
-/*struct ColorRGBExp32
+class DLight_t
 {
-	unsigned char r, g, b;
-	signed char exponent;
-};
-*/
-
-struct DLight_t
-{
+private:
+	struct DColor
+	{
+		uint8_t r, g, b;
+	};
+public:
 	int	m_flags;
 	Vector m_origin;
 	float m_radius;
-	Color m_color;
+	DColor m_color;
+	char m_exponent;
 	float m_die;
 	float m_decay;
 	float m_minlight;
 	int	m_key;
 	int	m_style;
-	Vector m_Direction;
-	float m_InnerAngle;
-	float m_OuterAngle;
+	Vector m_direction;
+	float m_innerAngle;
+	float m_outerAngle;
 };
 
 class IVEfx

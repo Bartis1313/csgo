@@ -82,7 +82,6 @@ void backtrack::update()
 		return;
 	}
 
-
 	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 	{
 		auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));

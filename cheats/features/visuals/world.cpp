@@ -1,5 +1,6 @@
 #include "world.hpp"
 #include "../../../utilities/utilities.hpp"
+#include "../../menu/vars.hpp"
 #include <format>
 
 void world::drawMisc()
@@ -168,5 +169,69 @@ void world::drawProjectiles(Entity_t* ent)
 		{
 			render::text(box.x + box.w / 2, box.y + box.h + 2, fonts::tahoma, drop->getWpnName(), false, Colors::White);
 		}
+	}
+}
+
+void loadSkyBoxFunction(const char* name)
+{
+	using fn = void(__fastcall*)(const char*);
+	static const auto forceSky = reinterpret_cast<fn>(utilities::patternScan(ENGINE_DLL, LOAD_SKY));
+	forceSky(name);
+}
+
+void world::skyboxLoad(int stage)
+{
+	if (!interfaces::engine->isInGame())
+		return;
+
+	// do not run when stage frames are not reached
+	if (stage != FRAME_RENDER_START)
+		return;
+
+	static auto sky = interfaces::console->findVar(XOR("sv_skyname"));
+
+	// remove sky, not in meaning as full color
+	static const auto removeSky = interfaces::console->findVar(XOR("r_3dsky"));
+	removeSky->setValue(vars::bRunNight ? false : true);	
+
+	if (vars::bRunNight)
+	{
+		for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
+		{
+			auto material = interfaces::matSys->getMaterial(handle);
+
+			if (!material)
+				continue;
+
+			if (material->isError())
+				continue;
+
+			if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
+			{
+				material->colorModulate(Colors::Turquoise);
+			}
+		}
+		// force to new sky
+		loadSkyBoxFunction(XOR("sky_csgo_night2"));
+	}
+	else if (!vars::bRunNight)
+	{
+		for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
+		{
+			auto material = interfaces::matSys->getMaterial(handle);
+
+			if (!material)
+				continue;
+
+			if (material->isError())
+				continue;
+
+			if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
+			{
+				material->colorModulate(Colors::White);
+			}
+		}
+		// restore the sky
+		loadSkyBoxFunction(sky->m_name);
 	}
 }

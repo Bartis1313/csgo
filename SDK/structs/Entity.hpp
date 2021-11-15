@@ -146,6 +146,7 @@ public:
 	_NODISCARD Vector getHitboxPos(int id);
 	_NODISCARD Vector getBonePosition(int id);
 	_NODISCARD bool isC4Owner();
+	// TODO: fix for strange unicodes or empty spaces
 	_NODISCARD std::string getName();
 	_NODISCARD int getKills();
 	_NODISCARD int getDeaths();

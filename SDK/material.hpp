@@ -59,13 +59,16 @@ public:
     VFUNC(const char*, getName, 0, (), (this));
     VFUNC(const char*, getTextureGroupName, 1, (), (this));
     VFUNC(IMaterialVar*, findVar, 11, (const char* name, bool* found = nullptr, bool complain = true), (this, name, found, complain));
-    VFUNC(void, incrementReferenceCount, 12, (), (this));
-    VFUNC(void, decrementReferenceCount, 13, (), (this));
     VFUNC(void, alphaModulate, 27, (float alpha), (this, alpha));   
     VFUNC(void, colorModulate, 28, (float r, float g, float b), (this, r, g, b));
+    VFUNC(void, colorModulate, 28, (Color color), (this, color.rDevided(), color.gDevided(), color.bDevided()));
+   /* void colorModulate(Color color)
+    {
+        colorModulate(color.rDevided(), color.gDevided(), color.bDevided());
+        alphaModulate(color.aDevided());
+    }*/
     VFUNC(void, setMaterialVarFlag, 29, (MaterialVarFlags_t flag, bool on), (this, flag, on));
-    VFUNC(int, getReferenceCount, 56, (), (this));
-    VFUNC(bool, isPrecached, 70, (), (this));
+    VFUNC(bool, isError, 42, (), (this));
 };
 
 

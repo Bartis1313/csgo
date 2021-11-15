@@ -5,11 +5,12 @@
 
 namespace world
 {
+	void drawMisc();
 	void drawProjectiles(Entity_t* ent);
 	void drawBomb(Entity_t* ent);
 	void drawBombDropped(Entity_t* ent);
 
-	void drawMisc();
+	void skyboxLoad(int stage);
 
 	// TODO:
 	void drawSmoke(Entity_t* ent);

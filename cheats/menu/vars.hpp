@@ -44,6 +44,10 @@ namespace vars
 	inline bool bDrawSkeleton = false;
 
 	inline int iBacktrackChams = 0;
+
+	inline bool bDLight = false;
+
+	inline bool bRunNight = false;
 	
 	inline Item options[] =
 	{
@@ -68,7 +72,9 @@ namespace vars
 		Item{ "Draw Flags", &bShowFlags }, // 18
 		Item{ "Draw Infos", &bDrawInfos }, // 19
 		Item{ "Skeleton", &bDrawSkeleton }, // 20
-		Item{ "BT Chams", &iBacktrackChams, {"OFF", "Stable", "Last tick", "Rainbow"} }, // 21
+		Item{ "BT Chams", &iBacktrackChams, {"OFF", "Stable", "Last tick", "Rainbow"} }, // 21,
+		Item{ "DLight", &bDLight }, // 22,
+		Item{ "NightMode" , &bRunNight }, // 23
 	};
 	
 	inline std::map<std::string, int> names =
@@ -94,6 +100,8 @@ namespace vars
 		{"esp_flags", 18},
 		{"esp_info", 19},
 		{"esp_skeleton", 20},
-		{"bt_chams", 21}
+		{"bt_chams", 21},
+		{"dl_light", 22},
+		{"nightmode", 23},
 	};
 };

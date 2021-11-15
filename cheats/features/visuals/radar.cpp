@@ -1,6 +1,7 @@
 #include "radar.hpp"
 #include "../../game.hpp"
 #include "../../menu/vars.hpp"
+#include "../../globals.hpp"
 #include <format>
 
 static constexpr auto dotThickness = 5;
@@ -43,10 +44,6 @@ Vector2D radar::entToRadar(Vector eye, Vector angles, Vector entPos, Vector2D po
 	dotX += pos.x;
 	dotY += pos.y;
 
-	// because it may fail on start of new game
-	if (!game::localPlayer)
-		check = false;
-
 	// should be just 2d vec, 3rd z value for 3d is empty because radar is a normal rectnagle -> 2D
 	return Vector2D(dotX, dotY);
 }
@@ -59,7 +56,10 @@ void radar::run()
 	if (!interfaces::engine->isInGame())
 		return;
 
-	if (!game::localPlayer)
+	// boi is angry so i give him localPlayer here
+	auto localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
+
+	if (!localPlayer)
 		return;
 
 	int x, y;
@@ -69,7 +69,7 @@ void radar::run()
 	int size = 90;
 
 	render::drawTrapezFilled(Vector2D(centerx - size, centery - size), Vector2D(centerx + size, centery - size),
-		Vector2D(centerx + size, centery + size), Vector2D(centerx - size, centery + size), Colors::Grey);
+		Vector2D(centerx + size, centery + size), Vector2D(centerx - size, centery + size), Color(128, 128, 128, 190));
 
 	render::drawTrapezOutline(Vector2D(centerx - size - 1, centery - size - 1), Vector2D(centerx + size + 1, centery - size - 1),
 		Vector2D(centerx + size + 1, centery + size + 1), Vector2D(centerx - size - 1, centery + size + 1), Colors::Black);
@@ -77,10 +77,19 @@ void radar::run()
 	int toAlign = render::getTextSize(fonts::tahoma, "Radar");
 	render::text(centerx - toAlign / 2, centery - size - 10, fonts::tahoma, "Radar", false, Colors::LightBlue);
 
-	render::drawFilledRect(centerx, centery - size, 1, 2 * size, Color(0, 0, 0, 120));
-	render::drawFilledRect(centerx - size, centery, 2 * size, 1, Color(0, 0, 0, 120));
+	render::drawFilledRect(centerx - 5, centery - 1, 11, 3, Colors::Black);
+	render::drawFilledRect(centerx - 1, centery - 5, 3, 11, Colors::Black);
 
-	const auto myEye = game::localPlayer->getEyePos();
+	render::drawLine(centerx - 4, centery, centerx + 5, centery, Colors::Green);
+	render::drawLine(centerx, centery + 4, centerx, centery - 5, Colors::Green);
+	
+	// don't use this, there is needed trigonometry
+	/*auto endXhelper = (globals::FOV > 90) ? -90 : -globals::FOV;
+	auto endYhelper = (globals::FOV > 90) ? globals::FOV - 90 : 0;
+
+	render::drawLine(Vector2D(centerx, centery), Vector2D(centerx - endXhelper, centery - size + endYhelper), Colors::Black);*/
+
+	const auto myEye = localPlayer->getEyePos();
 	Vector ang = {};
 	interfaces::engine->getViewAngles(ang);
 
@@ -94,7 +103,7 @@ void radar::run()
 		if (ent->isDormant())
 			continue;
 
-		if (ent == game::localPlayer)
+		if (ent == localPlayer)
 			continue;
 
 		if (!ent->isAlive() || !game::localPlayer->isAlive())
@@ -123,7 +132,7 @@ void radar::run()
 			render::drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, Colors::White);
 			render::drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, Color(255, 30, 110, 255));
 			// magic - 4 due to text, and - 3 to correction
-			render::text(entRotatedPos.x - 4, entRotatedPos.y - dotThickness - 3, fonts::smalle, std::format("{:.2f}m", utilities::distToMeters(game::localPlayer->absOrigin().DistTo(ent->absOrigin()))), false, Color(100, 20, 70, 255));
+			render::text(entRotatedPos.x - 4, entRotatedPos.y - dotThickness - 3, fonts::smalle, std::format("{:.2f}m", utilities::distToMeters(localPlayer->absOrigin().DistTo(ent->absOrigin()))), false, Color(100, 20, 70, 255));
 		}
 	}
 }

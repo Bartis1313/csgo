@@ -82,7 +82,6 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 		{
 			if (backtrack::isValid(record->front().simTime))
 			{
-				// here no need for blend
 				ovverride(false, false, Colors::Grey);
 				CALL(ctx, state, info, record->back().matrix);
 			}

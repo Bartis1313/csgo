@@ -67,6 +67,8 @@ void esp::run()
 		if (entity)
 		{
 			drawPlayer(entity);
+			drawSkeleton(entity);
+			runDLight(entity);
 		}
 	}
 }
@@ -209,7 +211,7 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 
 	auto offset = currentAmmo * box.w / maxAmmo;
 	render::drawFilledRect(newBox.x - 1, newBox.y - 1, newBox.w, 4, Colors::Black);
-	render::drawFilledRect(newBox.x, newBox.y, offset, 2, Colors::Purple);
+	render::drawFilledRect(newBox.x, newBox.y, offset, 2, Colors::Turquoise);
 	
 	if (maxAmmo != currentAmmo)
 		render::text(newBox.x + offset, newBox.y + 1, fonts::tahoma, std::to_string(currentAmmo), false, Colors::White);
@@ -240,17 +242,14 @@ void esp::drawSkeleton(Player_t* ent)
 	if (!studio)
 		return;
 
-	if (ent->m_bGunGameImmunity())
-		return;
-
 	// have to check if selected record is filled, if no then just skip
-	auto record = !backtrack::records[ent->getIndex()].empty() ? &backtrack::records[ent->getIndex()].back() : nullptr;
+	auto record = !backtrack::records[ent->getIndex()].empty() ? &backtrack::records[ent->getIndex()] : nullptr;
 
 	for (int i = 0; i < studio->m_bonesCount; i++)
 	{
 		auto bone = studio->bone(i);
 		if (!bone)
-			return;
+			continue;
 
 		if (bone->m_parent == -1)
 			continue;
@@ -260,22 +259,21 @@ void esp::drawSkeleton(Player_t* ent)
 
 		// skip like here
 		auto child = record
-			? Vector(record->matrix[i][0][3], record->matrix[i][1][3], record->matrix[i][2][3])
+			? record->back().matrix[i].origin()
 			: ent->getBonePosition(i);
 
 		auto parent = record
-			? Vector(record->matrix[bone->m_parent][0][3], record->matrix[bone->m_parent][1][3], record->matrix[bone->m_parent][2][3])
+			? record->back().matrix[bone->m_parent].origin()
 			: ent->getBonePosition(bone->m_parent);
 
 		auto chest = 6;
 
 		auto upper = record
-			? Vector(record->matrix[chest + 1][0][3], record->matrix[chest + 1][1][3], record->matrix[chest + 1][2][3])
-			- Vector(record->matrix[chest][0][3], record->matrix[chest][1][3], record->matrix[chest][2][3])
+			? record->back().matrix[chest + 1].origin() - record->back().matrix[chest].origin()
 			: ent->getBonePosition(chest + 1) - ent->getBonePosition(chest);
 
 		auto breast = record
-			? Vector(record->matrix[chest][0][3], record->matrix[chest][1][3], record->matrix[chest][2][3]) + upper / 2
+			? record->back().matrix[chest].origin() + upper / 2
 			: ent->getBonePosition(chest) + upper / 2;
 
 		auto deltachild = child - breast;
@@ -294,9 +292,7 @@ void esp::drawSkeleton(Player_t* ent)
 
 		if (render::WorldToScreen(parent, screenp) && render::WorldToScreen(child, screenc))
 		{
-			// so drawn correctly, this needs some checking to not draw some ents that are not seen for us
-			// TODO: fix some bt rendering for some ents
-			if(record && backtrack::isValid(record->simTime))
+			if(record && backtrack::isValid(record->front().simTime))
 				render::drawLine(screenp[0], screenp[1], screenc[0], screenc[1], Colors::White);
 			else if(!record)
 				render::drawLine(screenp[0], screenp[1], screenc[0], screenc[1], Colors::White);
@@ -314,6 +310,27 @@ void esp::drawSnapLine(Player_t* ent, const Box& box)
 		// lines on the bottom and center bottom box
 		render::drawLine(width / 2, height, box.x + box.w / 2, box.y + box.h, Colors::Purple);
 	}
+}
+
+void esp::runDLight(Player_t* ent)
+{
+	// https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/client/c_spotlight_end.cpp#L112
+
+	if (!interfaces::engine->isInGame())
+		return;
+
+	if (!vars::bDLight)
+		return;
+
+	auto DLight = interfaces::effects->clAllocDlight(ent->getIndex());
+	DLight->m_style = DLIGHT_NO_WORLD_ILLUMINATION;
+	DLight->m_color = { 20, 70, 150 };
+	DLight->m_origin = ent->absOrigin();
+	DLight->m_radius = 80.0f;
+	DLight->m_die = interfaces::globalVars->m_curtime + 0.05f;
+	DLight->m_exponent = 10.0f;
+	DLight->m_decay = 30.0f;
+	DLight->m_key = ent->getIndex();
 }
 
 void esp::drawPlayer(Player_t* ent)
@@ -340,12 +357,11 @@ void esp::drawPlayer(Player_t* ent)
 		break;
 	}
 
-	esp::drawHealth(ent, box);
-	esp::drawArmor(ent, box);
-	esp::drawWeapon(ent, box);
-	esp::drawInfo(ent, box);
-	esp::drawSkeleton(ent);
-	esp::drawSnapLine(ent, box);
+	drawHealth(ent, box);
+	drawArmor(ent, box);
+	drawWeapon(ent, box);
+	drawInfo(ent, box);
+	drawSnapLine(ent, box);
 }
 
 // add this to events manager 

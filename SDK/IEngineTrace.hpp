@@ -7,8 +7,9 @@
 
 class Player_t;
 
-struct Ray_t
+class Ray_t
 {
+public:
 	Vector m_start;
 	PAD(4);
 	Vector m_delta;
@@ -65,7 +66,7 @@ struct Trace_t
 	int m_hitbox;
 };
 
-struct TraceFilter
+class TraceFilter
 {
 public:
 	TraceFilter(Player_t* entity) :
@@ -88,5 +89,5 @@ class IEngineTrace
 {
 public:
 	VFUNC(int, getPointContents, 0, (const Vector& absPosition, int contentsMask), (this, std::cref(absPosition), contentsMask, nullptr));
-	VFUNC(void, traceRay, 5, (const Ray_t& ray, unsigned int mask, const TraceFilter* filter, Trace_t* trace), (this, std::cref(ray), mask, filter, trace));
+	VFUNC(void, traceRay, 5, (const Ray_t& ray, unsigned int mask, TraceFilter* filter, Trace_t* trace), (this, std::cref(ray), mask, filter, trace));
 };

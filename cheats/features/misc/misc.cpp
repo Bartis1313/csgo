@@ -129,15 +129,15 @@ void misc::drawLocalInfo()
 	render::text(width, 25, fonts::tahoma, std::format(XOR("Weapon {} [{} / {}]"), weapon->getWpnName(), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
 	render::text(width, 35, fonts::tahoma, std::format(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100), false, Colors::Yellow);
 	render::text(width, 45, fonts::tahoma, std::format(XOR("Zoom level {}"), weapon->m_zoomLevel()), false, Colors::Yellow);
-	render::text(width, 55, fonts::tahoma, std::format(XOR("POS: x: {:.2f} y: {:.2f} z: {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->m_vecOrigin().y, game::localPlayer->m_vecOrigin().z), false, Colors::Yellow);
-	render::text(width, 65, fonts::tahoma, std::format(XOR("Velocity: {:.2f}"), game::localPlayer->m_vecVelocity().Length2D()), false, Colors::Yellow);
+	render::text(width, 55, fonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->m_vecOrigin().y, game::localPlayer->m_vecOrigin().z), false, Colors::Yellow);
+	render::text(width, 65, fonts::tahoma, std::format(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().Length2D()), false, Colors::Yellow);
 	// test
-	render::text(width, 75, fonts::tahoma, std::format(XOR("Kills: {}"), game::getLocalKills()), false, Colors::Yellow);
-	render::text(width, 85, fonts::tahoma, std::format(XOR("Deaths: {}"), game::getLocalDeaths()), false, Colors::Yellow);
+	render::text(width, 75, fonts::tahoma, std::format(XOR("Kills {}"), game::getLocalKills()), false, Colors::Yellow);
+	render::text(width, 85, fonts::tahoma, std::format(XOR("Deaths {}"), game::getLocalDeaths()), false, Colors::Yellow);
 	// escape divide by zero exceptions by using this trick:
 	float kd = game::getLocalKills() / (game::getLocalDeaths() == 0 ? 1 : game::getLocalDeaths());
-	render::text(width, 95, fonts::tahoma, std::format(XOR("KD: {:.2f}"), kd), false, Colors::Yellow);
-	render::text(width, 105, fonts::tahoma, std::format(XOR("Ping: {}"), game::getLocalPing()), false, Colors::Yellow);
+	render::text(width, 95, fonts::tahoma, std::format(XOR("KD {:.2f}"), kd), false, Colors::Yellow);
+	render::text(width, 105, fonts::tahoma, std::format(XOR("Ping {}"), game::getLocalPing()), false, Colors::Yellow);
 
 	width *= 1.25f;
 	render::text(width, 15, fonts::tahoma, legitbot::bestEnt ? std::format(XOR("Aimbot working on: {}"), legitbot::bestEnt->getName()) : "", false, Colors::LightBlue);

@@ -122,6 +122,7 @@ namespace interfaces
 	inline IVStudioRender* studioRender;
 	// remember to dereference!
 	inline PlayerResource** resource;
+	inline IVEfx* effects;
 
 	bool init();
 }

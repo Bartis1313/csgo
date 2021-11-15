@@ -1,6 +1,6 @@
 #pragma once
 
-// 17:09 13.11.2021
+// 18:30 14.11.2021
 // Bartis: updated
 
 enum VTableIndexes
@@ -34,3 +34,6 @@ enum VTableIndexes
 #define HASC4					XOR("56 8B F1 85 F6 74 31")
 #define INVALIDATE_BONE_CACHE	XOR("80 3D ? ? ? ? ? 74 16 A1 ? ? ? ? 48 C7 81")
 #define PLAYER_RESOURCE			XOR("8B 3D ? ? ? ? 85 FF 0F 84 ? ? ? ? 81 C7")
+// useless since in here you can read it can be forced, but it's safer
+// https://www.unknowncheats.me/forum/counterstrike-global-offensive/213556-changing-sky-spoofing-cvar.html
+#define LOAD_SKY				XOR("55 8B EC 81 EC ? ? ? ? 56 57 8B F9 C7 45")

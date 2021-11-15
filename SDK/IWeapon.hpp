@@ -5,21 +5,15 @@
 class WeaponInfo
 {
 public:
-	PAD(20)
+	PAD(20);
 	int m_maxClip1;
 	int m_maxClip2;
 	PAD(8);
 	int m_primaryMaxAmmo;
 	int m_secondaryMaxAmmo;
-	PAD(92);
-	const char* m_hudName;
+	PAD(90);
 	const char* m_WeaponName;
-	PAD(2);
-	bool isMelee;
-	PAD(17);
-	int m_slot;
-	int m_position;
-	PAD(28);
+	PAD(60);
 	int m_type;
 	PAD(4);
 	int m_price;
@@ -28,6 +22,7 @@ public:
 	bool isFullAuto;
 	PAD(3);	
 	int m_damage;
+	float m_hsMultiplier;
 	float m_armorRatio;
 	int m_bullets;
 	float m_penetration;
@@ -36,8 +31,8 @@ public:
 	float m_rangeModyfier;
 	PAD(16);
 	bool isSilenced;
-	PAD(119);
-	float m_recoil;
+	PAD(123);
+	//float m_recoil; not sure
 };
 
 class IWeapon

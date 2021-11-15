@@ -106,12 +106,9 @@ Vector legitbot::getBestBonePos(CUserCmd* cmd)
                 bestHitbox = hitbox;
                 bestEnt = ent;
             }
-            // will not hit this though, since loop has always valid ranged size
-            if (vars::iAimbot != NEAREST)
-                break;
         }
     }
-    bestPoint = bestHitbox;
+
     return bestHitbox;
 }
 
@@ -181,10 +178,8 @@ void legitbot::run(CUserCmd* cmd)
             interfaces::engine->setViewAngles(cmd->m_viewangles);
         }
     }
-    // so selected esp aimbot will be accurate
     else
     {
         bestEnt = nullptr;
-        bestPoint = Vector{ 0, 0, 0 };
     }
 }

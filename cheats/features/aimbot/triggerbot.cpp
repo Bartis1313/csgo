@@ -1,7 +1,7 @@
 #include "triggerbot.hpp"
 #include "../../game.hpp"
 
-// TODO: triggerbot simple delay and fix this at all
+// TODO: triggerbot simple delay
 void triggerbot::run(CUserCmd* cmd)
 {
 	if (!vars::bTriggerbot)
@@ -27,8 +27,9 @@ void triggerbot::run(CUserCmd* cmd)
 		return;
 
 	const auto myEye = game::localPlayer->getEyePos();
-	const auto end = myEye + math::angleVec(cmd->m_viewangles) * weapon->getWpnInfo()->m_range;
-	
+	const auto range = weapon->getWpnInfo()->m_range;
+	const auto end = myEye + math::angleVec(cmd->m_viewangles) * range;
+
 	Trace_t trace;
 	Ray_t ray;
 	TraceFilter filter;
@@ -51,9 +52,14 @@ void triggerbot::run(CUserCmd* cmd)
 	if (!entity->isPlayer())
 		return;
 
-	if (entity == game::localPlayer || entity->isDormant() || !entity->isAlive() || entity->m_bGunGameImmunity())
+	if (entity->isDormant())
+		return;
+
+	if (!entity->isAlive())
+		return;
+
+	if (entity->m_bGunGameImmunity())
 		return;
 
 	cmd->m_buttons |= IN_ATTACK;
-
 }

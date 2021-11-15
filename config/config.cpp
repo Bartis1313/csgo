@@ -14,7 +14,6 @@ namespace config
 		
 		auto err = ini.LoadFile(location.c_str());
 
-		// because I don't force replace, when I add new features to config I delete it manually
 		if (!__PATH.empty() || !err)
 		{
 			ini.SetBoolValue(XOR("HACK"), XOR("BUNNYHOP"), vars::bBunnyHop, "", false);
@@ -39,6 +38,8 @@ namespace config
 			ini.SetLongValue(XOR("HACK"), XOR("BT CHAMS TYPE"), vars::iBacktrackChams, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("ESP INFO"), vars::bDrawInfos, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("ESP SKELETON"), vars::bDrawSkeleton, "", false);
+			ini.SetBoolValue(XOR("HACK"), XOR("DL LIGHT"), vars::bDLight, "", false);
+			ini.SetBoolValue(XOR("HACK"), XOR("NIGHTMODE"), vars::bRunNight, "", false);
 			auto check = ini.SaveFile(location.c_str());
 			if (!check)
 				LOG(LOG_INFO, "Saved the config without error\n");
@@ -81,6 +82,8 @@ namespace config
 				vars::iBacktrackChams = ini.GetLongValue(XOR("HACK"), XOR("BT CHAMS TYPE"));
 				vars::bDrawInfos = ini.GetBoolValue(XOR("HACK"), XOR("ESP INFO"));
 				vars::bDrawSkeleton = ini.GetBoolValue(XOR("HACK"), XOR("ESP SKELETON"));
+				vars::bDLight = ini.GetBoolValue(XOR("HACK"), XOR("DL LIGHT"));
+				vars::bRunNight = ini.GetBoolValue(XOR("HACK"), XOR("NIGHTMODE"));
 				LOG(LOG_INFO, "Config loaded success\n");
 
 				return true;

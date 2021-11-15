@@ -12,6 +12,7 @@ namespace esp
 	void drawSound(IGameEvent* event);
 	void drawInfo(Player_t* ent, const Box& box);
 	void drawPlayer(Player_t* ent);
+	void runDLight(Player_t* ent);
 
 	void drawHealth(Player_t* ent, const Box& box);
 	void drawArmor(Player_t* ent, const Box& box);

@@ -1,8 +1,9 @@
+#include <format>
 #include "menu.hpp"
 #include "../../utilities/renderer/renderer.hpp"
 #include "../../config/config.hpp"
 #include "../game.hpp"
-#include <format>
+#include "../globals.hpp"
 
 static short index = 0;
 
@@ -208,6 +209,11 @@ void Menu::draw()
 	{
 		drawText(width, height, Colors::Yellow, game::localPlayer ? XOR("Hello Bartis :)") : XOR("Hello Undefined :)"));
 		height += 15;
+		drawText(width, height, Colors::Yellow, std::format(XOR("FAKE: {:.2f}"), globals::fakeAngle.y));
+		drawText(width + 100, height, Colors::Yellow, std::format(XOR("REAL: {:.2f}"), globals::realAngle.y));
+		auto diff = std::abs(globals::fakeAngle.y - globals::realAngle.y);
+		drawText(width + 200, height, (diff > 30) ? Colors::Green : Colors::Red, std::format(XOR("DIFF: {:.2f}"), globals::realAngle.y));
+		height += 15;
 	}
 
 	// must have something unique to catch index selected
@@ -230,7 +236,7 @@ void Menu::draw()
 	drawBool(vars::names["backtrack"], width, height);
 	drawInt(vars::names["backtrack_ms"], width, height);
 
-	width = x * 0.26f;
+	width = x * 0.25f;
 	height = 15;
 
 	if (interfaces::engine->isInGame())
@@ -240,7 +246,7 @@ void Menu::draw()
 			render::textf(width, height, fonts::tahoma, false, Colors::Yellow, XOR("Local Player %p"), game::localPlayer);
 		else
 			render::textf(width, height, fonts::tahoma, false, Colors::Yellow, XOR("Local Player 0x0"));
-		height += 15;
+		height += 30;
 	}
 
 	drawBool(vars::names["radar"], width, height);
@@ -249,4 +255,6 @@ void Menu::draw()
 	drawBool(vars::names["esp_info"], width, height);
 	drawBool(vars::names["esp_skeleton"], width, height);
 	drawVec(vars::names["bt_chams"], width, height);
+	drawBool(vars::names["dl_light"], width, height);
+	drawBool(vars::names["nightmode"], width, height);
 }
