@@ -10,8 +10,7 @@ static short index = 0;
 #ifndef _DEBUG
 void Menu::handleKeys(Item* set) const
 {
-	// let insert to be controlled 24/7, others only if menu is opened,
-	// TODO: add guards for debug detection since writing dummy cached is an overkill
+	// let insert to be controlled 24/7, others only if menu is opened
 	if (LF(GetAsyncKeyState).cached()(VK_INSERT) & 1)
 	{
 		vars::bMenuOpen = !vars::bMenuOpen;
@@ -82,8 +81,7 @@ void Menu::handleKeys(Item* set) const
 #else
 void Menu::handleKeys(Item* set) const
 {
-	// let insert to be controlled 24/7, others only if menu is opened,
-	// TODO: add guards for debug detection since writing dummy cached is an overkill
+	// let insert to be controlled 24/7, others only if menu is opened
 	if (LF(GetAsyncKeyState)(VK_INSERT) & 1)
 	{
 		vars::bMenuOpen = !vars::bMenuOpen;
@@ -187,6 +185,17 @@ void Menu::drawVec(int idx, int x, int& y)
 	drawText(x + 100, y, (settings[idx].getInt() != 0) ? Colors::LightBlue : Colors::White, settings[idx].getVec().at(settings[idx].getInt()));
 
 	y += 15;
+}
+
+// if you are here and you are lazy to use this drawVec drawBool etc... here is something for ya
+void Menu::drawOption(int idx, int x, int& y)
+{
+	if (settings[idx].isAddable())
+		Menu::drawInt(idx, x, y);
+	if(settings[idx].isBoolOption())
+		Menu::drawBool(idx, x, y);
+	if (settings[idx].isVectorOption())
+		Menu::drawVec(idx, x, y);
 }
 
 void Menu::draw()
