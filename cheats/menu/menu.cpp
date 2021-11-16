@@ -79,7 +79,7 @@ void Menu::handleKeys() const
 	}
 }
 #else
-void Menu::handleKeys(Item* set) const
+void Menu::handleKeys() const
 {
 	// let insert to be controlled 24/7, others only if menu is opened
 	if (LF(GetAsyncKeyState)(VK_INSERT) & 1)
