@@ -7,7 +7,8 @@
 #include "../features/misc/bunnyhop.hpp"
 #include "../features/aimbot/triggerbot.hpp"
 #include "../globals.hpp"
-#include ".././features/visuals/world.hpp"
+#include "../features/visuals/world.hpp"
+#include "../features/misc/misc.hpp"
 
 bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 {	
@@ -38,6 +39,7 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 		backtrack::run(cmd);
 		legitbot::run(cmd);
 		triggerbot::run(cmd);
+		misc::getVelocityData();
 	}	
 	prediction::end();
 

@@ -21,9 +21,6 @@ enum FontFlags
 	FONTFLAG_BITMAP = 0x800,
 };
 
-unsigned long fonts::tahoma;
-unsigned long fonts::smalle;
-
 namespace render
 {
 	void init()
@@ -33,6 +30,7 @@ namespace render
 
 		fonts::smalle = interfaces::surface->fontCreate();
 		interfaces::surface->setFontGlyph(fonts::smalle, "Tahoma", 9, 800, 0, 0, FONTFLAG_ANTIALIAS);
+
 		LOG(LOG_INFO, "render success\n");
 	}
 

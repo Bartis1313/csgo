@@ -46,6 +46,7 @@ namespace config
 			else
 			{
 				LOG(LOG_ERR, "Config save failed\n");
+				throw std::runtime_error(XOR("Config could not reach the path"));
 			}
 		}
 	}

@@ -156,7 +156,7 @@ struct GraphPoint
 	float x1, y1, x2, y2;
 };
 
-void misc::drawFpsGraph()
+void misc::drawFpsPlot()
 {
 	// return; because no scaling added yet
 	return;
@@ -177,12 +177,71 @@ void misc::drawFpsGraph()
 
 	for (int i = 0; i < records.size() - 1; i++)
 	{
+		// because frames sometimes may be stupid, like on loading new map
 		auto current = std::clamp(records.at(i).fps, 0.0f, 500.0f);
 		auto next = std::clamp(records.at(i + 1).fps, 0.0f, 500.0f);
 
 		// ratios: put anything you find good
 		const auto a = 1.0f;
 		const auto b = 15.0f;
+
+		GraphPoint points =
+		{
+			static_cast<float>(x / 2 - (i - 1)),
+			y / 2 - a * std::sqrt(current * b),
+			static_cast<float>(x / 2 - i),
+			y / 2 - a * std::sqrt(next * b)
+		};
+
+		render::drawLine(points.x1, points.y1,
+			points.x2, points.y2, Color(170, 200, 180, 200));
+	}
+}
+
+struct RecordVelocity
+{
+	float velocity;
+};
+
+std::deque<RecordVelocity> velRecords;
+
+// because without prediction the values might not be that accurate
+void misc::getVelocityData()
+{
+	if (!game::localPlayer)
+		return;
+
+	if (!interfaces::engine->isInGame())
+	{
+		velRecords.clear();
+		return;
+	}
+
+	velRecords.resize(300);
+
+	// put every tick to record, this way you don't have to call clear() when heap gets filled more than width of graph
+	velRecords.insert(velRecords.begin(), RecordVelocity{ game::localPlayer->m_vecVelocity().Length2D() });
+}
+
+void misc::drawVelocityPlot()
+{
+	// return; because no scaling added yet
+	return;
+
+	if (!game::localPlayer)
+		return;
+
+	int x, y;
+	interfaces::engine->getScreenSize(x, y);
+
+	for (int i = 0; i < velRecords.size() - 1; i++)
+	{
+		auto current = velRecords.at(i).velocity;
+		auto next = velRecords.at(i + 1).velocity;
+
+		// ratios: put anything you find good
+		const auto a = 1.0f;
+		const auto b = 2.0f;
 
 		GraphPoint points =
 		{

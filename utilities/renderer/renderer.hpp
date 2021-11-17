@@ -10,8 +10,8 @@ struct Box
 
 namespace fonts
 {
-	extern unsigned long tahoma;
-	extern unsigned long smalle;
+	inline unsigned long tahoma;
+	inline unsigned long smalle;
 }
 
 namespace render
