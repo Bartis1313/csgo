@@ -61,5 +61,5 @@ I will try to implement it in a short time perioid, eventually people who commit
 
 # People who helped
 * [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs15 leak which made reversing even easier.
-* [Pawe³ Gozdur](https://github.com/carlos-konewka) - helping me with math, especially plot logic.
+* [Pawel Gozdur](https://github.com/carlos-konewka) - helping me with math, especially plot logic.
 * [UC Wiki](https://www.unknowncheats.me/wiki/UnKnoWnCheaTs_Game_Hacking_Wiki) - for very helpful sources.
