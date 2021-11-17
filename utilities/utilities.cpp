@@ -42,8 +42,17 @@ namespace utilities
 
 	std::string getHackPath()
 	{
-		fs::current_path(__DOCUMENTS);
-		return fs::absolute(XOR("Bartis_internal/csgo")).string();
+		std::string res = {};
+		try
+		{
+			fs::current_path(__DOCUMENTS);
+			res = fs::absolute(XOR("Bartis_internal/csgo")).string();
+		}
+		catch (const fs::filesystem_error& err)
+		{
+			throw std::runtime_error(err.what());
+		}
+		return !res.empty() ? res : "";
 	}
 
 	std::string getTime()

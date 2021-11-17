@@ -158,14 +158,14 @@ struct GraphPoint
 
 void misc::drawFpsGraph()
 {
-	// because it's not fixed yet
+	// return; because no scaling added yet
 	return;
 
 	// static so we can get records get saved
 	static std::deque<Record> records;
 
 	// width of graph
-	records.resize(200);
+	records.resize(300);
 
 	int x, y;
 	interfaces::engine->getScreenSize(x, y);
@@ -174,21 +174,25 @@ void misc::drawFpsGraph()
 	records.insert(records.begin(), Record{ 1.f / interfaces::globalVars->m_frametime });
 
 	// go for every stored record, -1 to access next record this way
+
 	for (int i = 0; i < records.size() - 1; i++)
 	{
-		auto current = records.at(i).fps;
-		auto next = records.at(i + 1).fps;
+		auto current = std::clamp(records.at(i).fps, 0.0f, 500.0f);
+		auto next = std::clamp(records.at(i + 1).fps, 0.0f, 500.0f);
 
-		// here this needs to be fixed with getting ratio well
-		// TODO: fix this
+		// ratios: put anything you find good
+		const auto a = 1.0f;
+		const auto b = 15.0f;
+
 		GraphPoint points =
 		{
-			x / 2 - i - 1,
-			y / 2 - (current / 3.0f),
-			x / 2 - i,
-			y / 2 - (next / 3.0f)
+			static_cast<float>(x / 2 - (i - 1)),
+			y / 2 - a * std::sqrt(current * b),
+			static_cast<float>(x / 2 - i),
+			y / 2 - a * std::sqrt(next * b)
 		};
 
-		render::drawLine(points.x1, points.y1, points.x2, points.y2, Color(170, 200, 180, 200));
+		render::drawLine(points.x1, points.y1,
+			points.x2, points.y2, Color(170, 200, 180, 200));
 	}
 }
