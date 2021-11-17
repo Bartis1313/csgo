@@ -115,13 +115,13 @@ void radar::run()
 		bool check = true;
 		const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D(centerx - size, centery - size), Vector2D(2.0f * size, 2.0f * size), 1.8f, check);
 
-		// must be better way
+		// must be better way, idk how to make it easier
 		auto entYaw = ent->m_angEyeAngles().y;
 
 		if (entYaw < 0)
-			entYaw = 180 + ((180 + entYaw));
+			entYaw = 360 + entYaw;
 
-		const auto rotated = (270 - entYaw) + ang.y;
+		const auto rotated = 270 - entYaw + ang.y;
 
 		// this arg should not be dotRad in this case, as value gets higher line too
 		const auto finalX = dotRad * std::cos(DEG2RAD(rotated));

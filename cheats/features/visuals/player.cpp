@@ -69,6 +69,7 @@ void esp::run()
 			drawPlayer(entity);
 			drawSkeleton(entity);
 			runDLight(entity);
+			drawLaser(entity);
 		}
 	}
 }
@@ -309,6 +310,24 @@ void esp::drawSnapLine(Player_t* ent, const Box& box)
 
 		// lines on the bottom and center bottom box
 		render::drawLine(width / 2, height, box.x + box.w / 2, box.y + box.h, Colors::Purple);
+	}
+}
+
+void esp::drawLaser(Player_t* ent)
+{
+	// get from where to start, "laser ESP" is always starting from head I think
+	auto start = ent->getBonePosition(8);
+	// get angle to draw with correct view
+	auto forward = math::angleVec(ent->m_angEyeAngles());
+	// end is where lines just ends, this 70 is hardcoded, but whatever here tbh
+	auto end = start + forward * 70.f;
+
+	if (Vector screenLocal, screenEnt; render::WorldToScreen(start, screenLocal) && render::WorldToScreen(end, screenEnt))
+	{
+		render::drawCircleFilled(screenLocal.x, screenLocal.y, 3, 32, Colors::Red);
+		// was lazy to make a polygon for only 2 width
+		render::drawLine(screenLocal.x, screenLocal.y, screenEnt.x, screenEnt.y, Color(190, 190, 190, 200));
+		render::drawLine(screenLocal.x + 1, screenLocal.y + 1, screenEnt.x + 1, screenEnt.y + 1, Color(190, 190, 190, 200));
 	}
 }
 

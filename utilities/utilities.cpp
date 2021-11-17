@@ -28,9 +28,8 @@ namespace utilities
 	{
 		fs::current_path(__DOCUMENTS);
 		//CreateDirectoryA(std::string(__DOCUMENTS + std::string("\\") + std::string("Bartis internal")).c_str(), NULL);
-		fs::create_directories(XOR("Bartis_internal/csgo"));
-
-		return true;
+		bool result = fs::create_directories(XOR("Bartis_internal/csgo"));
+		return result ? true : throw std::runtime_error(XOR("Could not create directory"));
 	}
 
 	std::string getHackPath()

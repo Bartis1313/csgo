@@ -19,6 +19,7 @@ namespace esp
 	void drawWeapon(Player_t* ent, const Box& box);
 	void drawSkeleton(Player_t* ent);
 	void drawSnapLine(Player_t* ent, const Box& box);
+	void drawLaser(Player_t* ent);
 
 	// 3d
 	void renderBox3D(Entity_t* ent, bool fill = false);

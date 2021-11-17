@@ -21,5 +21,6 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		radar::run();
 		misc::drawCrosshair();
 		misc::drawLocalInfo();
+		misc::drawFpsGraph();
 	}
 }

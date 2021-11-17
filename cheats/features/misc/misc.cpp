@@ -5,6 +5,7 @@
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../aimbot/aimbot.hpp"
 #include <format>
+#include <deque>
 
 constexpr int VK_VKEY = 0x56;
 
@@ -141,4 +142,53 @@ void misc::drawLocalInfo()
 
 	width *= 1.25f;
 	render::text(width, 15, fonts::tahoma, legitbot::bestEnt ? std::format(XOR("Aimbot working on: {}"), legitbot::bestEnt->getName()) : "", false, Colors::LightBlue);
+}
+
+// 1.f / interfaces::globalVars;
+
+struct Record
+{
+	float fps;
+};
+
+void misc::drawFpsGraph()
+{
+	// because it's not fixed yet
+	return;
+
+	// static so we can get records get saved
+	static std::deque<Record> records;
+
+	// width of graph
+	records.resize(200);
+
+	if (!interfaces::engine->isConnected())
+	{
+		records.clear();
+	}
+
+	int x, y;
+	interfaces::engine->getScreenSize(x, y);
+
+	// put every tick to record, this way you don't have to call clear() when heap gets filled more than width of graph
+	records.insert(records.begin(), Record{ 1.f / interfaces::globalVars->m_frametime });
+
+	// go for every stored record, -1 to access next record this way
+	for (int i = 0; i < records.size() - 1; i++)
+	{
+		auto current = records.at(i).fps;
+		auto next = records.at(i + 1).fps;
+
+		// here this needs to be fixed with getting ratio well
+		// TODO: fix this
+		RECT points =
+		{
+			x / 2 - i - 1,
+			y / 2 - (current / 3.0f),
+			x / 2 - i,
+			y / 2 - (next / 3.0f)
+		};
+
+		render::drawLine(points.left, points.top, points.right, points.bottom, Color(170, 200, 180, 200));
+	}
 }

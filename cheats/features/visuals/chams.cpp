@@ -140,7 +140,7 @@ void chams::run(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_
 
 	if (ent->isPlayer())
 	{
-		drawChams(ent, ctx, state, std::cref(info), std::cref(matrix));
 		drawBacktrackChams(ent, ctx, state, std::cref(info));
+		drawChams(ent, ctx, state, std::cref(info), std::cref(matrix));
 	}
 }

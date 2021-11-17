@@ -55,6 +55,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.0.8 - small update with making menu usage more easier, items are now in map and features can be passed as name for vars::names map
 * 1.0.9 - big update for performance, recode, and code style. All functions are camel case. I seperated visuals to be in few files since it's better to read and move in code. Added even more visuals once again. Fixed prediction, thanks: [kaposzta99](https://github.com/Bartis1313/csgo/issues/4)
 * 1.1.0 - update came with fixes: triggerbot, backtrack records and SDK. Added Dlight and "nightmode" that just forces other skybox. Few very small addons to menu and code changes.
+* 1.0.1 - small update with new planned feature and handling the error in case the directory can't be created.
 </details>
 
 # People who helped
