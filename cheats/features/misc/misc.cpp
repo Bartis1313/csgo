@@ -151,6 +151,11 @@ struct Record
 	float fps;
 };
 
+struct GraphPoint
+{
+	float x1, y1, x2, y2;
+};
+
 void misc::drawFpsGraph()
 {
 	// because it's not fixed yet
@@ -181,7 +186,7 @@ void misc::drawFpsGraph()
 
 		// here this needs to be fixed with getting ratio well
 		// TODO: fix this
-		RECT points =
+		GraphPoint points =
 		{
 			x / 2 - i - 1,
 			y / 2 - (current / 3.0f),
@@ -189,6 +194,6 @@ void misc::drawFpsGraph()
 			y / 2 - (next / 3.0f)
 		};
 
-		render::drawLine(points.left, points.top, points.right, points.bottom, Color(170, 200, 180, 200));
+		render::drawLine(points.x1, points.y1, points.x2, points.y2, Color(170, 200, 180, 200));
 	}
 }
