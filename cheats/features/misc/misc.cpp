@@ -167,11 +167,6 @@ void misc::drawFpsGraph()
 	// width of graph
 	records.resize(200);
 
-	if (!interfaces::engine->isConnected())
-	{
-		records.clear();
-	}
-
 	int x, y;
 	interfaces::engine->getScreenSize(x, y);
 
