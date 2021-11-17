@@ -26,10 +26,18 @@ namespace utilities
 
 	bool prepareDirectories()
 	{
-		fs::current_path(__DOCUMENTS);
-		//CreateDirectoryA(std::string(__DOCUMENTS + std::string("\\") + std::string("Bartis internal")).c_str(), NULL);
-		bool result = fs::create_directories(XOR("Bartis_internal/csgo"));
-		return result ? true : throw std::runtime_error(XOR("Could not create directory"));
+		bool result = false;
+		try
+		{
+			fs::current_path(__DOCUMENTS);
+			//CreateDirectoryA(std::string(__DOCUMENTS + std::string("\\") + std::string("Bartis internal")).c_str(), NULL);
+			result = fs::create_directories(XOR("Bartis_internal/csgo"));
+		}
+		catch (const fs::filesystem_error& err)
+		{
+			throw std::runtime_error(err.what());
+		}
+		return result ? true : false;
 	}
 
 	std::string getHackPath()
