@@ -1,7 +1,6 @@
 #include "interfaces.hpp"
 #include "../structs/IDXandPaterrns.hpp"
 #include "../../utilities/utilities.hpp"
-#include "../../cheats/game.hpp"
 
 bool interfaces::init()
 {

@@ -1,5 +1,4 @@
 #pragma once
-#include <type_traits>
 #include <cstdint>
 #include <fstream>
 #include <unordered_map>
