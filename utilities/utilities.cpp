@@ -37,7 +37,7 @@ namespace utilities
 		{
 			throw std::runtime_error(err.what());
 		}
-		return result ? true : false;
+		return result;
 	}
 
 	std::string getHackPath()
@@ -52,7 +52,7 @@ namespace utilities
 		{
 			throw std::runtime_error(err.what());
 		}
-		return !res.empty() ? res : "";
+		return res;
 	}
 
 	std::string getTime()

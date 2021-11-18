@@ -151,9 +151,9 @@ struct Record
 	float fps;
 };
 
-struct GraphPoint
+struct PlotPoint
 {
-	float x1, y1, x2, y2;
+	int x1, y1, x2, y2;
 };
 
 void misc::drawFpsPlot()
@@ -185,11 +185,11 @@ void misc::drawFpsPlot()
 		const auto a = 1.0f;
 		const auto b = 15.0f;
 
-		GraphPoint points =
+		PlotPoint points =
 		{
-			static_cast<float>(x / 2 - (i - 1)),
+			x / 2 - (i - 1),
 			y / 2 - a * std::sqrt(current * b),
-			static_cast<float>(x / 2 - i),
+			x / 2 - i,
 			y / 2 - a * std::sqrt(next * b)
 		};
 
@@ -243,11 +243,11 @@ void misc::drawVelocityPlot()
 		const auto a = 1.0f;
 		const auto b = 2.0f;
 
-		GraphPoint points =
+		PlotPoint points =
 		{
-			static_cast<float>(x / 2 - (i - 1)),
+			x / 2 - (i - 1),
 			y / 2 - a * std::sqrt(current * b),
-			static_cast<float>(x / 2 - i),
+			x / 2 - i,
 			y / 2 - a * std::sqrt(next * b)
 		};
 
