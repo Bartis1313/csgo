@@ -153,14 +153,11 @@ struct Record
 
 struct PlotPoint
 {
-	int x1, y1, x2, y2;
+	float x1, y1, x2, y2;
 };
 
 void misc::drawFpsPlot()
 {
-	// return; because no scaling added yet
-	return;
-
 	// static so we can get records get saved
 	static std::deque<Record> records;
 
@@ -169,6 +166,16 @@ void misc::drawFpsPlot()
 
 	int x, y;
 	interfaces::engine->getScreenSize(x, y);
+	x /= 2, y /= 2;
+
+	// get position to startdrawing, although this time I am goona start from right pos, because of the loop under
+	auto widthPoint = x + (x * 0.97f);
+
+	// a bit of hardcode here
+	render::drawFilledRect(widthPoint - records.size() - 1, y - 250 + 2, records.size() + 5, 150, Colors::Grey);
+	render::drawOutlineRect(widthPoint - records.size() - 1, y - 250 + 2, records.size() + 5, 150, Colors::Black);
+
+	render::text(widthPoint - records.size() / 2, y - 250 - 14, fonts::tahoma, XOR("FPS Plot"), true, Colors::LightBlue);
 
 	// put every tick to record, this way you don't have to call clear() when heap gets filled more than width of graph
 	records.insert(records.begin(), Record{ 1.f / interfaces::globalVars->m_frametime });
@@ -185,12 +192,13 @@ void misc::drawFpsPlot()
 		const auto a = 1.0f;
 		const auto b = 15.0f;
 
+
 		PlotPoint points =
 		{
-			x / 2 - (i - 1),
-			y / 2 - a * std::sqrt(current * b),
-			x / 2 - i,
-			y / 2 - a * std::sqrt(next * b)
+			widthPoint - (i - 1),
+			y - 100 - a * std::sqrt(current * b),
+			widthPoint - i,
+			y - 100 - a * std::sqrt(next * b)
 		};
 
 		render::drawLine(points.x1, points.y1,
@@ -225,14 +233,22 @@ void misc::getVelocityData()
 
 void misc::drawVelocityPlot()
 {
-	// return; because no scaling added yet
-	return;
-
 	if (!game::localPlayer)
+		return;
+
+	if (!interfaces::engine->isInGame())
 		return;
 
 	int x, y;
 	interfaces::engine->getScreenSize(x, y);
+	x /= 2, y /= 2;
+
+	auto widthPoint = x + (x * 0.97f);
+
+	render::drawFilledRect(widthPoint - velRecords.size() - 1, y - 50 + 2, velRecords.size() + 5, 50, Colors::Grey);
+	render::drawOutlineRect(widthPoint - velRecords.size() - 1, y - 50 + 2, velRecords.size() + 5, 50, Colors::Black);
+
+	render::text(widthPoint - velRecords.size() / 2, y - 50 - 14, fonts::tahoma, XOR("Velocity Plot"), true, Colors::LightBlue);
 
 	for (int i = 0; i < velRecords.size() - 1; i++)
 	{
@@ -245,10 +261,10 @@ void misc::drawVelocityPlot()
 
 		PlotPoint points =
 		{
-			x / 2 - (i - 1),
-			y / 2 - a * std::sqrt(current * b),
-			x / 2 - i,
-			y / 2 - a * std::sqrt(next * b)
+			widthPoint - (i - 1),
+			y - a * std::sqrt(current * b),
+			widthPoint - i,
+			y - a * std::sqrt(next * b)
 		};
 
 		render::drawLine(points.x1, points.y1,
