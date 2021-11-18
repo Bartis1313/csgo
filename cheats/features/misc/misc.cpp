@@ -158,6 +158,9 @@ struct PlotPoint
 
 void misc::drawFpsPlot()
 {
+	if (!vars::bShowPlots)
+		return;
+
 	// static so we can get records get saved
 	static std::deque<Record> records;
 
@@ -233,6 +236,9 @@ void misc::getVelocityData()
 
 void misc::drawVelocityPlot()
 {
+	if (!vars::bShowPlots)
+		return;
+
 	if (!game::localPlayer)
 		return;
 

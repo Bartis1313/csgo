@@ -266,4 +266,6 @@ void Menu::draw()
 	drawVec(vars::names["bt_chams"], width, height);
 	drawBool(vars::names["dl_light"], width, height);
 	drawBool(vars::names["nightmode"], width, height);
+	drawBool(vars::names["esp_lines"], width, height);
+	drawBool(vars::names["plots"], width, height);
 }

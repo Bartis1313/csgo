@@ -315,6 +315,9 @@ void esp::drawSnapLine(Player_t* ent, const Box& box)
 
 void esp::drawLaser(Player_t* ent)
 {
+	if (!vars::bEspLasers)
+		return;
+
 	// get from where to start, "laser ESP" is always starting from head I think
 	auto start = ent->getBonePosition(8);
 	// get angle to draw with correct view

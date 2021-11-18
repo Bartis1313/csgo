@@ -29,6 +29,7 @@ namespace config
 			ini.SetLongValue(XOR("HACK"), XOR("RCS XY VALUE"), vars::iRCS, "", false);
 			ini.SetLongValue(XOR("HACK"), XOR("CROSSHAIR TYPE"), vars::iCrosshair, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("TRIGGERBOT"), vars::bTriggerbot, "", false);
+			ini.SetLongValue(XOR("HACK"), XOR("TRIGGERBOT MS"), vars::iTriggerDelay, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("BACKTRACK"), vars::bBacktrack, "", false);
 			ini.SetLongValue(XOR("HACK"), XOR("BACKTRACK TICKS"), vars::iBacktrackTick, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("MENU OPENED"), vars::bMenuOpen, "", false);
@@ -40,6 +41,8 @@ namespace config
 			ini.SetBoolValue(XOR("HACK"), XOR("ESP SKELETON"), vars::bDrawSkeleton, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("DL LIGHT"), vars::bDLight, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("NIGHTMODE"), vars::bRunNight, "", false);
+			ini.SetBoolValue(XOR("HACK"), XOR("ESP LASERS"), vars::bEspLasers, "", false);
+			ini.SetBoolValue(XOR("HACK"), XOR("SHOW PLOTS"), vars::bShowPlots, "", false);
 			auto check = ini.SaveFile(location.c_str());
 			if (!check)
 				LOG(LOG_INFO, "Saved the config without error\n");
@@ -74,6 +77,7 @@ namespace config
 				vars::iRCS = ini.GetLongValue(XOR("HACK"), XOR("RCS XY VALUE"));
 				vars::iCrosshair = ini.GetLongValue(XOR("HACK"), XOR("CROSSHAIR TYPE"));
 				vars::bTriggerbot = ini.GetBoolValue(XOR("HACK"), XOR("TRIGGERBOT"));
+				vars::iTriggerDelay = ini.GetLongValue(XOR("HACK"), XOR("TRIGGERBOT MS"));
 				vars::bBacktrack = ini.GetBoolValue(XOR("HACK"), XOR("BACKTRACK"));
 				vars::iBacktrackTick = ini.GetLongValue(XOR("HACK"), XOR("BACKTRACK TICKS"));
 				vars::bMenuOpen = ini.GetBoolValue(XOR("HACK"), XOR("MENU OPENED"));
@@ -85,6 +89,8 @@ namespace config
 				vars::bDrawSkeleton = ini.GetBoolValue(XOR("HACK"), XOR("ESP SKELETON"));
 				vars::bDLight = ini.GetBoolValue(XOR("HACK"), XOR("DL LIGHT"));
 				vars::bRunNight = ini.GetBoolValue(XOR("HACK"), XOR("NIGHTMODE"));
+				vars::bEspLasers = ini.GetBoolValue(XOR("HACK"), XOR("ESP LASERS"));
+				vars::bShowPlots = ini.GetBoolValue(XOR("HACK"), XOR("SHOW PLOTS"));
 				LOG(LOG_INFO, "Config loaded success\n");
 
 				return true;

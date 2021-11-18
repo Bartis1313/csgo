@@ -48,6 +48,10 @@ namespace vars
 	inline bool bDLight = false;
 
 	inline bool bRunNight = false;
+
+	inline bool bEspLasers = false;
+
+	inline bool bShowPlots = false;
 	
 	inline Item options[] =
 	{
@@ -75,6 +79,8 @@ namespace vars
 		Item{ "BT Chams", &iBacktrackChams, {"OFF", "Stable", "Last tick", "Rainbow"} }, // 21,
 		Item{ "DLight", &bDLight }, // 22,
 		Item{ "NightMode" , &bRunNight }, // 23
+		Item{ "Esp Lasers", &bEspLasers }, // 24
+		Item{ "Draw Plots", &bShowPlots }, // 25
 	};
 	
 	inline std::map<std::string, int> names =
@@ -103,5 +109,7 @@ namespace vars
 		{"bt_chams", 21},
 		{"dl_light", 22},
 		{"nightmode", 23},
+		{"esp_lines", 24},
+		{"plots", 25},
 	};
 };
