@@ -29,9 +29,6 @@ public:
     SendPropType  m_type;
 };
 
-// to this line those can be used in netvar dump
-// TODO: add types in dumper
-
 class RecvTable;
 class RecvProp;
 

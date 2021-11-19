@@ -38,12 +38,13 @@ class NetvarManager : public singleton<NetvarManager>
 public:
 	void init();
 	uintptr_t getNetvar(const char* tableName, const char* propName);
-	void dump(RecvTable* recvTable);
 	void dump();
 private:
 	std::unordered_map<std::string, RecvTable*> m_Tables;
 	uintptr_t getProp(const char* tableName, const char* propName, RecvProp** prop = 0);
-	uintptr_t getProp(RecvTable* recv, const char* propName, RecvProp** prop = 0);
+	uintptr_t getProp(RecvTable* recvTable, const char* propName, RecvProp** prop = 0);
 	RecvTable* getTable(const char* tableName);
+	std::string getType(RecvProp* recvTable);
+	void dump(RecvTable* recvTable);
 	std::ofstream file;
 };

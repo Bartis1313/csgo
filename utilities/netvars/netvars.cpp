@@ -93,6 +93,31 @@ RecvTable* NetvarManager::getTable(const char* tableName)
 //	return false;
 //}
 
+std::string NetvarManager::getType(RecvProp* recvTable)
+{
+	switch (recvTable->m_recvType)
+	{
+	case DPT_Int:
+		return XOR("int");
+	case DPT_Float:
+		return XOR("float");
+	case DPT_Vector:
+		return XOR("Vector");
+	case DPT_VectorXY:
+		return XOR("Vector2D");
+	case DPT_String:
+		return XOR("char*");
+	case DPT_Array:
+		return XOR("array*");
+	case DPT_DataTable:
+		return XOR("void*");
+	case DPT_Int64:
+		return XOR("__int64");
+	default:
+		return "";
+	}
+}
+
 void NetvarManager::dump(RecvTable* recvTable)
 {
 	for (int i = 0; i < recvTable->m_propsNum; i++)
@@ -104,10 +129,10 @@ void NetvarManager::dump(RecvTable* recvTable)
 
 		std::string recvName = recvProp->m_varName;
 
-		if (recvName.find(XOR("baseclass")) == 0)
+		if (!recvName.find(XOR("baseclass")))
 			continue;
 
-		if (!recvName.find(XOR("m_")) == 0)
+		if (recvName.find(XOR("m_")))
 			continue;
 
 		// offsets for set are hardcoded- simply no need for this
@@ -115,7 +140,8 @@ void NetvarManager::dump(RecvTable* recvTable)
 			<< std::setfill('_') << std::setw(80 - recvName.length()) << recvName
 			<< std::setfill(' ') << std::setw(recvName.length() + 2) << " -> "
 			<< "0x" << std::setfill('0') << std::setw(8) << std::hex
-			<< std::uppercase << recvProp->m_offset << "\n";
+			<< std::uppercase << recvProp->m_offset
+			<< " -> " << getType(recvProp) << "\n";
 
 		if (recvProp->m_dataTable)
 			dump(recvProp->m_dataTable);
