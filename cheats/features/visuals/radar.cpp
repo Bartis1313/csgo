@@ -68,14 +68,10 @@ void radar::run()
 	int centery = y - 110;
 	int size = 90;
 
-	render::drawTrapezFilled(Vector2D(centerx - size, centery - size), Vector2D(centerx + size, centery - size),
-		Vector2D(centerx + size, centery + size), Vector2D(centerx - size, centery + size), Color(128, 128, 128, 190));
+	render::drawFilledRect(centerx - size, centery - size, 2 * size, 2 * size, Color(128, 128, 128, 190));
+	render::drawOutlineRect(centerx - size - 1, centery - size - 1, 2 * size + 1, 2 * size + 1, Colors::Black);
 
-	render::drawTrapezOutline(Vector2D(centerx - size - 1, centery - size - 1), Vector2D(centerx + size + 1, centery - size - 1),
-		Vector2D(centerx + size + 1, centery + size + 1), Vector2D(centerx - size - 1, centery + size + 1), Colors::Black);
-
-	int toAlign = render::getTextSize(fonts::tahoma, "Radar");
-	render::text(centerx - toAlign / 2, centery - size - 10, fonts::tahoma, "Radar", false, Colors::LightBlue);
+	render::text(centerx, centery - size - 14, fonts::tahoma, XOR("Radar"), true, Colors::LightBlue);
 
 	render::drawFilledRect(centerx - 5, centery - 1, 11, 3, Colors::Black);
 	render::drawFilledRect(centerx - 1, centery - 5, 3, 11, Colors::Black);
