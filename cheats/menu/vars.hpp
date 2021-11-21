@@ -52,6 +52,9 @@ namespace vars
 	inline bool bEspLasers = false;
 
 	inline bool bShowPlots = false;
+
+	inline int iHandChams = 0;
+	inline int iWeaponChams = 0;
 	
 	inline Item options[] =
 	{
@@ -81,6 +84,8 @@ namespace vars
 		Item{ "NightMode" , &bRunNight }, // 23
 		Item{ "Esp Lasers", &bEspLasers }, // 24
 		Item{ "Draw Plots", &bShowPlots }, // 25
+		Item{ "Hand Chams", &iHandChams, {"OFF", "Color", "No Hands"} }, // 26
+		Item{ "Weapon Chams", &iWeaponChams, {"OFF", "Color", "No Weapon"} }, // 27
 	};
 	
 	inline std::map<std::string, int> names =
@@ -111,5 +116,7 @@ namespace vars
 		{"nightmode", 23},
 		{"esp_lines", 24},
 		{"plots", 25},
+		{"arm_chams", 26},
+		{"weapon_chams", 27},
 	};
 };

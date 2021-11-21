@@ -40,6 +40,12 @@ public:
 		return *((int*)this);
 	}
 
+	// useful for future, and guis
+	std::array<float, 4> getModulate() const
+	{
+		return { rDevided(), gDevided() , bDevided() , aDevided() };
+	}
+
 	inline int r() const { return color[0]; }
 	inline int g() const { return color[1]; }
 	inline int b() const { return color[2]; }

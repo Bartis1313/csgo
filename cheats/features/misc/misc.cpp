@@ -253,7 +253,7 @@ void misc::drawVelocityPlot()
 	{
 		auto currentVal = velRecords.at(i).velocity;
 		float cx = widthPoint - (i - 1);
-		float cy = y - 100 - a * std::sqrt(currentVal * b);
+		float cy = y - a * std::sqrt(currentVal * b);
 
 		if (i > 0)
 			render::drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));

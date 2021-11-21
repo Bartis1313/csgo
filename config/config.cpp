@@ -43,6 +43,8 @@ namespace config
 			ini.SetBoolValue(XOR("HACK"), XOR("NIGHTMODE"), vars::bRunNight, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("ESP LASERS"), vars::bEspLasers, "", false);
 			ini.SetBoolValue(XOR("HACK"), XOR("SHOW PLOTS"), vars::bShowPlots, "", false);
+			ini.SetLongValue(XOR("HACK"), XOR("HAND CHAMS"), vars::iHandChams, "", false);
+			ini.SetLongValue(XOR("HACK"), XOR("WEAPON CHAMS"), vars::iWeaponChams, "", false);
 			auto check = ini.SaveFile(location.c_str());
 			if (!check)
 				LOG(LOG_INFO, "Saved the config without error\n");
@@ -91,6 +93,8 @@ namespace config
 				vars::bRunNight = ini.GetBoolValue(XOR("HACK"), XOR("NIGHTMODE"));
 				vars::bEspLasers = ini.GetBoolValue(XOR("HACK"), XOR("ESP LASERS"));
 				vars::bShowPlots = ini.GetBoolValue(XOR("HACK"), XOR("SHOW PLOTS"));
+				vars::iHandChams = ini.GetLongValue(XOR("HACK"), XOR("HAND CHAMS"));
+				vars::iWeaponChams = ini.GetLongValue(XOR("HACK"), XOR("WEAPON CHAMS"));
 				LOG(LOG_INFO, "Config loaded success\n");
 
 				return true;

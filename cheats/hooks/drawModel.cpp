@@ -12,6 +12,7 @@ void __stdcall hooks::drawModel::hooked(void* ctx, const DrawModelState_t& state
 		return original(interfaces::modelRender, ctx, std::cref(state), std::cref(info), matrix);
 
 	chams::run(ctx, std::cref(state), std::cref(info), matrix);
+	chams::drawModel(ctx, std::cref(state), std::cref(info), matrix);
 	
 	original(interfaces::modelRender, ctx, std::cref(state), std::cref(info), matrix);
 	interfaces::modelRender->overrideMaterial(nullptr);

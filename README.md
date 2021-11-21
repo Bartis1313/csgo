@@ -57,6 +57,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.1.0 - update came with fixes: triggerbot, backtrack records and SDK. Added Dlight and "nightmode" that just forces other skybox. Few very small addons to menu and code changes.
 * 1.1.1 - small update with new planned feature and handling the error in case the directory can't be created.
 * 1.1.2 - 2D plot added, for fps and velocity. From now if config fails to find file to save, it throws the error.
+* 1.1.3 - Added hand/weapon chams, and rewrote chams code.
 </details>
 
 # People who helped

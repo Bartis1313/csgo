@@ -209,9 +209,20 @@ void world::skyboxLoad(int stage)
 			if (material->isError())
 				continue;
 
+			if (strstr(material->getTextureGroupName(), XOR("World textures")))
+			{
+				material->colorModulate(0.2f, 0.2f, 0.2f);
+			}
+
+			if (strstr(material->getTextureGroupName(), XOR("StaticProp")))
+			{
+				material->colorModulate(0.2f, 0.2f, 0.2f);
+			}
+
 			if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
 			{
 				material->colorModulate(Colors::Turquoise);
+				material->alphaModulate(0.5f);
 			}
 		}
 		// force to new sky
@@ -228,10 +239,21 @@ void world::skyboxLoad(int stage)
 
 			if (material->isError())
 				continue;
+	
+			if (strstr(material->getTextureGroupName(), XOR("StaticProp")))
+			{
+				material->colorModulate(Colors::White);
+			}
+
+			if (strstr(material->getTextureGroupName(), XOR("World textures")))
+			{
+				material->colorModulate(Colors::White);
+			}
 
 			if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
 			{
 				material->colorModulate(Colors::White);
+				material->alphaModulate(1.0f);
 			}
 		}
 		// restore the sky

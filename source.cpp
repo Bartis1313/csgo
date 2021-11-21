@@ -5,6 +5,7 @@
 #include "utilities/netvars/netvars.hpp"
 #include "config/config.hpp"
 #include "source.hpp"
+#include "cheats/features/visuals/chams.hpp"
 
 ULONG WINAPI init(PVOID instance)
 {

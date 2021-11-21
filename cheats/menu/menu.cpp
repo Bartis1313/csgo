@@ -268,4 +268,6 @@ void Menu::draw()
 	drawBool(vars::names["nightmode"], width, height);
 	drawBool(vars::names["esp_lines"], width, height);
 	drawBool(vars::names["plots"], width, height);
+	drawVec(vars::names["arm_chams"], width, height);
+	drawVec(vars::names["weapon_chams"], width, height);
 }
