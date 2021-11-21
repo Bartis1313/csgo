@@ -92,7 +92,7 @@ void misc::drawCrosshair()
 		//width -= (width * (game::localPlayer->m_aimPunchAngle().y));
 		//height += (height * (game::localPlayer->m_aimPunchAngle().x));
 
-		if (Vector endScreen; render::WorldToScreen(end, endScreen) && game::localPlayer->isAlive())
+		if (Vector endScreen; render::worldToScreen(end, endScreen) && game::localPlayer->isAlive())
 		{
 			render::drawFilledRect(endScreen.x - 5, endScreen.y - 1, 11, 3, Colors::Black);
 			render::drawFilledRect(endScreen.x - 1, endScreen.y - 5, 3, 11, Colors::Black);
@@ -144,16 +144,9 @@ void misc::drawLocalInfo()
 	render::text(width, 15, fonts::tahoma, legitbot::bestEnt ? std::format(XOR("Aimbot working on: {}"), legitbot::bestEnt->getName()) : "", false, Colors::LightBlue);
 }
 
-// 1.f / interfaces::globalVars;
-
 struct Record
 {
 	float fps;
-};
-
-struct PlotPoint
-{
-	float x1, y1, x2, y2;
 };
 
 void misc::drawFpsPlot()
@@ -163,9 +156,6 @@ void misc::drawFpsPlot()
 
 	// static so we can get records get saved
 	static std::deque<Record> records;
-
-	// width of graph
-	records.resize(300);
 
 	int x, y;
 	interfaces::engine->getScreenSize(x, y);
@@ -180,32 +170,27 @@ void misc::drawFpsPlot()
 
 	render::text(widthPoint - records.size() / 2, y - 250 - 14, fonts::tahoma, XOR("FPS Plot"), true, Colors::LightBlue);
 
-	// put every tick to record, this way you don't have to call clear() when heap gets filled more than width of graph
-	records.insert(records.begin(), Record{ 1.f / interfaces::globalVars->m_frametime });
+	records.push_back(Record{ 1.f / interfaces::globalVars->m_frametime });
+	
+	// width
+	while (records.size() > 300)
+		records.pop_front();
 
-	// go for every stored record, -1 to access next record this way
+	// ratios: put anything you find good
+	const auto a = 1.0f;
+	const auto b = 10.0f;
 
-	for (int i = 0; i < records.size() - 1; i++)
+	float lx = 0, ly = 0;
+	for (int i = 0; i < records.size(); i++)
 	{
 		// because frames sometimes may be stupid, like on loading new map
-		auto current = std::clamp(records.at(i).fps, 0.0f, 500.0f);
-		auto next = std::clamp(records.at(i + 1).fps, 0.0f, 500.0f);
+		auto currentVal = std::clamp(records.at(i).fps, 0.0f, 500.0f);
+		float cx = widthPoint - (i - 1);
+		float cy = y - 100 - a * std::sqrt(currentVal * b);
 
-		// ratios: put anything you find good
-		const auto a = 1.0f;
-		const auto b = 15.0f;
-
-
-		PlotPoint points =
-		{
-			widthPoint - (i - 1),
-			y - 100 - a * std::sqrt(current * b),
-			widthPoint - i,
-			y - 100 - a * std::sqrt(next * b)
-		};
-
-		render::drawLine(points.x1, points.y1,
-			points.x2, points.y2, Color(170, 200, 180, 200));
+		if (i > 0)
+			render::drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
+		lx = cx; ly = cy;
 	}
 }
 
@@ -219,6 +204,9 @@ std::deque<RecordVelocity> velRecords;
 // because without prediction the values might not be that accurate
 void misc::getVelocityData()
 {
+	if (!vars::bShowPlots)
+		return;
+
 	if (!game::localPlayer)
 		return;
 
@@ -227,11 +215,12 @@ void misc::getVelocityData()
 		velRecords.clear();
 		return;
 	}
+	
+	velRecords.push_back(RecordVelocity{ game::localPlayer->m_vecVelocity().Length2D() });
 
-	velRecords.resize(300);
-
-	// put every tick to record, this way you don't have to call clear() when heap gets filled more than width of graph
-	velRecords.insert(velRecords.begin(), RecordVelocity{ game::localPlayer->m_vecVelocity().Length2D() });
+	// width
+	while (velRecords.size() > 300)
+		velRecords.pop_front();
 }
 
 void misc::drawVelocityPlot()
@@ -256,24 +245,18 @@ void misc::drawVelocityPlot()
 
 	render::text(widthPoint - velRecords.size() / 2, y - 50 - 14, fonts::tahoma, XOR("Velocity Plot"), true, Colors::LightBlue);
 
-	for (int i = 0; i < velRecords.size() - 1; i++)
+	const auto a = 1.0f;
+	const auto b = 2.0f;
+
+	float lx = 0, ly = 0;
+	for (int i = 0; i < velRecords.size(); i++)
 	{
-		auto current = velRecords.at(i).velocity;
-		auto next = velRecords.at(i + 1).velocity;
+		auto currentVal = velRecords.at(i).velocity;
+		float cx = widthPoint - (i - 1);
+		float cy = y - 100 - a * std::sqrt(currentVal * b);
 
-		// ratios: put anything you find good
-		const auto a = 1.0f;
-		const auto b = 2.0f;
-
-		PlotPoint points =
-		{
-			widthPoint - (i - 1),
-			y - a * std::sqrt(current * b),
-			widthPoint - i,
-			y - a * std::sqrt(next * b)
-		};
-
-		render::drawLine(points.x1, points.y1,
-			points.x2, points.y2, Color(170, 200, 180, 200));
+		if (i > 0)
+			render::drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
+		lx = cx; ly = cy;
 	}
 }

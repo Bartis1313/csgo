@@ -21,9 +21,6 @@ class Player_t;
 * Functions that return something as value from some value on the stack in function
 * example:
 * void blabla() { auto i = 10; return i;} -> i is on the stack, those functions I keep in cpp
-* 
-* Updated 01:25 05.11.2021
-* There are many missing, with time and those which I need, I will add
 */
 
 
@@ -99,6 +96,16 @@ public:
 	_NODISCARD bool isGrenade();
 	_NODISCARD bool isKnife();
 	_NODISCARD bool isNonAimable();
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+// TODO: add more to points
+class Inferno_t : public Entity_t
+{
+public:
+	_NODISCARD static float expireTime() { return 7.0f; }
+	OFFSET(float, spawnTime, 0x20);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

@@ -148,7 +148,7 @@ namespace utilities
 
 		for (int i = 0; i < 8; i++)
 		{
-			if (!render::WorldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
+			if (!render::worldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
 				return false;
 
 			left = std::min(left, screen.at(i).x);

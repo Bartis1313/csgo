@@ -13,7 +13,7 @@ namespace world
 	void skyboxLoad(int stage);
 
 	// TODO:
-	void drawSmoke(Entity_t* ent);
+	//void drawSmoke(Entity_t* ent);
 	void drawMolotovPoints(Entity_t* ent);
 	void drawSmokeTimer(Entity_t* ent);
 	void drawMolotovTimer(Entity_t* ent);

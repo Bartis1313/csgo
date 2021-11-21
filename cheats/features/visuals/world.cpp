@@ -27,6 +27,9 @@ void world::drawMisc()
 		{
 			switch (cl->m_classID)
 			{
+			case CInferno:
+				drawMolotovPoints(entity);
+				break;
 			case CC4:
 				drawBombDropped(entity);
 				break;
@@ -49,7 +52,7 @@ void world::drawBombDropped(Entity_t* ent)
 	if (!ownerEntity)
 	{
 		Vector screen = {};
-		if (render::WorldToScreen(ent->absOrigin(), screen))
+		if (render::worldToScreen(ent->absOrigin(), screen))
 			render::text(screen.x, screen.y, fonts::tahoma, "Dropped bomb", false, Colors::White);
 	}
 }
@@ -113,7 +116,7 @@ void world::drawProjectiles(Entity_t* ent)
 		Vector nadeOrigin = ent->absOrigin();
 		Vector nadePos = {};
 
-		if (!render::WorldToScreen(nadeOrigin, nadePos))
+		if (!render::worldToScreen(nadeOrigin, nadePos))
 			return;
 
 		std::string nadeName = "";
@@ -234,4 +237,23 @@ void world::skyboxLoad(int stage)
 		// restore the sky
 		loadSkyBoxFunction(sky->m_name);
 	}
+}
+
+// man I am too dumb for this, this is TODO
+void world::drawMolotovPoints(Entity_t* ent)
+{
+	auto molotov = reinterpret_cast<Inferno_t*>(ent);
+	if (!molotov)
+		return;
+
+	Vector screen = {};
+	if (!render::worldToScreen(molotov->absOrigin(), screen))
+		return;
+
+	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/master/game/server/cstrike15/Effects/inferno.cpp
+	// here you can see ratios and everything
+
+	render::drawCircle3D(molotov->absOrigin() + Vector(0, 60, 0), 60, 32, Colors::Red);
+
+	render::text(screen.x, screen.y + 60, fonts::tahoma, XOR("Molotov"), false, Colors::White);
 }

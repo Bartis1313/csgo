@@ -9,7 +9,7 @@
 ULONG WINAPI init(PVOID instance)
 {
 	//  it can throw it when instant quit, ignore that. It's possible to hook game's detection for all of this
-	AddVectoredExceptionHandler(1, memErrorCatch);
+	//AddVectoredExceptionHandler(1, memErrorCatch);
 
 	console::init(XOR("CSGO DEBUG"));
 

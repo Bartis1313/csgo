@@ -70,15 +70,31 @@ namespace render
 
 	void drawCircleFilled(const int x, const int y, const int radius, const int points, Color color)
 	{
-		std::vector<Vertex_t> verts{};
+		std::vector<Vertex_t> verts = {};
 
-		float step = M_PI * 2.0 / points;
-		for (float i = 0; i < (M_PI * 2.0); i += step)
+		float step = M_PI * 2.0f / points;
+		for (float i = 0; i < (M_PI * 2.0f); i += step)
 		{
 			verts.emplace_back(Vector2D(x + (radius * std::cos(i)), y + (radius * std::sin(i))));
 		}
 		interfaces::surface->drawSetColor(color);
 		interfaces::surface->drawTexturedPolygon(verts.size(), verts.data());
+	}
+
+	void drawCircle3D(Vector pos, int radius, int points, Color color)
+	{
+		float step = (float)M_PI * 2.0f / points;
+
+		for (float i = 0; i < (M_PI * 2.0f); i += step)
+		{
+			Vector start(radius * std::cos(i) + pos.x, radius * std::sin(i) + pos.y, pos.z);
+			Vector end(radius * std::cos(i + step) + pos.x, radius * std::sin(i + step) + pos.y, pos.z);
+
+			if (Vector screenStart, screenEnd; worldToScreen(start, screenStart) && worldToScreen(end, screenEnd))
+			{
+				drawLine(screenStart.x, screenStart.y, screenEnd.x, screenEnd.y, color);
+			}
+		}
 	}
 
 	/*
@@ -141,8 +157,7 @@ namespace render
 			Vertex_t(p4)
 		};
 
-		interfaces::surface->drawSetColor(color);
-		drawPolygonOutline(4, verts, color);
+		drawPolyLine(4, verts, color);
 	}
 
 	void drawPolyLine(int* x, int* y, const int count, Color color)
@@ -153,27 +168,13 @@ namespace render
 
 	void drawPolyLine(const int count, Vertex_t* verts, Color color)
 	{
-		static int x[128];
-		static int y[128];
+		static int x[300];
+		static int y[300];
 
 		for (int i = 0; i < count; i++)
 		{
 			x[i] = verts[i].m_Position.x;
 			y[i] = verts[i].m_Position.y;
-		}
-
-		drawPolyLine(x, y, count, color);
-	}
-
-	void drawPolygonOutline(const int count, Vertex_t* verts, Color color)
-	{
-		static int x[128];
-		static int y[128];
-
-		for (int i = 0; i < count; i++)
-		{
-			x[i] = std::ceil(verts[i].m_Position.x);
-			y[i] = std::ceil(verts[i].m_Position.y);
 		}
 
 		drawPolyLine(x, y, count, color);
@@ -237,7 +238,7 @@ namespace render
 		return width;
 	}
 
-	bool WorldToScreen(const Vector& in, Vector& out)
+	bool worldToScreen(const Vector& in, Vector& out)
 	{
 		return interfaces::debugOverlay->worldToScreen(in, out) != 1;
 	}
@@ -283,7 +284,7 @@ namespace render
 		static bool check = true;
 		for (size_t i = 0; i < box.size(); i++)
 		{
-			if(!WorldToScreen(box.at(i), points.at(i)))
+			if(!worldToScreen(box.at(i), points.at(i)))
 				check = false;
 		}
 

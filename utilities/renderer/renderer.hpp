@@ -27,12 +27,12 @@ namespace render
 	void drawFilledRect(int x, int y, int w, int h, Color color);
 	void drawCircle(int x, int y, int radius, int points, Color color);
 	void drawCircleFilled(int x, int y, int radius, int points, Color color);
+	void drawCircle3D(Vector pos, int radius, int points, Color color);
 	void drawTriangle(Vector2D p1, Vector2D p2, Vector2D p3, Color color);
 	void drawTrapezFilled(Vector2D p1, Vector2D p2, Vector2D p3, Vector2D p4, Color color);
 	void drawTrapezOutline(Vector2D p1, Vector2D p2, Vector2D p3, Vector2D p4, Color color);
 	void drawPolyLine(int* x, int* y, const int count, Color color);
 	void drawPolyLine(const int count, Vertex_t* verts, Color color);
-	void drawPolygonOutline(const int count, Vertex_t* verts, Color color);
 	void text(const int x, const int y, const unsigned long font, const wchar_t *text, const bool centered, Color color);
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, Color color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, Color color, const char* fmt, ...);
@@ -43,5 +43,5 @@ namespace render
 	int getTextSize(unsigned long font, const std::string& text);
 
 	// for hack
-	bool WorldToScreen(const Vector& in, Vector& out);
+	bool worldToScreen(const Vector& in, Vector& out);
 }

@@ -291,7 +291,7 @@ void esp::drawSkeleton(Player_t* ent)
 
 		Vector screenp, screenc;
 
-		if (render::WorldToScreen(parent, screenp) && render::WorldToScreen(child, screenc))
+		if (render::worldToScreen(parent, screenp) && render::worldToScreen(child, screenc))
 		{
 			if(record && backtrack::isValid(record->front().simTime))
 				render::drawLine(screenp[0], screenp[1], screenc[0], screenc[1], Colors::White);
@@ -325,7 +325,7 @@ void esp::drawLaser(Player_t* ent)
 	// end is where lines just ends, this 70 is hardcoded, but whatever here tbh
 	auto end = start + forward * 70.f;
 
-	if (Vector screenLocal, screenEnt; render::WorldToScreen(start, screenLocal) && render::WorldToScreen(end, screenEnt))
+	if (Vector screenLocal, screenEnt; render::worldToScreen(start, screenLocal) && render::worldToScreen(end, screenEnt))
 	{
 		render::drawCircleFilled(screenLocal.x, screenLocal.y, 3, 32, Colors::Red);
 		// was lazy to make a polygon for only 2 width
