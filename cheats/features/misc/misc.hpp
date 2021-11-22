@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include "../../../SDK/interfaces/interfaces.hpp"
 
 namespace misc
 {
@@ -11,4 +12,7 @@ namespace misc
 	void drawFpsPlot();
 	void drawVelocityPlot();
 	void getVelocityData();
+	void drawHitmarker();
+	void playHitmarker(IGameEvent* event);
+	inline int hitAlpha = 0;
 }

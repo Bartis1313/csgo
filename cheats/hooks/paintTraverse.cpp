@@ -23,5 +23,6 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		misc::drawLocalInfo();
 		misc::drawFpsPlot();
 		misc::drawVelocityPlot();
+		misc::drawHitmarker();
 	}
 }

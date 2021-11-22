@@ -21,7 +21,7 @@ enum BTChamsIDs
 	RAINBOW,
 };
 
-void chams::ovverride(bool ignore, bool wireframe, Color color)
+void chams::overrideChams(bool ignore, bool wireframe, Color color)
 {
 	static auto mat = interfaces::matSys->findMaterial(XOR("debug/debugambientcube"), XOR(TEXTURE_GROUP_MODEL));
 	mat->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignore);
@@ -36,13 +36,13 @@ void chams::drawChams(Player_t* ent, void* ctx, const DrawModelState_t& state, c
 	switch (vars::iChams)
 	{
 	case STATIC:
-		ovverride(false, false, Color(255, 0, 255, 255));
+		overrideChams(false, false, Color(255, 0, 255, 255));
 		CALL(ctx, state, info, matrix);
 		break;
 	case XYZ:
-		ovverride(true, false, Color(0, 100, 255, 255));
+		overrideChams(true, false, Color(0, 100, 255, 255));
 		CALL(ctx, state, info, matrix);
-		ovverride(false, false, Color(255, 0, 255, 255));
+		overrideChams(false, false, Color(255, 0, 255, 255));
 		CALL(ctx, state, info, matrix);
 		break;
 	default:
@@ -66,7 +66,7 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 				{
 					if (backtrack::isValid(record->at(i).simTime))
 					{
-						ovverride(false, false, Color(255 - (i * (255 / record->size())), i * (255 / record->size()), 255, 30));
+						overrideChams(false, false, Color(255 - (i * (255 / record->size())), i * (255 / record->size()), 255, 30));
 						CALL(ctx, state, info, record->at(i).matrix);
 					}
 				}
@@ -81,7 +81,7 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 		{
 			if (backtrack::isValid(record->front().simTime))
 			{
-				ovverride(false, false, Colors::Grey);
+				overrideChams(false, false, Colors::Grey);
 				CALL(ctx, state, info, record->back().matrix);
 			}
 		}
@@ -101,7 +101,7 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 					{
 						Rainbow color;
 						// fine effect: (float)i / (float)size as saturation arg
-						ovverride(false, false, color.drawRainbow(interfaces::globalVars->m_frametime, 0.7f, 0.8f, 0.01f));
+						overrideChams(false, false, color.drawRainbow(interfaces::globalVars->m_frametime, 0.7f, 0.8f, 0.01f));
 						CALL(ctx, state, info, record->at(i).matrix);
 					}
 				}
@@ -143,7 +143,7 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 			if (strstr(name.c_str() + 17, XOR("arms")))
 			{
 				static auto material = interfaces::matSys->findMaterial(name.c_str(), XOR(TEXTURE_GROUP_MODEL));
-				ovverride(false, false, Color(0, 180, 250, 255));
+				overrideChams(false, false, Color(0, 180, 250, 255));
 				if (vars::iHandChams == NO_HANDS)
 				{
 					material->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
@@ -160,10 +160,12 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 				!strstr(name.c_str() + 17, XOR("arms")) &&
 				!game::localPlayer->m_bIsScoped())
 			{
-				// first call the engine, so in this case weapon model is visible with effects, nice for wareframe
+				// first call the engine, so in this case weapon model is visible with effects, nice for wireframe
+				// TODO: fix no weapon effect caused by calling original twice
+				
 				CALL(ctx, state, info, matrix);
 				static auto material = interfaces::matSys->findMaterial(name.c_str(), XOR(TEXTURE_GROUP_MODEL));
-				ovverride(false, true, Colors::Palevioletred);
+				overrideChams(false, true, Colors::Palevioletred);
 				if (vars::iWeaponChams == NO_WEAPON)
 				{
 					material->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);

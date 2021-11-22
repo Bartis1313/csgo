@@ -56,4 +56,5 @@ public:
 	VFUNC(void, drawTextureFromName, 36, (int id, const char* name, int filter, bool reload = 0), (this, id, name, filter, reload));
 	VFUNC(void, getCursor, 100, (int& x, int& y), (this, std::ref(x), std::ref(y)));
 	VFUNC(void, drawTexturedRect, 41, (int x, int y, int width, int height), (this, x, y, width, height));
+	VFUNC(void, playSound, 82, (const char* name), (this, name));
 };

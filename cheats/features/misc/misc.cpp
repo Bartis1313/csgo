@@ -4,6 +4,7 @@
 #include "../../game.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../aimbot/aimbot.hpp"
+#include "../../globals.hpp"
 #include <format>
 #include <deque>
 
@@ -132,13 +133,18 @@ void misc::drawLocalInfo()
 	render::text(width, 45, fonts::tahoma, std::format(XOR("Zoom level {}"), weapon->m_zoomLevel()), false, Colors::Yellow);
 	render::text(width, 55, fonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->m_vecOrigin().y, game::localPlayer->m_vecOrigin().z), false, Colors::Yellow);
 	render::text(width, 65, fonts::tahoma, std::format(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().Length2D()), false, Colors::Yellow);
-	// test
+
 	render::text(width, 75, fonts::tahoma, std::format(XOR("Kills {}"), game::getLocalKills()), false, Colors::Yellow);
 	render::text(width, 85, fonts::tahoma, std::format(XOR("Deaths {}"), game::getLocalDeaths()), false, Colors::Yellow);
-	// escape divide by zero exceptions by using this trick:
-	float kd = game::getLocalKills() / (game::getLocalDeaths() == 0 ? 1 : game::getLocalDeaths());
+	// escape divide by zero exceptions by using this trick
+	float kd = game::getLocalKills() / (game::getLocalDeaths() ? game::getLocalDeaths() : 1);
 	render::text(width, 95, fonts::tahoma, std::format(XOR("KD {:.2f}"), kd), false, Colors::Yellow);
 	render::text(width, 105, fonts::tahoma, std::format(XOR("Ping {}"), game::getLocalPing()), false, Colors::Yellow);
+
+	float accuracy = globals::shotsFired
+		? (static_cast<float>(globals::shotsHit) / static_cast<float>(globals::shotsFired)) * 100.0f
+		: 0.0f;
+	render::text(width, 115, fonts::tahoma, std::format(XOR("Accuracy [{} / {}] {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy), false, Colors::Yellow);
 
 	width *= 1.25f;
 	render::text(width, 15, fonts::tahoma, legitbot::bestEnt ? std::format(XOR("Aimbot working on: {}"), legitbot::bestEnt->getName()) : "", false, Colors::LightBlue);
@@ -258,5 +264,48 @@ void misc::drawVelocityPlot()
 		if (i > 0)
 			render::drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
 		lx = cx; ly = cy;
+	}
+}
+
+void misc::playHitmarker(IGameEvent* event)
+{
+	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
+	if (!attacker)
+		return;
+
+	// very important
+	if (attacker == game::localPlayer)
+	{
+		globals::shotsHit++;
+		// new hit = new hitmarker
+		hitAlpha = 255;
+		// browse those files for more
+		interfaces::surface->playSound(XOR("buttons\\arena_switch_press_02.wav"));
+	}	
+}
+
+// TODO: Add hitmarker when ent died from local player
+void misc::drawHitmarker()
+{
+	if (!game::localPlayer)
+		return;
+
+	if (!game::localPlayer->isAlive())
+		return;
+
+	int x, y;
+	interfaces::engine->getScreenSize(x, y);
+	x /= 2, y /= 2;
+
+	if (hitAlpha > 0)
+	{
+		// you can add ratio for coords to make this hitmarker 100% like from other games
+		render::drawLine(x - 10, y + 10, x - 5, y + 5, Color(255, 255, 255, hitAlpha));
+		render::drawLine(x + 10, y + 10, x + 5, y + 5, Color(255, 255, 255, hitAlpha));
+		render::drawLine(x - 10, y - 10, x - 5, y - 5, Color(255, 255, 255, hitAlpha));
+		render::drawLine(x + 10, y - 10, x + 5, y - 5, Color(255, 255, 255, hitAlpha));
+
+		// feel free to use anything that is more accurate, first multiply was just hardcoded by guessing
+		hitAlpha -= 1.8f * (interfaces::globalVars->m_frametime) * 255;
 	}
 }

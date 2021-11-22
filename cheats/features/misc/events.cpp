@@ -3,12 +3,16 @@
 #include "../../game.hpp"
 #include "../visuals/player.hpp"
 #include "../../../SDK/IGameEvent.hpp"
+#include "misc.hpp"
+#include "../../globals.hpp"
 
 void Events::init() const
 {
 	interfaces::eventManager->addListener(&Events::g(), XOR("player_footstep"));
 	interfaces::eventManager->addListener(&Events::g(), XOR("player_death"));
 	interfaces::eventManager->addListener(&Events::g(), XOR("round_start"));
+	interfaces::eventManager->addListener(&Events::g(), XOR("player_hurt"));
+	interfaces::eventManager->addListener(&Events::g(), XOR("weapon_fire"));
 	LOG(LOG_INFO, "events hooked\n");
 }
 
@@ -25,7 +29,21 @@ void Events::FireGameEvent(IGameEvent* event)
 	}
 	else if (!strcmp(event->getName(), XOR("round_start")))
 	{
-		
+		globals::shotsFired = 0, globals::shotsHit = 0;
+	}
+	else if (!strcmp(event->getName(), XOR("player_hurt")))
+	{
+		misc::playHitmarker(event);
+	}
+	else if (!strcmp(event->getName(), XOR("weapon_fire")))
+	{
+		// here just check like that
+		auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
+		if (!attacker)
+			return;
+
+		if (attacker == game::localPlayer)
+			globals::shotsFired++;
 	}
 }
 

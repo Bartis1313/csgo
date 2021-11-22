@@ -7,22 +7,35 @@ Very short and commented source aimed for legit gameplay
 In development, not every feature may work perfectly.
 
 # Features: 
- - BUNNYHOP
- - CHAMS [Normal, Xyz, Backtrack Chams]
- - ESP [2D, 2D Filled, 3D, 3D Filled]
- - GLOW
- - SOUNDESP
- - FOV (Changing your local FOV)
- - THIRD PERSON (no bypass for sv_cheats included yet)
- - AIMBOT [NEAREST, HEAD, CHEST]
- - FOV AIMBOT
- - SMOOTH AIMBOT
- - TRIGGERBOT
- - RCS [With one value representing both yaw and punch]
- - CROSSHAIR [Static, Recoil, Engine]
- - LOCALPLAYER INFO
- - ESP FLAGS
- - RADAR 2D
+<details>
+
+ * BunnyHop
+ * Chams (Normal, Xyz)
+ * ESP (2D, 2D Filled, 3D, 3D Filled)
+ * Glow
+ * Sound ESP
+ * Fov (Changing your local FOV)
+ * Third Person (no bypass for sv_cheats included yet)
+ * Aimbot (Nearest, Head, Chest)
+ * Fov Aimbot
+ * Smooth Aimbot
+ * Triggerbot (delay in ms)
+ * Rcs (With one value representing both yaw and punch)
+ * Crosshair (Static, Recoil, Engine)
+ * Backtrack (manipulation in ms)
+ * Radar 2D (Representing on small overlay where enemies are, including their view)
+ * Local Info (Some information about local player)
+ * Esp Flags (Some information about enemies, their hp, armor etc...)
+ * Esp Info (For now only name and C4 holder)
+ * Esp Skeleton (Skeleton drawn by lines, working with backtrack too)
+ * Backtrack Chams (Static, Rainbow, Last Tick)
+ * DLight (Uses engine to highlight the player)
+ * Nigtmode (Chnages materials to be darker including chnage of the sky)
+ * Esp Lines (They will only show on selected target by aimbot)
+ * Plots (Represent current FPS and Velocity in stored records and then drawn using lines and difference between them)
+ * Arm Chams (Color, no arms)
+ * Weapon Chams (Color, no weapon)
+ </details>
 
 # Keybinds
  - ARROW UP/DOWN (Set current index of feature, it will highlight at as grey color)
@@ -58,6 +71,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.1.1 - small update with new planned feature and handling the error in case the directory can't be created.
 * 1.1.2 - 2D plot added, for fps and velocity. From now if config fails to find file to save, it throws the error.
 * 1.1.3 - Added hand/weapon chams, and rewrote chams code.
+* 1.1.4 - Added global shots counter, which can result in getting valid accuracy per round, and hitmarker with sound got added.
 </details>
 
 # People who helped
