@@ -150,8 +150,8 @@ public:
 	_NODISCARD bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
 	_NODISCARD bool IsValid() { return (isAlive() && !isDormant()); }
 
-	_NODISCARD Vector getHitboxPos(int id);
-	_NODISCARD Vector getBonePosition(int id);
+	_NODISCARD Vector getHitboxPos(const int id);
+	_NODISCARD Vector getBonePosition(const int id);
 	_NODISCARD bool isC4Owner();
 	// TODO: fix for strange unicodes or empty spaces
 	_NODISCARD std::string getName();

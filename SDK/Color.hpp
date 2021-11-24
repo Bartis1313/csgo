@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <array>
 
 class Color
 {
@@ -9,35 +10,25 @@ public:
 		setColor(255, 255, 255, 255);
 	}
 
-	Color(int r, int g, int b, int a = 255)
+	Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
 	{
 		setColor(r, g, b, a);
 	}
 
-	void setColor(int r, int g, int b, int a = 255)
+	void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
 	{
-		color[0] = static_cast<uint8_t>(r);
-		color[1] = static_cast<uint8_t>(g);
-		color[2] = static_cast<uint8_t>(b);
-		color[3] = static_cast<uint8_t>(a);
+		color[0] = r;
+		color[1] = g;
+		color[2] = b;
+		color[3] = a;
 	}
 
-	void getColor(int& r, int& g, int& b, int& a) const
+	void getColor(uint8_t& r, uint8_t& g, uint8_t& b, uint8_t& a) const
 	{
 		r = color[0];
 		g = color[1];
 		b = color[2];
 		a = color[3];
-	}
-
-	void setRawColor(int color32)
-	{
-		*((int*)this) = color32;
-	}
-
-	int getRawColor() const
-	{
-		return *((int*)this);
 	}
 
 	// useful for future, and guis
@@ -46,10 +37,10 @@ public:
 		return { rDevided(), gDevided() , bDevided() , aDevided() };
 	}
 
-	inline int r() const { return color[0]; }
-	inline int g() const { return color[1]; }
-	inline int b() const { return color[2]; }
-	inline int a() const { return color[3]; }
+	inline uint8_t r() const { return color[0]; }
+	inline uint8_t g() const { return color[1]; }
+	inline uint8_t b() const { return color[2]; }
+	inline uint8_t a() const { return color[3]; }
 
 	inline float rDevided() const { return color[0] / 255.0f; }
 	inline float gDevided() const { return color[1] / 255.0f; }
@@ -74,12 +65,6 @@ public:
 	bool operator != (const Color& rhs) const
 	{
 		return !(operator==(rhs));
-	}
-
-	Color& operator=(const Color& rhs)
-	{
-		setRawColor(rhs.getRawColor());
-		return *this;
 	}
 
 	static Color fromHSB(float hue, float saturation, float brightness)
