@@ -195,7 +195,7 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 	if (!weapon)
 		return;
 
-	render::text(box.x + box.w + 5, box.y - 1, fonts::tahoma, ent->getActiveWeapon()->getWpnName(), false, Colors::White);
+	render::text(box.x + box.w / 2, box.y + box.h + 5, fonts::tahoma, ent->getActiveWeapon()->getWpnName(), true, Colors::White);
 
 	// skip useless trash for calculations
 	if (weapon->isNonAimable())

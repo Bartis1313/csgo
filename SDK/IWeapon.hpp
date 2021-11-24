@@ -11,7 +11,7 @@ public:
 	PAD(8);
 	int m_primaryMaxAmmo;
 	int m_secondaryMaxAmmo;
-	PAD(90);
+	PAD(92);
 	const char* m_WeaponName;
 	PAD(60);
 	int m_type;

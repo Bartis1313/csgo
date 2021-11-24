@@ -85,56 +85,64 @@ std::string Weapon_t::getWpnName()
 
 bool Weapon_t::isRifle()
 {
-	const static auto type = this->getWpnInfo()->m_type;
+	const auto idx = m_iItemDefinitionIndex();
 
-	return type == WEAPONTYPE_RIFLE;
+	return idx == WEAPON_AK47 || idx == WEAPON_M4A1 || idx == WEAPON_M4A1_SILENCER || idx == WEAPON_GALILAR ||
+		idx == WEAPON_FAMAS || idx == WEAPON_AUG || idx == WEAPON_SG553;
 }
 
 bool Weapon_t::isSmg()
 {
-	const static auto type = this->getWpnInfo()->m_type;
+	const auto idx = m_iItemDefinitionIndex();
 
-	return type == WEAPONTYPE_SUBMACHINEGUN;
+	return idx == WEAPON_MAC10 || idx == WEAPON_MP7 || idx == WEAPON_MP9 || idx == WEAPON_P90 ||
+		idx == WEAPON_BIZON || idx == WEAPON_UMP45 || idx == WEAPON_MP5SD;
 }
 
 bool Weapon_t::isShotgun()
 {
-	const static auto type = this->getWpnInfo()->m_type;
+	const auto idx = m_iItemDefinitionIndex();
 
-	return type == WEAPONTYPE_SHOTGUN;
+	return idx == WEAPON_XM1014 || idx == WEAPON_NOVA || idx == WEAPON_SAWEDOFF || idx == WEAPON_MAG7 || idx == WEAPON_M249 || idx == WEAPON_NEGEV;
 }
 
 bool Weapon_t::isPistol()
 {
-	const static auto type = this->getWpnInfo()->m_type;
+	const auto idx = m_iItemDefinitionIndex();
 
-	return type == WEAPONTYPE_PISTOL;
+	return idx == WEAPON_DEAGLE || idx == WEAPON_ELITE || idx == WEAPON_FIVESEVEN || idx == WEAPON_P250 ||
+		idx == WEAPON_GLOCK || idx == WEAPON_HKP2000 || idx == WEAPON_CZ75A || idx == WEAPON_USP_SILENCER || idx == WEAPON_TEC9 || idx == WEAPON_REVOLVER;
 }
 
 bool Weapon_t::isSniper()
 {
-	const static auto type = this->getWpnInfo()->m_type;
+	const auto idx = m_iItemDefinitionIndex();
 
-	return type == WEAPONTYPE_SNIPER_RIFLE;
+	return idx == WEAPON_AWP || idx == WEAPON_SCAR20 || idx == WEAPON_G3SG1 || idx == WEAPON_SSG08;
 }
 
 bool Weapon_t::isGrenade()
 {
-	const static auto type = this->getWpnInfo()->m_type;
+	const auto idx = m_iItemDefinitionIndex();
 
-	return type == WEAPONTYPE_GRENADE;
+	return idx == WEAPON_FLASHBANG || idx == WEAPON_HEGRENADE || idx == WEAPON_SMOKEGRENADE || idx == WEAPON_MOLOTOV || idx == WEAPON_DECOY || idx == WEAPON_INCGRENADE;
 }
 
 bool Weapon_t::isKnife()
 {
-	const static auto type = this->getWpnInfo()->m_type;
+	const auto idx = m_iItemDefinitionIndex();
 
-	return type == WEAPONTYPE_KNIFE;
+	return idx == WEAPON_KNIFE || idx == WEAPON_KNIFE_BAYONET || idx == WEAPON_KNIFE_BUTTERFLY || idx == WEAPON_KNIFE_FALCHION
+		|| idx == WEAPON_KNIFE_FLIP || idx == WEAPON_KNIFE_GUT || idx == WEAPON_KNIFE_KARAMBIT || idx == WEAPON_KNIFE_M9_BAYONET
+		|| idx == WEAPON_KNIFE_PUSH || idx == WEAPON_KNIFE_SURVIVAL_BOWIE || idx == WEAPON_KNIFE_T || idx == WEAPON_KNIFE_TACTICAL
+		|| idx == WEAPON_KNIFEGG || idx == WEAPON_KNIFE_GHOST || idx == WEAPON_KNIFE_GYPSY_JACKKNIFE || idx == WEAPON_KNIFE_STILETTO
+		|| idx == WEAPON_KNIFE_URSUS || idx == WEAPON_KNIFE_WIDOWMAKER || idx == WEAPON_KNIFE_CSS || idx == WEAPON_KNIFE_CANIS
+		|| idx == WEAPON_KNIFE_CORD || idx == WEAPON_KNIFE_OUTDOOR || idx == WEAPON_KNIFE_SKELETON;
 }
 
 bool Weapon_t::isNonAimable()
 {
-	const static auto idx = m_iItemDefinitionIndex();
+	const auto idx = m_iItemDefinitionIndex();
 
 	if (idx == WEAPON_C4 || idx == WEAPON_HEALTHSHOT)
 		return true;
