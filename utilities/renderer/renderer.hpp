@@ -12,6 +12,7 @@ namespace fonts
 {
 	inline unsigned long tahoma;
 	inline unsigned long smalle;
+	inline unsigned long espBar;
 }
 
 namespace render

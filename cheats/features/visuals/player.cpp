@@ -137,24 +137,23 @@ void esp::drawHealth(Player_t* ent, const Box& box)
 
 		Box newBox =
 		{
-			box.x - 7,
+			box.x - 6,
 			box.y - 1,
-			4,
+			2,
 			box.h + 2,
 		};
 
 		// fill first
 		render::drawFilledRect(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
-		render::drawFilledRect(newBox.x + 1, newBox.y + pad + 1, 2, offset, playerColor(ent));
+		render::drawFilledRect(newBox.x, newBox.y + pad - 1, 2, offset + 2, playerColor(ent));
+		render::drawOutlineRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
+
 		// if the player has health below max, then draw HP info
-		// also 12 val is pretty hardcoded here, I don't use calcsize function for such small texts
 		if (health < 100)
-			render::text(newBox.x - 16, newBox.y + 1 + pad + 8, fonts::tahoma, std::to_string(health), false, Colors::White);
+			render::text(newBox.x - 2, newBox.y + pad - 4, fonts::espBar, std::to_string(health), false, Colors::White);
 	}
 }
 
-// same as health with how it works, but different pos only, only difference is small math with x,y 
-// why not 6 and 7 here too? should be easy to answer, in graphics in this case I start from left side and end on right, use logic
 void esp::drawArmor(Player_t* ent, const Box& box)
 {
 	if (!vars::bDrawInfos)
@@ -168,18 +167,21 @@ void esp::drawArmor(Player_t* ent, const Box& box)
 
 		Box newBox =
 		{
-			box.x + box.w + 2,
+			box.x + box.w + 4,
 			box.y - 1,
-			4,
-			box.h + 2
+			2,
+			box.h + 2,
 		};
 
-		render::drawFilledRect(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
 		Color armorCol = Color(0, armor * 1.4f, 250, 255); // light to blue, something simple
-		render::drawFilledRect(newBox.x + 1, newBox.y + pad + 1, 2, offset, armorCol);
+
+		render::drawFilledRect(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
+		render::drawFilledRect(newBox.x, newBox.y + pad - 1, 2, offset + 2, armorCol);
+		render::drawOutlineRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
+
 
 		if (armor < 100)
-			render::text(newBox.x + 2, newBox.y + 1 + pad + 12, fonts::tahoma, std::to_string(armor), false, Colors::White);
+			render::text(newBox.x - 2, newBox.y + pad - 4, fonts::espBar, std::to_string(armor), false, Colors::White);
 	}
 }
 

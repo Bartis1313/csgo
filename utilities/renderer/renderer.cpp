@@ -31,6 +31,9 @@ namespace render
 		fonts::smalle = interfaces::surface->fontCreate();
 		interfaces::surface->setFontGlyph(fonts::smalle, "Tahoma", 9, 800, 0, 0, FONTFLAG_ANTIALIAS);
 
+		fonts::espBar = interfaces::surface->fontCreate();
+		interfaces::surface->setFontGlyph(fonts::espBar, "Franklin Gothic", 10, 300, 0, 0, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+
 		LOG(LOG_INFO, "render success\n");
 	}
 
