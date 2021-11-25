@@ -70,6 +70,7 @@ void esp::run()
 			drawSkeleton(entity);
 			runDLight(entity);
 			drawLaser(entity);
+			esp::enemyIsAimingAtYou(entity);
 		}
 	}
 }
@@ -296,9 +297,9 @@ void esp::drawSkeleton(Player_t* ent)
 		if (render::worldToScreen(parent, screenp) && render::worldToScreen(child, screenc))
 		{
 			if(record && backtrack::isValid(record->front().simTime))
-				render::drawLine(screenp[0], screenp[1], screenc[0], screenc[1], Colors::White);
+				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, Colors::White);
 			else if(!record)
-				render::drawLine(screenp[0], screenp[1], screenc[0], screenc[1], Colors::White);
+				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, Colors::White);
 		}
 	}
 }
@@ -440,4 +441,21 @@ void esp::drawSound(IGameEvent* event)
 
 	if (beam_draw)
 		interfaces::beams->drawBeam(beam_draw);
+}
+
+void esp::enemyIsAimingAtYou(Player_t* ent)
+{
+	if (!game::localPlayer)
+		return;
+
+	if (!interfaces::engine->isInGame())
+		return;
+
+	int x, y;
+	interfaces::engine->getScreenSize(x, y);
+
+	if (game::localPlayer->isPossibleToSee(ent, ent->getEyePos()))
+	{
+		render::text(x / 2, 60, fonts::tahoma, XOR("Enemy is aiming at you"), true, Colors::Red);
+	}
 }

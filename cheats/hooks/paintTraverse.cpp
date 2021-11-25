@@ -24,5 +24,6 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		misc::drawFpsPlot();
 		misc::drawVelocityPlot();
 		misc::drawHitmarker();
+		world::drawZeusRange();
 	}
 }

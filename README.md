@@ -72,6 +72,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.1.2 - 2D plot added, for fps and velocity. From now if config fails to find file to save, it throws the error.
 * 1.1.3 - Added hand/weapon chams, and rewrote chams code.
 * 1.1.4 - Added global shots counter, which can result in getting valid accuracy per round, and hitmarker with sound got added.
+* 1.1.5 - Added visibility check, in aimbot and triggerbot. Some visuals added.
 </details>
 
 # People who helped

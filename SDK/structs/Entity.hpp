@@ -115,7 +115,7 @@ class Player_t : public Entity_t
 public:
 	// added many here, it's late night as I am writing it, I think those will be enough for all time this cheat is developed
 
-	NETVAR(Vector, m_angEyeAngles, "DT_CSPlayer", "m_angEyeAngles");
+	NETVAR(Vector, m_angEyeAngles, "DT_CSPlayer", "m_angEyeAngles[0]");
 	NETVAR(Vector, m_viewPunchAngle, "DT_BasePlayer", "m_viewPunchAngle");
 	NETVAR(Vector, m_aimPunchAngle, "DT_BasePlayer", "m_aimPunchAngle");
 	NETVAR(Vector, m_vecVelocity, "DT_BasePlayer", "m_vecVelocity[0]");
@@ -158,6 +158,7 @@ public:
 	_NODISCARD int getKills();
 	_NODISCARD int getDeaths();
 	_NODISCARD int getPing();
+	_NODISCARD bool isPossibleToSee(Player_t* ent, const Vector& pos);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

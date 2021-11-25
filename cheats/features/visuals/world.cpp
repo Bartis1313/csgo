@@ -1,6 +1,7 @@
 #include "world.hpp"
 #include "../../../utilities/utilities.hpp"
 #include "../../menu/vars.hpp"
+#include "../../game.hpp"
 #include <format>
 
 void world::drawMisc()
@@ -197,7 +198,9 @@ void world::skyboxLoad(int stage)
 	static const auto removeSky = interfaces::console->findVar(XOR("r_3dsky"));
 	removeSky->setValue(vars::bRunNight ? false : true);	
 
-	if (vars::bRunNight)
+	static bool done = false;
+
+	if (vars::bRunNight && !done)
 	{
 		for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
 		{
@@ -222,13 +225,13 @@ void world::skyboxLoad(int stage)
 			if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
 			{
 				material->colorModulate(Colors::Turquoise);
-				material->alphaModulate(0.5f);
 			}
 		}
 		// force to new sky
 		loadSkyBoxFunction(XOR("sky_csgo_night2"));
+		done = true;
 	}
-	else if (!vars::bRunNight)
+	else if (!vars::bRunNight && done)
 	{
 		for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
 		{
@@ -253,11 +256,11 @@ void world::skyboxLoad(int stage)
 			if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
 			{
 				material->colorModulate(Colors::White);
-				material->alphaModulate(1.0f);
 			}
 		}
 		// restore the sky
 		loadSkyBoxFunction(sky->m_name);
+		done = false;
 	}
 }
 
@@ -278,4 +281,22 @@ void world::drawMolotovPoints(Entity_t* ent)
 	render::drawCircle3D(molotov->absOrigin() + Vector(0, 60, 0), 60, 32, Colors::Red);
 
 	render::text(screen.x, screen.y + 60, fonts::tahoma, XOR("Molotov"), false, Colors::White);
+}
+
+void world::drawZeusRange()
+{
+	if (!game::localPlayer)
+		return;
+
+	if (!interfaces::engine->isInGame())
+		return;
+
+	auto weapon = game::localPlayer->getActiveWeapon();
+	if (!weapon)
+		return;
+
+	if (weapon->m_iItemDefinitionIndex() == WEAPON_TASER)
+	{
+		render::drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, Colors::Palevioletred);
+	}
 }

@@ -27,5 +27,5 @@ namespace esp
 	// boxes stuff
 	void drawBox2D(Player_t* ent, const Box& box);
 	void drawBox2DFilled(Player_t* ent, const Box& box);
-	
+	void enemyIsAimingAtYou(Player_t* ent);
 };

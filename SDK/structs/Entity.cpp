@@ -246,4 +246,19 @@ int Player_t::getPing()
 	return 0;
 }
 
+bool Player_t::isPossibleToSee(Player_t* ent, const Vector& pos)
+{
+	Trace_t tr;
+	Ray_t ray;
+	TraceFilter filter;
+
+	auto start = this->getEyePos();
+	auto end = pos;
+	filter.m_skip = this;
+	ray.initialize(start, pos);
+	interfaces::trace->traceRay(ray, MASK_VISIBLE, &filter, &tr);
+
+	return tr.m_entity == ent || tr.m_fraction > 1.0f;
+}
+
 ////////////////////////////////////////////////////////////////

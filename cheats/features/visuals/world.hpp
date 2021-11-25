@@ -17,4 +17,5 @@ namespace world
 	void drawMolotovPoints(Entity_t* ent);
 	void drawSmokeTimer(Entity_t* ent);
 	void drawMolotovTimer(Entity_t* ent);
+	void drawZeusRange();
 }

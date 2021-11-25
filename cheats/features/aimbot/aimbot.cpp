@@ -92,9 +92,15 @@ Vector legitbot::getBestBonePos(CUserCmd* cmd)
         if (ent->m_bGunGameImmunity())
             continue;
 
+        if (!game::localPlayer->isPossibleToSee(ent, ent->getEyePos()))
+            continue;
+
         for (const auto& pos : posToAim())
         {          
             auto hitbox = ent->getHitboxPos(pos);
+
+            if (!game::localPlayer->isPossibleToSee(ent, hitbox))
+                continue;
 
             auto angles = cmd->m_viewangles + punch;
 

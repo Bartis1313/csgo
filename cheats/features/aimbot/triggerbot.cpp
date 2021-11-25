@@ -75,6 +75,9 @@ void triggerbot::run(CUserCmd* cmd)
 	if (entity->m_bGunGameImmunity())
 		return;
 
+	if (!game::localPlayer->isPossibleToSee(entity, entity->getEyePos()))
+		return;
+
 	// that is bad way
 	/*if (delay >= vars::iTriggerDelay)
 	{
