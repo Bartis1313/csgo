@@ -13,4 +13,7 @@ namespace math
 	Vector transformVector(const Vector& in, matrix3x4_t matrix);
 	void transformVector(Vector& in, matrix3x4_t& mat, Vector& out);
 	Vector angleVec(const Vector& angle);
+	float normalizeYaw(float yaw);
+	// direction vector based on euler dimension
+	Vector vectorToAngle(const Vector& vec);
 }

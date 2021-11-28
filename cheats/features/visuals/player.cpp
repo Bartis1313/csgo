@@ -292,9 +292,7 @@ void esp::drawSkeleton(Player_t* ent)
 		if (abs(deltachild.z) < 5.0f && deltaparent.Length() < 5.0f && deltachild.Length() < 5.0f || i == 6)
 			continue;
 
-		Vector screenp, screenc;
-
-		if (render::worldToScreen(parent, screenp) && render::worldToScreen(child, screenc))
+		if (Vector screenp, screenc; render::worldToScreen(parent, screenp) && render::worldToScreen(child, screenc))
 		{
 			if(record && backtrack::isValid(record->front().simTime))
 				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, Colors::White);
@@ -331,9 +329,7 @@ void esp::drawLaser(Player_t* ent)
 	if (Vector screenLocal, screenEnt; render::worldToScreen(start, screenLocal) && render::worldToScreen(end, screenEnt))
 	{
 		render::drawCircleFilled(screenLocal.x, screenLocal.y, 3, 32, Colors::Red);
-		// was lazy to make a polygon for only 2 width
-		render::drawLine(screenLocal.x, screenLocal.y, screenEnt.x, screenEnt.y, Color(190, 190, 190, 200));
-		render::drawLine(screenLocal.x + 1, screenLocal.y + 1, screenEnt.x + 1, screenEnt.y + 1, Color(190, 190, 190, 200));
+		render::drawLine(screenLocal.x, screenLocal.y, screenEnt.x, screenEnt.y, Colors::Purple);
 	}
 }
 
@@ -443,6 +439,23 @@ void esp::drawSound(IGameEvent* event)
 		interfaces::beams->drawBeam(beam_draw);
 }
 
+//struct PlayerData
+//{
+//	Player_t* ent;
+//	float aimPercentage;
+//	bool operator==(const PlayerData& data)
+//	{
+//		return (ent == data.ent) ? true : false;
+//	}
+//	bool operator<(const PlayerData& data) const
+//	{
+//		return (ent < data.ent) ? true : false;
+//	}
+//};
+
+
+//std::set<PlayerData> data;
+
 void esp::enemyIsAimingAtYou(Player_t* ent)
 {
 	if (!game::localPlayer)
@@ -454,8 +467,83 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 	int x, y;
 	interfaces::engine->getScreenSize(x, y);
 
-	if (game::localPlayer->isPossibleToSee(ent, ent->getEyePos()))
+	Vector posDelta = ent->getEyePos() - game::localPlayer->getEyePos();
+	Vector idealAimAngle = math::vectorToAngle(posDelta);
+
+	// account for their spray control
+	static const auto scale = interfaces::console->findVar(XOR("weapon_recoil_scale"))->getFloat();
+	idealAimAngle -= ent->m_aimPunchAngle() * scale;
+
+	Vector curEnemyAngle = ent->m_angEyeAngles();
+
+	float dy = math::normalizeYaw(curEnemyAngle.y - idealAimAngle.y),
+		dp = curEnemyAngle.x - idealAimAngle.x;
+	dp = std::clamp(dp, -89.0f, 89.0f);
+
+	float fovDist = sqrtf(dy * dy + dp * dp);
+	bool check = ent->isPossibleToSee(game::localPlayer, game::localPlayer->getEyePos());
+
+	// fovDist < 90.0f hardcoded, because it's impossible to know it
+	// so if somebody is cheating with 3rd cam, this will not be valid
+	if (check && fovDist <= 90.0f)
 	{
-		render::text(x / 2, 60, fonts::tahoma, XOR("Enemy is aiming at you"), true, Colors::Red);
+		render::text(x / 2, 60, fonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
 	}
+	// in the moment when enemy aims through walls, don't check trace
+	if (fovDist <= 5.0f)
+	{
+		render::text(x / 2, 80, fonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
+	}
+
+	//Vector posDelta = ent->getEyePos() - game::localPlayer->getHitboxPos(HITBOX_BELLY); // ideally find the closest point on your body to their crosshair but whatever
+	//Vector idealAimAngle = VectorToAngle(posDelta);
+
+	//// account for their spray control
+	//static const auto scale = interfaces::console->findVar(XOR("weapon_recoil_scale"))->getFloat();
+	//idealAimAngle -= ent->m_aimPunchAngle() * scale;
+
+	//Vector curEnemyAngle = ent->m_angEyeAngles();
+	//// broken smth? engine gives this, or I am stupid? Like 360 pitch randomly
+	//if (curEnemyAngle.x > 1.0f)
+	//	curEnemyAngle.x -= 360.0f;
+
+	//float dy = normalizeYaw(curEnemyAngle.y - idealAimAngle.y),
+	//	dp = curEnemyAngle.x - idealAimAngle.x;
+
+	//float fovDist = sqrtf(dy * dy + dp * dp);
+	//float aimPercentage = 100.0f - std::min(100.0f, fovDist);
+
+	//int x, y;
+	//interfaces::engine->getScreenSize(x, y);
+
+	//PlayerData tmp = PlayerData(ent, 0.0f);
+	//auto it = data.find(tmp);
+
+	///*if (it != data.end())
+	//	console::log(LOG_NO, "JEST\n");
+	//else
+	//	console::log(LOG_NO, "NIE MA\n");*/
+	//if (it == data.end())
+	//{
+	//	if(fovDist < 5.0f)
+	//		data.insert(PlayerData{ ent, aimPercentage });
+	//}
+	//else
+	//{
+	//	auto tmp = *it;
+	//	tmp.aimPercentage = aimPercentage;
+	//	data.erase(it);
+	//	if(fovDist < 5.0f)
+	//	{
+	//		data.insert(tmp);
+	//	}
+	//}
+
+	//int ii = 0;
+	//for (auto itr = data.begin(); itr != data.end(); itr++)
+	//{
+	//	render::text(x / 2, ii * 20, fonts::tahoma,
+	//		std::format("Enemy is aiming you {:.2f}%", (*itr).aimPercentage), true, Colors::Red);
+	//	ii++;
+	//}
 }

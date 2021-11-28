@@ -55,3 +55,38 @@ Vector math::angleVec(const Vector& angle)
 
 	return Vector(cp * cy, cp * sy, -sp);
 }
+
+float math::normalizeYaw(float yaw)
+{
+	while (yaw > 180.0f)
+		yaw -= 360.0f;
+
+	while (yaw < -180.0f)
+		yaw += 360.0f;
+
+	return yaw;
+}
+
+Vector math::vectorToAngle(const Vector& vec)
+{
+	Vector angle = {};
+	if (vec.x == 0.0f && vec.y == 0.0f)
+	{
+		angle.x = (vec.z > 0.0f) ? 270.0f : 90.0f;
+		angle.y = 0.0f;
+	}
+	else
+	{
+		angle.x = RAD2DEG(std::atan2(-vec.z, vec.Length2D()));
+		angle.y = RAD2DEG(std::atan2(vec.y, vec.x));
+
+		if (angle.y > 90.0f)
+			angle.y -= 180.0f;
+		else if (angle.y < 90.0f)
+			angle.y += 180.0f;
+		else if (angle.y == 90.0f)
+			angle.y = 0.0f;
+	}
+	angle.z = 0.0f;
+	return angle;
+}
