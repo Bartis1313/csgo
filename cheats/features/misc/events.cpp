@@ -27,7 +27,7 @@ void Events::FireGameEvent(IGameEvent* event)
 		// testing
 		interfaces::console->consolePrintf("Died\n");
 	}
-	else if (!strcmp(event->getName(), XOR("round_start")))
+	else if (!strcmp(event->getName(), XOR("game_start")))
 	{
 		globals::shotsFired = 0, globals::shotsHit = 0;
 	}

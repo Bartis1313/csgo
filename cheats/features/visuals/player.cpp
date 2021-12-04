@@ -70,7 +70,7 @@ void esp::run()
 			drawSkeleton(entity);
 			runDLight(entity);
 			drawLaser(entity);
-			esp::enemyIsAimingAtYou(entity);
+			enemyIsAimingAtYou(entity);
 		}
 	}
 }
@@ -218,7 +218,7 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 	render::drawFilledRect(newBox.x, newBox.y, offset, 2, Colors::Turquoise);
 	
 	if (maxAmmo != currentAmmo)
-		render::text(newBox.x + offset, newBox.y + 1, fonts::tahoma, std::to_string(currentAmmo), false, Colors::White);
+		render::text(newBox.x + offset, newBox.y + 1, fonts::espBar, std::to_string(currentAmmo), false, Colors::White);
 }
 
 void esp::drawInfo(Player_t* ent, const Box& box)
@@ -229,7 +229,7 @@ void esp::drawInfo(Player_t* ent, const Box& box)
 	render::text(box.x + (box.w / 2), box.y - 15, fonts::tahoma, ent->getName(), true, playerColor(ent));
 
 	if (ent->isC4Owner())
-		render::text(box.x - 25 + box.w, box.y + 5 + box.h, fonts::tahoma, "C4", false, playerColor(ent));
+		render::text(box.x - 25 + box.w, box.y + 5 + box.h, fonts::tahoma, XOR("C4"), false, playerColor(ent));
 }
 
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
@@ -260,6 +260,11 @@ void esp::drawSkeleton(Player_t* ent)
 
 		if (!(bone->m_flags & BONE_USED_BY_HITBOX))
 			continue;
+
+		if (Vector scr; render::worldToScreen(ent->getBonePosition(i), scr))
+		{
+			render::text(scr.x, scr.y, fonts::smalle, std::to_string(i), false, Colors::Green);
+		}
 
 		// skip like here
 		auto child = record
@@ -439,23 +444,6 @@ void esp::drawSound(IGameEvent* event)
 		interfaces::beams->drawBeam(beam_draw);
 }
 
-//struct PlayerData
-//{
-//	Player_t* ent;
-//	float aimPercentage;
-//	bool operator==(const PlayerData& data)
-//	{
-//		return (ent == data.ent) ? true : false;
-//	}
-//	bool operator<(const PlayerData& data) const
-//	{
-//		return (ent < data.ent) ? true : false;
-//	}
-//};
-
-
-//std::set<PlayerData> data;
-
 void esp::enemyIsAimingAtYou(Player_t* ent)
 {
 	if (!game::localPlayer)
@@ -476,16 +464,16 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 
 	Vector curEnemyAngle = ent->m_angEyeAngles();
 
+	curEnemyAngle.normalize();
+
 	float dy = math::normalizeYaw(curEnemyAngle.y - idealAimAngle.y),
 		dp = curEnemyAngle.x - idealAimAngle.x;
-	dp = std::clamp(dp, -89.0f, 89.0f);
 
-	float fovDist = sqrtf(dy * dy + dp * dp);
+	float fovDist = std::sqrt(dy * dy + dp * dp);
 	bool check = ent->isPossibleToSee(game::localPlayer, game::localPlayer->getEyePos());
 
-	// fovDist < 90.0f hardcoded, because it's impossible to know it
-	// so if somebody is cheating with 3rd cam, this will not be valid
-	if (check && fovDist <= 90.0f)
+	// hardcoded, when enemies use 3rd cam or some fov changer, it won't be accurate
+	if (check && fovDist <= 60.0f)
 	{
 		render::text(x / 2, 60, fonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
 	}
@@ -494,56 +482,4 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 	{
 		render::text(x / 2, 80, fonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
 	}
-
-	//Vector posDelta = ent->getEyePos() - game::localPlayer->getHitboxPos(HITBOX_BELLY); // ideally find the closest point on your body to their crosshair but whatever
-	//Vector idealAimAngle = VectorToAngle(posDelta);
-
-	//// account for their spray control
-	//static const auto scale = interfaces::console->findVar(XOR("weapon_recoil_scale"))->getFloat();
-	//idealAimAngle -= ent->m_aimPunchAngle() * scale;
-
-	//Vector curEnemyAngle = ent->m_angEyeAngles();
-	//// broken smth? engine gives this, or I am stupid? Like 360 pitch randomly
-	//if (curEnemyAngle.x > 1.0f)
-	//	curEnemyAngle.x -= 360.0f;
-
-	//float dy = normalizeYaw(curEnemyAngle.y - idealAimAngle.y),
-	//	dp = curEnemyAngle.x - idealAimAngle.x;
-
-	//float fovDist = sqrtf(dy * dy + dp * dp);
-	//float aimPercentage = 100.0f - std::min(100.0f, fovDist);
-
-	//int x, y;
-	//interfaces::engine->getScreenSize(x, y);
-
-	//PlayerData tmp = PlayerData(ent, 0.0f);
-	//auto it = data.find(tmp);
-
-	///*if (it != data.end())
-	//	console::log(LOG_NO, "JEST\n");
-	//else
-	//	console::log(LOG_NO, "NIE MA\n");*/
-	//if (it == data.end())
-	//{
-	//	if(fovDist < 5.0f)
-	//		data.insert(PlayerData{ ent, aimPercentage });
-	//}
-	//else
-	//{
-	//	auto tmp = *it;
-	//	tmp.aimPercentage = aimPercentage;
-	//	data.erase(it);
-	//	if(fovDist < 5.0f)
-	//	{
-	//		data.insert(tmp);
-	//	}
-	//}
-
-	//int ii = 0;
-	//for (auto itr = data.begin(); itr != data.end(); itr++)
-	//{
-	//	render::text(x / 2, ii * 20, fonts::tahoma,
-	//		std::format("Enemy is aiming you {:.2f}%", (*itr).aimPercentage), true, Colors::Red);
-	//	ii++;
-	//}
 }

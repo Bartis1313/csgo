@@ -42,82 +42,6 @@ void legitbot::drawFov()
     }
 }
 
-inline constexpr std::vector<int> posToAim()
-{
-    std::vector<int> vec = {};
-    switch (vars::iAimbot)
-    {
-    case NEAREST:
-        for (int i = 0; i < HITBOX_MAX; i++)
-            vec.emplace_back(i);
-        return vec;
-    case HEAD:
-        return { HITBOX_HEAD };
-    case CHEST:
-        return { HITBOX_LOWER_CHEST };
-    default:
-        return {};
-    }
-    return {};
-}
-
-
-Vector legitbot::getBestBonePos(CUserCmd* cmd)
-{
-    float bestFov = vars::iFovAimbot;
-    //int unseenHitboxes = 0;
-    Vector bestHitbox = { 0, 0, 0 };
-
-    const auto weapon = game::localPlayer->getActiveWeapon();
-    const auto& punch = weapon->isRifle() ? game::localPlayer->getAimPunch() : Vector(0, 0, 0);
-    // TODO: test vfunc for performance later
-    const auto myEye = game::localPlayer->getEyePos();
-
-    for (int i = 1; i < interfaces::engine->getMaxClients(); i++)
-    {
-        const auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
-
-        if (!ent)
-            continue;
-
-        if (!ent->isAlive() || !game::localPlayer->isAlive())
-            continue;
-
-        if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
-            continue;
-
-        if (ent->isDormant())
-            continue;
-
-        if (ent->m_bGunGameImmunity())
-            continue;
-
-        if (!game::localPlayer->isPossibleToSee(ent, ent->getEyePos()))
-            continue;
-
-        for (const auto& pos : posToAim())
-        {          
-            auto hitbox = ent->getHitboxPos(pos);
-
-            if (!game::localPlayer->isPossibleToSee(ent, hitbox))
-                continue;
-
-            auto angles = cmd->m_viewangles + punch;
-
-            auto fov = math::calcFov(myEye, hitbox, angles);
-
-            if (fov < bestFov)
-            {
-                bestFov = fov;
-                bestHitbox = hitbox;
-                bestEnt = ent;
-            }
-        }
-    }
-
-    return bestHitbox;
-}
-
 void legitbot::RCS(CUserCmd* cmd)
 {
     static Vector oldPunch{ 0, 0, 0 };
@@ -126,7 +50,7 @@ void legitbot::RCS(CUserCmd* cmd)
     punch.x *= vars::iRCS / 100.0f;
     punch.y *= vars::iRCS / 100.0f;
 
-    auto& toMove = cmd->m_viewangles += (oldPunch - punch);
+    auto toMove = cmd->m_viewangles += (oldPunch - punch);
     toMove.clamp();
 
     interfaces::engine->setViewAngles(toMove);
@@ -142,38 +66,94 @@ void legitbot::run(CUserCmd* cmd)
     if (!game::localPlayer)
         return;
 
-    if (!interfaces::engine->isConnected() || !interfaces::engine->isInGame())
-        return;
-
-    if (!game::localPlayer->isAlive())
-        return;
-
     auto weapon = game::localPlayer->getActiveWeapon();
 
     if (!weapon)
         return;
 
     if (weapon->isNonAimable())
+    {
+        // in special cases when weapon that got accepted with aimbot
+        // and later on gun got switched to nonaimable, in past snapline was shown, now no
+        bestEnt = nullptr;
         return;
+    }
 
     if (weapon->isSniper() && !game::localPlayer->m_bIsScoped())
         return;
 
-    // TODO: add some detection for recoil, eg: tec9 is a pistol but rcs is okay to add for it, simple checking isRifle() is not enough
     if (vars::iRCS)
         RCS(cmd);
 
-    auto punch = weapon->isRifle() ? game::localPlayer->getAimPunch() : Vector(0, 0, 0);
-    auto myEye = game::localPlayer->getEyePos();
-
-    if (cmd->m_buttons & IN_ATTACK && vars::iAimbot) // add key later
+    if (cmd->m_buttons & IN_ATTACK) // add key later
     {
-        const auto bestPos = getBestBonePos(cmd);
+        auto bestFov = vars::iFovAimbot;
+        Vector bestPos = Vector(0, 0, 0);
+        const auto punch = weapon->isRifle() || weapon->isSmg() ? game::localPlayer->getAimPunch() : Vector(0, 0, 0);
+        const auto myEye = game::localPlayer->getEyePos();
 
-        if (!bestPos.IsZero() && bestEnt)
+        for (int i = 1; i <= interfaces::engine->getMaxClients(); i++)
+        {
+            auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+
+            if (!ent)
+                continue;
+
+            if (ent == game::localPlayer)
+                continue;
+
+            if (!ent->isAlive() || !game::localPlayer->isAlive())
+                continue;
+
+            if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+                continue;
+
+            if (ent->isDormant())
+                continue;
+
+            if (ent->m_bGunGameImmunity())
+                continue;
+            
+            // I tried many ways with vector, seems too slow or whatever the issue is, this is good enough
+            // if you want bones which I dislike because it will be useless effort, some bone ids are not the same for every model
+            // https://cdn.discordapp.com/attachments/829304849027170305/916477147261051000/unknown.png
+            for (int pos = HITBOX_HEAD; pos < HITBOX_MAX; pos++)
+            {
+                Vector hitPos = Vector(0, 0, 0);
+                switch (vars::iAimbot)
+                {
+                case NEAREST:
+                    hitPos = ent->getHitboxPos(pos);
+                    break;
+                case HEAD:
+                    hitPos = ent->getHitboxPos(HITBOX_HEAD);
+                    break;
+                case CHEST:
+                    hitPos = ent->getHitboxPos(HITBOX_LOWER_CHEST);
+                    break;
+                }
+                auto angles = cmd->m_viewangles + punch;
+                angles.clamp();
+
+                if (!game::localPlayer->isPossibleToSee(ent, hitPos))
+                    continue;
+
+                auto fov = math::calcFov(myEye, hitPos, angles);
+
+                if (fov < bestFov)
+                {
+                    bestFov = fov;
+                    bestPos = hitPos;
+                    bestEnt = ent;
+                }
+                if (vars::iAimbot != NEAREST)
+                    break;
+            }
+        }
+
+        if (!bestPos.IsZero())
         {
             auto angle = math::calcAngleRelative(myEye, bestPos, cmd->m_viewangles + punch);
-
             angle.clamp();
 
             // remember to only smooth when the value is non zero/negative!
@@ -185,7 +165,5 @@ void legitbot::run(CUserCmd* cmd)
         }
     }
     else
-    {
         bestEnt = nullptr;
-    }
 }

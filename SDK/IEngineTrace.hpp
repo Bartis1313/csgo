@@ -2,6 +2,7 @@
 #include "vars.hpp"
 #include "math/Vector.hpp"
 #include "math/VMatrix.hpp"
+#include "../utilities/pad.hpp"
 
 #pragma warning(disable: 26495)
 
@@ -11,9 +12,11 @@ class Ray_t
 {
 public:
 	Vector m_start;
-	PAD(4);
+private:
+	float w = 0;
+public:
 	Vector m_delta;
-	PAD(40);
+	PAD(40); // matrix
 	bool m_isRay = true;
 	bool m_isSwept;
 

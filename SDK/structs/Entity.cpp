@@ -1,5 +1,6 @@
 #include "Entity.hpp"
 #undef max
+#include <format>
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -249,16 +250,15 @@ int Player_t::getPing()
 bool Player_t::isPossibleToSee(Player_t* ent, const Vector& pos)
 {
 	Trace_t tr;
-	Ray_t ray;
 	TraceFilter filter;
 
 	auto start = this->getEyePos();
 	auto end = pos;
 	filter.m_skip = this;
-	ray.initialize(start, pos);
-	interfaces::trace->traceRay(ray, MASK_VISIBLE, &filter, &tr);
+	interfaces::trace->traceRay({ this->getEyePos(), pos }, MASK_PLAYER, &filter, &tr);
 
-	return tr.m_entity == ent || tr.m_fraction > 1.0f;
+	return tr.m_entity == this || tr.m_fraction > 0.97f;
+
 }
 
 ////////////////////////////////////////////////////////////////

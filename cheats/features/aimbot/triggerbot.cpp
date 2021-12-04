@@ -42,13 +42,10 @@ void triggerbot::run(CUserCmd* cmd)
 		return;
 
 	Trace_t trace;
-	Ray_t ray;
 	TraceFilter filter;
 
 	filter.m_skip = game::localPlayer;
-
-	ray.initialize(myEye, end);
-	interfaces::trace->traceRay(ray, MASK_PLAYER, &filter, &trace);
+	interfaces::trace->traceRay({ myEye, end }, MASK_PLAYER, &filter, &trace);
 
 	// so this way we skip time of trace
 	delay = current;
@@ -75,8 +72,8 @@ void triggerbot::run(CUserCmd* cmd)
 	if (entity->m_bGunGameImmunity())
 		return;
 
-	if (!game::localPlayer->isPossibleToSee(entity, entity->getEyePos()))
-		return;
+	//if (!game::localPlayer->isPossibleToSee(entity, entity->getEyePos()))
+	//	return;
 
 	// that is bad way
 	/*if (delay >= vars::iTriggerDelay)

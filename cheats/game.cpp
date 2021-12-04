@@ -36,10 +36,10 @@ namespace game
 	{
 		if (!localPlayer)
 			return 0;
-		auto res = *interfaces::resource;
+		const static auto res = *interfaces::resource;
 		if (res)
 		{
-			auto kills = res->getKills(localPlayer->getIndex());
+			const static auto kills = res->getKills(localPlayer->getIndex());
 			return kills;
 		}
 		return 0;
@@ -48,10 +48,10 @@ namespace game
 	{
 		if (!localPlayer)
 			return 0;
-		auto res = *interfaces::resource;
+		const static auto res = *interfaces::resource;
 		if (res)
 		{
-			auto deaths = res->getDeaths(localPlayer->getIndex());
+			const static auto deaths = res->getDeaths(localPlayer->getIndex());
 			return deaths;
 		}
 		return 0;
@@ -61,10 +61,10 @@ namespace game
 	{
 		if (!localPlayer)
 			return 0;
-		auto res = *interfaces::resource;
+		const static auto res = *interfaces::resource;
 		if (res)
 		{
-			auto ping = res->getPing(localPlayer->getIndex());
+			const static auto ping = res->getPing(localPlayer->getIndex());
 			return ping;
 		}
 		return 0;

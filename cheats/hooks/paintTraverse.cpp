@@ -8,11 +8,15 @@
 
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
 {
+	if (strstr(interfaces::panel->getName(panel), XOR("HudZoom")))
+	{
+		if (interfaces::engine->isInGame())		
+			return;
+	}
+
 	original(interfaces::panel, panel, forceRepaint, allowForce);
 
-	const auto toDraw = interfaces::panel->getName(panel);
-
-	if (strstr(toDraw, XOR("MatSystemTopPanel")))
+	if (strstr(interfaces::panel->getName(panel), XOR("MatSystemTopPanel")))
 	{
 		Menu::g().draw();
 		Menu::g().handleKeys();
@@ -25,5 +29,6 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		misc::drawVelocityPlot();
 		misc::drawHitmarker();
 		world::drawZeusRange();
+		misc::drawNoScope();
 	}
 }

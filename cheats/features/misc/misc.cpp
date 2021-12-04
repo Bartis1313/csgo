@@ -309,3 +309,20 @@ void misc::drawHitmarker()
 		hitAlpha -= 1.8f * (interfaces::globalVars->m_frametime) * 255;
 	}
 }
+
+void misc::drawNoScope()
+{
+	if (!game::localPlayer)
+		return;
+
+	if (!interfaces::engine->isInGame())
+		return;
+
+	if (game::localPlayer->m_bIsScoped())
+	{
+		int x, y;
+		interfaces::engine->getScreenSize(x, y);
+		render::drawLine(x / 2, 0, x / 2, y, Colors::Black);
+		render::drawLine(0, y / 2, x, y / 2, Colors::Black);
+	}
+}

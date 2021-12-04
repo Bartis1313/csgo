@@ -14,5 +14,6 @@ namespace misc
 	void getVelocityData();
 	void drawHitmarker();
 	void playHitmarker(IGameEvent* event);
+	void drawNoScope();
 	inline int hitAlpha = 0;
 }

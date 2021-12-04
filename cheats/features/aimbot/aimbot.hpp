@@ -7,7 +7,6 @@
 
 namespace legitbot
 {
-	Vector getBestBonePos(CUserCmd* cmd);
 	void drawFov();
 	void run(CUserCmd* cmd);
 	void RCS(CUserCmd* cmd);
