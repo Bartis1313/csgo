@@ -261,11 +261,6 @@ void esp::drawSkeleton(Player_t* ent)
 		if (!(bone->m_flags & BONE_USED_BY_HITBOX))
 			continue;
 
-		if (Vector scr; render::worldToScreen(ent->getBonePosition(i), scr))
-		{
-			render::text(scr.x, scr.y, fonts::smalle, std::to_string(i), false, Colors::Green);
-		}
-
 		// skip like here
 		auto child = record
 			? record->back().matrix[i].origin()
