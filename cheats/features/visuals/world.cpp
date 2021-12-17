@@ -58,6 +58,25 @@ void world::drawBombDropped(Entity_t* ent)
 	}
 }
 
+
+float scaleDamageArmor(float dmg, const float armor)
+{
+	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/183347-bomb-damage-indicator.html
+	if (armor > 0)
+	{
+		float flNew = dmg * 0.5f;
+		float flArmor = (dmg - flNew) * 0.5f;
+
+		if (flArmor > armor)
+		{
+			flArmor = armor * (1.f / 0.5f);
+			flNew = dmg - flArmor;
+		}
+		dmg = flNew;
+	}
+
+	return dmg;
+}
 void world::drawBomb(Entity_t* ent)
 {
 	const auto tickbomb = interfaces::console->findVar(XOR("mp_c4timer"))->getFloat();
@@ -67,19 +86,22 @@ void world::drawBomb(Entity_t* ent)
 	if (bombtime < 0.0f)
 		return;
 
+	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/389530-bomb-damage-indicator.html
+	const float hypDist = (ent->getEyePos() - game::localPlayer->getEyePos()).Length(), sigma = (500.0f * 3.5f) / 3.0f;
+	const float dmg = scaleDamageArmor((500.f * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
+
+	const bool isSafe = dmg < game::localPlayer->m_iHealth();
+
 	Box box;
 	if (utilities::getBox(ent, box))
 	{
 		render::text(box.x, box.y, fonts::tahoma, "Planted Bomb", false, Colors::LightBlue);
-		render::drawOutlineRect(box.x - 1, box.y - 1, box.w + 2, box.h + 2, Color(0, 0, 0, 200));
-		render::drawOutlineRect(box.x, box.y, box.w, box.h, Color(120, 60, 0, 200));
-		render::drawOutlineRect(box.x + 1, box.y + 1, box.w - 2, box.h - 2, Color(0, 0, 0, 200));
 	}
 
 	uint8_t r = static_cast<uint8_t>(255.0f - bombtime / tickbomb * 255.0f);
 	uint8_t g = static_cast<uint8_t>(bombtime / tickbomb * 255.0f);
 
-	render::text(5, 800, fonts::tahoma, std::format("TIME: {:.3f}", bombtime), false, Color{ r, g, 0, 200 });
+	render::text(5, 800, fonts::tahoma, isSafe ? std::format("TIME {:.2f} DMG {:.2f} SAFE", bombtime, dmg) : std::format("TIME {:.2f} DMG {:.2f} YOU DIE", bombtime, dmg), false, Color{ r, g, 0, 200 });
 }
 
 
@@ -278,9 +300,11 @@ void world::drawMolotovPoints(Entity_t* ent)
 	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/master/game/server/cstrike15/Effects/inferno.cpp
 	// here you can see ratios and everything
 
-	render::drawCircle3D(molotov->absOrigin() + Vector(0, 60, 0), 60, 32, Colors::Red);
+	Vector min = {}, max = {};
+	ent->getRenderBounds(min, max);
+	render::drawCircle3D(molotov->absOrigin(), 0.5f * Vector(max - min).Length2D(), 32, Colors::Red);
 
-	render::text(screen.x, screen.y + 60, fonts::tahoma, XOR("Molotov"), false, Colors::White);
+	render::text(screen.x, screen.y, fonts::tahoma, XOR("Molotov"), false, Colors::White);
 }
 
 void world::drawZeusRange()

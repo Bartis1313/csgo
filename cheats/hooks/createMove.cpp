@@ -12,12 +12,10 @@
 
 bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 {	
-	original(inputFrame, cmd);
+	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
 	if (!cmd || !cmd->m_commandNumber)
 		original(inputFrame, cmd);
-
-	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
 	// thanks for reminding me https://github.com/Bartis1313/csgo/issues/4
 	if(original(inputFrame, cmd))

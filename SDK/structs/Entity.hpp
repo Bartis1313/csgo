@@ -44,6 +44,7 @@ public:
 	VFUNC(ClientClass*, clientClass, 2, (), (this + 0x8));
 	VFUNC(ICollideable*, collideable, 3, (), (this));
 	VFUNC(int, getIndex, 10, (), (this + 0x8));
+	VFUNC(void, getRenderBounds, 17, (Vector& mins, Vector& maxs), (this + 0x4, std::ref(mins), std::ref(maxs)));
 	VFUNC(bool, isPlayer, ISPLAYER, (), (this));
 	VFUNC(bool, isWeapon, ISWEAPON, (), (this));
 	VFUNC(bool, setupBones, 13, (matrix3x4_t* out, int maxBones, int mask, float time), (this + 0x4, out, maxBones, mask, time));
@@ -52,6 +53,7 @@ public:
 	VFUNC(bool, isDormant, 9, (), (this + 0x8));
 
 	_NODISCARD Vector getAimPunch();
+	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +147,6 @@ public:
 
 	void setAbsOrigin(const Vector& origin);
 	_NODISCARD Weapon_t* getActiveWeapon();
-	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); } // there is some vtable iirc, but this is safer when it comes with updates
 	_NODISCARD bool isAlive() { return m_iHealth() > 0; }
 	_NODISCARD bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
 	_NODISCARD bool IsValid() { return (isAlive() && !isDormant()); }
