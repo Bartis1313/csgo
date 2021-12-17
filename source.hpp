@@ -68,7 +68,7 @@ LONG WINAPI memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 
 	for (const auto& el : crashNames)
 	{
-		if (code == std::cref(el.first))
+		if (code == el.first)
 		{
 			static bool bOnce = [=]()
 			{

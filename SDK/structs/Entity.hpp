@@ -37,6 +37,7 @@ public:
 	NETVAR(bool, m_bSpotted, "DT_BaseEntity", "m_bSpotted");
 	NETVAR(float, m_flSimulationTime, "DT_BasePlayer", "m_flSimulationTime");
 	NETVAR_ADDR(int, moveType, "DT_BasePlayer", "m_nRenderMode", 1);
+	NETVAR_ADDR(matrix3x4_t, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
 
 	VFUNC(Vector&, absOrigin, 10, (), (this));
 	VFUNC(Vector&, absAngles, 11, (), (this));
@@ -51,7 +52,6 @@ public:
 	VFUNC(bool, isDormant, 9, (), (this + 0x8));
 
 	_NODISCARD Vector getAimPunch();
-	_NODISCARD matrix3x4_t& m_rgflCoordinateFrame();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

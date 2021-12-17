@@ -15,7 +15,7 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 	original(inputFrame, cmd);
 
 	if (!cmd || !cmd->m_commandNumber)
-		return false;
+		original(inputFrame, cmd);
 
 	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
@@ -24,7 +24,6 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 		interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
 
 	game::serverTime(cmd);
-
 	bunnyhop::run(cmd);
 	bunnyhop::strafe(cmd);
 

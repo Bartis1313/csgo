@@ -119,9 +119,11 @@ void backtrack::update()
 			records.at(i).pop_back();
 
 		// lambda check for valid time simulation
-		auto check = [](const StoredRecord& rec) { return !isValid(rec.simTime); };
 		// check every record with simtime
-		const auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), check);
+		const auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [](const StoredRecord& rec)
+			{
+				return !isValid(rec.simTime);
+			});
 
 		// if it's not valid then clean up everything on this record
 		if (invalid != std::cend(records.at(i)))

@@ -11,20 +11,11 @@ Vector Entity_t::getAimPunch()
 	return vec;
 }
 
-matrix3x4_t& Entity_t::m_rgflCoordinateFrame()
-{
-	const static auto m_CollisionGroup = NetvarManager::g().getNetvar(XOR("DT_BaseEntity"), XOR("m_CollisionGroup"));
-	// this was found in reclass, originally I had some bad resulting in CE addr
-	const static auto validCoord = m_CollisionGroup - 0x30;
-
-	return *reinterpret_cast<matrix3x4_t*>((uintptr_t)this + validCoord);
-}
-
 ////////////////////////////////////////////////////////////////////////
 
 std::string Weapon_t::getWpnName()
 {
-	switch (m_iItemDefinitionIndex())
+	switch (this->m_iItemDefinitionIndex())
 	{
 	case WEAPON_KNIFE: return "KNIFE";
 	case WEAPON_KNIFE_T: return "KNIFE";
@@ -86,59 +77,37 @@ std::string Weapon_t::getWpnName()
 
 bool Weapon_t::isRifle()
 {
-	const auto idx = m_iItemDefinitionIndex();
-
-	return idx == WEAPON_AK47 || idx == WEAPON_M4A1 || idx == WEAPON_M4A1_SILENCER || idx == WEAPON_GALILAR ||
-		idx == WEAPON_FAMAS || idx == WEAPON_AUG || idx == WEAPON_SG553;
+	return this->getWpnInfo()->m_type == WEAPONTYPE_RIFLE;
 }
 
 bool Weapon_t::isSmg()
 {
-	const auto idx = m_iItemDefinitionIndex();
-
-	return idx == WEAPON_MAC10 || idx == WEAPON_MP7 || idx == WEAPON_MP9 || idx == WEAPON_P90 ||
-		idx == WEAPON_BIZON || idx == WEAPON_UMP45 || idx == WEAPON_MP5SD;
+	return this->getWpnInfo()->m_type == WEAPONTYPE_MACHINEGUN;
 }
 
 bool Weapon_t::isShotgun()
 {
-	const auto idx = m_iItemDefinitionIndex();
-
-	return idx == WEAPON_XM1014 || idx == WEAPON_NOVA || idx == WEAPON_SAWEDOFF || idx == WEAPON_MAG7 || idx == WEAPON_M249 || idx == WEAPON_NEGEV;
+	return this->getWpnInfo()->m_type == WEAPONTYPE_SHOTGUN;
 }
 
 bool Weapon_t::isPistol()
 {
-	const auto idx = m_iItemDefinitionIndex();
-
-	return idx == WEAPON_DEAGLE || idx == WEAPON_ELITE || idx == WEAPON_FIVESEVEN || idx == WEAPON_P250 ||
-		idx == WEAPON_GLOCK || idx == WEAPON_HKP2000 || idx == WEAPON_CZ75A || idx == WEAPON_USP_SILENCER || idx == WEAPON_TEC9 || idx == WEAPON_REVOLVER;
+	return this->getWpnInfo()->m_type == WEAPONTYPE_PISTOL;
 }
 
 bool Weapon_t::isSniper()
 {
-	const auto idx = m_iItemDefinitionIndex();
-
-	return idx == WEAPON_AWP || idx == WEAPON_SCAR20 || idx == WEAPON_G3SG1 || idx == WEAPON_SSG08;
+	return this->getWpnInfo()->m_type == WEAPONTYPE_SNIPER_RIFLE;
 }
 
 bool Weapon_t::isGrenade()
 {
-	const auto idx = m_iItemDefinitionIndex();
-
-	return idx == WEAPON_FLASHBANG || idx == WEAPON_HEGRENADE || idx == WEAPON_SMOKEGRENADE || idx == WEAPON_MOLOTOV || idx == WEAPON_DECOY || idx == WEAPON_INCGRENADE;
+	return this->getWpnInfo()->m_type == WEAPONTYPE_GRENADE;
 }
 
 bool Weapon_t::isKnife()
 {
-	const auto idx = m_iItemDefinitionIndex();
-
-	return idx == WEAPON_KNIFE || idx == WEAPON_KNIFE_BAYONET || idx == WEAPON_KNIFE_BUTTERFLY || idx == WEAPON_KNIFE_FALCHION
-		|| idx == WEAPON_KNIFE_FLIP || idx == WEAPON_KNIFE_GUT || idx == WEAPON_KNIFE_KARAMBIT || idx == WEAPON_KNIFE_M9_BAYONET
-		|| idx == WEAPON_KNIFE_PUSH || idx == WEAPON_KNIFE_SURVIVAL_BOWIE || idx == WEAPON_KNIFE_T || idx == WEAPON_KNIFE_TACTICAL
-		|| idx == WEAPON_KNIFEGG || idx == WEAPON_KNIFE_GHOST || idx == WEAPON_KNIFE_GYPSY_JACKKNIFE || idx == WEAPON_KNIFE_STILETTO
-		|| idx == WEAPON_KNIFE_URSUS || idx == WEAPON_KNIFE_WIDOWMAKER || idx == WEAPON_KNIFE_CSS || idx == WEAPON_KNIFE_CANIS
-		|| idx == WEAPON_KNIFE_CORD || idx == WEAPON_KNIFE_OUTDOOR || idx == WEAPON_KNIFE_SKELETON;
+	return this->getWpnInfo()->m_type == WEAPONTYPE_KNIFE;
 }
 
 bool Weapon_t::isNonAimable()
@@ -211,7 +180,19 @@ std::string Player_t::getName()
 {
 	playerInfo_t info;
 	interfaces::engine->getPlayerInfo(this->getIndex(), &info);
-	return info.name;
+
+	std::string name = info.name;
+
+	if (name.length() > 20)
+		name = name.substr(0, 20).append(XOR("..."));
+
+	std::for_each(name.begin(), name.end(), [](char& el)
+		{
+			if (el < 0 || el > 128)
+				el = '?';
+		});
+
+	return name;
 }
 
 int Player_t::getKills()

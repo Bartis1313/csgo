@@ -4,15 +4,12 @@
 #include <ShlObj_core.h>
 #include "renderer/renderer.hpp"
 #include "../SDK/structs/Entity.hpp"
+#include <optional>
 
 #undef max
 #undef min
 
 namespace fs = std::filesystem;
-
-#define INRANGE(x,a,b)    (x >= a && x <= b) 
-#define getBits( x )    (INRANGE((x&(~0x20)),'A','F') ? ((x&(~0x20)) - 'A' + 0xa) : (INRANGE(x,'0','9') ? x - '0' : 0))
-#define getByte( x )    (getBits(x[0]) << 4 | getBits(x[1]))
 
 namespace utilities
 {
@@ -66,9 +63,6 @@ namespace utilities
 
 	uintptr_t patternScan(const char* mod, const char* mask)
 	{
-		auto m_mask = mask;
-		uintptr_t first = 0;
-
 		MODULEINFO modInfo;
 #ifndef _DEBUG
 		LF(K32GetModuleInformation).cached()(LF(GetCurrentProcess).cached()(), LF(GetModuleHandleA).cached()(mod), &modInfo, sizeof(MODULEINFO));
@@ -76,37 +70,35 @@ namespace utilities
 		LF(K32GetModuleInformation)(LF(GetCurrentProcess)(), LF(GetModuleHandleA)(mod), &modInfo, sizeof(MODULEINFO));
 #endif		
 		uintptr_t ranageStart = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
-		uintptr_t rangeEnd = ranageStart + modInfo.SizeOfImage;
-
-		for (auto curAddr = ranageStart; curAddr < rangeEnd; curAddr++)
-		{
-			if (*(PBYTE)m_mask == '\?' || *(BYTE*)curAddr == getByte(m_mask))
+		std::istringstream iss{ mask };
+		std::vector<std::string> parts{ std::istream_iterator<std::string>{ iss }, std::istream_iterator<std::string>{} };
+		std::vector<std::optional<byte>> actualPattern = {};
+		
+		std::for_each(parts.cbegin(), parts.cend(), [&](const std::string& str) -> void
 			{
-				if (!*m_mask)
-					return first;
-
-				if (!first)
-					first = curAddr;
-
-				if (!m_mask[2])
-					return first;
-
-				if (*(PWORD)m_mask == '\?\?' || *(PBYTE)m_mask != '\?')
-					m_mask += 3;
+				if (str == "?" || str == "??")
+					actualPattern.emplace_back(std::nullopt);
 				else
-					m_mask += 2;
-			}
-			else
+					actualPattern.emplace_back(static_cast<byte>(std::stoi(str, nullptr, 16)));
+			});
+		
+		for (auto i = 0; i < modInfo.SizeOfImage; i++)
+		{
+			if (static auto check = [](byte* data, const std::vector<std::optional<byte>>& _mask) -> bool
+				{
+					for (auto _byte : _mask)
+					{
+						if (_byte && _byte.value() != *data)
+							return false;
+							data++;
+					}
+					return true;
+				}; check(reinterpret_cast<byte*>(ranageStart + i), actualPattern))
 			{
-				m_mask = mask;
-				first = 0;
-
-				if (first != 0)
-					curAddr = first;
-				m_mask = mask;
-				first = 0;
+				return ranageStart + i;
 			}
 		}
+
 		LF(MessageBoxA)(nullptr, XOR("Pattern scanning failed!"), XOR("Bartis hack"), MB_OK | MB_ICONWARNING);
 
 		return 0;
