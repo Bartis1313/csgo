@@ -20,7 +20,7 @@ struct Box;
     #define XOR(s) (s)
 #endif
 
-inline void LOG(const short type, const std::string& str) { console::log(type, std::cref(str)); }
+inline void LOG(const short type, const std::string& str) { console::log(type, str); }
 
 namespace utilities
 {
