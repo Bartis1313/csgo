@@ -286,7 +286,7 @@ void world::skyboxLoad(int stage)
 	}
 }
 
-// man I am too dumb for this, this is TODO
+// TODO: add points, as drawing one circle is not accurate
 void world::drawMolotovPoints(Entity_t* ent)
 {
 	auto molotov = reinterpret_cast<Inferno_t*>(ent);
@@ -302,7 +302,7 @@ void world::drawMolotovPoints(Entity_t* ent)
 
 	Vector min = {}, max = {};
 	ent->getRenderBounds(min, max);
-	render::drawCircle3D(molotov->absOrigin(), 0.5f * Vector(max - min).Length2D(), 32, Colors::Red);
+	render::drawFilledCircle3D(molotov->absOrigin(), 0.5f * Vector(max - min).Length2D(), 32, Colors::Red);
 
 	render::text(screen.x, screen.y, fonts::tahoma, XOR("Molotov"), false, Colors::White);
 }

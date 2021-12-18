@@ -1,9 +1,6 @@
 #include "renderer.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 
-#define STRING2(x) #x
-#define STRING(x) STRING2(x)
-
 enum FontFlags
 {
 	FONTFLAG_NONE,
@@ -21,236 +18,259 @@ enum FontFlags
 	FONTFLAG_BITMAP = 0x800,
 };
 
-namespace render
+unsigned long render::__createFont(const char* fontName, const int size, const int weight, const unsigned long flags)
 {
-	void init()
+	auto result = interfaces::surface->fontCreate();
+	interfaces::surface->setFontGlyph(result, fontName, size, weight, 0, 0, flags);
+	return result;
+}
+
+void render::init()
+{
+	fonts::tahoma = __createFont("Tahoma", 14, 800, FONTFLAG_OUTLINE);
+	fonts::smalle = __createFont("Tahoma", 9, 800, FONTFLAG_ANTIALIAS);
+	fonts::espBar = __createFont("Franklin Gothic", 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+
+	LOG(LOG_INFO, "render success\n");
+}
+
+void render::drawLine(const int x, const int y, const int x2, const int y2, const Color& color)
+{
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawLine(x, y, x2, y2);
+}
+
+void render::drawLine(const Vector2D& start, const Vector2D& end, const Color& color)
+{
+	drawLine(start.x, start.y, end.x, end.y, color);
+}
+
+void render::drawOutlineRect(const int x, const int y, const int w, const int h, const Color& color)
+{
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawOutlinedRect(x, y, w, h);
+}
+
+void render::drawOutlineRect(const Vector2D& start, const Vector2D& end, const Color& color)
+{
+	drawOutlineRect(start.x, start.y, end.x, end.y, color);
+}
+
+void render::drawFilledRect(const int x, const int y, const int w, const int h, const Color& color)
+{
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawFilledRectangle(x, y, w, h);
+}
+
+void render::drawCircle(const int x, const int y, const int radius, const int points, const Color& color)
+{
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawOutlinedCircle(x, y, radius, points);
+}
+
+void render::drawCircleFilled(const int x, const int y, const int radius, const int points, const Color& color)
+{
+	std::vector<Vertex_t> verts = {};
+
+	float step = std::numbers::pi_v<float> *2.0f / points;
+	for (float i = 0; i < (std::numbers::pi_v<float> *2.0f); i += step)
 	{
-		fonts::tahoma = interfaces::surface->fontCreate();
-		interfaces::surface->setFontGlyph(fonts::tahoma, "Tahoma", 14, 800, 0, 0, FONTFLAG_OUTLINE);
-
-		fonts::smalle = interfaces::surface->fontCreate();
-		interfaces::surface->setFontGlyph(fonts::smalle, "Tahoma", 9, 800, 0, 0, FONTFLAG_ANTIALIAS);
-
-		fonts::espBar = interfaces::surface->fontCreate();
-		interfaces::surface->setFontGlyph(fonts::espBar, "Franklin Gothic", 10, 300, 0, 0, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
-
-		LOG(LOG_INFO, "render success\n");
+		verts.emplace_back(Vector2D(x + (radius * std::cos(i)), y + (radius * std::sin(i))));
 	}
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawTexturedPolygon(verts.size(), verts.data());
+}
 
-	void drawLine(const int x, const int y, const int x2, const int y2, Color color)
+void render::drawCircle3D(const Vector& pos, const int radius, const int points, const Color& color)
+{
+	float step = std::numbers::pi_v<float> *2.0f / points;
+
+	for (float i = 0; i < (std::numbers::pi_v<float> *2.0f); i += step)
 	{
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawLine(x, y, x2, y2);
-	}
+		Vector start(radius * std::cos(i) + pos.x, radius * std::sin(i) + pos.y, pos.z);
+		Vector end(radius * std::cos(i + step) + pos.x, radius * std::sin(i + step) + pos.y, pos.z);
 
-	void drawLine(Vector2D start, Vector2D end, Color color)
-	{
-		drawLine(start.x, start.y, end.x, end.y, color);
-	}
-
-	void drawOutlineRect(const int x, const int y, const int w, const int h, Color color)
-	{
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawOutlinedRect(x, y, w, h);
-	}
-
-	void drawOutlineRect(Vector2D start, Vector2D end, Color color)
-	{
-		drawOutlineRect(start.x, start.y, end.x, end.y, color);
-	}
-
-	void drawFilledRect(const int x, const int y, const int w, const int h, Color color)
-	{
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawFilledRectangle(x, y, w, h);
-	}
-
-	void drawCircle(const int x, const int y, const int radius, const int points, Color color)
-	{
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawOutlinedCircle(x, y, radius, points);
-	}
-
-	void drawCircleFilled(const int x, const int y, const int radius, const int points, Color color)
-	{
-		std::vector<Vertex_t> verts = {};
-
-		float step = M_PI * 2.0f / points;
-		for (float i = 0; i < (M_PI * 2.0f); i += step)
+		if (Vector screenStart, screenEnd; worldToScreen(start, screenStart) && worldToScreen(end, screenEnd))
 		{
-			verts.emplace_back(Vector2D(x + (radius * std::cos(i)), y + (radius * std::sin(i))));
+			drawLine(screenStart.x, screenStart.y, screenEnd.x, screenEnd.y, color);
 		}
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawTexturedPolygon(verts.size(), verts.data());
 	}
+}
 
-	void drawCircle3D(Vector pos, int radius, int points, Color color)
+void render::drawFilledCircle3D(const Vector& pos, const int radius, const int points, const Color& color)
+{
+	Vector orignalW2S = {};
+	if (!worldToScreen(pos, orignalW2S))
+		return;
+
+	Vector screenStart = {};
+	float step = std::numbers::pi_v<float> *2.0f / points;
+	static Vector before = NOTHING;
+
+	for (float i = 0; i < (std::numbers::pi_v<float> *2.0f); i += step)
 	{
-		float step = (float)M_PI * 2.0f / points;
+		Vector start(radius * std::cos(i) + pos.x, radius * std::sin(i) + pos.y, pos.z);
 
-		for (float i = 0; i < (M_PI * 2.0f); i += step)
+		if (worldToScreen(start, screenStart) && !before.IsZero())
 		{
-			Vector start(radius * std::cos(i) + pos.x, radius * std::sin(i) + pos.y, pos.z);
-			Vector end(radius * std::cos(i + step) + pos.x, radius * std::sin(i + step) + pos.y, pos.z);
-
-			if (Vector screenStart, screenEnd; worldToScreen(start, screenStart) && worldToScreen(end, screenEnd))
-			{
-				drawLine(screenStart.x, screenStart.y, screenEnd.x, screenEnd.y, color);
-			}
+			drawLine(screenStart.x, screenStart.y, before.x, before.y, color);
+			drawTriangle(Vector2D(orignalW2S.x, orignalW2S.y), Vector2D(screenStart.x, screenStart.y), Vector2D(before.x, before.y),
+				Color(color.r(), color.g(), color.b(), color.a() / 4.0f));
 		}
+		before = screenStart;
 	}
+}
 
-	/*
-			  + -p1
-			 / \
-			/   \
-		   /	 \
-	 p2 - +-------+ - p3
 
-	 */
+/*
+		  + -p1
+		 / \
+		/   \
+	   /	 \
+ p2 - +-------+ - p3
 
-	void drawTriangle(Vector2D p1, Vector2D p2, Vector2D p3, Color color)
+ */
+
+void render::drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
+{
+	Vertex_t verts[] =
 	{
-		Vertex_t verts[] =
-		{
-			Vertex_t(p1),
-			Vertex_t(p2),
-			Vertex_t(p3)
-		};
+		Vertex_t(p1),
+		Vertex_t(p2),
+		Vertex_t(p3)
+	};
 
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawTexturedPolygon(3, verts);
-	}
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawTexturedPolygon(3, verts);
+}
 
-	/*	  p4+
-			| `
-			|	 `
-			|		`
-			|			`
-			|			   `+p3
-			|				|
-			|				|
-			|				|
-			|				|
-			|				|
-		  p1+---------------+p2
-	 */
+/*	  p4+
+		| `
+		|	 `
+		|		`
+		|			`
+		|			   `+p3
+		|				|
+		|				|
+		|				|
+		|				|
+		|				|
+	  p1+---------------+p2
+ */
 
-	void drawTrapezFilled(Vector2D p1, Vector2D p2, Vector2D p3, Vector2D p4, Color color)
+void render::drawTrapezFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
+{
+	Vertex_t verts[] =
 	{
-		Vertex_t verts[] =
-		{
-			Vertex_t(p1),
-			Vertex_t(p2),
-			Vertex_t(p3),
-			Vertex_t(p4)
-		};
+		Vertex_t(p1),
+		Vertex_t(p2),
+		Vertex_t(p3),
+		Vertex_t(p4)
+	};
 
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawTexturedPolygon(4, verts);
-	}
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawTexturedPolygon(4, verts);
+}
 
-	void drawTrapezOutline(Vector2D p1, Vector2D p2, Vector2D p3, Vector2D p4, Color color)
+void render::drawTrapezOutline(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
+{
+	Vertex_t verts[] =
 	{
-		Vertex_t verts[] =
-		{
-			Vertex_t(p1),
-			Vertex_t(p2),
-			Vertex_t(p3),
-			Vertex_t(p4)
-		};
+		Vertex_t(p1),
+		Vertex_t(p2),
+		Vertex_t(p3),
+		Vertex_t(p4)
+	};
 
-		drawPolyLine(4, verts, color);
-	}
+	drawPolyLine(4, verts, color);
+}
 
-	void drawPolyLine(int* x, int* y, const int count, Color color)
+void render::drawPolyLine(int* x, int* y, const int count, const Color& color)
+{
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawPolyLine(x, y, count);
+}
+
+void render::drawPolyLine(const int count, Vertex_t* verts, const Color& color)
+{
+	static int x[300];
+	static int y[300];
+
+	for (int i = 0; i < count; i++)
 	{
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawPolyLine(x, y, count);
+		x[i] = verts[i].m_Position.x;
+		y[i] = verts[i].m_Position.y;
 	}
 
-	void drawPolyLine(const int count, Vertex_t* verts, Color color)
-	{
-		static int x[300];
-		static int y[300];
+	drawPolyLine(x, y, count, color);
+}
 
-		for (int i = 0; i < count; i++)
-		{
-			x[i] = verts[i].m_Position.x;
-			y[i] = verts[i].m_Position.y;
-		}
+void render::text(const int x, const int y, const unsigned long font, const wchar_t* text, const bool centered, const Color& color)
+{
+	interfaces::surface->drawTextFont(font);
+	int width, height;
 
-		drawPolyLine(x, y, count, color);
-	}
+	interfaces::surface->getTextSize(font, text, width, height);
+	interfaces::surface->setTextColor(color);
+	interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
+	interfaces::surface->drawRenderText(text, wcslen(text));
+}
 
-	void text(const int x, const int y, const unsigned long font, const wchar_t* text, const bool centered, Color color)
-	{
-		interfaces::surface->drawTextFont(font);
-		int width, height;
+void render::text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color)
+{
+	if (text.empty())
+		return;
 
-		interfaces::surface->getTextSize(font, text, width, height);
-		interfaces::surface->setTextColor(color);
-		interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
-		interfaces::surface->drawRenderText(text, wcslen(text));
-	}
+	const auto converted = std::wstring(text.cbegin(), text.cend());
+	int width, height;
 
-	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, Color color)
-	{
-		if (text.empty())
-			return;
+	interfaces::surface->drawTextFont(font);
+	interfaces::surface->getTextSize(font, converted.c_str(), width, height);
+	interfaces::surface->setTextColor(color);
+	interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
+	interfaces::surface->drawRenderText(converted.c_str(), wcslen(converted.c_str()));
+}
 
-		const auto converted = std::wstring(text.cbegin(), text.cend());
-		int width, height;
-		
-		interfaces::surface->drawTextFont(font);
-		interfaces::surface->getTextSize(font, converted.c_str(), width, height);
-		interfaces::surface->setTextColor(color);
-		interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
-		interfaces::surface->drawRenderText(converted.c_str(), wcslen(converted.c_str()));
-	}
+void render::textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...)
+{
+	if (!fmt)
+		return;
 
-	void textf(const int x, const int y, const unsigned long font, const bool centered, Color color, const char* fmt, ...)
-	{
-#pragma message ("use render::text with std::format rather than render::textf if possible, line: " STRING(__LINE__) " in: " __FUNCTION__)
+	if (strlen(fmt) < 2)
+		return;
 
-		if (!fmt)
-			return;
+	va_list args;
+	char buf[256] = {};
 
-		if (strlen(fmt) < 2)
-			return;
+	va_start(args, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, args);
+	buf[sizeof(buf) - 1] = 0;
+	va_end(args);
 
-		va_list args;
-		char buf[256] = {};
+	text(x, y, font, buf, centered, color);
+}
 
-		va_start(args, fmt);
-		vsnprintf(buf, sizeof(buf), fmt, args);
-		buf[sizeof(buf) - 1] = 0;
-		va_end(args);
+int render::getTextSize(const unsigned long font, const std::string& text)
+{
+	std::wstring wtext(text.begin(), text.end());
+	const wchar_t* wbuf = wtext.c_str();
 
-		text(x, y, font, buf, centered, color);
-	}
+	int width, height;
+	interfaces::surface->getTextSize(font, wbuf, width, height);
 
-	int getTextSize(const unsigned long font, const std::string& text)
-	{
-		std::wstring wtext(text.begin(), text.end());
-		const wchar_t* wbuf = wtext.c_str();
+	return width;
+}
 
-		int width, height;
-		interfaces::surface->getTextSize(font, wbuf, width, height);
+bool render::worldToScreen(const Vector& in, Vector& out)
+{
+	return interfaces::debugOverlay->worldToScreen(in, out) != 1;
+}
 
-		return width;
-	}
+// cs engine lines are not anti aliased :(
 
-	bool worldToScreen(const Vector& in, Vector& out)
-	{
-		return interfaces::debugOverlay->worldToScreen(in, out) != 1;
-	}
-
-	// cs engine lines are not anti aliased :(
-
-	//#define CLASSIC_LINE
-	//#define DEBUG_RENDER
-	//#define TRIANGLE_METHOD
+//#define CLASSIC_LINE
+//#define DEBUG_RENDER
+//#define TRIANGLE_METHOD
 #define POLYGON_METHOD
 	/*
 	* Quick explanation, nobody explains this
@@ -278,119 +298,106 @@ namespace render
 
 	*/
 
-	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled)
+void render::drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled)
+{
+	constexpr unsigned int SIZE = 8;
+	// transormed points to get pos.x/.y
+	std::array<Vector, SIZE> points = {};
+
+	static bool check = true;
+	for (size_t i = 0; i < box.size(); i++)
 	{
-		constexpr unsigned int SIZE = 8;
-		// transormed points to get pos.x/.y
-		std::array<Vector, SIZE> points = {};
+		if (!worldToScreen(box.at(i), points.at(i)))
+			check = false;
+	}
 
-		static bool check = true;
-		for (size_t i = 0; i < box.size(); i++)
+	if (check)
+	{
+		// anything with low alpha
+		Color fill{ color.r(), color.g(), color.b(), 30 };
+
+		// lines to draw
+		std::array<Vector2D, SIZE> lines = {};
+		for (size_t i = 0; i < SIZE; i++)
 		{
-			if(!worldToScreen(box.at(i), points.at(i)))
-				check = false;
-		}
-
-		if (check)
-		{
-			// anything with low alpha
-			Color fill{ color.r(), color.g(), color.b(), 30 };
-
-			// lines to draw
-			std::array<Vector2D, SIZE> lines = {};
-			for (size_t i = 0; i < SIZE; i++)
-			{
-				lines.at(i) = { points.at(i).x, points.at(i).y };
+			lines.at(i) = { points.at(i).x, points.at(i).y };
 
 #ifdef DEBUG_RENDER
-				textf(lines.at(i).x, lines.at(i).y, fonts::tahoma, false, Color(100, 20, 100, 255), "[%i] posX: %0.2f, posY: %0.2f", i, lines.at(i).x, lines.at(i).y);
+			textf(lines.at(i).x, lines.at(i).y, fonts::tahoma, false, Color(100, 20, 100, 255), "[%i] posX: %0.2f, posY: %0.2f", i, lines.at(i).x, lines.at(i).y);
 #endif // DEBUG_RENDER
-			}
-			// first fill then draw lines
-			if (filled)
-			{
+		}
+		// first fill then draw lines
+		if (filled)
+		{
 #ifdef TRIANGLE_METHOD
-				// bottom
-				drawTriangle(lines.at(0), lines.at(1), lines.at(2), fill);
-				drawTriangle(lines.at(2), lines.at(0), lines.at(3), fill);
-				// top
-				drawTriangle(lines.at(4), lines.at(5), lines.at(6), fill);
-				drawTriangle(lines.at(6), lines.at(4), lines.at(7), fill);
+			// bottom
+			drawTriangle(lines.at(0), lines.at(1), lines.at(2), fill);
+			drawTriangle(lines.at(2), lines.at(0), lines.at(3), fill);
+			// top
+			drawTriangle(lines.at(4), lines.at(5), lines.at(6), fill);
+			drawTriangle(lines.at(6), lines.at(4), lines.at(7), fill);
 
-				for (int i = 0; i < 3; i++)
-				{
-					drawTriangle(lines.at(i), lines.at(i + 1), lines.at(i + 4), fill);
-					drawTriangle(lines.at(i + 4), lines.at(i + 5), lines.at(i + 1), fill);
-				}
-				// manually render left 
-				drawTriangle(lines.at(3), lines.at(4), lines.at(7), fill);
-				drawTriangle(lines.at(0), lines.at(3), lines.at(4), fill);
+			for (int i = 0; i < 3; i++)
+			{
+				drawTriangle(lines.at(i), lines.at(i + 1), lines.at(i + 4), fill);
+				drawTriangle(lines.at(i + 4), lines.at(i + 5), lines.at(i + 1), fill);
+			}
+			// manually render left 
+			drawTriangle(lines.at(3), lines.at(4), lines.at(7), fill);
+			drawTriangle(lines.at(0), lines.at(3), lines.at(4), fill);
 #endif // TRIANGLE_METHOD
 
 #ifdef POLYGON_METHOD			 
-				// bottom
-				drawTrapezFilled(lines.at(0), lines.at(1), lines.at(2), lines.at(3), fill);
-				// top
-				drawTrapezFilled(lines.at(4), lines.at(5), lines.at(6), lines.at(7), fill);
-				// front
-				drawTrapezFilled(lines.at(3), lines.at(2), lines.at(6), lines.at(7), fill);
-				// back
-				drawTrapezFilled(lines.at(0), lines.at(1), lines.at(5), lines.at(4), fill);
-				// right
-				drawTrapezFilled(lines.at(2), lines.at(1), lines.at(5), lines.at(6), fill);
-				// left
-				drawTrapezFilled(lines.at(3), lines.at(0), lines.at(4), lines.at(7), fill);
+			// bottom
+			drawTrapezFilled(lines.at(0), lines.at(1), lines.at(2), lines.at(3), fill);
+			// top
+			drawTrapezFilled(lines.at(4), lines.at(5), lines.at(6), lines.at(7), fill);
+			// front
+			drawTrapezFilled(lines.at(3), lines.at(2), lines.at(6), lines.at(7), fill);
+			// back
+			drawTrapezFilled(lines.at(0), lines.at(1), lines.at(5), lines.at(4), fill);
+			// right
+			drawTrapezFilled(lines.at(2), lines.at(1), lines.at(5), lines.at(6), fill);
+			// left
+			drawTrapezFilled(lines.at(3), lines.at(0), lines.at(4), lines.at(7), fill);
 #endif // POLYGON_METHOD
-			}
+		}
 #ifdef CLASSIC_LINE
-			// bottom parts
-			for (int i = 0; i < 3; i++)
-			{
-				drawLine(lines.at(i), lines.at(i + 1), color);
-			}
-			// missing part at the bottom
-			drawLine(lines.at(0), lines.at(3), color);
-			// top parts
-			for (int i = 4; i < 7; i++)
-			{
-				drawLine(lines.at(i), lines.at(i + 1), color);
-			}
-			// missing part at the top
-			drawLine(lines.at(4), lines.at(7), color);
+		// bottom parts
+		for (int i = 0; i < 3; i++)
+		{
+			drawLine(lines.at(i), lines.at(i + 1), color);
+		}
+		// missing part at the bottom
+		drawLine(lines.at(0), lines.at(3), color);
+		// top parts
+		for (int i = 4; i < 7; i++)
+		{
+			drawLine(lines.at(i), lines.at(i + 1), color);
+		}
+		// missing part at the top
+		drawLine(lines.at(4), lines.at(7), color);
 
-			// now all 4 lines missing parts for 3d box
-			for (int i = 0; i < 4; i++)
-			{
-				drawLine(lines.at(i), lines.at(i + 4), color);
-			}
+		// now all 4 lines missing parts for 3d box
+		for (int i = 0; i < 4; i++)
+		{
+			drawLine(lines.at(i), lines.at(i + 4), color);
+		}
 #endif // CLASSIC_LINE
 
 #ifdef POLYGON_METHOD
-			// bottom
-			drawTrapezOutline(lines.at(0), lines.at(1), lines.at(2), lines.at(3), fill);
-			// top
-			drawTrapezOutline(lines.at(4), lines.at(5), lines.at(6), lines.at(7), fill);
-			// front
-			drawTrapezOutline(lines.at(3), lines.at(2), lines.at(6), lines.at(7), fill);
-			// back
-			drawTrapezOutline(lines.at(0), lines.at(1), lines.at(5), lines.at(4), fill);
-			// right
-			drawTrapezOutline(lines.at(2), lines.at(1), lines.at(5), lines.at(6), fill);
-			// left
-			drawTrapezOutline(lines.at(3), lines.at(0), lines.at(4), lines.at(7), fill);
+		// bottom
+		drawTrapezOutline(lines.at(0), lines.at(1), lines.at(2), lines.at(3), fill);
+		// top
+		drawTrapezOutline(lines.at(4), lines.at(5), lines.at(6), lines.at(7), fill);
+		// front
+		drawTrapezOutline(lines.at(3), lines.at(2), lines.at(6), lines.at(7), fill);
+		// back
+		drawTrapezOutline(lines.at(0), lines.at(1), lines.at(5), lines.at(4), fill);
+		// right
+		drawTrapezOutline(lines.at(2), lines.at(1), lines.at(5), lines.at(6), fill);
+		// left
+		drawTrapezOutline(lines.at(3), lines.at(0), lines.at(4), lines.at(7), fill);
 #endif // POLYGON_METHOD
-		}
 	}
-
-	/*RECT viewport()
-	{
-		RECT viewport = {};
-
-		static int width, height;
-		interfaces::engine->getScreenSize(width, height);
-		viewport.right = width;
-		viewport.bottom = height;
-
-		return viewport;
-	}*/
 }

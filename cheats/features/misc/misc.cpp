@@ -318,6 +318,13 @@ void misc::drawNoScope()
 	if (!interfaces::engine->isInGame())
 		return;
 
+	auto weapon = game::localPlayer->getActiveWeapon();
+	if (!weapon)
+		return;
+
+	if (!weapon->isSniper())
+		return;
+
 	if (game::localPlayer->m_bIsScoped())
 	{
 		int x, y;

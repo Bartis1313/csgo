@@ -19,29 +19,30 @@ namespace render
 {
 	void init();
 
-	//vgui::HFont __createFont(const char* fontName, int size, int weight, unsigned long flags);
+	unsigned long  __createFont(const char* fontName, const int size, const int weight, const unsigned long flags);
 
-	void drawLine(int x, int y, int x2, int y2, Color color);
-	void drawLine(Vector2D start, Vector2D end, Color color);
-	void drawOutlineRect(int x, int y, int w, int h, Color color);
-	void drawOutlineRect(Vector2D start, Vector2D end, Color color);
-	void drawFilledRect(int x, int y, int w, int h, Color color);
-	void drawCircle(int x, int y, int radius, int points, Color color);
-	void drawCircleFilled(int x, int y, int radius, int points, Color color);
-	void drawCircle3D(Vector pos, int radius, int points, Color color);
-	void drawTriangle(Vector2D p1, Vector2D p2, Vector2D p3, Color color);
-	void drawTrapezFilled(Vector2D p1, Vector2D p2, Vector2D p3, Vector2D p4, Color color);
-	void drawTrapezOutline(Vector2D p1, Vector2D p2, Vector2D p3, Vector2D p4, Color color);
-	void drawPolyLine(int* x, int* y, const int count, Color color);
-	void drawPolyLine(const int count, Vertex_t* verts, Color color);
-	void text(const int x, const int y, const unsigned long font, const wchar_t *text, const bool centered, Color color);
-	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, Color color);
-	void textf(const int x, const int y, const unsigned long font, const bool centered, Color color, const char* fmt, ...);
+	void drawLine(const int x, const int y, const int x2, const int y2, const Color& color);
+	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color);
+	void drawOutlineRect(const int x, const int y, const int w, const int h, const Color& color);
+	void drawOutlineRect(const Vector2D& start, const Vector2D& end, const Color& color);
+	void drawFilledRect(const int x, const int y, const int w, const int h, const Color& color);
+	void drawCircle(const int x, const int y, const int radius, const int points, const Color& color);
+	void drawCircleFilled(const int x, const int y, const int radius, const int points, const Color& color);
+	void drawCircle3D(const Vector& pos, const int radius, const int points, const Color& color);
+	void drawFilledCircle3D(const Vector& pos, const int radius, const int points, const Color& color);
+	void drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
+	void drawTrapezFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
+	void drawTrapezOutline(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
+	void drawPolyLine(int* x, int* y, const int count, const Color& color);
+	void drawPolyLine(const int count, Vertex_t* verts, const Color& color);
+	void text(const int x, const int y, const unsigned long font, const wchar_t *text, const bool centered, const Color& color);
+	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
+	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
 
 	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
 
 	// get text size, it responses for esp distance format and more options
-	int getTextSize(unsigned long font, const std::string& text);
+	int getTextSize(const unsigned long font, const std::string& text);
 
 	// for hack
 	bool worldToScreen(const Vector& in, Vector& out);

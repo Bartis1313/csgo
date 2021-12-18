@@ -77,36 +77,57 @@ std::string Weapon_t::getWpnName()
 
 bool Weapon_t::isRifle()
 {
+	if (!this->getWpnInfo())
+		return false;
+
 	return this->getWpnInfo()->m_type == WEAPONTYPE_RIFLE;
 }
 
 bool Weapon_t::isSmg()
 {
+	if (!this->getWpnInfo())
+		return false;
+
 	return this->getWpnInfo()->m_type == WEAPONTYPE_MACHINEGUN;
 }
 
 bool Weapon_t::isShotgun()
 {
+	if (!this->getWpnInfo())
+		return false;
+
 	return this->getWpnInfo()->m_type == WEAPONTYPE_SHOTGUN;
 }
 
 bool Weapon_t::isPistol()
 {
+	if (!this->getWpnInfo())
+		return false;
+
 	return this->getWpnInfo()->m_type == WEAPONTYPE_PISTOL;
 }
 
 bool Weapon_t::isSniper()
 {
+	if (!this->getWpnInfo())
+		return false;
+
 	return this->getWpnInfo()->m_type == WEAPONTYPE_SNIPER_RIFLE;
 }
 
 bool Weapon_t::isGrenade()
 {
+	if (!this->getWpnInfo())
+		return false;
+
 	return this->getWpnInfo()->m_type == WEAPONTYPE_GRENADE;
 }
 
 bool Weapon_t::isKnife()
 {
+	if (!this->getWpnInfo())
+		return false;
+
 	return this->getWpnInfo()->m_type == WEAPONTYPE_KNIFE;
 }
 
@@ -232,9 +253,6 @@ bool Player_t::isPossibleToSee(Player_t* ent, const Vector& pos)
 {
 	Trace_t tr;
 	TraceFilter filter;
-
-	auto start = this->getEyePos();
-	auto end = pos;
 	filter.m_skip = this;
 	interfaces::trace->traceRay({ this->getEyePos(), pos }, MASK_PLAYER, &filter, &tr);
 
