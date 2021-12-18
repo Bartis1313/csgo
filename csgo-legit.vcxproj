@@ -306,6 +306,7 @@
     <ClInclude Include="dependencies\minhook\hde\table64.h" />
     <ClInclude Include="dependencies\minhook\trampoline.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="SDK\animations.hpp" />
     <ClInclude Include="SDK\CGameMovement.hpp" />
     <ClInclude Include="SDK\ClientMode.hpp" />
     <ClInclude Include="SDK\CPlayerResource.hpp" />

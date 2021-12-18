@@ -1,6 +1,7 @@
 #include "Entity.hpp"
-#undef max
 #include <format>
+
+#undef max
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -9,6 +10,23 @@ Vector Entity_t::getAimPunch()
 	Vector vec = {};
 	vfunc::callVFunc<void, PUNCH>(this, std::ref(vec));
 	return vec;
+}
+
+AnimationLayer* Entity_t::getAnimOverlays()
+{
+	const static auto offset = *reinterpret_cast<uintptr_t*>(utilities::patternScan(CLIENT_DLL, ANIMATION_LAYER) + 0x2); // 0x2990
+	return *reinterpret_cast<AnimationLayer**>(uintptr_t(this) + offset);
+}
+
+size_t Entity_t::getSequenceActivity(size_t sequence)
+{
+	auto studio = interfaces::modelInfo->getStudioModel(this->getModel());
+	if (!studio)
+		return 0;
+
+	using fn = int(__fastcall*)(void*, void*, int);
+	const static auto originalGSA = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, SEQUENCE_ACTIVITY));
+	return originalGSA(this, studio, sequence);
 }
 
 ////////////////////////////////////////////////////////////////////////

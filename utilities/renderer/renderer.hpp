@@ -38,12 +38,7 @@ namespace render
 	void text(const int x, const int y, const unsigned long font, const wchar_t *text, const bool centered, const Color& color);
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
-
 	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
-
-	// get text size, it responses for esp distance format and more options
 	int getTextSize(const unsigned long font, const std::string& text);
-
-	// for hack
 	bool worldToScreen(const Vector& in, Vector& out);
 }

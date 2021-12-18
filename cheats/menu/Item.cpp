@@ -4,7 +4,7 @@
 int Item::count = 0;
 
 Item::Item(const std::string& id, int* ref, const std::array<int, 2>& limits) : 
-	m_ID{std::cref(id)},
+	m_ID{id},
 	m_iVal{ref},
 	m_Limits{limits}
 {
@@ -13,7 +13,7 @@ Item::Item(const std::string& id, int* ref, const std::array<int, 2>& limits) :
 }
 
 Item::Item(const std::string& id, bool* ref) :
-	m_ID{std::cref(id)},
+	m_ID{id},
 	m_bVal{ref}
 {
 	m_isbool = true;
@@ -21,7 +21,7 @@ Item::Item(const std::string& id, bool* ref) :
 }
 
 Item::Item(const std::string& id, int* ref, const std::vector<std::string>& vec) :
-	m_ID{std::cref(id)},
+	m_ID{id},
 	m_Options{std::cref(vec)},
 	m_iVal{ref}
 {

@@ -6,8 +6,27 @@
 #include "../features/visuals/radar.hpp"
 #include "../features/misc/misc.hpp"
 
+bool shouldReloadsFonts()
+{
+	static int oldX, oldY, x, y;
+	interfaces::engine->getScreenSize(x, y);
+
+	if (x != oldX || y != oldY)
+	{
+		oldX = x;
+		oldY = y;
+
+		return true;
+	}
+
+	return false;
+}
+
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
 {
+	if (shouldReloadsFonts())
+		render::init();
+
 	if (strstr(interfaces::panel->getName(panel), XOR("HudZoom")))
 	{
 		if (interfaces::engine->isInGame())		
@@ -23,12 +42,12 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		esp::run();
 		world::drawMisc();
 		radar::run();
-		misc::drawCrosshair();
 		misc::drawLocalInfo();
 		misc::drawFpsPlot();
 		misc::drawVelocityPlot();
 		misc::drawHitmarker();
 		world::drawZeusRange();
 		misc::drawNoScope();
+		misc::drawCrosshair();
 	}
 }

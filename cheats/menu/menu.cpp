@@ -160,7 +160,7 @@ Color handleWhite(int id, int curridx) // so we know when to show darker
 
 void Menu::drawText(int x, int y, Color color, const std::string& text)
 {
-	render::text(x, y, fonts::tahoma, std::cref(text), false, color);
+	render::text(x, y, fonts::tahoma, text, false, color);
 }
 
 void Menu::drawBool(int idx, int x, int& y)

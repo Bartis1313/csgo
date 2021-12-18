@@ -4,6 +4,7 @@
 #include "../interfaces/interfaces.hpp"
 #include "IDXandPaterrns.hpp"
 #include "../../utilities/math/math.hpp"
+#include "../animations.hpp"
 
 
 class Weapon_t;
@@ -54,6 +55,8 @@ public:
 
 	_NODISCARD Vector getAimPunch();
 	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
+	_NODISCARD AnimationLayer* getAnimOverlays();
+	_NODISCARD size_t getSequenceActivity(size_t sequence);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -69,7 +72,7 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-class Weapon_t : Entity_t
+class Weapon_t : public Entity_t
 {
 public:
 	NETVAR(float, m_flNextPrimaryAttack, "DT_BaseCombatWeapon", "m_flNextPrimaryAttack");

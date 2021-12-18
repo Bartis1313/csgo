@@ -202,8 +202,8 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 	if (weapon->isNonAimable())
 		return;
 
-	auto maxAmmo = weapon->getWpnInfo()->m_maxClip1;
-	auto currentAmmo = weapon->m_iClip1();
+	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
+	int currentAmmo = weapon->m_iClip1();
 
 	Box newBox =
 	{
@@ -213,12 +213,24 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 		2
 	};
 
-	auto offset = currentAmmo * box.w / maxAmmo;
+	int barWidth = currentAmmo * box.w / maxAmmo;
+	bool isReloading = false;
+	auto animlayer = ent->getAnimOverlays()[1];
+
+	if (animlayer.m_sequence)
+	{
+		auto sequenceActivity = ent->getSequenceActivity(animlayer.m_sequence);
+		isReloading = sequenceActivity == 967 && animlayer.m_weight; // ACT_CSGO_RELOAD
+
+		if (isReloading && animlayer.m_weight != 0.0f && animlayer.m_cycle < 0.99f)
+			barWidth = (animlayer.m_cycle * box.w) / 1.0f;
+	}
+
 	render::drawFilledRect(newBox.x - 1, newBox.y - 1, newBox.w, 4, Colors::Black);
-	render::drawFilledRect(newBox.x, newBox.y, offset, 2, Colors::Turquoise);
+	render::drawFilledRect(newBox.x, newBox.y, barWidth, 2, Colors::Turquoise);
 	
-	if (maxAmmo != currentAmmo)
-		render::text(newBox.x + offset, newBox.y + 1, fonts::espBar, std::to_string(currentAmmo), false, Colors::White);
+	if (maxAmmo != currentAmmo && !isReloading)
+		render::text(newBox.x + barWidth, newBox.y + 1, fonts::espBar, std::to_string(currentAmmo), false, Colors::White);
 }
 
 void esp::drawInfo(Player_t* ent, const Box& box)

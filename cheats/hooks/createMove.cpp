@@ -36,12 +36,8 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 	}
 	prediction::end();
 
-
-	uintptr_t* framePtr;
-	__asm { \
-	__asm mov framePtr, ebp \
-	}
-	auto& sendPacket = *reinterpret_cast<bool*>(*framePtr - 0x1C);
+	uintptr_t framePtr = *reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(_AddressOfReturnAddress()) - sizeof(uintptr_t));
+	bool& sendPacket = *reinterpret_cast<bool*>(framePtr - 0x1C);
 
 	if (sendPacket)
 		globals::realAngle = cmd->m_viewangles;
