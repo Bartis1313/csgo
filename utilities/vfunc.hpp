@@ -10,19 +10,19 @@ namespace vfunc
 	}
 
 	// use for any function that does not represent packed args and can be thiscall
-	template <typename T, size_t index, typename ... args_t>
-	inline constexpr T callVFunc(void* thisptr, args_t... ca_list)
+	template <typename T, size_t index, typename ... Args_t>
+	inline constexpr T callVFunc(void* thisptr, Args_t... args)
 	{
-		using virtualFunction = T(__thiscall***)(void*, args_t...);
-		return (*reinterpret_cast<virtualFunction>(thisptr))[index](thisptr, ca_list...);
+		using virtualFunction = T(__thiscall***)(void*, Args_t...);
+		return (*reinterpret_cast<virtualFunction>(thisptr))[index](thisptr, args...);
 	}
 
 	// ONLY for packed arguments in base case !!!
-	template<typename T, size_t index, typename... args_t>
-	inline constexpr T callVPack(void* thisptr, args_t... ca_list)
+	template<typename T, size_t index, typename... Args_t>
+	inline constexpr T callVPack(void* thisptr, Args_t... args)
 	{
-		using packedVirtualFunction = T(__cdecl***)(void*, args_t...);
-		return (*reinterpret_cast<packedVirtualFunction>(thisptr))[index](thisptr, ca_list...);
+		using packedVirtualFunction = T(__cdecl***)(void*, Args_t...);
+		return (*reinterpret_cast<packedVirtualFunction>(thisptr))[index](thisptr, args...);
 	}
 }
 
