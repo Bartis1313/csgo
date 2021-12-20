@@ -1,6 +1,5 @@
 #pragma once
 #include "../../SDK/interfaces/interfaces.hpp"
-#include "../../dependencies/minhook/Minhook.h"
 
 enum hookIndexes
 {
@@ -14,7 +13,7 @@ enum hookIndexes
 
 namespace hooks
 {
-	bool init();
+	void init();
 	void shutdown();
 
 	struct paintTraverse
@@ -64,5 +63,4 @@ namespace hooks
 		inline static fn original = nullptr;
 		static const int index = FRAMESTAGE;
 	};
-
 }

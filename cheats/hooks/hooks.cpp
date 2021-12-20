@@ -1,10 +1,7 @@
-#include "../../utilities/utilities.hpp"
 #include "hooks.hpp"
-#include "../menu/menu.hpp"
-#include "../../utilities/renderer/renderer.hpp"
 #include "../features/misc/events.hpp"
-
-using namespace utilities;
+#include "../../dependencies/minhook/Minhook.h"
+#include <format>
 
 inline void* TARGET(void* arg, unsigned int index)
 {
@@ -17,7 +14,7 @@ inline void** ORIGINAL(T& arg)
 	return reinterpret_cast<void**>(&arg);
 }
 
-bool hooks::init()
+void hooks::init()
 {
 	const auto paintTraverseTarget = TARGET(interfaces::panel, paintTraverse::index);
 	const auto creteMoveTarget = TARGET(interfaces::clientMode, createMove::index);
@@ -29,51 +26,44 @@ bool hooks::init()
 	if (MH_Initialize() != MH_OK)
 		throw std::runtime_error(XOR("MH_Initialize hook error"));
 
-	if (const auto hk = MH_CreateHook(creteMoveTarget, &createMove::hooked, ORIGINAL(createMove::original)))
-	{
-		//LOG("")
-		if(hk != MH_OK)
-			throw std::runtime_error(XOR("createMove hook error"));
-	}
+	const auto hk1 = MH_CreateHook(creteMoveTarget, &createMove::hooked, ORIGINAL(createMove::original));
+	if (hk1 != MH_OK)
+		throw std::runtime_error(XOR("createMove hook error"));
+	LOG(LOG_INFO, std::format(XOR("createMove -> {}"), MH_StatusToString(hk1)));
 
-	if (const auto hk = MH_CreateHook(paintTraverseTarget, &paintTraverse::hooked, ORIGINAL(paintTraverse::original)))
-	{
-		if (hk != MH_OK)
-			throw std::runtime_error(XOR("paintTraverse hook error"));
-	}
+	const auto hk2 = MH_CreateHook(paintTraverseTarget, &paintTraverse::hooked, ORIGINAL(paintTraverse::original));
+	if (hk2 != MH_OK)
+		throw std::runtime_error(XOR("paintTraverse hook error"));
+	LOG(LOG_INFO, std::format(XOR("paintTraverse -> {}"), MH_StatusToString(hk2)));
 
-	if (const auto hk = MH_CreateHook(drawModelTarget, &drawModel::hooked, ORIGINAL(drawModel::original)))
-	{
-		if (hk != MH_OK)
-			throw std::runtime_error(XOR("drawModel hook error"));
-	}
+	const auto hk3 = MH_CreateHook(drawModelTarget, &drawModel::hooked, ORIGINAL(drawModel::original));
+	if (hk3 != MH_OK)
+		throw std::runtime_error(XOR("drawModel hook error"));
+	LOG(LOG_INFO, std::format(XOR("drawModel -> {}"), MH_StatusToString(hk3)));
 
-	if (const auto hk = MH_CreateHook(overrideViewTarget, &overrideView::hooked, ORIGINAL(overrideView::original)))
-	{
-		if (hk != MH_OK)
-			throw std::runtime_error(XOR("overrideView hook error"));
-	}
+	const auto hk4 = MH_CreateHook(overrideViewTarget, &overrideView::hooked, ORIGINAL(overrideView::original));
+	if (hk4 != MH_OK)
+		throw std::runtime_error(XOR("overrideView hook error"));
+	LOG(LOG_INFO, std::format(XOR("overrideView -> {}"), MH_StatusToString(hk4)));
 
-	if (const auto hk = MH_CreateHook(doPostScreenEffectsTarget, &doPostScreenEffects::hooked, ORIGINAL(doPostScreenEffects::original)))
-	{
-		if(hk != MH_OK)
-			throw std::runtime_error(XOR("doPostScreenEffects hook error"));
-	}
+	const auto hk5 = MH_CreateHook(doPostScreenEffectsTarget, &doPostScreenEffects::hooked, ORIGINAL(doPostScreenEffects::original));
+	if (hk5 != MH_OK)
+		throw std::runtime_error(XOR("doPostScreenEffects hook error"));
+	LOG(LOG_INFO, std::format(XOR("doPostScreenEffects -> {}"), MH_StatusToString(hk5)));
 
-	if (const auto hk = MH_CreateHook(frameStageNotifyTarget, &frameStageNotify::hooked, ORIGINAL(frameStageNotify::original)))
-	{
-		if(hk != MH_OK)
-			throw std::runtime_error(XOR("frameStageNotify hook error"));
-	}
-
+	const auto hk6 = MH_CreateHook(frameStageNotifyTarget, &frameStageNotify::hooked, ORIGINAL(frameStageNotify::original));
+	if (hk6 != MH_OK)
+		throw std::runtime_error(XOR("frameStageNotify hook error"));
+	LOG(LOG_INFO, std::format(XOR("frameStageNotify -> {}"), MH_StatusToString(hk6)));
+	
 	Events::g().init();
 
-	if (const auto hk = MH_EnableHook(MH_ALL_HOOKS); hk != MH_OK)
-		throw std::runtime_error(XOR("MH_EnableHook hook error"));
+	const auto status = MH_EnableHook(MH_ALL_HOOKS);
+	if(status != MH_OK)
+		throw std::runtime_error(XOR("MH_ALL_HOOKS error"));
+	LOG(LOG_INFO, std::format(XOR("MH_ALL_HOOKS -> {}"), MH_StatusToString(status)));
 
 	LOG(LOG_INFO, XOR("hooks initialized!"));
-
-	return true;
 }
 
 void hooks::shutdown()
