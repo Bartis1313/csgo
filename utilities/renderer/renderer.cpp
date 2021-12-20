@@ -31,7 +31,7 @@ void render::init()
 	fonts::smalle = __createFont("Tahoma", 9, 800, FONTFLAG_ANTIALIAS);
 	fonts::espBar = __createFont("Franklin Gothic", 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 
-	LOG(LOG_INFO, "render success\n");
+	LOG(LOG_INFO, XOR("render success"));
 }
 
 void render::drawLine(const int x, const int y, const int x2, const int y2, const Color& color)

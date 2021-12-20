@@ -8,4 +8,5 @@ namespace globals
 	inline Vector fakeAngle = { 0, 0, 0 };
 	inline int shotsFired = 0;
 	inline int shotsHit = 0;
+	inline HMODULE instance = {};
 }

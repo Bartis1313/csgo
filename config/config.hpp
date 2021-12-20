@@ -6,6 +6,6 @@
 
 namespace config
 {
-	bool init();
+	void init();
 	void save();
 }

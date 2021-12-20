@@ -9,7 +9,7 @@ public:
 	int	m_dispatchedSrc;
 	int	m_dispatchedDst;
 	int	m_order;
-	unsigned int m_sequence;
+	size_t m_sequence;
 	float m_prevCycle;
 	float m_weight;
 	float m_weightDeltaRate;

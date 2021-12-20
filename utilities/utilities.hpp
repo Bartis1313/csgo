@@ -39,6 +39,8 @@ namespace utilities
     inline float distToMeters(const float dist) { return dist * 0.0254f; }
 
     bool getBox(Entity_t* ent, Box& box);
+
+    size_t inByteOrder(const size_t netLong);
 }
 
 inline std::string __DOCUMENTS = utilities::getFolder();

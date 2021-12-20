@@ -154,3 +154,14 @@ bool utilities::getBox(Entity_t* ent, Box& box)
 
 	return true;
 }
+
+size_t utilities::inByteOrder(const size_t netLong)
+{
+	std::array<byte, 4> data = {};
+	memcpy(&data, &netLong, data.size());
+
+	return (static_cast<size_t>(data.at(3)) << 0)
+		| (static_cast<size_t>(data.at(2)) << 8)
+		| (static_cast<size_t>(data.at(1)) << 16)
+		| (static_cast<size_t>(data.at(0)) << 24);
+}

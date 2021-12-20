@@ -31,7 +31,7 @@ void printStack()
 #else
 		SymFromAddr(process, (DWORD64)(stack[i]), 0, symbol);
 #endif
-		LOG(LOG_NO, std::format(XOR("{}: {} - 0x{:X}\n"), frames - i - 1, symbol->Name, symbol->Address));
+		LOG(LOG_NO, std::format(XOR("{}: {} - 0x{:X}"), frames - i - 1, symbol->Name, symbol->Address));
 	}
 
 	free(symbol);
@@ -91,15 +91,15 @@ LONG WINAPI memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 
 				ss << std::format(XOR("Exception (fatal) {} at address {} ({}), flags - {}, params - {}\n"), crashNames[code], addr, name, flag, params);
 				// x86
-				LOG(LOG_NO, std::format(XOR("EAX - 0x{:X}\n"), pExceptionInfo->ContextRecord->Eax));
-				LOG(LOG_NO, std::format(XOR("EBP - 0x{:X}\n"), pExceptionInfo->ContextRecord->Ebp));
-				LOG(LOG_NO, std::format(XOR("EBX - 0x{:X}\n"), pExceptionInfo->ContextRecord->Ebx));
-				LOG(LOG_NO, std::format(XOR("ECX - 0x{:X}\n"), pExceptionInfo->ContextRecord->Ecx));
-				LOG(LOG_NO, std::format(XOR("EDI - 0x{:X}\n"), pExceptionInfo->ContextRecord->Edi));
-				LOG(LOG_NO, std::format(XOR("EDX - 0x{:X}\n"), pExceptionInfo->ContextRecord->Edx));
-				LOG(LOG_NO, std::format(XOR("EIP - 0x{:X}\n"), pExceptionInfo->ContextRecord->Eip));
-				LOG(LOG_NO, std::format(XOR("ESI - 0x{:X}\n"), pExceptionInfo->ContextRecord->Esi));
-				LOG(LOG_NO, std::format(XOR("ESP - 0x{:X}\n"), pExceptionInfo->ContextRecord->Esp));
+				LOG(LOG_NO, std::format(XOR("EAX - 0x{:X}"), pExceptionInfo->ContextRecord->Eax));
+				LOG(LOG_NO, std::format(XOR("EBP - 0x{:X}"), pExceptionInfo->ContextRecord->Ebp));
+				LOG(LOG_NO, std::format(XOR("EBX - 0x{:X}"), pExceptionInfo->ContextRecord->Ebx));
+				LOG(LOG_NO, std::format(XOR("ECX - 0x{:X}"), pExceptionInfo->ContextRecord->Ecx));
+				LOG(LOG_NO, std::format(XOR("EDI - 0x{:X}"), pExceptionInfo->ContextRecord->Edi));
+				LOG(LOG_NO, std::format(XOR("EDX - 0x{:X}"), pExceptionInfo->ContextRecord->Edx));
+				LOG(LOG_NO, std::format(XOR("EIP - 0x{:X}"), pExceptionInfo->ContextRecord->Eip));
+				LOG(LOG_NO, std::format(XOR("ESI - 0x{:X}"), pExceptionInfo->ContextRecord->Esi));
+				LOG(LOG_NO, std::format(XOR("ESP - 0x{:X}"), pExceptionInfo->ContextRecord->Esp));
 
 				LOG(LOG_NO, ss.str());
 				printStack();

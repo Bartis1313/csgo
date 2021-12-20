@@ -6,6 +6,8 @@
 #include "config/config.hpp"
 #include "source.hpp"
 #include "cheats/features/visuals/chams.hpp"
+#include "cheats/globals.hpp"
+#include "cheats/menu/GUI/gui.hpp"
 
 ULONG WINAPI init(PVOID instance)
 {
@@ -21,14 +23,15 @@ ULONG WINAPI init(PVOID instance)
 		interfaces::init();
 		NetvarManager::g().init();
 		NetvarManager::g().dump();
-		render::init();
+		test::init();
 		hooks::init();
+		render::init();
 		config::init();
 	}
 	catch (const std::runtime_error& err)
 	{
 		LF(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
-		LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), 1);
+		LF(FreeLibraryAndExitThread)(reinterpret_cast<HMODULE>(instance), EXIT_SUCCESS);
 	}
 	
 	return EXIT_SUCCESS;
@@ -38,7 +41,6 @@ ULONG WINAPI shutdown(PVOID instance)
 {
 	hooks::shutdown();
 	console::shutdown();
-	LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), 0);
 	return TRUE;
 }
 
@@ -51,6 +53,8 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST VOID* rese
 		// here this sometimes throw null on mm
 		if (instance)
 			LF(DisableThreadLibraryCalls)(instance);
+
+		globals::instance = instance;
 
 		LF(CreateThread)(nullptr, NULL, init, instance, NULL, nullptr);
 

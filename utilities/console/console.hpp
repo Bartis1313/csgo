@@ -17,5 +17,5 @@ namespace console
 	void shutdown();
 	void setColor(WORD color);
 	void reset();
-	void log(const short type, const std::string& str);
+	void log(const short type, const std::string& str, const bool useNewLine = true);
 }

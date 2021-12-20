@@ -5,6 +5,7 @@
 #include "../features/visuals/world.hpp"
 #include "../features/visuals/radar.hpp"
 #include "../features/misc/misc.hpp"
+#include "../menu/GUI/gui.hpp"
 
 bool shouldReloadsFonts()
 {
@@ -15,7 +16,6 @@ bool shouldReloadsFonts()
 	{
 		oldX = x;
 		oldY = y;
-
 		return true;
 	}
 
@@ -49,5 +49,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		world::drawZeusRange();
 		misc::drawNoScope();
 		misc::drawCrosshair();
+		// testing image, all good
+		test::run();
 	}
 }

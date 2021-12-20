@@ -8,7 +8,7 @@
 
 enum consoleColors
 {
-	CONSOLE_WHITE = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE, // white on top applies here too, you did not understand this
+	CONSOLE_WHITE = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
 	CONSOLE_BLACK = 0,
 	CONSOLE_DARKBLUE = FOREGROUND_BLUE,
 	CONSOLE_DARKGREEN = FOREGROUND_GREEN,
@@ -51,9 +51,7 @@ bool console::init(const char* title)
 
 	LF(AllocConsole)();
 
-	freopen_s((_iobuf**)__acrt_iob_func(0), "CONIN$", "r", __acrt_iob_func(0));
-	freopen_s((_iobuf**)__acrt_iob_func(0), "CONOUT$", "w", __acrt_iob_func(1));
-	freopen_s((_iobuf**)__acrt_iob_func(0), "CONOUT$", "w", __acrt_iob_func(2));
+	freopen_s(reinterpret_cast<FILE**>(__acrt_iob_func(0)), XOR("CONOUT$"), XOR("w"), __acrt_iob_func(1));
 
 	LF(SetConsoleTitleA)(title);
 
@@ -65,15 +63,13 @@ bool console::init(const char* title)
 void console::shutdown() 
 {
 #ifdef _DEBUG
-	fclose((_iobuf*)__acrt_iob_func(0));
-	fclose((_iobuf*)__acrt_iob_func(1));
-	fclose((_iobuf*)__acrt_iob_func(2));
+	fclose(__acrt_iob_func(1));
 	LF(FreeConsole)();
 #endif
 	return;
 }
 
-static std::map<short, WORD> colors =
+std::map<short, WORD> colors =
 {
 	{LOG_NO, CONSOLE_WHITE},
 	{LOG_INFO, CONSOLE_GREEN},
@@ -82,7 +78,7 @@ static std::map<short, WORD> colors =
 };
 
 // I have no idea how to name variables sometimes
-static std::map<short, const char*> consoleStrings =
+std::map<short, const char*> consoleStrings =
 {
 	{LOG_NO, ""},
 	{LOG_INFO, "[info] "},
@@ -90,7 +86,7 @@ static std::map<short, const char*> consoleStrings =
 	{LOG_ERR, "[err] "}
 };
 
-void console::log(const short type, const std::string& str)
+void console::log(const short type, const std::string& str, const bool useNewLine)
 {
 	if (str.empty())
 		return;
@@ -102,15 +98,13 @@ void console::log(const short type, const std::string& str)
 	console::setColor(colors[type]);
 	std::cout << consoleStrings[type];
 	console::reset();
-#endif	
-
+#endif
 	ss << "[" << utilities::getTime() << "] " << str;
-
+	if (useNewLine)
+		ss << "\n";
 	log << consoleStrings[type] << ss.str();
 	log.close();
 #ifdef _DEBUG
 	std::cout << ss.str();
 #endif
-	ss.clear();
-	return;	
 }

@@ -13,7 +13,7 @@ void Events::init() const
 	interfaces::eventManager->addListener(&Events::g(), XOR("round_start"));
 	interfaces::eventManager->addListener(&Events::g(), XOR("player_hurt"));
 	interfaces::eventManager->addListener(&Events::g(), XOR("weapon_fire"));
-	LOG(LOG_INFO, "events hooked\n");
+	LOG(LOG_INFO, XOR("events hooked"));
 }
 
 void Events::FireGameEvent(IGameEvent* event)

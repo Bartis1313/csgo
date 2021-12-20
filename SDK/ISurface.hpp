@@ -31,7 +31,7 @@ public:
 	VFUNC(void, drawTexturedPolygon, 106, (int n, Vertex_t* vertice, bool clip = true), (this, n, vertice, clip));
 	VFUNC(void, drawFilledRectangle, 16, (int x, int y, int w, int h), (this, x, y, x + w, y + h));
 	VFUNC(void, setTextureId, 38, (int id), (this, id));
-	VFUNC(void, setStextureRGBA, 37, (int id, const unsigned char* rgba, int wide, int tall), (this, id, rgba, wide, tall));
+	VFUNC(void, setTextureRGBA, 37, (int id, const unsigned char* rgba, int wide, int tall), (this, id, rgba, wide, tall));
 	VFUNC(int, createNewTextureID, 43, (bool procedural = false), (this, procedural));
 	VFUNC(void, drawOutlinedRect, 18, (int x, int y, int w, int h), (this, x, y, x + w, y + h));
 	VFUNC(void, drawLine, 19, (int x1, int y1, int x2, int y2), (this, x1, y1, x2, y2));
@@ -57,4 +57,5 @@ public:
 	VFUNC(void, getCursor, 100, (int& x, int& y), (this, std::ref(x), std::ref(y)));
 	VFUNC(void, drawTexturedRect, 41, (int x, int y, int width, int height), (this, x, y, width, height));
 	VFUNC(void, playSound, 82, (const char* name), (this, name));
+	VFUNC(bool, isTextureValid, 42, (int id), (this, id));
 };
