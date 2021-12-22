@@ -6,7 +6,9 @@
 #include "../features/visuals/radar.hpp"
 #include "../features/misc/misc.hpp"
 #include "../menu/GUI/gui.hpp"
+#include "../globals.hpp"
 
+#pragma region "Paint Helpers"
 bool shouldReloadsFonts()
 {
 	static int oldX, oldY, x, y;
@@ -21,6 +23,7 @@ bool shouldReloadsFonts()
 
 	return false;
 }
+#pragma endregion
 
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
 {

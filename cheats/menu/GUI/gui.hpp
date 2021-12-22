@@ -20,6 +20,39 @@ protected:
 	size_t m_width, m_height;
 };
 
+enum Ranges
+{
+	GET_X = 1,
+	GET_Y,
+	GET_W,
+	GET_H
+};
+
+namespace GUI
+{
+	struct Area
+	{
+		int x, y, w, h;
+	};
+
+	class GUI
+	{
+	public:
+		Area getRanges();
+		void initAreaNormal(int x, int y, int w, int h)
+		{
+			m_area = Area{ x, y, w, h };
+		}
+		bool isMouseInRange();
+	protected:
+		Area m_area;
+		// main drawing
+		virtual void draw() = 0;
+		// update the pos, when menu is moved
+		virtual void update() = 0;
+	};
+}
+
 namespace test
 {
 	void run();

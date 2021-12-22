@@ -9,4 +9,6 @@ namespace globals
 	inline int shotsFired = 0;
 	inline int shotsHit = 0;
 	inline HMODULE instance = {};
+	inline int mouseX = {};
+	inline int mouseY = {};
 }
