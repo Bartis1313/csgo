@@ -35,6 +35,7 @@ namespace render
 	void drawTrapezOutline(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
 	void drawPolyLine(int* x, int* y, const int count, const Color& color);
 	void drawPolyLine(const int count, Vertex_t* verts, const Color& color);
+	void drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal);
 	void text(const int x, const int y, const unsigned long font, const wchar_t *text, const bool centered, const Color& color);
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);

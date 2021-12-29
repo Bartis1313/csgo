@@ -321,6 +321,30 @@ void world::drawZeusRange()
 
 	if (weapon->m_iItemDefinitionIndex() == WEAPON_TASER)
 	{
+		//const static float range = weapon->getWpnInfo()->m_range;
+		//const Vector abs = game::localPlayer->absOrigin() + Vector(0.0f, 0.0f, 30.0f); // small correction to get correct trace visually, will still throw false positives on stairs etc...
+
+		//Vector screenStart = {};
+		//float step = std::numbers::pi_v<float> *2.0f / 32;
+		//static Vector before = NOTHING;
+
+		//for (float i = 0; i < (M_PI * 2.0f); i += step)
+		//{
+		//	Vector start(range * std::cos(i) + abs.x, range * sin(i) + abs.y, abs.z);
+
+		//	Trace_t trace;
+		//	TraceFilter filter;
+		//	filter.m_skip = game::localPlayer;
+
+		//	interfaces::trace->traceRay({ abs, start }, MASK_SHOT_BRUSHONLY, &filter, &trace);
+
+		//	if (render::worldToScreen(trace.m_end, screenStart) && before.IsValid())
+		//	{
+		//		render::drawLine(screenStart.x, screenStart.y, before.x, before.y, Colors::Palevioletred);
+		//		before = screenStart;
+		//	}
+		//}
+		// I think it's useless to take ^ code, if you really want to, use something as eyepos to not get false results, but then this is only useful in 3rd person
 		render::drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, Colors::Palevioletred);
 	}
 }

@@ -23,10 +23,25 @@ bool shouldReloadsFonts()
 
 	return false;
 }
+
+bool isValidWindow()
+{
+	// sub window is better, for cs as they recently updated main window name
+	if (auto window = LF(FindWindowW)(XOR(L"Valve001"), NULL); LF(GetForegroundWindow)() != window)
+		return false;
+
+	return true;
+}
 #pragma endregion
 
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
 {
+	if (!isValidWindow())
+		return;
+
+	interfaces::surface->getCursor(globals::mouseX, globals::mouseY);
+
+	// will run first no matter what, you can edit the function a bit or add ghetto static counter
 	if (shouldReloadsFonts())
 		render::init();
 

@@ -162,6 +162,8 @@ public:
 	_NODISCARD int getDeaths();
 	_NODISCARD int getPing();
 	_NODISCARD bool isPossibleToSee(Player_t* ent, const Vector& pos);
+	// address as number
+	_NODISCARD uintptr_t getLiteralAddress();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

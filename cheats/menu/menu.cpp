@@ -250,11 +250,9 @@ void Menu::draw()
 
 	if (interfaces::engine->isInGame())
 	{
-		// I quite escape the usage of printf formatting in this project, but this is just breaking my head, I can't format it nicely with format
-		if(game::localPlayer)
-			render::textf(width, height, fonts::tahoma, false, Colors::Yellow, XOR("Local Player %p"), game::localPlayer);
-		else
-			render::textf(width, height, fonts::tahoma, false, Colors::Yellow, XOR("Local Player 0x0"));
+		game::localPlayer
+			? render::text(width, height, fonts::tahoma, std::format(XOR("Local Player {:X}"), game::localPlayer->getLiteralAddress()), false, Colors::Yellow)
+			: render::text(width, height, fonts::tahoma, XOR("Local Player 0x0"), false, Colors::Yellow);
 		height += 30;
 	}
 

@@ -30,26 +30,66 @@ enum Ranges
 
 namespace GUI
 {
-	struct Area
-	{
-		int x, y, w, h;
-	};
-
-	class GUI
+	// base class for menu gui
+	class Element
 	{
 	public:
-		Area getRanges();
-		void initAreaNormal(int x, int y, int w, int h)
-		{
-			m_area = Area{ x, y, w, h };
-		}
-		bool isMouseInRange();
+		static bool isMouseInRange(const int x, const int y, const int w, const int h);
 	protected:
-		Area m_area;
+		int m_X, m_Y;
 		// main drawing
 		virtual void draw() = 0;
 		// update the pos, when menu is moved
 		virtual void update() = 0;
+	};
+	// class to draw basic window to represent gui. simple rect
+	class Window : public Element
+	{
+	public:
+		virtual void draw();
+		virtual void update();
+	};
+	// class to add tabs, it's like a button, but some things are different
+	class Tab : public Element
+	{
+	public:
+		virtual void draw();
+		virtual void update();
+	};
+	// button, it has the option to turn off/on the feature
+	class Button : public Element
+	{
+	public:
+		virtual void draw();
+		virtual void update();
+	};
+	// button but as a list with options
+	class GroupBox : public Element
+	{
+	public:
+		virtual void draw();
+		virtual void update();
+	};
+	// input that can go for numbers or letters
+	class Input : public Element
+	{
+	public:
+		virtual void draw();
+		virtual void update();
+	};
+	// a very basic slider that represent some percentage or number to dynamically choice in range between
+	class Slider : public Element
+	{
+	public:
+		virtual void draw();
+		virtual void update();
+	};
+	// the special case for this GUI, color picker will be based on image, since it will look nicer and easier to make
+	class ColorPicker : public Element
+	{
+	public:
+		virtual void draw();
+		virtual void update();
 	};
 }
 

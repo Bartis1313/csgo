@@ -205,6 +205,26 @@ void render::drawPolyLine(const int count, Vertex_t* verts, const Color& color)
 	drawPolyLine(x, y, count, color);
 }
 
+void render::drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal)
+{
+	auto gradient = [&](const Color& color, unsigned int alpha1, unsigned int alpha2)
+	{
+		interfaces::surface->drawSetColor(color);
+		interfaces::surface->drawFilledFadeRect(x, y, w, h, alpha1, alpha2, horizontal);
+	};
+
+	if (!horizontal)
+	{
+		gradient(first, 255, 255);
+		gradient(second, 0, 255);
+	}
+	else if (horizontal)
+	{
+		gradient(first, 255, 0);
+		gradient(second, 0, 255);
+	}
+}
+
 void render::text(const int x, const int y, const unsigned long font, const wchar_t* text, const bool centered, const Color& color)
 {
 	interfaces::surface->drawTextFont(font);
@@ -240,7 +260,10 @@ void render::textf(const int x, const int y, const unsigned long font, const boo
 		return;
 
 	va_list args;
-	char buf[256] = {};
+	char buf[256];
+
+	// this is dependable on CPU and project settings as with speed
+	std::fill(buf, buf + 256, 0);
 
 	va_start(args, fmt);
 	vsnprintf(buf, sizeof(buf), fmt, args);

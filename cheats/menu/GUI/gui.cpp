@@ -40,6 +40,12 @@ void TextureHolder::draw(const int x, const int y)
 	interfaces::surface->drawTexturedRect(x, y, x + m_width, y + m_height);
 };
 
+
+bool GUI::Element::isMouseInRange(const int x, const int y, const int w, const int h)
+{
+	return globals::mouseX > x && globals::mouseY > y && globals::mouseX < w + x && globals::mouseY < h + y;
+}
+
 void test::init()
 {
 	fatchad = TextureHolder(IMAGE_PNG1);

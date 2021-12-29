@@ -47,7 +47,7 @@ public:
 	VFUNC(void, unlockCursor, 66, (), (this));
 	VFUNC(void, setClipRect, 147, (int x, int y, int w, int h), (this, x, y, w, h));
 	VFUNC(void, drawFilledFadeRect, 123, (int x, int y, int w, int h, unsigned int alpha1, unsigned int alpha2, bool horizontal),
-		(this, x, y, w, h, alpha1, alpha2, horizontal));
+		(this, x, y, x + w, y + h, alpha1, alpha2, horizontal));
 	VFUNC(void, drawColorText, 163, (unsigned long font, int x, int y, Color col, int alpha, const char* text),
 		(this, font, x, y, col, alpha, text));
 	VFUNC(void, getScreenSize, 44, (int& width, int& height),

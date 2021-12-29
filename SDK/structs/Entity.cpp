@@ -275,7 +275,11 @@ bool Player_t::isPossibleToSee(Player_t* ent, const Vector& pos)
 	interfaces::trace->traceRay({ this->getEyePos(), pos }, MASK_PLAYER, &filter, &tr);
 
 	return tr.m_entity == this || tr.m_fraction > 0.97f;
+}
 
+uintptr_t Player_t::getLiteralAddress()
+{
+	return *reinterpret_cast<uintptr_t*>(this);
 }
 
 ////////////////////////////////////////////////////////////////

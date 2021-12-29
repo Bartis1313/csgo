@@ -76,6 +76,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.1.6 - Changed aimbot, fixed visibility, aimbot now uses only one function to run. Added no scope overlay.
 * 1.1.7 - fixed code, added more visuals. Added few more things to SDK.
 * 1.1.8 - added image rendering, pretty simple as it does need only one argument. Console logging is a bit simplier now. Fixed the main thread call with handling critical errors correctly.
+* 1.1.9 - very small update. Added check for paint hook, implemented idea of gui.
 </details>
 
 # People who helped
