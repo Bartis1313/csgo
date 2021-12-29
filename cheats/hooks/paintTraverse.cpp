@@ -27,7 +27,7 @@ bool shouldReloadsFonts()
 bool isValidWindow()
 {
 	// sub window is better, for cs as they recently updated main window name
-	if (auto window = LF(FindWindowW).safe()(XOR(L"Valve001"), NULL); LF(GetForegroundWindow)() != window)
+	if (auto window = LF(FindWindowW).cached()(XOR(L"Valve001"), NULL); LF(GetForegroundWindow)() != window)
 		return false;
 
 	return true;
