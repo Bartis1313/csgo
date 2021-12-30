@@ -188,7 +188,9 @@
     <ClCompile Include="cheats\hooks\paintTraverse.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\menu\GUI\Element.cpp" />
     <ClCompile Include="cheats\menu\GUI\gui.cpp" />
+    <ClCompile Include="cheats\menu\GUI\window.cpp" />
     <ClCompile Include="cheats\menu\Item.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>

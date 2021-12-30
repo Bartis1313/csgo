@@ -27,9 +27,13 @@ bool shouldReloadsFonts()
 bool isValidWindow()
 {
 	// sub window is better, for cs as they recently updated main window name
+#ifdef _DEBUG
+	if (auto window = FindWindowW(L"Valve001", NULL); GetForegroundWindow() != window)
+		return false;
+#else
 	if (auto window = LF(FindWindowW).cached()(XOR(L"Valve001"), NULL); LF(GetForegroundWindow).cached()() != window)
 		return false;
-
+#endif
 	return true;
 }
 #pragma endregion
