@@ -101,7 +101,7 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 					{
 						Rainbow color;
 						// fine effect: (float)i / (float)size as saturation arg
-						overrideChams(false, false, color.drawRainbow(interfaces::globalVars->m_frametime, 0.7f, 0.8f, 0.01f));
+						overrideChams(false, false, color.drawRainbow(interfaces::globalVars->m_frametime * 10, 0.7f, 0.8f, 0.01f)); // 10x faster cuz looks better imo - Trophy
 						CALL(ctx, state, info, record->at(i).matrix);
 					}
 				}
@@ -161,11 +161,9 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 				!game::localPlayer->m_bIsScoped())
 			{
 				// first call the engine, so in this case weapon model is visible with effects, nice for wireframe
-				// TODO: fix no weapon effect caused by calling original twice
 				
-				CALL(ctx, state, info, matrix);
 				static auto material = interfaces::matSys->findMaterial(name.c_str(), XOR(TEXTURE_GROUP_MODEL));
-				overrideChams(false, true, Colors::Palevioletred);
+				overrideChams(false, false, Colors::Palevioletred); // - Trophy
 				if (vars::iWeaponChams == NO_WEAPON)
 				{
 					material->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
