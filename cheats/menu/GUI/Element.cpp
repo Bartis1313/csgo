@@ -1,7 +1,7 @@
 #include "gui.hpp"
 #include "../../globals.hpp"
 
-bool GUI::Element::isMouseInRange(const int x, const int y, const int width, const int height)
+bool GUI::Element::isMouseInRange(const int x, const int y, const int width, const int height) const
 {
 	return globals::mouseX > x && globals::mouseY > y
 		&& globals::mouseX < width + x && globals::mouseY < height + y;

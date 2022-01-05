@@ -25,24 +25,17 @@ inline void LOG(const short type, const std::string& str) { console::log(type, s
 namespace utilities
 {
     std::string getFolder();
-
     bool prepareDirectories();
-
     std::string getHackPath();
-
     std::string getTime();
-
     // old style: "A0 15 ?? FF A3"
     uintptr_t patternScan(const char* mod, const char* mask);
-
     // TODO: make it in verctor class later
     inline float distToMeters(const float dist) { return dist * 0.0254f; }
-
+    // https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bounding_ESP_Boxes
     bool getBox(Entity_t* ent, Box& box);
-
     size_t inByteOrder(const size_t netLong);
 }
 
 inline std::string __DOCUMENTS = utilities::getFolder();
-
 inline std::string __PATH = utilities::getHackPath();

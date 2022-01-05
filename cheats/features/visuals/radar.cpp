@@ -4,10 +4,12 @@
 #include "../../globals.hpp"
 #include <format>
 
-static constexpr auto dotThickness = 5;
-static constexpr auto dotRad = 20.0f;
+constexpr auto dotThickness = 5;
+constexpr auto dotRad = 20.0f;
 
-Vector2D radar::entToRadar(Vector eye, Vector angles, Vector entPos, Vector2D pos, Vector2D size, float scale, bool& check)
+#define VEC2D_NONE Vector2D(0.0f, 0.0f);
+
+Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale)
 {
 	float directionX, directionY;
 	float dotX, dotY;
@@ -29,16 +31,16 @@ Vector2D radar::entToRadar(Vector eye, Vector angles, Vector entPos, Vector2D po
 
 	// do not draw out of range
 	if (dotX < dotThickness)
-		check = false;
+		return VEC2D_NONE;
 
 	if (dotX > size.x)
-		check = false;
+		return VEC2D_NONE;
 
 	if (dotY < dotThickness)
-		check = false;
+		return VEC2D_NONE;
 
 	if (dotY > size.y)
-		check = false;
+		return VEC2D_NONE;
 
 	// again correct for out center...
 	dotX += pos.x;
@@ -62,11 +64,11 @@ void radar::run()
 	if (!localPlayer)
 		return;
 
-	int x, y;
+	static int x, y;
 	interfaces::engine->getScreenSize(x, y);
-	int centerx = x / 2 - 20;
-	int centery = y - 110;
-	int size = 90;
+	static int centerx = x / 2 - 20;
+	static int centery = y - 110;
+	static int size = 90;
 
 	render::drawFilledRect(centerx - size, centery - size, 2 * size, 2 * size, Color(128, 128, 128, 190));
 	render::drawOutlineRect(centerx - size - 1, centery - size - 1, 2 * size + 1, 2 * size + 1, Colors::Black);
@@ -108,22 +110,21 @@ void radar::run()
 		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 			continue;
 
-		bool check = true;
-		const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D(centerx - size, centery - size), Vector2D(2.0f * size, 2.0f * size), 1.8f, check);
+		const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D(centerx - size, centery - size), Vector2D(2.0f * size, 2.0f * size), 1.8f);
 
 		// must be better way, idk how to make it easier
 		auto entYaw = ent->m_angEyeAngles().y;
 
-		if (entYaw < 0)
-			entYaw = 360 + entYaw;
+		if (entYaw < 0.0f)
+			entYaw = 360.0f + entYaw;
 
-		const auto rotated = 270 - entYaw + ang.y;
+		const auto rotated = 270.0f - entYaw + ang.y;
 
 		// this arg should not be dotRad in this case, as value gets higher line too
 		const auto finalX = dotRad * std::cos(DEG2RAD(rotated));
 		const auto finalY = dotRad * std::sin(DEG2RAD(rotated));
 
-		if (check)
+		if (!entRotatedPos.IsZero())
 		{
 			render::drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, Colors::White);
 			render::drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, Color(255, 30, 110, 255));

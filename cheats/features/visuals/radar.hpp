@@ -5,6 +5,6 @@
 
 namespace radar
 {
-	Vector2D entToRadar(Vector eye, Vector angles, Vector EntityPos, Vector2D pos, Vector2D size, float scale, bool& check);
+	Vector2D entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale);
 	void run();
 }

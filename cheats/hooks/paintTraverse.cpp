@@ -6,7 +6,6 @@
 #include "../features/visuals/radar.hpp"
 #include "../features/misc/misc.hpp"
 #include "../menu/GUI/gui.hpp"
-#include "../globals.hpp"
 
 #pragma region "Paint Helpers"
 bool shouldReloadsFonts()
@@ -36,6 +35,25 @@ bool isValidWindow()
 #endif
 	return true;
 }
+
+void guiStates()
+{
+#ifdef _DEBUG
+	for (short i = 0; i < 256; i++)
+	{
+		GUI::globals::previousKeyState[i] = GUI::globals::keyState[i];
+		GUI::globals::keyState[i] = GetAsyncKeyState(i);
+	}
+#else
+	for (short i = 0; i < 256; i++)
+	{
+		GUI::globals::previousKeyState[i] = GUI::globals::keyState[i];
+		GUI::globals::keyState[i] = LF(GetAsyncKeyState).cached()(i);
+	}
+#endif
+	interfaces::surface->getCursor(GUI::globals::mouseX, GUI::globals::mouseY);
+}
+
 #pragma endregion
 
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
@@ -43,15 +61,13 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	if (!isValidWindow())
 		return;
 
-	interfaces::surface->getCursor(globals::mouseX, globals::mouseY);
-
 	// will run first no matter what, you can edit the function a bit or add ghetto static counter
 	if (shouldReloadsFonts())
 		render::init();
 
 	if (strstr(interfaces::panel->getName(panel), XOR("HudZoom")))
 	{
-		if (interfaces::engine->isInGame())		
+		if (interfaces::engine->isInGame())
 			return;
 	}
 
@@ -59,8 +75,9 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 
 	if (strstr(interfaces::panel->getName(panel), XOR("MatSystemTopPanel")))
 	{
-		Menu::g().draw();
-		Menu::g().handleKeys();
+		guiStates();
+		//Menu::g().draw();
+		//Menu::g().handleKeys();
 		esp::run();
 		world::drawMisc();
 		radar::run();
@@ -72,6 +89,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		misc::drawNoScope();
 		misc::drawCrosshair();
 		// testing image, all good
-		test::run();
+		//test::run();
+		GUI::renderGUI::test();
 	}
 }

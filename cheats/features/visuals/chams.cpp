@@ -5,7 +5,7 @@
 
 inline constexpr void CALL(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix)
 {
-	hooks::drawModel::original(interfaces::modelRender, ctx, std::cref(state), std::cref(info), matrix);
+	hooks::drawModel::original(interfaces::modelRender, ctx, state, info, matrix);
 }
 
 enum ChamsIDs
@@ -161,7 +161,7 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 				!game::localPlayer->m_bIsScoped())
 			{
 				// first call the engine, so in this case weapon model is visible with effects, nice for wireframe
-				
+
 				static auto material = interfaces::matSys->findMaterial(name.c_str(), XOR(TEXTURE_GROUP_MODEL));
 				overrideChams(false, false, Colors::Palevioletred); // - Trophy
 				if (vars::iWeaponChams == NO_WEAPON)
@@ -196,7 +196,7 @@ void chams::run(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_
 
 	if (ent->isPlayer())
 	{
-		drawBacktrackChams(ent, ctx, std::cref(state), std::cref(info));
-		drawChams(ent, ctx, std::cref(state), std::cref(info), matrix);
+		drawBacktrackChams(ent, ctx, state, info);
+		drawChams(ent, ctx, state, info, matrix);
 	}
 }
