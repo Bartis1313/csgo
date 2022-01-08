@@ -57,6 +57,9 @@ public:
 	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
 	_NODISCARD AnimationLayer* getAnimOverlays();
 	_NODISCARD size_t getSequenceActivity(size_t sequence);
+
+	// dodaj metody do loopowania itd, TODO
+	void virtual draw() = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

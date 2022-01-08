@@ -1,9 +1,14 @@
 #pragma once
 #include <Windows.h>
-#include <utility>
+#include <array>
 #include <string>
 #include "../../../utilities/renderer/renderer.hpp"
 #include "TextureHolder.hpp"
+
+/*
+* Window -> init with actual literal pos
+* other classes, init with menu globals, say you wanna get a checkbox, then init with globals::menuX + 20 and etc, etc, etc, etc
+*/
 
 namespace GUI
 {
@@ -25,7 +30,7 @@ namespace GUI
 	public:
 		Window(const int x, const int y, const int width, const int height);
 		void initWindow();
-		std::pair<int, int> getWindowPos() const;
+		std::array<int, 4> getWindowPos() const;
 		virtual void draw() override;
 	private:
 		void drawBackground() const;
@@ -36,28 +41,37 @@ namespace GUI
 	class Tab : public Element
 	{
 	public:
-		Tab(const std::string& title, const int x, const int y, const int width, const int height, unsigned long font, const Color& color);
-		bool isActive();
+		Tab(const std::string& title, const int x, const int y, const int width, const int height, const Color& color);
+		bool isActive() const;
 		virtual void draw() override;
 	private:
 		bool m_active;
 		std::string m_title;
-		unsigned long m_font;
+		Color m_color;
+	};
+	// checkbox, represents a button to change some boolean
+	class CheckBox : public Element
+	{
+	public:
+		CheckBox(const std::string& title, const int x, const int y, const int width, const int height, const Color& color, bool* feature);
+		bool isActive() const;
+		virtual void draw() override;
+	private:
+		bool m_active;
+		bool* m_feature;
+		std::string m_title;
 		Color m_color;
 	};
 	// button, it has the option to turn off/on the feature
-	template<typename T>
 	class Button : public Element
 	{
 	public:
-		Button(const std::string& title, const int x, const int y, const int width, const int height, unsigned long font, const Color& color, T* feature);
+		Button(const std::string& title, const int x, const int y, const int width, const int height, const Color& color);
 		bool isClicked();
 		virtual void draw() override;
 	private:
 		std::string m_title;
 		bool m_clicked;
-		T* m_feature;
-		unsigned long m_font;
 		Color m_color;
 	};
 	// button but as a list with options
@@ -98,16 +112,31 @@ namespace GUI
 		inline short keyState[256];
 		inline short previousKeyState[256];
 	}
+	bool isKeyDown(const short key);
 	bool isKeyPressed(const short key);
 
 	// some objects
-
-	inline Window mainWindow {globals::menuX, globals::menuY, globals::menuWidth, globals::menuHeight};
+	inline bool debil = true;
+	inline Window mainWindow{ globals::menuX, globals::menuY, globals::menuWidth, globals::menuHeight };
+	inline CheckBox boxik{ "Test", 20, 30, 15, 15, Colors::DarkBlue, &debil };
+	inline std::array<Tab, 2> windowTabs =
+	{
+		Tab{"Something", 10, 10, 50, 15, Colors::White},
+		Tab{"Something", 60, 10, 50, 15, Colors::White}
+	};
 
 	namespace renderGUI
 	{
 		void test();
 	}
+
+	enum HelperPos
+	{
+		M_X,
+		M_Y,
+		M_WIDTH,
+		M_HEIGHT
+	};
 }
 
 namespace test

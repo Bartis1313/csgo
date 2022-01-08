@@ -8,11 +8,13 @@ struct Box
 	int x, y, w, h;
 };
 
+// make it as a struct to make calculations for Y padding offset for gui, etc
 namespace fonts
 {
 	inline unsigned long tahoma;
 	inline unsigned long smalle;
 	inline unsigned long espBar;
+	inline unsigned long menuFont;
 }
 
 namespace render
@@ -25,7 +27,11 @@ namespace render
 	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color);
 	void drawOutlineRect(const int x, const int y, const int w, const int h, const Color& color);
 	void drawOutlineRect(const Vector2D& start, const Vector2D& end, const Color& color);
+	void drawOutlineRect(const int x, const int y, const int w, const int h, const Color& color, const Color& colorOutline);
 	void drawFilledRect(const int x, const int y, const int w, const int h, const Color& color);
+	void drawFilledRect(const int x, const int y, const int w, const int h, const Color& color, const Color& colorOutline);
+	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/181578-draw-rounded-box-static-dynamic.html
+	void drawRoundedRect(const int x, const int y, const int w, const int h, const int radius, const int numberOfVertices, const Color& color);
 	void drawCircle(const int x, const int y, const int radius, const int points, const Color& color);
 	void drawCircleFilled(const int x, const int y, const int radius, const int points, const Color& color);
 	void drawCircle3D(const Vector& pos, const int radius, const int points, const Color& color);
@@ -40,6 +46,6 @@ namespace render
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
 	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
-	int getTextSize(const unsigned long font, const std::string& text);
-	bool worldToScreen(const Vector& in, Vector& out);
+	_NODISCARD int getTextSize(const unsigned long font, const std::string& text);
+	_NODISCARD bool worldToScreen(const Vector& in, Vector& out);
 }

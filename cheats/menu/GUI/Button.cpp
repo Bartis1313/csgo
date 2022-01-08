@@ -1,26 +1,23 @@
 #include "gui.hpp"
 
-template<typename T>
-GUI::Button<T>::Button(const std::string& title, const int x, const int y, const int width, const int height, unsigned long font, const Color& color, T* feature)
-	: m_title{ title }, m_font{ font }, m_color{color}, m_feature{ feature }
+GUI::Button::Button(const std::string& title, const int x, const int y, const int width, const int height, const Color& color)
+	: m_title{ title }, m_color{ color }
 {
 	setPos(x, y, width, height);
 }
 
-template<typename T>
-bool GUI::Button<T>::isClicked()
+bool GUI::Button::isClicked()
 {
-	if (isKeyPressed(VK_LBUTTON) && isMouseInRange(m_X, m_Y, m_width, m_height))
+	if (isKeyDown(VK_LBUTTON) && isMouseInRange(m_X, m_Y, m_width, m_height))
 	{
 		return true;
 	}
 	return false;
 }
 
-template<typename T>
-void GUI::Button<T>::draw()
+void GUI::Button::draw()
 {
 	render::drawFilledRect(m_X, m_Y, m_width, m_height, Color(80, 80, 80, 255));
 
-	render::text(m_X, m_Y, m_font, m_title, true, m_color);
+	render::text(m_X, m_Y, fonts::menuFont, m_title, true, m_color);
 }

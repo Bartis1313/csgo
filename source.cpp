@@ -28,8 +28,8 @@ DWORD WINAPI init(PVOID instance)
         NetvarManager::g().init();
         NetvarManager::g().dump();
         test::init();
-        hooks::init();
         render::init();
+        hooks::init();
         config::init();
     }
     catch (const std::runtime_error& err)
@@ -43,7 +43,7 @@ DWORD WINAPI init(PVOID instance)
 
 void WINAPI _shutdown(PVOID instance)
 {
-    while (!GUI::isKeyPressed(VK_DELETE))
+    while (!GUI::isKeyDown(VK_DELETE))
     {
         std::this_thread::sleep_for(100ms);
     }

@@ -14,7 +14,12 @@ void test::run()
 	fatchad.draw(400, 500);
 }
 
-bool GUI::isKeyPressed(const short key)
+bool GUI::isKeyDown(const short key)
 {
 	return globals::keyState[key];
+}
+
+bool GUI::isKeyPressed(const short key)
+{
+	return globals::keyState[key] && !globals::previousKeyState[key];
 }

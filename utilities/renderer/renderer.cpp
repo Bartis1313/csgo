@@ -27,9 +27,10 @@ unsigned long render::__createFont(const char* fontName, const int size, const i
 
 void render::init()
 {
-	fonts::tahoma = __createFont("Tahoma", 14, 800, FONTFLAG_OUTLINE);
-	fonts::smalle = __createFont("Tahoma", 9, 800, FONTFLAG_ANTIALIAS);
-	fonts::espBar = __createFont("Franklin Gothic", 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+	fonts::tahoma = __createFont(XOR("Tahoma"), 14, 800, FONTFLAG_OUTLINE);
+	fonts::smalle = __createFont(XOR("Tahoma"), 9, 800, FONTFLAG_ANTIALIAS);
+	fonts::espBar = __createFont(XOR("Franklin Gothic"), 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+	fonts::menuFont = __createFont(XOR("Verdana"), 12, 350, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 
 	LOG(LOG_INFO, XOR("render success"));
 }
@@ -56,10 +57,48 @@ void render::drawOutlineRect(const Vector2D& start, const Vector2D& end, const C
 	drawOutlineRect(start.x, start.y, end.x, end.y, color);
 }
 
+void render::drawOutlineRect(const int x, const int y, const int w, const int h, const Color& color, const Color& colorOutline)
+{
+	drawOutlineRect(x, y, w, h, color);
+	drawOutlineRect(x - 1, y - 1, w + 2, h + 2, colorOutline);
+	drawOutlineRect(x + 1, y + 1, w - 2, h - 2, colorOutline);
+}
+
 void render::drawFilledRect(const int x, const int y, const int w, const int h, const Color& color)
 {
 	interfaces::surface->drawSetColor(color);
 	interfaces::surface->drawFilledRectangle(x, y, w, h);
+}
+
+void render::drawFilledRect(const int x, const int y, const int w, const int h, const Color& color, const Color& colorOutline)
+{
+	drawFilledRect(x, y, w, h, color);
+	drawOutlineRect(x - 1, y - 1, w + 2, h + 2, colorOutline);
+	drawOutlineRect(x + 1, y + 1, w - 2, h - 2, colorOutline);
+}
+
+void render::drawRoundedRect(const int x, const int y, const int w, const int h, const int radius, const int numberOfVertices, const Color& color)
+{
+	if (numberOfVertices < 2)
+		return;
+
+	auto roundV = std::make_unique<Vertex_t[]>(4 * numberOfVertices);
+
+	for (int i = 0; i < 4; i++)
+	{
+		int _x = x + ((i < 2) ? (w - radius) : radius);
+		int _y = y + ((i % 3) ? (h - radius) : radius);
+
+		for (int j = 0; j < numberOfVertices; j++)
+		{
+			float rad = DEG2RAD((90.f * i) + (j / static_cast<float>(numberOfVertices - 1)) * 90.f);
+
+			roundV[(i * numberOfVertices) + j] = Vertex_t{ Vector2D{_x + radius * std::sin(rad), _y - radius * std::cos(rad)} };
+		}
+	}
+
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->drawTexturedPolygon(4 * numberOfVertices, roundV.get());
 }
 
 void render::drawCircle(const int x, const int y, const int radius, const int points, const Color& color)

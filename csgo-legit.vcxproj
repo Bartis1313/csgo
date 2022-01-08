@@ -189,6 +189,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\menu\GUI\Button.cpp" />
+    <ClCompile Include="cheats\menu\GUI\CheckBox.cpp" />
     <ClCompile Include="cheats\menu\GUI\drawing.cpp" />
     <ClCompile Include="cheats\menu\GUI\Element.cpp" />
     <ClCompile Include="cheats\menu\GUI\gui.cpp" />

@@ -12,7 +12,7 @@ void GUI::Window::initWindow()
 	static std::pair<int, int> mousePos;
 	static std::pair<int, int> menuPos;
 
-	if (isKeyPressed(VK_LBUTTON))
+	if (isKeyDown(VK_LBUTTON))
 	{
 		//printf("mouse x %i, mouse y %i\n", globals::mouseX, globals::mouseY);
 
@@ -43,9 +43,9 @@ void GUI::Window::initWindow()
 }
 
 
-std::pair<int, int> GUI::Window::getWindowPos() const
+std::array<int, 4> GUI::Window::getWindowPos() const
 {
-	return std::pair<int, int>{m_X, m_Y};
+	return {m_X, m_Y, m_width, m_height};
 }
 
 void GUI::Window::draw()
