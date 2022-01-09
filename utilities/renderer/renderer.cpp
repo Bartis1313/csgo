@@ -160,16 +160,6 @@ void render::drawFilledCircle3D(const Vector& pos, const int radius, const int p
 	}
 }
 
-
-/*
-		  + -p1
-		 / \
-		/   \
-	   /	 \
- p2 - +-------+ - p3
-
- */
-
 void render::drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
 {
 	Vertex_t verts[] =
@@ -182,20 +172,6 @@ void render::drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D
 	interfaces::surface->drawSetColor(color);
 	interfaces::surface->drawTexturedPolygon(3, verts);
 }
-
-/*	  p4+
-		| `
-		|	 `
-		|		`
-		|			`
-		|			   `+p3
-		|				|
-		|				|
-		|				|
-		|				|
-		|				|
-	  p1+---------------+p2
- */
 
 void render::drawTrapezFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
 {
@@ -272,7 +248,7 @@ void render::text(const int x, const int y, const unsigned long font, const wcha
 	interfaces::surface->getTextSize(font, text, width, height);
 	interfaces::surface->setTextColor(color);
 	interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
-	interfaces::surface->drawRenderText(text, wcslen(text));
+	interfaces::surface->drawRenderText(text, std::char_traits<wchar_t>::length(text));
 }
 
 void render::text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color)
@@ -287,7 +263,7 @@ void render::text(const int x, const int y, const unsigned long font, const std:
 	interfaces::surface->getTextSize(font, converted.c_str(), width, height);
 	interfaces::surface->setTextColor(color);
 	interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
-	interfaces::surface->drawRenderText(converted.c_str(), wcslen(converted.c_str()));
+	interfaces::surface->drawRenderText(converted.c_str(), converted.size());
 }
 
 void render::textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...)
@@ -352,7 +328,7 @@ bool render::worldToScreen(const Vector& in, Vector& out)
 		p7-|------p6 |
 		|  |      |  |
 		|  |	  |  |
-		|  |      |	 |
+		|  |	  |	 |
 		|  p0-----|-p1
 		| /       | /
 		|/        |/

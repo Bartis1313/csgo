@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <array>
 #include <string>
+#include <span>
 #include "../../../utilities/renderer/renderer.hpp"
 #include "TextureHolder.hpp"
 
@@ -41,19 +42,27 @@ namespace GUI
 	class Tab : public Element
 	{
 	public:
-		Tab(const std::string& title, const int x, const int y, const int width, const int height, const Color& color);
-		bool isActive() const;
+		// init single tab, no need for X, Y pos, as this is automatically done with tab list
+		Tab(const std::string& title);
+		// init whole tab list
+		Tab(const std::span<Tab>& arr, const size_t height, const size_t paddingWidth, const size_t paddingXbetween,
+			const size_t paddingY, const Color& color, const Color& secColor);
 		virtual void draw() override;
 	private:
-		bool m_active;
 		std::string m_title;
 		Color m_color;
+		Color m_secColor;
+		std::span<Tab> m_array;
+		size_t m_PaddingWidth;
+		size_t m_paddingY;
+		size_t m_paddingBetween;
 	};
 	// checkbox, represents a button to change some boolean
 	class CheckBox : public Element
 	{
 	public:
-		CheckBox(const std::string& title, const int x, const int y, const int width, const int height, const Color& color, bool* feature);
+		CheckBox(const std::string& title, const int x, const int y, const int width, const int height,
+			const Color& color, const Color& secColor, bool* feature);
 		bool isActive() const;
 		virtual void draw() override;
 	private:
@@ -61,6 +70,7 @@ namespace GUI
 		bool* m_feature;
 		std::string m_title;
 		Color m_color;
+		Color m_secColor;
 	};
 	// button, it has the option to turn off/on the feature
 	class Button : public Element
@@ -108,6 +118,7 @@ namespace GUI
 		inline int menuY = 500;
 		inline int menuWidth = 800;
 		inline int menuHeight = 400;
+		inline int lastTab = 0;
 
 		inline short keyState[256];
 		inline short previousKeyState[256];
@@ -116,14 +127,15 @@ namespace GUI
 	bool isKeyPressed(const short key);
 
 	// some objects
-	inline bool debil = true;
+	inline bool somebool = true;
 	inline Window mainWindow{ globals::menuX, globals::menuY, globals::menuWidth, globals::menuHeight };
-	inline CheckBox boxik{ "Test", 20, 30, 15, 15, Colors::DarkBlue, &debil };
-	inline std::array<Tab, 2> windowTabs =
+	inline CheckBox somebutton{ "Test", 20, 30, 15, 15, Colors::Green, Color(70, 70, 70, 255), &somebool };
+	inline std::array<Tab, 2> arrTabs =
 	{
-		Tab{"Something", 10, 10, 50, 15, Colors::White},
-		Tab{"Something", 60, 10, 50, 15, Colors::White}
+		Tab{ "Something" },
+		Tab{ "Something2" }
 	};
+	inline Tab windowTabs{ arrTabs, 20, 10, 8, 10, Color(50, 120, 220, 255), Color(50, 120, 180, 255) };
 
 	namespace renderGUI
 	{
@@ -136,6 +148,12 @@ namespace GUI
 		M_Y,
 		M_WIDTH,
 		M_HEIGHT
+	};
+
+	enum TabNames
+	{
+		SOMETHING_1,
+		SOMETHING_2,
 	};
 }
 

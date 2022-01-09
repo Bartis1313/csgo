@@ -1,34 +1,62 @@
 #include "gui.hpp"
 
-GUI::Tab::Tab(const std::string& title, const int x, const int y, const int width, const int height, const Color& color)
-	: m_title{ title }, m_color{color}
+GUI::Tab::Tab(const std::string& title)
+	: m_title{ title }
+{}
+
+GUI::Tab::Tab(const std::span<Tab>& arr, const size_t height, const size_t paddingWidth, const size_t paddingXbetween,
+	const size_t paddingY, const Color& color, const Color& secColor)
+	: m_array{ arr }, m_PaddingWidth{ paddingWidth }, m_paddingBetween{ paddingXbetween }, m_paddingY{ paddingY },
+	m_color{ color }, m_secColor{ secColor }
 {
-	setPos(x, y, width, height);
+	m_height = height;
 }
 
 void GUI::Tab::draw()
 {
-	bool isInRange = isMouseInRange(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height);
+	if (m_array.empty())
+		return;
 
-	if (isInRange && isKeyPressed(VK_LBUTTON))
+	// have to somehow see what tab has been pressed
+	static int tabNow = globals::lastTab;
+	if (globals::lastTab != tabNow)
 	{
-		m_active = !m_active;
-
-		//printf("zmeinilo\n");
+		tabNow = globals::lastTab;
 	}
 
-	// prob shouldn't be rounded for case of looking better
+	// based on menu size, and amount of tabs, you don't have to care about giving all values to draw in selected pos
+	static int size = (globals::menuWidth / m_array.size()) - m_PaddingWidth;
 
-	render::drawRoundedRect(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height, 10, 16,
-		m_active ? Color(50, 120, 220, 255) : Color(50, 120, 180, 255));
+	for (int i = 0; i < m_array.size(); i++)
+	{
+		int x = globals::menuX + m_paddingBetween + (i * size);
+		int y = globals::menuY + m_paddingY;
+		int w = size;
+		int h = m_height;
 
-	if (isInRange)
-		render::drawRoundedRect(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height, 10, 16, Color(50, 100, 140, 255));
+		bool isInRange = isMouseInRange(x, y, w, h);
+		bool isSelected = globals::lastTab == i;
 
-	render::text(globals::menuX + m_X + 3, globals::menuY + m_Y, fonts::menuFont, m_title, false, Colors::White);
-}
+		if (isInRange && isKeyPressed(VK_LBUTTON))
+		{
+			globals::lastTab = i;
 
-bool GUI::Tab::isActive() const
-{
-	return m_active;
+			//printf("ostatnie %i \n", globals::lastTab);
+		}
+
+		render::drawGradient(x, y, w, h,
+			isSelected ? m_color : m_secColor,
+			isSelected ? Colors::Black : m_secColor, false);
+
+		render::drawOutlineRect(x + 1, y + 1, w - 2, h - 2,
+			isInRange ? m_color : m_secColor);
+
+		if (isInRange)
+			render::drawFilledRect(x, y, w, h, Colors::Grey);
+
+		render::drawOutlineRect(x, y, w, h, Colors::Black);
+
+		// TODO: add better calculation based on font
+		render::text(x + (size / 2), y + 3, fonts::menuFont, m_array[i].m_title, true, isSelected ? Color(200, 170, 70, 255) : Colors::White);
+	}
 }

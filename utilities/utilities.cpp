@@ -25,13 +25,15 @@ bool utilities::prepareDirectories()
 	try
 	{
 		fs::current_path(__DOCUMENTS);
-		//CreateDirectoryA(std::string(__DOCUMENTS + std::string("\\") + std::string("Bartis internal")).c_str(), NULL);
 		result = fs::create_directories(XOR("Bartis_internal/csgo"));
 	}
 	catch (const fs::filesystem_error& err)
 	{
 		throw std::runtime_error(err.what());
 	}
+
+	LOG(LOG_INFO, result ? XOR("Created new folder, prepared directories") : XOR("Folder already exists with config, prepared directories"));
+
 	return result;
 }
 

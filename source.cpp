@@ -24,13 +24,13 @@ DWORD WINAPI init(PVOID instance)
     try
     {
         utilities::prepareDirectories();
+        config::init();
         interfaces::init();
         NetvarManager::g().init();
         NetvarManager::g().dump();
         test::init();
         render::init();
         hooks::init();
-        config::init();
     }
     catch (const std::runtime_error& err)
     {
@@ -55,7 +55,7 @@ void WINAPI _shutdown(PVOID instance)
     LF(FreeLibraryAndExitThread)(reinterpret_cast<HMODULE>(instance), EXIT_SUCCESS);
 }
 
-BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST VOID* reserved)
+BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID reserved)
 {
     if (reason == DLL_PROCESS_ATTACH)
     {
