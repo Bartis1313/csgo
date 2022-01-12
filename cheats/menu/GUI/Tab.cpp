@@ -4,9 +4,9 @@ GUI::Tab::Tab(const std::string& title)
 	: m_title{ title }
 {}
 
-GUI::Tab::Tab(const std::span<Tab>& arr, const size_t height, const size_t paddingWidth, const size_t paddingXbetween,
+GUI::Tab::Tab(const std::span<Tab>& arr, const size_t height, const size_t paddingXbetween,
 	const size_t paddingY, const Color& color, const Color& secColor)
-	: m_array{ arr }, m_PaddingWidth{ paddingWidth }, m_paddingBetween{ paddingXbetween }, m_paddingY{ paddingY },
+	: m_array{ arr }, m_paddingBetween{ paddingXbetween }, m_paddingY{ paddingY },
 	m_color{ color }, m_secColor{ secColor }
 {
 	m_height = height;
@@ -18,14 +18,14 @@ void GUI::Tab::draw()
 		return;
 
 	// have to somehow see what tab has been pressed
-	static int tabNow = globals::lastTab;
-	if (globals::lastTab != tabNow)
+	static size_t tabNow = m_selectedTab;
+	if (m_selectedTab != tabNow)
 	{
-		tabNow = globals::lastTab;
+		tabNow = m_selectedTab;
 	}
 
 	// based on menu size, and amount of tabs, you don't have to care about giving all values to draw in selected pos
-	static int size = (globals::menuWidth / m_array.size()) - m_PaddingWidth;
+	static int size = (globals::menuWidth / m_array.size()) - m_paddingBetween;
 
 	for (int i = 0; i < m_array.size(); i++)
 	{
@@ -35,11 +35,11 @@ void GUI::Tab::draw()
 		int h = m_height;
 
 		bool isInRange = isMouseInRange(x, y, w, h);
-		bool isSelected = globals::lastTab == i;
+		bool isSelected = m_selectedTab == i;
 
 		if (isInRange && isKeyPressed(VK_LBUTTON))
 		{
-			globals::lastTab = i;
+			m_selectedTab = i;
 
 			//printf("ostatnie %i \n", globals::lastTab);
 		}
@@ -59,4 +59,9 @@ void GUI::Tab::draw()
 		// TODO: add better calculation based on font
 		render::text(x + (size / 2), y + 3, fonts::menuFont, m_array[i].m_title, true, isSelected ? Color(200, 170, 70, 255) : Colors::White);
 	}
+}
+
+size_t GUI::Tab::getSelected() const
+{
+	return m_selectedTab;
 }

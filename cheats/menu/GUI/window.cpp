@@ -45,7 +45,7 @@ void GUI::Window::initWindow()
 
 std::array<int, 4> GUI::Window::getWindowPos() const
 {
-	return {m_X, m_Y, m_width, m_height};
+	return { m_X, m_Y, m_width, m_height };
 }
 
 void GUI::Window::draw()

@@ -192,6 +192,7 @@
     <ClCompile Include="cheats\menu\GUI\CheckBox.cpp" />
     <ClCompile Include="cheats\menu\GUI\drawing.cpp" />
     <ClCompile Include="cheats\menu\GUI\Element.cpp" />
+    <ClCompile Include="cheats\menu\GUI\GroupBox.cpp" />
     <ClCompile Include="cheats\menu\GUI\gui.cpp" />
     <ClCompile Include="cheats\menu\GUI\Tab.cpp" />
     <ClCompile Include="cheats\menu\GUI\TextureHolder.cpp" />
@@ -381,10 +382,10 @@
     <ClInclude Include="utilities\vfunc.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="csgo-legit.rc" />
+    <Image Include="dependencies\images\fatchad.png" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="dependencies\images\fatchad.png" />
+    <ResourceCompile Include="csgo-legit.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

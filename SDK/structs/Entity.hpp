@@ -57,9 +57,6 @@ public:
 	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
 	_NODISCARD AnimationLayer* getAnimOverlays();
 	_NODISCARD size_t getSequenceActivity(size_t sequence);
-
-	// dodaj metody do loopowania itd, TODO
-	void virtual draw() = 0;
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +146,7 @@ public:
 	NETVAR(bool, m_bDucking, "DT_CSPlayer", "m_bDucking");
 	NETVAR(float, m_flHealthShotBoostExpirationTime, "DT_CSPlayer", "m_flHealthShotBoostExpirationTime");
 	NETVAR(unsigned long, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget");
-	NETVAR(int, m_hActiveWeapon,"DT_CSPlayer", "m_hActiveWeapon");
+	NETVAR(int, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
 
 	void setAbsOrigin(const Vector& origin);
 	_NODISCARD Weapon_t* getActiveWeapon();

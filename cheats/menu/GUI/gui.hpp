@@ -3,12 +3,17 @@
 #include <array>
 #include <string>
 #include <span>
+#include <functional>
+#include <vector>
 #include "../../../utilities/renderer/renderer.hpp"
+#include "../../../SDK/interfaces/interfaces.hpp"
 #include "TextureHolder.hpp"
+
+// TODO: recode it a bit and make defines for few constans like: button width etc...
 
 /*
 * Window -> init with actual literal pos
-* other classes, init with menu globals, say you wanna get a checkbox, then init with globals::menuX + 20 and etc, etc, etc, etc
+* other classes, init with menu globals, say you wanna get a checkbox, then init with globals::menuX + 20 and etc, etc, etc...
 */
 
 namespace GUI
@@ -45,8 +50,9 @@ namespace GUI
 		// init single tab, no need for X, Y pos, as this is automatically done with tab list
 		Tab(const std::string& title);
 		// init whole tab list
-		Tab(const std::span<Tab>& arr, const size_t height, const size_t paddingWidth, const size_t paddingXbetween,
+		Tab(const std::span<Tab>& arr, const size_t height, const size_t paddingXbetween,
 			const size_t paddingY, const Color& color, const Color& secColor);
+		size_t getSelected() const;
 		virtual void draw() override;
 	private:
 		std::string m_title;
@@ -56,6 +62,7 @@ namespace GUI
 		size_t m_PaddingWidth;
 		size_t m_paddingY;
 		size_t m_paddingBetween;
+		size_t m_selectedTab = 0;
 	};
 	// checkbox, represents a button to change some boolean
 	class CheckBox : public Element
@@ -76,20 +83,47 @@ namespace GUI
 	class Button : public Element
 	{
 	public:
-		Button(const std::string& title, const int x, const int y, const int width, const int height, const Color& color);
-		bool isClicked();
+		Button(const std::string& title, const int x, const int y, const int width, const int height, 
+			const Color& color, const Color& secColor, const std::function<void()>& lambda);
 		virtual void draw() override;
 	private:
 		std::string m_title;
-		bool m_clicked;
 		Color m_color;
+		Color m_secColor;
+		std::function<void()> m_lamda;
 	};
 	// button but as a list with options
 	class GroupBox : public Element
 	{
 	public:
+		// init some smaller groupbox, this one will only allow to select ONE feature
+		GroupBox(const std::string& title, const int x, const int y, const int width, const int height,
+			const std::vector<std::string>& names, const Color& color, const Color& secColor, int* option);
 		virtual void draw() override;
+		bool isActive() const;
+		bool isOptionOn() const;
+	private:
+		std::string m_title;
+		bool m_active;
+		Color m_color;
+		Color m_secColor;
+		std::vector<std::string> m_names;
+		int* m_option;
 	};
+	class MultiBox : public Element
+	{
+	public:
+		// init groupbox by many features listed in array
+		MultiBox(const std::string& title, const std::vector<std::string>& names, const std::vector<bool>* feature);
+		virtual void draw() override;
+	private:
+		std::string m_title;
+		Color m_color;
+		Color m_secColor;
+		std::vector<std::string> m_names;
+		std::vector<bool>* m_listedOptions;
+	};
+
 	// input that can go for numbers or letters
 	class Input : public Element
 	{
@@ -118,10 +152,13 @@ namespace GUI
 		inline int menuY = 500;
 		inline int menuWidth = 800;
 		inline int menuHeight = 400;
-		inline int lastTab = 0;
 
 		inline short keyState[256];
 		inline short previousKeyState[256];
+
+		// if pressed group/multi box, then quit adding other features at all
+		// better method would be to detect if groupbox is in range of hidden features by box list
+		inline bool isTakingBoxInput = false;
 	}
 	bool isKeyDown(const short key);
 	bool isKeyPressed(const short key);
@@ -135,7 +172,15 @@ namespace GUI
 		Tab{ "Something" },
 		Tab{ "Something2" }
 	};
-	inline Tab windowTabs{ arrTabs, 20, 10, 8, 10, Color(50, 120, 220, 255), Color(50, 120, 180, 255) };
+	inline Tab windowTabs{ arrTabs, 20, 8, 10, Color(50, 120, 220, 255), Color(50, 120, 180, 255) };
+	inline Button button{ "Button", 10, 80, 50, 20, Color(50, 120, 220, 255), Color(50, 120, 180, 255),
+		[]()
+		{
+			interfaces::console->consoleColorPrintf(Colors::Green, "Siema\n");
+		}
+	};
+	inline int selected = -1;
+	inline GroupBox group{ "This is a group", 20, 200, 150, 20, {"First", "Second", "Third", "Fourth", "Fith"}, Color(30, 30, 30, 255), Color(40, 40, 40, 255), &selected};
 
 	namespace renderGUI
 	{
