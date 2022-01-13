@@ -31,6 +31,11 @@ public:
 		a = color[3];
 	}
 
+	Color getColorWithAlpha(const Color& color, uint8_t a) const
+	{
+		return Color(color.r(), color.g(), color.b(), a);
+	}
+
 	// useful for future, and guis
 	std::array<float, 4> getModulate() const
 	{
@@ -156,4 +161,5 @@ namespace Colors
 	inline Color Purple = Color(140, 20, 252, 255);
 	inline Color Turquoise = Color(60, 210, 200, 255);
 	inline Color Palevioletred = Color(220, 110, 150, 255);
+	inline Color Pink = Color(255, 100, 180, 255);
 }

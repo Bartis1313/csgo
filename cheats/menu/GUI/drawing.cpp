@@ -11,5 +11,8 @@ void GUI::renderGUI::test()
 		somebutton.draw();
 		button.draw();
 		group.draw();
+		multi.draw();
+		text.draw();
+		drawspectre();
 	}
 }

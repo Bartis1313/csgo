@@ -114,18 +114,40 @@ namespace GUI
 	{
 	public:
 		// init groupbox by many features listed in array
-		MultiBox(const std::string& title, const std::vector<std::string>& names, const std::vector<bool>* feature);
+		MultiBox(const std::string& title, const int x, const int y, const int width, const int height,
+			const std::vector<std::string>& names, const Color& color, const Color& secColor, std::vector<bool>* feature);
 		virtual void draw() override;
+		bool isActive() const;
+		bool isOptionOn(const size_t idx) const;
 	private:
 		std::string m_title;
+		bool m_active;
 		Color m_color;
 		Color m_secColor;
 		std::vector<std::string> m_names;
 		std::vector<bool>* m_listedOptions;
 	};
-
-	// input that can go for numbers or letters
-	class Input : public Element
+	// write anything to the box
+	class TextInput : public Element
+	{
+	public:
+		TextInput(const std::string& title, const int x, const int y, const int width, const int height,
+			const Color& color, const Color& secColor, std::string* text);
+		virtual void draw() override;
+		static void initTabs();
+		bool isActive() const;
+	private:
+		static std::array<std::string, 254> m_smallLetters;
+		static std::array<std::string, 254> m_bigLetters;
+		static bool m_inited;
+		std::string m_title;
+		bool m_active;
+		Color m_color;
+		Color m_secColor;
+		std::string* m_text;
+	};
+	// press anything, few keys are banned. 
+	class KeyHolder : public Element
 	{
 	public:
 		virtual void draw() override;
@@ -162,6 +184,8 @@ namespace GUI
 	}
 	bool isKeyDown(const short key);
 	bool isKeyPressed(const short key);
+	// THIS IS TEST
+	void drawspectre();
 
 	// some objects
 	inline bool somebool = true;
@@ -173,7 +197,7 @@ namespace GUI
 		Tab{ "Something2" }
 	};
 	inline Tab windowTabs{ arrTabs, 20, 8, 10, Color(50, 120, 220, 255), Color(50, 120, 180, 255) };
-	inline Button button{ "Button", 10, 80, 50, 20, Color(50, 120, 220, 255), Color(50, 120, 180, 255),
+	inline Button button{ "Button", 20, 80, 50, 20, Color(50, 120, 220, 255), Color(50, 120, 180, 255),
 		[]()
 		{
 			interfaces::console->consoleColorPrintf(Colors::Green, "Siema\n");
@@ -181,6 +205,11 @@ namespace GUI
 	};
 	inline int selected = -1;
 	inline GroupBox group{ "This is a group", 20, 200, 150, 20, {"First", "Second", "Third", "Fourth", "Fith"}, Color(30, 30, 30, 255), Color(40, 40, 40, 255), &selected};
+	inline std::vector<bool> options = { false, false, false, false, false, false, false, false};
+	inline MultiBox multi{ "This is a multibox", 20, 300, 150, 20, {"First", "Second", "Third", "Fourth", "Fith", "Sixth", "Seventh", "Eith"},
+		Color(30, 30, 30, 255), Color(40, 40, 40, 255), &options};
+	inline std::string t;
+	inline TextInput text{ "This is a textinput", 20, 120, 150, 20, Color(30, 30, 30, 255), Color(40, 40, 40, 255), &t };
 
 	namespace renderGUI
 	{

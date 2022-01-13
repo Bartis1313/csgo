@@ -35,6 +35,8 @@ namespace utilities
     // https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bounding_ESP_Boxes
     bool getBox(Entity_t* ent, Box& box);
     size_t inByteOrder(const size_t netLong);
+    std::string getKeyName(UINT virtualKey);
+    std::string toLowerCase(const std::string& str);
 }
 
 inline std::string __DOCUMENTS = utilities::getFolder();

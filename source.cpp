@@ -30,6 +30,7 @@ DWORD WINAPI init(PVOID instance)
         NetvarManager::g().dump();
         test::init();
         render::init();
+        GUI::TextInput::initTabs();
         hooks::init();
     }
     catch (const std::runtime_error& err)

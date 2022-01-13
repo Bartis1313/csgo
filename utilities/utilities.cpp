@@ -167,3 +167,73 @@ size_t utilities::inByteOrder(const size_t netLong)
 		| (static_cast<size_t>(data.at(1)) << 16)
 		| (static_cast<size_t>(data.at(0)) << 24);
 }
+
+std::string utilities::getKeyName(UINT virtualKey)
+{
+#ifdef _DEBUG
+	UINT scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
+#else
+	UINT scanCode = LF(MapVirtualKeyA).caached()(virtualKey, MAPVK_VK_TO_VSC);
+#endif
+
+	// because MapVirtualKey strips the extended bit for some keys
+	switch (virtualKey)
+	{
+	case VK_LEFT: case VK_UP: case VK_RIGHT: case VK_DOWN: // arrow keys
+	case VK_PRIOR: case VK_NEXT: // page up and page down
+	case VK_END: case VK_HOME:
+	case VK_INSERT: case VK_DELETE:
+	case VK_DIVIDE: // numpad slash
+	case VK_NUMLOCK:
+	{
+		scanCode |= 0x100; // set extended bit
+		break;
+	}
+	case 1:
+		return XOR("LMB");
+		break;
+	case 2:
+		return XOR("RMB");
+		break;
+	case 4:
+		return XOR("MMB");
+		break;
+	case 5:
+		return XOR("Side 1");
+		break;
+	case 6:
+		return XOR("Side 2");
+		break;
+	}
+
+	char keyName[50];
+#ifdef _DEBUG
+	if (GetKeyNameTextA(scanCode << 16, keyName, sizeof(keyName)) != 0)
+	{
+		return keyName;
+}
+	else
+	{
+		return XOR("[None]");
+	}
+#else
+	if (LF(GetKeyNameTextA).cached()(scanCode << 16, keyName, sizeof(keyName)) != 0)
+	{
+		return keyName;
+	}
+	else
+	{
+		return XOR("[None]");
+	}
+#endif
+}
+
+std::string utilities::toLowerCase(const std::string& str)
+{	
+	std::string result = str;
+	std::for_each(result.begin(), result.end(), [](char& el)
+		{
+			el = ::tolower(el);
+		});
+	return std::move(result);
+}
