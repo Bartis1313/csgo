@@ -13,6 +13,10 @@ void GUI::renderGUI::test()
 		group.draw();
 		multi.draw();
 		text.draw();
-		drawspectre();
+		picker.draw();
+		slider.draw();
+		holder.draw();
 	}
+
+	resetGlobals();
 }

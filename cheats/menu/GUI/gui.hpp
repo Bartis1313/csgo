@@ -1,10 +1,13 @@
 #pragma once
 #include <Windows.h>
-#include <array>
 #include <string>
+#include <array>
 #include <span>
+#include <utility>
 #include <functional>
 #include <vector>
+#include <memory>
+#include <any>
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
 #include "TextureHolder.hpp"
@@ -22,7 +25,7 @@ namespace GUI
 	class Element
 	{
 	public:
-		bool isMouseInRange(const int x, const int y, const int width, const int height) const;
+		_NODISCARD bool isMouseInRange(const int x, const int y, const int width, const int height) const;
 		void setPos(const int x, const int y, const int width, const int height);
 	protected:
 		int m_X, m_Y;
@@ -36,7 +39,7 @@ namespace GUI
 	public:
 		Window(const int x, const int y, const int width, const int height);
 		void initWindow();
-		std::array<int, 4> getWindowPos() const;
+		_NODISCARD std::array<int, 4> getWindowPos() const;
 		virtual void draw() override;
 	private:
 		void drawBackground() const;
@@ -52,7 +55,7 @@ namespace GUI
 		// init whole tab list
 		Tab(const std::span<Tab>& arr, const size_t height, const size_t paddingXbetween,
 			const size_t paddingY, const Color& color, const Color& secColor);
-		size_t getSelected() const;
+		_NODISCARD size_t getSelected() const;
 		virtual void draw() override;
 	private:
 		std::string m_title;
@@ -70,7 +73,7 @@ namespace GUI
 	public:
 		CheckBox(const std::string& title, const int x, const int y, const int width, const int height,
 			const Color& color, const Color& secColor, bool* feature);
-		bool isActive() const;
+		_NODISCARD bool isActive() const;
 		virtual void draw() override;
 	private:
 		bool m_active;
@@ -100,8 +103,8 @@ namespace GUI
 		GroupBox(const std::string& title, const int x, const int y, const int width, const int height,
 			const std::vector<std::string>& names, const Color& color, const Color& secColor, int* option);
 		virtual void draw() override;
-		bool isActive() const;
-		bool isOptionOn() const;
+		_NODISCARD bool isActive() const;
+		_NODISCARD bool isOptionOn() const;
 	private:
 		std::string m_title;
 		bool m_active;
@@ -117,8 +120,8 @@ namespace GUI
 		MultiBox(const std::string& title, const int x, const int y, const int width, const int height,
 			const std::vector<std::string>& names, const Color& color, const Color& secColor, std::vector<bool>* feature);
 		virtual void draw() override;
-		bool isActive() const;
-		bool isOptionOn(const size_t idx) const;
+		_NODISCARD bool isActive() const;
+		_NODISCARD bool isOptionOn(const size_t idx) const;
 	private:
 		std::string m_title;
 		bool m_active;
@@ -135,10 +138,10 @@ namespace GUI
 			const Color& color, const Color& secColor, std::string* text);
 		virtual void draw() override;
 		static void initTabs();
-		bool isActive() const;
+		_NODISCARD bool isActive() const;
 	private:
-		static std::array<std::string, 254> m_smallLetters;
-		static std::array<std::string, 254> m_bigLetters;
+		static std::array<std::string, 256> m_smallLetters;
+		static std::array<std::string, 256> m_bigLetters;
 		static bool m_inited;
 		std::string m_title;
 		bool m_active;
@@ -150,19 +153,52 @@ namespace GUI
 	class KeyHolder : public Element
 	{
 	public:
+		KeyHolder(const std::string& title, const int x, const int y, const int width, const int height,
+			const Color& color, const Color& secColor, int* key);
 		virtual void draw() override;
+		_NODISCARD bool isActive() const;
+	private:
+		std::string m_title;
+		bool m_active;
+		Color m_color;
+		Color m_secColor;
+		int* m_key;
 	};
 	// a very basic slider that represent some percentage or number to dynamically choice in range between
 	class Slider : public Element
 	{
 	public:
+		Slider(const std::string& title, const int x, const int y, const int width, const int height,
+			const Color& color, const Color& secColor, std::pair<float, float> minMax, float* value);
 		virtual void draw() override;
+		_NODISCARD bool isActive() const;
+	private:
+		std::string m_title;
+		bool m_active;
+		Color m_color;
+		Color m_secColor;
+		std::pair<float, float> m_minMax;
+		float* m_value;
 	};
-	// the special case for this GUI, color picker will be based on image, since it will look nicer and easier to make
+
+	// color picker with already made all colors by hsl looping. Alternatively you can draw it from file
 	class ColorPicker : public Element
 	{
 	public:
+		//ColorPicker(const std::string& title);
 		virtual void draw() override;
+		bool isActive() const;
+	private:
+		static std::unique_ptr<Color[]> m_gradient;
+		static std::unique_ptr<Color[]> m_alphaBar;
+		static std::unique_ptr<Color[]> m_hueBar;
+
+		static int m_gradientID;
+		static int m_textureALPHAID;
+		static int m_textureHUEID;
+		std::string m_title;
+		bool m_active;
+		Color getColorFromPos(const int x, const int y);
 	};
 
 	namespace globals
@@ -181,11 +217,11 @@ namespace GUI
 		// if pressed group/multi box, then quit adding other features at all
 		// better method would be to detect if groupbox is in range of hidden features by box list
 		inline bool isTakingBoxInput = false;
+		inline bool grabbingWindow = false;
 	}
 	bool isKeyDown(const short key);
 	bool isKeyPressed(const short key);
-	// THIS IS TEST
-	void drawspectre();
+	void resetGlobals();
 
 	// some objects
 	inline bool somebool = true;
@@ -208,8 +244,14 @@ namespace GUI
 	inline std::vector<bool> options = { false, false, false, false, false, false, false, false};
 	inline MultiBox multi{ "This is a multibox", 20, 300, 150, 20, {"First", "Second", "Third", "Fourth", "Fith", "Sixth", "Seventh", "Eith"},
 		Color(30, 30, 30, 255), Color(40, 40, 40, 255), &options};
-	inline std::string t;
+	inline std::string t = {};
 	inline TextInput text{ "This is a textinput", 20, 120, 150, 20, Color(30, 30, 30, 255), Color(40, 40, 40, 255), &t };
+	inline float slided = 0.0f;
+	inline Slider slider{ "This is a slider", 20, 240, 150, 7, Colors::LightBlue, Color(30, 30, 30, 255), {0.0f, 100.0f}, &slided };
+	inline int bind = 0;
+	inline KeyHolder holder{ "This is a keyholder", 150, 50, 5, 8, Colors::White, Colors::Black, &bind };
+	// not finished
+	inline ColorPicker picker;
 
 	namespace renderGUI
 	{

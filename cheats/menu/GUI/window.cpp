@@ -16,7 +16,8 @@ void GUI::Window::initWindow()
 	{
 		//printf("mouse x %i, mouse y %i\n", globals::mouseX, globals::mouseY);
 
-		if (!isDragging && isMouseInRange(globals::menuX, globals::menuY, globals::menuWidth, globals::menuHeight))
+		if (!isDragging && isMouseInRange(globals::menuX, globals::menuY, globals::menuWidth, globals::menuHeight) 
+			&& !isMouseInRange(globals::menuX, globals::menuY + 25, globals::menuWidth, globals::menuHeight - 25))
 		{
 			isDragging = true;
 			mousePos = { globals::mouseX, globals::mouseY };
@@ -25,6 +26,7 @@ void GUI::Window::initWindow()
 		if (isDragging)
 		{
 			//printf("dragging\n");
+			globals::grabbingWindow = true;
 
 			globals::menuX = menuPos.first + globals::mouseX - mousePos.first;
 			globals::menuY = menuPos.second + globals::mouseY - mousePos.second;

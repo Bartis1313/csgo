@@ -47,7 +47,7 @@ void GUI::GroupBox::draw()
 
 	// displays ... when the feature is empty
 	render::text(globals::menuX + m_X + (m_width / 2), globals::menuY + m_Y + 3, fonts::menuFont, this->isOptionOn() ? m_names.at(*m_option) : "...",
-		true, this->isOptionOn() ? Colors::LightBlue : Colors::White);
+		true, this->isActive() ? Colors::LightBlue : Colors::White);
 
 	if (this->isActive())
 	{

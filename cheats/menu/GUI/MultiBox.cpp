@@ -46,7 +46,7 @@ void GUI::MultiBox::draw()
 	}
 
 	render::text(globals::menuX + m_X + (m_width / 2), globals::menuY + m_Y + 3, fonts::menuFont, !allText.empty() ? allText : "...", true,
-		!allText.empty() ? Colors::LightBlue : Colors::White);
+		this->isActive() ? Colors::LightBlue : Colors::White);
 
 	// when active, change box to be not active
 	static bool toChange = false;

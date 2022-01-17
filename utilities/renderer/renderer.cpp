@@ -222,7 +222,7 @@ void render::drawPolyLine(const int count, Vertex_t* verts, const Color& color)
 
 void render::drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal)
 {
-	auto gradient = [=](const Color& color, unsigned int alpha1, unsigned int alpha2)
+	static auto gradient = [=](const Color& color, unsigned int alpha1, unsigned int alpha2)
 	{
 		interfaces::surface->drawSetColor(color);
 		interfaces::surface->drawFilledFadeRect(x, y, w, h, alpha1, alpha2, horizontal);
@@ -291,12 +291,21 @@ void render::textf(const int x, const int y, const unsigned long font, const boo
 int render::getTextSize(const unsigned long font, const std::string& text)
 {
 	std::wstring wtext(text.begin(), text.end());
-	const wchar_t* wbuf = wtext.c_str();
 
 	int width, height;
-	interfaces::surface->getTextSize(font, wbuf, width, height);
+	interfaces::surface->getTextSize(font, wtext.c_str(), width, height);
 
 	return width;
+}
+
+Vector2D render::getTextSizeXY(const unsigned long font, const std::string& text)
+{
+	std::wstring wtext(text.begin(), text.end());
+
+	int width, height;
+	interfaces::surface->getTextSize(font, wtext.c_str(), width, height);
+
+	return Vector2D(width, height);
 }
 
 bool render::worldToScreen(const Vector& in, Vector& out)
@@ -438,4 +447,23 @@ void render::drawBox3D(const std::array<Vector, 8>& box, const Color& color, boo
 		drawTrapezOutline(lines.at(3), lines.at(0), lines.at(4), lines.at(7), fill);
 #endif // POLYGON_METHOD
 	}
+}
+
+void render::initNewTexture(int& id, Color* RGBA, const int w, const int h)
+{
+	id = interfaces::surface->createNewTextureID(true);
+	interfaces::surface->setTextureRGBA(id, RGBA, w, h);
+}
+
+void render::initNewTexture(int& id, unsigned char* RGBA, const int w, const int h)
+{
+	id = interfaces::surface->createNewTextureID(true);
+	interfaces::surface->setTextureRGBA(id, RGBA, w, h);
+}
+
+void render::drawFromTexture(const int id, const int x, const int y, const int w, const int h, const Color& color)
+{
+	interfaces::surface->drawSetColor(color);
+	interfaces::surface->setTextureId(id);
+	interfaces::surface->drawTexturedRect(x, y, x + w, y + h);
 }

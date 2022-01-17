@@ -32,6 +32,7 @@ public:
 	VFUNC(void, drawFilledRectangle, 16, (int x, int y, int w, int h), (this, x, y, x + w, y + h));
 	VFUNC(void, setTextureId, 38, (int id), (this, id));
 	VFUNC(void, setTextureRGBA, 37, (int id, const unsigned char* rgba, int wide, int tall), (this, id, rgba, wide, tall));
+	VFUNC(void, setTextureRGBA, 37, (int id, Color* rgba, int wide, int tall), (this, id, rgba, wide, tall));
 	VFUNC(int, createNewTextureID, 43, (bool procedural = false), (this, procedural));
 	VFUNC(void, drawOutlinedRect, 18, (int x, int y, int w, int h), (this, x, y, x + w, y + h));
 	VFUNC(void, drawLine, 19, (int x1, int y1, int x2, int y2), (this, x1, y1, x2, y2));

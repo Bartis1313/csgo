@@ -78,6 +78,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.1.8 - added image rendering, pretty simple as it does need only one argument. Console logging is a bit simplier now. Fixed the main thread call with handling critical errors correctly.
 * 1.1.9 - very small update. Added check for paint hook, implemented idea of gui.
 * 1.2.0 - update to gui and few fixes in random files. (broke the git again..., lol)
+* 1.2.1 - GUI update with finishing ideas of everything, recode is still needed for automatic padding for GUI objects or add ideally add flags to choose.
 </details>
 
 # People who helped

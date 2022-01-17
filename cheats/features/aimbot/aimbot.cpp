@@ -114,7 +114,7 @@ void legitbot::run(CUserCmd* cmd)
             if (ent->m_bGunGameImmunity())
                 continue;
             
-            // I tried many ways with vector, seems too slow or whatever the issue is, this is good enough
+            // vector can be used to... to detect hotboxes, after gui is done you can easily make vector with boolens as multibox for them
             // if you want bones which I dislike because it will be useless effort, some bone ids are not the same for every model
             // https://cdn.discordapp.com/attachments/829304849027170305/916477147261051000/unknown.png
             for (int pos = HITBOX_HEAD; pos < HITBOX_MAX; pos++)

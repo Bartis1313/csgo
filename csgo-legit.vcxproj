@@ -190,11 +190,14 @@
     </ClCompile>
     <ClCompile Include="cheats\menu\GUI\Button.cpp" />
     <ClCompile Include="cheats\menu\GUI\CheckBox.cpp" />
+    <ClCompile Include="cheats\menu\GUI\ColorPicker.cpp" />
     <ClCompile Include="cheats\menu\GUI\drawing.cpp" />
     <ClCompile Include="cheats\menu\GUI\Element.cpp" />
     <ClCompile Include="cheats\menu\GUI\GroupBox.cpp" />
     <ClCompile Include="cheats\menu\GUI\gui.cpp" />
+    <ClCompile Include="cheats\menu\GUI\KeyHolder.cpp" />
     <ClCompile Include="cheats\menu\GUI\MultiBox.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Silder.cpp" />
     <ClCompile Include="cheats\menu\GUI\Tab.cpp" />
     <ClCompile Include="cheats\menu\GUI\TextInput.cpp" />
     <ClCompile Include="cheats\menu\GUI\TextureHolder.cpp" />

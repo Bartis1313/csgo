@@ -173,7 +173,7 @@ std::string utilities::getKeyName(UINT virtualKey)
 #ifdef _DEBUG
 	UINT scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
 #else
-	UINT scanCode = LF(MapVirtualKeyA).caached()(virtualKey, MAPVK_VK_TO_VSC);
+	UINT scanCode = LF(MapVirtualKeyA).cached()(virtualKey, MAPVK_VK_TO_VSC);
 #endif
 
 	// because MapVirtualKey strips the extended bit for some keys

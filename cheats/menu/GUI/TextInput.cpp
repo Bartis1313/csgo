@@ -3,8 +3,8 @@
 
 bool GUI::TextInput::m_inited = false;
 
-std::array<std::string, 254> GUI::TextInput::m_smallLetters = {  };
-std::array<std::string, 254> GUI::TextInput::m_bigLetters = {  };
+std::array<std::string, 256> GUI::TextInput::m_smallLetters;
+std::array<std::string, 256> GUI::TextInput::m_bigLetters;
 
 GUI::TextInput::TextInput(const std::string& title, const int x, const int y, const int width, const int height,
 	const Color& color, const Color& secColor, std::string* text)
@@ -75,7 +75,7 @@ void GUI::TextInput::draw()
 			m_text->pop_back();
 		}
 
-		for (int i = 0; i < 255; i++)
+		for (short i = 0; i < 256; i++)
 		{
 			// should skip some useless keys here
 
@@ -121,13 +121,21 @@ void GUI::TextInput::draw()
 		toDraw = toDraw.substr(0, 18).append("...");
 	}
 
-	render::text(globals::menuX + m_X + (m_width / 2), globals::menuY + m_Y + 3, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Color(150, 150, 150, 255));
+	if (toDraw.empty())
+	{
+		toDraw = "...";
+	}
+
+	render::text(globals::menuX + m_X + (m_width / 2), globals::menuY + m_Y + 3, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Colors::White);
 }
 
 void GUI::TextInput::initTabs()
 {
 #define FILL_SMALL(idx) m_smallLetters.at(idx) = utilities::toLowerCase(utilities::getKeyName(idx))
 #define FILL_BIG(idx) m_bigLetters.at(idx) = utilities::getKeyName(idx)
+
+	std::fill(m_smallLetters.begin(), m_smallLetters.end(), "");
+	std::fill(m_bigLetters.begin(), m_bigLetters.end(), "");
 
 	// space
 	FILL_SMALL(0x20) = " ";

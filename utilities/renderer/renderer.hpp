@@ -47,5 +47,10 @@ namespace render
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
 	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
 	_NODISCARD int getTextSize(const unsigned long font, const std::string& text);
+	_NODISCARD Vector2D getTextSizeXY(const unsigned long font, const std::string& text);
 	_NODISCARD bool worldToScreen(const Vector& in, Vector& out);
+	void initNewTexture(int& id, Color* RGBA, const int w, const int h);
+	void initNewTexture(int& id, unsigned char* RGBA, const int w, const int h);
+	// color argument is very sometimes needed, because texture is mostly supposed to be all filled
+	void drawFromTexture(const int id, const int x, const int y, const int w, const int h, const Color& color);
 }
