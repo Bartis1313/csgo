@@ -175,7 +175,7 @@ public:
 		float g = (std::clamp<int>(clr[1], 0, 255) / 255.0f);
 		float b = (std::clamp<int>(clr[2], 0, 255) / 255.0f);
 		float max = std::max(std::max(r, g), b);
-		float min = std::max(std::max(r, g), b);
+		float min = std::min(std::min(r, g), b);
 		float delta = max - min;
 
 		if (!delta)
