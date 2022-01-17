@@ -222,7 +222,7 @@ void render::drawPolyLine(const int count, Vertex_t* verts, const Color& color)
 
 void render::drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal)
 {
-	static auto gradient = [=](const Color& color, unsigned int alpha1, unsigned int alpha2)
+	auto gradient = [=](const Color& color, unsigned int alpha1, unsigned int alpha2)
 	{
 		interfaces::surface->drawSetColor(color);
 		interfaces::surface->drawFilledFadeRect(x, y, w, h, alpha1, alpha2, horizontal);

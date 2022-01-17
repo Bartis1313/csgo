@@ -65,9 +65,9 @@ void GUI::ColorPicker::draw()
 					Color::fromHSB(j / 150.0f, 1.0f, 1.0f);
 				*reinterpret_cast<Color*>(m_alphaBar.get() + i + j * SLIDER_SIZE) =
 					Color(0, 0, 0, j / static_cast<float>(COLOR_PICKER_SIZE) / 255.0f);
-			}		
+			}
 		}
-		
+
 		// init the color pick, unfortunately surface spamming rectangles isn't very good idea, it would need to init once again after each change
 		// did not test the performance after the change.
 		for (int i = 0; i < COLOR_PICKER_SIZE; i++)
@@ -81,7 +81,7 @@ void GUI::ColorPicker::draw()
 		}
 		render::initNewTexture(m_gradientID, m_gradient.get(), COLOR_PICKER_SIZE, COLOR_PICKER_SIZE);
 		render::initNewTexture(m_textureHUEID, m_hueBar.get(), SLIDER_SIZE, COLOR_PICKER_SIZE);
-		render::initNewTexture(m_textureALPHAID, m_alphaBar.get(), SLIDER_SIZE, COLOR_PICKER_SIZE);	
+		render::initNewTexture(m_textureALPHAID, m_alphaBar.get(), SLIDER_SIZE, COLOR_PICKER_SIZE);
 	}
 
 	render::drawFromTexture(m_gradientID, 900, 300, COLOR_PICKER_SIZE, COLOR_PICKER_SIZE, Colors::White);
