@@ -1,28 +1,27 @@
-#include "gui.hpp"
+#include "MultiBox.hpp"
 
-GUI::MultiBox::MultiBox(const std::string& title, const int x, const int y, const int width, const int height,
-	const std::vector<std::string>& names, const Color& color, const Color& secColor, std::vector<bool>* feature)
-	: m_title{ title }, m_names{ names }, m_color{ color }, m_secColor{ secColor }, m_listedOptions{ feature }
+GUI::MultiBox::MultiBox(const std::string& title, const std::vector<std::string>& names, std::vector<bool>* feature)
+	: m_title{ title }, m_names{ names }, m_listedOptions{ feature }
 {
-	setPos(x, y, width, height);
+	setElement(MULTIBOX_WIDTH, MULTIBOX_HEIGHT);
 }
 
-void GUI::MultiBox::draw()
+void GUI::MultiBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 {
 	if (m_names.empty())
 		return;
 
 	// range of first window, showing what feature is represented
-	bool isInRange = isMouseInRange(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height);
+	bool isInRange = isMouseInRange(pos->x, pos->y, m_width, m_height);
 
 	// text on up with padding
-	render::text(globals::menuX + m_X, globals::menuY + m_Y - 15, fonts::menuFont, m_title, false, Colors::White);
+	render::text(pos->x, pos->y - 15, fonts::menuFont, m_title, false, Colors::White);
 
-	render::drawGradient(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height, m_color,
-		(isInRange || this->isActive()) ? Color(m_color.r() + 30, m_color.g() + 30, m_color.b() + 30, m_color.a()) : m_secColor, false);
+	render::drawGradient(pos->x, pos->y, m_width, m_height, Color(30, 30, 30, 255),
+		(isInRange || this->isActive()) ? Color(60, 60, 60, 255) : Color(40, 40, 40, 255), false);
 
-	render::drawOutlineRect(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height, Colors::Black);
-	
+	render::drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
+
 	// copy of argument
 	std::vector<bool> options = *m_listedOptions;
 
@@ -45,7 +44,7 @@ void GUI::MultiBox::draw()
 		}
 	}
 
-	render::text(globals::menuX + m_X + (m_width / 2), globals::menuY + m_Y + 3, fonts::menuFont, !allText.empty() ? allText : "...", true,
+	render::text(pos->x + (m_width / 2), pos->y + 3, fonts::menuFont, !allText.empty() ? allText : "...", true,
 		this->isActive() ? Colors::LightBlue : Colors::White);
 
 	// when active, change box to be not active
@@ -81,13 +80,18 @@ void GUI::MultiBox::draw()
 
 	if (this->isActive())
 	{
+		if (!skipCall)
+		{
+			parent->skip(this, pos);
+		}
+
 		// draw background for features
-		render::drawFilledRect(globals::menuX + m_X, globals::menuY + m_Y + m_height, m_width, (m_names.size() * m_height), m_secColor);
+		render::drawFilledRect(pos->x, pos->y + m_height, m_width, (m_names.size() * m_height), Color(40, 40, 40, 255));
 
 		for (int i = 0; i < m_names.size(); i++)
 		{
-			int x = globals::menuX + m_X;
-			int y = globals::menuY + m_Y + m_height + (i * m_height);
+			int x = pos->x;
+			int y = pos->y + m_height + (i * m_height);
 
 			// if single rectangle representing feature was hovered
 			bool isInSingleBox = isMouseInRange(x, y, m_width, m_height);
@@ -105,7 +109,7 @@ void GUI::MultiBox::draw()
 			// draw shadow on hovered feature
 			if (isInSingleBox)
 			{
-				render::drawFilledRect(x, y, m_width, m_height, m_color);
+				render::drawFilledRect(x, y, m_width, m_height, Color(30, 30, 30, 255));
 			}
 
 			render::text(x + (m_width / 2), y + 3, fonts::menuFont, m_names.at(i), true,
@@ -124,8 +128,10 @@ void GUI::MultiBox::draw()
 			m_active = false;
 		}
 
-		render::drawOutlineRect(globals::menuX + m_X, globals::menuY + m_Y + m_height - 1, m_width, (m_names.size() * m_height) + 1, Colors::Black);
+		render::drawOutlineRect(pos->x, pos->y + m_height - 1, m_width, (m_names.size() * m_height) + 1, Colors::Black);
 	}
+
+	pos->y += 40;
 }
 
 bool GUI::MultiBox::isActive() const

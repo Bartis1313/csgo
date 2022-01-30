@@ -3,6 +3,8 @@
 #include "../dependencies/xorstr.hpp"
 #include "console/console.hpp"
 #include <string>
+#include <span>
+#include <algorithm>
 
 class Entity_t;
 struct Box;
@@ -37,6 +39,20 @@ namespace utilities
     size_t inByteOrder(const size_t netLong);
     std::string getKeyName(UINT virtualKey);
     std::string toLowerCase(const std::string& str);
+    // return filled array
+    template<typename T, size_t howMany>
+    std::span<T> getFilledArray(const T& toFill)
+    {
+        std::span<T> toReturn(howMany);
+        std::fill(toReturn.begin(), toReturn.begin() + howMany, toFill);
+        return toReturn;
+    }
+    // make argument as filled
+    template<typename T>
+    void fillArray(std::span<T>& arr, const T& toFill)
+    {
+        std::fill(arr.begin(), arr.end(), toFill);
+    }
 }
 
 inline std::string __DOCUMENTS = utilities::getFolder();

@@ -478,22 +478,15 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 
 	float fovDist = std::sqrt(dy * dy + dp * dp);
 	bool check = ent->isPossibleToSee(game::localPlayer, game::localPlayer->getEyePos());
-	// do not overdraw multiple time same info in same place
-	int renderCheck1 = 0;
-	int renderCheck2 = 0;
 
 	// hardcoded, when enemies use 3rd cam or some fov changer, it won't be accurate
 	if (check && fovDist <= 60.0f)
 	{
-		if(renderCheck1 == 1)
-			render::text(x / 2, 60, fonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
-		renderCheck1++;
+		render::text(x / 2, 60, fonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
 	}
 	// in the moment when enemy aims through walls, don't check trace
 	if (fovDist <= 5.0f)
 	{
-		if(renderCheck2 == 1)
-			render::text(x / 2, 80, fonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
-		renderCheck2++;
+		render::text(x / 2, 80, fonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
 	}
 }

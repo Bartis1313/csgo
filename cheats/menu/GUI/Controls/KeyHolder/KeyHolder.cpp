@@ -1,11 +1,11 @@
-#include "gui.hpp"
-#include <map>
+#include "KeyHolder.hpp"
+#include "../../../../../utilities/utilities.hpp"
 
-GUI::KeyHolder::KeyHolder(const std::string& title, const int x, const int y, const int width, const int height,
-	const Color& color, const Color& secColor, int* key)
-	: m_title{ title }, m_color{ color }, m_secColor{ secColor }, m_key{ key }
+GUI::KeyHolder::KeyHolder(const std::string& title, int* key)
+	: m_title{ title }, m_key{ key }
 {
-	setPos(x, y, width, height);
+	setElement(KEYHOLDER_WIDTH, KEYHOLDER_HEIGHT);
+	setPadding(0);
 }
 
 // some banned keys
@@ -19,7 +19,7 @@ constexpr bool isbadKey(const short key)
 	return false;
 }
 
-void GUI::KeyHolder::draw()
+void GUI::KeyHolder::draw(Vector2D* pos, Menu* parent, bool skipCall)
 {
 	// only on start
 	std::string name = "init";
@@ -54,7 +54,7 @@ void GUI::KeyHolder::draw()
 	// to align better? yes
 	Vector2D textSize = render::getTextSizeXY(fonts::menuFont, name);
 
-	bool isInRange = isMouseInRange(globals::menuX + m_X - textSize.x, globals::menuY + m_Y, textSize.x, textSize.y + 3);
+	bool isInRange = isMouseInRange(pos->x - textSize.x, pos->y, textSize.x, textSize.y + 3);
 
 	if (isKeyPressed(VK_LBUTTON) && isInRange)
 	{
@@ -63,9 +63,9 @@ void GUI::KeyHolder::draw()
 
 	// isGettingKey can be this->isActive() in this case, soon it will be patched with extras
 
-	render::drawFilledRect(globals::menuX + m_X - textSize.x, globals::menuY + m_Y, textSize.x + 6, textSize.y + 3,
+	render::drawFilledRect(pos->x - textSize.x, pos->y, textSize.x + 6, textSize.y + 3,
 		Colors::Black, Color(80, 80, 80, 255));
-	render::text(globals::menuX + m_X + 3 - textSize.x, globals::menuY + m_Y + 2, fonts::menuFont,
+	render::text(pos->x + 3 - textSize.x, pos->y + 2, fonts::menuFont,
 		isGettingKey ? "..." : name, false, isGettingKey ? Colors::LightBlue : Color(180, 180, 180, 255));
 }
 

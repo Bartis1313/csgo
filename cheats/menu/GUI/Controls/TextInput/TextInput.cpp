@@ -1,4 +1,5 @@
-#include "gui.hpp"
+#include "TextInput.hpp"
+#include "../../../../../utilities/utilities.hpp"
 #include <chrono>
 
 bool GUI::TextInput::m_inited = false;
@@ -6,11 +7,11 @@ bool GUI::TextInput::m_inited = false;
 std::array<std::string, 256> GUI::TextInput::m_smallLetters;
 std::array<std::string, 256> GUI::TextInput::m_bigLetters;
 
-GUI::TextInput::TextInput(const std::string& title, const int x, const int y, const int width, const int height,
-	const Color& color, const Color& secColor, std::string* text)
-	: m_title{ title }, m_color{ color }, m_secColor{ secColor }, m_text{ text }
+GUI::TextInput::TextInput(const std::string& title, std::string* text)
+	: m_title{ title }, m_text{ text }
 {
-	setPos(x, y, width, height);
+	setElement(TEXTINPUT_WIDTH, TEXTINPUT_HEIGHT);
+	setPadding(40);
 }
 
 constexpr bool isbadKey(const short key)
@@ -27,23 +28,23 @@ constexpr auto timeSinceEpoch = []() -> long long
 	return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now().time_since_epoch()).count();
 };
 
-void GUI::TextInput::draw()
+void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 {
 	if (!m_inited)
 		return;
 
 	static long long timer = 0LL;
-	// static float timerBackSpace = 0LL; -> problems with making rules for that
+	// static long long timerBackSpace = 0LL; -> problems with making rules for that
 
-	bool isInRange = isMouseInRange(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height);
+	bool isInRange = isMouseInRange(pos->x, pos->y, m_width, m_height);
 
 	// text on up with padding
-	render::text(globals::menuX + m_X, globals::menuY + m_Y - 15, fonts::menuFont, m_title, false, Colors::White);
+	render::text(pos->x, pos->y - 15, fonts::menuFont, m_title, false, Colors::White);
 
-	render::drawGradient(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height, m_color,
+	render::drawGradient(pos->x, pos->y, m_width, m_height, m_color,
 		(isInRange || this->isActive()) ? Color(m_color.r() + 30, m_color.g() + 30, m_color.b() + 30, m_color.a()) : m_secColor, false);
 
-	render::drawOutlineRect(globals::menuX + m_X, globals::menuY + m_Y, m_width, m_height, Colors::Black);
+	render::drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
 
 	static bool toChange = false;
 	static auto check = [this]() -> void
@@ -126,7 +127,9 @@ void GUI::TextInput::draw()
 		toDraw = "...";
 	}
 
-	render::text(globals::menuX + m_X + (m_width / 2), globals::menuY + m_Y + 3, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Colors::White);
+	render::text(pos->x + (m_width / 2), pos->y + 3, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Colors::White);
+
+	pos->y += this->getPadding();
 }
 
 void GUI::TextInput::initTabs()

@@ -7,7 +7,8 @@
 #include "source.hpp"
 #include "cheats/features/visuals/chams.hpp"
 #include "cheats/globals.hpp"
-#include "cheats/menu/GUI/gui.hpp"
+#include "cheats/menu/GUI/drawing.hpp"
+#include "cheats/menu/GUI/Controls/TextInput/TextInput.hpp"
 #include <thread>
 
 using namespace std::literals;
@@ -28,9 +29,9 @@ DWORD WINAPI init(PVOID instance)
         interfaces::init();
         NetvarManager::g().init();
         NetvarManager::g().dump();
-        test::init();
         render::init();
         GUI::TextInput::initTabs();
+        GUI::initGui();
         hooks::init();
     }
     catch (const std::runtime_error& err)

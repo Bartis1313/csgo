@@ -4,26 +4,26 @@
 int Item::count = 0;
 
 Item::Item(const std::string& id, int* ref, const std::array<int, 2>& limits) : 
-	m_ID{id},
-	m_iVal{ref},
-	m_Limits{limits}
+	m_ID{ id },
+	m_iVal{ ref },
+	m_Limits{ limits }
 {
 	m_isInt = true;
 	count++;
 }
 
 Item::Item(const std::string& id, bool* ref) :
-	m_ID{id},
-	m_bVal{ref}
+	m_ID{ id },
+	m_bVal{ ref }
 {
 	m_isbool = true;
 	count++;
 }
 
 Item::Item(const std::string& id, int* ref, const std::vector<std::string>& vec) :
-	m_ID{id},
-	m_Options{std::cref(vec)},
-	m_iVal{ref}
+	m_ID{ id },
+	m_Options{ vec },
+	m_iVal{ ref }
 {
 	m_isVec = true;
 	count++;

@@ -452,17 +452,25 @@ void render::drawBox3D(const std::array<Vector, 8>& box, const Color& color, boo
 void render::initNewTexture(int& id, Color* RGBA, const int w, const int h)
 {
 	id = interfaces::surface->createNewTextureID(true);
-	interfaces::surface->setTextureRGBA(id, RGBA, w, h);
+	if(id)
+		interfaces::surface->setTextureRGBA(id, RGBA, w, h);
+	else
+		throw std::runtime_error(std::format(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
 }
-
 void render::initNewTexture(int& id, unsigned char* RGBA, const int w, const int h)
 {
 	id = interfaces::surface->createNewTextureID(true);
-	interfaces::surface->setTextureRGBA(id, RGBA, w, h);
+	if (id)
+		interfaces::surface->setTextureRGBA(id, RGBA, w, h);
+	else
+		throw std::runtime_error(std::format(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
 }
 
 void render::drawFromTexture(const int id, const int x, const int y, const int w, const int h, const Color& color)
 {
+	if (!interfaces::surface->isTextureValid(id))
+		return;
+
 	interfaces::surface->drawSetColor(color);
 	interfaces::surface->setTextureId(id);
 	interfaces::surface->drawTexturedRect(x, y, x + w, y + h);

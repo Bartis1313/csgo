@@ -79,6 +79,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.1.9 - very small update. Added check for paint hook, implemented idea of gui.
 * 1.2.0 - update to gui and few fixes in random files. (broke the git again..., lol)
 * 1.2.1 - GUI update with finishing ideas of everything, recode is still needed for automatic padding for GUI objects or add ideally add flags to choose.
+* 1.2.2 - Big GUI update, it now can use auto padding, changed few comments to make it easier to understand in whole code. Still it needs few fixes.
 </details>
 
 # People who helped

@@ -1,11 +1,12 @@
 #include "hooks.hpp"
-#include "../menu/menu.hpp"
+#include "../menu/menuX88.hpp"
 #include "../features/visuals/player.hpp"
 #include "../features/aimbot/aimbot.hpp"
 #include "../features/visuals/world.hpp"
 #include "../features/visuals/radar.hpp"
 #include "../features/misc/misc.hpp"
-#include "../menu/GUI/gui.hpp"
+#include "../menu/GUI/drawing.hpp"
+#include "../globals.hpp"
 
 #pragma region "Paint Helpers"
 bool shouldReloadsFonts()
@@ -41,17 +42,17 @@ void guiStates()
 #ifdef _DEBUG
 	for (short i = 0; i < 256; i++)
 	{
-		GUI::globals::previousKeyState[i] = GUI::globals::keyState[i];
-		GUI::globals::keyState[i] = GetAsyncKeyState(i);
+		globals::previousKeyState[i] = globals::keyState[i];
+		globals::keyState[i] = static_cast<bool>(GetAsyncKeyState(i));
 	}
 #else
 	for (short i = 0; i < 256; i++)
 	{
-		GUI::globals::previousKeyState[i] = GUI::globals::keyState[i];
-		GUI::globals::keyState[i] = LF(GetAsyncKeyState).cached()(i);
+		globals::previousKeyState[i] = globals::keyState[i];
+		globals::keyState[i] = static_cast<bool>(LF(GetAsyncKeyState).cached()(i));
 	}
 #endif
-	interfaces::surface->getCursor(GUI::globals::mouseX, GUI::globals::mouseY);
+	interfaces::surface->getCursor(globals::mouseX, globals::mouseY);
 }
 
 #pragma endregion
@@ -90,6 +91,6 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		misc::drawCrosshair();
 		// testing image, all good
 		//test::run();
-		GUI::renderGUI::test();
+		GUI::draw();
 	}
 }

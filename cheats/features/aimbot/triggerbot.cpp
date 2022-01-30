@@ -37,7 +37,7 @@ void triggerbot::run(CUserCmd* cmd)
 	static auto delay = interfaces::globalVars->m_realtime;
 	const auto current = interfaces::globalVars->m_realtime;
 
-	// because this time is lower than ms, when using chrono, you can cast to ms so it's more flexible
+	// because this time is in seconds, so delay must be /1000 (s->ms), when using chrono, you can cast to ms so it's more flexible
 	if ((current - delay) < static_cast<float>(vars::iTriggerDelay / 1000.0f))
 		return;
 

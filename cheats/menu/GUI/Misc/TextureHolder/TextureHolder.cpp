@@ -1,13 +1,18 @@
 #include "TextureHolder.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../dependencies/lodepng.h"
-#include "../../../resource.h"
-#include "../../globals.hpp"
+#include "../../../../../utilities/renderer/renderer.hpp"
+#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../dependencies/lodepng.h"
+#include "../../../../globals.hpp"
 #include <format>
 
 TextureHolder::TextureHolder(const unsigned short resourceID)
 {
 	HRSRC hResInfo = LF(FindResourceA)(globals::instance, MAKEINTRESOURCEA(resourceID), XOR("PNG"));
+
+	// yes, because I get unlimited questions why crash on inject !!!!11111...
+	if (!hResInfo)
+		throw std::runtime_error(XOR("hResInfo returned nullptr, impossible to continue"));
+
 	HGLOBAL hResData = LF(LoadResource)(globals::instance, hResInfo);
 	unsigned char* hResPtr = reinterpret_cast<unsigned char*>(LF(LockResource)(hResData));
 	size_t size = LF(SizeofResource)(globals::instance, hResInfo);
@@ -23,19 +28,12 @@ TextureHolder::TextureHolder(const unsigned short resourceID)
 
 	std::copy(vecImage.cbegin(), vecImage.cend(), data.get());
 
-	m_textureID = interfaces::surface->createNewTextureID(true);
-	if (m_textureID)
-		interfaces::surface->setTextureRGBA(m_textureID, data.get(), m_width, m_height);
-	else
-		throw std::runtime_error(std::format(XOR("setTextureRGBA failed to create new texture, ID was: {}"), resourceID));
+	render::initNewTexture(m_textureID, data.get(), m_width, m_height);
+
+	LOG(LOG_INFO, std::format(XOR("loaded texture ID - {} without error"), m_textureID));
 };
 
 void TextureHolder::draw(const int x, const int y)
 {
-	if (!interfaces::surface->isTextureValid(m_textureID))
-		return;
-
-	interfaces::surface->drawSetColor(Colors::White);
-	interfaces::surface->setTextureId(m_textureID);
-	interfaces::surface->drawTexturedRect(x, y, x + m_width, y + m_height);
+	render::drawFromTexture(m_textureID, x, y, m_width, m_height, Colors::White);
 };

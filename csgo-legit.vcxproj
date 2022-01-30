@@ -188,24 +188,24 @@
     <ClCompile Include="cheats\hooks\paintTraverse.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\menu\GUI\Button.cpp" />
-    <ClCompile Include="cheats\menu\GUI\CheckBox.cpp" />
-    <ClCompile Include="cheats\menu\GUI\ColorPicker.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\Button\Button.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\CheckBox\CheckBox.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\ColorPicker\ColorPicker.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\ComboBox\ComboBox.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\Group\Group.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\KeyHolder\KeyHolder.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\MultiBox\MultiBox.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\Slider\Slider.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\Tab\Tab.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\TextInput\TextInput.cpp" />
     <ClCompile Include="cheats\menu\GUI\drawing.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Element.cpp" />
-    <ClCompile Include="cheats\menu\GUI\GroupBox.cpp" />
-    <ClCompile Include="cheats\menu\GUI\gui.cpp" />
-    <ClCompile Include="cheats\menu\GUI\KeyHolder.cpp" />
-    <ClCompile Include="cheats\menu\GUI\MultiBox.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Silder.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Tab.cpp" />
-    <ClCompile Include="cheats\menu\GUI\TextInput.cpp" />
-    <ClCompile Include="cheats\menu\GUI\TextureHolder.cpp" />
-    <ClCompile Include="cheats\menu\GUI\window.cpp" />
+    <ClCompile Include="cheats\menu\GUI\mainMenu.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Misc\guimisc.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Misc\TextureHolder\TextureHolder.cpp" />
     <ClCompile Include="cheats\menu\Item.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\menu\menu.cpp">
+    <ClCompile Include="cheats\menu\menuX88.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="config\config.cpp">
@@ -310,10 +310,25 @@
     <ClInclude Include="cheats\game.hpp" />
     <ClInclude Include="cheats\globals.hpp" />
     <ClInclude Include="cheats\hooks\hooks.hpp" />
-    <ClInclude Include="cheats\menu\GUI\gui.hpp" />
-    <ClInclude Include="cheats\menu\GUI\TextureHolder.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\Button\Button.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\CheckBox\CheckBox.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\ColorPicker\ColorPicker.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\ComboBox\ComboBox.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\Element\Element.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\Group\Group.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\KeyHolder\KeyHolder.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\Lining\Lining.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\MultiBox\MultiBox.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\Slider\Slider.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\Tab\Tab.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\TextInput\TextInput.hpp" />
+    <ClInclude Include="cheats\menu\GUI\drawing.hpp" />
+    <ClInclude Include="cheats\menu\GUI\mainMenu.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Misc\guimisc.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Misc\TextureHolder\TextureHolder.hpp" />
+    <ClInclude Include="cheats\menu\GUI\sizes.hpp" />
     <ClInclude Include="cheats\menu\Item.hpp" />
-    <ClInclude Include="cheats\menu\menu.hpp" />
+    <ClInclude Include="cheats\menu\menuX88.hpp" />
     <ClInclude Include="cheats\menu\vars.hpp" />
     <ClInclude Include="dependencies\lodepng.h" />
     <ClInclude Include="dependencies\minhook\buffer.h" />

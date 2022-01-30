@@ -46,7 +46,9 @@ namespace render
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
 	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
+	// width only
 	_NODISCARD int getTextSize(const unsigned long font, const std::string& text);
+	// width and height
 	_NODISCARD Vector2D getTextSizeXY(const unsigned long font, const std::string& text);
 	_NODISCARD bool worldToScreen(const Vector& in, Vector& out);
 	void initNewTexture(int& id, Color* RGBA, const int w, const int h);

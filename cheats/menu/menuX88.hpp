@@ -16,6 +16,7 @@ public:
 	void drawInt(int idx, int x, int& y);
 	void drawVec(int idx, int x, int& y);
 	void drawOption(int idx, int x, int& y);
+	// should delete this later and use keys from GUI namespace due to useless function calls
 	void handleKeys() const;
 private:
 	Item* settings = vars::options;
