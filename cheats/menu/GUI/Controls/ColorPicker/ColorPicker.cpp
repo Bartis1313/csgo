@@ -79,7 +79,7 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	}
 
 	// always draw it in the menu
-	render::drawGradient(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2 , 15, 8, *m_colorNow, Colors::Black, false);
+	render::drawGradient(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2, 15, 8, Color(*m_colorNow, m_alphaForColor), Color(Colors::Black, m_alphaForColor), false, false);
 	render::drawOutlineRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2- 1, 15 + 1, 8 + 1, Colors::Black);
 	
 	bool isInRangeButton = isMouseInRange(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y, 15, 8);
@@ -108,8 +108,6 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	int x = parent->getX() + parent->getWidth() + parent->getThickness() + 7;
 	int y = parent->getY() + 5;
 
-	bool isInSpectrumRange = isMouseInRange(x, y, m_width + SLIDER_WIDTH + SLIDER_WIDTH, m_height);
-
 	if (this->isActive())
 	{
 		if (!skipCall)
@@ -117,16 +115,18 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			parent->skip(this, pos);
 		}
 
-		if (isKeyPressed(VK_LBUTTON) && !(isInRangeButton || isInSpectrumRange) && !toSkip)
+		// to move from rect bit to draw
+		x += 4;
+
+		bool isInPickerRange = isMouseInRange(x, y - 5, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 12, m_height + 10);
+
+		if (isKeyPressed(VK_LBUTTON) && !(isInRangeButton || isInPickerRange) && !toSkip)
 			m_active = false;
 
 		// rects so it doesn't look raw
-		render::drawFilledRect(x, y - 5, m_width + SLIDER_WIDTH + 10, m_height + 30, Color(50, 50, 50, 255));
-		render::drawOutlineRect(x, y - 5, m_width + SLIDER_WIDTH + 10, m_height + 30, Colors::Black);
-		render::drawOutlineRect(x + 1, y - 4, m_width + SLIDER_WIDTH + 8, m_height + 28, Color(80, 80, 80, 255));
-		// was bored and this text pos is hardcoded
-		render::text(x + 25, y + m_height + 5, fonts::menuFont, std::format(XOR("Color({}, {}, {}, {})"),
-			m_colorNow->r(), m_colorNow->g(), m_colorNow->b(), m_colorNow->a()), false, *m_colorNow);
+		render::drawFilledRect(x, y - 5, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 12, m_height + 10, Color(50, 50, 50, 255));
+		render::drawOutlineRect(x, y - 5, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 12, m_height + 10, Colors::Black);
+		render::drawOutlineRect(x + 1, y - 4, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 10, m_height + 8, Color(80, 80, 80, 255));
 
 		// to move from rect bit to draw
 		x += 4;
@@ -134,16 +134,23 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		render::drawFromTexture(m_gradientID, x, y, m_width, m_height, Colors::White);
 		render::drawFilledRect(x + m_width, y, 2, m_height, Color(50, 50, 50, 255));
 		render::drawFromTexture(m_hueID, x + m_width + 2, y, SLIDER_WIDTH, m_height, Colors::White);
+		render::drawGradient(x + m_width + SLIDER_WIDTH + 4, y, SLIDER_WIDTH, m_height, Colors::White, Colors::Black, false);
 		// should draw it better, easiest is to use gradients from surface
 		//render::drawFromTexture(m_textureALPHAID, x + COLOR_PICKER_SIZE + SLIDER_SIZE, y, SLIDER_SIZE, m_height, Colors::White);
 
 		// + 2 look up^
 		bool isInHueRange = isMouseInRange(x + 2 + m_width, y, SLIDER_WIDTH, m_height);
+		// + 4, same, just look up
+		bool isInAlphaRange = isMouseInRange(x + m_width + SLIDER_WIDTH + 4, y, SLIDER_WIDTH, m_height);
 
 		// change BROKEN pos, gotta fix it
 		if (isKeyDown(VK_LBUTTON) && isMouseInRange(x, y, m_width, m_height))
 		{
-			*m_colorNow = getColorFromSpectrum(globals::mouseX - x, globals::mouseY - y);
+			*m_colorNow = Color(
+				getColorFromSpectrum(globals::mouseX - x, globals::mouseY - y).r(),
+				getColorFromSpectrum(globals::mouseX - x, globals::mouseY - y).g(),
+				getColorFromSpectrum(globals::mouseX - x, globals::mouseY - y).b(),
+				m_alphaForColor);
 
 			mousePointX = globals::mouseX;
 			mousePointY = globals::mouseY;
@@ -157,21 +164,23 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		render::drawFilledRect(mousePointX, mousePointY, 4, 4, Colors::LightBlue);
 		render::drawOutlineRect(mousePointX, mousePointY, 4, 4, Colors::Black);
 
-		if (isKeyDown(VK_LBUTTON) && isMouseInRange(x + m_width + 2, y, SLIDER_WIDTH, m_height))
-		{
-			// should be detected by hue's but my cursor is brokey and gotta fix it
-			m_levelHue = 255 * (globals::mouseY - y) / m_height;
-		}
-
 		// if in hue bar range, then first delete old rgba bitmap or whatever u gonna call it, and init new
 		if (isInHueRange && isKeyDown(VK_LBUTTON))
 		{
+			// should be detected by hue's but my cursor is brokey and gotta fix it
+			m_levelHue = 255 * (globals::mouseY - y) / m_height;
+
 			for (int i = 0; i < m_width; i++)
 			{
 				for (int j = 0; j < m_height; j++)
 				{
 					*reinterpret_cast<Color*>(m_gradient.get() + i + j * m_width) =
-						Color::fromHSB(Color::getHueFromColor(getColorFromHueBar(globals::mouseX - (x + 2 + m_width), globals::mouseY - y)),
+						Color::fromHSB(Color::getHueFromColor(
+							Color(
+								getColorFromHueBar(globals::mouseX - (x + 2 + m_width), globals::mouseY - y).r(),
+								getColorFromHueBar(globals::mouseX - (x + 2 + m_width), globals::mouseY - y).g(),
+								getColorFromHueBar(globals::mouseX - (x + 2 + m_width), globals::mouseY - y).b(),
+								m_alphaForColor)),
 							j / static_cast<float>(m_width), i / static_cast<float>(m_width));
 				}
 			}
@@ -181,20 +190,38 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			render::initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
 		}
 
+		if (isInAlphaRange && isKeyDown(VK_LBUTTON))
+		{
+			m_levelAlpha = 255 * (globals::mouseY - y) / m_height;
+
+			m_alphaForColor = 255 - m_levelAlpha;
+		}
+
 		// to align
-		float posYPAD = (m_levelHue / 255.0f) * m_height;
+		float posYHue = (m_levelHue / 255.0f) * m_height;
 		// single check to clamp, to not show it in outlines
-		if (posYPAD > m_height - 2)
-			posYPAD -= 2;
+		if (posYHue > m_height - 2)
+			posYHue -= 2;
+
+		float posYAlpha = (m_levelAlpha / 255.0f) * m_height;
+		// single check to clamp, to not show it in outlines
+		if (posYAlpha > m_height - 2)
+			posYAlpha -= 2;
 
 		//render::drawGradient(vecAlphaPos.x, vecAlphaPos.y, vecAlphaSize.x, vecAlphaSize.y, Color(255, 255, 255), Color(0, 0, 0), false);
 
 		// rgb hue stuff
-		render::drawFilledRect(x + m_width + 2 + 1, y + posYPAD + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
+		render::drawFilledRect(x + m_width + 2 + 1, y + posYHue + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
+		// alpha slider stuff
+		render::drawFilledRect(x + m_width + SLIDER_WIDTH + 4 + 1, y + posYAlpha + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
 		// hue slider outline, + 2 due to rect between them
-		render::drawOutlineRect(x + m_width + 2, y + posYPAD, SLIDER_WIDTH, 3, Colors::Black);
+		render::drawOutlineRect(x + m_width + 2, y + posYHue, SLIDER_WIDTH, 3, Colors::Black);
+		// alpha slider
+		render::drawOutlineRect(x + m_width + SLIDER_WIDTH + 4, y + posYAlpha, SLIDER_WIDTH, 3, Colors::Black);
 		// outline for whole hue rect
 		render::drawOutlineRect(x + 2 + m_width, y, SLIDER_WIDTH, m_height, Colors::Black);
+		// outline for whole alpha rect
+		render::drawOutlineRect(x + 4 + m_width + SLIDER_WIDTH, y, SLIDER_WIDTH, m_height, Colors::Black);
 		// color spectrum outline
 		render::drawOutlineRect(x, y, m_width, m_height, Colors::Black);
 	}

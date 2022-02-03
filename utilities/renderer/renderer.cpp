@@ -221,7 +221,7 @@ void render::drawPolyLine(const int count, Vertex_t* verts, const Color& color)
 }
 
 // https://www.unknowncheats.me/forum/counterstrike-global-offensive/189418-medical-attention-gradients-surface.html got fixed gradient blend from there
-void render::drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal)
+void render::drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal, bool blend)
 {
 	auto gradient = [=](const Color& clr, bool reversed)
 	{
@@ -233,7 +233,7 @@ void render::drawGradient(const int x, const int y, const int w, const int h, co
 			horizontal ? true : false);
 	};
 
-	auto blend = [](const Color& first, const Color& second, float t)
+	auto blendColor = [](const Color& first, const Color& second, float t)
 	{
 		return Color(
 			first.r() + t * (second.r() - first.r()),
@@ -242,7 +242,8 @@ void render::drawGradient(const int x, const int y, const int w, const int h, co
 			first.a() + t * (second.a() - first.a()));
 	};
 
-	drawFilledRect(x, y, w, h, blend(first, second, 0.5f));
+	if (blend)
+		drawFilledRect(x, y, w, h, blendColor(first, second, 0.5f));
 	gradient(first, true);
 	gradient(second, false);
 }
