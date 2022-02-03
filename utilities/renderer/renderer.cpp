@@ -220,24 +220,31 @@ void render::drawPolyLine(const int count, Vertex_t* verts, const Color& color)
 	drawPolyLine(x, y, count, color);
 }
 
+// https://www.unknowncheats.me/forum/counterstrike-global-offensive/189418-medical-attention-gradients-surface.html got fixed gradient blend from there
 void render::drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal)
 {
-	auto gradient = [=](const Color& color, unsigned int alpha1, unsigned int alpha2)
+	auto gradient = [=](const Color& clr, bool reversed)
 	{
-		interfaces::surface->drawSetColor(color);
-		interfaces::surface->drawFilledFadeRect(x, y, w, h, alpha1, alpha2, horizontal);
+		interfaces::surface->drawSetColor(clr);
+		interfaces::surface->drawFilledFadeRect(
+			x, y, w, h,
+			reversed ? clr.a() : 0,
+			reversed ? 0 : clr.a(),
+			horizontal ? true : false);
 	};
 
-	if (!horizontal)
+	auto blend = [](const Color& first, const Color& second, float t)
 	{
-		gradient(first, 255, 255);
-		gradient(second, 0, 255);
-	}
-	else if (horizontal)
-	{
-		gradient(first, 255, 0);
-		gradient(second, 0, 255);
-	}
+		return Color(
+			first.r() + t * (second.r() - first.r()),
+			first.g() + t * (second.g() - first.g()),
+			first.b() + t * (second.b() - first.b()),
+			first.a() + t * (second.a() - first.a()));
+	};
+
+	drawFilledRect(x, y, w, h, blend(first, second, 0.5f));
+	gradient(first, true);
+	gradient(second, false);
 }
 
 void render::text(const int x, const int y, const unsigned long font, const wchar_t* text, const bool centered, const Color& color)
