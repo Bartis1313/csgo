@@ -7,7 +7,7 @@
 #define SLIDER_WIDTH 20
 
 GUI::ColorPicker::ColorPicker(Color* color)
-	: m_colorNow{ color }
+	: m_colorNow{ color }, m_alphaForColor{ m_colorNow->a() }
 {
 	setElement(COLORPICKER_WIDTH, COLORPICKER_HEIGHT);
 	setPadding(0);

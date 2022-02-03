@@ -32,6 +32,6 @@ namespace GUI
 		int mousePointY;
 		int m_levelHue = 0;
 		int m_levelAlpha = 0;
-		uint8_t m_alphaForColor = 255;
+		uint8_t m_alphaForColor;
 	};
 }
