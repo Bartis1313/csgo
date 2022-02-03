@@ -187,6 +187,13 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			interfaces::surface->deleteTextureID(m_gradientID);
 			// and create new, this is valid way? I think so
 			render::initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
+
+			// should update color too, but mousePos is to fix
+			*m_colorNow = Color(
+				getColorFromSpectrum(mousePointX - x, mousePointY - y).r(),
+				getColorFromSpectrum(mousePointX - x, mousePointY - y).g(),
+				getColorFromSpectrum(mousePointX - x, mousePointY - y).b(),
+				m_alphaForColor);
 		}
 
 		if (isInAlphaRange && isKeyDown(VK_LBUTTON))
@@ -206,8 +213,6 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		// single check to clamp, to not show it in outlines
 		if (posYAlpha > m_height - 2)
 			posYAlpha -= 2;
-
-		//render::drawGradient(vecAlphaPos.x, vecAlphaPos.y, vecAlphaSize.x, vecAlphaSize.y, Color(255, 255, 255), Color(0, 0, 0), false);
 
 		// rgb hue stuff
 		render::drawFilledRect(x + m_width + 2 + 1, y + posYHue + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
