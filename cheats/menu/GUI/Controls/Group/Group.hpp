@@ -8,6 +8,9 @@
 #include "../Slider/Slider.hpp"
 #include "../ColorPicker/ColorPicker.hpp"
 #include "../Lining/Lining.hpp"
+#include "../HelpMarker/HelpMarker.hpp"
+
+class Color;
 
 namespace GUI
 {
@@ -23,14 +26,15 @@ namespace GUI
 		void addComboBox(const std::string& title, const std::vector<std::string>& names, int* option);
 		void addMultiBox(const std::string& title, const std::vector<std::string>& names, std::vector<bool>* feature);
 		void addTextInput(const std::string& title, std::string* text);
-		void addKeyHolder(const std::string& title, int* key);
+		void addKeyHolder(int* key);
 		void addSlider(const std::string& title, std::pair<float, float> minMax, float* value);
-		void addColorPicker(const std::string& title, Color* color);
+		void addColorPicker(Color* color);
+		void addHelpMarker(const std::string& text);
 
 		void draw(Vector2D* pos, Menu* parent);
+		void shutdown();
 	private:
 		std::string m_name;
-		Tab* m_parent;
 		// add it later, to overload or do smth
 		int m_height;
 		// useless ?

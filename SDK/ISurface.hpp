@@ -30,10 +30,11 @@ public:
 	VFUNC(void, setTextColor, 24, (Color color), (this, color));
 	VFUNC(void, drawTexturedPolygon, 106, (int n, Vertex_t* vertice, bool clip = true), (this, n, vertice, clip));
 	VFUNC(void, drawFilledRectangle, 16, (int x, int y, int w, int h), (this, x, y, x + w, y + h));
-	VFUNC(void, setTextureId, 38, (int id), (this, id));
+	VFUNC(void, drawSetTexture, 38, (int id), (this, id));
 	VFUNC(void, setTextureRGBA, 37, (int id, const unsigned char* rgba, int wide, int tall), (this, id, rgba, wide, tall));
 	VFUNC(void, setTextureRGBA, 37, (int id, Color* rgba, int wide, int tall), (this, id, rgba, wide, tall));
 	VFUNC(int, createNewTextureID, 43, (bool procedural = false), (this, procedural));
+	VFUNC(bool, deleteTextureID, 39, (int id), (this, id));
 	VFUNC(void, drawOutlinedRect, 18, (int x, int y, int w, int h), (this, x, y, x + w, y + h));
 	VFUNC(void, drawLine, 19, (int x1, int y1, int x2, int y2), (this, x1, y1, x2, y2));
 	VFUNC(void, drawPolyLine, 20, (int* px, int* py, int numPoints), (this, px, py, numPoints));

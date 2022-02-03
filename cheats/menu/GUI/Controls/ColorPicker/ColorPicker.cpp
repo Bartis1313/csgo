@@ -1,31 +1,24 @@
 #include "ColorPicker.hpp"
 #include "../../../../globals.hpp"
+#include "../../../../../SDK/interfaces/interfaces.hpp"
 
-std::unique_ptr<Color[]> GUI::ColorPicker::m_gradient = nullptr;
-std::unique_ptr<Color[]> GUI::ColorPicker::m_alphaBar = nullptr;
-std::unique_ptr<Color[]> GUI::ColorPicker::m_hueBar = nullptr;
-
-int GUI::ColorPicker::m_gradientID = 0;
-int GUI::ColorPicker::m_textureALPHAID = 0;
-int GUI::ColorPicker::m_textureHUEID = 0;
-
-// because it's rectangle and using this names as height or width can confuse why
+// because it's square and using this names as height or width can confuse why
 #define COLOR_PICKER_SIZE COLORPICKER_HEIGHT
-//#define SLIDER_SIZE 20
+#define SLIDER_WIDTH 20
 
-GUI::ColorPicker::ColorPicker(const std::string& title, Color* color)
-	: m_title{ title }, m_colorNow{ color }
+GUI::ColorPicker::ColorPicker(Color* color)
+	: m_colorNow{ color }
 {
 	setElement(COLORPICKER_WIDTH, COLORPICKER_HEIGHT);
 	setPadding(0);
+	m_type = COLOR_PICKER;
 }
 
 void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 {
-	// ghetto is to spam gradients by multiplying 25.5? probably the same way but less effective and even longer to render
-
-	//happens only once, because static
-	if (!m_gradient)
+	// old method can run this as static, because it same for every object
+	/* 
+	* if (!m_gradient)
 	{
 		m_gradient = std::make_unique<Color[]>(m_width * m_height);
 
@@ -49,17 +42,52 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 
 		render::initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
 	}
+	*/
 
-	render::drawGradient(pos->x, pos->y, m_width, m_height, *m_colorNow, Colors::Black, false);
-	render::drawOutlineRect(pos->x - 1, pos->y - 1, m_width + 1, m_height + 1, Colors::Black);
 
-	bool isInRangeButton = isMouseInRange(pos->x, pos->y, m_width, m_height);
+	// first init, just pick any from those 3 bitmaps
+	if (!m_gradient)
+	{
+		m_gradient = std::make_unique<Color[]>(m_width * m_height);
+		m_hueBar = std::make_unique<Color[]>(m_width * SLIDER_WIDTH);
+		//m_alphaBar = std::make_unique<Color[]>(COLOR_PICKER_SIZE * SLIDER_SIZE);
 
-	static bool toChange = false;
-	static auto check = [this]() -> void
+		// init the bars
+		for (int i = 0; i < SLIDER_WIDTH; i++)
+		{
+			for (int j = 0; j < m_height; j++)
+			{
+				*reinterpret_cast<Color*>(m_hueBar.get() + i + j * SLIDER_WIDTH) =
+					Color::fromHSB(j / 150.0f, 1.0f, 1.0f);
+				//*reinterpret_cast<Color*>(m_alphaBar.get() + i + j * SLIDER_SIZE) =
+				//	Color(0, 0, 0, j / static_cast<float>(COLOR_PICKER_SIZE) * 255.0f);
+			}
+		}
+
+		for (int i = 0; i < m_width; i++)
+		{
+			for (int j = 0; j < m_height; j++)
+			{
+				*reinterpret_cast<Color*>(m_gradient.get() + i + j * m_width) =
+					Color::fromHSB(Color::getHueFromColor(*m_colorNow),
+						j / static_cast<float>(m_width), i / static_cast<float>(m_width));
+			}
+		}
+		render::initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
+		render::initNewTexture(m_hueID, m_hueBar.get(), SLIDER_WIDTH, m_height);
+		//render::initNewTexture(m_alphaID, m_alphaBar.get(), SLIDER_SIZE, COLOR_PICKER_SIZE);
+	}
+
+	// always draw it in the menu
+	render::drawGradient(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2 , 15, 8, *m_colorNow, Colors::Black, false);
+	render::drawOutlineRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2- 1, 15 + 1, 8 + 1, Colors::Black);
+	
+	bool isInRangeButton = isMouseInRange(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y, 15, 8);
+
+	auto check = [this]() -> void
 	{
 		m_active = !m_active;
-		toChange = false;
+		m_toChange = false;
 	};
 
 	// whenever we click the main box to show list of features
@@ -67,82 +95,129 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 
 	if (isKeyPressed(VK_LBUTTON) && isInRangeButton)
 	{
-		if (toChange)
+		if (m_toChange)
 			check();
 		toSkip = true;
 	}
 	else if (isInRangeButton)
 	{
-		toChange = true;
+		m_toChange = true;
 	}
 
-	int x = pos->x + 100;
-	int y = pos->y;
+	// why? idk, I already added the skipCall so you can draw it anywhere you want
+	int x = parent->getX() + parent->getWidth() + parent->getThickness() + 7;
+	int y = parent->getY() + 5;
 
-	bool isInSpectrumRange = isMouseInRange(x, y, m_width, m_height);
+	bool isInSpectrumRange = isMouseInRange(x, y, m_width + SLIDER_WIDTH + SLIDER_WIDTH, m_height);
 
 	if (this->isActive())
 	{
+		if (!skipCall)
+		{
+			parent->skip(this, pos);
+		}
+
 		if (isKeyPressed(VK_LBUTTON) && !(isInRangeButton || isInSpectrumRange) && !toSkip)
-			m_active = !m_active;
+			m_active = false;
+
+		// rects so it doesn't look raw
+		render::drawFilledRect(x, y - 5, m_width + SLIDER_WIDTH + 10, m_height + 30, Color(50, 50, 50, 255));
+		render::drawOutlineRect(x, y - 5, m_width + SLIDER_WIDTH + 10, m_height + 30, Colors::Black);
+		render::drawOutlineRect(x + 1, y - 4, m_width + SLIDER_WIDTH + 8, m_height + 28, Color(80, 80, 80, 255));
+		// was bored and this text pos is hardcoded
+		render::text(x + 25, y + m_height + 5, fonts::menuFont, std::format(XOR("Color({}, {}, {}, {})"),
+			m_colorNow->r(), m_colorNow->g(), m_colorNow->b(), m_colorNow->a()), false, *m_colorNow);
+
+		// to move from rect bit to draw
+		x += 4;
 
 		render::drawFromTexture(m_gradientID, x, y, m_width, m_height, Colors::White);
+		render::drawFilledRect(x + m_width, y, 2, m_height, Color(50, 50, 50, 255));
+		render::drawFromTexture(m_hueID, x + m_width + 2, y, SLIDER_WIDTH, m_height, Colors::White);
+		// should draw it better, easiest is to use gradients from surface
+		//render::drawFromTexture(m_textureALPHAID, x + COLOR_PICKER_SIZE + SLIDER_SIZE, y, SLIDER_SIZE, m_height, Colors::White);
 
-		if (isKeyDown(VK_LBUTTON) && isInSpectrumRange)
+		// + 2 look up^
+		bool isInHueRange = isMouseInRange(x + 2 + m_width, y, SLIDER_WIDTH, m_height);
+
+		// change BROKEN pos, gotta fix it
+		if (isKeyDown(VK_LBUTTON) && isMouseInRange(x, y, m_width, m_height))
 		{
-			*m_colorNow = getColorFromPos(globals::mouseX - x, globals::mouseY - y);
+			*m_colorNow = getColorFromSpectrum(globals::mouseX - x, globals::mouseY - y);
+
+			mousePointX = globals::mouseX;
+			mousePointY = globals::mouseY;
 		}
-	}
 
-	// second method, which maybe look nicer, but may cost performance a lot
-	/*
-	if (!m_gradient)
-	{
-		m_gradient = std::make_unique<Color[]>(COLOR_PICKER_SIZE * COLOR_PICKER_SIZE);
-		m_hueBar = std::make_unique<Color[]>(COLOR_PICKER_SIZE * SLIDER_SIZE);
-		m_alphaBar = std::make_unique<Color[]>(COLOR_PICKER_SIZE * SLIDER_SIZE);
+		// don't go crazy with values, -4 because rect to draw has this width
+		mousePointX = std::clamp(mousePointX, x, x + m_width - 4);
+		mousePointY = std::clamp(mousePointY, y, y + m_width - 4);
 
-		// init the bars
-		for (int i = 0; i < SLIDER_SIZE; i++)
+		// render small 4x4 rectangle, this gotta be fixed with pos btw
+		render::drawFilledRect(mousePointX, mousePointY, 4, 4, Colors::LightBlue);
+		render::drawOutlineRect(mousePointX, mousePointY, 4, 4, Colors::Black);
+
+		if (isKeyDown(VK_LBUTTON) && isMouseInRange(x + m_width + 2, y, SLIDER_WIDTH, m_height))
 		{
-			for (int j = 0; j < COLOR_PICKER_SIZE; j++)
+			// should be detected by hue's but my cursor is brokey and gotta fix it
+			m_levelHue = 255 * (globals::mouseY - y) / m_height;
+		}
+
+		// if in hue bar range, then first delete old rgba bitmap or whatever u gonna call it, and init new
+		if (isInHueRange && isKeyDown(VK_LBUTTON))
+		{
+			for (int i = 0; i < m_width; i++)
 			{
-				*reinterpret_cast<Color*>(m_hueBar.get() + i + j * SLIDER_SIZE) =
-					Color::fromHSB(j / 150.0f, 1.0f, 1.0f);
-				*reinterpret_cast<Color*>(m_alphaBar.get() + i + j * SLIDER_SIZE) =
-					Color(0, 0, 0, j / static_cast<float>(COLOR_PICKER_SIZE) / 255.0f);
+				for (int j = 0; j < m_height; j++)
+				{
+					*reinterpret_cast<Color*>(m_gradient.get() + i + j * m_width) =
+						Color::fromHSB(Color::getHueFromColor(getColorFromHueBar(globals::mouseX - (x + 2 + m_width), globals::mouseY - y)),
+							j / static_cast<float>(m_width), i / static_cast<float>(m_width));
+				}
 			}
+			// then delete old
+			interfaces::surface->deleteTextureID(m_gradientID);
+			// and create new, this is valid way? I think so
+			render::initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
 		}
 
-		// init the color pick, unfortunately surface spamming rectangles isn't very good idea, it would need to init once again after each change
-		// did not test the performance after the change.
-		for (int i = 0; i < COLOR_PICKER_SIZE; i++)
-		{
-			for (int j = 0; j < COLOR_PICKER_SIZE; j++)
-			{
-				*reinterpret_cast<Color*>(m_gradient.get() + i + j * COLOR_PICKER_SIZE) =
-					Color::fromHSB(Color::getHueFromColor(Colors::Black),
-						j / static_cast<float>(COLOR_PICKER_SIZE), i / static_cast<float>(COLOR_PICKER_SIZE));
-			}
-		}
-		render::initNewTexture(m_gradientID, m_gradient.get(), COLOR_PICKER_SIZE, COLOR_PICKER_SIZE);
-		render::initNewTexture(m_textureHUEID, m_hueBar.get(), SLIDER_SIZE, COLOR_PICKER_SIZE);
-		render::initNewTexture(m_textureALPHAID, m_alphaBar.get(), SLIDER_SIZE, COLOR_PICKER_SIZE);
+		// to align
+		float posYPAD = (m_levelHue / 255.0f) * m_height;
+		// single check to clamp, to not show it in outlines
+		if (posYPAD > m_height - 2)
+			posYPAD -= 2;
+
+		//render::drawGradient(vecAlphaPos.x, vecAlphaPos.y, vecAlphaSize.x, vecAlphaSize.y, Color(255, 255, 255), Color(0, 0, 0), false);
+
+		// rgb hue stuff
+		render::drawFilledRect(x + m_width + 2 + 1, y + posYPAD + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
+		render::drawOutlineRect(x + m_width + 2, y + posYPAD, SLIDER_WIDTH, 3, Colors::Black);
+		// hue slider outline, + 2 due to rect between them
+		render::drawOutlineRect(x + 2 + m_width, y, SLIDER_WIDTH, m_height, Colors::Black);
+		// color spectrum outline
+		render::drawOutlineRect(x, y, m_width, m_height, Colors::Black);
 	}
-
-	render::drawFromTexture(m_gradientID, 900, 300, COLOR_PICKER_SIZE, COLOR_PICKER_SIZE, Colors::White);
-	render::drawFromTexture(m_textureALPHAID, 200, 300, SLIDER_SIZE, COLOR_PICKER_SIZE, Colors::White);
-	render::drawFromTexture(m_textureHUEID, 100, 300, SLIDER_SIZE, COLOR_PICKER_SIZE, Colors::White);
-	*/
 }
 
-Color GUI::ColorPicker::getColorFromPos(const int x, const int y)
+Color GUI::ColorPicker::getColorFromSpectrum(const int x, const int y)
 {
-	//printf("x is = %i y is = %i and index to gradient = %i\n", x, y, y * COLOR_PICKER_SIZE);
 	return *reinterpret_cast<Color*>(m_gradient.get() + x + y * COLOR_PICKER_SIZE);
 }
 
-bool GUI::ColorPicker::isActive() const
+Color GUI::ColorPicker::getColorFromHueBar(const int x, const int y)
+{
+	return *reinterpret_cast<Color*>(m_hueBar.get() + x + y * SLIDER_WIDTH);
+}
+
+bool GUI::ColorPicker::isActive()
 {
 	return m_active;
+}
+
+// when you use 1st method to draw colorpicker, then make it static and call once
+void GUI::ColorPicker::destroy()
+{
+	interfaces::surface->deleteTextureID(m_gradientID);
+	interfaces::surface->deleteTextureID(m_hueID);
+	//interfaces::surface->deleteTextureID(m_alphaID);
 }

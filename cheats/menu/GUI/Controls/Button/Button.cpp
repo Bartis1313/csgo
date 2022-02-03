@@ -4,33 +4,37 @@ GUI::Button::Button(const std::string& title, const std::function<void()>& lambd
 	: m_title{ title }, m_lamda{ lambda }
 {
 	setElement(BUTTON_WIDTH, BUTTON_HEIGHT);
-	setPadding(25);
+	setPadding(m_height + 5);
+	m_type = BUTTON;
 }
 
 void GUI::Button::draw(Vector2D* pos, Menu* parent, bool skipCall)
 {
-	bool isInRange = isMouseInRange(pos->x, pos->y, m_width, m_height);
+	bool isInRange = isMouseInRange(pos->x + PAD_TEXT_X, pos->y, m_width, m_height);
 
 	if (isInRange && isKeyPressed(VK_LBUTTON))
 	{
 		m_lamda();
-
 		//printf("zmeinilo\n");
 	}
 
-	render::drawGradient(pos->x, pos->y, m_width, m_height,
-		Color(50, 120, 220, 255), Colors::Black, false);
+	render::drawGradient(pos->x + PAD_TEXT_X, pos->y, m_width, m_height, Color(30, 30, 30, 255),
+		isInRange ? Color(60, 60, 60, 255) : Color(40, 40, 40, 255), false);
 
-	render::drawOutlineRect(pos->x + 1, pos->y + 1, m_width - 2, m_height - 2, isInRange ? Color(50, 120, 220, 255) : Color(50, 120, 180, 255));
+	// should just make some delayed active to make it look cool, this is to add
+	//if (this->isActive())
+	//	render::drawFilledRect(pos->x + PAD_TEXT_X, pos->y, m_width, m_height, Colors::Grey);
 
-	if (isInRange)
-		render::drawFilledRect(pos->x, pos->y, m_width, m_height, Colors::Grey);
-
-	render::drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
+	render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y, m_width, m_height, Colors::Black);
 
 	// TODO: add better calculation based on font
-	render::text(pos->x + (m_width / 2), pos->y + 2, fonts::menuFont, m_title, true,
-		isInRange ? Color(200, 170, 70, 255) : Colors::White);
+	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 2, fonts::menuFont, m_title, true,
+		isInRange ? Colors::White : Color(200, 220, 200, 200));
 
 	pos->y += this->getPadding();
+}
+
+bool GUI::Button::isActive()
+{
+	return m_active;
 }

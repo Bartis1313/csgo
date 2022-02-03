@@ -8,10 +8,10 @@ namespace GUI
 	{
 	public:
 		CheckBox(const std::string& title, bool* feature);
-		_NODISCARD bool isActive() const;
 		virtual void draw(Vector2D* pos, Menu* parent, bool skipCall = false) override;
+		_NODISCARD virtual bool isActive() override;
 	private:
-		bool m_active;
+		bool m_active = false;
 		bool* m_feature;
 		std::string m_title;
 	};

@@ -10,11 +10,11 @@ namespace GUI
 		// init some smaller groupbox, this one will only allow to select ONE feature
 		ComboBox(const std::string& title, const std::vector<std::string>& names, int* option);
 		virtual void draw(Vector2D* pos, Menu* parent, bool skipCall = false) override;
-		_NODISCARD bool isActive() const;
+		_NODISCARD virtual bool isActive() override;
 		_NODISCARD bool isOptionOn() const;
 	private:
 		std::string m_title;
-		bool m_active;
+		bool m_active = false;
 		std::vector<std::string> m_names;
 		int* m_option;
 	};

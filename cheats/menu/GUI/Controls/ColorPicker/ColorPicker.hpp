@@ -7,20 +7,27 @@ namespace GUI
 	class ColorPicker : public Element
 	{
 	public:
-		ColorPicker(const std::string& title, Color* color);
+		ColorPicker(Color* color);
 		virtual void draw(Vector2D* pos, Menu* parent, bool skipCall = false) override;
-		bool isActive() const;
+		_NODISCARD virtual bool isActive() override;
+		virtual void destroy() override;
 	private:
-		static std::unique_ptr<Color[]> m_gradient;
-		static std::unique_ptr<Color[]> m_alphaBar;
-		static std::unique_ptr<Color[]> m_hueBar;
+		// shouldn't be static for 2nd method
+		std::unique_ptr<Color[]> m_gradient = nullptr;
+		std::unique_ptr<Color[]> m_alphaBar = nullptr;
+		std::unique_ptr<Color[]> m_hueBar = nullptr;
 
-		static int m_gradientID;
-		static int m_textureALPHAID;
-		static int m_textureHUEID;
+		int m_gradientID;
+		int m_alphaID;
+		int m_hueID;
 		std::string m_title;
-		bool m_active;
-		Color getColorFromPos(const int x, const int y);
+		bool m_active = false;
+		// those both work like bitmap color detection
+		Color getColorFromSpectrum(const int x, const int y);
+		Color getColorFromHueBar(const int x, const int y);
 		Color* m_colorNow;
+		int mousePointX;
+		int mousePointY;
+		int m_levelHue = 0;
 	};
 }

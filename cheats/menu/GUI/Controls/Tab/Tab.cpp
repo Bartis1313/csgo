@@ -18,3 +18,11 @@ void GUI::Tab::draw(Vector2D* pos)
 		el->draw(pos, m_parent);
 	}
 }
+
+void GUI::Tab::shutdown()
+{
+	for (const auto& el : m_groups)
+	{
+		el->shutdown();
+	}
+}

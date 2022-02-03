@@ -22,6 +22,7 @@ namespace GUI
 		// this will only draw CONTENT on selected tab
 		void draw(Vector2D* pos);
 		void setParent(Menu* addr) { m_parent = addr; }
+		void shutdown();
 
 		_NODISCARD std::string getName() const { return m_name; }
 		_NODISCARD Menu* getParent() const { return m_parent; }

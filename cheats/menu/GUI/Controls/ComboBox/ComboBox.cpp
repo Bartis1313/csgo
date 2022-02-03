@@ -4,7 +4,8 @@ GUI::ComboBox::ComboBox(const std::string& title, const std::vector<std::string>
 	: m_title{ title }, m_names{ names }, m_option{ option }
 {
 	setElement(COMBOBOX_WIDTH, COMBOBOX_HEIGHT);
-	setPadding(40);
+	setPadding(m_height + 18);
+	m_type = COMBOBOX;
 }
 
 void GUI::ComboBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
@@ -13,22 +14,21 @@ void GUI::ComboBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		return;
 
 	// range of first window, showing what feature is represented
-	bool isInRange = isMouseInRange(pos->x, pos->y, m_width, m_height);
+	bool isInRange = isMouseInRange(pos->x, pos->y + 15, m_width, m_height);
 
 	// text on up with padding
-	render::text(pos->x, pos->y - 15, fonts::menuFont, m_title, false, Colors::White);
+	render::text(pos->x + PAD_TEXT_X, pos->y, fonts::menuFont, m_title, false, this->isActive() ? Colors::White : Color(200, 220, 200, 200));
 
-	render::drawGradient(pos->x, pos->y, m_width, m_height, Color(30, 30, 30, 255),
+	render::drawGradient(pos->x + PAD_TEXT_X, pos->y + 15, m_width, m_height, Color(30, 30, 30, 255),
 		(isInRange || this->isActive()) ? Color(60, 60, 60, 255) : Color(40, 40, 40, 255), false);
 
-	render::drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
+	render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + 15, m_width, m_height, Colors::Black);
 
 	// when active, change box to be not active
-	static bool toChange = false;
-	static auto check = [this]() -> void
+	auto check = [this]() -> void
 	{
 		m_active = !m_active;
-		toChange = false;
+		m_toChange = false;
 	};
 
 	// whenever we click the main box to show list of features
@@ -36,18 +36,19 @@ void GUI::ComboBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 
 	if (isKeyPressed(VK_LBUTTON) && isInRange)
 	{
-		if (toChange)
+		if (m_toChange)
 			check();
 		toSkip = true;
 	}
 	else if (isInRange)
 	{
-		toChange = true;
+		m_toChange = true;
 	}
 
 	// displays ... when the feature is empty
-	render::text(pos->x + (m_width / 2), pos->y + 3, fonts::menuFont, this->isOptionOn() ? m_names.at(*m_option) : "...",
-		true, this->isActive() ? Colors::LightBlue : Colors::White);
+	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 15 + 3, fonts::menuFont, this->isOptionOn() ? m_names.at(*m_option) : "...",
+		true, this->isActive() ? Colors::LightBlue : Color(200, 220, 200, 200));
+
 
 	if (this->isActive())
 	{
@@ -57,12 +58,12 @@ void GUI::ComboBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		}
 
 		// draw background for features
-		render::drawFilledRect(pos->x, pos->y + m_height, m_width, (m_names.size() * m_height), Color(40, 40, 40, 255));
+		render::drawFilledRect(pos->x + PAD_TEXT_X, pos->y + 15 + m_height, m_width, (m_names.size() * m_height), Color(40, 40, 40, 255));
 
 		for (int i = 0; i < m_names.size(); i++)
 		{
-			int x = pos->x;
-			int y = pos->y + m_height + (i * m_height);
+			int x = pos->x + PAD_TEXT_X;
+			int y = pos->y + 15 + m_height + (i * m_height);
 
 			// if single rectangle representing feature was hovered
 			bool isInSingleBox = isMouseInRange(x, y, m_width, m_height);
@@ -95,18 +96,20 @@ void GUI::ComboBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			}
 		}
 
-		if (isKeyPressed(VK_LBUTTON) && !toSkip)
+		bool isInBoxRange = isMouseInRange(pos->x + PAD_TEXT_X, pos->y + m_height + 15, m_width, (m_names.size() * m_height));
+
+		if (isKeyPressed(VK_LBUTTON) && !toSkip && !isInBoxRange)
 		{
 			m_active = false;
 		}
 
-		render::drawOutlineRect(pos->x, pos->y + m_height - 1, m_width, (m_names.size() * m_height) + 1, Colors::Black);
+		render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + m_height - 1 + 15, m_width, (m_names.size() * m_height) + 1, Colors::Black);
 	}
 
 	pos->y += this->getPadding();
 }
 
-bool GUI::ComboBox::isActive() const
+bool GUI::ComboBox::isActive()
 {
 	return m_active;
 }

@@ -7,12 +7,13 @@ namespace GUI
 	class KeyHolder : public Element
 	{
 	public:
-		KeyHolder(const std::string& title, int* key);
+		KeyHolder(int* key);
 		virtual void draw(Vector2D* pos, Menu* parent, bool skipCall = false) override;
-		_NODISCARD bool isActive() const;
+		_NODISCARD virtual bool isActive() override;
 	private:
 		std::string m_title;
-		bool m_active;
+		bool m_active = false;
+		bool m_isGettingKey = false;
 		int* m_key;
 	};
 }

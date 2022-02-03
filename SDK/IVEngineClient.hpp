@@ -58,4 +58,5 @@ public:
 	VFUNC(VMatrix&, worldToScreenMatrix, 37, (), (this));
 	VFUNC(const char*, getLevelName, 53, (), (this));
 	VFUNC(INetChannelInfo*, getNameNetChannel, 78, (), (this));
+	VFUNC(bool, isTakingScreenshot, 92, (), (this));
 };

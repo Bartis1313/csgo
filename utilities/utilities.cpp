@@ -5,6 +5,7 @@
 #include "renderer/renderer.hpp"
 #include "../SDK/structs/Entity.hpp"
 #include <optional>
+#include <sstream>
 
 #undef max
 #undef min
@@ -84,7 +85,7 @@ uintptr_t utilities::patternScan(const char* mod, const char* mask)
 
 	for (auto i = 0; i < modInfo.SizeOfImage; i++)
 	{
-		if (static auto check = [](byte* data, const std::vector<std::optional<byte>>& _mask) -> bool
+		if (auto check = [](byte* data, const std::vector<std::optional<byte>>& _mask) -> bool
 			{
 				for (const auto& _byte : _mask)
 				{
@@ -236,4 +237,16 @@ std::string utilities::toLowerCase(const std::string& str)
 			el = ::tolower(el);
 		});
 	return std::move(result);
+}
+
+std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
+{
+	std::vector<std::string> res;
+	std::stringstream content{ str };
+	std::string word;
+	while (std::getline(content, word, limit))
+	{
+		res.emplace_back(word);
+	}
+	return res;
 }

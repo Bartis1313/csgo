@@ -24,7 +24,6 @@ void GUI::Group::addComboBox(const std::string& title, const std::vector<std::st
 
 void GUI::Group::addMultiBox(const std::string& title, const std::vector<std::string>& names, std::vector<bool>* feature)
 {
-	//auto t = std::make_unique<MultiBox>(title, names, feature);
 	auto t = new MultiBox(title, names, feature);
 	m_Elements.emplace_back(t);
 }
@@ -35,9 +34,9 @@ void GUI::Group::addTextInput(const std::string& title, std::string* text)
 	m_Elements.emplace_back(t);
 }
 
-void GUI::Group::addKeyHolder(const std::string& title, int* key)
+void GUI::Group::addKeyHolder(int* key)
 {
-	auto t = new KeyHolder(title, key);
+	auto t = new KeyHolder(key);
 	m_Elements.emplace_back(t);
 }
 
@@ -47,9 +46,15 @@ void GUI::Group::addSlider(const std::string& title, std::pair<float, float> min
 	m_Elements.emplace_back(t);
 }
 
-void GUI::Group::addColorPicker(const std::string& title, Color* color)
+void GUI::Group::addColorPicker(Color* color)
 {
-	auto t = new ColorPicker(title, color);
+	auto t = new ColorPicker(color);
+	m_Elements.emplace_back(t);
+}
+
+void GUI::Group::addHelpMarker(const std::string& text)
+{
+	auto t = new HelpMarker(text);
 	m_Elements.emplace_back(t);
 }
 
@@ -65,8 +70,17 @@ void GUI::Group::draw(Vector2D* pos, Menu* parent)
 	render::text(pos->x, pos->y, fonts::menuFont, m_name, false, Colors::White);
 	pos->y += render::getTextSizeXY(fonts::menuFont, m_name).y + 5;
 
-	for (const auto& control : m_Elements)
-		control->draw(pos, parent);
+	for (const auto& el : m_Elements)
+		el->draw(pos, parent);
 
 	pos->y += GROUPY_PAD;
+}
+
+void GUI::Group::shutdown()
+{
+	for (const auto& el : m_Elements)
+	{
+		if (el->getType() == COLOR_PICKER)
+			el->destroy();
+	}
 }

@@ -193,6 +193,7 @@
     <ClCompile Include="cheats\menu\GUI\Controls\ColorPicker\ColorPicker.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\ComboBox\ComboBox.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\Group\Group.cpp" />
+    <ClCompile Include="cheats\menu\GUI\Controls\HelpMarker\HelpMarker.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\KeyHolder\KeyHolder.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\MultiBox\MultiBox.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\Slider\Slider.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="cheats\menu\GUI\Controls\ComboBox\ComboBox.hpp" />
     <ClInclude Include="cheats\menu\GUI\Controls\Element\Element.hpp" />
     <ClInclude Include="cheats\menu\GUI\Controls\Group\Group.hpp" />
+    <ClInclude Include="cheats\menu\GUI\Controls\HelpMarker\HelpMarker.hpp" />
     <ClInclude Include="cheats\menu\GUI\Controls\KeyHolder\KeyHolder.hpp" />
     <ClInclude Include="cheats\menu\GUI\Controls\Lining\Lining.hpp" />
     <ClInclude Include="cheats\menu\GUI\Controls\MultiBox\MultiBox.hpp" />
@@ -344,6 +346,7 @@
     <ClInclude Include="SDK\CGameMovement.hpp" />
     <ClInclude Include="SDK\ClientMode.hpp" />
     <ClInclude Include="SDK\CPlayerResource.hpp" />
+    <ClInclude Include="SDK\InputSystem.hpp" />
     <ClInclude Include="SDK\misc\misc.hpp" />
     <ClInclude Include="source.hpp" />
     <ClInclude Include="config\config.hpp" />

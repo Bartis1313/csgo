@@ -4,6 +4,7 @@
 #include "console/console.hpp"
 #include <string>
 #include <span>
+#include <vector>
 #include <algorithm>
 
 class Entity_t;
@@ -53,6 +54,7 @@ namespace utilities
     {
         std::fill(arr.begin(), arr.end(), toFill);
     }
+    std::vector<std::string> splitStr(const std::string& str, char limit = ' ');
 }
 
 inline std::string __DOCUMENTS = utilities::getFolder();

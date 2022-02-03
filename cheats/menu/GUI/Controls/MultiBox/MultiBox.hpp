@@ -10,11 +10,12 @@ namespace GUI
 		// init groupbox by many features listed in array
 		MultiBox(const std::string& title, const std::vector<std::string>& names, std::vector<bool>* feature);
 		virtual void draw(Vector2D* pos, Menu* parent, bool skipCall = false) override;
-		_NODISCARD bool isActive() const;
+		_NODISCARD virtual bool isActive() override;
 		_NODISCARD bool isOptionOn(const size_t idx) const;
 	private:
 		std::string m_title;
-		bool m_active;
+		bool m_active = false;
+		bool m_toChangeSingle;
 		std::vector<std::string> m_names;
 		std::vector<bool>* m_listedOptions;
 	};

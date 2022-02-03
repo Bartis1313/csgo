@@ -235,4 +235,5 @@ namespace Colors
 	inline Color Turquoise = Color(60, 210, 200, 255);
 	inline Color Palevioletred = Color(220, 110, 150, 255);
 	inline Color Pink = Color(255, 100, 180, 255);
+	inline Color Coral = Color(255, 127, 80, 255);
 }

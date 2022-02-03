@@ -59,7 +59,7 @@ void hooks::init()
 	Events::g().init();
 
 	const auto status = MH_EnableHook(MH_ALL_HOOKS);
-	if(status != MH_OK)
+	if (status != MH_OK)
 		throw std::runtime_error(XOR("MH_ALL_HOOKS error"));
 	LOG(LOG_INFO, std::format(XOR("MH_ALL_HOOKS -> {}"), MH_StatusToString(status)));
 

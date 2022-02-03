@@ -4,6 +4,8 @@ GUI::MultiBox::MultiBox(const std::string& title, const std::vector<std::string>
 	: m_title{ title }, m_names{ names }, m_listedOptions{ feature }
 {
 	setElement(MULTIBOX_WIDTH, MULTIBOX_HEIGHT);
+	setPadding(m_height + 18);
+	m_type = MULTIBOX;
 }
 
 void GUI::MultiBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
@@ -12,15 +14,15 @@ void GUI::MultiBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		return;
 
 	// range of first window, showing what feature is represented
-	bool isInRange = isMouseInRange(pos->x, pos->y, m_width, m_height);
+	bool isInRange = isMouseInRange(pos->x, pos->y + 15, m_width, m_height);
 
 	// text on up with padding
-	render::text(pos->x, pos->y - 15, fonts::menuFont, m_title, false, Colors::White);
+	render::text(pos->x + PAD_TEXT_X, pos->y, fonts::menuFont, m_title, false, this->isActive() ? Colors::White : Color(200, 220, 200, 200));
 
-	render::drawGradient(pos->x, pos->y, m_width, m_height, Color(30, 30, 30, 255),
+	render::drawGradient(pos->x + PAD_TEXT_X, pos->y + 15, m_width, m_height, Color(30, 30, 30, 255),
 		(isInRange || this->isActive()) ? Color(60, 60, 60, 255) : Color(40, 40, 40, 255), false);
 
-	render::drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
+	render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + 15, m_width, m_height, Colors::Black);
 
 	// copy of argument
 	std::vector<bool> options = *m_listedOptions;
@@ -44,15 +46,14 @@ void GUI::MultiBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		}
 	}
 
-	render::text(pos->x + (m_width / 2), pos->y + 3, fonts::menuFont, !allText.empty() ? allText : "...", true,
-		this->isActive() ? Colors::LightBlue : Colors::White);
+	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 3 + 15, fonts::menuFont, !allText.empty() ? allText : "...", true,
+		this->isActive() ? Colors::LightBlue : Color(200, 220, 200, 200));
 
 	// when active, change box to be not active
-	static bool toChange = false;
-	static auto check = [this]() -> void
+	auto check = [this]() -> void
 	{
 		m_active = !m_active;
-		toChange = false;
+		m_toChange = false;
 	};
 
 	// whenever we click the main box to show list of features
@@ -60,22 +61,19 @@ void GUI::MultiBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 
 	if (isKeyPressed(VK_LBUTTON) && isInRange)
 	{
-		if (toChange)
+		if (m_toChange)
 			check();
 		toSkip = true;
 	}
 	else if (isInRange)
 	{
-		toChange = true;
+		m_toChange = true;
 	}
 
-	// checks for multibox choices, this one needs same way of handling main box of activity
-	static bool toChangeSingle = false;
-
-	static auto checkSingle = [&](const size_t idx) -> void
+	auto checkSingle = [&](const size_t idx) -> void
 	{
 		options.at(idx) = !options.at(idx);
-		toChangeSingle = false;
+		m_toChangeSingle = false;
 	};
 
 	if (this->isActive())
@@ -86,24 +84,24 @@ void GUI::MultiBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		}
 
 		// draw background for features
-		render::drawFilledRect(pos->x, pos->y + m_height, m_width, (m_names.size() * m_height), Color(40, 40, 40, 255));
+		render::drawFilledRect(pos->x + PAD_TEXT_X, pos->y + 15 + m_height, m_width, (m_names.size() * m_height), Color(40, 40, 40, 255));
 
 		for (int i = 0; i < m_names.size(); i++)
 		{
-			int x = pos->x;
-			int y = pos->y + m_height + (i * m_height);
+			int x = pos->x + PAD_TEXT_X;
+			int y = pos->y + 15 + m_height + (i * m_height);
 
 			// if single rectangle representing feature was hovered
 			bool isInSingleBox = isMouseInRange(x, y, m_width, m_height);
 
 			if (isKeyPressed(VK_LBUTTON) && isInSingleBox)
 			{
-				if (toChangeSingle)
+				if (m_toChangeSingle)
 					checkSingle(i);
 			}
 			else if (isInSingleBox)
 			{
-				toChangeSingle = true;
+				m_toChangeSingle = true;
 			}
 
 			// draw shadow on hovered feature
@@ -123,18 +121,20 @@ void GUI::MultiBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 
 		*m_listedOptions = options;
 
-		if (isKeyPressed(VK_LBUTTON) && !toSkip)
+		bool isInBoxRange = isMouseInRange(pos->x + PAD_TEXT_X, pos->y + 15 + m_height, m_width, (m_names.size() * m_height));
+
+		if (isKeyPressed(VK_LBUTTON) && !toSkip && !isInBoxRange)
 		{
 			m_active = false;
 		}
 
-		render::drawOutlineRect(pos->x, pos->y + m_height - 1, m_width, (m_names.size() * m_height) + 1, Colors::Black);
+		render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + 15 + m_height - 1, m_width, (m_names.size() * m_height) + 1, Colors::Black);
 	}
 
-	pos->y += 40;
+	pos->y += this->getPadding();
 }
 
-bool GUI::MultiBox::isActive() const
+bool GUI::MultiBox::isActive()
 {
 	return m_active;
 }

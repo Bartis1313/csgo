@@ -11,7 +11,8 @@ GUI::TextInput::TextInput(const std::string& title, std::string* text)
 	: m_title{ title }, m_text{ text }
 {
 	setElement(TEXTINPUT_WIDTH, TEXTINPUT_HEIGHT);
-	setPadding(40);
+	setPadding(m_height + 5);
+	m_type = TEXT_INPUT;
 }
 
 constexpr bool isbadKey(const short key)
@@ -33,34 +34,30 @@ void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	if (!m_inited)
 		return;
 
-	static long long timer = 0LL;
-	// static long long timerBackSpace = 0LL; -> problems with making rules for that
-
-	bool isInRange = isMouseInRange(pos->x, pos->y, m_width, m_height);
+	bool isInRange = isMouseInRange(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height);
 
 	// text on up with padding
-	render::text(pos->x, pos->y - 15, fonts::menuFont, m_title, false, Colors::White);
+	render::text(pos->x + PAD_TEXT_X, pos->y - 5, fonts::menuFont, m_title, false, this->isActive() ? Colors::White : Color(200, 220, 200, 200));
 
-	render::drawGradient(pos->x, pos->y, m_width, m_height, m_color,
-		(isInRange || this->isActive()) ? Color(m_color.r() + 30, m_color.g() + 30, m_color.b() + 30, m_color.a()) : m_secColor, false);
+	render::drawGradient(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Color(30, 30, 30, 255),
+		(isInRange || this->isActive()) ? Color(60, 60, 60, 255) : Color(40, 40, 40, 255), false);
 
-	render::drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
+	render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Colors::Black);
 
-	static bool toChange = false;
-	static auto check = [this]() -> void
+	auto check = [this]() -> void
 	{
 		m_active = !m_active;
-		toChange = false;
+		m_toChange = false;
 	};
 
 	if (isKeyPressed(VK_LBUTTON) && isInRange)
 	{
-		if (toChange)
+		if (m_toChange)
 			check();
 	}
 	else if (isInRange)
 	{
-		toChange = true;
+		m_toChange = true;
 	}
 
 	if (this->isActive())
@@ -106,11 +103,11 @@ void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	}
 
 	// "blink" effect
-	if (auto now = timeSinceEpoch(); now > timer)
-		timer = now + 1000;
+	if (auto now = timeSinceEpoch(); now > m_timer)
+		m_timer = now + 1000;
 
 	std::string toDraw = *m_text;
-	if (auto size = render::getTextSize(fonts::menuFont, *m_text); this->isActive() && timeSinceEpoch() > timer - 500 && size < m_width - 4)
+	if (auto size = render::getTextSize(fonts::menuFont, *m_text); this->isActive() && timeSinceEpoch() > m_timer - 500 && size < m_width - 4)
 	{
 		toDraw += "|";
 	}
@@ -127,7 +124,7 @@ void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		toDraw = "...";
 	}
 
-	render::text(pos->x + (m_width / 2), pos->y + 3, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Colors::White);
+	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 3 + 10, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Color(200, 220, 200, 200));
 
 	pos->y += this->getPadding();
 }
@@ -200,7 +197,7 @@ void GUI::TextInput::initTabs()
 	m_inited = true;
 }
 
-bool GUI::TextInput::isActive() const
+bool GUI::TextInput::isActive()
 {
 	return m_active;
 }

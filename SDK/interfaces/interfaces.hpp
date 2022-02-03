@@ -37,6 +37,7 @@
 #include "../material.hpp"
 #include "../Recv.hpp"
 #include "../vars.hpp"
+#include "../InputSystem.hpp"
 
 #include "../math/Vector.hpp"
 #include "../UtlVector.hpp"
@@ -121,6 +122,7 @@ namespace interfaces
 	// remember to dereference!
 	inline PlayerResource** resource;
 	inline IVEfx* effects;
+	inline InputSystem* ioSystem;
 
 	bool init();
 }

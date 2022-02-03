@@ -9,6 +9,7 @@ enum hookIndexes
 	OVERRIDE = 18,
 	POSTSCREENEFFECT = 44,
 	FRAMESTAGE = 37,
+	//LOCK_CURSOR = 67, why another hook
 };
 
 namespace hooks

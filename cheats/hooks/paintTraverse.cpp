@@ -62,9 +62,12 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	if (!isValidWindow())
 		return;
 
-	// will run first no matter what, you can edit the function a bit or add ghetto static counter
+	// will run first no matter what, you can hook screensizechanged only for this
 	if (shouldReloadsFonts())
 		render::init();
+
+	if (interfaces::engine->isTakingScreenshot())
+		return;
 
 	if (strstr(interfaces::panel->getName(panel), XOR("HudZoom")))
 	{
@@ -89,8 +92,11 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		world::drawZeusRange();
 		misc::drawNoScope();
 		misc::drawCrosshair();
-		// testing image, all good
-		//test::run();
 		GUI::draw();
+	}
+
+	if (strstr(interfaces::panel->getName(panel), XOR("FocusOverlayPanel")))
+	{
+		interfaces::panel->setMouseInputEnabled(panel, GUI::menu->isOpened());
 	}
 }

@@ -13,7 +13,7 @@
 
 using namespace std::literals;
 
-void WINAPI _shutdown(PVOID instance);
+VOID WINAPI _shutdown(PVOID instance);
 
 DWORD WINAPI init(PVOID instance)
 {
@@ -43,13 +43,14 @@ DWORD WINAPI init(PVOID instance)
     return TRUE;
 }
 
-void WINAPI _shutdown(PVOID instance)
+VOID WINAPI _shutdown(PVOID instance)
 {
     while (!GUI::isKeyDown(VK_DELETE))
     {
         std::this_thread::sleep_for(100ms);
     }
 
+    GUI::menu->shutdown();
     hooks::shutdown();
     console::shutdown();
 

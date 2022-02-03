@@ -472,6 +472,6 @@ void render::drawFromTexture(const int id, const int x, const int y, const int w
 		return;
 
 	interfaces::surface->drawSetColor(color);
-	interfaces::surface->setTextureId(id);
+	interfaces::surface->drawSetTexture(id);
 	interfaces::surface->drawTexturedRect(x, y, x + w, y + h);
 }

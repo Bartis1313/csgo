@@ -23,6 +23,7 @@ enum VTableIndexes
 #define MATERIAL_DLL		XOR("materialsystem.dll")
 #define LOCALIZE_DLL		XOR("localize.dll")
 #define STUDIORENDER_DLL	XOR("studiorender.dll")
+#define INPUTSYSTEM_DLL	XOR("inputsystem.dll")
 
 #define GLOWMANAGER				XOR("0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00")
 #define BEAMS					XOR("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")
