@@ -191,8 +191,9 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 
 		// rgb hue stuff
 		render::drawFilledRect(x + m_width + 2 + 1, y + posYPAD + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
-		render::drawOutlineRect(x + m_width + 2, y + posYPAD, SLIDER_WIDTH, 3, Colors::Black);
 		// hue slider outline, + 2 due to rect between them
+		render::drawOutlineRect(x + m_width + 2, y + posYPAD, SLIDER_WIDTH, 3, Colors::Black);
+		// outline for whole hue rect
 		render::drawOutlineRect(x + 2 + m_width, y, SLIDER_WIDTH, m_height, Colors::Black);
 		// color spectrum outline
 		render::drawOutlineRect(x, y, m_width, m_height, Colors::Black);
