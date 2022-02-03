@@ -132,7 +132,6 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		x += 4;
 
 		render::drawFromTexture(m_gradientID, x, y, m_width, m_height, Colors::White);
-		render::drawFilledRect(x + m_width, y, 2, m_height, Color(50, 50, 50, 255));
 		render::drawFromTexture(m_hueID, x + m_width + 2, y, SLIDER_WIDTH, m_height, Colors::White);
 		render::drawGradient(x + m_width + SLIDER_WIDTH + 4, y, SLIDER_WIDTH, m_height, Colors::White, Colors::Black, false);
 		// should draw it better, easiest is to use gradients from surface
