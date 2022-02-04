@@ -250,3 +250,11 @@ std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
 	}
 	return res;
 }
+
+uintptr_t utilities::getRandomInt(const uintptr_t start, const uintptr_t& end)
+{
+	std::random_device randomdev;
+	std::mt19937 mt(randomdev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist(start, end);
+	return dist(mt);
+}

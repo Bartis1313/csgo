@@ -1,6 +1,7 @@
 #include "hooks.hpp"
 #include "../features/misc/events.hpp"
 #include "../../dependencies/minhook/Minhook.h"
+#include "../../SDK/structs/IDXandPaterrns.hpp"
 #include <format>
 
 inline void* TARGET(void* arg, unsigned int index)
@@ -22,6 +23,22 @@ void hooks::init()
 	const auto overrideViewTarget = TARGET(interfaces::clientMode, overrideView::index);
 	const auto doPostScreenEffectsTarget = TARGET(interfaces::clientMode, doPostScreenEffects::index);
 	const auto frameStageNotifyTarget = TARGET(interfaces::client, frameStageNotify::index);
+
+	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK) + 0x1;
+	const auto offsetClient = *reinterpret_cast<uintptr_t*>(addrClient);
+	const auto clientValidAddrTarget = reinterpret_cast<void*>(addrClient + 0x4 + offsetClient);
+
+	const auto addrEngine = utilities::patternScan(ENGINE_DLL, NEW_CHECK) + 0x1;
+	const auto offsetEngine = *reinterpret_cast<uintptr_t*>(addrEngine);
+	const auto engineValidAddrTarget = reinterpret_cast<void*>(addrEngine + 0x4 + offsetEngine);
+
+	const auto addrStudio = utilities::patternScan(STUDIORENDER_DLL, NEW_CHECK) + 0x1;
+	const auto offsetStudio = *reinterpret_cast<uintptr_t*>(addrStudio);
+	const auto studioValidAddrTarget = reinterpret_cast<void*>(addrStudio + 0x4 + offsetStudio);
+
+	const auto addrMaterial = utilities::patternScan(MATERIAL_DLL, NEW_CHECK) + 0x1;
+	const auto offsetMaterial = *reinterpret_cast<uintptr_t*>(addrMaterial);
+	const auto matertialValidAddrTarget = reinterpret_cast<void*>(addrMaterial + 0x4 + offsetMaterial);
 
 	if (MH_Initialize() != MH_OK)
 		throw std::runtime_error(XOR("MH_Initialize hook error"));
@@ -55,7 +72,27 @@ void hooks::init()
 	if (hk6 != MH_OK)
 		throw std::runtime_error(XOR("frameStageNotify hook error"));
 	LOG(LOG_INFO, std::format(XOR("frameStageNotify -> {}"), MH_StatusToString(hk6)));
-	
+
+	const auto hk7 = MH_CreateHook(clientValidAddrTarget, &clientValidAddr::hooked, ORIGINAL(clientValidAddr::original));
+	if (hk7 != MH_OK)
+		throw std::runtime_error(XOR("clientValidAddr hook error"));
+	LOG(LOG_INFO, std::format(XOR("clientValidAddr -> {}"), MH_StatusToString(hk7)));
+
+	const auto hk8 = MH_CreateHook(engineValidAddrTarget, &engineValidAddr::hooked, ORIGINAL(engineValidAddr::original));
+	if (hk8 != MH_OK)
+		throw std::runtime_error(XOR("engineValidAddr hook error"));
+	LOG(LOG_INFO, std::format(XOR("engineValidAddr -> {}"), MH_StatusToString(hk7)));
+
+	const auto hk9 = MH_CreateHook(studioValidAddrTarget, &studioRenderValidAddr::hooked, ORIGINAL(studioRenderValidAddr::original));
+	if (hk7 != MH_OK)
+		throw std::runtime_error(XOR("studioValidAddr hook error"));
+	LOG(LOG_INFO, std::format(XOR("studioValidAddr -> {}"), MH_StatusToString(hk7)));
+
+	const auto hk10 = MH_CreateHook(matertialValidAddrTarget, &materialSystemValidAddr::hooked, ORIGINAL(materialSystemValidAddr::original));
+	if (hk7 != MH_OK)
+		throw std::runtime_error(XOR("matertialValidAddr hook error"));
+	LOG(LOG_INFO, std::format(XOR("matertialValidAddr -> {}"), MH_StatusToString(hk7)));
+
 	Events::g().init();
 
 	const auto status = MH_EnableHook(MH_ALL_HOOKS);

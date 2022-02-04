@@ -1,6 +1,6 @@
 #pragma once
 
-// 18:30 14.11.2021
+// 13:53 04.02.2022
 // Bartis: updated
 
 enum VTableIndexes
@@ -40,3 +40,4 @@ enum VTableIndexes
 #define LOAD_SKY				XOR("55 8B EC 81 EC ? ? ? ? 56 57 8B F9 C7 45")
 #define ANIMATION_LAYER			XOR("8B 89 ? ? ? ? 8D 0C D1")
 #define SEQUENCE_ACTIVITY		XOR("55 8B EC 53 8B 5D 08 56 8B F1 83")
+#define NEW_CHECK				XOR("E8 ? ? ? ? 84 C0 75 15 FF 75 10")

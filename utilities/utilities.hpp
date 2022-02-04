@@ -6,6 +6,7 @@
 #include <span>
 #include <vector>
 #include <algorithm>
+#include <random>
 
 class Entity_t;
 struct Box;
@@ -54,7 +55,8 @@ namespace utilities
     {
         std::fill(arr.begin(), arr.end(), toFill);
     }
-    std::vector<std::string> splitStr(const std::string& str, char limit = ' ');
+    std::vector<std::string> splitStr(const std::string& str, char limit = ' ');  
+    uintptr_t getRandomInt(const uintptr_t start, const uintptr_t& end);
 }
 
 inline std::string __DOCUMENTS = utilities::getFolder();

@@ -188,6 +188,7 @@
     <ClCompile Include="cheats\hooks\paintTraverse.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\hooks\validAddrChecks.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\Button\Button.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\CheckBox\CheckBox.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\ColorPicker\ColorPicker.cpp" />

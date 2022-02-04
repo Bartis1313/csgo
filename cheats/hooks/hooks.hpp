@@ -64,4 +64,34 @@ namespace hooks
 		inline static fn original = nullptr;
 		static const int index = FRAMESTAGE;
 	};
+	
+	// latest update
+
+	struct clientValidAddr
+	{
+		using fn = char(__fastcall*)(uintptr_t, int, uintptr_t);
+		static char __fastcall hooked(uintptr_t thisptr, int edx, uintptr_t retAddr);
+		inline static fn original = nullptr;
+	};
+
+	struct engineValidAddr
+	{
+		using fn = char(__fastcall*)(uintptr_t, int, uintptr_t);
+		static char __fastcall hooked(uintptr_t thisptr, int edx, uintptr_t retAddr);
+		inline static fn original = nullptr;
+	};
+
+	struct studioRenderValidAddr
+	{
+		using fn = char(__fastcall*)(uintptr_t, int, uintptr_t);
+		static char __fastcall hooked(uintptr_t thisptr, int edx, uintptr_t retAddr);
+		inline static fn original = nullptr;
+	};
+
+	struct materialSystemValidAddr
+	{
+		using fn = char(__fastcall*)(uintptr_t, int, uintptr_t);
+		static char __fastcall hooked(uintptr_t thisptr, int edx, uintptr_t retAddr);
+		inline static fn original = nullptr;
+	};
 }
