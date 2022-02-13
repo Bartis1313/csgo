@@ -1,12 +1,12 @@
-#include <format>
 #include "player.hpp"
-#include "../../menu/vars.hpp"
-#include "../../game.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
+#include "../../../config/vars.hpp"
+#include "../../game.hpp"
 #include "../../../SDK/Enums.hpp"
 #include "../../globals.hpp"
 #include "../aimbot/aimbot.hpp"
 #include "../backtrack/backtrack.hpp"
+#include <format>
 
 #undef min
 #undef max
@@ -127,7 +127,7 @@ void esp::drawBox2DFilled(Player_t* ent, const Box& box)
 
 void esp::drawHealth(Player_t* ent, const Box& box)
 {
-	if (!vars::bDrawInfos)
+	if (!config.get<bool>(vars.bShowInfo))
 		return;
 
 	auto health = ent->m_iHealth() > 100 ? 100 : ent->m_iHealth();
@@ -157,7 +157,7 @@ void esp::drawHealth(Player_t* ent, const Box& box)
 
 void esp::drawArmor(Player_t* ent, const Box& box)
 {
-	if (!vars::bDrawInfos)
+	if(!config.get<bool>(vars.bDrawInfos))
 		return;
 
 	auto armor = ent->m_ArmorValue() > 100 ? 100 : ent->m_ArmorValue();
@@ -189,7 +189,7 @@ void esp::drawArmor(Player_t* ent, const Box& box)
 // TODO: Smooth reload time, or even detect time of reload
 void esp::drawWeapon(Player_t* ent, const Box& box)
 {
-	if (!vars::bDrawInfos)
+	if (!config.get<bool>(vars.bDrawInfos))
 		return;
 
 	auto weapon = ent->getActiveWeapon();
@@ -235,7 +235,7 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 
 void esp::drawInfo(Player_t* ent, const Box& box)
 {
-	if (!vars::bShowFlags)
+	if (!config.get<bool>(vars.bDrawInfos))
 		return;
 
 	render::text(box.x + (box.w / 2), box.y - 15, fonts::tahoma, ent->getName(), true, playerColor(ent));
@@ -247,7 +247,7 @@ void esp::drawInfo(Player_t* ent, const Box& box)
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
 void esp::drawSkeleton(Player_t* ent)
 {
-	if (!vars::bDrawSkeleton)
+	if (!config.get<bool>(vars.bDrawSkeleton))
 		return;
 
 	auto model = ent->getModel();
@@ -318,17 +318,14 @@ void esp::drawSnapLine(Player_t* ent, const Box& box)
 {
 	if (ent == legitbot::bestEnt)
 	{
-		int width, height;
-		interfaces::engine->getScreenSize(width, height);
-
 		// lines on the bottom and center bottom box
-		render::drawLine(width / 2, height, box.x + box.w / 2, box.y + box.h, Colors::Purple);
+		render::drawLine(globals::screenX / 2, globals::screenY, box.x + box.w / 2, box.y + box.h, Colors::Purple);
 	}
 }
 
 void esp::drawLaser(Player_t* ent)
 {
-	if (!vars::bEspLasers)
+	if (!config.get<bool>(vars.bEspLasers))
 		return;
 
 	// get from where to start, "laser ESP" is always starting from head I think
@@ -352,7 +349,7 @@ void esp::runDLight(Player_t* ent)
 	if (!interfaces::engine->isInGame())
 		return;
 
-	if (!vars::bDLight)
+	if (!config.get<bool>(vars.bDLight))
 		return;
 
 	auto DLight = interfaces::effects->clAllocDlight(ent->getIndex());
@@ -372,7 +369,7 @@ void esp::drawPlayer(Player_t* ent)
 	if (!utilities::getBox(ent, box))
 		return;
 
-	switch (vars::iEsp)
+	switch (config.get<int>(vars.iEsp))
 	{
 	case BOX2D:
 		drawBox2D(ent, box);
@@ -400,7 +397,7 @@ void esp::drawPlayer(Player_t* ent)
 // add this to events manager 
 void esp::drawSound(IGameEvent* event)
 {
-	if (!vars::bSoundEsp)
+	if (!config.get<bool>(vars.bSoundEsp))
 		return;
 
 	auto userid = interfaces::engine->getPlayerID(event->getInt(XOR("userid")));
@@ -419,7 +416,7 @@ void esp::drawSound(IGameEvent* event)
 	if (entity->m_bGunGameImmunity())
 		return;
 
-	auto modelIndex = interfaces::modelInfo->getModelIndex(XOR("sprites/physbeam.vmt"));
+	static auto modelIndex = interfaces::modelInfo->getModelIndex(XOR("sprites/physbeam.vmt"));
 
 	BeamInfo_t info = {};
 
@@ -445,10 +442,8 @@ void esp::drawSound(IGameEvent* event)
 	info.m_endRadius = 20.f;
 	info.m_renderable = true;
 
-	auto beam_draw = interfaces::beams->createRingPoint(info);
-
-	if (beam_draw)
-		interfaces::beams->drawBeam(beam_draw);
+	if (auto beamDraw = interfaces::beams->createRingPoint(info); beamDraw)
+		interfaces::beams->drawBeam(beamDraw);
 }
 
 void esp::enemyIsAimingAtYou(Player_t* ent)
@@ -458,9 +453,6 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 
 	if (!interfaces::engine->isInGame())
 		return;
-
-	int x, y;
-	interfaces::engine->getScreenSize(x, y);
 
 	Vector posDelta = ent->getEyePos() - game::localPlayer->getEyePos();
 	Vector idealAimAngle = math::vectorToAngle(posDelta);
@@ -482,11 +474,11 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 	// hardcoded, when enemies use 3rd cam or some fov changer, it won't be accurate
 	if (check && fovDist <= 60.0f)
 	{
-		render::text(x / 2, 60, fonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
+		render::text(globals::screenX / 2, 60, fonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
 	}
 	// in the moment when enemy aims through walls, don't check trace
 	if (fovDist <= 5.0f)
 	{
-		render::text(x / 2, 80, fonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
+		render::text(globals::screenX / 2, 80, fonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
 	}
 }

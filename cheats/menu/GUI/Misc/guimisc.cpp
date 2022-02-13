@@ -2,22 +2,22 @@
 #include "../../../globals.hpp"
 #include "../../../../SDK/math/Vector2D.hpp"
 
-bool GUI::isKeyDown(const short key)
+bool GUI::isKeyDown(const unsigned key)
 {
 	return globals::keyState[key];
 }
 
-bool GUI::isKeyPressed(const short key)
+bool GUI::isKeyPressed(const unsigned key)
 {
 	return globals::keyState[key] && !globals::previousKeyState[key];
 }
 
-void GUI::raiseKey(const short key)
+void GUI::raiseKey(const unsigned key)
 {
 	globals::keyState[key] = false;
 }
 
-void GUI::forceKey(const short key)
+void GUI::forceKey(const unsigned key)
 {
 	globals::keyState[key] = true;
 }

@@ -1,7 +1,5 @@
 #include "bunnyhop.hpp"
-#include "../../menu/vars.hpp"
-#include "../../../utilities/utilities.hpp"
-#include "../../../SDK/CUserCmd.hpp"
+#include "../../game.hpp"
 
 enum movetypes
 {
@@ -11,7 +9,7 @@ enum movetypes
 
 void bunnyhop::run(CUserCmd* cmd)
 {
-	if (!vars::bBunnyHop)
+	if (!config.get<bool>(vars.bBunnyHop))
 		return;
 
 	if (!game::localPlayer)
@@ -31,7 +29,7 @@ void bunnyhop::run(CUserCmd* cmd)
 
 void bunnyhop::strafe(CUserCmd* cmd)
 {
-	if (!vars::bBunnyHop)
+	if (!config.get<bool>(vars.bBunnyHop))
 		return;
 
 	if (!game::localPlayer)

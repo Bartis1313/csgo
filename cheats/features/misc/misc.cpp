@@ -1,8 +1,8 @@
 #include "misc.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../menu/vars.hpp"
-#include "../../game.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
+#include "../../game.hpp"
+#include "../../../config/vars.hpp"
 #include "../aimbot/aimbot.hpp"
 #include "../../globals.hpp"
 #include <format>
@@ -13,7 +13,7 @@ constexpr int VK_VKEY = 0x56;
 // TODO: rewrite this
 void misc::thirdperson()
 {
-	if (!vars::bThirdp)
+	if (!config.get<bool>(vars.bThirdp))
 		return;
 
 	if (!interfaces::engine->isInGame())
@@ -43,7 +43,10 @@ enum CrossHairTypes
 
 void misc::drawCrosshair()
 {
-	if (!vars::iCrosshair)
+	const static auto crosshair = interfaces::console->findVar(XOR("cl_crosshair_recoil"));
+	crosshair->setValue(config.get<int>(vars.iCrosshair) == ENGINE ? true : false);
+
+	if (!config.get<int>(vars.iCrosshair))
 		return;
 
 	if (!game::localPlayer)
@@ -60,10 +63,7 @@ void misc::drawCrosshair()
 	x /= 2;
 	y /= 2;
 
-	const auto crosshair = interfaces::console->findVar(XOR("cl_crosshair_recoil"));
-	crosshair->setValue(vars::iCrosshair == ENGINE ? true : false);
-
-	switch (vars::iCrosshair)
+	switch (config.get<int>(vars.iCrosshair))
 	{
 	case STATIC:
 		// -1 for y because elselike it will be not aligned
@@ -110,7 +110,7 @@ void misc::drawCrosshair()
 
 void misc::drawLocalInfo()
 {
-	if (!vars::bShowInfo)
+	if (!config.get<bool>(vars.bDrawInfos))
 		return;
 
 	if (!game::localPlayer)
@@ -123,9 +123,7 @@ void misc::drawLocalInfo()
 	if (!weapon)
 		return;
 
-	int width, height;
-	interfaces::engine->getScreenSize(width, height);
-	width *= 0.6f;
+	int width = globals::screenX * 0.6f;
 
 	render::text(width, 15, fonts::tahoma, std::format(XOR("Map: {}"), interfaces::engine->getLevelName()), false, Colors::Green);
 	render::text(width, 25, fonts::tahoma, std::format(XOR("Weapon {} [{} / {}]"), weapon->getWpnName(), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
@@ -134,12 +132,12 @@ void misc::drawLocalInfo()
 	render::text(width, 55, fonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->m_vecOrigin().y, game::localPlayer->m_vecOrigin().z), false, Colors::Yellow);
 	render::text(width, 65, fonts::tahoma, std::format(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().Length2D()), false, Colors::Yellow);
 
-	render::text(width, 75, fonts::tahoma, std::format(XOR("Kills {}"), game::getLocalKills()), false, Colors::Yellow);
-	render::text(width, 85, fonts::tahoma, std::format(XOR("Deaths {}"), game::getLocalDeaths()), false, Colors::Yellow);
+	render::text(width, 75, fonts::tahoma, std::format(XOR("Kills {}"), game::localPlayer->getKills()), false, Colors::Yellow);
+	render::text(width, 85, fonts::tahoma, std::format(XOR("Deaths {}"), game::localPlayer->getDeaths()), false, Colors::Yellow);
 	// escape divide by zero exceptions by using this trick
-	float kd = game::getLocalKills() / (game::getLocalDeaths() ? game::getLocalDeaths() : 1);
+	float kd = game::localPlayer->getKills() / (game::localPlayer->getDeaths() ? game::localPlayer->getDeaths() : 1.0f);
 	render::text(width, 95, fonts::tahoma, std::format(XOR("KD {:.2f}"), kd), false, Colors::Yellow);
-	render::text(width, 105, fonts::tahoma, std::format(XOR("Ping {}"), game::getLocalPing()), false, Colors::Yellow);
+	render::text(width, 105, fonts::tahoma, std::format(XOR("Ping {}"), game::localPlayer->getPing()), false, Colors::Yellow);
 
 	float accuracy = globals::shotsFired
 		? (static_cast<float>(globals::shotsHit) / static_cast<float>(globals::shotsFired)) * 100.0f
@@ -157,14 +155,14 @@ struct Record
 
 void misc::drawFpsPlot()
 {
-	if (!vars::bShowPlots)
+	if (!config.get<bool>(vars.bShowPlots))
 		return;
 
 	// static so we can get records get saved
 	static std::deque<Record> records;
 
-	int x, y;
-	interfaces::engine->getScreenSize(x, y);
+	int x = globals::screenX;
+	int y = globals::screenY;
 	x /= 2, y /= 2;
 
 	// get position to startdrawing, although this time I am goona start from right pos, because of the loop under
@@ -210,7 +208,7 @@ std::deque<RecordVelocity> velRecords;
 // because without prediction the values might not be that accurate
 void misc::getVelocityData()
 {
-	if (!vars::bShowPlots)
+	if (!config.get<bool>(vars.bShowPlots))
 		return;
 
 	if (!game::localPlayer)
@@ -231,7 +229,7 @@ void misc::getVelocityData()
 
 void misc::drawVelocityPlot()
 {
-	if (!vars::bShowPlots)
+	if (!config.get<bool>(vars.bShowPlots))
 		return;
 
 	if (!game::localPlayer)
@@ -240,8 +238,8 @@ void misc::drawVelocityPlot()
 	if (!interfaces::engine->isInGame())
 		return;
 
-	int x, y;
-	interfaces::engine->getScreenSize(x, y);
+	int x = globals::screenX;
+	int y = globals::screenY;
 	x /= 2, y /= 2;
 
 	auto widthPoint = x + (x * 0.97f);
@@ -293,8 +291,8 @@ void misc::drawHitmarker()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	int x, y;
-	interfaces::engine->getScreenSize(x, y);
+	int x = globals::screenX;
+	int y = globals::screenY;
 	x /= 2, y /= 2;
 
 	if (hitAlpha > 0)
@@ -327,8 +325,8 @@ void misc::drawNoScope()
 
 	if (game::localPlayer->m_bIsScoped())
 	{
-		int x, y;
-		interfaces::engine->getScreenSize(x, y);
+		int x = globals::screenX;
+		int y = globals::screenY;
 		render::drawLine(x / 2, 0, x / 2, y, Colors::Black);
 		render::drawLine(0, y / 2, x, y / 2, Colors::Black);
 	}

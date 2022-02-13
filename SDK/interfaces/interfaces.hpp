@@ -124,5 +124,6 @@ namespace interfaces
 	inline IVEfx* effects;
 	inline InputSystem* ioSystem;
 
-	bool init();
+	// shoudl be called once
+	void init();
 }

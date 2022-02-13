@@ -1,6 +1,7 @@
 #include "radar.hpp"
+#include "../../../SDK/interfaces/interfaces.hpp"
 #include "../../game.hpp"
-#include "../../menu/vars.hpp"
+#include "../../../config/vars.hpp"
 #include "../../globals.hpp"
 #include <format>
 
@@ -52,7 +53,7 @@ Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 
 void radar::run()
 {
-	if (!vars::bRadar)
+	if (!config.get<bool>(vars.bRadar))
 		return;
 
 	if (!interfaces::engine->isInGame())
@@ -64,8 +65,8 @@ void radar::run()
 	if (!localPlayer)
 		return;
 
-	static int x, y;
-	interfaces::engine->getScreenSize(x, y);
+	int x = globals::screenX;
+	int y = globals::screenY;
 	static int centerx = x / 2 - 20;
 	static int centery = y - 110;
 	static int size = 90;

@@ -1,6 +1,4 @@
 #pragma once
-#include "../../../SDK/structs/Entity.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
 
 namespace radar

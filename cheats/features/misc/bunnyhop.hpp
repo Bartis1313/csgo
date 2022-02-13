@@ -1,7 +1,6 @@
 #pragma once
-#include "../../game.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../SDK/CUserCmd.hpp"
+#include "../../../config/vars.hpp"
 
 // TODO: Legit
 namespace bunnyhop

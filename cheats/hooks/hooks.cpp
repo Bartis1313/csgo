@@ -15,6 +15,7 @@ inline void** ORIGINAL(T& arg)
 	return reinterpret_cast<void**>(&arg);
 }
 
+// ye this looks bad, I need to make some class for it
 void hooks::init()
 {
 	const auto paintTraverseTarget = TARGET(interfaces::panel, paintTraverse::index);
@@ -24,21 +25,17 @@ void hooks::init()
 	const auto doPostScreenEffectsTarget = TARGET(interfaces::clientMode, doPostScreenEffects::index);
 	const auto frameStageNotifyTarget = TARGET(interfaces::client, frameStageNotify::index);
 
-	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK) + 0x1;
-	const auto offsetClient = *reinterpret_cast<uintptr_t*>(addrClient);
-	const auto clientValidAddrTarget = reinterpret_cast<void*>(addrClient + 0x4 + offsetClient);
+	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK);
+	const auto clientValidAddrTarget = reinterpret_cast<void*>(addrClient);
 
-	const auto addrEngine = utilities::patternScan(ENGINE_DLL, NEW_CHECK) + 0x1;
-	const auto offsetEngine = *reinterpret_cast<uintptr_t*>(addrEngine);
-	const auto engineValidAddrTarget = reinterpret_cast<void*>(addrEngine + 0x4 + offsetEngine);
+	const auto addrEngine = utilities::patternScan(ENGINE_DLL, NEW_CHECK);
+	const auto engineValidAddrTarget = reinterpret_cast<void*>(addrEngine);
 
-	const auto addrStudio = utilities::patternScan(STUDIORENDER_DLL, NEW_CHECK) + 0x1;
-	const auto offsetStudio = *reinterpret_cast<uintptr_t*>(addrStudio);
-	const auto studioValidAddrTarget = reinterpret_cast<void*>(addrStudio + 0x4 + offsetStudio);
+	const auto addrStudio = utilities::patternScan(STUDIORENDER_DLL, NEW_CHECK);
+	const auto studioValidAddrTarget = reinterpret_cast<void*>(addrStudio);
 
-	const auto addrMaterial = utilities::patternScan(MATERIAL_DLL, NEW_CHECK) + 0x1;
-	const auto offsetMaterial = *reinterpret_cast<uintptr_t*>(addrMaterial);
-	const auto matertialValidAddrTarget = reinterpret_cast<void*>(addrMaterial + 0x4 + offsetMaterial);
+	const auto addrMaterial = utilities::patternScan(MATERIAL_DLL, NEW_CHECK);
+	const auto matertialValidAddrTarget = reinterpret_cast<void*>(addrMaterial);
 
 	if (MH_Initialize() != MH_OK)
 		throw std::runtime_error(XOR("MH_Initialize hook error"));
@@ -93,7 +90,7 @@ void hooks::init()
 		throw std::runtime_error(XOR("matertialValidAddr hook error"));
 	LOG(LOG_INFO, std::format(XOR("matertialValidAddr -> {}"), MH_StatusToString(hk7)));
 
-	Events::g().init();
+	events.init();
 
 	const auto status = MH_EnableHook(MH_ALL_HOOKS);
 	if (status != MH_OK)
@@ -106,6 +103,6 @@ void hooks::init()
 void hooks::shutdown()
 {
 	MH_Uninitialize();
-	Events::g().shutdown();
+	events.shutdown();
 	MH_DisableHook(MH_ALL_HOOKS);
 }

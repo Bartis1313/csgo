@@ -16,4 +16,5 @@ namespace globals
 	// TODO: edit everything that calls vfunc for screensize and use this instead for less calls
 	inline int screenX = 0;
 	inline int screenY = 0;
+	inline bool interfacesDone = false;
 }

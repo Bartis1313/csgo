@@ -124,10 +124,8 @@ void GUI::Menu::draw()
 	else
 		m_dragging = false;
 
-	static int x, y;
-	interfaces::engine->getScreenSize(x, y);
-	m_X = std::clamp(m_X, 0 + static_cast<int>(THICKNESS), x - m_width - static_cast<int>(THICKNESS));
-	m_Y = std::clamp(m_Y, 0 + static_cast<int>(THICKNESS * 4), y - m_height - static_cast<int>(THICKNESS));
+	m_X = std::clamp(m_X, 0 + static_cast<int>(THICKNESS), globals::screenX - m_width - static_cast<int>(THICKNESS));
+	m_Y = std::clamp(m_Y, 0 + static_cast<int>(THICKNESS * 4), globals::screenY - m_height - static_cast<int>(THICKNESS));
 
 	drawBackground();
 	drawExtraBackgroundLines();

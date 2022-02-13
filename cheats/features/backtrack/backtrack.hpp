@@ -1,5 +1,4 @@
 #pragma once
-#include "../../game.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
 #include <deque>
 #include <array>

@@ -1,64 +1,21 @@
 #include "utilities.hpp"
-#include <Psapi.h>
-#include <filesystem>
-#include <ShlObj_core.h>
 #include "renderer/renderer.hpp"
 #include "../SDK/structs/Entity.hpp"
+#include <Psapi.h>
 #include <optional>
 #include <sstream>
+#include <algorithm>
+#include <chrono>
 
 #undef max
 #undef min
-
-namespace fs = std::filesystem;
-
-std::string utilities::getFolder()
-{
-	CHAR documents[MAX_PATH];
-	HRESULT result = SHGetFolderPath(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents);
-
-	return std::string(documents);
-}
-
-bool utilities::prepareDirectories()
-{
-	bool result = false;
-	try
-	{
-		fs::current_path(__DOCUMENTS);
-		result = fs::create_directories(XOR("Bartis_internal/csgo"));
-	}
-	catch (const fs::filesystem_error& err)
-	{
-		throw std::runtime_error(err.what());
-	}
-
-	LOG(LOG_INFO, result ? XOR("Created new folder, prepared directories") : XOR("Folder already exists with config, prepared directories"));
-
-	return result;
-}
-
-std::string utilities::getHackPath()
-{
-	std::string res = {};
-	try
-	{
-		fs::current_path(__DOCUMENTS);
-		res = fs::absolute(XOR("Bartis_internal/csgo")).string();
-	}
-	catch (const fs::filesystem_error& err)
-	{
-		throw std::runtime_error(err.what());
-	}
-	return res;
-}
 
 std::string utilities::getTime()
 {
 	const auto now = std::chrono::system_clock::now();
 	const auto time = std::chrono::system_clock::to_time_t(now);
 	std::stringstream ss;
-	ss << std::put_time(std::localtime(&time), XOR("%Y:%m:%d-%X"));
+	ss << std::put_time(std::localtime(&time), XOR("%d:%m:%Y-%X"));
 	return ss.str();
 }
 
@@ -169,10 +126,10 @@ size_t utilities::inByteOrder(const size_t netLong)
 		| (static_cast<size_t>(data.at(0)) << 24);
 }
 
-std::string utilities::getKeyName(UINT virtualKey)
+std::string utilities::getKeyName(const unsigned virtualKey)
 {
 #ifdef _DEBUG
-	UINT scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
+	unsigned scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
 #else
 	UINT scanCode = LF(MapVirtualKeyA).cached()(virtualKey, MAPVK_VK_TO_VSC);
 #endif
@@ -207,9 +164,8 @@ std::string utilities::getKeyName(UINT virtualKey)
 		break;
 	}
 
-	char keyName[50];
 #ifdef _DEBUG
-	if (GetKeyNameTextA(scanCode << 16, keyName, sizeof(keyName)) != 0)
+	if (char keyName[50]; GetKeyNameTextA(scanCode << 16, keyName, sizeof(keyName)) != 0)
 	{
 		return keyName;
 }
@@ -218,7 +174,7 @@ std::string utilities::getKeyName(UINT virtualKey)
 		return XOR("[None]");
 	}
 #else
-	if (LF(GetKeyNameTextA).cached()(scanCode << 16, keyName, sizeof(keyName)) != 0)
+	if (char keyName[50]; LF(GetKeyNameTextA).cached()(scanCode << 16, keyName, sizeof(keyName)) != 0)
 	{
 		return keyName;
 	}
@@ -239,6 +195,16 @@ std::string utilities::toLowerCase(const std::string& str)
 	return std::move(result);
 }
 
+std::string utilities::toUpperCase(const std::string& str)
+{
+	std::string result = str;
+	std::for_each(result.begin(), result.end(), [](char& el)
+		{
+			el = ::toupper(el);
+		});
+	return std::move(result);
+}
+
 std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
 {
 	std::vector<std::string> res;
@@ -249,12 +215,4 @@ std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
 		res.emplace_back(word);
 	}
 	return res;
-}
-
-uintptr_t utilities::getRandomInt(const uintptr_t start, const uintptr_t& end)
-{
-	std::random_device randomdev;
-	std::mt19937 mt(randomdev());
-	std::uniform_int_distribution<std::mt19937::result_type> dist(start, end);
-	return dist(mt);
 }

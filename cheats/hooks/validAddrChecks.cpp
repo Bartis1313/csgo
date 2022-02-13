@@ -1,33 +1,23 @@
 #include "hooks.hpp"
-#include "../../SDK/structs/IDXandPaterrns.hpp"
-#include "../../utilities/utilities.hpp"
 
-#ifdef _DEBUG
-	#define GET_RANDOM_ADDR(_module) reinterpret_cast<uintptr_t>(GetModuleHandleA(_module) + 0xFFF + utilities::getRandomAddr(0, 0x4444))
-#else
-	#define GET_RANDOM_ADDR(_module) reinterpret_cast<uintptr_t>(LF(GetModuleHandleA).cached()(_module) + 0xFFF + utilities::getRandomInt(0, 0x4444))
-#endif
+// https://imgur.com/KdBfQD3 - useless to add this random addr, and easier for everyone, I force to return valid addr
 
-char __fastcall hooks::clientValidAddr::hooked(uintptr_t thisptr, int edx, uintptr_t retAddr)
+char __fastcall hooks::clientValidAddr::hooked(void* thisptr, void* edx, const char* lpModuleName)
 {
-	static uintptr_t randomAddr = GET_RANDOM_ADDR(CLIENT_DLL);
-	return original(thisptr, edx, randomAddr);
+	return 1;
 }
 
-char __fastcall hooks::engineValidAddr::hooked(uintptr_t thisptr, int edx, uintptr_t retAddr)
+char __fastcall hooks::engineValidAddr::hooked(void* thisptr, void* edx, const char* lpModuleName)
 {
-	static uintptr_t randomAddr = GET_RANDOM_ADDR(ENGINE_DLL);
-	return original(thisptr, edx, randomAddr);
+	return 1;
 }
 
-char __fastcall hooks::studioRenderValidAddr::hooked(uintptr_t thisptr, int edx, uintptr_t retAddr)
+char __fastcall hooks::studioRenderValidAddr::hooked(void* thisptr, void* edx, const char* lpModuleName)
 {
-	static uintptr_t randomAddr = GET_RANDOM_ADDR(STUDIORENDER_DLL);
-	return original(thisptr, edx, randomAddr);
+	return 1;
 }
 
-char __fastcall hooks::materialSystemValidAddr::hooked(uintptr_t thisptr, int edx, uintptr_t retAddr)
+char __fastcall hooks::materialSystemValidAddr::hooked(void* thisptr, void* edx, const char* lpModuleName)
 {
-	static uintptr_t randomAddr = GET_RANDOM_ADDR(MATERIAL_DLL);
-	return original(thisptr, edx, randomAddr);
+	return 1;
 }

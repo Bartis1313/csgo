@@ -21,7 +21,7 @@ namespace render
 {
 	void init();
 
-	unsigned long  __createFont(const char* fontName, const int size, const int weight, const unsigned long flags);
+	_NODISCARD unsigned long  __createFont(const char* fontName, const int size, const int weight, const unsigned long flags);
 
 	void drawLine(const int x, const int y, const int x2, const int y2, const Color& color);
 	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color);

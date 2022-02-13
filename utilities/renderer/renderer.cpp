@@ -32,7 +32,7 @@ void render::init()
 	fonts::espBar = __createFont(XOR("Franklin Gothic"), 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 	fonts::menuFont = __createFont(XOR("Verdana"), 12, 350, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 
-	LOG(LOG_INFO, XOR("render success"));
+	LOG(LOG_INFO, XOR("render init success"));
 }
 
 void render::drawLine(const int x, const int y, const int x2, const int y2, const Color& color)

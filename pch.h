@@ -10,4 +10,4 @@
 #include "dependencies/xorstr.hpp"
 
 // some globals, don't add ent based stuff there
-#include "cheats/menu/vars.hpp"
+#include "config/vars.hpp"

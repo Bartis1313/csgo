@@ -1,6 +1,7 @@
 #include <iomanip>
 #include "netvars.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
+#include "../../config/config.hpp"
 
 void NetvarManager::init()
 {
@@ -83,16 +84,6 @@ RecvTable* NetvarManager::getTable(const char* tableName)
 	return 0;
 }
 
-//static constexpr bool uselessNums(const std::string& str)
-//{
-//	if (str.find("0") == 0
-//		|| str.find("1") == 0
-//		|| str.find("2") == 0
-//		)
-//		return true;
-//	return false;
-//}
-
 std::string NetvarManager::getType(RecvProp* recvTable)
 {
 	switch (recvTable->m_recvType)
@@ -150,7 +141,7 @@ void NetvarManager::dump(RecvTable* recvTable)
 
 void NetvarManager::dump()
 {
-	file = std::ofstream{ __PATH + XOR("\\netvarsDump.txt"), std::ofstream::out | std::ofstream::trunc };
+	file = std::ofstream{ config.getPathForSave(XOR("netvarsDump.txt")), std::ofstream::out | std::ofstream::trunc};
 
 	file << XOR("Netvars from: ") << utilities::getTime() << "\n\n";
 

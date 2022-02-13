@@ -12,7 +12,8 @@
 bool shouldReloadsFonts()
 {
 	static int oldX, oldY, x, y;
-	interfaces::engine->getScreenSize(x, y);
+	x = globals::screenX;
+	y = globals::screenY;
 
 	if (x != oldX || y != oldY)
 	{
@@ -37,22 +38,67 @@ bool isValidWindow()
 	return true;
 }
 
+// run keys
 void guiStates()
 {
 #ifdef _DEBUG
-	for (short i = 0; i < 256; i++)
+	for (unsigned i = 0; i < 256; i++)
 	{
 		globals::previousKeyState[i] = globals::keyState[i];
 		globals::keyState[i] = static_cast<bool>(GetAsyncKeyState(i));
 	}
 #else
-	for (short i = 0; i < 256; i++)
+	for (unsigned i = 0; i < 256; i++)
 	{
 		globals::previousKeyState[i] = globals::keyState[i];
 		globals::keyState[i] = static_cast<bool>(LF(GetAsyncKeyState).cached()(i));
 	}
 #endif
 	interfaces::surface->getCursor(globals::mouseX, globals::mouseY);
+}
+
+// run current screensize
+void getScreen()
+{
+	int x, y;
+	interfaces::engine->getScreenSize(x, y);
+	globals::screenX = x;
+	globals::screenY = y;
+}
+
+// handle x88 menu keys and drawing
+void x88Handle()
+{
+	x88Menu.handleKeys();
+	x88Menu.draw();
+}
+
+// draw hack name
+void drawWaterMark()
+{
+	render::text(20, 10, fonts::tahoma, XOR("csgo legit"), false, Colors::Palevioletred);
+}
+
+// draw all painting
+void paintHandle()
+{
+	guiStates();
+	esp::run();
+	world::drawMisc();
+	radar::run();
+	misc::drawLocalInfo();
+	misc::drawFpsPlot();
+	misc::drawVelocityPlot();
+	misc::drawHitmarker();
+	world::drawZeusRange();
+	misc::drawNoScope();
+	misc::drawCrosshair();
+
+	config.get<bool>(vars.bMenuOpenedx88)
+		? x88Handle()
+		: GUI::draw();
+
+	drawWaterMark();
 }
 
 #pragma endregion
@@ -62,6 +108,8 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	if (!isValidWindow())
 		return;
 
+	getScreen();
+
 	// will run first no matter what, you can hook screensizechanged only for this
 	if (shouldReloadsFonts())
 		render::init();
@@ -69,7 +117,11 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	if (interfaces::engine->isTakingScreenshot())
 		return;
 
-	if (strstr(interfaces::panel->getName(panel), XOR("HudZoom")))
+	static unsigned int panelID = 0;
+
+	const auto panelName = interfaces::panel->getName(panel);
+
+	if (strstr(panelName, XOR("HudZoom")))
 	{
 		if (interfaces::engine->isInGame())
 			return;
@@ -77,26 +129,14 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 
 	original(interfaces::panel, panel, forceRepaint, allowForce);
 
-	if (strstr(interfaces::panel->getName(panel), XOR("MatSystemTopPanel")))
+	if (!panelID)
 	{
-		guiStates();
-		//Menu::g().draw();
-		//Menu::g().handleKeys();
-		esp::run();
-		world::drawMisc();
-		radar::run();
-		misc::drawLocalInfo();
-		misc::drawFpsPlot();
-		misc::drawVelocityPlot();
-		misc::drawHitmarker();
-		world::drawZeusRange();
-		misc::drawNoScope();
-		misc::drawCrosshair();
-		GUI::draw();
+		if (strstr(panelName, XOR("MatSystemTopPanel")))
+			panelID = panel;
 	}
-
-	if (strstr(interfaces::panel->getName(panel), XOR("FocusOverlayPanel")))
+	else if (panelID == panel)
 	{
 		interfaces::panel->setMouseInputEnabled(panel, GUI::menu->isOpened());
+		paintHandle();
 	}
 }

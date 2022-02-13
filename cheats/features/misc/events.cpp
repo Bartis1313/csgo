@@ -1,5 +1,4 @@
 #include "events.hpp"
-#include "../../menu/vars.hpp"
 #include "../../game.hpp"
 #include "../visuals/player.hpp"
 #include "../../../SDK/IGameEvent.hpp"
@@ -8,11 +7,11 @@
 
 void Events::init() const
 {
-	interfaces::eventManager->addListener(&Events::g(), XOR("player_footstep"));
-	interfaces::eventManager->addListener(&Events::g(), XOR("player_death"));
-	interfaces::eventManager->addListener(&Events::g(), XOR("round_start"));
-	interfaces::eventManager->addListener(&Events::g(), XOR("player_hurt"));
-	interfaces::eventManager->addListener(&Events::g(), XOR("weapon_fire"));
+	interfaces::eventManager->addListener(&events, XOR("player_footstep"));
+	interfaces::eventManager->addListener(&events, XOR("player_death"));
+	interfaces::eventManager->addListener(&events, XOR("round_start"));
+	interfaces::eventManager->addListener(&events, XOR("player_hurt"));
+	interfaces::eventManager->addListener(&events, XOR("weapon_fire"));
 	LOG(LOG_INFO, XOR("events hooked"));
 }
 
@@ -49,5 +48,5 @@ void Events::FireGameEvent(IGameEvent* event)
 
 void Events::shutdown() const
 {
-	interfaces::eventManager->removeListener(&Events::g());
+	interfaces::eventManager->removeListener(&events);
 }

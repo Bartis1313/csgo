@@ -1,5 +1,6 @@
 #include "backtrack.hpp"
-#include "../../menu/vars.hpp"
+#include "../../game.hpp"
+#include "../../../config/vars.hpp"
 // useless windefs
 #undef min
 #undef max
@@ -74,7 +75,7 @@ static float extraTicks()
 void backtrack::update()
 {
 
-	if (!game::localPlayer || !vars::bBacktrack || !game::localPlayer->isAlive())
+	if (!game::localPlayer || !vars.bBacktrack || !game::localPlayer->isAlive())
 	{
 		// basically reset all
 		for (auto& el : records)
@@ -115,7 +116,7 @@ void backtrack::update()
 		records.at(i).push_front(record);
 
 		// when records are FULL and bigger than ticks we set in backtrack, then pop them
-		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(static_cast<float>(vars::iBacktrackTick / 1000.0f + extraTicks()))))
+		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(static_cast<float>(config.get<int>(vars.iBacktrackTick) / 1000.0f + extraTicks()))))
 			records.at(i).pop_back();
 
 		// lambda check for valid time simulation
@@ -137,7 +138,7 @@ void backtrack::run(CUserCmd* cmd)
 	// we set origin and that's it, and go through nodes of records
 	// Maybe: some backtrack aimbot
 
-	if (!vars::bBacktrack)
+	if (!config.get<bool>(vars.bBacktrack))
 		return;
 
 	if (!game::localPlayer)
@@ -191,11 +192,8 @@ void backtrack::run(CUserCmd* cmd)
 
 		bestFov = 180.0f;
 
-		// if ticks method used
-		// auto ticksPassed = 0;
-		for (int i = 0; i < records.at(bestPlayerIdx).size(); /* && ticksPassed < vars::iBacktrackTick*/ i++)
+		for (int i = 0; i < records.at(bestPlayerIdx).size(); i++)
 		{
-			// ticksPassed++;
 			const auto& record = records.at(bestPlayerIdx).at(i);
 			if (!isValid(record.simTime))
 				continue;

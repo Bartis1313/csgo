@@ -3,37 +3,52 @@
 #include <fstream>
 #include <unordered_map>
 #include "../../utilities/utilities.hpp"
-#include "../../utilities/singleton.hpp"
 #include "../../SDK/Recv.hpp"
 
-// generate netvar, easy to find in client.dll
+// generate netvar address
+// type - template type for return type
+// name - name your function
+// table - table name to search the netvar prop
+// prop - prop name
 #define NETVAR(type, name, table, prop) \
-_NODISCARD type& name() { \
-	static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
-	return *reinterpret_cast<type*>((uintptr_t)this + offset ); \
+_NODISCARD std::add_lvalue_reference_t<type> name() { \
+	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
+	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset ); \
     }
 
 // generate netvar, but address as the pointer
+// type - template type for return type
+// name - name your function
+// table - table name to search the netvar prop
+// prop - prop name
 #define PTRNETVAR(type, name, table, prop) \
-_NODISCARD type* name() { \
-	static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
-	return reinterpret_cast<type*>((uintptr_t)this + offset); \
+_NODISCARD std::add_pointer_t<type> name() { \
+	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
+	return reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset); \
     }
 
 // define literal offset
+// type - template type for return type
+// name - name your function
+// offset - offset to add
 #define OFFSET(type, name, offset) \
-_NODISCARD type& name() { \
-	return *reinterpret_cast<type*>((uintptr_t)this + offset); \
+_NODISCARD std::add_lvalue_reference_t<type> name() { \
+	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset); \
 	}
 
 // use like normal netvar, with bytes to add as last argument
+// type - template type for return type
+// name - name your function
+// table - table name to search the netvar prop
+// prop - prop name
+// addr - extra offset to add
 #define NETVAR_ADDR(type, name, table, prop, addr) \
-_NODISCARD type& name() { \
-	static uintptr_t offset = NetvarManager::g().getNetvar(XOR(table), XOR(prop)); \
-	return *reinterpret_cast<type*>((uintptr_t)this + offset + addr); \
+_NODISCARD std::add_lvalue_reference_t<type> name() { \
+	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
+	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset + addr); \
 	}
 
-class NetvarManager : public singleton<NetvarManager>
+class NetvarManager
 {
 public:
 	void init();
@@ -47,4 +62,4 @@ private:
 	std::string getType(RecvProp* recvTable);
 	void dump(RecvTable* recvTable);
 	std::ofstream file;
-};
+} inline netvarMan;

@@ -31,7 +31,7 @@ void printStack()
 #else
 		SymFromAddr(process, (DWORD64)(stack[i]), 0, symbol);
 #endif
-		LOG(LOG_NO, std::format(XOR("{}: {} - 0x{:X}"), frames - i - 1, symbol->Name, symbol->Address));
+		LOG(LOG_ERR, std::format(XOR("{}: {} - 0x{:X}"), frames - i - 1, symbol->Name, symbol->Address));
 	}
 
 	free(symbol);
@@ -39,36 +39,36 @@ void printStack()
 
 std::map<DWORD, const char*> crashNames
 {
-	{EXCEPTION_ACCESS_VIOLATION, "EXCEPTION_ACCESS_VIOLATION"},
-	{EXCEPTION_READ_FAULT, "EXCEPTION_READ_FAULT"},
-	{EXCEPTION_DATATYPE_MISALIGNMENT, "EXCEPTION_DATATYPE_MISALIGNMENT"},
-	{EXCEPTION_BREAKPOINT, "EXCEPTION_BREAKPOINT"},
-	{EXCEPTION_SINGLE_STEP, "EXCEPTION_SINGLE_STEP"},
-	{EXCEPTION_ARRAY_BOUNDS_EXCEEDED, "EXCEPTION_ARRAY_BOUNDS_EXCEEDED"},
-	{EXCEPTION_FLT_DENORMAL_OPERAND, "EXCEPTION_FLT_DENORMAL_OPERAND"},
-	{EXCEPTION_FLT_DIVIDE_BY_ZERO, "EXCEPTION_FLT_DIVIDE_BY_ZERO"},
-	{EXCEPTION_FLT_INEXACT_RESULT, "EXCEPTION_FLT_INEXACT_RESULT"},
-	{EXCEPTION_FLT_INVALID_OPERATION, "EXCEPTION_FLT_INVALID_OPERATION"},
-	{EXCEPTION_FLT_OVERFLOW, "EXCEPTION_FLT_OVERFLOW"},
-	{EXCEPTION_FLT_STACK_CHECK, "EXCEPTION_FLT_STACK_CHECK"},
-	{EXCEPTION_FLT_UNDERFLOW, "EXCEPTION_FLT_UNDERFLOW"},
-	{EXCEPTION_INT_DIVIDE_BY_ZERO, "EXCEPTION_INT_DIVIDE_BY_ZERO"},
-	{EXCEPTION_INT_OVERFLOW, "EXCEPTION_INT_OVERFLOW"},
-	{EXCEPTION_PRIV_INSTRUCTION, "EXCEPTION_PRIV_INSTRUCTION"},
-	{EXCEPTION_NONCONTINUABLE_EXCEPTION, "EXCEPTION_NONCONTINUABLE_EXCEPTION"},
-	{EXCEPTION_STACK_OVERFLOW, "EXCEPTION_STACK_OVERFLOW"},
-	{EXCEPTION_INVALID_DISPOSITION, "EXCEPTION_INVALID_DISPOSITION"},
-	{EXCEPTION_GUARD_PAGE, "EXCEPTION_GUARD_PAGE"},
-	{EXCEPTION_INVALID_HANDLE, "EXCEPTION_INVALID_HANDLE"}
+	{EXCEPTION_ACCESS_VIOLATION, XOR("EXCEPTION_ACCESS_VIOLATION")},
+	{EXCEPTION_READ_FAULT, XOR("EXCEPTION_READ_FAULT") },
+	{EXCEPTION_DATATYPE_MISALIGNMENT, XOR("EXCEPTION_DATATYPE_MISALIGNMENT")},
+	{EXCEPTION_BREAKPOINT, XOR("EXCEPTION_BREAKPOINT")},
+	{EXCEPTION_SINGLE_STEP, XOR("EXCEPTION_SINGLE_STEP")},
+	{EXCEPTION_ARRAY_BOUNDS_EXCEEDED, XOR("EXCEPTION_ARRAY_BOUNDS_EXCEEDED")},
+	{EXCEPTION_FLT_DENORMAL_OPERAND, XOR("EXCEPTION_FLT_DENORMAL_OPERAND")},
+	{EXCEPTION_FLT_DIVIDE_BY_ZERO, XOR("EXCEPTION_FLT_DIVIDE_BY_ZERO")},
+	{EXCEPTION_FLT_INEXACT_RESULT, XOR("EXCEPTION_FLT_INEXACT_RESULT")},
+	{EXCEPTION_FLT_INVALID_OPERATION, XOR("EXCEPTION_FLT_INVALID_OPERATION")},
+	{EXCEPTION_FLT_OVERFLOW, XOR("EXCEPTION_FLT_OVERFLOW")},
+	{EXCEPTION_FLT_STACK_CHECK, XOR("EXCEPTION_FLT_STACK_CHECK")},
+	{EXCEPTION_FLT_UNDERFLOW, XOR("EXCEPTION_FLT_UNDERFLOW")},
+	{EXCEPTION_INT_DIVIDE_BY_ZERO, XOR("EXCEPTION_INT_DIVIDE_BY_ZERO")},
+	{EXCEPTION_INT_OVERFLOW, XOR("EXCEPTION_INT_OVERFLOW")},
+	{EXCEPTION_PRIV_INSTRUCTION, XOR("EXCEPTION_PRIV_INSTRUCTION")},
+	{EXCEPTION_NONCONTINUABLE_EXCEPTION, XOR("EXCEPTION_NONCONTINUABLE_EXCEPTION")},
+	{EXCEPTION_STACK_OVERFLOW, XOR("EXCEPTION_STACK_OVERFLOW")},
+	{EXCEPTION_INVALID_DISPOSITION, XOR("EXCEPTION_INVALID_DISPOSITION")},
+	{EXCEPTION_GUARD_PAGE, XOR("EXCEPTION_GUARD_PAGE")},
+	{EXCEPTION_INVALID_HANDLE, XOR("EXCEPTION_INVALID_HANDLE")}
 };
 
 LONG WINAPI memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 {
 	const auto code = pExceptionInfo->ExceptionRecord->ExceptionCode;
 
-	for (const auto& el : crashNames)
+	for (const auto& [number, name] : crashNames)
 	{
-		if (code == el.first)
+		if (code == number)
 		{
 			static bool bOnce = [=]()
 			{
@@ -91,17 +91,17 @@ LONG WINAPI memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 
 				ss << std::format(XOR("Exception (fatal) {} at address {} ({}), flags - {}, params - {}\n"), crashNames[code], addr, name, flag, params);
 				// x86
-				LOG(LOG_NO, std::format(XOR("EAX - 0x{:X}"), pExceptionInfo->ContextRecord->Eax));
-				LOG(LOG_NO, std::format(XOR("EBP - 0x{:X}"), pExceptionInfo->ContextRecord->Ebp));
-				LOG(LOG_NO, std::format(XOR("EBX - 0x{:X}"), pExceptionInfo->ContextRecord->Ebx));
-				LOG(LOG_NO, std::format(XOR("ECX - 0x{:X}"), pExceptionInfo->ContextRecord->Ecx));
-				LOG(LOG_NO, std::format(XOR("EDI - 0x{:X}"), pExceptionInfo->ContextRecord->Edi));
-				LOG(LOG_NO, std::format(XOR("EDX - 0x{:X}"), pExceptionInfo->ContextRecord->Edx));
-				LOG(LOG_NO, std::format(XOR("EIP - 0x{:X}"), pExceptionInfo->ContextRecord->Eip));
-				LOG(LOG_NO, std::format(XOR("ESI - 0x{:X}"), pExceptionInfo->ContextRecord->Esi));
-				LOG(LOG_NO, std::format(XOR("ESP - 0x{:X}"), pExceptionInfo->ContextRecord->Esp));
+				LOG(LOG_ERR, std::format(XOR("EAX - 0x{:X}"), pExceptionInfo->ContextRecord->Eax));
+				LOG(LOG_ERR, std::format(XOR("EBP - 0x{:X}"), pExceptionInfo->ContextRecord->Ebp));
+				LOG(LOG_ERR, std::format(XOR("EBX - 0x{:X}"), pExceptionInfo->ContextRecord->Ebx));
+				LOG(LOG_ERR, std::format(XOR("ECX - 0x{:X}"), pExceptionInfo->ContextRecord->Ecx));
+				LOG(LOG_ERR, std::format(XOR("EDI - 0x{:X}"), pExceptionInfo->ContextRecord->Edi));
+				LOG(LOG_ERR, std::format(XOR("EDX - 0x{:X}"), pExceptionInfo->ContextRecord->Edx));
+				LOG(LOG_ERR, std::format(XOR("EIP - 0x{:X}"), pExceptionInfo->ContextRecord->Eip));
+				LOG(LOG_ERR, std::format(XOR("ESI - 0x{:X}"), pExceptionInfo->ContextRecord->Esi));
+				LOG(LOG_ERR, std::format(XOR("ESP - 0x{:X}"), pExceptionInfo->ContextRecord->Esp));
 
-				LOG(LOG_NO, ss.str());
+				LOG(LOG_ERR, ss.str());
 				printStack();
 				LF(MessageBoxA)(nullptr, ss.str().c_str(), XOR("Fatal error!"), MB_ICONERROR | MB_OK);
 				bOnce = true;

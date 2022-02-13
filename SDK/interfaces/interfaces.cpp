@@ -1,8 +1,9 @@
 #include "interfaces.hpp"
 #include "../structs/IDXandPaterrns.hpp"
 #include "../../utilities/utilities.hpp"
+#include "../../cheats/globals.hpp"
 
-bool interfaces::init()
+void interfaces::init()
 {
 	engine = getInterface<IVEngineClient>(ENGINE_DLL, XOR("VEngineClient014"));
 	panel = getInterface<IPanel>(VGUI_DLL, XOR("VGUI_Panel009"));
@@ -33,7 +34,10 @@ bool interfaces::init()
 	input = *reinterpret_cast<Input**>((*reinterpret_cast<uintptr_t**>(client))[16] + 0x1);
 	resource = *reinterpret_cast<PlayerResource***>(utilities::patternScan(CLIENT_DLL, PLAYER_RESOURCE) + 0x2);
 
-	LOG(LOG_INFO, XOR("interfaces success"));
+	globals::interfacesDone = true;
 
-	return true;
+	// because it's first log ever
+	interfaces::engine->executeClientCMD(XOR("clear"));
+
+	LOG(LOG_INFO, XOR("interfaces success"));
 }

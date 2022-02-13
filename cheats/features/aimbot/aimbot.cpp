@@ -1,6 +1,8 @@
 #include "aimbot.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../globals.hpp"
+#include "../../../config/vars.hpp"
+#include "../../game.hpp"
 
 enum AimbotID
 {
@@ -16,7 +18,7 @@ void legitbot::drawFov()
 {
     if (interfaces::engine->isConnected() && interfaces::engine->isInGame())
     {
-        if (!vars::iAimbot)
+        if (!config.get<bool>(vars.bAimbot))
             return;
 
         if (!game::localPlayer)
@@ -33,34 +35,15 @@ void legitbot::drawFov()
         if (weapon->isNonAimable())
             return;
 
-        int x, y;
-        interfaces::engine->getScreenSize(x, y);
+        float radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
 
-        float radius = std::tan(DEG2RAD(vars::iFovAimbot) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * x;
-
-        render::drawCircle(x / 2, y / 2, radius, 32, Colors::LightBlue);
+        render::drawCircle(globals::screenX / 2, globals::screenY / 2, radius, 32, Colors::LightBlue);
     }
-}
-
-void legitbot::RCS(CUserCmd* cmd)
-{
-    static Vector oldPunch{ 0, 0, 0 };
-    auto punch = game::localPlayer->m_aimPunchAngle() * 2.0f;
-
-    punch.x *= vars::iRCS / 100.0f;
-    punch.y *= vars::iRCS / 100.0f;
-
-    auto toMove = cmd->m_viewangles += (oldPunch - punch);
-    toMove.clamp();
-
-    interfaces::engine->setViewAngles(toMove);
-
-    oldPunch = punch;
 }
 
 void legitbot::run(CUserCmd* cmd)
 {
-    if (!vars::iAimbot && !vars::iRCS)
+    if (!config.get<bool>(vars.bAimbot))
         return;
 
     if (!game::localPlayer)
@@ -82,17 +65,14 @@ void legitbot::run(CUserCmd* cmd)
     if (weapon->isSniper() && !game::localPlayer->m_bIsScoped())
         return;
 
-    if (vars::iRCS)
-        RCS(cmd);
-
     if (cmd->m_buttons & IN_ATTACK) // add key later
     {
-        auto bestFov = vars::iFovAimbot;
-        Vector bestPos = Vector(0, 0, 0);
+        float bestFov = config.get<float>(vars.fFovAimbot);
+        Vector bestPos = Vector{ 0.0f, 0.0f, 0.0f };
         const auto punch = weapon->isRifle() || weapon->isSmg() ? game::localPlayer->getAimPunch() : Vector(0, 0, 0);
         const auto myEye = game::localPlayer->getEyePos();
 
-        for (int i = 1; i <= interfaces::engine->getMaxClients(); i++)
+        for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
         {
             auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
 
@@ -119,8 +99,8 @@ void legitbot::run(CUserCmd* cmd)
             // https://cdn.discordapp.com/attachments/829304849027170305/916477147261051000/unknown.png
             for (int pos = HITBOX_HEAD; pos < HITBOX_MAX; pos++)
             {
-                Vector hitPos = Vector(0, 0, 0);
-                switch (vars::iAimbot)
+                Vector hitPos = Vector{ 0.0f, 0.0f, 0.0f };
+                switch (config.get<int>(vars.iAimbot))
                 {
                 case NEAREST:
                     hitPos = ent->getHitboxPos(pos);
@@ -146,7 +126,7 @@ void legitbot::run(CUserCmd* cmd)
                     bestPos = hitPos;
                     bestEnt = ent;
                 }
-                if (vars::iAimbot != NEAREST)
+                if (config.get<int>(vars.iAimbot) != NEAREST)
                     break;
             }
         }
@@ -157,8 +137,8 @@ void legitbot::run(CUserCmd* cmd)
             angle.clamp();
 
             // remember to only smooth when the value is non zero/negative!
-            if (vars::iSmooth)
-                angle /= vars::iSmooth;
+            if (auto smoothing = config.get<float>(vars.fSmooth); smoothing)
+                angle /= smoothing;
             cmd->m_viewangles += angle;
 
             interfaces::engine->setViewAngles(cmd->m_viewangles);
@@ -167,3 +147,43 @@ void legitbot::run(CUserCmd* cmd)
     else
         bestEnt = nullptr;
 }
+
+void legitbot::RCS(CUserCmd* cmd)
+{
+    static Vector oldPunch{ 0.0f, 0.0f, 0.0f };
+    auto punch = game::localPlayer->m_aimPunchAngle() * 2.0f;
+
+    punch.x *= config.get<float>(vars.fRCS) / 100.0f;
+    punch.y *= config.get<float>(vars.fRCS) / 100.0f;
+
+    auto toMove = cmd->m_viewangles += (oldPunch - punch);
+    toMove.clamp();
+
+    interfaces::engine->setViewAngles(toMove);
+
+    oldPunch = punch;
+}
+
+
+void legitbot::runRCS(CUserCmd* cmd)
+{
+    if (!config.get<bool>(vars.bRCS))
+        return;
+
+    if (!game::localPlayer)
+        return;
+
+    auto weapon = game::localPlayer->getActiveWeapon();
+
+    if (!weapon)
+        return;
+
+    if (weapon->isNonAimable())
+        return;
+
+    if (weapon->isSniper())
+        return;
+
+    RCS(cmd);
+}
+

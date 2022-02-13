@@ -6,7 +6,4 @@ namespace game
 	inline Player_t* localPlayer = nullptr;
 	_NODISCARD bool isAvailable();
 	float serverTime(CUserCmd* cmd = nullptr);
-	_NODISCARD int getLocalKills();
-	_NODISCARD int getLocalDeaths();
-	_NODISCARD int getLocalPing();
 }

@@ -239,7 +239,7 @@ int Player_t::getKills()
 	const static auto res = *interfaces::resource;
 	if (res)
 	{
-		const static auto kills = res->getKills(this->getIndex());
+		const auto kills = res->getKills(this->getIndex());
 		return kills;
 	}
 	return 0;
@@ -250,7 +250,7 @@ int Player_t::getDeaths()
 	const static auto res = *interfaces::resource;
 	if (res)
 	{
-		const static auto deaths = res->getDeaths(this->getIndex());
+		const auto deaths = res->getDeaths(this->getIndex());
 		return deaths;
 	}
 	return 0;
@@ -261,7 +261,7 @@ int Player_t::getPing()
 	const static auto res = *interfaces::resource;
 	if (res)
 	{
-		const static auto ping = res->getPing(this->getIndex());
+		const auto ping = res->getPing(this->getIndex());
 		return ping;
 	}
 	return 0;

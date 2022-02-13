@@ -1,24 +1,23 @@
 #pragma once
 #include "../utilities/netvars/netvars.hpp"
 
+// not really a netvar return address, but return valid value
+// type - template type for return type
+// name - name your function
+// netvarFun - passed by name function that returns correct address to that netvar, NOT VALUE
+#define NETVAR_BY_INDEX(type, name, netvarFun) \
+_NODISCARD type name(const int index) { \
+	return netvarFun()[index]; \
+    }
+
 class PlayerResource
 {
 public:
-	int getKills(int id)
-	{
-		static auto m_iKills = NetvarManager::g().getNetvar(XOR("DT_PlayerResource"), XOR("m_iKills"));
-		return *reinterpret_cast<int*>((uintptr_t)this + m_iKills + id * 0x4);
-	}
-
-	int getDeaths(int id)
-	{
-		const static auto m_iDeaths = NetvarManager::g().getNetvar(XOR("DT_PlayerResource"), XOR("m_iDeaths"));
-		return *reinterpret_cast<int*>((uintptr_t)this + m_iDeaths + id * 0x4);
-	}
-
-	int getPing(int id)
-	{
-		const static auto m_iPing = NetvarManager::g().getNetvar(XOR("DT_PlayerResource"), XOR("m_iPing"));
-		return *reinterpret_cast<int*>((uintptr_t)this + m_iPing + id * 0x4);
-	}
+	NETVAR_BY_INDEX(int, getKills, m_iKills);
+	NETVAR_BY_INDEX(int, getDeaths, m_iDeaths);
+	NETVAR_BY_INDEX(int, getPing, m_iPing);
+private: // 65 is supposed to be max players, correct if this is higher, who plays on such big servers though?
+	NETVAR(int[65], m_iKills, "DT_PlayerResource", "m_iKills");
+	NETVAR(int[65], m_iDeaths, "DT_PlayerResource", "m_iDeaths");
+	NETVAR(int[65], m_iPing, "DT_PlayerResource", "m_iPing");
 };

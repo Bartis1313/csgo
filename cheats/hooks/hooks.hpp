@@ -69,29 +69,29 @@ namespace hooks
 
 	struct clientValidAddr
 	{
-		using fn = char(__fastcall*)(uintptr_t, int, uintptr_t);
-		static char __fastcall hooked(uintptr_t thisptr, int edx, uintptr_t retAddr);
+		using fn = char(__fastcall*)(void*, void*, const char*);
+		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct engineValidAddr
 	{
-		using fn = char(__fastcall*)(uintptr_t, int, uintptr_t);
-		static char __fastcall hooked(uintptr_t thisptr, int edx, uintptr_t retAddr);
+		using fn = char(__fastcall*)(void*, void*, const char*);
+		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct studioRenderValidAddr
 	{
-		using fn = char(__fastcall*)(uintptr_t, int, uintptr_t);
-		static char __fastcall hooked(uintptr_t thisptr, int edx, uintptr_t retAddr);
+		using fn = char(__fastcall*)(void*, void*, const char*);
+		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct materialSystemValidAddr
 	{
-		using fn = char(__fastcall*)(uintptr_t, int, uintptr_t);
-		static char __fastcall hooked(uintptr_t thisptr, int edx, uintptr_t retAddr);
+		using fn = char(__fastcall*)(void*, void*, const char*);
+		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 }

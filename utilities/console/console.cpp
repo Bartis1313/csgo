@@ -4,7 +4,10 @@
 #include <sstream>
 #include <format>
 #include <map>
-#include "../utilities.hpp"
+#include "../../config/config.hpp"
+#include "../../SDK/Color.hpp"
+#include "../../cheats/globals.hpp"
+#include "../../SDK/interfaces/interfaces.hpp"
 
 enum consoleColors
 {
@@ -51,7 +54,7 @@ bool console::init(const char* title)
 
 	LF(AllocConsole)();
 
-	freopen_s(reinterpret_cast<FILE**>(__acrt_iob_func(0)), XOR("CONOUT$"), XOR("w"), __acrt_iob_func(1));
+	freopen_s(reinterpret_cast<FILE**>(__acrt_iob_func(1)), XOR("CONOUT$"), XOR("w"), __acrt_iob_func(1));
 
 	LF(SetConsoleTitleA)(title);
 
@@ -69,7 +72,7 @@ void console::shutdown()
 	return;
 }
 
-std::map<short, WORD> colors =
+std::map<short, WORD> colorsConsole =
 {
 	{LOG_NO, CONSOLE_WHITE},
 	{LOG_INFO, CONSOLE_GREEN},
@@ -77,7 +80,6 @@ std::map<short, WORD> colors =
 	{LOG_ERR, CONSOLE_RED}
 };
 
-// I have no idea how to name variables sometimes
 std::map<short, const char*> consoleStrings =
 {
 	{LOG_NO, ""},
@@ -86,23 +88,39 @@ std::map<short, const char*> consoleStrings =
 	{LOG_ERR, "[err] "}
 };
 
+std::map<short, Color> consoleColors =
+{
+	{LOG_NO, Colors::White },
+	{LOG_INFO, Colors::Green },
+	{LOG_WELCOME, Colors::Cyan },
+	{LOG_ERR, Colors::Red }
+};
+
 void console::log(const short type, const std::string& str, const bool useNewLine)
 {
 	if (str.empty())
 		return;
 	
-	std::ofstream log(__PATH + XOR("\\hack.log"), std::ofstream::out | std::ofstream::app);
+	std::ofstream log{ config.getPathForSave(XOR("hack.log")), std::ofstream::out | std::ofstream::app};
 	std::stringstream ss;
 
 #ifdef _DEBUG
-	console::setColor(colors[type]);
+	console::setColor(colorsConsole[type]);
 	std::cout << consoleStrings[type];
 	console::reset();
 #endif
 	ss << "[" << utilities::getTime() << "] " << str;
 	if (useNewLine)
 		ss << "\n";
+
+	if (globals::interfacesDone)
+		interfaces::console->consoleColorPrintf(consoleColors[type], consoleStrings[type]);
+
 	log << consoleStrings[type] << ss.str();
+
+	if (globals::interfacesDone)
+		interfaces::console->consoleColorPrintf(Colors::White, ss.str().c_str());
+	
 	log.close();
 #ifdef _DEBUG
 	std::cout << ss.str();

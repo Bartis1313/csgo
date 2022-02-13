@@ -61,4 +61,5 @@ namespace Colors
 	inline Color Palevioletred = Color(220, 110, 150, 255);
 	inline Color Pink = Color(255, 100, 180, 255);
 	inline Color Coral = Color(255, 127, 80, 255);
+	inline Color Cyan = Color(0, 255, 255, 255);
 }

@@ -1,13 +1,11 @@
 #include "glow.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../SDK/structs/Entity.hpp"
 #include "../../game.hpp"
-#include "../../menu/vars.hpp"
+#include "../../../config/vars.hpp"
 
-// TODO: what drops so hard???
 void glow::run()
 {
-	if (!vars::bGlow)
+	if (!config.get<bool>(vars.bGlow))
 		return;
 
 	if (!game::localPlayer)

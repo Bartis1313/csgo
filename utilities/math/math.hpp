@@ -6,14 +6,14 @@
 
 namespace math
 {
-	Vector calcAngleRelative(const Vector& src, const Vector& dest, const Vector& viewAngle);
+	_NODISCARD Vector calcAngleRelative(const Vector& src, const Vector& dest, const Vector& viewAngle);
 	float calcFov(const Vector& source, const Vector& destination, const Vector& viewAngles);	
 	// based on two vectors resulting one
 	void makeVec(const Vector& in, Vector& out);
-	Vector transformVector(const Vector& in, matrix3x4_t matrix);
+	_NODISCARD Vector transformVector(const Vector& in, matrix3x4_t matrix);
 	void transformVector(Vector& in, matrix3x4_t& mat, Vector& out);
-	Vector angleVec(const Vector& angle);
-	float normalizeYaw(float yaw);
+	_NODISCARD Vector angleVec(const Vector& angle);
+	_NODISCARD float normalizeYaw(float yaw);
 	// direction vector based on euler dimension
-	Vector vectorToAngle(const Vector& vec);
+	_NODISCARD Vector vectorToAngle(const Vector& vec);
 }

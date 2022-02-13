@@ -1,9 +1,10 @@
 #include "triggerbot.hpp"
 #include "../../game.hpp"
+#include "../../../config/vars.hpp"
 
 void triggerbot::run(CUserCmd* cmd)
 {
-	if (!vars::bTriggerbot)
+	if (!config.get<bool>(vars.bTriggerbot))
 		return;
 
 	if (!interfaces::engine->isInGame())
@@ -38,7 +39,7 @@ void triggerbot::run(CUserCmd* cmd)
 	const auto current = interfaces::globalVars->m_realtime;
 
 	// because this time is in seconds, so delay must be /1000 (s->ms), when using chrono, you can cast to ms so it's more flexible
-	if ((current - delay) < static_cast<float>(vars::iTriggerDelay / 1000.0f))
+	if ((current - delay) < static_cast<float>(config.get<float>(vars.fTriggerDelay) / 1000.0f))
 		return;
 
 	Trace_t trace;

@@ -4,6 +4,7 @@
 #include "utilities/renderer/renderer.hpp"
 #include "utilities/netvars/netvars.hpp"
 #include "config/config.hpp"
+#include "config/vars.hpp" // so vars load
 #include "source.hpp"
 #include "cheats/features/visuals/chams.hpp"
 #include "cheats/globals.hpp"
@@ -17,20 +18,18 @@ VOID WINAPI _shutdown(PVOID instance);
 
 DWORD WINAPI init(PVOID instance)
 {
-    //AddVectoredExceptionHandler(1, memErrorCatch);
+    AddVectoredExceptionHandler(TRUE, memErrorCatch);
 
     console::init(XOR("CSGO DEBUG"));
 
     // warning: if you do wrong hierarchy - crash
     try
     {
-        utilities::prepareDirectories();
-        config::init();
         interfaces::init();
-        NetvarManager::g().init();
-        NetvarManager::g().dump();
+        config.init();
+        netvarMan.init();
+        netvarMan.dump();
         render::init();
-        GUI::TextInput::initTabs();
         GUI::initGui();
         hooks::init();
     }
@@ -50,7 +49,10 @@ VOID WINAPI _shutdown(PVOID instance)
         std::this_thread::sleep_for(100ms);
     }
 
+    RemoveVectoredExceptionHandler(globals::instance);
+
     GUI::menu->shutdown();
+    LOG(LOG_INFO, XOR("Hack shutdown"));
     hooks::shutdown();
     console::shutdown();
 

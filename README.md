@@ -5,6 +5,7 @@ Very short and commented source aimed for legit gameplay
 
 # Information
 In development, not every feature may work perfectly.
+x88 menu is ON by default. To use GUI, switch option in text menu to "OFF", the GUI will be now the master menu.
 
 # Features: 
 <details>
@@ -81,6 +82,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.2.1 - GUI update with finishing ideas of everything, recode is still needed for automatic padding for GUI objects or add ideally add flags to choose.
 * 1.2.2 - Big GUI update, it now can use auto padding, changed few comments to make it easier to understand in whole code. Still it needs few fixes.
 * 1.2.3 - Almost GUI is finished, few things left.
+* 1.2.4 - Update on new config system using type safe checks, menu is finally ready to work with variables and multiple configs. Fixed, removed bunch of functions. Deleted singleton as it's a very bad choice to work with single class objects. Reduced many calls. Made return address more easier.
 </details>
 
 # People who helped

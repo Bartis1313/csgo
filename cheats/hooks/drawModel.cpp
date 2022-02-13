@@ -4,10 +4,6 @@
 
 void __stdcall hooks::drawModel::hooked(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix)
 {
-	// when invalid it will make all players invisible
-	if (!game::localPlayer)
-		return;
-
 	if(!interfaces::engine->isInGame() || interfaces::modelRender->isForcedMaterial())
 		return original(interfaces::modelRender, ctx, state, info, matrix);
 

@@ -26,16 +26,7 @@ namespace vfunc
 	}
 }
 
-//#define VFUNC(type, name, index, ...) \
-//type name { \
-//	return vfunc::callVFunc<type, index>(this, __VA_ARGS__); \
-//}
-
-// only disadvantage is the fact I can't [[nodiscard]] here because type might be void
-
 #define VFUNC(type, name, index, args, variables) \
 type name args { \
     return vfunc::callVFunc<type, index>variables; \
 }
-
-// for packed vfunctions you will unfortunately need to make function yourself

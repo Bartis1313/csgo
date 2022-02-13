@@ -1,6 +1,7 @@
 #include "chams.hpp"
 #include "../../game.hpp"
-#include "../../menu/vars.hpp"
+#include "../../../config/vars.hpp"
+#include "../../../utilities/renderer/renderer.hpp"
 #include "../backtrack/backtrack.hpp"
 
 inline constexpr void CALL(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix)
@@ -33,7 +34,7 @@ void chams::overrideChams(bool ignore, bool wireframe, Color color)
 
 void chams::drawChams(Player_t* ent, void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix)
 {
-	switch (vars::iChams)
+	switch (config.get<int>(vars.iChams))
 	{
 	case STATIC:
 		overrideChams(false, false, Color(255, 0, 255, 255));
@@ -52,7 +53,7 @@ void chams::drawChams(Player_t* ent, void* ctx, const DrawModelState_t& state, c
 
 void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info)
 {
-	switch (vars::iBacktrackChams)
+	switch (config.get<int>(vars.iBacktrackChams))
 	{
 	case STABLE:
 	{
@@ -130,21 +131,21 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 	if (!game::localPlayer->isAlive())
 		return;
 
-	if (!vars::iHandChams && !vars::iWeaponChams)
+	if (!config.get<int>(vars.iHandChams) && !config.get<int>(vars.iWeaponChams))
 		return;
 
 	std::string name = info.m_model->m_name;
 
 	if (name.starts_with(XOR("models/weapons/v_")))
 	{
-		if (vars::iHandChams)
+		if (config.get<int>(vars.iHandChams))
 		{
 			// 17 skips the ptr to move 17 indexes, so models/weapons/v_ is skipped
 			if (strstr(name.c_str() + 17, XOR("arms")))
 			{
 				static auto material = interfaces::matSys->findMaterial(name.c_str(), XOR(TEXTURE_GROUP_MODEL));
 				overrideChams(false, false, Color(0, 180, 250, 255));
-				if (vars::iHandChams == NO_HANDS)
+				if (vars.iHandChams == NO_HANDS)
 				{
 					material->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
 					interfaces::modelRender->overrideMaterial(material);
@@ -153,7 +154,7 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 			}
 		}
 
-		if (vars::iWeaponChams)
+		if (config.get<int>(vars.iWeaponChams))
 		{
 			if (!strstr(name.c_str() + 17, XOR("fists")) &&
 				!strstr(name.c_str() + 17, XOR("tablet")) &&
@@ -164,7 +165,7 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 
 				static auto material = interfaces::matSys->findMaterial(name.c_str(), XOR(TEXTURE_GROUP_MODEL));
 				overrideChams(false, false, Colors::Palevioletred); // - Trophy
-				if (vars::iWeaponChams == NO_WEAPON)
+				if (vars.iWeaponChams == NO_WEAPON)
 				{
 					material->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
 					interfaces::modelRender->overrideMaterial(material);

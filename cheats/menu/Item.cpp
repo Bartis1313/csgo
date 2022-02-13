@@ -3,12 +3,21 @@
 
 int Item::count = 0;
 
-Item::Item(const std::string& id, int* ref, const std::array<int, 2>& limits) : 
+Item::Item(const std::string& id, int* ref, const std::pair<float, float>& limits) :
 	m_ID{ id },
 	m_iVal{ ref },
 	m_Limits{ limits }
 {
 	m_isInt = true;
+	count++;
+}
+
+Item::Item(const std::string& id, float* ref, const std::pair<float, float>& limits) :
+	m_ID{ id },
+	m_fVal{ ref },
+	m_Limits{ limits }
+{
+	m_isFloat = true;
 	count++;
 }
 
@@ -29,7 +38,7 @@ Item::Item(const std::string& id, int* ref, const std::vector<std::string>& vec)
 	count++;
 }
 
-void Item::chnageIntRefp()
+void Item::changeVectorIndexByPlus()
 {
 	if (*m_iVal < m_Options.size())
 		*m_iVal += 1;
@@ -37,7 +46,7 @@ void Item::chnageIntRefp()
 		*m_iVal = 0;
 }
 
-void Item::chnageIntRefm()
+void Item::changeVectorIndexByMinus()
 {
 	if (*m_iVal < m_Options.size())
 		*m_iVal -= 1;
@@ -45,19 +54,35 @@ void Item::chnageIntRefm()
 		*m_iVal = m_Options.size() - 1;
 }
 
-void Item::chnageAddableRefp()
+void Item::chnageAddableByPlus()
 {
-	if (*m_iVal < m_Limits.at(1))
-		*m_iVal += 1;
+	if (m_isInt)
+	{
+		if (*m_iVal < m_Limits.second)
+			*m_iVal += 1;
+	}
+	else if (m_isFloat)
+	{
+		if (*m_fVal < m_Limits.second)
+			*m_fVal += 1.0f;
+	}
 }
 
-void Item::chnageAddableRefm()
+void Item::chnageAddableByMinus()
 {
-	if (*m_iVal > m_Limits.at(0))
-		*m_iVal -= 1;
+	if (m_isInt)
+	{
+		if (*m_iVal > m_Limits.first)
+			*m_iVal -= 1;
+	}
+	else if (m_isFloat)
+	{
+		if (*m_fVal > m_Limits.first)
+			*m_fVal -= 1.0f;
+	}
 }
 
-void Item::changeBoolRef()
+void Item::changeBool()
 {
 	*m_bVal = !*m_bVal;
 }

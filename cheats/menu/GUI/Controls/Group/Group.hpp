@@ -21,15 +21,15 @@ namespace GUI
 		// should be only called in tab
 		Group(const std::string& name, Lining lining);
 
-		void addCheckBox(const std::string& title, bool* feature);
-		void addButton(const std::string& title, const std::function<void()>& lambda);
-		void addComboBox(const std::string& title, const std::vector<std::string>& names, int* option);
-		void addMultiBox(const std::string& title, const std::vector<std::string>& names, std::vector<bool>* feature);
-		void addTextInput(const std::string& title, std::string* text);
-		void addKeyHolder(int* key);
-		void addSlider(const std::string& title, std::pair<float, float> minMax, float* value);
-		void addColorPicker(Color* color);
-		void addHelpMarker(const std::string& text);
+		CheckBox* addCheckBox(const std::string& title, bool* feature);
+		Button* addButton(const std::string& title, const std::function<void()>& lambda);
+		ComboBox* addComboBox(const std::string& title, const std::vector<std::string>& names, int* option);
+		MultiBox* addMultiBox(const std::string& title, const std::vector<std::string>& names, std::vector<bool>* feature);
+		TextInput* addTextInput(const std::string& title, std::string* text);
+		KeyHolder* addKeyHolder(int* key);
+		Slider* addSlider(const std::string& title, std::pair<float, float> minMax, float* value);
+		ColorPicker* addColorPicker(Color* color);
+		HelpMarker* addHelpMarker(const std::string& text);
 
 		void draw(Vector2D* pos, Menu* parent);
 		void shutdown();

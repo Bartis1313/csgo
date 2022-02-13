@@ -1,6 +1,6 @@
 #pragma once
 
-// 13:53 04.02.2022
+// 20:52 13.02.2022
 // Bartis: updated
 
 enum VTableIndexes
@@ -23,7 +23,7 @@ enum VTableIndexes
 #define MATERIAL_DLL		XOR("materialsystem.dll")
 #define LOCALIZE_DLL		XOR("localize.dll")
 #define STUDIORENDER_DLL	XOR("studiorender.dll")
-#define INPUTSYSTEM_DLL	XOR("inputsystem.dll")
+#define INPUTSYSTEM_DLL		XOR("inputsystem.dll")
 
 #define GLOWMANAGER				XOR("0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00")
 #define BEAMS					XOR("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")
@@ -40,4 +40,4 @@ enum VTableIndexes
 #define LOAD_SKY				XOR("55 8B EC 81 EC ? ? ? ? 56 57 8B F9 C7 45")
 #define ANIMATION_LAYER			XOR("8B 89 ? ? ? ? 8D 0C D1")
 #define SEQUENCE_ACTIVITY		XOR("55 8B EC 53 8B 5D 08 56 8B F1 83")
-#define NEW_CHECK				XOR("E8 ? ? ? ? 84 C0 75 15 FF 75 10")
+#define NEW_CHECK				XOR("55 8B EC 56 8B F1 33 C0 57 8B 7D 08 8B 8E") // direct sig, sub_10797090

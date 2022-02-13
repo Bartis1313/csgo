@@ -2,11 +2,10 @@
 #include <string>
 #include <vector>
 #include "Item.hpp"
-#include "vars.hpp"
+#include "../../config/vars.hpp"
 #include "../../SDK/Color.hpp"
-#include "../../utilities/singleton.hpp"
 
-class Menu : public singleton<Menu>
+class Menu
 {
 public:
 	Menu() = default;
@@ -14,10 +13,8 @@ public:
 	void drawText(int x, int y, Color color, const std::string& text);
 	void drawBool(int idx, int x, int& y);
 	void drawInt(int idx, int x, int& y);
+	void drawFloat(int idx, int x, int& y);
 	void drawVec(int idx, int x, int& y);
 	void drawOption(int idx, int x, int& y);
-	// should delete this later and use keys from GUI namespace due to useless function calls
 	void handleKeys() const;
-private:
-	Item* settings = vars::options;
-};
+} inline x88Menu;

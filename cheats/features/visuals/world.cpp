@@ -1,12 +1,15 @@
 #include "world.hpp"
 #include "../../../utilities/utilities.hpp"
-#include "../../menu/vars.hpp"
+#include "../../../SDK/interfaces/interfaces.hpp"
+#include "../../../utilities/renderer/renderer.hpp"
 #include "../../game.hpp"
+#include "../../../config/vars.hpp"
 #include <format>
 
 void world::drawMisc()
 {
-	for (int i = 1; i < interfaces::entList->getHighestIndex(); i++)
+	const auto maxIndex = interfaces::entList->getHighestIndex();
+	for (int i = 1; i <= maxIndex; i++)
 	{
 		auto entity = reinterpret_cast<Entity_t*>(interfaces::entList->getClientEntity(i));
 
@@ -79,7 +82,7 @@ float scaleDamageArmor(float dmg, const float armor)
 }
 void world::drawBomb(Entity_t* ent)
 {
-	const auto tickbomb = interfaces::console->findVar(XOR("mp_c4timer"))->getFloat();
+	const static auto tickbomb = interfaces::console->findVar(XOR("mp_c4timer"))->getFloat();
 	const auto bombent = reinterpret_cast<Bomb_t*>(ent);
 	const auto bombtime = bombent->m_flC4Blow() - interfaces::globalVars->m_curtime;
 
@@ -218,11 +221,11 @@ void world::skyboxLoad(int stage)
 
 	// remove sky, not in meaning as full color
 	static const auto removeSky = interfaces::console->findVar(XOR("r_3dsky"));
-	removeSky->setValue(vars::bRunNight ? false : true);	
+	removeSky->setValue(config.get<bool>(vars.bRunNight) ? false : true);	
 
 	static bool done = false;
 
-	if (vars::bRunNight && !done)
+	if (config.get<bool>(vars.bRunNight) && !done)
 	{
 		for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
 		{
@@ -253,7 +256,7 @@ void world::skyboxLoad(int stage)
 		loadSkyBoxFunction(XOR("sky_csgo_night2"));
 		done = true;
 	}
-	else if (!vars::bRunNight && done)
+	else if (!config.get<bool>(vars.bRunNight) && done)
 	{
 		for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
 		{

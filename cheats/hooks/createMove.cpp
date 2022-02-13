@@ -1,6 +1,5 @@
 #include "hooks.hpp"
 #include "../game.hpp"
-#include "../menu/vars.hpp"
 #include "../features/aimbot/aimbot.hpp"
 #include "../features/prediction/prediction.hpp"
 #include "../features/backtrack/backtrack.hpp"
@@ -11,7 +10,7 @@
 #include "../features/misc/misc.hpp"
 
 bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
-{	
+{
 	original(inputFrame, cmd);
 
 	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
@@ -31,6 +30,7 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 	{
 		backtrack::run(cmd);
 		legitbot::run(cmd);
+		legitbot::runRCS(cmd);
 		triggerbot::run(cmd);
 		misc::getVelocityData();
 	}
