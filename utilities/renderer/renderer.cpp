@@ -112,9 +112,9 @@ void render::drawCircleFilled(const int x, const int y, const int radius, const 
 	std::vector<Vertex_t> verts = {};
 
 	float step = std::numbers::pi_v<float> *2.0f / points;
-	for (float i = 0.0f; i < (std::numbers::pi_v<float> *2.0f); i += step)
+	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
 	{
-		verts.emplace_back(std::move(Vector2D(x + (radius * std::cos(i)), y + (radius * std::sin(i)))));
+		verts.emplace_back(std::move(Vector2D(x + (radius * std::cos(angle)), y + (radius * std::sin(angle)))));
 	}
 	interfaces::surface->drawSetColor(color);
 	interfaces::surface->drawTexturedPolygon(verts.size(), verts.data());
@@ -124,10 +124,10 @@ void render::drawCircle3D(const Vector& pos, const int radius, const int points,
 {
 	float step = std::numbers::pi_v<float> *2.0f / points;
 
-	for (float i = 0.0f; i < (std::numbers::pi_v<float> *2.0f); i += step)
+	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
 	{
-		Vector start(radius * std::cos(i) + pos.x, radius * std::sin(i) + pos.y, pos.z);
-		Vector end(radius * std::cos(i + step) + pos.x, radius * std::sin(i + step) + pos.y, pos.z);
+		Vector start(radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z);
+		Vector end(radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z);
 
 		if (Vector screenStart, screenEnd; worldToScreen(start, screenStart) && worldToScreen(end, screenEnd))
 		{
@@ -146,9 +146,9 @@ void render::drawFilledCircle3D(const Vector& pos, const int radius, const int p
 	float step = std::numbers::pi_v<float> *2.0f / points;
 	static Vector before = NOTHING;
 
-	for (float i = 0.0f; i < (std::numbers::pi_v<float> *2.0f); i += step)
+	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
 	{
-		Vector start(radius * std::cos(i) + pos.x, radius * std::sin(i) + pos.y, pos.z);
+		Vector start(radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z);
 
 		if (worldToScreen(start, screenStart) && !before.IsZero())
 		{
