@@ -46,6 +46,8 @@ namespace render
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
 	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
+	// percent should be passed in 0-100 range
+	void drawProgressRing(const int x, const int y, int radius, const int points, float percent, const int thickness, const Color& color);
 	// width only
 	_NODISCARD int getTextSize(const unsigned long font, const std::string& text);
 	// width and height

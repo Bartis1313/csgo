@@ -112,9 +112,9 @@ void render::drawCircleFilled(const int x, const int y, const int radius, const 
 	std::vector<Vertex_t> verts = {};
 
 	float step = std::numbers::pi_v<float> *2.0f / points;
-	for (float i = 0; i < (std::numbers::pi_v<float> *2.0f); i += step)
+	for (float i = 0.0f; i < (std::numbers::pi_v<float> *2.0f); i += step)
 	{
-		verts.emplace_back(Vector2D(x + (radius * std::cos(i)), y + (radius * std::sin(i))));
+		verts.emplace_back(std::move(Vector2D(x + (radius * std::cos(i)), y + (radius * std::sin(i)))));
 	}
 	interfaces::surface->drawSetColor(color);
 	interfaces::surface->drawTexturedPolygon(verts.size(), verts.data());
@@ -124,7 +124,7 @@ void render::drawCircle3D(const Vector& pos, const int radius, const int points,
 {
 	float step = std::numbers::pi_v<float> *2.0f / points;
 
-	for (float i = 0; i < (std::numbers::pi_v<float> *2.0f); i += step)
+	for (float i = 0.0f; i < (std::numbers::pi_v<float> *2.0f); i += step)
 	{
 		Vector start(radius * std::cos(i) + pos.x, radius * std::sin(i) + pos.y, pos.z);
 		Vector end(radius * std::cos(i + step) + pos.x, radius * std::sin(i + step) + pos.y, pos.z);
@@ -146,7 +146,7 @@ void render::drawFilledCircle3D(const Vector& pos, const int radius, const int p
 	float step = std::numbers::pi_v<float> *2.0f / points;
 	static Vector before = NOTHING;
 
-	for (float i = 0; i < (std::numbers::pi_v<float> *2.0f); i += step)
+	for (float i = 0.0f; i < (std::numbers::pi_v<float> *2.0f); i += step)
 	{
 		Vector start(radius * std::cos(i) + pos.x, radius * std::sin(i) + pos.y, pos.z);
 
@@ -460,7 +460,7 @@ void render::drawBox3D(const std::array<Vector, 8>& box, const Color& color, boo
 void render::initNewTexture(int& id, Color* RGBA, const int w, const int h)
 {
 	id = interfaces::surface->createNewTextureID(true);
-	if(id)
+	if (id)
 		interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
 		throw std::runtime_error(std::format(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
@@ -482,4 +482,32 @@ void render::drawFromTexture(const int id, const int x, const int y, const int w
 	interfaces::surface->drawSetColor(color);
 	interfaces::surface->drawSetTexture(id);
 	interfaces::surface->drawTexturedRect(x, y, x + w, y + h);
+}
+
+void render::drawProgressRing(const int x, const int y, int radius, const int points, float percent, const int thickness, const Color& color)
+{
+	// make 0-100 range
+	percent = std::clamp(percent, 0.0f, 100.0f);
+	percent *= 3.6;
+
+	// ending point in deg
+	float endingLine = DEG2RAD(percent);
+
+	// delta between radius and thickness will be needed for loop
+	float delta = radius - thickness;
+
+	// step to move everytime in the drawing loop
+	float step = std::numbers::pi_v<float> *2.0f / points;
+
+	for (; radius > delta; radius--)
+	{
+		for (float i = 0.0f; i < endingLine; i += step)
+		{
+			// maybe this is not the best performance way with surface. Can mess with custom textures
+			drawLine(
+				Vector2D(x + (radius * std::cos(i)), y + (radius * std::sin(i))),
+				Vector2D(x + (radius * std::cos(i + step)), y + (radius * std::sin(i + step))),
+				color);
+		}
+	}
 }
