@@ -484,30 +484,40 @@ void render::drawFromTexture(const int id, const int x, const int y, const int w
 	interfaces::surface->drawTexturedRect(x, y, x + w, y + h);
 }
 
-void render::drawProgressRing(const int x, const int y, int radius, const int points, float percent, const int thickness, const Color& color)
+void render::drawProgressRing(const int x, const int y, float radius, const int points, float percent, const float thickness, const Color& color)
 {
-	// make 0-100 range
+	// alfa means 0.0 - 1.0 range of how filled circle is
 	percent = std::clamp(percent, 0.0f, 100.0f);
-	percent *= 3.6;
-
-	// ending point in deg
-	float endingLine = DEG2RAD(percent);
-
-	// delta between radius and thickness will be needed for loop
-	float delta = radius - thickness;
-
-	// step to move everytime in the drawing loop
+	float alfa = percent / 100.0f;
+	
+	// basically telling how precision will be
 	float step = std::numbers::pi_v<float> *2.0f / points;
 
-	for (; radius > delta; radius--)
+	// limit angle, based on percentage passed
+	float maxAngle = std::numbers::pi_v<float> *2.0f * alfa;
+
+	for(float angle = 0.0f; angle < maxAngle; angle += step)
 	{
-		for (float i = 0.0f; i < endingLine; i += step)
-		{
-			// maybe this is not the best performance way with surface. Can mess with custom textures
-			drawLine(
-				Vector2D(x + (radius * std::cos(i)), y + (radius * std::sin(i))),
-				Vector2D(x + (radius * std::cos(i + step)), y + (radius * std::sin(i + step))),
-				color);
-		}
+		float ax = x + (radius * std::cos(angle)); // - (std::numbers::pi_v<float> / 2.0f)) - will make clock like turning order
+		float ay = y + (radius * std::sin(angle));
+
+		float bx = x + (radius + thickness) * std::cos(angle);
+		float by = y + (radius + thickness) * std::sin(angle);
+
+		float cx = x + (radius * std::cos(angle + step));
+		float cy = y + (radius * std::sin(angle + step));
+
+		float dx = x + (radius + thickness) * std::cos(angle + step);
+		float dy = y + (radius + thickness) * std::sin(angle + step);
+
+		// aswell you can pass triangles with a bit higher precision in drawing
+		
+		// somethign brokey in this function, that's why this order
+		drawTrapezFilled(
+			Vector2D(cx, cy),
+			Vector2D(dx, dy),
+			Vector2D(bx, by),
+			Vector2D(ax, ay),
+			color);
 	}
 }
