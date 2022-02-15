@@ -3,6 +3,7 @@
 #include "../Button/Button.hpp"
 #include "../ComboBox/ComboBox.hpp"
 #include "../MultiBox/MultiBox.hpp"
+#include "../Text/Text.hpp"
 #include "../TextInput/TextInput.hpp"
 #include "../KeyHolder/KeyHolder.hpp"
 #include "../Slider/Slider.hpp"
@@ -30,6 +31,7 @@ namespace GUI
 		Slider* addSlider(const std::string& title, std::pair<float, float> minMax, float* value);
 		ColorPicker* addColorPicker(Color* color);
 		HelpMarker* addHelpMarker(const std::string& text);
+		Text* addText(const std::string& text);
 
 		void draw(Vector2D* pos, Menu* parent);
 		void shutdown();

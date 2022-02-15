@@ -10,6 +10,6 @@ namespace GUI
 		virtual void draw(Vector2D* pos, Menu* parent, bool skipCall = false) override;
 	private:
 		std::string m_text;
-		std::string m_helpString = "(?)";
+		std::string m_helpString = XOR("(?)");
 	};
 }

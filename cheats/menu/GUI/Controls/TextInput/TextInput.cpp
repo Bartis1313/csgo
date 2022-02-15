@@ -11,7 +11,7 @@ GUI::TextInput::TextInput(const std::string& title, std::string* text)
 	: m_title{ title }, m_text{ text }
 {
 	setElement(TEXTINPUT_WIDTH, TEXTINPUT_HEIGHT);
-	setPadding(m_height + 5);
+	setPadding(m_height + 15);
 	m_type = TEXT_INPUT;
 }
 
@@ -116,12 +116,12 @@ void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	if (auto size = render::getTextSize(fonts::menuFont, *m_text); size > m_width - 15)
 	{
 		// so much hardcoded, dunno how to make it easy
-		toDraw = toDraw.substr(0, 18).append("...");
+		toDraw = toDraw.substr(0, 18).append(XOR("..."));
 	}
 
 	if (toDraw.empty())
 	{
-		toDraw = "...";
+		toDraw = XOR("...");
 	}
 
 	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 3 + 10, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Color(200, 220, 200, 200));

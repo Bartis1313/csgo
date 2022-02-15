@@ -74,7 +74,6 @@ static float extraTicks()
 
 void backtrack::update()
 {
-
 	if (!game::localPlayer || !vars.bBacktrack || !game::localPlayer->isAlive())
 	{
 		// basically reset all
@@ -96,15 +95,8 @@ void backtrack::update()
 		if (records.at(i).size() && (records.at(i).front().simTime == entity->m_flSimulationTime()))
 			continue;
 
-		// this pvs fix is like bruh fix
-		/**reinterpret_cast<Vector*>((uintptr_t)entity + 0xA0) = entity->absOrigin();
-		*reinterpret_cast<int*>((uintptr_t)entity + 0xA30) = interfaces::globalVars->m_frameCount;
-		*reinterpret_cast<int*>((uintptr_t)entity + 0xA28) = 0;*/
-
 		StoredRecord record = {};
 		// head will be used for calculations, from my testing it seemed to be better
-		//record.head = entity->getHitboxPos(HITBOX_HEAD);
-		// later on will be used for setting the abs of entity
 		record.origin = entity->absOrigin();
 		record.simTime = entity->m_flSimulationTime();
 		record.head = entity->getBonePosition(8);
@@ -116,7 +108,7 @@ void backtrack::update()
 		records.at(i).push_front(record);
 
 		// when records are FULL and bigger than ticks we set in backtrack, then pop them
-		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(static_cast<float>(config.get<int>(vars.iBacktrackTick) / 1000.0f + extraTicks()))))
+		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(config.get<float>(vars.fBacktrackTick) / 1000.0f + extraTicks())))
 			records.at(i).pop_back();
 
 		// lambda check for valid time simulation

@@ -4,7 +4,7 @@ GUI::ComboBox::ComboBox(const std::string& title, const std::vector<std::string>
 	: m_title{ title }, m_names{ names }, m_option{ option }
 {
 	setElement(COMBOBOX_WIDTH, COMBOBOX_HEIGHT);
-	setPadding(m_height + 18);
+	setPadding(m_height + 22);
 	m_type = COMBOBOX;
 }
 
@@ -46,7 +46,7 @@ void GUI::ComboBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	}
 
 	// displays ... when the feature is empty
-	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 15 + 3, fonts::menuFont, this->isOptionOn() ? m_names.at(*m_option) : "...",
+	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 15 + 3, fonts::menuFont, this->isOptionOn() ? m_names.at(*m_option) : XOR("..."),
 		true, this->isActive() ? Colors::LightBlue : Color(200, 220, 200, 200));
 
 

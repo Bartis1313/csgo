@@ -6,6 +6,6 @@ namespace GUI
 	enum Lining
 	{
 		PAD,
-		AUTO_PADDING
+		AUTO_PADDING // not implemented
 	};
 }

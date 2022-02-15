@@ -20,6 +20,7 @@ namespace GUI
 		void skip(Element* elementToSkip, Vector2D* pos);
 		void setSelected(const int idx) { m_selectedTab = idx; }
 		void shutdown();
+		void setOpened(const bool state) { m_opened = state; }
 
 		_NODISCARD Tab* addTab(const std::string& name);
 

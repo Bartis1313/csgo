@@ -29,7 +29,7 @@ void bunnyhop::run(CUserCmd* cmd)
 
 void bunnyhop::strafe(CUserCmd* cmd)
 {
-	if (!config.get<bool>(vars.bBunnyHop))
+	if (!config.get<bool>(vars.bAutoStrafe))
 		return;
 
 	if (!game::localPlayer)

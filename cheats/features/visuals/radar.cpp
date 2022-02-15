@@ -5,13 +5,12 @@
 #include "../../globals.hpp"
 #include <format>
 
-constexpr auto dotThickness = 5;
-constexpr auto dotRad = 20.0f;
-
 #define VEC2D_NONE Vector2D(0.0f, 0.0f);
 
 Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale)
 {
+	auto dotThickness = config.get<float>(vars.fRadarThickness);
+
 	float directionX, directionY;
 	float dotX, dotY;
 
@@ -21,8 +20,8 @@ Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 	auto yawDeg = angles.y - 90.0f;
 	// calculate dots of radian and return correct view
 	const auto yawToRadian = DEG2RAD(yawDeg);
-	dotX = (directionY * std::cos(yawToRadian) - directionX * std::sin(yawToRadian)) / dotRad;
-	dotY = (directionY * std::sin(yawToRadian) + directionX * std::cos(yawToRadian)) / dotRad;
+	dotX = (directionY * std::cos(yawToRadian) - directionX * std::sin(yawToRadian)) / 20.0f;
+	dotY = (directionY * std::sin(yawToRadian) + directionX * std::cos(yawToRadian)) / 20.0f;
 	// return correct scale, it zooms in/out depends what value is thrown
 	dotX *= scale;
 	dotY *= scale;
@@ -82,17 +81,11 @@ void radar::run()
 	render::drawLine(centerx - 4, centery, centerx + 5, centery, Colors::Green);
 	render::drawLine(centerx, centery + 4, centerx, centery - 5, Colors::Green);
 	
-	// don't use this, there is needed trigonometry
-	/*auto endXhelper = (globals::FOV > 90) ? -90 : -globals::FOV;
-	auto endYhelper = (globals::FOV > 90) ? globals::FOV - 90 : 0;
-
-	render::drawLine(Vector2D(centerx, centery), Vector2D(centerx - endXhelper, centery - size + endYhelper), Colors::Black);*/
-
 	const auto myEye = localPlayer->getEyePos();
 	Vector ang = {};
 	interfaces::engine->getViewAngles(ang);
 
-	for (int i = 1; i < interfaces::globalVars->m_maxClients; i++)
+	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 	{
 		auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
 
@@ -111,9 +104,8 @@ void radar::run()
 		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 			continue;
 
-		const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D(centerx - size, centery - size), Vector2D(2.0f * size, 2.0f * size), 1.8f);
+		const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D(centerx - size, centery - size), Vector2D(2.0f * size, 2.0f * size), config.get<float>(vars.fRadarScale));
 
-		// must be better way, idk how to make it easier
 		auto entYaw = ent->m_angEyeAngles().y;
 
 		if (entYaw < 0.0f)
@@ -121,16 +113,17 @@ void radar::run()
 
 		const auto rotated = 270.0f - entYaw + ang.y;
 
-		// this arg should not be dotRad in this case, as value gets higher line too
+		auto dotRad = config.get<float>(vars.fRadarLenght);
+
 		const auto finalX = dotRad * std::cos(DEG2RAD(rotated));
 		const auto finalY = dotRad * std::sin(DEG2RAD(rotated));
 
 		if (!entRotatedPos.IsZero())
 		{
-			render::drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, Colors::White);
-			render::drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, Color(255, 30, 110, 255));
-			// magic - 4 due to text, and - 3 to correction
-			render::text(entRotatedPos.x - 4, entRotatedPos.y - dotThickness - 3, fonts::smalle, std::format("{:.2f}m", utilities::distToMeters(localPlayer->absOrigin().DistTo(ent->absOrigin()))), false, Color(100, 20, 70, 255));
+			auto dotThickness = config.get<float>(vars.fRadarThickness);
+
+			render::drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, config.get<Color>(vars.cRadarLine));
+			render::drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, config.get<Color>(vars.cRadarPlayer));
 		}
 	}
 }

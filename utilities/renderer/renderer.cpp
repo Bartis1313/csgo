@@ -248,6 +248,34 @@ void render::drawGradient(const int x, const int y, const int w, const int h, co
 	gradient(second, false);
 }
 
+void render::drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, const Color& third, bool horizontal, bool blend)
+{
+	auto gradient = [=](const Color& clr, bool reversed)
+	{
+		interfaces::surface->drawSetColor(clr);
+		interfaces::surface->drawFilledFadeRect(
+			x, y, w, h,
+			reversed ? clr.a() : 0,
+			reversed ? 0 : clr.a(),
+			horizontal ? true : false);
+	};
+
+	auto blendColor = [](const Color& first, const Color& second, const Color& third, float t)
+	{
+		return Color(
+			first.r() + t * (second.r() - third.r()),
+			first.g() + t * (second.g() - third.g()),
+			first.b() + t * (second.b() - third.b()),
+			first.a() + t * (second.a() - third.a()));
+	};
+
+	if (blend)
+		drawFilledRect(x, y, w, h, blendColor(first, second, third, 0.5f));
+	gradient(first, true);
+	gradient(second, false);
+	gradient(third, false);
+}
+
 void render::text(const int x, const int y, const unsigned long font, const wchar_t* text, const bool centered, const Color& color)
 {
 	interfaces::surface->drawTextFont(font);

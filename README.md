@@ -1,11 +1,26 @@
 # Csgo
 Very short and commented source aimed for legit gameplay
 
-![Bartis internal CSGO](https://i.imgur.com/XMf6n7v.jpg)
+![Bartis internal CSGO](https://imgur.com/QwPgxMp.jpg)
 
 # Information
 In development, not every feature may work perfectly.
-x88 menu is ON by default. To use GUI, switch option in text menu to "OFF", the GUI will be now the master menu.
+<br />
+For people coming only for x88 menu - this is very limited in making it as a menu, there is no even need for any config system for such simple gui.
+<br />
+Why am I making 3 types of menu? For fun, you can select which one you want. ImGui menu will be the best option though.
+<br />
+**BEFORE anything, make sure you have it installed**: [c++ redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170) [directX](https://www.microsoft.com/en-us/download/details.aspx?id=35)
+
+# FAQ
+Crashing on inject
+- You either have some missing files, or cheat was not updated. Open the issue giving enough information to help you.
+
+How to compile
+- Just open VS, don't change anything, you can try change enhanced instruction set (valid for your CPU).
+
+I can't compile
+- Install runtimes for it.
 
 # Features: 
 <details>
@@ -41,7 +56,7 @@ x88 menu is ON by default. To use GUI, switch option in text menu to "OFF", the 
 # Keybinds
  - ARROW UP/DOWN (Set current index of feature, it will highlight at as grey color)
  - ARROW RIGHT/LEFT (Vector - switches index of vector, Int - add/minus, Bool - ON/OFF)
- - INSERT (Close text menu)
+ - INSERT (Close menu)
 
 # Issues or requests
 For now the cheat may have them many as during development my main goal is to learn how to write optimized and simple code
@@ -51,9 +66,9 @@ I will try to implement it in a short time perioid, eventually people who commit
 
 # Ending Goals
 - More features, especially visual friendly
-- Fix performance, to keep it very stable
+- <del>Fix performance, to keep it very stable </del> done
 - Create custom UI, with quake looking set, starting from icons, ending on killfeed
-- Add option to either use x88 style menu or dynamic gui wiritten with game's engine
+- <del>Add option to either use x88 style menu or dynamic gui wiritten with game's engine or even ImGui</del> done, not ImGui part
 
 # Log
 <details>
@@ -83,7 +98,16 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.2.2 - Big GUI update, it now can use auto padding, changed few comments to make it easier to understand in whole code. Still it needs few fixes.
 * 1.2.3 - Almost GUI is finished, few things left.
 * 1.2.4 - Update on new config system using type safe checks, menu is finally ready to work with variables and multiple configs. Fixed, removed bunch of functions. Deleted singleton as it's a very bad choice to work with single class objects. Reduced many calls. Made return address more easier.
+* 1.2.5 - Made surface GUI example to be working correctly. Added ImGui + freetype libraries, as it's next goal to use this GUI framework as example + solid rendering. Fixed code in few places, and removed oftently changed files from precompilation, which could lead to errors.
 </details>
+
+# Dependencies
+* [minhook](https://github.com/TsudaKageyu/minhook)
+* [lazy importer](https://github.com/JustasMasiulis/lazy_importer)
+* [xorstr](https://github.com/JustasMasiulis/xorstr)
+* [lodepng](https://github.com/lvandeve/lodepng)
+* [json](https://github.com/nlohmann/json)
+* [ImGui](https://github.com/ocornut/imgui)
 
 # People who helped
 * [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs15 leak which made reversing even easier.

@@ -17,7 +17,7 @@ void GUI::Slider::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	// needed for further calculations
 	const float deltaBetween = m_minMax.second - m_minMax.first;
 
-	std::string toDraw = std::format("{} - {:.2f}", m_title, *m_value);
+	std::string toDraw = std::format(XOR("{} - {:.2f}"), m_title, *m_value);
 
 	render::text(pos->x + PAD_TEXT_X, pos->y - 5, fonts::menuFont, toDraw, false, (isInRange || this->isActive()) ? Colors::White : Color(200, 220, 200, 200));
 

@@ -11,13 +11,13 @@ inline constexpr void CALL(void* ctx, const DrawModelState_t& state, const Model
 
 enum ChamsIDs
 {
-	STATIC = 1,
+	STATIC = 0,
 	XYZ,
 };
 
 enum BTChamsIDs
 {
-	STABLE = 1,
+	STABLE = 0,
 	LAST_TICK,
 	RAINBOW,
 };
@@ -37,13 +37,13 @@ void chams::drawChams(Player_t* ent, void* ctx, const DrawModelState_t& state, c
 	switch (config.get<int>(vars.iChams))
 	{
 	case STATIC:
-		overrideChams(false, false, Color(255, 0, 255, 255));
+		overrideChams(false, false, config.get<Color>(vars.cChams));
 		CALL(ctx, state, info, matrix);
 		break;
 	case XYZ:
-		overrideChams(true, false, Color(0, 100, 255, 255));
+		overrideChams(true, false, config.get<Color>(vars.cChamsXYZ));
 		CALL(ctx, state, info, matrix);
-		overrideChams(false, false, Color(255, 0, 255, 255));
+		overrideChams(false, false, config.get<Color>(vars.cChams));
 		CALL(ctx, state, info, matrix);
 		break;
 	default:
@@ -117,9 +117,9 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 
 enum HandTypes
 {
-	COLOR = 1,
-	NO_HANDS = 2,
-	NO_WEAPON = 2,
+	COLOR = 0,
+	NO_HANDS,
+	NO_WEAPON,
 };
 
 // TODO: fix performance
@@ -178,6 +178,9 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 
 void chams::run(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix)
 {
+	if (!config.get<bool>(vars.bChams))
+		return;
+
 	if (!game::localPlayer)
 		return;
 

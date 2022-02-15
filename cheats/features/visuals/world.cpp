@@ -50,14 +50,16 @@ void world::drawMisc()
 
 void world::drawBombDropped(Entity_t* ent)
 {
+	if (!config.get<bool>(vars.bDrawDroppedC4))
+		return;
+
 	auto ownerHandle = ent->m_hOwnerEntity();
 	auto ownerEntity = interfaces::entList->getClientFromHandle(ownerHandle);
 
 	if (!ownerEntity)
 	{
-		Vector screen = {};
-		if (render::worldToScreen(ent->absOrigin(), screen))
-			render::text(screen.x, screen.y, fonts::tahoma, "Dropped bomb", false, Colors::White);
+		if (Vector screen; render::worldToScreen(ent->absOrigin(), screen))
+			render::text(screen.x, screen.y, fonts::tahoma, XOR("Dropped bomb"), false, config.get<Color>(vars.cDrawDroppedC4));
 	}
 }
 
@@ -82,6 +84,9 @@ float scaleDamageArmor(float dmg, const float armor)
 }
 void world::drawBomb(Entity_t* ent)
 {
+	if (!config.get<bool>(vars.bDrawBomb))
+		return;
+
 	const static auto tickbomb = interfaces::console->findVar(XOR("mp_c4timer"))->getFloat();
 	const auto bombent = reinterpret_cast<Bomb_t*>(ent);
 	const auto bombtime = bombent->m_flC4Blow() - interfaces::globalVars->m_curtime;
@@ -90,21 +95,23 @@ void world::drawBomb(Entity_t* ent)
 		return;
 
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/389530-bomb-damage-indicator.html
-	const float hypDist = (ent->getEyePos() - game::localPlayer->getEyePos()).Length(), sigma = (500.0f * 3.5f) / 3.0f;
+
+	constexpr float sigma = (500.0f * 3.5f) / 3.0f;
+
+	const float hypDist = (ent->getEyePos() - game::localPlayer->getEyePos()).Length();
 	const float dmg = scaleDamageArmor((500.f * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
 
 	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 
-	Box box;
-	if (utilities::getBox(ent, box))
+	if (Box box; utilities::getBox(ent, box))
 	{
-		render::text(box.x, box.y, fonts::tahoma, "Planted Bomb", false, Colors::LightBlue);
+		render::text(box.x, box.y, fonts::tahoma, XOR("Planted Bomb"), false, config.get<Color>(vars.cDrawBomb));
 	}
 
 	uint8_t r = static_cast<uint8_t>(255.0f - bombtime / tickbomb * 255.0f);
 	uint8_t g = static_cast<uint8_t>(bombtime / tickbomb * 255.0f);
 
-	render::text(5, 800, fonts::tahoma, isSafe ? std::format("TIME {:.2f} DMG {:.2f} SAFE", bombtime, dmg) : std::format("TIME {:.2f} DMG {:.2f} YOU DIE", bombtime, dmg), false, Color{ r, g, 0, 200 });
+	render::text(5, 800, fonts::tahoma, isSafe ? std::format(XOR("TIME {:.2f} DMG {:.2f} SAFE"), bombtime, dmg) : std::format(XOR("TIME {:.2f} DMG {:.2f} YOU DIE"), bombtime, dmg), false, Color{ r, g, 0, 200 });
 }
 
 
@@ -119,6 +126,9 @@ static bool isNade(const int classid)
 
 void world::drawProjectiles(Entity_t* ent)
 {
+	if (!config.get<bool>(vars.bDrawProjectiles))
+		return;
+
 	auto cl = ent->clientClass();
 
 	if (!cl)
@@ -136,7 +146,7 @@ void world::drawProjectiles(Entity_t* ent)
 
 	auto projectileName = static_cast<std::string>(studio->m_name);
 
-	if (projectileName.find("thrown") != std::string::npos
+	if (projectileName.find(XOR("thrown")) != std::string::npos
 		|| isNade(cl->m_classID))
 	{
 		Vector nadeOrigin = ent->absOrigin();
@@ -148,55 +158,51 @@ void world::drawProjectiles(Entity_t* ent)
 		std::string nadeName = "";
 		Color colorNade;
 
-		if (projectileName.find("flashbang") != std::string::npos)
+		if (projectileName.find(XOR("flashbang")) != std::string::npos)
 		{
-			nadeName = "FLASHBANG";
-			colorNade = Color(130, 0, 200, 255);
+			nadeName = XOR("FLASHBANG");
+			colorNade = config.get<Color>(vars.cFlashBang);
 		}
-		else if (projectileName.find("ggrenade") != std::string::npos)
+		else if (projectileName.find(XOR("ggrenade")) != std::string::npos)
 		{
-			nadeName = "GRENADE";
-			colorNade = Color(130, 180, 20, 255);
+			nadeName = XOR("GRENADE");
+			colorNade = config.get<Color>(vars.cGranede);
 		}
-		else if (projectileName.find("molotov") != std::string::npos)
+		else if (projectileName.find(XOR("molotov")) != std::string::npos)
 		{
-			nadeName = "MOLOTOV";
-			colorNade = Color(130, 200, 120, 255);
+			nadeName = XOR("MOLOTOV");
+			colorNade = config.get<Color>(vars.cMolotov);
 		}
-		else if (projectileName.find("incendiary") != std::string::npos)
+		else if (projectileName.find(XOR("incendiary")) != std::string::npos)
 		{
-			nadeName = "FIRE INC";
-			colorNade = Color(130, 200, 120, 255);
+			nadeName = XOR("FIRE INC");
+			colorNade = config.get<Color>(vars.cIncediary);
 		}
-		else if (projectileName.find("smokegrenade") != std::string::npos)
+		else if (projectileName.find(XOR("smokegrenade")) != std::string::npos)
 		{
-			nadeName = "SMOKE";
-			colorNade = Color(20, 70, 30, 255);
+			nadeName = XOR("SMOKE");
+			colorNade = config.get<Color>(vars.cSmoke);
 		}
-		else if (projectileName.find("decoy") != std::string::npos)
+		else if (projectileName.find(XOR("decoy")) != std::string::npos)
 		{
-			nadeName = "DECOY";
-			colorNade = Color(0, 30, 60, 255);
+			nadeName = XOR("DECOY");
+			colorNade = config.get<Color>(vars.cDecoy);
 		}
 		else
 			return;
 
-		Box box;
-
-		if (utilities::getBox(ent, box))
+		if (Box box; utilities::getBox(ent, box))
 		{
 			render::text(box.x + box.w / 2, box.y + box.h + 2, fonts::tahoma, nadeName, false, colorNade);
 		}
 	}
-	else if (projectileName.find("dropped") != std::string::npos)
+	else if (projectileName.find(XOR("dropped")) != std::string::npos)
 	{
 		const auto drop = reinterpret_cast<Weapon_t*>(ent);
 
-		Box box;
-
-		if (utilities::getBox(ent, box))
+		if (Box box; utilities::getBox(ent, box))
 		{
-			render::text(box.x + box.w / 2, box.y + box.h + 2, fonts::tahoma, drop->getWpnName(), false, Colors::White);
+			render::text(box.x + box.w / 2, box.y + box.h + 2, fonts::tahoma, drop->getWpnName(), false, config.get<Color>(vars.cDropped));
 		}
 	}
 }
@@ -208,90 +214,112 @@ void loadSkyBoxFunction(const char* name)
 	forceSky(name);
 }
 
+namespace skyGlobals
+{
+	bool done = false;
+	IConVar* sky = nullptr;
+}
+
+void implySky()
+{
+	if (skyGlobals::done)
+		return;
+
+	for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
+	{
+		auto material = interfaces::matSys->getMaterial(handle);
+
+		if (!material)
+			continue;
+
+		if (material->isError())
+			continue;
+
+		float brightness = config.get<float>(vars.fBrightnessWorld) / 100.0f;
+
+		if (strstr(material->getTextureGroupName(), XOR("World textures")))
+		{
+			material->colorModulate(brightness, brightness, brightness);
+		}
+
+		if (strstr(material->getTextureGroupName(), XOR("StaticProp")))
+		{
+			material->colorModulate(brightness, brightness, brightness);
+		}
+
+		if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
+		{
+			material->colorModulate(config.get<Color>(vars.cSky));
+		}
+	}
+	// force to new sky
+	loadSkyBoxFunction(XOR("sky_csgo_night2"));
+	skyGlobals::done = true;
+}
+
+void destroySky()
+{
+	if (!skyGlobals::done)
+		return;
+
+	for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
+	{
+		auto material = interfaces::matSys->getMaterial(handle);
+
+		if (!material)
+			continue;
+
+		if (material->isError())
+			continue;
+
+		if (strstr(material->getTextureGroupName(), XOR("StaticProp")))
+		{
+			material->colorModulate(Colors::White);
+		}
+
+		if (strstr(material->getTextureGroupName(), XOR("World textures")))
+		{
+			material->colorModulate(Colors::White);
+		}
+
+		if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
+		{
+			material->colorModulate(Colors::White);
+		}
+	}
+	// restore the sky
+	loadSkyBoxFunction(skyGlobals::sky->m_name);
+	skyGlobals::done = false;
+}
+
 void world::skyboxLoad(int stage)
 {
 	if (!interfaces::engine->isInGame())
+		return;
+
+	if (!game::localPlayer)
 		return;
 
 	// do not run when stage frames are not reached
 	if (stage != FRAME_RENDER_START)
 		return;
 
-	static auto sky = interfaces::console->findVar(XOR("sv_skyname"));
+	skyGlobals::sky = interfaces::console->findVar(XOR("sv_skyname"));
+
+	bool enabled = config.get<bool>(vars.bRunNight);
+	enabled ? implySky() : destroySky();
 
 	// remove sky, not in meaning as full color
 	static const auto removeSky = interfaces::console->findVar(XOR("r_3dsky"));
 	removeSky->setValue(config.get<bool>(vars.bRunNight) ? false : true);	
-
-	static bool done = false;
-
-	if (config.get<bool>(vars.bRunNight) && !done)
-	{
-		for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
-		{
-			auto material = interfaces::matSys->getMaterial(handle);
-
-			if (!material)
-				continue;
-
-			if (material->isError())
-				continue;
-
-			if (strstr(material->getTextureGroupName(), XOR("World textures")))
-			{
-				material->colorModulate(0.2f, 0.2f, 0.2f);
-			}
-
-			if (strstr(material->getTextureGroupName(), XOR("StaticProp")))
-			{
-				material->colorModulate(0.2f, 0.2f, 0.2f);
-			}
-
-			if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
-			{
-				material->colorModulate(Colors::Turquoise);
-			}
-		}
-		// force to new sky
-		loadSkyBoxFunction(XOR("sky_csgo_night2"));
-		done = true;
-	}
-	else if (!config.get<bool>(vars.bRunNight) && done)
-	{
-		for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
-		{
-			auto material = interfaces::matSys->getMaterial(handle);
-
-			if (!material)
-				continue;
-
-			if (material->isError())
-				continue;
-	
-			if (strstr(material->getTextureGroupName(), XOR("StaticProp")))
-			{
-				material->colorModulate(Colors::White);
-			}
-
-			if (strstr(material->getTextureGroupName(), XOR("World textures")))
-			{
-				material->colorModulate(Colors::White);
-			}
-
-			if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
-			{
-				material->colorModulate(Colors::White);
-			}
-		}
-		// restore the sky
-		loadSkyBoxFunction(sky->m_name);
-		done = false;
-	}
 }
 
 // TODO: add points, as drawing one circle is not accurate
 void world::drawMolotovPoints(Entity_t* ent)
 {
+	if (!config.get<bool>(vars.bDrawmolotovRange))
+		return;
+
 	auto molotov = reinterpret_cast<Inferno_t*>(ent);
 	if (!molotov)
 		return;
@@ -305,13 +333,16 @@ void world::drawMolotovPoints(Entity_t* ent)
 
 	Vector min = {}, max = {};
 	ent->getRenderBounds(min, max);
-	render::drawFilledCircle3D(molotov->absOrigin(), 0.5f * Vector(max - min).Length2D(), 32, Colors::Red);
+	render::drawFilledCircle3D(molotov->absOrigin(), 0.5f * Vector(max - min).Length2D(), 32, config.get<Color>(vars.cMolotovRange));
 
-	render::text(screen.x, screen.y, fonts::tahoma, XOR("Molotov"), false, Colors::White);
+	render::text(screen.x, screen.y, fonts::tahoma, XOR("Molotov"), false, config.get<Color>(vars.cMolotovRangeText));
 }
 
 void world::drawZeusRange()
 {
+	if (!config.get<bool>(vars.bDrawZeusRange))
+		return;
+
 	if (!game::localPlayer)
 		return;
 
@@ -348,6 +379,6 @@ void world::drawZeusRange()
 		//	}
 		//}
 		// I think it's useless to take ^ code, if you really want to, use something as eyepos to not get false results, but then this is only useful in 3rd person
-		render::drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, Colors::Palevioletred);
+		render::drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, config.get<Color>(vars.cZeusRange));
 	}
 }

@@ -42,6 +42,7 @@ namespace render
 	void drawPolyLine(int* x, int* y, const int count, const Color& color);
 	void drawPolyLine(const int count, Vertex_t* verts, const Color& color);
 	void drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal, bool blend = true);
+	void drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, const Color& third, bool horizontal, bool blend = true);
 	void text(const int x, const int y, const unsigned long font, const wchar_t *text, const bool centered, const Color& color);
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);

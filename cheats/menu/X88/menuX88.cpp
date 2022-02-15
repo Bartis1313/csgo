@@ -1,45 +1,49 @@
 #include <format>
 #include "menuX88.hpp"
-#include "../../utilities/renderer/renderer.hpp"
-#include "../../config/config.hpp"
-#include "../game.hpp"
-#include "../globals.hpp"
-#include "GUI/Misc/guimisc.hpp"
+#include "../../../utilities/renderer/renderer.hpp"
+#include "../../../config/config.hpp"
+#include "../../game.hpp"
+#include "../../globals.hpp"
+#include "../GUI/Misc/guimisc.hpp"
+#include "../GUI/drawing.hpp"
 
 static short index = 0;
 
 namespace x88Options
 {
+
+	inline int shit = 0;
+
 	inline Item options[] =
 	{
 		Item{ XOR("BunnyHop"), &config.getRef<bool>(vars.bBunnyHop) }, // 0
-		Item{ XOR("Chams"), &config.getRef<int>(vars.iChams), { XOR("OFF"), XOR("Static"), XOR("Xyz")} }, // 1
-		Item{ XOR("Esp"), &config.getRef<int>(vars.iEsp), { XOR("OFF"), XOR("2D"), XOR("2D FILLED"), XOR("3D"), XOR("3D FILLED") } }, // 2
+		Item{ XOR("Chams"), &config.getRef<int>(vars.iChams), { XOR("Static"), XOR("Xyz")} }, // 1
+		Item{ XOR("Esp"), &config.getRef<int>(vars.iEsp), { XOR("2D"), XOR("2D FILLED"), XOR("3D"), XOR("3D FILLED") } }, // 2
 		Item{ XOR("Glow"), &config.getRef<bool>(vars.bGlow) }, // 3
 		Item{ XOR("Sound Esp"), &config.getRef<bool>(vars.bSoundEsp) }, // 4
-		Item{ XOR("Fov"), &config.getRef<int>(vars.iFOV), {-35.0f, 35.0f } }, // 5
+		Item{ XOR("Fov"), &config.getRef<float>(vars.fFOV), {-35.0f, 35.0f } }, // 5
 		Item{ XOR("ThirdP"), &config.getRef<bool>(vars.bThirdp) }, // 6
-		Item{ XOR("Aimbot"), &config.getRef<int>(vars.iAimbot),  { XOR("OFF"), XOR("Nearest"), XOR("Head"), XOR("Chest") } }, // 7
+		Item{ XOR("Aimbot"), &config.getRef<int>(vars.iAimbot),  { XOR("Nearest"), XOR("Head"), XOR("Chest") } }, // 7
 		Item{ XOR("AimFov"), &config.getRef<float>(vars.fFovAimbot), {0.0f, 15.0f } }, // 8
 		Item{ XOR("Smooth"), &config.getRef<float>(vars.fSmooth), { 0.0f, 50.0f } }, // 9
 		Item{ XOR("Rcs"), &config.getRef<float>(vars.fRCS), { 0.0f, 100.0f } }, // 10
-		Item{ XOR("Xhair"), &config.getRef<int>(vars.iCrosshair), { XOR("OFF"), XOR("Static"), XOR("Recoil"), XOR("Engine") } }, // 11
+		Item{ XOR("Xhair"), &config.getRef<int>(vars.iCrosshair), { XOR("Static"), XOR("Recoil"), XOR("Engine") } }, // 11
 		Item{ XOR("Triggerbot"), &config.getRef<bool>(vars.bTriggerbot) }, // 12
 		Item{ XOR("Trigger Delay"), &config.getRef<float>(vars.fTriggerDelay), { 0.0f, 1000.0f } }, // 13
 		Item{ XOR("Backtrack"), &config.getRef<bool>(vars.bBacktrack)}, // 14
-		Item{ XOR("Backtrack ms"), &config.getRef<int>(vars.iBacktrackTick), { 1.0f, 200.0f } }, // 15
+		Item{ XOR("Backtrack ms"), &config.getRef<float>(vars.fBacktrackTick), { 1.0f, 200.0f } }, // 15
 		Item{ XOR("Radar 2D"), &config.getRef<bool>(vars.bRadar) }, // 16
 		Item{ XOR("Local Info"), &config.getRef<bool>(vars.bShowInfo) }, // 17
 		Item{ XOR("Draw Flags"), &config.getRef<bool>(vars.bShowFlags) }, // 18
 		Item{ XOR("Draw Infos"), &config.getRef<bool>(vars.bDrawInfos) }, // 19
 		Item{ XOR("Skeleton"), &config.getRef<bool>(vars.bDrawSkeleton) }, // 20
-		Item{ XOR("BT Chams"), &config.getRef<int>(vars.iBacktrackChams), { XOR("OFF"), XOR("Stable"), XOR("Last tick"), XOR("Rainbow") } }, // 21,
+		Item{ XOR("BT Chams"), &config.getRef<int>(vars.iBacktrackChams), { XOR("Stable"), XOR("Last tick"), XOR("Rainbow") } }, // 21,
 		Item{ XOR("DLight"), &config.getRef<bool>(vars.bDLight) }, // 22,
 		Item{ XOR("NightMode") , &config.getRef<bool>(vars.bRunNight) }, // 23
 		Item{ XOR("Esp Lasers"), &config.getRef<bool>(vars.bEspLasers) }, // 24
-		Item{ XOR("Draw Plots"), &config.getRef<bool>(vars.bShowPlots) }, // 25
-		Item{ XOR("Hand Chams"), &config.getRef<int>(vars.iHandChams), { XOR("OFF"), XOR("Color"), XOR("No Hands") } }, // 26
-		Item{ XOR("Weapon Chams"), &config.getRef<int>(vars.iWeaponChams), { XOR("OFF"), XOR("Color"), XOR("No Weapon") } }, // 27
+		Item{ XOR("Draw velocity Plot"), &config.getRef<bool>(vars.bShowVelocityPlot) }, // 25
+		Item{ XOR("Hand Chams"), &config.getRef<int>(vars.iHandChams), { XOR("Color"), XOR("No Hands") } }, // 26
+		Item{ XOR("Weapon Chams"), &config.getRef<int>(vars.iWeaponChams), { XOR("Color"), XOR("No Weapon") } }, // 27
 		Item{ XOR("x88menu"), &config.getRef<bool>(vars.bMenuOpenedx88) }, // 28
 	};
 }
@@ -48,6 +52,8 @@ void Menu::handleKeys() const
 {
 	if (!config.get<bool>(vars.bMenuOpenedx88))
 		return;
+
+	GUI::menu->setOpened(false);
 
 	if (GUI::isKeyPressed(VK_DOWN))
 	{
@@ -148,12 +154,15 @@ void Menu::drawFloat(int idx, int x, int& y)
 void Menu::drawVec(int idx, int x, int& y)
 {
 	drawText(x, y, handleWhite(idx, index), x88Options::options[idx].getName());
-	drawText(x + 100, y, (x88Options::options[idx].getInt() != 0) ? Colors::LightBlue : Colors::White, x88Options::options[idx].getVec().at(x88Options::options[idx].getInt()));
+
+
+	int num = x88Options::options[idx].getInt();
+	drawText(x + 100, y, (x88Options::options[idx].getInt() != -1) ? Colors::LightBlue : Colors::White, 
+		num >= 0 ? x88Options::options[idx].getVec().at(num) : XOR("OFF"));
 
 	y += 15;
 }
 
-// if you are here and you are lazy to use this drawVec drawBool etc... here is something for ya
 void Menu::drawOption(int idx, int x, int& y)
 {
 	if (x88Options::options[idx].isIntOption())
@@ -231,22 +240,22 @@ void Menu::draw()
 	// must have something unique to catch index selected
 	// practise with static index for menu is just not good,
 	// maybe you want selected index option
-	drawBool(x88map::names[XOR("bunnyhop")], width, height);
-	drawVec(x88map::names[XOR("chams")], width, height);
-	drawVec(x88map::names[XOR("esp")], width, height);
-	drawBool(x88map::names[XOR("glow")], width, height);
-	drawBool(x88map::names[XOR("soundesp")], width, height);
-	drawInt(x88map::names[XOR("fov")], width, height);
-	drawBool(x88map::names[XOR("thirdp")], width, height);
-	drawVec(x88map::names[XOR("aimbot")], width, height);
-	drawFloat(x88map::names[XOR("aimbot_fov")], width, height);
-	drawFloat(x88map::names[XOR("smooth")], width, height);
-	drawFloat(x88map::names[XOR("rcs")], width, height);
-	drawVec(x88map::names[XOR("xhair")], width, height);
-	drawBool(x88map::names[XOR("triggerbot")], width, height);
-	drawFloat(x88map::names[XOR("triggerbot_delay")], width, height);
-	drawBool(x88map::names[XOR("backtrack")], width, height);
-	drawInt(x88map::names[XOR("backtrack_ms")], width, height);
+	drawOption(x88map::names[XOR("bunnyhop")], width, height);
+	drawOption(x88map::names[XOR("chams")], width, height);
+	drawOption(x88map::names[XOR("esp")], width, height);
+	drawOption(x88map::names[XOR("glow")], width, height);
+	drawOption(x88map::names[XOR("soundesp")], width, height);
+	drawOption(x88map::names[XOR("fov")], width, height);
+	drawOption(x88map::names[XOR("thirdp")], width, height);
+	drawOption(x88map::names[XOR("aimbot")], width, height);
+	drawOption(x88map::names[XOR("aimbot_fov")], width, height);
+	drawOption(x88map::names[XOR("smooth")], width, height);
+	drawOption(x88map::names[XOR("rcs")], width, height);
+	drawOption(x88map::names[XOR("xhair")], width, height);
+	drawOption(x88map::names[XOR("triggerbot")], width, height);
+	drawOption(x88map::names[XOR("triggerbot_delay")], width, height);
+	drawOption(x88map::names[XOR("backtrack")], width, height);
+	drawOption(x88map::names[XOR("backtrack_ms")], width, height);
 
 	width = x * 0.25f;
 	height = 15;
@@ -259,17 +268,17 @@ void Menu::draw()
 		height += 30;
 	}
 
-	drawBool(x88map::names[XOR("radar")], width, height);
-	drawBool(x88map::names[XOR("local_info")], width, height);
-	drawBool(x88map::names[XOR("esp_flags")], width, height);
-	drawBool(x88map::names[XOR("esp_info")], width, height);
-	drawBool(x88map::names[XOR("esp_skeleton")], width, height);
-	drawVec(x88map::names[XOR("bt_chams")], width, height);
-	drawBool(x88map::names[XOR("dl_light")], width, height);
-	drawBool(x88map::names[XOR("nightmode")], width, height);
-	drawBool(x88map::names[XOR("esp_lines")], width, height);
-	drawBool(x88map::names[XOR("plots")], width, height);
-	drawVec(x88map::names[XOR("arm_chams")], width, height);
-	drawVec(x88map::names[XOR("weapon_chams")], width, height);
-	drawBool(x88map::names[XOR("x88_opened")], width, height);
+	drawOption(x88map::names[XOR("radar")], width, height);
+	drawOption(x88map::names[XOR("local_info")], width, height);
+	drawOption(x88map::names[XOR("esp_flags")], width, height);
+	drawOption(x88map::names[XOR("esp_info")], width, height);
+	drawOption(x88map::names[XOR("esp_skeleton")], width, height);
+	drawOption(x88map::names[XOR("bt_chams")], width, height);
+	drawOption(x88map::names[XOR("dl_light")], width, height);
+	drawOption(x88map::names[XOR("nightmode")], width, height);
+	drawOption(x88map::names[XOR("esp_lines")], width, height);
+	drawOption(x88map::names[XOR("plots")], width, height);
+	drawOption(x88map::names[XOR("arm_chams")], width, height);
+	drawOption(x88map::names[XOR("weapon_chams")], width, height);
+	drawOption(x88map::names[XOR("x88_opened")], width, height);
 }

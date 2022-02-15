@@ -6,7 +6,7 @@
 
 enum AimbotID
 {
-    NEAREST = 1,
+    NEAREST = 0,
     HEAD,
     CHEST
 };
@@ -18,7 +18,7 @@ void legitbot::drawFov()
 {
     if (interfaces::engine->isConnected() && interfaces::engine->isInGame())
     {
-        if (!config.get<bool>(vars.bAimbot))
+        if (!config.get<bool>(vars.bDrawFov))
             return;
 
         if (!game::localPlayer)
@@ -37,7 +37,7 @@ void legitbot::drawFov()
 
         float radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
 
-        render::drawCircle(globals::screenX / 2, globals::screenY / 2, radius, 32, Colors::LightBlue);
+        render::drawCircle(globals::screenX / 2, globals::screenY / 2, radius, 32, config.get<Color>(vars.cDrawFov));
     }
 }
 
@@ -69,7 +69,7 @@ void legitbot::run(CUserCmd* cmd)
     {
         float bestFov = config.get<float>(vars.fFovAimbot);
         Vector bestPos = Vector{ 0.0f, 0.0f, 0.0f };
-        const auto punch = weapon->isRifle() || weapon->isSmg() ? game::localPlayer->getAimPunch() : Vector(0, 0, 0);
+        const auto punch = weapon->isRifle() || weapon->isSmg() ? game::localPlayer->getAimPunch() : Vector{ 0.0f, 0.0f, 0.0f };
         const auto myEye = game::localPlayer->getEyePos();
 
         for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
@@ -110,6 +110,8 @@ void legitbot::run(CUserCmd* cmd)
                     break;
                 case CHEST:
                     hitPos = ent->getHitboxPos(HITBOX_LOWER_CHEST);
+                    break;
+                default:
                     break;
                 }
                 auto angles = cmd->m_viewangles + punch;

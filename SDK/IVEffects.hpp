@@ -19,6 +19,14 @@ class DLight_t
 private:
 	struct DColor
 	{
+		DColor() = default;
+		DColor(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t)
+			: r{ _r }, g{ _g }, b{ _b }
+		{}
+		DColor(const Color& clr)
+			: r{ clr.r() }, g{ clr.g() }, b{ clr.b() }
+		{}
+
 		uint8_t r, g, b;
 	};
 public:

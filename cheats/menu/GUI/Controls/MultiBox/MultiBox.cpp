@@ -4,7 +4,7 @@ GUI::MultiBox::MultiBox(const std::string& title, const std::vector<std::string>
 	: m_title{ title }, m_names{ names }, m_listedOptions{ feature }
 {
 	setElement(MULTIBOX_WIDTH, MULTIBOX_HEIGHT);
-	setPadding(m_height + 18);
+	setPadding(m_height + 22);
 	m_type = MULTIBOX;
 }
 
@@ -41,12 +41,12 @@ void GUI::MultiBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			if (auto size = render::getTextSize(fonts::menuFont, allText); size > m_width - 4)
 			{
 				// hardcoded
-				allText = allText.substr(0, 30).append("...");
+				allText = allText.substr(0, 30).append(XOR("..."));
 			}
 		}
 	}
 
-	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 3 + 15, fonts::menuFont, !allText.empty() ? allText : "...", true,
+	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 3 + 15, fonts::menuFont, !allText.empty() ? allText : XOR("..."), true,
 		this->isActive() ? Colors::LightBlue : Color(200, 220, 200, 200));
 
 	// when active, change box to be not active

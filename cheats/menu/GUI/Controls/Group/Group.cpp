@@ -67,6 +67,13 @@ GUI::HelpMarker* GUI::Group::addHelpMarker(const std::string& text)
 	return t;
 }
 
+GUI::Text* GUI::Group::addText(const std::string& text)
+{
+	auto t = new Text(text);
+	m_Elements.emplace_back(std::move(t));
+	return t;
+}
+
 // TODO: add some proper rect, preferably add height as argument or overload this
 void GUI::Group::draw(Vector2D* pos, Menu* parent)
 {

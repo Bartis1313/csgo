@@ -74,6 +74,7 @@ public:
 
 	bool save(const std::string& file);
 	bool load(const std::string& file);
+	void deleteCfg(const std::string& file);
 	// pass default file here
 	bool init();
 	void reload();
@@ -96,14 +97,14 @@ public:
 	{
 		return m_allVars.at(idx).get<T>();
 	}
-	// getting this field will be needed to list them or count
-	_NODISCARD std::vector<std::string>& getAllConfigFiles() const;
 	// get main folder
 	_NODISCARD std::filesystem::path getHacksPath() const;
 	// usefull in case of x88 menu
 	_NODISCARD std::string getDefaultConfigName() const { return m_defaultName; }
 	// get correct path for savings
 	_NODISCARD std::filesystem::path getPathForSave(const std::string& file) const;
+	// get all files
+	_NODISCARD std::vector<std::string> getAllConfigFiles() const { return m_allFilesInFolder; }
 private:
 	// don't duplicate names
 	_NODISCARD size_t getIndexByName(const std::string& name);

@@ -5,6 +5,7 @@
 #include "../../../config/vars.hpp"
 #include "../aimbot/aimbot.hpp"
 #include "../../globals.hpp"
+#include "../../menu/GUI/Misc/guimisc.hpp"
 #include <format>
 #include <deque>
 
@@ -22,31 +23,28 @@ void misc::thirdperson()
 	if (!game::localPlayer || !game::localPlayer->isAlive())
 		return;
 
-	static bool bRun = false;
-#ifndef _DEBUG
-	if (LF(GetAsyncKeyState).cached()(VK_VKEY) & 1)
-		bRun = !bRun;
-#else
-	if (LF(GetAsyncKeyState)(VK_VKEY) & 1)
-		bRun = !bRun;
-#endif	
-	interfaces::input->m_cameraInThirdPerson = bRun;
+	if (GUI::isKeyPressed(VK_VKEY))
+		config.getRef<bool>(vars.bThirdp) = !config.getRef<bool>(vars.bThirdp);
+
+	interfaces::input->m_cameraInThirdPerson = config.get<bool>(vars.bThirdp);
 	interfaces::input->m_cameraOffset.z = 220.0f;
 }
 
 enum CrossHairTypes
 {
-	STATIC = 1,
+	STATIC = 0,
 	RECOIL,
 	ENGINE
 };
 
 void misc::drawCrosshair()
 {
-	const static auto crosshair = interfaces::console->findVar(XOR("cl_crosshair_recoil"));
-	crosshair->setValue(config.get<int>(vars.iCrosshair) == ENGINE ? true : false);
+	int cfgCross = config.get<int>(vars.iCrosshair);
 
-	if (!config.get<int>(vars.iCrosshair))
+	const static auto crosshair = interfaces::console->findVar(XOR("cl_crosshair_recoil"));
+	crosshair->setValue(cfgCross == ENGINE ? true : false);
+
+	if (cfgCross == -1)
 		return;
 
 	if (!game::localPlayer)
@@ -58,12 +56,12 @@ void misc::drawCrosshair()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	int x, y;
-	interfaces::surface->getScreenSize(x, y);
+	int x = globals::screenX;
+	int y = globals::screenY;
 	x /= 2;
 	y /= 2;
 
-	switch (config.get<int>(vars.iCrosshair))
+	switch (cfgCross)
 	{
 	case STATIC:
 		// -1 for y because elselike it will be not aligned
@@ -110,7 +108,7 @@ void misc::drawCrosshair()
 
 void misc::drawLocalInfo()
 {
-	if (!config.get<bool>(vars.bDrawInfos))
+	if (!config.get<bool>(vars.bDrawMiscInfo))
 		return;
 
 	if (!game::localPlayer)
@@ -155,7 +153,7 @@ struct Record
 
 void misc::drawFpsPlot()
 {
-	if (!config.get<bool>(vars.bShowPlots))
+	if (!config.get<bool>(vars.bShowFpsPlot))
 		return;
 
 	// static so we can get records get saved
@@ -208,7 +206,7 @@ std::deque<RecordVelocity> velRecords;
 // because without prediction the values might not be that accurate
 void misc::getVelocityData()
 {
-	if (!config.get<bool>(vars.bShowPlots))
+	if (!config.get<bool>(vars.bShowVelocityPlot))
 		return;
 
 	if (!game::localPlayer)
@@ -229,7 +227,7 @@ void misc::getVelocityData()
 
 void misc::drawVelocityPlot()
 {
-	if (!config.get<bool>(vars.bShowPlots))
+	if (!config.get<bool>(vars.bShowVelocityPlot))
 		return;
 
 	if (!game::localPlayer)
@@ -267,6 +265,9 @@ void misc::drawVelocityPlot()
 
 void misc::playHitmarker(IGameEvent* event)
 {
+	if (!config.get<bool>(vars.bPlayHitmarker))
+		return;
+
 	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
 	if (!attacker)
 		return;
@@ -276,7 +277,7 @@ void misc::playHitmarker(IGameEvent* event)
 	{
 		globals::shotsHit++;
 		// new hit = new hitmarker
-		hitAlpha = 255;
+		hitAlpha = interfaces::globalVars->m_curtime;
 		// browse those files for more
 		interfaces::surface->playSound(XOR("buttons\\arena_switch_press_02.wav"));
 	}	
@@ -285,6 +286,9 @@ void misc::playHitmarker(IGameEvent* event)
 // TODO: Add hitmarker when ent died from local player
 void misc::drawHitmarker()
 {
+	if(!config.get<bool>(vars.bDrawHitmarker))
+		return;
+
 	if (!game::localPlayer)
 		return;
 
@@ -304,12 +308,15 @@ void misc::drawHitmarker()
 		render::drawLine(x + 10, y - 10, x + 5, y - 5, Color(255, 255, 255, hitAlpha));
 
 		// feel free to use anything that is more accurate, first multiply was just hardcoded by guessing
-		hitAlpha -= 1.8f * (interfaces::globalVars->m_frametime) * 255;
+		hitAlpha -= 1.8f * (interfaces::globalVars->m_curtime) * 255;
 	}
 }
 
 void misc::drawNoScope()
 {
+	if (!config.get<bool>(vars.bNoScope))
+		return;
+
 	if (!game::localPlayer)
 		return;
 

@@ -11,6 +11,7 @@
 #include "../../../../../utilities/renderer/renderer.hpp" // drawing
 #include "../../Misc/guimisc.hpp" // this detection for keys
 #include "../../sizes.hpp" // sizes for elements
+#include "../../../../../utilities/utilities.hpp" // xor etc
 
 namespace GUI
 {
@@ -30,7 +31,8 @@ namespace GUI
 		SLIDER,
 		// tab should not be there
 
-		TEXT_INPUT
+		TEXT_INPUT,
+		TEXT
 	};
 
 

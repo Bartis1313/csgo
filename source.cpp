@@ -12,6 +12,8 @@
 #include "cheats/menu/GUI/Controls/TextInput/TextInput.hpp"
 #include <thread>
 
+#define USE_IMGUI
+
 using namespace std::literals;
 
 VOID WINAPI _shutdown(PVOID instance);

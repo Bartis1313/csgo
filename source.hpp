@@ -72,8 +72,8 @@ LONG WINAPI memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 		{
 			static bool bOnce = [=]()
 			{
-				const auto symbol = (SYMBOL_INFO*)malloc(sizeof(SYMBOL_INFO) + 256 * sizeof(TCHAR));
-				symbol->MaxNameLen = 1024; // sometimes the name is huge to get it valid
+				const auto symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char), 1);
+				symbol->MaxNameLen = TRACE_MAX_FUNCTION_NAME_LENGTH; // sometimes the name is huge to get it valid
 				symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
 				const auto process = LF(GetCurrentProcess)();

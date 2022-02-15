@@ -201,6 +201,13 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			m_levelAlpha = 255 * (globals::mouseY - y) / m_height;
 
 			m_alphaForColor = 255 - m_levelAlpha;
+
+			// update after alpha bar move
+			*m_colorNow = Color(
+				getColorFromSpectrum(mousePointX - x, mousePointY - y).r(),
+				getColorFromSpectrum(mousePointX - x, mousePointY - y).g(),
+				getColorFromSpectrum(mousePointX - x, mousePointY - y).b(),
+				m_alphaForColor);
 		}
 
 		// to align

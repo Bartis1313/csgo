@@ -23,12 +23,12 @@ constexpr bool isbadKey(const short key)
 void GUI::KeyHolder::draw(Vector2D* pos, Menu* parent, bool skipCall)
 {
 	// only on start
-	std::string name = "init";
+	std::string name = XOR("init");
 
 	// if key is given, then change name to "..." waiting state
 	if (m_isGettingKey)
 	{
-		name = "...";
+		name = XOR("...");
 
 		// looop through possible choices
 		for (short i = 1; i < 256; i++)
@@ -77,7 +77,7 @@ void GUI::KeyHolder::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	render::drawFilledRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y - 20, textSize.x + 5, textSize.y + 3, Color(40, 40, 40, 255));
 	render::drawOutlineRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y -20, textSize.x + 5, textSize.y + 3, Colors::Black);
 	render::text(pos->x + PAD_TEXT_X + BOX_WIDTH + 8, pos->y - 18, fonts::menuFont,
-		m_isGettingKey ? "..." : name, false, m_isGettingKey ? Colors::LightBlue : Color(180, 180, 180, 255));
+		m_isGettingKey ? XOR("...") : name, false, m_isGettingKey ? Colors::LightBlue : Color(180, 180, 180, 255));
 }
 
 bool GUI::KeyHolder::isActive()

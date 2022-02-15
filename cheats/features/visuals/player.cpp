@@ -13,8 +13,7 @@
 
 enum boxTypes
 {
-	OFF = 0,
-	BOX2D,
+	BOX2D = 0,
 	FILLED2D,
 	BOX3D,
 	FILLED3D
@@ -109,15 +108,16 @@ void esp::renderBox3D(Entity_t* ent, bool fill)
 
 void esp::drawBox2D(Player_t* ent, const Box& box)
 {
+	Color cfgCol = config.get<Color>(vars.cBox);
+
 	render::drawOutlineRect(box.x - 1, box.y - 1, box.w + 2, box.h + 2, Color(0, 0, 0,  200));
-	render::drawOutlineRect(box.x, box.y, box.w, box.h, playerColor(ent, true));
+	render::drawOutlineRect(box.x, box.y, box.w, box.h, cfgCol);
 	render::drawOutlineRect(box.x + 1, box.y + 1, box.w - 2, box.h - 2, Color(0, 0, 0, 200));
 }
 
 void esp::drawBox2DFilled(Player_t* ent, const Box& box)
 {
-	const uint8_t alphaOutline = static_cast<uint8_t>(255 * 0.6f);
-	const Color fill{ 0, 0, 0, alphaOutline };
+	Color fill = config.get<Color>(vars.cBoxFill);
 
 	// first create rectangle then do outlines
 
@@ -127,7 +127,7 @@ void esp::drawBox2DFilled(Player_t* ent, const Box& box)
 
 void esp::drawHealth(Player_t* ent, const Box& box)
 {
-	if (!config.get<bool>(vars.bShowInfo))
+	if (!config.get<bool>(vars.bDrawHealth))
 		return;
 
 	auto health = ent->m_iHealth() > 100 ? 100 : ent->m_iHealth();
@@ -157,7 +157,7 @@ void esp::drawHealth(Player_t* ent, const Box& box)
 
 void esp::drawArmor(Player_t* ent, const Box& box)
 {
-	if(!config.get<bool>(vars.bDrawInfos))
+	if(!config.get<bool>(vars.bDrawArmor))
 		return;
 
 	auto armor = ent->m_ArmorValue() > 100 ? 100 : ent->m_ArmorValue();
@@ -186,17 +186,18 @@ void esp::drawArmor(Player_t* ent, const Box& box)
 	}
 }
 
-// TODO: Smooth reload time, or even detect time of reload
 void esp::drawWeapon(Player_t* ent, const Box& box)
 {
-	if (!config.get<bool>(vars.bDrawInfos))
+	if (!config.get<bool>(vars.bDrawWeapon))
 		return;
 
 	auto weapon = ent->getActiveWeapon();
 	if (!weapon)
 		return;
 
-	render::text(box.x + box.w / 2, box.y + box.h + 5, fonts::tahoma, ent->getActiveWeapon()->getWpnName(), true, Colors::White);
+	Color tex = config.get<Color>(vars.cWeaponText);
+
+	render::text(box.x + box.w / 2, box.y + box.h + 5, fonts::espBar, ent->getActiveWeapon()->getWpnName(), true, tex);
 
 	// skip useless trash for calculations
 	if (weapon->isNonAimable())
@@ -227,10 +228,10 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 	}
 
 	render::drawFilledRect(newBox.x - 1, newBox.y - 1, newBox.w, 4, Colors::Black);
-	render::drawFilledRect(newBox.x, newBox.y, barWidth, 2, Colors::Turquoise);
+	render::drawFilledRect(newBox.x, newBox.y, barWidth, 2, config.get<Color>(vars.cReloadbar));
 	
 	if (maxAmmo != currentAmmo && !isReloading)
-		render::text(newBox.x + barWidth, newBox.y + 1, fonts::espBar, std::to_string(currentAmmo), false, Colors::White);
+		render::text(newBox.x + barWidth, newBox.y + 1, fonts::espBar, std::to_string(currentAmmo), false, tex);
 }
 
 void esp::drawInfo(Player_t* ent, const Box& box)
@@ -306,10 +307,12 @@ void esp::drawSkeleton(Player_t* ent)
 
 		if (Vector screenp, screenc; render::worldToScreen(parent, screenp) && render::worldToScreen(child, screenc))
 		{
+			Color skel = config.get<Color>(vars.cSkeleton);
+
 			if(record && backtrack::isValid(record->front().simTime))
-				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, Colors::White);
+				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, skel);
 			else if(!record)
-				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, Colors::White);
+				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, skel);
 		}
 	}
 }
@@ -354,7 +357,7 @@ void esp::runDLight(Player_t* ent)
 
 	auto DLight = interfaces::effects->clAllocDlight(ent->getIndex());
 	DLight->m_style = DLIGHT_NO_WORLD_ILLUMINATION;
-	DLight->m_color = { 20, 70, 150 };
+	DLight->m_color = { config.get<Color>(vars.cDlight) };
 	DLight->m_origin = ent->absOrigin();
 	DLight->m_radius = 80.0f;
 	DLight->m_die = interfaces::globalVars->m_curtime + 0.05f;
@@ -365,6 +368,9 @@ void esp::runDLight(Player_t* ent)
 
 void esp::drawPlayer(Player_t* ent)
 {
+	if (!config.get<bool>(vars.bEsp))
+		return;
+
 	Box box;
 	if (!utilities::getBox(ent, box))
 		return;
@@ -448,6 +454,9 @@ void esp::drawSound(IGameEvent* event)
 
 void esp::enemyIsAimingAtYou(Player_t* ent)
 {
+	if (!config.get<bool>(vars.bAimingWarn))
+		return;
+
 	if (!game::localPlayer)
 		return;
 

@@ -38,20 +38,32 @@ Item::Item(const std::string& id, int* ref, const std::vector<std::string>& vec)
 	count++;
 }
 
+// about plus and minus - this would never be handled like this. It is because there had to be a trick to manipulate indexes and not giving OFF string
+
 void Item::changeVectorIndexByPlus()
 {
-	if (*m_iVal < m_Options.size())
+	if (*m_iVal < m_Options.size() + 1 || *m_iVal == -1)
+	{
 		*m_iVal += 1;
+	}	
+
 	if (*m_iVal >= m_Options.size())
-		*m_iVal = 0;
+	{
+		*m_iVal = -1;
+	}
 }
 
 void Item::changeVectorIndexByMinus()
 {
-	if (*m_iVal < m_Options.size())
+	if (*m_iVal < m_Options.size() + 1 || *m_iVal == -1)
+	{
 		*m_iVal -= 1;
-	if (*m_iVal <= -1)
+	}
+
+	if (*m_iVal < -1)
+	{
 		*m_iVal = m_Options.size() - 1;
+	}
 }
 
 void Item::chnageAddableByPlus()

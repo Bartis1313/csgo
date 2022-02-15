@@ -15,8 +15,6 @@ void GUI::CheckBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	if (isInRange && isKeyPressed(VK_LBUTTON))
 	{
 		*m_feature = !*m_feature;
-
-		//printf("zmeinilo\n");
 	}
 
 	render::drawGradient(pos->x, pos->y, m_width, m_height,
@@ -26,7 +24,7 @@ void GUI::CheckBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		render::drawFilledRect(pos->x, pos->y, m_width, m_height, Colors::Grey);
 
 	render::drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
-	// TODO: do changes after fonts struct is added
+	
 	render::text(pos->x + PAD_TEXT_X, pos->y - 1, fonts::menuFont, m_title, false, this->isActive() ? Colors::White : Color(200, 220, 200, 200));
 
 	pos->y += this->getPadding();

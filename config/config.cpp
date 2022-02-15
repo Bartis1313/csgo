@@ -135,7 +135,7 @@ bool Config::load(const std::string& file)
 		LOG(LOG_ERR, std::format(XOR("Loading {} file has failed: {}"), file, err.what()));
 	}
 
-	for (const auto& var : config)
+	for (auto& var : config)
 	{
 		size_t idx = getIndexByName(var[XOR("name")].get<std::string>());
 
@@ -230,9 +230,13 @@ bool Config::init()
 			return false;
 	}
 
-	if (!save(getDefaultConfigName()))
-	{
-		return false;
+	// check if the default file already exists, if yes, don't save
+	if (auto path = m_documentsPath / m_folder / getDefaultConfigName(); !std::filesystem::exists(path))
+	{ 
+		LOG(LOG_INFO, std::format(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
+
+		if (!save(getDefaultConfigName()))
+			return false;
 	}
 
 	if (!load(getDefaultConfigName()))
@@ -254,16 +258,11 @@ void Config::reload()
 	for (const auto& entry : iterator)
 	{
 		if (std::string name = entry.path().filename().string();
-			entry.path().extension() == XOR("cfg") && !name.empty())
+			entry.path().extension() == XOR(".cfg") && !name.empty())
 		{
 			m_allFilesInFolder.emplace_back(std::move(name));
 		}
 	}
-}
-
-std::vector<std::string>& Config::getAllConfigFiles() const
-{
-	return std::add_lvalue_reference_t<std::vector<std::string>>(m_allFilesInFolder);
 }
 
 std::filesystem::path Config::getHacksPath() const
@@ -283,4 +282,15 @@ std::filesystem::path Config::getHacksPath() const
 std::filesystem::path Config::getPathForSave(const std::string& file) const
 {
 	return std::filesystem::path{ m_documentsPath / m_folder / file };
+}
+
+void Config::deleteCfg(const std::string& file)
+{
+	auto path = getPathForConfig(file);
+
+	if (path.string() == m_defaultConfig)
+		LOG(LOG_ERR, XOR("Can't delete default config"));
+
+	if (auto toDel = getPathForSave(path.string()); std::filesystem::remove(toDel))
+		LOG(LOG_INFO, std::format(XOR("Removed config {}"), toDel.filename().string()));
 }

@@ -1,5 +1,5 @@
 #include "hooks.hpp"
-#include "../menu/menuX88.hpp"
+#include "../menu/x88/menuX88.hpp"
 #include "../features/visuals/player.hpp"
 #include "../features/aimbot/aimbot.hpp"
 #include "../features/visuals/world.hpp"
@@ -82,7 +82,6 @@ void drawWaterMark()
 // draw all painting
 void paintHandle()
 {
-	guiStates();
 	esp::run();
 	world::drawMisc();
 	radar::run();
@@ -93,12 +92,11 @@ void paintHandle()
 	world::drawZeusRange();
 	misc::drawNoScope();
 	misc::drawCrosshair();
+	legitbot::drawFov();
 
 	config.get<bool>(vars.bMenuOpenedx88)
 		? x88Handle()
 		: GUI::draw();
-
-	drawWaterMark();
 }
 
 #pragma endregion
@@ -118,12 +116,19 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		return;
 
 	static unsigned int panelID = 0;
+	static unsigned int panelScope = 0;
+	static unsigned int panelFocus = 0;
 
 	const auto panelName = interfaces::panel->getName(panel);
 
-	if (strstr(panelName, XOR("HudZoom")))
+	if (!panelScope)
 	{
-		if (interfaces::engine->isInGame())
+		if(strstr(panelName, XOR("HudZoom")))
+			panelScope = panel;
+	}
+	else if (panelScope == panel)
+	{
+		if (interfaces::engine->isInGame() && config.get<bool>(vars.bNoScope))
 			return;
 	}
 
@@ -136,7 +141,18 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	}
 	else if (panelID == panel)
 	{
-		interfaces::panel->setMouseInputEnabled(panel, GUI::menu->isOpened());
+		guiStates();
 		paintHandle();
+		drawWaterMark();
+	}
+
+	if (!panelFocus)
+	{
+		if (strstr(panelName, XOR("FocusOverlayPanel")))
+			panelFocus = panel;
+	}
+	else if (panelFocus == panel)
+	{
+		interfaces::panel->setMouseInputEnabled(panel, GUI::menu->isOpened());
 	}
 }

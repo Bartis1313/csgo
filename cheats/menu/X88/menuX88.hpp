@@ -2,8 +2,8 @@
 #include <string>
 #include <vector>
 #include "Item.hpp"
-#include "../../config/vars.hpp"
-#include "../../SDK/Color.hpp"
+#include "../../../config/vars.hpp"
+#include "../../../SDK/Color.hpp"
 
 class Menu
 {

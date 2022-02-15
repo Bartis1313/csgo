@@ -7,7 +7,7 @@ GUI::Tab::Tab(const std::string& name)
 GUI::Group* GUI::Tab::addGroup(const std::string& name, Lining lining)
 {
 	auto t = new Group(name, lining);
-	m_groups.emplace_back(t);
+	m_groups.emplace_back(std::move(t));
 	return t;
 }
 
