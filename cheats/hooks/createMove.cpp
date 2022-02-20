@@ -71,7 +71,7 @@ __declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(void*, int, int
 	__asm
 	{
 		push ebp
-		mov	ebc, esp
+		mov ebc, esp
 		push ebx
 		push esp
 		push dword ptr[active]
