@@ -6,16 +6,16 @@ class Input
 {
 public:
     PAD(173);
-	bool m_cameraInThirdPerson;
-	PAD(2);
-	Vector m_cameraOffset;
+    bool m_cameraInThirdPerson;
+    PAD(2);
+    Vector m_cameraOffset;
     PAD(56);
     CUserCmd* m_commands;
     CVerifiedUserCmd* m_verifiedCommands;
 
     VFUNC(CUserCmd*, getUserCmd, 8, (int slot, int sequence), (this, slot, sequence))
 
-    CVerifiedUserCmd* getVerifiedUserCmd(int sequence)
+        CVerifiedUserCmd* getVerifiedUserCmd(int sequence)
     {
         return &m_verifiedCommands[sequence % 150];
     }
