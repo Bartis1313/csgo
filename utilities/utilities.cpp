@@ -57,7 +57,7 @@ uintptr_t utilities::patternScan(const char* mod, const char* mask)
 		}
 	}
 
-	LF(MessageBoxA)(nullptr, XOR("Pattern scanning failed!"), XOR("Bartis hack"), MB_OK | MB_ICONWARNING);
+	LF(MessageBoxA)(nullptr, std::format(XOR("Pattern scanning failed! mod: {} mask: {}"), mod, mask).c_str(), XOR("Bartis hack"), MB_OK | MB_ICONWARNING);
 
 	return 0;
 }
@@ -215,4 +215,13 @@ std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
 		res.emplace_back(word);
 	}
 	return res;
+}
+
+SHORT utilities::getKey(int vKey)
+{
+#ifdef _DEBUG
+	return GetAsyncKeyState(vKey);
+#else
+	return LF(GetAsyncKeyState).cached()(vKey);
+#endif
 }

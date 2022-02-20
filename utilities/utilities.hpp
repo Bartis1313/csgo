@@ -46,4 +46,5 @@ namespace utilities
         return toReturn;
     } 
     _NODISCARD std::vector<std::string> splitStr(const std::string& str, char limit = ' ');
+    _NODISCARD SHORT getKey(int vKey);
 }

@@ -1,12 +1,12 @@
 #pragma once
 #include <cstdint>
+#include <type_traits>
 
 namespace vfunc
 {
-	// if overflow anyhow use std::int32, mainly used for hooks
-	inline uintptr_t getVFunc(void* thisptr, size_t index)
+	inline constexpr void* getVFunc(void* thisptr, size_t index)
 	{
-		return static_cast<uintptr_t>((*reinterpret_cast<uintptr_t**>(thisptr))[index]);
+		return (*static_cast<void***>(thisptr))[index];
 	}
 
 	// use for any function that does not represent packed args and can be thiscall

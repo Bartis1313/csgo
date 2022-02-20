@@ -1,6 +1,8 @@
 #pragma once
 #include "../../SDK/interfaces/interfaces.hpp"
 
+#define FASTARGS void* thisptr, void* edx
+
 enum hookIndexes
 {
 	PAINTTRAVERSE = 41,
@@ -9,7 +11,10 @@ enum hookIndexes
 	OVERRIDE = 18,
 	POSTSCREENEFFECT = 44,
 	FRAMESTAGE = 37,
-	//LOCK_CURSOR = 67, why another hook
+	LOCK_CURSOR = 67,
+	RESETDX = 16,
+	PRESENTDX = 17,
+	PROXY_MOVE = 22,
 };
 
 namespace hooks
@@ -63,9 +68,7 @@ namespace hooks
 		static void __stdcall hooked(int frame);
 		inline static fn original = nullptr;
 		static const int index = FRAMESTAGE;
-	};
-	
-	// latest update
+	};	
 
 	struct clientValidAddr
 	{
@@ -93,5 +96,47 @@ namespace hooks
 		using fn = char(__fastcall*)(void*, void*, const char*);
 		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
 		inline static fn original = nullptr;
+	};
+
+	struct lockCursor
+	{
+		using fn = void(__thiscall*)(void*);
+		static void __stdcall hooked();
+		inline static fn original = nullptr;
+		static const int index = LOCK_CURSOR;
+	};
+
+	struct reset
+	{
+		using fn = long(__stdcall*)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+		static long __stdcall hooked(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params);
+		inline static fn original = nullptr;
+		static const int index = RESETDX;
+	};
+
+	struct present
+	{
+		using fn = long(__stdcall*)(IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
+		static long __stdcall hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region);
+		inline static fn original = nullptr;
+		static const int index = PRESENTDX;
+	};
+
+	struct wndProcSys
+	{
+		inline static WNDPROC wndProcOriginal = nullptr;
+		inline static HWND currentWindow = nullptr;
+		inline static LRESULT __stdcall wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+
+		static void init();
+		static void shutdown();
+	};
+
+	struct proxyCreateMove
+	{
+		using fn = void(__fastcall*)(void*, int, int, float, bool);
+		static void __fastcall hooked(void*, int, int sequence, float inputTime, bool active);
+		inline static fn original = nullptr;
+		static const int index = PROXY_MOVE;
 	};
 }

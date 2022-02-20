@@ -1,3 +1,10 @@
 #pragma once
-#include "../../../dependencies/ImGui/imgui_internal.h"
-// TODO
+
+namespace ImGuiMenu
+{
+	void init();
+	void shutdown();
+	void example();
+
+	inline bool isMenuActive = true;
+}

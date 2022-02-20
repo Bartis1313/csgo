@@ -2,6 +2,7 @@
 #include <Windows.h>
 #include <format>
 #include <type_traits>
+#include <d3d9.h>
 
 #include "../ClientMode.hpp"
 #include "../CGameMovement.hpp"
@@ -122,7 +123,8 @@ namespace interfaces
 	// remember to dereference!
 	inline PlayerResource** resource;
 	inline IVEfx* effects;
-	inline InputSystem* ioSystem;
+	inline InputSystem* iSystem;
+	inline IDirect3DDevice9* dx9Device;
 
 	// shoudl be called once
 	void init();

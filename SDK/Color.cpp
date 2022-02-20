@@ -1,4 +1,5 @@
 #include "Color.hpp"
+#include "../dependencies/ImGui/imgui.h" // for struct
 
 float Rainbow::hue = 0.0f;
 
@@ -28,6 +29,11 @@ void Color::setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 void Color::setAlpha(uint8_t a)
 {
 	m_color.at(3) = a;
+}
+
+ImVec4 Color::getImguiColor(const Color& color)
+{
+	return ImVec4{ color.rDevided(), color.gDevided(), color.bDevided(), color.aDevided() };
 }
 
 Color Color::fromHSB(float hue, float saturation, float brightness)

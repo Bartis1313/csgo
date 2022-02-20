@@ -9,23 +9,25 @@
 #include "../features/visuals/world.hpp"
 #include "../features/misc/misc.hpp"
 
+// might be removed, and move to proxy
 bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 {
-	original(inputFrame, cmd);
+	static auto orig = original;
 
 	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
 	if (!cmd || !cmd->m_commandNumber || !game::localPlayer)
-		return original(inputFrame, cmd);
+		return orig(inputFrame, cmd);
 
 	// thanks for reminding me https://github.com/Bartis1313/csgo/issues/4
-	if (original(inputFrame, cmd))
+	if (orig(inputFrame, cmd))
 		interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
 
 	game::serverTime(cmd);
 	bunnyhop::run(cmd);
 	bunnyhop::strafe(cmd);
 
+	// should be placed in proxy if you need packet
 	prediction::start(cmd);
 	{
 		backtrack::run(cmd);
@@ -36,13 +38,48 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 	}
 	prediction::end();
 
-	uintptr_t framePtr = *reinterpret_cast<uintptr_t*>(reinterpret_cast<uintptr_t>(_AddressOfReturnAddress()) - sizeof(uintptr_t));
-	bool& sendPacket = *reinterpret_cast<bool*>(framePtr - 0x1C);
-
-	if (sendPacket)
-		globals::realAngle = cmd->m_viewangles;
-	else
-		globals::fakeAngle = cmd->m_viewangles;
+	// recent update killed it, nothing on stack
 
 	return false;
+}
+
+// to get the sendPacket correctly and no need to define it anywhere in headers
+void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool& sendPacket)
+{
+	hooks::proxyCreateMove::original(interfaces::client, 0, sequence, inputTime, active);
+
+	CUserCmd* cmd = interfaces::input->getUserCmd(0, sequence);
+	if (!cmd || !cmd->m_commandNumber)
+		return;
+
+	CVerifiedUserCmd* verifiedCmd = interfaces::input->getVerifiedUserCmd(sequence);
+	if (!verifiedCmd)
+		return;
+
+	if (sendPacket)
+	{
+		// do anything that needs it, if you rely on prediction, then move prediction to the proxy hook
+	}
+
+	verifiedCmd->m_cmd = *cmd;
+	verifiedCmd->m_crc = cmd->getChecksum();
+}
+
+// wrapper for function
+__declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(void*, int, int sequence, float inputTime, bool active)
+{
+	__asm
+	{
+		PUSH	EBP
+		MOV		EBP,			ESP
+		PUSH    EBX
+		PUSH    ESP
+		PUSH    DWORD			PTR[active]
+		PUSH    DWORD			PTR[inputTime]
+		PUSH    DWORD			PTR[sequence]
+		CALL	createMoveProxy
+		POP	    EBX
+		POP		EBP
+		RET		0xC
+	}
 }

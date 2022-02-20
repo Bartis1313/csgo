@@ -1,18 +1,18 @@
 #include "cheats/hooks/hooks.hpp"
+#include "cheats/hooks/helpers/helper.hpp"
 #include "utilities/console/console.hpp"
 #include "SDK/interfaces/interfaces.hpp"
 #include "utilities/renderer/renderer.hpp"
 #include "utilities/netvars/netvars.hpp"
-#include "config/config.hpp"
 #include "config/vars.hpp" // so vars load
 #include "source.hpp"
-#include "cheats/features/visuals/chams.hpp"
 #include "cheats/globals.hpp"
 #include "cheats/menu/GUI/drawing.hpp"
 #include "cheats/menu/GUI/Controls/TextInput/TextInput.hpp"
+#include "cheats/features/misc/events.hpp"
+#include "utilities/simpleTimer.hpp"
+#include "cheats/menu/GUI-ImGui/menu.hpp"
 #include <thread>
-
-#define USE_IMGUI
 
 using namespace std::literals;
 
@@ -24,6 +24,8 @@ DWORD WINAPI init(PVOID instance)
 
     console::init(XOR("CSGO DEBUG"));
 
+    START_TIME
+
     // warning: if you do wrong hierarchy - crash
     try
     {
@@ -32,34 +34,39 @@ DWORD WINAPI init(PVOID instance)
         netvarMan.init();
         netvarMan.dump();
         render::init();
-        GUI::initGui();
+        //GUI::initGui();
+        hooks::wndProcSys::init();
         hooks::init();
     }
     catch (const std::runtime_error& err)
     {
         LF(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
-        LF(FreeLibraryAndExitThread)(reinterpret_cast<HMODULE>(instance), EXIT_SUCCESS);
+        LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
     }
+
+    END_TIME
+    PRINT_TIME_TO_LOG("hooks took")
 
     return TRUE;
 }
 
 VOID WINAPI _shutdown(PVOID instance)
 {
-    while (!GUI::isKeyDown(VK_DELETE))
+    while (!utilities::getKey(config.get<int>(vars.iKeyPanic)))
     {
-        std::this_thread::sleep_for(100ms);
+        std::this_thread::sleep_for(50ms);
     }
 
     RemoveVectoredExceptionHandler(globals::instance);
-
-    GUI::menu->shutdown();
-    LOG(LOG_INFO, XOR("Hack shutdown"));
+    hooks::wndProcSys::shutdown();
+    events.shutdown();
     hooks::shutdown();
+    //GUI::menu->shutdown();
+    LOG(LOG_INFO, XOR("Hack shutdown"));
     console::shutdown();
 
-    LF(MessageBoxA)(nullptr, XOR("Hack shutdown"), XOR("Confirmed hack shutdown"), MB_OK | MB_ICONERROR);
-    LF(FreeLibraryAndExitThread)(reinterpret_cast<HMODULE>(instance), EXIT_SUCCESS);
+   // LF(MessageBoxA)(nullptr, XOR("Hack shutdown"), XOR("Confirmed hack shutdown"), MB_OK | MB_ICONERROR);
+    LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
 }
 
 BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID reserved)

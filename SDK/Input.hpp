@@ -5,8 +5,18 @@
 class Input
 {
 public:
-	PAD(173);
+    PAD(173);
 	bool m_cameraInThirdPerson;
-	PAD(1);
+	PAD(2);
 	Vector m_cameraOffset;
+    PAD(56);
+    CUserCmd* m_commands;
+    CVerifiedUserCmd* m_verifiedCommands;
+
+    VFUNC(CUserCmd*, getUserCmd, 8, (int slot, int sequence), (this, slot, sequence))
+
+    CVerifiedUserCmd* getVerifiedUserCmd(int sequence)
+    {
+        return &m_verifiedCommands[sequence % 150];
+    }
 };

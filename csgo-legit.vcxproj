@@ -182,12 +182,15 @@
     <ClCompile Include="cheats\hooks\hooks.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\hooks\lokcCursor.cpp" />
+    <ClCompile Include="cheats\hooks\present.cpp" />
     <ClCompile Include="cheats\hooks\overrideView.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\hooks\paintTraverse.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\hooks\reset.cpp" />
     <ClCompile Include="cheats\hooks\validAddrChecks.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\menu.cpp" />
     <ClCompile Include="cheats\menu\GUI\Controls\Button\Button.cpp" />
@@ -220,6 +223,7 @@
     <ClCompile Include="dependencies\ImGui\imgui_draw.cpp" />
     <ClCompile Include="dependencies\ImGui\imgui_freetype.cpp" />
     <ClCompile Include="dependencies\ImGui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="dependencies\ImGui\imgui_impl_win32.cpp" />
     <ClCompile Include="dependencies\ImGui\imgui_stdlib.cpp" />
     <ClCompile Include="dependencies\ImGui\imgui_tables.cpp" />
     <ClCompile Include="dependencies\ImGui\imgui_widgets.cpp" />
@@ -274,6 +278,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="SDK\checksum_crc.cpp" />
     <ClCompile Include="SDK\Color.cpp" />
     <ClCompile Include="SDK\structs\Entity.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -322,6 +327,7 @@
     <ClInclude Include="cheats\game.hpp" />
     <ClInclude Include="cheats\globals.hpp" />
     <ClInclude Include="cheats\hooks\hooks.hpp" />
+    <ClInclude Include="cheats\hooks\helpers\helper.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\menu.hpp" />
     <ClInclude Include="cheats\menu\GUI\Controls\Button\Button.hpp" />
     <ClInclude Include="cheats\menu\GUI\Controls\CheckBox\CheckBox.hpp" />
@@ -448,6 +454,7 @@
     <ClInclude Include="dependencies\ImGui\imgui.h" />
     <ClInclude Include="dependencies\ImGui\imgui_freetype.h" />
     <ClInclude Include="dependencies\ImGui\imgui_impl_dx9.h" />
+    <ClInclude Include="dependencies\ImGui\imgui_impl_win32.h" />
     <ClInclude Include="dependencies\ImGui\imgui_internal.h" />
     <ClInclude Include="dependencies\ImGui\imgui_stdlib.h" />
     <ClInclude Include="dependencies\ImGui\imstb_rectpack.h" />
@@ -466,6 +473,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SDK\animations.hpp" />
     <ClInclude Include="SDK\CGameMovement.hpp" />
+    <ClInclude Include="SDK\checksum_crc.hpp" />
     <ClInclude Include="SDK\ClientMode.hpp" />
     <ClInclude Include="SDK\CPlayerResource.hpp" />
     <ClInclude Include="SDK\InputSystem.hpp" />
@@ -489,6 +497,7 @@
     <ClInclude Include="utilities\pad.hpp" />
     <ClInclude Include="utilities\renderer\renderer.hpp" />
     <ClInclude Include="utilities\csgo.hpp" />
+    <ClInclude Include="utilities\simpleTimer.hpp" />
     <ClInclude Include="utilities\utilities.hpp" />
     <ClInclude Include="SDK\CGlowManager.hpp" />
     <ClInclude Include="SDK\ClientClass.hpp" />

@@ -3,6 +3,8 @@
 #include <array>
 #include <algorithm>
 
+struct ImVec4;
+
 #undef min
 #undef max
 
@@ -20,6 +22,8 @@ public:
 	_NODISCARD uint8_t g() const { return m_color.at(1); }
 	_NODISCARD uint8_t b() const { return m_color.at(2); }
 	_NODISCARD uint8_t a() const { return m_color.at(3); }
+
+	_NODISCARD static ImVec4 getImguiColor(const Color& color);
 
 	_NODISCARD float rDevided() const { return m_color.at(0) / 255.0f; }
 	_NODISCARD float gDevided() const { return m_color.at(1) / 255.0f; }

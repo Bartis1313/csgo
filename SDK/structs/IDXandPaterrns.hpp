@@ -24,6 +24,7 @@ enum VTableIndexes
 #define LOCALIZE_DLL		XOR("localize.dll")
 #define STUDIORENDER_DLL	XOR("studiorender.dll")
 #define INPUTSYSTEM_DLL		XOR("inputsystem.dll")
+#define SHARED_API			XOR("shaderapidx9.dll")
 
 #define GLOWMANAGER				XOR("0F 11 05 ? ? ? ? 83 C8 01 C7 05 ? ? ? ? 00 00 00 00")
 #define BEAMS					XOR("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")
@@ -41,3 +42,4 @@ enum VTableIndexes
 #define ANIMATION_LAYER			XOR("8B 89 ? ? ? ? 8D 0C D1")
 #define SEQUENCE_ACTIVITY		XOR("55 8B EC 53 8B 5D 08 56 8B F1 83")
 #define NEW_CHECK				XOR("55 8B EC 56 8B F1 33 C0 57 8B 7D 08 8B 8E") // direct sig, sub_10797090
+#define DX9_DEVICE				XOR("A1 ? ? ? ? 50 8B 08 FF 51 0C")

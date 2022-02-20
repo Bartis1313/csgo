@@ -10,7 +10,7 @@ using namespace nlohmann;
 std::string Config::m_mainEntryFolder = XOR("Bartis_internal");
 
 ConfigType::ConfigType(const Types var, const std::string& name)
-	: m_type {var}, m_name{ name }
+	: m_type{ var }, m_name{ name }
 {
 	// now check if the type is correct
 	if (std::holds_alternative<bool>(m_type))
@@ -135,7 +135,7 @@ bool Config::load(const std::string& file)
 		LOG(LOG_ERR, std::format(XOR("Loading {} file has failed: {}"), file, err.what()));
 	}
 
-	for (auto& var : config)
+	for (const auto& var : config)
 	{
 		size_t idx = getIndexByName(var[XOR("name")].get<std::string>());
 
@@ -231,8 +231,9 @@ bool Config::init()
 	}
 
 	// check if the default file already exists, if yes, don't save
+	// TODO: detect any changes, replace them with new file. Only idea for now is to compare file size (kb)
 	if (auto path = m_documentsPath / m_folder / getDefaultConfigName(); !std::filesystem::exists(path))
-	{ 
+	{
 		LOG(LOG_INFO, std::format(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
 
 		if (!save(getDefaultConfigName()))
