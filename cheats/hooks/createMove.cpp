@@ -9,7 +9,7 @@
 #include "../features/visuals/world.hpp"
 #include "../features/misc/misc.hpp"
 
-// might be removed, and move to proxy
+// this is only to fix viewangle to correct
 bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 {
 	static auto orig = original;
@@ -22,23 +22,6 @@ bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 	// thanks for reminding me https://github.com/Bartis1313/csgo/issues/4
 	if (orig(inputFrame, cmd))
 		interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
-
-	game::serverTime(cmd);
-	bunnyhop::run(cmd);
-	bunnyhop::strafe(cmd);
-
-	// should be placed in proxy if you need packet
-	prediction::start(cmd);
-	{
-		backtrack::run(cmd);
-		legitbot::run(cmd);
-		legitbot::runRCS(cmd);
-		triggerbot::run(cmd);
-		misc::getVelocityData();
-	}
-	prediction::end();
-
-	// recent update killed it, nothing on stack
 
 	return false;
 }
@@ -56,26 +39,35 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	if (!verifiedCmd)
 		return;
 
-	if (sendPacket)
+	game::serverTime(cmd);
+	bunnyhop::run(cmd);
+	bunnyhop::strafe(cmd);
+
+	prediction::start(cmd);
 	{
-		// do anything that needs it, if you rely on prediction, then move prediction to the proxy hook
+		backtrack::run(cmd);
+		legitbot::run(cmd);
+		legitbot::runRCS(cmd);
+		triggerbot::run(cmd);
+		misc::getVelocityData();
 	}
+	prediction::end();
 
 	verifiedCmd->m_cmd = *cmd;
 	verifiedCmd->m_crc = cmd->getChecksum();
 }
 
 // wrapper for function
-__declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(void*, int, int sequence, float inputTime, bool active)
+__declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(void*, int, int sequence, float inputFrame, bool active)
 {
 	__asm
 	{
 		push ebp
-		mov ebc, esp
+		mov ebp, esp
 		push ebx
 		push esp
 		push dword ptr[active]
-		push dword ptr[inputTime]
+		push dword ptr[inputFrame]
 		push dword ptr[sequence]
 		call createMoveProxy
 		pop ebx

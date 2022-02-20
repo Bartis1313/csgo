@@ -135,7 +135,7 @@ namespace hooks
 	struct proxyCreateMove
 	{
 		using fn = void(__fastcall*)(void*, int, int, float, bool);
-		static void __fastcall hooked(void*, int, int sequence, float inputTime, bool active);
+		static void __fastcall hooked(void*, int, int sequence, float inputFrame, bool active);
 		inline static fn original = nullptr;
 		static const int index = PROXY_MOVE;
 	};
