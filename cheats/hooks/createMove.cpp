@@ -9,27 +9,28 @@
 #include "../features/visuals/world.hpp"
 #include "../features/misc/misc.hpp"
 
-// this is only to fix viewangle to correct
-bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
-{
-	static auto orig = original;
-
-	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
-
-	if (!cmd || !cmd->m_commandNumber || !game::localPlayer)
-		return orig(inputFrame, cmd);
-
-	// thanks for reminding me https://github.com/Bartis1313/csgo/issues/4
-	if (orig(inputFrame, cmd))
-		interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
-
-	return false;
-}
+//bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
+//{
+//	static auto orig = original;
+//
+//	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
+//
+//	if (!cmd || !cmd->m_commandNumber || !game::localPlayer)
+//		return orig(inputFrame, cmd);
+//
+//	// thanks for reminding me https://github.com/Bartis1313/csgo/issues/4
+//	if (orig(inputFrame, cmd))
+//		interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
+//
+//	return false;
+//}
 
 // to get the sendPacket correctly and no need to define it anywhere in headers
 void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool& sendPacket)
 {
 	hooks::proxyCreateMove::original(interfaces::client, 0, sequence, inputTime, active);
+
+	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
 	CUserCmd* cmd = interfaces::input->getUserCmd(0, sequence);
 	if (!cmd || !cmd->m_commandNumber)

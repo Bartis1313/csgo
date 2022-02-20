@@ -12,7 +12,7 @@ void hooks::init()
 {
 #pragma region game
 	const auto paintTraverseTarget = vfunc::getVFunc(interfaces::panel, paintTraverse::index);
-	const auto creteMoveTarget = vfunc::getVFunc(interfaces::clientMode, createMove::index);
+	//const auto creteMoveTarget = vfunc::getVFunc(interfaces::clientMode, createMove::index);
 	const auto drawModelTarget = vfunc::getVFunc(interfaces::modelRender, drawModel::index);
 	const auto overrideViewTarget = vfunc::getVFunc(interfaces::clientMode, overrideView::index);
 	const auto doPostScreenEffectsTarget = vfunc::getVFunc(interfaces::clientMode, doPostScreenEffects::index);
@@ -39,7 +39,7 @@ void hooks::init()
 
 	hookHelper::initMinhook();
 
-	hookHelper::tryHook(creteMoveTarget, &createMove::hooked, hookHelper::ORIGINAL(createMove::original), XOR("createMove"));
+	//hookHelper::tryHook(creteMoveTarget, &createMove::hooked, hookHelper::ORIGINAL(createMove::original), XOR("createMove"));
 	hookHelper::tryHook(createMoveProxyTarget, &proxyCreateMove::hooked, hookHelper::ORIGINAL(proxyCreateMove::original), XOR("createmoveProxy"));
 	// will probably use the paint hook only for few things now. I doubt this will be ever needed anymore after imgui choice
 	//hookHelper::tryHook(paintTraverseTarget, &paintTraverse::hooked, ORIGINAL(paintTraverse::original), XOR("paintTraverse"));

@@ -30,13 +30,13 @@ namespace hooks
 		static const int index = PAINTTRAVERSE;
 	};
 
-	struct createMove
+	/*struct createMove
 	{
 		using fn = bool(__stdcall*)(float, CUserCmd*);
 		static bool __stdcall hooked(float inputFrame, CUserCmd* cmd);
 		inline static fn original = nullptr;
 		static const int index = CREATEMOVE;
-	};
+	};*/
 
 	struct drawModel
 	{
