@@ -70,16 +70,16 @@ __declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(void*, int, int
 {
 	__asm
 	{
-		PUSH	EBP
-		MOV		EBP,			ESP
-		PUSH    EBX
-		PUSH    ESP
-		PUSH    DWORD			PTR[active]
-		PUSH    DWORD			PTR[inputTime]
-		PUSH    DWORD			PTR[sequence]
-		CALL	createMoveProxy
-		POP	    EBX
-		POP		EBP
-		RET		0xC
+		push	ebp
+		mov		ebc,	esp
+		push    ebx
+		push    esp
+		push    dword	ptr[active]
+		push	dword	ptr[inputTime]
+		push    dword	ptr[sequence]
+		call	createMoveProxy
+		pop	    ebx
+		pop		ebp
+		retn	0xC
 	}
 }
