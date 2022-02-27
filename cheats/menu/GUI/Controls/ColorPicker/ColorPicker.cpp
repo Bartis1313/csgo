@@ -40,7 +40,7 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			hue = 0.0f;
 		}
 
-		render::initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
+		render.initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
 	}
 	*/
 
@@ -73,14 +73,14 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 						j / static_cast<float>(m_width), i / static_cast<float>(m_width));
 			}
 		}
-		render::initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
-		render::initNewTexture(m_hueID, m_hueBar.get(), SLIDER_WIDTH, m_height);
-		//render::initNewTexture(m_alphaID, m_alphaBar.get(), SLIDER_SIZE, COLOR_PICKER_SIZE);
+		render.initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
+		render.initNewTexture(m_hueID, m_hueBar.get(), SLIDER_WIDTH, m_height);
+		//render.initNewTexture(m_alphaID, m_alphaBar.get(), SLIDER_SIZE, COLOR_PICKER_SIZE);
 	}
 
 	// always draw it in the menu
-	render::drawGradient(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2, 15, 8, Color(*m_colorNow, m_alphaForColor), Color(Colors::Black, m_alphaForColor), false, false);
-	render::drawOutlineRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2- 1, 15 + 1, 8 + 1, Colors::Black);
+	render.drawGradient(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2, 15, 8, Color(*m_colorNow, m_alphaForColor), Color(Colors::Black, m_alphaForColor), false, false);
+	render.drawOutlineRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y + 2- 1, 15 + 1, 8 + 1, Colors::Black);
 	
 	bool isInRangeButton = isMouseInRange(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y, 15, 8);
 
@@ -124,18 +124,18 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			m_active = false;
 
 		// rects so it doesn't look raw
-		render::drawFilledRect(x, y - 5, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 12, m_height + 10, Color(50, 50, 50, 255));
-		render::drawOutlineRect(x, y - 5, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 12, m_height + 10, Colors::Black);
-		render::drawOutlineRect(x + 1, y - 4, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 10, m_height + 8, Color(80, 80, 80, 255));
+		render.drawFilledRect(x, y - 5, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 12, m_height + 10, Color(50, 50, 50, 255));
+		render.drawOutlineRect(x, y - 5, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 12, m_height + 10, Colors::Black);
+		render.drawOutlineRect(x + 1, y - 4, m_width + SLIDER_WIDTH + SLIDER_WIDTH + 10, m_height + 8, Color(80, 80, 80, 255));
 
 		// to move from rect bit to draw
 		x += 4;
 
-		render::drawFromTexture(m_gradientID, x, y, m_width, m_height, Colors::White);
-		render::drawFromTexture(m_hueID, x + m_width + 2, y, SLIDER_WIDTH, m_height, Colors::White);
-		render::drawGradient(x + m_width + SLIDER_WIDTH + 4, y, SLIDER_WIDTH, m_height, Colors::White, Colors::Black, false);
+		render.drawFromTexture(m_gradientID, x, y, m_width, m_height, Colors::White);
+		render.drawFromTexture(m_hueID, x + m_width + 2, y, SLIDER_WIDTH, m_height, Colors::White);
+		render.drawGradient(x + m_width + SLIDER_WIDTH + 4, y, SLIDER_WIDTH, m_height, Colors::White, Colors::Black, false);
 		// should draw it better, easiest is to use gradients from surface
-		//render::drawFromTexture(m_textureALPHAID, x + COLOR_PICKER_SIZE + SLIDER_SIZE, y, SLIDER_SIZE, m_height, Colors::White);
+		//render.drawFromTexture(m_textureALPHAID, x + COLOR_PICKER_SIZE + SLIDER_SIZE, y, SLIDER_SIZE, m_height, Colors::White);
 
 		// + 2 look up^
 		bool isInHueRange = isMouseInRange(x + 2 + m_width, y, SLIDER_WIDTH, m_height);
@@ -160,8 +160,8 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		mousePointY = std::clamp(mousePointY, y, y + m_width - 4);
 
 		// render small 4x4 rectangle, this gotta be fixed with pos btw
-		render::drawFilledRect(mousePointX, mousePointY, 4, 4, Colors::LightBlue);
-		render::drawOutlineRect(mousePointX, mousePointY, 4, 4, Colors::Black);
+		render.drawFilledRect(mousePointX, mousePointY, 4, 4, Colors::LightBlue);
+		render.drawOutlineRect(mousePointX, mousePointY, 4, 4, Colors::Black);
 
 		// if in hue bar range, then first delete old rgba bitmap or whatever u gonna call it, and init new
 		if (isInHueRange && isKeyDown(VK_LBUTTON))
@@ -186,7 +186,7 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			// then delete old
 			interfaces::surface->deleteTextureID(m_gradientID);
 			// and create new, this is valid way? I think so
-			render::initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
+			render.initNewTexture(m_gradientID, m_gradient.get(), m_width, m_height);
 
 			// should update color too, but mousePos is to fix
 			*m_colorNow = Color(
@@ -222,19 +222,19 @@ void GUI::ColorPicker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 			posYAlpha -= 2;
 
 		// rgb hue stuff
-		render::drawFilledRect(x + m_width + 2 + 1, y + posYHue + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
+		render.drawFilledRect(x + m_width + 2 + 1, y + posYHue + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
 		// alpha slider stuff
-		render::drawFilledRect(x + m_width + SLIDER_WIDTH + 4 + 1, y + posYAlpha + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
+		render.drawFilledRect(x + m_width + SLIDER_WIDTH + 4 + 1, y + posYAlpha + 1, SLIDER_WIDTH - 2, 1, Colors::LightBlue);
 		// hue slider outline, + 2 due to rect between them
-		render::drawOutlineRect(x + m_width + 2, y + posYHue, SLIDER_WIDTH, 3, Colors::Black);
+		render.drawOutlineRect(x + m_width + 2, y + posYHue, SLIDER_WIDTH, 3, Colors::Black);
 		// alpha slider
-		render::drawOutlineRect(x + m_width + SLIDER_WIDTH + 4, y + posYAlpha, SLIDER_WIDTH, 3, Colors::Black);
+		render.drawOutlineRect(x + m_width + SLIDER_WIDTH + 4, y + posYAlpha, SLIDER_WIDTH, 3, Colors::Black);
 		// outline for whole hue rect
-		render::drawOutlineRect(x + 2 + m_width, y, SLIDER_WIDTH, m_height, Colors::Black);
+		render.drawOutlineRect(x + 2 + m_width, y, SLIDER_WIDTH, m_height, Colors::Black);
 		// outline for whole alpha rect
-		render::drawOutlineRect(x + 4 + m_width + SLIDER_WIDTH, y, SLIDER_WIDTH, m_height, Colors::Black);
+		render.drawOutlineRect(x + 4 + m_width + SLIDER_WIDTH, y, SLIDER_WIDTH, m_height, Colors::Black);
 		// color spectrum outline
-		render::drawOutlineRect(x, y, m_width, m_height, Colors::Black);
+		render.drawOutlineRect(x, y, m_width, m_height, Colors::Black);
 	}
 }
 

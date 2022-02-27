@@ -37,12 +37,12 @@ void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	bool isInRange = isMouseInRange(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height);
 
 	// text on up with padding
-	render::text(pos->x + PAD_TEXT_X, pos->y - 5, fonts::menuFont, m_title, false, this->isActive() ? Colors::White : Color(200, 220, 200, 200));
+	render.text(pos->x + PAD_TEXT_X, pos->y - 5, fonts::menuFont, m_title, false, this->isActive() ? Colors::White : Color(200, 220, 200, 200));
 
-	render::drawGradient(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Color(30, 30, 30, 255),
+	render.drawGradient(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Color(30, 30, 30, 255),
 		(isInRange || this->isActive()) ? Color(60, 60, 60, 255) : Color(40, 40, 40, 255), false);
 
-	render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Colors::Black);
+	render.drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Colors::Black);
 
 	auto check = [this]() -> void
 	{
@@ -87,7 +87,7 @@ void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 					break;
 				}
 				// some hardcoded check
-				if (auto size = render::getTextSize(fonts::menuFont, *m_text); size < m_width + 15 && !m_smallLetters.at(i).empty() && !m_bigLetters.at(i).empty())
+				if (auto size = render.getTextSize(fonts::menuFont, *m_text); size < m_width + 15 && !m_smallLetters.at(i).empty() && !m_bigLetters.at(i).empty())
 				{
 					if (isKeyDown(VK_SHIFT))
 					{
@@ -107,13 +107,13 @@ void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		m_timer = now + 1000;
 
 	std::string toDraw = *m_text;
-	if (auto size = render::getTextSize(fonts::menuFont, *m_text); this->isActive() && timeSinceEpoch() > m_timer - 500 && size < m_width - 4)
+	if (auto size = render.getTextSize(fonts::menuFont, *m_text); this->isActive() && timeSinceEpoch() > m_timer - 500 && size < m_width - 4)
 	{
 		toDraw += "|";
 	}
 
 	// apply when text too long
-	if (auto size = render::getTextSize(fonts::menuFont, *m_text); size > m_width - 15)
+	if (auto size = render.getTextSize(fonts::menuFont, *m_text); size > m_width - 15)
 	{
 		// so much hardcoded, dunno how to make it easy
 		toDraw = toDraw.substr(0, 18).append(XOR("..."));
@@ -124,7 +124,7 @@ void GUI::TextInput::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		toDraw = XOR("...");
 	}
 
-	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 3 + 10, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Color(200, 220, 200, 200));
+	render.text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 3 + 10, fonts::menuFont, toDraw, true, this->isActive() ? Colors::LightBlue : Color(200, 220, 200, 200));
 
 	pos->y += this->getPadding();
 }

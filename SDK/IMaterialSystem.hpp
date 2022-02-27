@@ -8,7 +8,7 @@ class KeyValues;
 class IMaterialSystem
 {
 public:
-	VFUNC(IMaterial*, createMaterial, 83, (const char* materialName, KeyValues* keyValues), (this, materialName, keyValues))
+	VFUNC(IMaterial*, createMaterial, 83, (const char* materialName, KeyValues* keyValues), (this, materialName, keyValues));
 	VFUNC(IMaterial*, findMaterial, 84, (char const* name, const char* group, bool complain = true, const char* prefix = nullptr), (this, name, group, complain, prefix));
 	VFUNC(short, firstMaterial, 86, (), (this));
 	VFUNC(short, nextMaterial, 87, (int handle), (this, handle));

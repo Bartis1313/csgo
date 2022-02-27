@@ -62,20 +62,20 @@ void GUI::Menu::drawAllTabs(Vector2D* pos)
 			//printf("ostatnie %i \n", globals::lastTab);
 		}
 
-		render::drawGradient(x, y, w, h,
+		render.drawGradient(x, y, w, h,
 			isSelected ? Color(50, 120, 220, 255) : Color(50, 120, 180, 255),
 			isSelected ? Colors::Black : Color(50, 120, 180, 255), false);
 
-		render::drawOutlineRect(x + 1, y + 1, w - 2, h - 2,
+		render.drawOutlineRect(x + 1, y + 1, w - 2, h - 2,
 			isInRange ? Color(50, 120, 220, 255) : Color(50, 120, 180, 255));
 
 		if (isInRange)
-			render::drawFilledRect(x, y, w, h, Colors::Grey);
+			render.drawFilledRect(x, y, w, h, Colors::Grey);
 
-		render::drawOutlineRect(x, y, w, h, Colors::Black);
+		render.drawOutlineRect(x, y, w, h, Colors::Black);
 
 		// TODO: add better calculation based on font
-		render::text(x + (size / 2), y + 3, fonts::menuFont, m_tabs.at(i)->getName(), true, isSelected ? Color(200, 170, 70, 255) : Colors::White);
+		render.text(x + (size / 2), y + 3, fonts::menuFont, m_tabs.at(i)->getName(), true, isSelected ? Color(200, 170, 70, 255) : Colors::White);
 	}
 
 	pos->x += this->getStartX();
@@ -133,8 +133,8 @@ void GUI::Menu::draw()
 	drawCloseRect();
 
 	// outlines to make cool look
-	render::drawOutlineRect(m_X - 1, m_Y - 1, m_width + 1, m_height + 1, Colors::Black);
-	render::drawOutlineRect(m_X - THICKNESS - 1, m_Y - (THICKNESS * 4) - 1, m_width + (THICKNESS * 2) + 1, m_height + (THICKNESS * 5) + 1, Colors::Black);
+	render.drawOutlineRect(m_X - 1, m_Y - 1, m_width + 1, m_height + 1, Colors::Black);
+	render.drawOutlineRect(m_X - THICKNESS - 1, m_Y - (THICKNESS * 4) - 1, m_width + (THICKNESS * 2) + 1, m_height + (THICKNESS * 5) + 1, Colors::Black);
 
 	Vector2D pos = Vector2D(m_X, m_Y);
 
@@ -166,21 +166,21 @@ void GUI::Menu::draw()
 
 void GUI::Menu::drawBackground() const
 {
-	render::drawFilledRect(m_X, m_Y, m_width, m_height, Color(50, 50, 50, 255));
+	render.drawFilledRect(m_X, m_Y, m_width, m_height, Color(50, 50, 50, 255));
 }
 
 void GUI::Menu::drawExtraBackgroundLines() const
 {
 	// left
-	render::drawGradient(m_X - THICKNESS, m_Y, THICKNESS, m_height + THICKNESS, Colors::LightBlue, Colors::Palevioletred, false);
+	render.drawGradient(m_X - THICKNESS, m_Y, THICKNESS, m_height + THICKNESS, Colors::LightBlue, Colors::Palevioletred, false);
 	// right
-	render::drawGradient(m_X + m_width, m_Y, THICKNESS, m_height + THICKNESS, Colors::Palevioletred, Colors::LightBlue, false);
+	render.drawGradient(m_X + m_width, m_Y, THICKNESS, m_height + THICKNESS, Colors::Palevioletred, Colors::LightBlue, false);
 	// bottom
-	render::drawGradient(m_X, m_Y + m_height, m_width, THICKNESS, Colors::Palevioletred, Colors::LightBlue, true);
+	render.drawGradient(m_X, m_Y + m_height, m_width, THICKNESS, Colors::Palevioletred, Colors::LightBlue, true);
 
 	// top - header
-	render::drawGradient(m_X - THICKNESS, m_Y - (THICKNESS * 4), m_width + (THICKNESS * 2), THICKNESS * 4, Colors::LightBlue, Colors::Palevioletred, true);
-	render::text(m_X, m_Y - (THICKNESS * 3) - 2, fonts::tahoma, XOR("CSGO legit"), false, Colors::Palevioletred);
+	render.drawGradient(m_X - THICKNESS, m_Y - (THICKNESS * 4), m_width + (THICKNESS * 2), THICKNESS * 4, Colors::LightBlue, Colors::Palevioletred, true);
+	render.text(m_X, m_Y - (THICKNESS * 3) - 2, fonts::tahoma, XOR("CSGO legit"), false, Colors::Palevioletred);
 }
 
 void GUI::Menu::drawCloseRect()
@@ -196,12 +196,12 @@ void GUI::Menu::drawCloseRect()
 		m_opened = !m_opened;
 	}
 
-	render::drawFilledRect(x, y, size, size, isInRange ? Colors::Red : Color(128, 128, 128, isInRange ? 255 : 150));
+	render.drawFilledRect(x, y, size, size, isInRange ? Colors::Red : Color(128, 128, 128, isInRange ? 255 : 150));
 	
-	render::drawLine(x, y, x + size, y + size, isInRange ? Colors::Black : Color(40, 40, 40, 150));
-	render::drawLine(x, y, x + size, y + size, isInRange ? Colors::Black : Color(40, 40, 40, 150));
-	render::drawLine(x, y + size, x + size, y, isInRange ? Colors::Black : Color(40, 40, 40, 150));
-	render::drawLine(x, y + size, x + size, y, isInRange ? Colors::Black : Color(40, 40, 40, 150));
+	render.drawLine(x, y, x + size, y + size, isInRange ? Colors::Black : Color(40, 40, 40, 150));
+	render.drawLine(x, y, x + size, y + size, isInRange ? Colors::Black : Color(40, 40, 40, 150));
+	render.drawLine(x, y + size, x + size, y, isInRange ? Colors::Black : Color(40, 40, 40, 150));
+	render.drawLine(x, y + size, x + size, y, isInRange ? Colors::Black : Color(40, 40, 40, 150));
 }
 
 void GUI::Menu::shutdown()

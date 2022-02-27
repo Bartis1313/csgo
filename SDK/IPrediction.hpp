@@ -20,7 +20,7 @@ public:
 	int m_impulseCommand;
 	Vector m_viewAngles;
 	Vector m_absViewAngles;
-	int m_buttons; 
+	int m_buttons;
 	int m_oldButtons;
 	float m_forwardMove;
 	float m_sideMove;
@@ -46,6 +46,6 @@ class IPrediction
 public:
 	VFUNC(void, setLocalViewangles, 13, (Vector& angle), (this, std::ref(angle)));
 	VFUNC(bool, inPrediction, 14, (), (this));
-	VFUNC(void, setupMove, 20, (Player_t* localPlayer, CUserCmd* cmd, IMoveHelper* moveHelper, CMoveData* moveData), (this, localPlayer, cmd, moveHelper, moveData))
+	VFUNC(void, setupMove, 20, (Player_t* localPlayer, CUserCmd* cmd, IMoveHelper* moveHelper, CMoveData* moveData), (this, localPlayer, cmd, moveHelper, moveData));
 	VFUNC(void, finishMove, 21, (Player_t* localPlayer, CUserCmd* cmd, CMoveData* moveData), (this, localPlayer, cmd, moveData))
 };

@@ -1,12 +1,8 @@
 #pragma once
 #include <cstdint>
 #include <array>
-#include <algorithm>
 
-struct ImVec4;
-
-#undef min
-#undef max
+struct ImColor;
 
 class Color
 {
@@ -23,7 +19,9 @@ public:
 	_NODISCARD uint8_t b() const { return m_color.at(2); }
 	_NODISCARD uint8_t a() const { return m_color.at(3); }
 
-	_NODISCARD static ImVec4 getImguiColor(const Color& color);
+	_NODISCARD static ImColor getImguiColor(const Color& color);
+	// edits alpha
+	_NODISCARD Color& getColorEditAlpha(const uint8_t amount);
 
 	_NODISCARD float rDevided() const { return m_color.at(0) / 255.0f; }
 	_NODISCARD float gDevided() const { return m_color.at(1) / 255.0f; }
@@ -32,7 +30,7 @@ public:
 
 	const uint8_t& operator[](int index) const { return m_color.at(index); }
 	const uint8_t& at(int index) const { return m_color.at(index); }
-	bool operator == (const Color& rhs) const {	return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
+	bool operator == (const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
 	bool operator != (const Color& rhs) const { return !(operator==(rhs)); }
 	static Color fromHSB(float hue, float saturation, float brightness);
 	//https://gist.github.com/mjackson/5311256
@@ -67,3 +65,5 @@ namespace Colors
 	inline Color Coral = Color(255, 127, 80, 255);
 	inline Color Cyan = Color(0, 255, 255, 255);
 }
+
+#define U32(col) Color::getImguiColor(col)

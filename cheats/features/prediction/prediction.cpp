@@ -4,9 +4,9 @@
 // some globals
 namespace
 {
-	static float curTime;
-	static float frameTime;
-	static uintptr_t* predicionRandomSeed;
+	float curTime;
+	float frameTime;
+	uintptr_t* predicionRandomSeed;
 	CMoveData data = {};
 }
 
@@ -15,9 +15,12 @@ void prediction::start(CUserCmd* cmd)
 	if (!game::localPlayer)
 		return;
 
-	// every frame this must be called, on end just reset
-	if(!predicionRandomSeed)
-		predicionRandomSeed = *reinterpret_cast<uintptr_t**>(utilities::patternScan(CLIENT_DLL, PREDICTIONRANDOMSEED) + 2);
+	// init once
+	static auto bOnce = []()
+	{
+		predicionRandomSeed = *reinterpret_cast<uintptr_t**>(utilities::patternScan(CLIENT_DLL, PREDICTIONRANDOMSEED) + 0x2);
+		return true;
+	} ();
 
 	// make it as a unique prediction, like md5 unique hash iirc or smth
 	*predicionRandomSeed = cmd->m_randomSeed & 0x7FFFFFFF;

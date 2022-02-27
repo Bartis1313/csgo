@@ -28,13 +28,11 @@ namespace utilities
 {
     _NODISCARD std::string getTime();
     // old style: "A0 15 ?? FF A3"
-    _NODISCARD uintptr_t patternScan(const char* mod, const char* mask);
-    // TODO: make it in verctor class later
-    _NODISCARD inline float distToMeters(const float dist) { return dist * 0.0254f; }
+    _NODISCARD uintptr_t patternScan(const std::string& mod, const std::string& mask);
     // https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bounding_ESP_Boxes
     _NODISCARD bool getBox(Entity_t* ent, Box& box);
     _NODISCARD size_t inByteOrder(const size_t netLong);
-    _NODISCARD std::string getKeyName(const unsigned virtualKey);
+    _NODISCARD std::string getKeyName(const UINT virtualKey);
     _NODISCARD std::string toLowerCase(const std::string& str);
     _NODISCARD std::string toUpperCase(const std::string& str);
     // return filled array, this should run span<T>, but there were some problems with vector<bool> due to its special magic
@@ -46,5 +44,5 @@ namespace utilities
         return toReturn;
     } 
     _NODISCARD std::vector<std::string> splitStr(const std::string& str, char limit = ' ');
-    _NODISCARD SHORT getKey(int vKey);
+    _NODISCARD SHORT getKey(const UINT vKey);
 }

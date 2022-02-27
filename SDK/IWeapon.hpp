@@ -20,7 +20,7 @@ public:
 	int m_priceKKillAward;
 	PAD(20);
 	bool isFullAuto;
-	PAD(3);	
+	PAD(3);
 	int m_damage;
 	float m_hsMultiplier;
 	float m_armorRatio;

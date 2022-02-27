@@ -6,7 +6,7 @@ class CViewSetup
 {
 public:
 	int x;
-	int xOld; 
+	int xOld;
 	int y;
 	int yOld;
 	int m_width;
@@ -15,7 +15,7 @@ public:
 	int m_heightOld;
 	PAD(144);
 	float m_fov;
-	float m_viewmodelFov; 
+	float m_viewmodelFov;
 	Vector m_origin;
 	Vector m_angles;
 	PAD(124);

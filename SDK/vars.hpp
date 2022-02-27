@@ -1,30 +1,6 @@
 #pragma once
 
-#define MAXSTUDIOTRIANGLES	25000
-#define MAXSTUDIOVERTS		10000
-#define	MAXSTUDIOFLEXVERTS	1000
-
-#define MAXSTUDIOSKINS		32		// total textures
-#define MAXSTUDIOBONES		128		// total bones actually used
-#define MAXSTUDIOFLEXDESC	1024	// maximum number of low level flexes (actual morph targets)
-#define MAXSTUDIOFLEXCTRL	96		// maximum number of flexcontrollers (input sliders)
-#define MAXSTUDIOPOSEPARAM	24
-#define MAXSTUDIOBONECTRLS	4
-#define MAXSTUDIOANIMBLOCKS 256
-
-#define MAXSTUDIOBONEBITS	7		// NOTE: MUST MATCH MAXSTUDIOBONES
-
-// NOTE!!! : Changing this number also changes the vtx file format!!!!!
-#define MAX_NUM_BONES_PER_VERT 3
-
-//Adrian - Remove this when we completely phase out the old event system.
-#define NEW_EVENT_STYLE ( 1 << 10 )
-
-#define BONE_CALCULATE_MASK			0x1F
-#define BONE_PHYSICALLY_SIMULATED	0x01	// bone is physically simulated when physics are active
-#define BONE_PHYSICS_PROCEDURAL		0x02	// procedural when physics is active
-#define BONE_ALWAYS_PROCEDURAL		0x04	// bone is always procedurally animated
-#define BONE_SCREEN_ALIGN_SPHERE	0x08	// bone aligns to the screen, not constrained in motion.
+#pragma region bone_masks
 #define BONE_SCREEN_ALIGN_CYLINDER	0x10	// bone aligns to the screen, constrained by it's own axis.
 
 #define BONE_USED_MASK				0x0007FF00
@@ -41,19 +17,9 @@
 #define BONE_USED_BY_VERTEX_LOD6	0x00010000
 #define BONE_USED_BY_VERTEX_LOD7	0x00020000
 #define BONE_USED_BY_BONE_MERGE		0x00040000	// bone is available for bone merge to occur against it
+#pragma endregion
 
-#define BONE_USED_BY_VERTEX_AT_LOD(lod) ( BONE_USED_BY_VERTEX_LOD0 << (lod) )
-#define BONE_USED_BY_ANYTHING_AT_LOD(lod) ( ( BONE_USED_BY_ANYTHING & ~BONE_USED_BY_VERTEX_MASK ) | BONE_USED_BY_VERTEX_AT_LOD(lod) )
-
-#define MAX_NUM_LODS 8
-
-#define BONE_TYPE_MASK				0x00F00000
-#define BONE_FIXED_ALIGNMENT		0x00100000	// bone can't spin 360 degrees, all interpolation is normalized around a fixed orientation
-
-#define BONE_HAS_SAVEFRAME_POS		0x00200000	// Vector48
-#define BONE_HAS_SAVEFRAME_ROT		0x00400000	// Quaternion64
-
-
+#pragma region player_masks
 // CBaseEntity::m_fFlags
 // PLAYER SPECIFIC FLAGS FIRST BECAUSE WE USE ONLY A FEW BITS OF NETWORK PRECISION
 #define	FL_ONGROUND				(1<<0)	// At rest / on the ground
@@ -120,8 +86,9 @@
 #define IN_GRENADE1  (1 << 23)
 #define IN_GRENADE2  (1 << 24)
 #define IN_LOOKSPIN  (1 << 25)
+#pragma endregion
 
-
+#pragma region texture_names
 #define TEXTURE_GROUP_LIGHTMAP						        "Lightmaps"
 #define TEXTURE_GROUP_WORLD							          "World textures"
 #define TEXTURE_GROUP_MODEL							          "Model textures"
@@ -150,72 +117,46 @@
 #define TEXTURE_GROUP_VERTEX_SHADERS				      "Vertex Shaders"
 #define TEXTURE_GROUP_RENDER_TARGET_SURFACE			  "RenderTarget Surfaces"
 #define TEXTURE_GROUP_MORPH_TARGETS					      "Morph Targets"
+#pragma endregion
 
+#pragma region content_masks
+#define	CONTENTS_EMPTY			0		// No contents
 
-#define	SURF_LIGHT		0x0001		// value will hold the light strength
-#define	SURF_SKY2D		0x0002		// don't draw, indicates we should skylight + draw 2d sky but not draw the 3D skybox
-#define	SURF_SKY		0x0004		// don't draw, but add to skybox
-#define	SURF_WARP		0x0008		// turbulent water warp
-#define	SURF_TRANS		0x0010
-#define SURF_NOPORTAL	0x0020	// the surface can not have a portal placed on it
-#define	SURF_TRIGGER	0x0040	// FIXME: This is an xbox hack to work around elimination of trigger surfaces, which breaks occluders
-#define	SURF_NODRAW		0x0080	// don't bother referencing the texture
-#define	SURF_HINT		0x0100	// make a primary bsp splitter
-#define	SURF_SKIP		0x0200	// completely ignore, allowing non-closed brushes
-#define SURF_NOLIGHT	0x0400	// Don't calculate light
-#define SURF_BUMPLIGHT	0x0800	// calculate three lightmaps for the surface for bumpmapping
-#define SURF_NOSHADOWS	0x1000	// Don't receive shadows
-#define SURF_NODECALS	0x2000	// Don't receive decals
-#define SURF_NOPAINT	0x2000	// the surface can not have paint placed on it
-#define SURF_NOCHOP		0x4000	// Don't subdivide patches on this surface
-#define SURF_HITBOX		0x8000	// surface is part of a hitbox
-
-#define CHAR_TEX_ANTLION		'A'
-#define CHAR_TEX_BLOODYFLESH	'B'
-#define	CHAR_TEX_CONCRETE		'C'
-#define CHAR_TEX_DIRT			'D'
-#define CHAR_TEX_EGGSHELL		'E' ///< the egg sacs in the tunnels in ep2.
-#define CHAR_TEX_FLESH			'F'
-#define CHAR_TEX_GRATE			'G'
-#define CHAR_TEX_ALIENFLESH		'H'
-#define CHAR_TEX_CLIP			'I'
-#define CHAR_TEX_SNOW			'K'
-#define CHAR_TEX_PLASTIC		'L'
-#define CHAR_TEX_METAL			'M'
-#define CHAR_TEX_SAND			'N'
-#define CHAR_TEX_FOLIAGE		'O'
-#define CHAR_TEX_COMPUTER		'P'
-#define CHAR_TEX_REFLECTIVE		'R'
-#define CHAR_TEX_SLOSH			'S'
-#define CHAR_TEX_TILE			'T'
-#define CHAR_TEX_CARDBOARD		'U'
-#define CHAR_TEX_VENT			'V'
-#define CHAR_TEX_WOOD			'W'
-#define CHAR_TEX_GLASS			'Y'
-#define CHAR_TEX_WARPSHIELD		'Z' ///< wierd-looking jello effect for advisor shield.
-
-#define	CONTENTS_EMPTY			0		/**< No contents. */
-#define	CONTENTS_SOLID			0x1		/**< an eye is never valid in a solid . */
-#define	CONTENTS_WINDOW			0x2		/**< translucent, but not watery (glass). */
+#define	CONTENTS_SOLID			0x1		// an eye is never valid in a solid
+#define	CONTENTS_WINDOW			0x2		// translucent, but not watery (glass)
 #define	CONTENTS_AUX			0x4
-#define	CONTENTS_GRATE			0x8		/**< alpha-tested "grate" textures.  Bullets/sight pass through, but solids don't. */
+#define	CONTENTS_GRATE			0x8		// alpha-tested "grate" textures.  Bullets/sight pass through, but solids don't
 #define	CONTENTS_SLIME			0x10
 #define	CONTENTS_WATER			0x20
-#define	CONTENTS_MIST			0x40
-#define CONTENTS_OPAQUE			0x80		/**< things that cannot be seen through (may be non-solid though). */
+#define	CONTENTS_BLOCKLOS		0x40	// block AI line of sight
+#define CONTENTS_OPAQUE			0x80	// things that cannot be seen through (may be non-solid though)
 #define	LAST_VISIBLE_CONTENTS	0x80
-#define ALL_VISIBLE_CONTENTS 	(LAST_VISIBLE_CONTENTS | (LAST_VISIBLE_CONTENTS-1))
+#define ALL_VISIBLE_CONTENTS (LAST_VISIBLE_CONTENTS | (LAST_VISIBLE_CONTENTS-1))
+
 #define CONTENTS_TESTFOGVOLUME	0x100
-#define CONTENTS_UNUSED5		0x200
-#define CONTENTS_UNUSED6		0x4000
-#define CONTENTS_TEAM1			0x800		/**< per team contents used to differentiate collisions. */
-#define CONTENTS_TEAM2			0x1000		/**< between players and objects on different teams. */
-#define CONTENTS_IGNORE_NODRAW_OPAQUE	0x2000		/**< ignore CONTENTS_OPAQUE on surfaces that have SURF_NODRAW. */
-#define CONTENTS_MOVEABLE		0x4000		/**< hits entities which are MOVETYPE_PUSH (doors, plats, etc) */
-#define	CONTENTS_AREAPORTAL		0x8000		/**< remaining contents are non-visible, and don't eat brushes. */
+#define CONTENTS_UNUSED			0x200	
+
+// unused 
+// NOTE: If it's visible, grab from the top + update LAST_VISIBLE_CONTENTS
+// if not visible, then grab from the bottom.
+#define CONTENTS_UNUSED6		0x400
+
+#define CONTENTS_TEAM1			0x800	// per team contents used to differentiate collisions 
+#define CONTENTS_TEAM2			0x1000	// between players and objects on different teams
+
+// ignore CONTENTS_OPAQUE on surfaces that have SURF_NODRAW
+#define CONTENTS_IGNORE_NODRAW_OPAQUE	0x2000
+
+// hits entities which are MOVETYPE_PUSH (doors, plats, etc.)
+#define CONTENTS_MOVEABLE		0x4000
+
+// remaining contents are non-visible, and don't eat brushes
+#define	CONTENTS_AREAPORTAL		0x8000
+
 #define	CONTENTS_PLAYERCLIP		0x10000
 #define	CONTENTS_MONSTERCLIP	0x20000
 
+// currents can be added to any other contents, and may be mixed
 #define	CONTENTS_CURRENT_0		0x40000
 #define	CONTENTS_CURRENT_90		0x80000
 #define	CONTENTS_CURRENT_180	0x100000
@@ -223,15 +164,27 @@
 #define	CONTENTS_CURRENT_UP		0x400000
 #define	CONTENTS_CURRENT_DOWN	0x800000
 
+#define	CONTENTS_ORIGIN			0x1000000	// removed before bsping an entity
 
-#define	CONTENTS_ORIGIN			0x1000000	/**< removed before bsping an entity. */
-#define	CONTENTS_MONSTER		0x2000000	/**< should never be on a brush, only in game. */
+#define	CONTENTS_MONSTER		0x2000000	// should never be on a brush, only in game
 #define	CONTENTS_DEBRIS			0x4000000
-#define	CONTENTS_DETAIL			0x8000000	/**< brushes to be added after vis leafs. */
-#define	CONTENTS_TRANSLUCENT	0x10000000	/**< auto set if any surface has trans. */
+#define	CONTENTS_DETAIL			0x8000000	// brushes to be added after vis leafs
+#define	CONTENTS_TRANSLUCENT	0x10000000	// auto set if any surface has trans
 #define	CONTENTS_LADDER			0x20000000
-#define CONTENTS_HITBOX			0x40000000	/**< use accurate hitboxes on trace. */
+#define CONTENTS_HITBOX			0x40000000	// use accurate hitboxes on trace
 
+
+#define	CONTENTS_ORIGIN			0x1000000	// removed before bsping an entity
+
+#define	CONTENTS_MONSTER		0x2000000	// should never be on a brush, only in game
+#define	CONTENTS_DEBRIS			0x4000000
+#define	CONTENTS_DETAIL			0x8000000	// brushes to be added after vis leafs
+#define	CONTENTS_TRANSLUCENT	0x10000000	// auto set if any surface has trans
+#define	CONTENTS_LADDER			0x20000000
+#define CONTENTS_HITBOX			0x40000000	// use accurate hitboxes on trace
+#pragma endregion
+
+#pragma region masks
 #define MASK_ALL						(0xFFFFFFFF)
 #define MASK_SOLID						(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
 #define MASK_PLAYERSOLID				(CONTENTS_SOLID|CONTENTS_MOVEABLE|CONTENTS_PLAYERCLIP|CONTENTS_WINDOW|CONTENTS_MONSTER|CONTENTS_GRATE)
@@ -256,4 +209,5 @@
 #define MASK_SPLITAREAPORTAL			(CONTENTS_WATER|CONTENTS_SLIME)
 #define MASK_CURRENT					(CONTENTS_CURRENT_0|CONTENTS_CURRENT_90|CONTENTS_CURRENT_180|CONTENTS_CURRENT_270|CONTENTS_CURRENT_UP|CONTENTS_CURRENT_DOWN)
 #define MASK_DEADSOLID					(CONTENTS_SOLID|CONTENTS_PLAYERCLIP|CONTENTS_WINDOW|CONTENTS_GRATE)
-#define	  MASK_PLAYER					(CONTENTS_HITBOX|CONTENTS_MONSTER|CONTENTS_DEBRIS|CONTENTS_MOVEABLE|CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_GRATE)
+#define	MASK_PLAYER						(CONTENTS_HITBOX|CONTENTS_MONSTER|CONTENTS_DEBRIS|CONTENTS_MOVEABLE|CONTENTS_SOLID|CONTENTS_WINDOW|CONTENTS_GRATE)
+#pragma endregion

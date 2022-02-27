@@ -7,7 +7,7 @@ long __stdcall hooks::reset::hooked(IDirect3DDevice9* device, D3DPRESENT_PARAMET
 
 	const auto hr = original(device, params);
 
-	if (SUCCEEDED(hr))
+	if (hr == D3D_OK)
 		ImGui_ImplDX9_CreateDeviceObjects();
 
 	return hr;

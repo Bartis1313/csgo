@@ -70,16 +70,16 @@ void radar::run()
 	static int centery = y - 110;
 	static int size = 90;
 
-	render::drawFilledRect(centerx - size, centery - size, 2 * size, 2 * size, Color(128, 128, 128, 190));
-	render::drawOutlineRect(centerx - size - 1, centery - size - 1, 2 * size + 1, 2 * size + 1, Colors::Black);
+	imRender.drawRectFilled(centerx - size, centery - size, 2 * size, 2 * size, Color(128, 128, 128, 190));
+	imRender.drawRect(centerx - size - 1, centery - size - 1, 2 * size + 1, 2 * size + 1, Colors::Black);
 
-	render::text(centerx, centery - size - 14, fonts::tahoma, XOR("Radar"), true, Colors::LightBlue);
+	imRender.text(centerx, centery - size - 14, ImFonts::tahoma, XOR("Radar"), true, Colors::LightBlue);
 
-	render::drawFilledRect(centerx - 5, centery - 1, 11, 3, Colors::Black);
-	render::drawFilledRect(centerx - 1, centery - 5, 3, 11, Colors::Black);
+	imRender.drawRectFilled(centerx - 5, centery - 1, 11, 3, Colors::Black);
+	imRender.drawRectFilled(centerx - 1, centery - 5, 3, 11, Colors::Black);
 
-	render::drawLine(centerx - 4, centery, centerx + 5, centery, Colors::Green);
-	render::drawLine(centerx, centery + 4, centerx, centery - 5, Colors::Green);
+	imRender.drawLine(centerx - 4, centery, centerx + 5, centery, Colors::Green);
+	imRender.drawLine(centerx, centery + 4, centerx, centery - 5, Colors::Green);
 	
 	const auto myEye = localPlayer->getEyePos();
 	Vector ang = {};
@@ -118,12 +118,12 @@ void radar::run()
 		const auto finalX = dotRad * std::cos(DEG2RAD(rotated));
 		const auto finalY = dotRad * std::sin(DEG2RAD(rotated));
 
-		if (!entRotatedPos.IsZero())
+		if (!entRotatedPos.isZero())
 		{
 			auto dotThickness = config.get<float>(vars.fRadarThickness);
 
-			render::drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, config.get<Color>(vars.cRadarLine));
-			render::drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, config.get<Color>(vars.cRadarPlayer));
+			imRender.drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, config.get<Color>(vars.cRadarLine));
+			imRender.drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, config.get<Color>(vars.cRadarPlayer));
 		}
 	}
 }

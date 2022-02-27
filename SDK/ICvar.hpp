@@ -1,9 +1,6 @@
 #pragma once
-#include <cstdint>
 #include "Color.hpp"
 #include "../utilities/vfunc.hpp"
-#include <type_traits>
-#include <array>
 
 class ConCommand;
 class IConVar;

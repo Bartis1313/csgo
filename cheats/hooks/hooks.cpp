@@ -3,9 +3,13 @@
 #include "../../dependencies/minhook/Minhook.h"
 #include "../../SDK/structs/IDXandPaterrns.hpp"
 #include "../../config/vars.hpp"
-#include "../../dependencies/ImGui/imgui_impl_win32.h"
 #include "../../cheats/menu/GUI-ImGui/menu.hpp"
 #include "helpers/helper.hpp"
+#include "../../utilities/renderer/renderer.hpp"
+#include "../../dependencies/ImGui/imgui.h"
+#include "../../dependencies/ImGui/imgui_impl_win32.h"
+#include "../features/visuals/player.hpp"
+#include "../features/visuals/world.hpp"
 #include <format>
 
 void hooks::init()
@@ -35,6 +39,7 @@ void hooks::init()
 #pragma region DX9
 	const auto resetTarget = vfunc::getVFunc(interfaces::dx9Device, reset::index);
 	const auto presentTagret = vfunc::getVFunc(interfaces::dx9Device, present::index);
+	//const auto endTarget = vfunc::getVFunc(interfaces::dx9Device, endScene::index);
 #pragma endregion
 
 	hookHelper::initMinhook();
@@ -42,7 +47,7 @@ void hooks::init()
 	//hookHelper::tryHook(creteMoveTarget, &createMove::hooked, hookHelper::ORIGINAL(createMove::original), XOR("createMove"));
 	hookHelper::tryHook(createMoveProxyTarget, &proxyCreateMove::hooked, hookHelper::ORIGINAL(proxyCreateMove::original), XOR("createmoveProxy"));
 	// will probably use the paint hook only for few things now. I doubt this will be ever needed anymore after imgui choice
-	//hookHelper::tryHook(paintTraverseTarget, &paintTraverse::hooked, ORIGINAL(paintTraverse::original), XOR("paintTraverse"));
+	hookHelper::tryHook(paintTraverseTarget, &paintTraverse::hooked, hookHelper::ORIGINAL(paintTraverse::original), XOR("paintTraverse"));
 	hookHelper::tryHook(drawModelTarget, &drawModel::hooked, hookHelper::ORIGINAL(drawModel::original), XOR("drawModel"));
 	hookHelper::tryHook(overrideViewTarget, &overrideView::hooked, hookHelper::ORIGINAL(overrideView::original), "overrideView");
 	hookHelper::tryHook(doPostScreenEffectsTarget, &doPostScreenEffects::hooked, hookHelper::ORIGINAL(doPostScreenEffects::original), XOR("doPostScreenEffects"));
@@ -53,13 +58,15 @@ void hooks::init()
 	hookHelper::tryHook(matertialValidAddrTarget, &materialSystemValidAddr::hooked, hookHelper::ORIGINAL(materialSystemValidAddr::original), XOR("matertialValidAddr"));
 	hookHelper::tryHook(resetTarget, &reset::hooked, hookHelper::ORIGINAL(reset::original), XOR("reset"));
 	hookHelper::tryHook(presentTagret, &present::hooked, hookHelper::ORIGINAL(present::original), XOR("present"));
-	hookHelper::tryHook(lockCursorTarget, &lockCursor::hooked, hookHelper::ORIGINAL(lockCursor::original), XOR("present"));
+	// use if endscene needed
+	//hookHelper::tryHook(endTarget, &endScene::hooked, hookHelper::ORIGINAL(endScene::original), XOR("endscene"));
+	hookHelper::tryHook(lockCursorTarget, &lockCursor::hooked, hookHelper::ORIGINAL(lockCursor::original), XOR("lock cursor"));
 
 	events.init();
 
 	hookHelper::checkAllHooks();
 
-	LOG(LOG_INFO, XOR("hooks initialized!"));
+	LOG(LOG_INFO, XOR("hooks success"));
 }
 
 #pragma region wndproc
@@ -78,6 +85,7 @@ void hooks::wndProcSys::init()
 void hooks::wndProcSys::shutdown()
 {
 	LF(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndProcOriginal));
+	interfaces::iSystem->enableInput(true);
 }
 
 LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -88,17 +96,15 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(hwnd);
 
+		LOG(LOG_INFO, XOR("init for wndProc success"));
+
 		return true;
 	} ();
 
-	static bool pressed = false;
-	if (!pressed && utilities::getKey(VK_INSERT))
-		pressed = true;
-	else if (pressed && !utilities::getKey(VK_INSERT))
-	{
-		pressed = false;
-		ImGuiMenu::isMenuActive = !ImGuiMenu::isMenuActive;
-	}
+	// here, don't call getasynckeystate, it's another call for something that is already given by arg
+	if (message == WM_KEYDOWN)
+		if (LOWORD(wparam) == config.get<int>(vars.iKeyMenu))
+			ImGuiMenu::isMenuActive = !ImGuiMenu::isMenuActive;
 
 	interfaces::iSystem->enableInput(!ImGuiMenu::isMenuActive);
 

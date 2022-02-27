@@ -209,12 +209,6 @@
     <ClCompile Include="cheats\menu\GUI\mainMenu.cpp" />
     <ClCompile Include="cheats\menu\GUI\Misc\guimisc.cpp" />
     <ClCompile Include="cheats\menu\GUI\Misc\TextureHolder\TextureHolder.cpp" />
-    <ClCompile Include="cheats\menu\X88\Item.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="cheats\menu\X88\menuX88.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="config\config.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -301,12 +295,6 @@
     <ClCompile Include="SDK\interfaces\interfaces.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="SDK\math\Vector.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="SDK\math\Vector2D.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="source.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -348,8 +336,6 @@
     <ClInclude Include="cheats\menu\GUI\Misc\guimisc.hpp" />
     <ClInclude Include="cheats\menu\GUI\Misc\TextureHolder\TextureHolder.hpp" />
     <ClInclude Include="cheats\menu\GUI\sizes.hpp" />
-    <ClInclude Include="cheats\menu\X88\Item.hpp" />
-    <ClInclude Include="cheats\menu\X88\menuX88.hpp" />
     <ClInclude Include="config\vars.hpp" />
     <ClInclude Include="dependencies\freetype\include\freetype\config\ftconfig.h" />
     <ClInclude Include="dependencies\freetype\include\freetype\config\ftheader.h" />
@@ -477,7 +463,6 @@
     <ClInclude Include="SDK\ClientMode.hpp" />
     <ClInclude Include="SDK\CPlayerResource.hpp" />
     <ClInclude Include="SDK\InputSystem.hpp" />
-    <ClInclude Include="SDK\misc\misc.hpp" />
     <ClInclude Include="source.hpp" />
     <ClInclude Include="config\config.hpp" />
     <ClInclude Include="dependencies\lazy_importer.hpp" />
@@ -528,7 +513,7 @@
     <ClInclude Include="SDK\vars.hpp" />
     <ClInclude Include="SDK\math\Vector.hpp" />
     <ClInclude Include="SDK\math\Vector2D.hpp" />
-    <ClInclude Include="SDK\math\VMatrix.hpp" />
+    <ClInclude Include="SDK\math\matrix.hpp" />
     <ClInclude Include="SDK\structs\Entity.hpp" />
     <ClInclude Include="source-sdk\classes\trace.hpp" />
     <ClInclude Include="utilities\vfunc.hpp" />

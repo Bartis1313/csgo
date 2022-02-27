@@ -36,12 +36,4 @@ public:
 private:
     high_resolution_clock::time_point m_Start;
     high_resolution_clock::time_point m_End;
-} inline timer;
-
-#define START_TIME timer.start();
-#define END_TIME timer.end();
-// str is desc, for example str - hooks took: 
-// the time in ms is added at the end
-// no need to pass string xored
-#define PRINT_TIME_TO_LOG(str) \
-    LOG(LOG_INFO, std::format(XOR("{} {:.5f}ms"), str, timer.getSec()));
+};

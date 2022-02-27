@@ -1,8 +1,6 @@
 #pragma once
 #include "IEngineTrace.hpp"
 #include "material.hpp"
-#include <cstdint>
-#include "../utilities/pad.hpp"
 
 enum Hitboxes
 {
@@ -74,8 +72,8 @@ struct mstudiohitboxset_t
 struct model_t
 {
 	void* m_handle;
-	char m_name[260]; 
-	int m_loadFlags; 
+	char m_name[260];
+	int m_loadFlags;
 	int m_serverCount;
 	int m_type;
 	int m_flags;
@@ -114,13 +112,6 @@ struct studiohdr_t
 	{
 		return (i > m_bonesCount) ? nullptr : reinterpret_cast<mstudiobone_t*>((uint8_t*)this + m_boneIndex) + i;
 	}
-};
-
-enum RenderableTranslucencyType_t
-{
-	RENDERABLE_IS_OPAQUE = 0,
-	RENDERABLE_IS_TRANSLUCENT,
-	RENDERABLE_IS_TWO_PASS,	// has both translucent and opaque sub-partsa
 };
 
 class IVModelInfo

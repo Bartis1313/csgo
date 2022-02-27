@@ -58,8 +58,8 @@ void world::drawBombDropped(Entity_t* ent)
 
 	if (!ownerEntity)
 	{
-		if (Vector screen; render::worldToScreen(ent->absOrigin(), screen))
-			render::text(screen.x, screen.y, fonts::tahoma, XOR("Dropped bomb"), false, config.get<Color>(vars.cDrawDroppedC4));
+		if (Vector screen; imRender.worldToScreen(ent->absOrigin(), screen))
+			imRender.text(screen.x, screen.y, ImFonts::tahoma, XOR("Dropped bomb"), false, config.get<Color>(vars.cDrawDroppedC4));
 	}
 }
 
@@ -98,20 +98,20 @@ void world::drawBomb(Entity_t* ent)
 
 	constexpr float sigma = (500.0f * 3.5f) / 3.0f;
 
-	const float hypDist = (ent->getEyePos() - game::localPlayer->getEyePos()).Length();
+	const float hypDist = (ent->getEyePos() - game::localPlayer->getEyePos()).length();
 	const float dmg = scaleDamageArmor((500.f * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
 
 	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 
 	if (Box box; utilities::getBox(ent, box))
 	{
-		render::text(box.x, box.y, fonts::tahoma, XOR("Planted Bomb"), false, config.get<Color>(vars.cDrawBomb));
+		imRender.text(box.x, box.y, ImFonts::tahoma, XOR("Planted Bomb"), false, config.get<Color>(vars.cDrawBomb));
 	}
 
 	uint8_t r = static_cast<uint8_t>(255.0f - bombtime / tickbomb * 255.0f);
 	uint8_t g = static_cast<uint8_t>(bombtime / tickbomb * 255.0f);
 
-	render::text(5, 800, fonts::tahoma, isSafe ? std::format(XOR("TIME {:.2f} DMG {:.2f} SAFE"), bombtime, dmg) : std::format(XOR("TIME {:.2f} DMG {:.2f} YOU DIE"), bombtime, dmg), false, Color{ r, g, 0, 200 });
+	imRender.text(5, 800, ImFonts::tahoma, isSafe ? std::format(XOR("TIME {:.2f} DMG {:.2f} SAFE"), bombtime, dmg) : std::format(XOR("TIME {:.2f} DMG {:.2f} YOU DIE"), bombtime, dmg), false, Color{ r, g, 0, 200 });
 }
 
 
@@ -152,7 +152,7 @@ void world::drawProjectiles(Entity_t* ent)
 		Vector nadeOrigin = ent->absOrigin();
 		Vector nadePos = {};
 
-		if (!render::worldToScreen(nadeOrigin, nadePos))
+		if (!imRender.worldToScreen(nadeOrigin, nadePos))
 			return;
 
 		std::string nadeName = "";
@@ -193,7 +193,7 @@ void world::drawProjectiles(Entity_t* ent)
 
 		if (Box box; utilities::getBox(ent, box))
 		{
-			render::text(box.x + box.w / 2, box.y + box.h + 2, fonts::tahoma, nadeName, false, colorNade);
+			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::tahoma, nadeName, false, colorNade);
 		}
 	}
 	else if (projectileName.find(XOR("dropped")) != std::string::npos)
@@ -202,7 +202,7 @@ void world::drawProjectiles(Entity_t* ent)
 
 		if (Box box; utilities::getBox(ent, box))
 		{
-			render::text(box.x + box.w / 2, box.y + box.h + 2, fonts::tahoma, drop->getWpnName(), false, config.get<Color>(vars.cDropped));
+			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::tahoma, drop->getWpnName(), false, config.get<Color>(vars.cDropped));
 		}
 	}
 }
@@ -325,7 +325,7 @@ void world::drawMolotovPoints(Entity_t* ent)
 		return;
 
 	Vector screen = {};
-	if (!render::worldToScreen(molotov->absOrigin(), screen))
+	if (!imRender.worldToScreen(molotov->absOrigin(), screen))
 		return;
 
 	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/master/game/server/cstrike15/Effects/inferno.cpp
@@ -333,9 +333,14 @@ void world::drawMolotovPoints(Entity_t* ent)
 
 	Vector min = {}, max = {};
 	ent->getRenderBounds(min, max);
-	render::drawFilledCircle3D(molotov->absOrigin(), 0.5f * Vector(max - min).Length2D(), 32, config.get<Color>(vars.cMolotovRange));
+	imRender.drawCircle3DFilled(molotov->absOrigin(), 0.5f * Vector(max - min).length2D(), 32, config.get<Color>(vars.cMolotovRange));
 
-	render::text(screen.x, screen.y, fonts::tahoma, XOR("Molotov"), false, config.get<Color>(vars.cMolotovRangeText));
+	imRender.text(screen.x, screen.y, ImFonts::tahoma, XOR("Molotov"), false, config.get<Color>(vars.cMolotovRangeText));
+}
+
+bool w2s(const Vector& in, Vector& out)
+{
+	return interfaces::debugOverlay->worldToScreen(in, out) != 1;
 }
 
 void world::drawZeusRange()
@@ -355,30 +360,11 @@ void world::drawZeusRange()
 
 	if (weapon->m_iItemDefinitionIndex() == WEAPON_TASER)
 	{
-		//const static float range = weapon->getWpnInfo()->m_range;
-		//const Vector abs = game::localPlayer->absOrigin() + Vector(0.0f, 0.0f, 30.0f); // small correction to get correct trace visually, will still throw false positives on stairs etc...
+		const static float range = weapon->getWpnInfo()->m_range;
+		const Vector abs = game::localPlayer->absOrigin() + Vector(0.0f, 0.0f, 30.0f); // small correction to get correct trace visually, will still throw false positives on stairs etc...
 
-		//Vector screenStart = {};
-		//float step = std::numbers::pi_v<float> *2.0f / 32;
-		//static Vector before = NOTHING;
-
-		//for (float i = 0; i < (M_PI * 2.0f); i += step)
-		//{
-		//	Vector start(range * std::cos(i) + abs.x, range * sin(i) + abs.y, abs.z);
-
-		//	Trace_t trace;
-		//	TraceFilter filter;
-		//	filter.m_skip = game::localPlayer;
-
-		//	interfaces::trace->traceRay({ abs, start }, MASK_SHOT_BRUSHONLY, &filter, &trace);
-
-		//	if (render::worldToScreen(trace.m_end, screenStart) && before.IsValid())
-		//	{
-		//		render::drawLine(screenStart.x, screenStart.y, before.x, before.y, Colors::Palevioletred);
-		//		before = screenStart;
-		//	}
-		//}
-		// I think it's useless to take ^ code, if you really want to, use something as eyepos to not get false results, but then this is only useful in 3rd person
-		render::drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, config.get<Color>(vars.cZeusRange));
+		//imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer, Colors::Palevioletred);
+		 
+		imRender.drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, config.get<Color>(vars.cZeusRange), true, 2.0f);
 	}
 }

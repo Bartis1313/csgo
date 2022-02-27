@@ -1,5 +1,6 @@
 #pragma once
 
+#pragma region beams
 enum BeamEffects
 {
 	TE_BEAMPOINTS = 0x00,		// beam effect between two points
@@ -35,6 +36,22 @@ enum BeamTypes
 	FBEAM_REVERSED = 0x00010000,
 	NUM_BEAM_FLAGS = 17	// KEEP THIS UPDATED!
 };
+#pragma endregion
+
+#pragma region all_classes_ids
+
+/*
+* to get this faster from dump, run this js script
+* let str = ``; // dumped all classes, raw output from console
+* let arr = str.split('\n');
+
+for(let i = 0; i < arr.length; i++) {
+    let s = arr[i];
+    let endPos = s.indexOf('(');
+    let resultString = arr[i].substring(0, endPos);
+    console.log(resultString + ',');
+}
+*/
 
 enum ClassID
 {
@@ -323,17 +340,9 @@ enum ClassID
 	SporeExplosion,
 	SporeTrail,
 };
+#pragma endregion
 
-enum AnalogCode
-{
-	ANALOG_CODE_INVALID = -1,
-	MOUSE_X = 0,
-	MOUSE_Y,
-	MOUSE_XY, // invoked when either x or y changes
-	MOUSE_WHEEL,
-	ANALOG_CODE_LAST = 10,
-};
-
+#pragma region framestage
 enum FrameStage
 {
 	FRAME_UNDEFINED = -1,
@@ -345,7 +354,9 @@ enum FrameStage
 	FRAME_RENDER_START,
 	FRAME_RENDER_END
 };
+#pragma endregion
 
+#pragma region weapons
 enum WeaponType
 {
 	WEAPONTYPE_KNIFE = 0,
@@ -360,7 +371,6 @@ enum WeaponType
 	WEAPONTYPE_GRENADE,
 	WEAPONTYPE_UNKNOWN
 };
-
 
 enum WeaponIndex
 {
@@ -447,16 +457,18 @@ enum WeaponIndex
 	WEAPON_KNIFE_WIDOWMAKER,
 	WEAPON_KNIFE_SKELETON = 525,
 	GLOVE_STUDDED_BLOODHOUND = 5027,
-	GLOVE_T_SIDE = 5028,
-	GLOVE_CT_SIDE = 5029,
-	GLOVE_SPORTY = 5030,
-	GLOVE_SLICK = 5031,
-	GLOVE_LEATHER_WRAP = 5032,
-	GLOVE_MOTORCYCLE = 5033,
-	GLOVE_SPECIALIST = 5034,
-	GLOVE_HYDRA = 5035
+	GLOVE_T_SIDE,
+	GLOVE_CT_SIDE,
+	GLOVE_SPORTY,
+	GLOVE_SLICK,
+	GLOVE_LEATHER_WRAP,
+	GLOVE_MOTORCYCLE,
+	GLOVE_SPECIALIST,
+	GLOVE_HYDRA,
 };
+#pragma endregion
 
+#pragma region spec_stuff
 enum ObserverTypes
 {
 	UNKNOWN_CAM,
@@ -468,3 +480,4 @@ enum ObserverTypes
 	FREE_LOOK_CAM,
 	UNDEFINED_CAM
 };
+#pragma endregion

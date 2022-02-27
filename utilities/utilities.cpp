@@ -19,13 +19,13 @@ std::string utilities::getTime()
 	return ss.str();
 }
 
-uintptr_t utilities::patternScan(const char* mod, const char* mask)
+uintptr_t utilities::patternScan(const std::string& mod, const std::string& mask)
 {
 	MODULEINFO modInfo;
 #ifndef _DEBUG
-	LF(K32GetModuleInformation).cached()(LF(GetCurrentProcess).cached()(), LF(GetModuleHandleA).cached()(mod), &modInfo, sizeof(MODULEINFO));
+	LF(K32GetModuleInformation).cached()(LF(GetCurrentProcess).cached()(), LF(GetModuleHandleA).cached()(mod.c_str()), &modInfo, sizeof(MODULEINFO));
 #else
-	LF(K32GetModuleInformation)(LF(GetCurrentProcess)(), LF(GetModuleHandleA)(mod), &modInfo, sizeof(MODULEINFO));
+	K32GetModuleInformation(GetCurrentProcess(), GetModuleHandleA(mod.c_str()), &modInfo, sizeof(MODULEINFO));
 #endif		
 	uintptr_t ranageStart = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
 	std::istringstream iss{ mask };
@@ -40,7 +40,7 @@ uintptr_t utilities::patternScan(const char* mod, const char* mask)
 				actualPattern.emplace_back(static_cast<byte>(std::stoi(str, nullptr, 16)));
 		});
 
-	for (auto i = 0; i < modInfo.SizeOfImage; i++)
+	for (int i = 0; i < modInfo.SizeOfImage; i++)
 	{
 		if (auto check = [](byte* data, const std::vector<std::optional<byte>>& _mask) -> bool
 			{
@@ -98,7 +98,7 @@ bool utilities::getBox(Entity_t* ent, Box& box)
 
 	for (int i = 0; i < 8; i++)
 	{
-		if (!render::worldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
+		if (!imRender.worldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
 			return false;
 
 		left = std::min(left, screen.at(i).x);
@@ -126,10 +126,10 @@ size_t utilities::inByteOrder(const size_t netLong)
 		| (static_cast<size_t>(data.at(0)) << 24);
 }
 
-std::string utilities::getKeyName(const unsigned virtualKey)
+std::string utilities::getKeyName(const UINT virtualKey)
 {
 #ifdef _DEBUG
-	unsigned scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
+	UINT scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
 #else
 	UINT scanCode = LF(MapVirtualKeyA).cached()(virtualKey, MAPVK_VK_TO_VSC);
 #endif
@@ -217,7 +217,7 @@ std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
 	return res;
 }
 
-SHORT utilities::getKey(int vKey)
+SHORT utilities::getKey(const UINT vKey)
 {
 #ifdef _DEBUG
 	return GetAsyncKeyState(vKey);

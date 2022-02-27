@@ -268,6 +268,7 @@ void Config::reload()
 
 std::filesystem::path Config::getHacksPath() const
 {
+#ifdef _DEBUG
 	// if possible to get the path, if so, return it
 	if (CHAR documents[MAX_PATH]; SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
 	{
@@ -276,6 +277,15 @@ std::filesystem::path Config::getHacksPath() const
 		toReturn.append(m_mainEntryFolder);
 		return toReturn;
 	}
+#else
+	if (CHAR documents[MAX_PATH]; SUCCEEDED(LF(SHGetFolderPathA).cached()(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
+	{
+		std::filesystem::path toReturn;
+		toReturn.assign(documents);
+		toReturn.append(m_mainEntryFolder);
+		return toReturn;
+	}
+#endif
 	// if fail, return empty
 	return {};
 }

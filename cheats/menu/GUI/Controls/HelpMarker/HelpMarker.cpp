@@ -13,12 +13,12 @@ void GUI::HelpMarker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		return;
 
 	// size for the "(?)"
-	auto size = render::getTextSizeXY(fonts::menuFont, m_helpString);
+	auto size = render.getTextSizeXY(fonts::menuFont, m_helpString);
 
-	render::text(pos->x + PAD_TEXT_X + BOX_WIDTH + 8, pos->y - (size.y / 2) + 4, fonts::menuFont, m_helpString, false, Colors::Coral);
+	render.text(pos->x + PAD_TEXT_X + BOX_WIDTH + 8, pos->y - (size.y / 2) + 4, fonts::menuFont, m_helpString, false, Colors::Coral);
 
 	// rest, checks if hovered
-	if (auto textVec = render::getTextSizeXY(fonts::menuFont, m_text); isMouseInRange(pos->x + PAD_TEXT_X + BOX_WIDTH + 8, pos->y - (size.y / 2) + 4, size.x, size.y))
+	if (auto textVec = render.getTextSizeXY(fonts::menuFont, m_text); isMouseInRange(pos->x + PAD_TEXT_X + BOX_WIDTH + 8, pos->y - (size.y / 2) + 4, size.x, size.y))
 	{
 		if (!skipCall)
 		{
@@ -28,8 +28,8 @@ void GUI::HelpMarker::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		int x = pos->x + 170;
 		int y = pos->y + 20;
 
-		render::drawFilledRect(x, y, textVec.x + 6, textVec.y + 6, Color(128, 128, 128, 255));
-		render::drawOutlineRect(x - 1, y - 1, textVec.x + 6 + 1, textVec.y + 6 + 1, Colors::Black);
-		render::text(x + 3, y - 6 + (textVec.y / 2), fonts::menuFont, m_text, false, Colors::Coral);
+		render.drawFilledRect(x, y, textVec.x + 6, textVec.y + 6, Color(128, 128, 128, 255));
+		render.drawOutlineRect(x - 1, y - 1, textVec.x + 6 + 1, textVec.y + 6 + 1, Colors::Black);
+		render.text(x + 3, y - 6 + (textVec.y / 2), fonts::menuFont, m_text, false, Colors::Coral);
 	}
 }

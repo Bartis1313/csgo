@@ -101,18 +101,18 @@ void esp::renderBox3D(Entity_t* ent, bool fill)
 	std::array<Vector, 8> transformed = {};
 
 	for (int i = 0; i < 8; i++)
-		VectorTransform(points.at(i), tranFrame, transformed.at(i));
+		transformed.at(i) = math::transformVector(points.at(i), tranFrame);
 	
-	render::drawBox3D(transformed, playerColor(reinterpret_cast<Player_t*>(ent), true), fill ? true : false);
+	imRender.drawBox3D(transformed, playerColor(reinterpret_cast<Player_t*>(ent), true), fill ? true : false);
 }
 
 void esp::drawBox2D(Player_t* ent, const Box& box)
 {
 	Color cfgCol = config.get<Color>(vars.cBox);
 
-	render::drawOutlineRect(box.x - 1, box.y - 1, box.w + 2, box.h + 2, Color(0, 0, 0,  200));
-	render::drawOutlineRect(box.x, box.y, box.w, box.h, cfgCol);
-	render::drawOutlineRect(box.x + 1, box.y + 1, box.w - 2, box.h - 2, Color(0, 0, 0, 200));
+	imRender.drawRect(box.x - 1, box.y - 1, box.w + 2, box.h + 2, Color(0, 0, 0,  200));
+	imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol);
+	imRender.drawRect(box.x + 1, box.y + 1, box.w - 2, box.h - 2, Color(0, 0, 0, 200));
 }
 
 void esp::drawBox2DFilled(Player_t* ent, const Box& box)
@@ -121,7 +121,7 @@ void esp::drawBox2DFilled(Player_t* ent, const Box& box)
 
 	// first create rectangle then do outlines
 
-	render::drawFilledRect(box.x - 1, box.y - 1, box.w + 2, box.h + 2, fill);
+	imRender.drawRectFilled(box.x - 1, box.y - 1, box.w + 2, box.h + 2, fill);
 	drawBox2D(ent, box);
 }
 
@@ -145,13 +145,13 @@ void esp::drawHealth(Player_t* ent, const Box& box)
 		};
 
 		// fill first
-		render::drawFilledRect(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
-		render::drawFilledRect(newBox.x, newBox.y + pad - 1, 2, offset + 2, playerColor(ent));
-		render::drawOutlineRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
+		imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
+		imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, playerColor(ent));
+		imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
 
 		// if the player has health below max, then draw HP info
 		if (health < 100)
-			render::text(newBox.x - 2, newBox.y + pad - 4, fonts::espBar, std::to_string(health), false, Colors::White);
+			imRender.text(newBox.x - 2, newBox.y + pad - 4, ImFonts::espBar, std::to_string(health), false, Colors::White);
 	}
 }
 
@@ -176,13 +176,13 @@ void esp::drawArmor(Player_t* ent, const Box& box)
 
 		Color armorCol = Color(0, armor * 1.4f, 250, 255); // light to blue, something simple
 
-		render::drawFilledRect(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
-		render::drawFilledRect(newBox.x, newBox.y + pad - 1, 2, offset + 2, armorCol);
-		render::drawOutlineRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
+		imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
+		imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, armorCol);
+		imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
 
 
 		if (armor < 100)
-			render::text(newBox.x - 2, newBox.y + pad - 4, fonts::espBar, std::to_string(armor), false, Colors::White);
+			imRender.text(newBox.x - 2, newBox.y + pad - 4, ImFonts::espBar, std::to_string(armor), false, Colors::White);
 	}
 }
 
@@ -197,7 +197,7 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 
 	Color tex = config.get<Color>(vars.cWeaponText);
 
-	render::text(box.x + box.w / 2, box.y + box.h + 5, fonts::espBar, ent->getActiveWeapon()->getWpnName(), true, tex);
+	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::espBar, ent->getActiveWeapon()->getWpnName(), true, tex);
 
 	// skip useless trash for calculations
 	if (weapon->isNonAimable())
@@ -227,11 +227,11 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 			barWidth = (animlayer.m_cycle * box.w) / 1.0f;
 	}
 
-	render::drawFilledRect(newBox.x - 1, newBox.y - 1, newBox.w, 4, Colors::Black);
-	render::drawFilledRect(newBox.x, newBox.y, barWidth, 2, config.get<Color>(vars.cReloadbar));
+	imRender.drawRectFilled(newBox.x - 1, newBox.y - 1, newBox.w, 4, Colors::Black);
+	imRender.drawRectFilled(newBox.x, newBox.y, barWidth, 2, config.get<Color>(vars.cReloadbar));
 	
 	if (maxAmmo != currentAmmo && !isReloading)
-		render::text(newBox.x + barWidth, newBox.y + 1, fonts::espBar, std::to_string(currentAmmo), false, tex);
+		imRender.text(newBox.x + barWidth, newBox.y + 1, ImFonts::espBar, std::to_string(currentAmmo), false, tex);
 }
 
 void esp::drawInfo(Player_t* ent, const Box& box)
@@ -239,10 +239,10 @@ void esp::drawInfo(Player_t* ent, const Box& box)
 	if (!config.get<bool>(vars.bDrawInfos))
 		return;
 
-	render::text(box.x + (box.w / 2), box.y - 15, fonts::tahoma, ent->getName(), true, playerColor(ent));
+	imRender.text(box.x + (box.w / 2), box.y - 15, ImFonts::tahoma, ent->getName(), true, playerColor(ent));
 
 	if (ent->isC4Owner())
-		render::text(box.x - 25 + box.w, box.y + 5 + box.h, fonts::tahoma, XOR("C4"), false, playerColor(ent));
+		imRender.text(box.x - 25 + box.w, box.y + 5 + box.h, ImFonts::tahoma, XOR("C4"), false, playerColor(ent));
 }
 
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
@@ -296,23 +296,23 @@ void esp::drawSkeleton(Player_t* ent)
 		auto deltachild = child - breast;
 		auto deltaparent = parent - breast;
 
-		if (deltaparent.Length() < 9.0f && deltachild.Length() < 9.0f)
+		if (deltaparent.length() < 9.0f && deltachild.length() < 9.0f)
 			parent = breast;
 
 		if (i == 5)
 			child = breast;
 
-		if (abs(deltachild.z) < 5.0f && deltaparent.Length() < 5.0f && deltachild.Length() < 5.0f || i == 6)
+		if (abs(deltachild.z) < 5.0f && deltaparent.length() < 5.0f && deltachild.length() < 5.0f || i == 6)
 			continue;
 
-		if (Vector screenp, screenc; render::worldToScreen(parent, screenp) && render::worldToScreen(child, screenc))
+		if (Vector screenp, screenc; imRender.worldToScreen(parent, screenp) && imRender.worldToScreen(child, screenc))
 		{
 			Color skel = config.get<Color>(vars.cSkeleton);
 
 			if(record && backtrack::isValid(record->front().simTime))
-				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, skel);
+				imRender.drawLine(screenp.x, screenp.y, screenc.x, screenc.y, skel);
 			else if(!record)
-				render::drawLine(screenp.x, screenp.y, screenc.x, screenc.y, skel);
+				imRender.drawLine(screenp.x, screenp.y, screenc.x, screenc.y, skel);
 		}
 	}
 }
@@ -322,7 +322,7 @@ void esp::drawSnapLine(Player_t* ent, const Box& box)
 	if (ent == legitbot::bestEnt)
 	{
 		// lines on the bottom and center bottom box
-		render::drawLine(globals::screenX / 2, globals::screenY, box.x + box.w / 2, box.y + box.h, Colors::Purple);
+		imRender.drawLine(globals::screenX / 2, globals::screenY, box.x + box.w / 2, box.y + box.h, Colors::Purple);
 	}
 }
 
@@ -338,10 +338,10 @@ void esp::drawLaser(Player_t* ent)
 	// end is where lines just ends, this 70 is hardcoded, but whatever here tbh
 	auto end = start + forward * 70.f;
 
-	if (Vector screenLocal, screenEnt; render::worldToScreen(start, screenLocal) && render::worldToScreen(end, screenEnt))
+	if (Vector screenLocal, screenEnt; imRender.worldToScreen(start, screenLocal) && imRender.worldToScreen(end, screenEnt))
 	{
-		render::drawCircleFilled(screenLocal.x, screenLocal.y, 3, 32, Colors::Red);
-		render::drawLine(screenLocal.x, screenLocal.y, screenEnt.x, screenEnt.y, Colors::Purple);
+		imRender.drawCircleFilled(screenLocal.x, screenLocal.y, 3, 32, Colors::Red);
+		imRender.drawLine(screenLocal.x, screenLocal.y, screenEnt.x, screenEnt.y, Colors::Purple);
 	}
 }
 
@@ -483,11 +483,11 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 	// hardcoded, when enemies use 3rd cam or some fov changer, it won't be accurate
 	if (check && fovDist <= 60.0f)
 	{
-		render::text(globals::screenX / 2, 60, fonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
+		imRender.text(globals::screenX / 2, 60, ImFonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
 	}
 	// in the moment when enemy aims through walls, don't check trace
 	if (fovDist <= 5.0f)
 	{
-		render::text(globals::screenX / 2, 80, fonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
+		imRender.text(globals::screenX / 2, 80, ImFonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
 	}
 }

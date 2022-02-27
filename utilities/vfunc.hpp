@@ -1,6 +1,4 @@
 #pragma once
-#include <cstdint>
-#include <type_traits>
 
 namespace vfunc
 {
@@ -25,7 +23,11 @@ namespace vfunc
 		return (*reinterpret_cast<packedVirtualFunction>(thisptr))[index](thisptr, args...);
 	}
 }
-
+// type - type of function
+// name - function's name
+// index - vtable index for this method
+// args - args to pass eg: (int value)
+// variables - variables from args, the starting will always be a pointer to class, eg: (this, value)
 #define VFUNC(type, name, index, args, variables) \
 type name args { \
     return vfunc::callVFunc<type, index>variables; \

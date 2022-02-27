@@ -1,4 +1,5 @@
 #include "math.hpp"
+#include <span>
 
 Vector math::calcAngleRelative(const Vector& source, const Vector& destination, const Vector& viewAngles)
 {
@@ -9,40 +10,21 @@ Vector math::calcAngleRelative(const Vector& source, const Vector& destination, 
 		RAD2DEG(std::atan2(delta.y, delta.x)) - viewAngles.y,
 		0.0f
 	);
-
-	angles.normalize();
-	return angles;
+;
+	return angles.normalize();
 }
 
 float math::calcFov(const Vector& source, const Vector& destination, const Vector& viewAngle)
 {
-	const auto angle = calcAngleRelative(std::cref(source), std::cref(destination), std::cref(viewAngle));
+	const auto angle = calcAngleRelative(source, destination, viewAngle);
 	const auto fov = std::hypot(angle.x, angle.y);
 	return fov;
 }
 
-void math::makeVec(const Vector& in, Vector& out)
+Vector math::transformVector(const Vector& in, const matrix3x4_t& matrix)
 {
-	const auto pitch = DEG2RAD(in.x);
-	const auto yaw = DEG2RAD(in.y);
-	const auto cospitch = std::cos(pitch);
-
-	out.x = -cospitch * -std::cos(yaw);
-	out.y = std::sin(yaw) * cospitch;
-	out.z = -std::sin(pitch);
-}
-
-Vector math::transformVector(const Vector& in, matrix3x4_t matrix)
-{
-	return Vector(in.Dot(matrix[0]) + matrix[0][3], in.Dot(matrix[1]) + matrix[1][3],
-		in.Dot(matrix[2]) + matrix[2][3]);
-}
-
-void math::transformVector(Vector& in, matrix3x4_t& mat, Vector& out)
-{
-	out.x = in.Dot(mat.m_flMatVal[0]) + mat.m_flMatVal[0][3];
-	out.y = in.Dot(mat.m_flMatVal[1]) + mat.m_flMatVal[1][3];
-	out.z = in.Dot(mat.m_flMatVal[2]) + mat.m_flMatVal[2][3];
+	return Vector(in.dot(matrix[0]) + matrix[0][3], in.dot(matrix[1]) + matrix[1][3],
+		in.dot(matrix[2]) + matrix[2][3]);
 }
 
 Vector math::angleVec(const Vector& angle)
@@ -77,7 +59,7 @@ Vector math::vectorToAngle(const Vector& vec)
 	}
 	else
 	{
-		angle.x = RAD2DEG(std::atan2(-vec.z, vec.Length2D()));
+		angle.x = RAD2DEG(std::atan2(-vec.z, vec.length2D()));
 		angle.y = RAD2DEG(std::atan2(vec.y, vec.x));
 
 		if (angle.y > 90.0f)

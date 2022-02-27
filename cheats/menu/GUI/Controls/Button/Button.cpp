@@ -17,12 +17,12 @@ void GUI::Button::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		m_lamda();
 	}
 
-	render::drawGradient(pos->x + PAD_TEXT_X, pos->y, m_width, m_height, Color(30, 30, 30, 255),
+	render.drawGradient(pos->x + PAD_TEXT_X, pos->y, m_width, m_height, Color(30, 30, 30, 255),
 		isInRange ? Color(60, 60, 60, 255) : Color(40, 40, 40, 255), false);
 
-	render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y, m_width, m_height, Colors::Black);
+	render.drawOutlineRect(pos->x + PAD_TEXT_X, pos->y, m_width, m_height, Colors::Black);
 
-	render::text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 2, fonts::menuFont, m_title, true,
+	render.text(pos->x + PAD_TEXT_X + (m_width / 2), pos->y + 2, fonts::menuFont, m_title, true,
 		isInRange ? Colors::White : Color(200, 220, 200, 200));
 
 	pos->y += this->getPadding();

@@ -17,15 +17,15 @@ void GUI::CheckBox::draw(Vector2D* pos, Menu* parent, bool skipCall)
 		*m_feature = !*m_feature;
 	}
 
-	render::drawGradient(pos->x, pos->y, m_width, m_height,
+	render.drawGradient(pos->x, pos->y, m_width, m_height,
 		this->isActive() ? Colors::LightBlue : Color(70, 70, 70, 255), this->isActive() ? Colors::Black : Color(70, 70, 70, 255), false);
 
 	if (isInRange)
-		render::drawFilledRect(pos->x, pos->y, m_width, m_height, Colors::Grey);
+		render.drawFilledRect(pos->x, pos->y, m_width, m_height, Colors::Grey);
 
-	render::drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
+	render.drawOutlineRect(pos->x, pos->y, m_width, m_height, Colors::Black);
 	
-	render::text(pos->x + PAD_TEXT_X, pos->y - 1, fonts::menuFont, m_title, false, this->isActive() ? Colors::White : Color(200, 220, 200, 200));
+	render.text(pos->x + PAD_TEXT_X, pos->y - 1, fonts::menuFont, m_title, false, this->isActive() ? Colors::White : Color(200, 220, 200, 200));
 
 	pos->y += this->getPadding();
 }

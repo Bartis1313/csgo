@@ -8,11 +8,6 @@
 TextureHolder::TextureHolder(const unsigned short resourceID)
 {
 	HRSRC hResInfo = LF(FindResourceA)(globals::instance, MAKEINTRESOURCEA(resourceID), XOR("PNG"));
-
-	// yes, because I get unlimited questions why crash on inject !!!!11111...
-	if (!hResInfo)
-		throw std::runtime_error(XOR("hResInfo returned nullptr, impossible to continue"));
-
 	HGLOBAL hResData = LF(LoadResource)(globals::instance, hResInfo);
 	unsigned char* hResPtr = reinterpret_cast<unsigned char*>(LF(LockResource)(hResData));
 	size_t size = LF(SizeofResource)(globals::instance, hResInfo);
@@ -28,12 +23,12 @@ TextureHolder::TextureHolder(const unsigned short resourceID)
 
 	std::copy(vecImage.cbegin(), vecImage.cend(), data.get());
 
-	render::initNewTexture(m_textureID, data.get(), m_width, m_height);
+	render.initNewTexture(m_textureID, data.get(), m_width, m_height);
 
 	LOG(LOG_INFO, std::format(XOR("loaded texture ID - {} without error"), m_textureID));
 };
 
 void TextureHolder::draw(const int x, const int y)
 {
-	render::drawFromTexture(m_textureID, x, y, m_width, m_height, Colors::White);
+	render.drawFromTexture(m_textureID, x, y, m_width, m_height, Colors::White);
 };

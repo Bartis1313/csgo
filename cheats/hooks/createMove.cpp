@@ -30,8 +30,6 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 {
 	hooks::proxyCreateMove::original(interfaces::client, 0, sequence, inputTime, active);
 
-	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
-
 	CUserCmd* cmd = interfaces::input->getUserCmd(0, sequence);
 	if (!cmd || !cmd->m_commandNumber)
 		return;
@@ -39,6 +37,8 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	CVerifiedUserCmd* verifiedCmd = interfaces::input->getVerifiedUserCmd(sequence);
 	if (!verifiedCmd)
 		return;
+
+	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
 	game::serverTime(cmd);
 	bunnyhop::run(cmd);

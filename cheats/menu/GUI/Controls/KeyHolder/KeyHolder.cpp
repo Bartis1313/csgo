@@ -63,7 +63,7 @@ void GUI::KeyHolder::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	}
 
 	// to align better? yes
-	Vector2D textSize = render::getTextSizeXY(fonts::menuFont, name);
+	Vector2D textSize = render.getTextSizeXY(fonts::menuFont, name);
 
 	bool isInRange = isMouseInRange(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y - 20, textSize.x + 5, textSize.y + 3);
 
@@ -74,9 +74,9 @@ void GUI::KeyHolder::draw(Vector2D* pos, Menu* parent, bool skipCall)
 
 	// isGettingKey can be this->isActive() in this case, soon it will be patched with extras
 
-	render::drawFilledRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y - 20, textSize.x + 5, textSize.y + 3, Color(40, 40, 40, 255));
-	render::drawOutlineRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y -20, textSize.x + 5, textSize.y + 3, Colors::Black);
-	render::text(pos->x + PAD_TEXT_X + BOX_WIDTH + 8, pos->y - 18, fonts::menuFont,
+	render.drawFilledRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y - 20, textSize.x + 5, textSize.y + 3, Color(40, 40, 40, 255));
+	render.drawOutlineRect(pos->x + PAD_TEXT_X + BOX_WIDTH + 5, pos->y -20, textSize.x + 5, textSize.y + 3, Colors::Black);
+	render.text(pos->x + PAD_TEXT_X + BOX_WIDTH + 8, pos->y - 18, fonts::menuFont,
 		m_isGettingKey ? XOR("...") : name, false, m_isGettingKey ? Colors::LightBlue : Color(180, 180, 180, 255));
 }
 

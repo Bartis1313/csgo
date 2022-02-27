@@ -1,6 +1,6 @@
 #pragma once
 
-// 20:52 13.02.2022
+// 23:02 27.02.2022
 // Bartis: updated
 
 enum VTableIndexes
@@ -12,8 +12,6 @@ enum VTableIndexes
 	WEAPONINFO = 461,
 	PUNCH = 346
 };
-
-// #define SIG(name, pattern) const char* SIG_ ## name = pattern
 
 #define ENGINE_DLL			XOR("engine.dll")
 #define CLIENT_DLL			XOR("client.dll")
@@ -43,3 +41,4 @@ enum VTableIndexes
 #define SEQUENCE_ACTIVITY		XOR("55 8B EC 53 8B 5D 08 56 8B F1 83")
 #define NEW_CHECK				XOR("55 8B EC 56 8B F1 33 C0 57 8B 7D 08 8B 8E") // direct sig, sub_10797090
 #define DX9_DEVICE				XOR("A1 ? ? ? ? 50 8B 08 FF 51 0C")
+#define VIEW_MATRIX_CLIENT		XOR("0F 10 05 ? ? ? ? 8D 85 ? ? ? ? B9")

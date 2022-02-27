@@ -1,7 +1,6 @@
 #pragma once
 #include "math/Vector2D.hpp"
 #include "Color.hpp"
-#include <functional>
 
 #include "../utilities/vfunc.hpp"
 

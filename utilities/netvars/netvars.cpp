@@ -11,15 +11,16 @@ void NetvarManager::init()
 	if (!clientClass)
 		return;
 
-	do {
+	while (clientClass)
+	{
 		auto recvTable = clientClass->m_recvTable;
 		m_Tables.emplace(std::string(recvTable->m_netTableName), recvTable);
 
 		clientClass = clientClass->m_next;
-	} while (clientClass);
+	}	
 }
 
-uintptr_t NetvarManager::getNetvar(const char* tableName, const char* propName)
+uintptr_t NetvarManager::getNetvar(const char* tableName, const char* propName) const
 {
 	auto offset = getProp(tableName, propName);
 	if (!offset)
@@ -28,7 +29,7 @@ uintptr_t NetvarManager::getNetvar(const char* tableName, const char* propName)
 	return offset;
 }
 
-uintptr_t NetvarManager::getProp(const char* tableName, const char* propName, RecvProp** prop)
+uintptr_t NetvarManager::getProp(const char* tableName, const char* propName, RecvProp** prop) const
 {
 	auto recvTable = getTable(tableName);
 	if (!recvTable)
@@ -41,7 +42,7 @@ uintptr_t NetvarManager::getProp(const char* tableName, const char* propName, Re
 	return offset;
 }
 
-uintptr_t NetvarManager::getProp(RecvTable* recvTable, const char* propName, RecvProp** prop)
+uintptr_t NetvarManager::getProp(RecvTable* recvTable, const char* propName, RecvProp** prop) const
 {
 	uintptr_t extraOffset = 0;
 
@@ -70,43 +71,39 @@ uintptr_t NetvarManager::getProp(RecvTable* recvTable, const char* propName, Rec
 	return extraOffset;
 }
 
-RecvTable* NetvarManager::getTable(const char* tableName)
+RecvTable* NetvarManager::getTable(const char* tableName) const
 {
 	if (m_Tables.empty())
-		return 0;
+		return nullptr;
 
-	for(auto table : m_Tables)
+	for(const auto& [name, recv] : m_Tables)
 	{
-		if (!strcmp(table.first.c_str(), tableName))
-			return table.second;
+		if (!strcmp(name.c_str(), tableName))
+			return recv;
 	}
 
-	return 0;
+	return nullptr;
 }
 
-std::string NetvarManager::getType(RecvProp* recvTable)
+static std::string propToStr(SendPropType type)
 {
-	switch (recvTable->m_recvType)
-	{
-	case DPT_Int:
-		return XOR("int");
-	case DPT_Float:
-		return XOR("float");
-	case DPT_Vector:
-		return XOR("Vector");
-	case DPT_VectorXY:
-		return XOR("Vector2D");
-	case DPT_String:
-		return XOR("char*");
-	case DPT_Array:
-		return XOR("array*");
-	case DPT_DataTable:
-		return XOR("void*");
-	case DPT_Int64:
-		return XOR("__int64");
-	default:
+	// not needed, just for always being sure
+	if (type >= DPT_NUMSendPropTypes)
 		return "";
-	}
+
+	static std::array<std::string, DPT_NUMSendPropTypes> arr =
+	{
+		XOR("int"), XOR("float"),
+		XOR("Vector"), XOR("Vector2D"),
+		XOR("string*"), XOR("array"),
+		XOR("datatable (void*)"), XOR("__int64")
+	};
+	return arr.at(type);
+}
+
+std::string NetvarManager::getType(RecvProp* recvTable) const
+{
+	return propToStr(recvTable->m_recvType);
 }
 
 void NetvarManager::dump(RecvTable* recvTable)
@@ -120,10 +117,7 @@ void NetvarManager::dump(RecvTable* recvTable)
 
 		std::string recvName = recvProp->m_varName;
 
-		if (!recvName.find(XOR("baseclass")))
-			continue;
-
-		if (recvName.find(XOR("m_")))
+		if (recvName.find(XOR("m_")) == std::string::npos) // not starting with m_
 			continue;
 
 		// offsets for set are hardcoded- simply no need for this
@@ -150,7 +144,7 @@ void NetvarManager::dump()
 		const auto recvTable = client->m_recvTable;
 		dump(recvTable);
 		client = client->m_next;
-	} while (client != 0);
+	} while (client);
 
 	file.close();
 }

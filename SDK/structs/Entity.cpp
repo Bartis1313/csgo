@@ -187,25 +187,23 @@ Vector Player_t::getHitboxPos(const int id)
 		{
 			if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(id); hitbox != nullptr)
 			{
-				auto min = Vector{}, max = Vector{};
-
-				math::transformVector(hitbox->m_bbmin, matBone[hitbox->m_bone], min);
-				math::transformVector(hitbox->m_bbmax, matBone[hitbox->m_bone], max);
+				Vector min = math::transformVector(hitbox->m_bbmin, matBone[hitbox->m_bone]);
+				Vector max = math::transformVector(hitbox->m_bbmax, matBone[hitbox->m_bone]);
 
 				return Vector((min.x + max.x) * 0.5f, (min.y + max.y) * 0.5f, (min.z + max.z) * 0.5f);
 			}
 		}
 	}
 
-	return NOTHING;
+	return {};
 }
 
 Vector Player_t::getBonePosition(const int id)
 {
-	if (matrix3x4_t matBone[BONE_USED_BY_HITBOX]; setupBones(matBone, BONE_USED_BY_HITBOX, BONE_USED_BY_HITBOX, 0.0f))
+	if (matrix3x4_t matBone[128]; setupBones(matBone, 128, BONE_USED_BY_HITBOX, 0.0f))
 		return matBone[id].origin();
 	
-	return NOTHING;
+	return {};
 }
 
 bool Player_t::isC4Owner()

@@ -6,9 +6,7 @@ Very short and commented source aimed for legit gameplay
 # Information
 In development, not every feature may work perfectly.
 <br />
-For people coming only for x88 menu - this is very limited in making it as a menu, there is no even need for any config system for such simple gui.
-<br />
-Why am I making 3 types of menu? For fun, you can select which one you want. ImGui menu will be the best option though.
+Menu key is insert, panic key is delete, you can change it in config if it matters.
 <br />
 **BEFORE anything, make sure you have it installed**: [c++ redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170) [directX](https://www.microsoft.com/en-us/download/details.aspx?id=35)
 
@@ -100,6 +98,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.2.4 - Update on new config system using type safe checks, menu is finally ready to work with variables and multiple configs. Fixed, removed bunch of functions. Deleted singleton as it's a very bad choice to work with single class objects. Reduced many calls. Made return address more easier.
 * 1.2.5 - Made surface GUI example to be working correctly. Added ImGui + freetype libraries, as it's next goal to use this GUI framework as example + solid rendering. Fixed code in few places, and removed oftently changed files from precompilation, which could lead to errors.
 * 1.2.6 - Added ImGui example, added ghetto fix for sendpacket, although it's not used. It's a temp fix. Made hooking even easier to use now.
+* 1.2.7 - Added ImGuiRender class which has a rich amount of functions, arguments are almost everywhere same as in surface rendering. GUI made with surface has been deleted aswell as x88 menu, if you need to know how was it done, search old repo commits. Cleaned up whole sdk and code in few places.
 </details>
 
 # Dependencies

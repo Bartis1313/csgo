@@ -1,11 +1,11 @@
 #pragma once
 #include <cstdint>
 
-#include "math/VMatrix.hpp"
+#include "math/matrix.hpp"
 #include "math/Vector.hpp"
 #include "../utilities/utilities.hpp"
 
-#define FLOW_OUTGOING	0		
+#define FLOW_OUTGOING	0
 #define FLOW_INCOMING	1
 #define MAX_FLOWS		2
 

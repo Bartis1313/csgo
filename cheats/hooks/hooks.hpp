@@ -1,8 +1,6 @@
 #pragma once
 #include "../../SDK/interfaces/interfaces.hpp"
 
-#define FASTARGS void* thisptr, void* edx
-
 enum hookIndexes
 {
 	PAINTTRAVERSE = 41,
@@ -15,6 +13,7 @@ enum hookIndexes
 	RESETDX = 16,
 	PRESENTDX = 17,
 	PROXY_MOVE = 22,
+	END_SCENE = 42,
 };
 
 namespace hooks
@@ -121,6 +120,14 @@ namespace hooks
 		inline static fn original = nullptr;
 		static const int index = PRESENTDX;
 	};
+
+	/*struct endScene
+	{
+		using fn = long(__stdcall*)(IDirect3DDevice9*);
+		static long __stdcall hooked(IDirect3DDevice9* device);
+		inline static fn original;
+		static const int index = END_SCENE;
+	};*/
 
 	struct wndProcSys
 	{

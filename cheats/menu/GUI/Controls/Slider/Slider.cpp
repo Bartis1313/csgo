@@ -19,7 +19,7 @@ void GUI::Slider::draw(Vector2D* pos, Menu* parent, bool skipCall)
 
 	std::string toDraw = std::format(XOR("{} - {:.2f}"), m_title, *m_value);
 
-	render::text(pos->x + PAD_TEXT_X, pos->y - 5, fonts::menuFont, toDraw, false, (isInRange || this->isActive()) ? Colors::White : Color(200, 220, 200, 200));
+	render.text(pos->x + PAD_TEXT_X, pos->y - 5, fonts::menuFont, toDraw, false, (isInRange || this->isActive()) ? Colors::White : Color(200, 220, 200, 200));
 
 	auto check = [this]() -> void
 	{
@@ -53,13 +53,13 @@ void GUI::Slider::draw(Vector2D* pos, Menu* parent, bool skipCall)
 	// how many pixels to move, or call it offset.
 	const float padX = ((*m_value - m_minMax.first) / deltaBetween) * m_width;
 
-	render::drawFilledRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Color(30, 30, 30, 255));
-	render::drawGradient(pos->x + 1 + PAD_TEXT_X, pos->y + 1 + 10, padX - 2, m_height - 2, Colors::LightBlue, Color(30, 30, 30, 255), false);
+	render.drawFilledRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Color(30, 30, 30, 255));
+	render.drawGradient(pos->x + 1 + PAD_TEXT_X, pos->y + 1 + 10, padX - 2, m_height - 2, Colors::LightBlue, Color(30, 30, 30, 255), false);
 
 	if (isInRange || this->isActive())
-		render::drawFilledRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Color(90, 90, 90, 125));
+		render.drawFilledRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Color(90, 90, 90, 125));
 
-	render::drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Colors::Black);
+	render.drawOutlineRect(pos->x + PAD_TEXT_X, pos->y + 10, m_width, m_height, Colors::Black);
 
 	pos->y += this->getPadding();
 }

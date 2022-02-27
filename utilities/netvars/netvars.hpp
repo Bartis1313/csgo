@@ -52,14 +52,14 @@ class NetvarManager
 {
 public:
 	void init();
-	uintptr_t getNetvar(const char* tableName, const char* propName);
+	uintptr_t getNetvar(const char* tableName, const char* propName) const;
 	void dump();
 private:
 	std::unordered_map<std::string, RecvTable*> m_Tables;
-	uintptr_t getProp(const char* tableName, const char* propName, RecvProp** prop = 0);
-	uintptr_t getProp(RecvTable* recvTable, const char* propName, RecvProp** prop = 0);
-	RecvTable* getTable(const char* tableName);
-	std::string getType(RecvProp* recvTable);
+	uintptr_t getProp(const char* tableName, const char* propName, RecvProp** prop = 0) const;
+	uintptr_t getProp(RecvTable* recvTable, const char* propName, RecvProp** prop = 0) const;
+	RecvTable* getTable(const char* tableName) const;
+	std::string getType(RecvProp* recvTable) const;
 	void dump(RecvTable* recvTable);
 	std::ofstream file;
 } inline netvarMan;

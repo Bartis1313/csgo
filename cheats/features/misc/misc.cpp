@@ -5,13 +5,12 @@
 #include "../../../config/vars.hpp"
 #include "../aimbot/aimbot.hpp"
 #include "../../globals.hpp"
-#include "../../menu/GUI/Misc/guimisc.hpp"
 #include <format>
 #include <deque>
 
 constexpr int VK_VKEY = 0x56;
 
-// TODO: rewrite this
+// TODO: rewrite this and fix lol
 void misc::thirdperson()
 {
 	if (!config.get<bool>(vars.bThirdp))
@@ -23,8 +22,8 @@ void misc::thirdperson()
 	if (!game::localPlayer || !game::localPlayer->isAlive())
 		return;
 
-	if (GUI::isKeyPressed(VK_VKEY))
-		config.getRef<bool>(vars.bThirdp) = !config.getRef<bool>(vars.bThirdp);
+	/*if (GUI::isKeyPressed(VK_VKEY))
+		config.getRef<bool>(vars.bThirdp) = !config.getRef<bool>(vars.bThirdp);*/
 
 	interfaces::input->m_cameraInThirdPerson = config.get<bool>(vars.bThirdp);
 	interfaces::input->m_cameraOffset.z = 220.0f;
@@ -66,11 +65,11 @@ void misc::drawCrosshair()
 	case STATIC:
 		// -1 for y because elselike it will be not aligned
 		// imo the best is to always throw w,h as odd num
-		render::drawFilledRect(x - 5, y - 1, 11, 3, Colors::Black);
-		render::drawFilledRect(x - 1, y - 5, 3, 11, Colors::Black);
+		imRender.drawRectFilled(x - 5, y - 1, 11, 3, Colors::Black);
+		imRender.drawRectFilled(x - 1, y - 5, 3, 11, Colors::Black);
 
-		render::drawLine(x - 4, y, x + 5, y, Colors::LightBlue);
-		render::drawLine(x, y + 4, x, y - 5, Colors::LightBlue);
+		imRender.drawLine(x - 4, y, x + 5, y, Colors::LightBlue);
+		imRender.drawLine(x, y + 4, x, y - 5, Colors::LightBlue);
 		break;
 	case RECOIL:
 	{
@@ -91,13 +90,13 @@ void misc::drawCrosshair()
 		//width -= (width * (game::localPlayer->m_aimPunchAngle().y));
 		//height += (height * (game::localPlayer->m_aimPunchAngle().x));
 
-		if (Vector endScreen; render::worldToScreen(end, endScreen) && game::localPlayer->isAlive())
+		if (Vector endScreen; imRender.worldToScreen(end, endScreen) && game::localPlayer->isAlive())
 		{
-			render::drawFilledRect(endScreen.x - 5, endScreen.y - 1, 11, 3, Colors::Black);
-			render::drawFilledRect(endScreen.x - 1, endScreen.y - 5, 3, 11, Colors::Black);
+			imRender.drawRectFilled(endScreen.x - 5, endScreen.y - 1, 11, 3, Colors::Black);
+			imRender.drawRectFilled(endScreen.x - 1, endScreen.y - 5, 3, 11, Colors::Black);
 
-			render::drawLine(endScreen.x - 4, endScreen.y, endScreen.x + 5, endScreen.y, Colors::LightBlue);
-			render::drawLine(endScreen.x, endScreen.y + 4, endScreen.x, endScreen.y - 5, Colors::LightBlue);
+			imRender.drawLine(endScreen.x - 4, endScreen.y, endScreen.x + 5, endScreen.y, Colors::LightBlue);
+			imRender.drawLine(endScreen.x, endScreen.y + 4, endScreen.x, endScreen.y - 5, Colors::LightBlue);
 		}
 		break;
 	}
@@ -123,27 +122,27 @@ void misc::drawLocalInfo()
 
 	int width = globals::screenX * 0.6f;
 
-	render::text(width, 15, fonts::tahoma, std::format(XOR("Map: {}"), interfaces::engine->getLevelName()), false, Colors::Green);
-	render::text(width, 25, fonts::tahoma, std::format(XOR("Weapon {} [{} / {}]"), weapon->getWpnName(), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
-	render::text(width, 35, fonts::tahoma, std::format(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100), false, Colors::Yellow);
-	render::text(width, 45, fonts::tahoma, std::format(XOR("Zoom level {}"), weapon->m_zoomLevel()), false, Colors::Yellow);
-	render::text(width, 55, fonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->m_vecOrigin().y, game::localPlayer->m_vecOrigin().z), false, Colors::Yellow);
-	render::text(width, 65, fonts::tahoma, std::format(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().Length2D()), false, Colors::Yellow);
+	imRender.text(width, 15, ImFonts::tahoma, std::format(XOR("Map: {}"), interfaces::engine->getLevelName()), false, Colors::Green);
+	imRender.text(width, 25, ImFonts::tahoma, std::format(XOR("Weapon {} [{} / {}]"), weapon->getWpnName(), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
+	imRender.text(width, 35, ImFonts::tahoma, std::format(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100), false, Colors::Yellow);
+	imRender.text(width, 45, ImFonts::tahoma, std::format(XOR("Zoom level {}"), weapon->m_zoomLevel()), false, Colors::Yellow);
+	imRender.text(width, 55, ImFonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->m_vecOrigin().y, game::localPlayer->m_vecOrigin().z), false, Colors::Yellow);
+	imRender.text(width, 65, ImFonts::tahoma, std::format(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().length2D()), false, Colors::Yellow);
 
-	render::text(width, 75, fonts::tahoma, std::format(XOR("Kills {}"), game::localPlayer->getKills()), false, Colors::Yellow);
-	render::text(width, 85, fonts::tahoma, std::format(XOR("Deaths {}"), game::localPlayer->getDeaths()), false, Colors::Yellow);
+	imRender.text(width, 75, ImFonts::tahoma, std::format(XOR("Kills {}"), game::localPlayer->getKills()), false, Colors::Yellow);
+	imRender.text(width, 85, ImFonts::tahoma, std::format(XOR("Deaths {}"), game::localPlayer->getDeaths()), false, Colors::Yellow);
 	// escape divide by zero exceptions by using this trick
 	float kd = game::localPlayer->getKills() / (game::localPlayer->getDeaths() ? game::localPlayer->getDeaths() : 1.0f);
-	render::text(width, 95, fonts::tahoma, std::format(XOR("KD {:.2f}"), kd), false, Colors::Yellow);
-	render::text(width, 105, fonts::tahoma, std::format(XOR("Ping {}"), game::localPlayer->getPing()), false, Colors::Yellow);
+	imRender.text(width, 95, ImFonts::tahoma, std::format(XOR("KD {:.2f}"), kd), false, Colors::Yellow);
+	imRender.text(width, 105, ImFonts::tahoma, std::format(XOR("Ping {}"), game::localPlayer->getPing()), false, Colors::Yellow);
 
 	float accuracy = globals::shotsFired
 		? (static_cast<float>(globals::shotsHit) / static_cast<float>(globals::shotsFired)) * 100.0f
 		: 0.0f;
-	render::text(width, 115, fonts::tahoma, std::format(XOR("Accuracy [{} / {}] {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy), false, Colors::Yellow);
+	imRender.text(width, 115, ImFonts::tahoma, std::format(XOR("Accuracy [{} / {}] {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy), false, Colors::Yellow);
 
 	width *= 1.25f;
-	render::text(width, 15, fonts::tahoma, legitbot::bestEnt ? std::format(XOR("Aimbot working on: {}"), legitbot::bestEnt->getName()) : "", false, Colors::LightBlue);
+	imRender.text(width, 15, ImFonts::tahoma, legitbot::bestEnt ? std::format(XOR("Aimbot working on: {}"), legitbot::bestEnt->getName()) : "", false, Colors::LightBlue);
 }
 
 struct Record
@@ -167,10 +166,10 @@ void misc::drawFpsPlot()
 	auto widthPoint = x + (x * 0.97f);
 
 	// a bit of hardcode here
-	render::drawFilledRect(widthPoint - records.size() - 1, y - 250 + 2, records.size() + 5, 150, Colors::Grey);
-	render::drawOutlineRect(widthPoint - records.size() - 1, y - 250 + 2, records.size() + 5, 150, Colors::Black);
+	imRender.drawRectFilled(widthPoint - records.size() - 1, y - 250 + 2, records.size() + 5, 150, Colors::Grey);
+	imRender.drawRect(widthPoint - records.size() - 1, y - 250 + 2, records.size() + 5, 150, Colors::Black);
 
-	render::text(widthPoint - records.size() / 2, y - 250 - 14, fonts::tahoma, XOR("FPS Plot"), true, Colors::LightBlue);
+	imRender.text(widthPoint - records.size() / 2, y - 250 - 14, ImFonts::tahoma, XOR("FPS Plot"), true, Colors::LightBlue);
 
 	records.push_back(Record{ 1.f / interfaces::globalVars->m_frametime });
 	
@@ -191,7 +190,7 @@ void misc::drawFpsPlot()
 		float cy = y - 100 - a * std::sqrt(currentVal * b);
 
 		if (i > 0)
-			render::drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
+			imRender.drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
 		lx = cx; ly = cy;
 	}
 }
@@ -218,7 +217,7 @@ void misc::getVelocityData()
 		return;
 	}
 	
-	velRecords.push_back(RecordVelocity{ game::localPlayer->m_vecVelocity().Length2D() });
+	velRecords.push_back(RecordVelocity{ game::localPlayer->m_vecVelocity().length2D() });
 
 	// width
 	while (velRecords.size() > 300)
@@ -242,10 +241,10 @@ void misc::drawVelocityPlot()
 
 	auto widthPoint = x + (x * 0.97f);
 
-	render::drawFilledRect(widthPoint - velRecords.size() - 1, y - 50 + 2, velRecords.size() + 5, 50, Colors::Grey);
-	render::drawOutlineRect(widthPoint - velRecords.size() - 1, y - 50 + 2, velRecords.size() + 5, 50, Colors::Black);
+	imRender.drawRectFilled(widthPoint - velRecords.size() - 1, y - 50 + 2, velRecords.size() + 5, 50, Colors::Grey);
+	imRender.drawRect(widthPoint - velRecords.size() - 1, y - 50 + 2, velRecords.size() + 5, 50, Colors::Black);
 
-	render::text(widthPoint - velRecords.size() / 2, y - 50 - 14, fonts::tahoma, XOR("Velocity Plot"), true, Colors::LightBlue);
+	imRender.text(widthPoint - velRecords.size() / 2, y - 50 - 14, ImFonts::tahoma, XOR("Velocity Plot"), true, Colors::LightBlue);
 
 	const auto a = 1.0f;
 	const auto b = 2.0f;
@@ -258,7 +257,7 @@ void misc::drawVelocityPlot()
 		float cy = y - a * std::sqrt(currentVal * b);
 
 		if (i > 0)
-			render::drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
+			imRender.drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
 		lx = cx; ly = cy;
 	}
 }
@@ -302,10 +301,10 @@ void misc::drawHitmarker()
 	if (hitAlpha > 0)
 	{
 		// you can add ratio for coords to make this hitmarker 100% like from other games
-		render::drawLine(x - 10, y + 10, x - 5, y + 5, Color(255, 255, 255, hitAlpha));
-		render::drawLine(x + 10, y + 10, x + 5, y + 5, Color(255, 255, 255, hitAlpha));
-		render::drawLine(x - 10, y - 10, x - 5, y - 5, Color(255, 255, 255, hitAlpha));
-		render::drawLine(x + 10, y - 10, x + 5, y - 5, Color(255, 255, 255, hitAlpha));
+		imRender.drawLine(x - 10, y + 10, x - 5, y + 5, Color(255, 255, 255, hitAlpha));
+		imRender.drawLine(x + 10, y + 10, x + 5, y + 5, Color(255, 255, 255, hitAlpha));
+		imRender.drawLine(x - 10, y - 10, x - 5, y - 5, Color(255, 255, 255, hitAlpha));
+		imRender.drawLine(x + 10, y - 10, x + 5, y - 5, Color(255, 255, 255, hitAlpha));
 
 		// feel free to use anything that is more accurate, first multiply was just hardcoded by guessing
 		hitAlpha -= 1.8f * (interfaces::globalVars->m_curtime) * 255;
@@ -334,7 +333,7 @@ void misc::drawNoScope()
 	{
 		int x = globals::screenX;
 		int y = globals::screenY;
-		render::drawLine(x / 2, 0, x / 2, y, Colors::Black);
-		render::drawLine(0, y / 2, x, y / 2, Colors::Black);
+		imRender.drawLine(x / 2, 0, x / 2, y, Colors::Black);
+		imRender.drawLine(0, y / 2, x, y / 2, Colors::Black);
 	}
 }

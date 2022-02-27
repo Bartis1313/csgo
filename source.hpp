@@ -76,12 +76,6 @@ LONG WINAPI memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 				symbol->MaxNameLen = TRACE_MAX_FUNCTION_NAME_LENGTH; // sometimes the name is huge to get it valid
 				symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
-				const auto process = LF(GetCurrentProcess)();
-#ifndef _DEBUG
-				LF(SymInitialize).cached()(process, NULL, TRUE);
-#else
-				SymInitialize(process, NULL, TRUE);
-#endif
 				std::stringstream ss;
 
 				const auto addr = pExceptionInfo->ExceptionRecord->ExceptionAddress;
@@ -104,7 +98,6 @@ LONG WINAPI memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 				LOG(LOG_ERR, ss.str());
 				printStack();
 				LF(MessageBoxA)(nullptr, ss.str().c_str(), XOR("Fatal error!"), MB_ICONERROR | MB_OK);
-				bOnce = true;
 				free(symbol);
 				ss.clear();
 

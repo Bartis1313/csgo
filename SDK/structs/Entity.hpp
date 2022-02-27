@@ -17,11 +17,9 @@ class Player_t;
 /*
 * This file is so far probably the easiest when it comes to netvar usage
 * You find the netvar - throw table and name, pretty easy
-* in my source I accept only "raw" names for netvars, it's more reliable for me
+* in my source I accept only "raw" table names for netvars, it's more reliable for me
 * Sometimes values need extra adress or are pointers
-* Functions that return something as value from some value on the stack in function
-* example:
-* void blabla() { auto i = 10; return i;} -> i is on the stack, those functions I keep in cpp
+* Try to keep longer methods in cpp file
 */
 
 

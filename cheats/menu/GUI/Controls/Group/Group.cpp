@@ -83,8 +83,8 @@ void GUI::Group::draw(Vector2D* pos, Menu* parent)
 		pos->y = parent->getMenuDrawHeight();
 	}
 
-	render::text(pos->x, pos->y, fonts::menuFont, m_name, false, Colors::White);
-	pos->y += render::getTextSizeXY(fonts::menuFont, m_name).y + 5;
+	render.text(pos->x, pos->y, fonts::menuFont, m_name, false, Colors::White);
+	pos->y += render.getTextSizeXY(fonts::menuFont, m_name).y + 5;
 
 	for (const auto& el : m_Elements)
 		el->draw(pos, parent);

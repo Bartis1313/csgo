@@ -37,7 +37,7 @@ void legitbot::drawFov()
 
         float radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
 
-        render::drawCircle(globals::screenX / 2, globals::screenY / 2, radius, 32, config.get<Color>(vars.cDrawFov));
+        imRender.drawCircle(globals::screenX / 2, globals::screenY / 2, radius, 32, config.get<Color>(vars.cDrawFov));
     }
 }
 
@@ -133,7 +133,7 @@ void legitbot::run(CUserCmd* cmd)
             }
         }
 
-        if (!bestPos.IsZero())
+        if (!bestPos.isZero())
         {
             auto angle = math::calcAngleRelative(myEye, bestPos, cmd->m_viewangles + punch);
             angle.clamp();

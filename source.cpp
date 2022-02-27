@@ -7,8 +7,6 @@
 #include "config/vars.hpp" // so vars load
 #include "source.hpp"
 #include "cheats/globals.hpp"
-#include "cheats/menu/GUI/drawing.hpp"
-#include "cheats/menu/GUI/Controls/TextInput/TextInput.hpp"
 #include "cheats/features/misc/events.hpp"
 #include "utilities/simpleTimer.hpp"
 #include "cheats/menu/GUI-ImGui/menu.hpp"
@@ -24,7 +22,8 @@ DWORD WINAPI init(PVOID instance)
 
     console::init(XOR("CSGO DEBUG"));
 
-    START_TIME
+    TimeCount initTimer;
+    initTimer.start();
 
     // warning: if you do wrong hierarchy - crash
     try
@@ -33,19 +32,18 @@ DWORD WINAPI init(PVOID instance)
         config.init();
         netvarMan.init();
         netvarMan.dump();
-        render::init();
-        //GUI::initGui();
+        //render.init();
         hooks::wndProcSys::init();
         hooks::init();
     }
     catch (const std::runtime_error& err)
     {
         LF(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
-        LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
+        LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_FAILURE);
     }
 
-    END_TIME
-    PRINT_TIME_TO_LOG("hooks took")
+    initTimer.end();
+    LOG(LOG_INFO, std::format(XOR("{} {:.5f}ms"), XOR("hooks took"), initTimer.getSec()));
 
     return TRUE;
 }
@@ -54,14 +52,14 @@ VOID WINAPI _shutdown(PVOID instance)
 {
     while (!utilities::getKey(config.get<int>(vars.iKeyPanic)))
     {
-        std::this_thread::sleep_for(50ms);
+        std::this_thread::sleep_for(100ms);
     }
 
     RemoveVectoredExceptionHandler(globals::instance);
     hooks::wndProcSys::shutdown();
+    ImGuiMenu::shutdown();
     events.shutdown();
     hooks::shutdown();
-    //GUI::menu->shutdown();
     LOG(LOG_INFO, XOR("Hack shutdown"));
     console::shutdown();
 

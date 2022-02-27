@@ -1,5 +1,6 @@
 #include "Color.hpp"
 #include "../dependencies/ImGui/imgui.h" // for struct
+#include <algorithm>
 
 float Rainbow::hue = 0.0f;
 
@@ -31,9 +32,15 @@ void Color::setAlpha(uint8_t a)
 	m_color.at(3) = a;
 }
 
-ImVec4 Color::getImguiColor(const Color& color)
+ImColor Color::getImguiColor(const Color& color)
 {
-	return ImVec4{ color.rDevided(), color.gDevided(), color.bDevided(), color.aDevided() };
+	return ImColor{ color.rDevided(), color.gDevided(), color.bDevided(), color.aDevided() };
+}
+
+Color& Color::getColorEditAlpha(const uint8_t amount)
+{
+	m_color.at(3) = amount;
+	return *this;
 }
 
 Color Color::fromHSB(float hue, float saturation, float brightness)
@@ -129,6 +136,9 @@ Color Color::hslToRGB(float hue, float saturation, float lightness)
 		static_cast<uint8_t>(g * 255),
 		static_cast<uint8_t>(b * 255));
 }
+
+#undef max
+#undef min
 
 float Color::getHueFromColor(const Color& clr)
 {

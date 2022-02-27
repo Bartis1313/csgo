@@ -35,7 +35,7 @@ class RecvProp;
 class CRecvProxyData
 {
 public:
-    const RecvProp* m_recvProp; 
+    const RecvProp* m_recvProp;
     DVariant m_value;
     int	m_element;
     int	m_objectID;
