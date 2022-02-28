@@ -158,7 +158,7 @@ void GUI::Menu::draw()
 		{
 			forceKey(VK_LBUTTON);
 		}
-		reinterpret_cast<Element*>(m_elementToSkip)->draw(&m_oldPos, this, true);
+		m_elementToSkip->draw(&m_oldPos, this, true);
 		m_skipClick = false;
 		m_elementToSkip = nullptr;
 	}
