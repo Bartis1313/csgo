@@ -46,7 +46,7 @@ void hooks::init()
 
 	//hookHelper::tryHook(creteMoveTarget, &createMove::hooked, hookHelper::ORIGINAL(createMove::original), XOR("createMove"));
 	hookHelper::tryHook(createMoveProxyTarget, &proxyCreateMove::hooked, hookHelper::ORIGINAL(proxyCreateMove::original), XOR("createmoveProxy"));
-	//hookHelper::tryHook(paintTraverseTarget, &paintTraverse::hooked, hookHelper::ORIGINAL(paintTraverse::original), XOR("paintTraverse"));
+	hookHelper::tryHook(paintTraverseTarget, &paintTraverse::hooked, hookHelper::ORIGINAL(paintTraverse::original), XOR("paintTraverse"));
 	hookHelper::tryHook(drawModelTarget, &drawModel::hooked, hookHelper::ORIGINAL(drawModel::original), XOR("drawModel"));
 	hookHelper::tryHook(overrideViewTarget, &overrideView::hooked, hookHelper::ORIGINAL(overrideView::original), "overrideView");
 	hookHelper::tryHook(doPostScreenEffectsTarget, &doPostScreenEffects::hooked, hookHelper::ORIGINAL(doPostScreenEffects::original), XOR("doPostScreenEffects"));
