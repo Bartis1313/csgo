@@ -1,5 +1,4 @@
 #include "math.hpp"
-#include <span>
 
 Vector math::calcAngleRelative(const Vector& source, const Vector& destination, const Vector& viewAngles)
 {

@@ -1,6 +1,7 @@
 #pragma once
 #include <DbgHelp.h>
 #include <WIndows.h>
+#include <map>
 #include "utilities/utilities.hpp"
 
 // 0x{:X} used because there is no actual syntax for 0xF450 printing for example, it's either like 0xf450 or 0XF450

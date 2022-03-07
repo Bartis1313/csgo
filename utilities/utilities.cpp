@@ -225,3 +225,15 @@ SHORT utilities::getKey(const UINT vKey)
 	return LF(GetAsyncKeyState).cached()(vKey);
 #endif
 }
+
+bool utilities::isValidWindow()
+{
+#ifdef _DEBUG
+	if (auto window = FindWindowA("Valve001", NULL); GetForegroundWindow() != window)
+		return false;
+#else
+	if (auto window = LF(FindWindowA).cached()(XOR("Valve001"), NULL); LF(GetForegroundWindow).cached()() != window)
+		return false;
+#endif
+	return true;
+}

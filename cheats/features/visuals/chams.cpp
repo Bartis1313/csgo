@@ -11,13 +11,13 @@ inline constexpr void CALL(void* ctx, const DrawModelState_t& state, const Model
 
 enum ChamsIDs
 {
-	STATIC = 0,
+	STATIC = 1,
 	XYZ,
 };
 
 enum BTChamsIDs
 {
-	STABLE = 0,
+	STABLE = 1,
 	LAST_TICK,
 	RAINBOW,
 };
@@ -27,8 +27,8 @@ void chams::overrideChams(bool ignore, bool wireframe, Color color)
 	static auto mat = interfaces::matSys->findMaterial(XOR("debug/debugambientcube"), XOR(TEXTURE_GROUP_MODEL));
 	mat->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignore);
 	mat->setMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
-	mat->alphaModulate(color.aDevided());
-	mat->colorModulate(color.rDevided(), color.gDevided(), color.bDevided());
+	mat->alphaModulate(color.a());
+	mat->colorModulate(color.r(), color.g(), color.b());
 	interfaces::modelRender->overrideMaterial(mat);
 }
 

@@ -88,12 +88,12 @@ std::map<short, const char*> consoleStrings =
 	{LOG_ERR, "[err] "}
 };
 
-std::map<short, Color> consoleColors =
+std::map<short, SDKColor> consoleColors =
 {
-	{LOG_NO, Colors::White },
-	{LOG_INFO, Colors::Green },
-	{LOG_WELCOME, Colors::Cyan },
-	{LOG_ERR, Colors::Red }
+	{LOG_NO, { 255, 255, 255, 255 } },
+	{LOG_INFO, { 0, 255, 0, 255 } },
+	{LOG_WELCOME, { 0, 255, 255, 255 } },
+	{LOG_ERR, { 255, 0, 0, 255 } }
 };
 
 void console::log(const short type, const std::string& str, const bool useNewLine)
@@ -119,7 +119,7 @@ void console::log(const short type, const std::string& str, const bool useNewLin
 	log << consoleStrings[type] << ss.str();
 
 	if (globals::interfacesDone)
-		interfaces::console->consoleColorPrintf(Colors::White, ss.str().c_str());
+		interfaces::console->consoleColorPrintf( { 255, 255, 255, 255 }, ss.str().c_str());
 	
 	log.close();
 #ifdef _DEBUG

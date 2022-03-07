@@ -65,7 +65,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -73,8 +73,14 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
     </ClCompile>
     <ProjectReference>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
@@ -83,24 +89,25 @@
       <AdditionalDependencies>DbgHelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level1</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest /Gw %(AdditionalOptions)</AdditionalOptions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DebugInformationFormat>None</DebugInformationFormat>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
-      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <EnableFiberSafeOptimizations>false</EnableFiberSafeOptimizations>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <OmitFramePointers>true</OmitFramePointers>
@@ -119,8 +126,7 @@
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <EnforceTypeConversionRules>
       </EnforceTypeConversionRules>
-      <RuntimeTypeInfo>
-      </RuntimeTypeInfo>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -130,7 +136,7 @@
       <AdditionalDependencies>DbgHelp.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
-      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <LinkTimeCodeGeneration>UseFastLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -192,23 +198,9 @@
     </ClCompile>
     <ClCompile Include="cheats\hooks\reset.cpp" />
     <ClCompile Include="cheats\hooks\validAddrChecks.cpp" />
+    <ClCompile Include="cheats\menu\GUI-ImGui\imguiaddons.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\menu.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\Button\Button.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\CheckBox\CheckBox.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\ColorPicker\ColorPicker.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\ComboBox\ComboBox.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\Group\Group.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\HelpMarker\HelpMarker.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\KeyHolder\KeyHolder.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\MultiBox\MultiBox.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\Slider\Slider.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\Tab\Tab.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\TextInput\TextInput.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Controls\Text\Text.cpp" />
-    <ClCompile Include="cheats\menu\GUI\drawing.cpp" />
-    <ClCompile Include="cheats\menu\GUI\mainMenu.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Misc\guimisc.cpp" />
-    <ClCompile Include="cheats\menu\GUI\Misc\TextureHolder\TextureHolder.cpp" />
+    <ClCompile Include="cheats\menu\GUI-ImGui\styles.cpp" />
     <ClCompile Include="config\config.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -221,7 +213,6 @@
     <ClCompile Include="dependencies\ImGui\imgui_stdlib.cpp" />
     <ClCompile Include="dependencies\ImGui\imgui_tables.cpp" />
     <ClCompile Include="dependencies\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="dependencies\lodepng.cpp" />
     <ClCompile Include="dependencies\minhook\buffer.c">
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)-c.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -316,26 +307,11 @@
     <ClInclude Include="cheats\globals.hpp" />
     <ClInclude Include="cheats\hooks\hooks.hpp" />
     <ClInclude Include="cheats\hooks\helpers\helper.hpp" />
+    <ClInclude Include="cheats\menu\GUI-ImGui\imguiaddons.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\menu.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\Button\Button.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\CheckBox\CheckBox.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\ColorPicker\ColorPicker.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\ComboBox\ComboBox.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\Element\Element.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\Group\Group.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\HelpMarker\HelpMarker.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\KeyHolder\KeyHolder.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\Lining\Lining.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\MultiBox\MultiBox.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\Slider\Slider.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\Tab\Tab.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\TextInput\TextInput.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Controls\Text\Text.hpp" />
-    <ClInclude Include="cheats\menu\GUI\drawing.hpp" />
-    <ClInclude Include="cheats\menu\GUI\mainMenu.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Misc\guimisc.hpp" />
-    <ClInclude Include="cheats\menu\GUI\Misc\TextureHolder\TextureHolder.hpp" />
-    <ClInclude Include="cheats\menu\GUI\sizes.hpp" />
+    <ClInclude Include="cheats\menu\GUI-ImGui\selections.hpp" />
+    <ClInclude Include="cheats\menu\GUI-ImGui\styles.hpp" />
+    <ClInclude Include="cheats\menu\GUI-ImGui\tabrender.hpp" />
     <ClInclude Include="config\vars.hpp" />
     <ClInclude Include="dependencies\freetype\include\freetype\config\ftconfig.h" />
     <ClInclude Include="dependencies\freetype\include\freetype\config\ftheader.h" />
@@ -447,7 +423,6 @@
     <ClInclude Include="dependencies\ImGui\imstb_textedit.h" />
     <ClInclude Include="dependencies\ImGui\imstb_truetype.h" />
     <ClInclude Include="dependencies\json.hpp" />
-    <ClInclude Include="dependencies\lodepng.h" />
     <ClInclude Include="dependencies\minhook\buffer.h" />
     <ClInclude Include="dependencies\minhook\hde\hde32.h" />
     <ClInclude Include="dependencies\minhook\hde\hde64.h" />
@@ -456,7 +431,6 @@
     <ClInclude Include="dependencies\minhook\hde\table64.h" />
     <ClInclude Include="dependencies\minhook\trampoline.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="resource.h" />
     <ClInclude Include="SDK\animations.hpp" />
     <ClInclude Include="SDK\CGameMovement.hpp" />
     <ClInclude Include="SDK\checksum_crc.hpp" />
@@ -520,9 +494,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="dependencies\images\fatchad.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="csgo-legit.rc" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="dependencies\freetype\Win32\freetype.lib" />

@@ -1,4 +1,6 @@
 #pragma once
+
+#include "Vector2D.hpp"
 #include <cmath>
 #include <algorithm>
 
@@ -60,6 +62,11 @@ public:
 	_NODISCARD float distTo(const Vector& vOther) const
 	{
 		return (*this - vOther).length();
+	}
+
+	_NODISCARD constexpr Vector2D toVec2D() const
+	{
+		return Vector2D{ x, y };
 	}
 
 	Vector& normalize()

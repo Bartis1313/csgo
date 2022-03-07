@@ -9,11 +9,9 @@ namespace globals
 	inline int shotsFired = 0;
 	inline int shotsHit = 0;
 	inline HMODULE instance = {};
-	inline int mouseX = 0;
-	inline int mouseY = 0;
-	inline bool keyState[256];
-	inline bool previousKeyState[256];
 	inline int screenX = 0;
 	inline int screenY = 0;
 	inline bool interfacesDone = false;
+	// TODO: store HWND by thread
+	inline HWND csgoWHND;
 }

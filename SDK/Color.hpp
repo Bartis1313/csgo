@@ -2,42 +2,61 @@
 #include <cstdint>
 #include <array>
 
-struct ImColor;
+using ImU32 = unsigned int;
+struct ImVec4;
 
+class Color;
+// 0-255 & 1byte type
+struct SDKColor
+{
+	SDKColor() = default;
+	SDKColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
+		: r{ r }, g{ g }, b{ b }, a{ a }
+	{}
+
+	uint8_t r, g, b, a;
+};
+
+// 0.0 - 1.0, you can pass ints as 0-255 though
 class Color
 {
 public:
-	Color();
-	Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
-	Color(const Color& clr, uint8_t a);
+	Color() = default;
+	constexpr Color(float r, float g, float b, float a = 1.0f)
+	{
+		setColor(r, g, b, a);
+	}
+	constexpr Color(int r, int g, int b, int a = 255)
+	{
+		setColor(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
+	}
 
-	void setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255);
-	void setAlpha(uint8_t a);
+	constexpr void setColor(float r, float g, float b, float a = 1.0f);
+	constexpr void setAlpha(float a);
 
-	_NODISCARD uint8_t r() const { return m_color.at(0); }
-	_NODISCARD uint8_t g() const { return m_color.at(1); }
-	_NODISCARD uint8_t b() const { return m_color.at(2); }
-	_NODISCARD uint8_t a() const { return m_color.at(3); }
+	_NODISCARD constexpr float r() const { return m_color.at(0); }
+	_NODISCARD constexpr float g() const { return m_color.at(1); }
+	_NODISCARD constexpr float b() const { return m_color.at(2); }
+	_NODISCARD constexpr float a() const { return m_color.at(3); }
 
-	_NODISCARD static ImColor getImguiColor(const Color& color);
+	_NODISCARD static ImVec4 getImguiColor(const Color& color);
 	// edits alpha
-	_NODISCARD Color& getColorEditAlpha(const uint8_t amount);
+	_NODISCARD constexpr Color& getColorEditAlpha(const float amount);
 
-	_NODISCARD float rDevided() const { return m_color.at(0) / 255.0f; }
-	_NODISCARD float gDevided() const { return m_color.at(1) / 255.0f; }
-	_NODISCARD float bDevided() const { return m_color.at(2) / 255.0f; }
-	_NODISCARD float aDevided() const { return m_color.at(3) / 255.0f; }
+	_NODISCARD constexpr uint8_t rMultiplied() const { return static_cast<uint8_t>(m_color.at(0) * 255.0f); }
+	_NODISCARD constexpr uint8_t gMultiplied() const { return static_cast<uint8_t>(m_color.at(1) * 255.0f); }
+	_NODISCARD constexpr uint8_t bMultiplied() const { return static_cast<uint8_t>(m_color.at(2) * 255.0f); }
+	_NODISCARD constexpr uint8_t aMultiplied() const { return static_cast<uint8_t>(m_color.at(3) * 255.0f); }
 
-	const uint8_t& operator[](int index) const { return m_color.at(index); }
-	const uint8_t& at(int index) const { return m_color.at(index); }
-	bool operator == (const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
-	bool operator != (const Color& rhs) const { return !(operator==(rhs)); }
+	constexpr const float& operator[](int index) const { return m_color.at(index); }
+	constexpr const float& at(int index) const { return m_color.at(index); }
+	constexpr bool operator == (const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
+	constexpr bool operator != (const Color& rhs) const { return !(operator==(rhs)); }
 	static Color fromHSB(float hue, float saturation, float brightness);
 	//https://gist.github.com/mjackson/5311256
 	static Color hslToRGB(float hue, float saturation, float lightness);
-	static float getHueFromColor(const Color& clr);
 private:
-	std::array<uint8_t, 4> m_color;
+	std::array<float, 4> m_color;
 };
 
 class Rainbow
@@ -64,6 +83,7 @@ namespace Colors
 	inline Color Pink = Color(255, 100, 180, 255);
 	inline Color Coral = Color(255, 127, 80, 255);
 	inline Color Cyan = Color(0, 255, 255, 255);
+	inline Color Blank = Color(0, 0, 0, 0);
 }
 
-#define U32(col) Color::getImguiColor(col)
+ImU32 U32(const Color& color);

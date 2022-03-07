@@ -10,8 +10,8 @@ class CGlowObject_t
 public:
 	void set(Color color)
 	{
-		rgb = Vector(color.rDevided(), color.gDevided(), color.bDevided());
-		a = color.aDevided();
+		rgb = Vector(color.r(), color.g(), color.b());
+		a = color.a();
 		m_occluded = true;
 		m_unoccluded = false;
 		m_bloomAmount = 1.0f;

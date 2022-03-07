@@ -1,7 +1,8 @@
 #pragma once
-#include "../dependencies/json.hpp"
+
 #include "../utilities/utilities.hpp"
 #include "../SDK/Color.hpp"
+#include <filesystem>
 #include <variant>
 #include <vector>
 #include <iostream>
@@ -72,7 +73,7 @@ public:
 	/// <param name="folder"></param>
 	Config(const std::string& file, const std::string& folder);
 
-	bool save(const std::string& file);
+	bool save(const std::string& file, const bool forceSave = false);
 	bool load(const std::string& file);
 	void deleteCfg(const std::string& file);
 	// pass default file here

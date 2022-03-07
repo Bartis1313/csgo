@@ -2,11 +2,11 @@
 #include <chrono>
 #include "utilities.hpp"
 
-// simple ms chrono timer
+// simple mcs chrono timer
 class TimeCount
 {
-    using high_resolution_clock = std::chrono::high_resolution_clock;
-    using microsecond = std::chrono::microseconds;
+    using steady_clock = std::chrono::steady_clock;
+    using microseconds = std::chrono::microseconds;
 public:
     explicit TimeCount()
     {
@@ -14,17 +14,17 @@ public:
     }
     void start()
     {
-        m_Start = high_resolution_clock::now();
+        m_Start = steady_clock::now();
     }
 
     void end()
     {
-        m_End = high_resolution_clock::now();
+        m_End = steady_clock::now();
     }
 
-    microsecond elapsed() const
+    microseconds elapsed() const
     {
-        return std::chrono::duration_cast<microsecond>(m_End - m_Start);
+        return std::chrono::duration_cast<microseconds>(m_End - m_Start);
     }
 
     double getSec() const
@@ -34,6 +34,6 @@ public:
         return timePassed;
     }
 private:
-    high_resolution_clock::time_point m_Start;
-    high_resolution_clock::time_point m_End;
+    steady_clock::time_point m_Start;
+    steady_clock::time_point m_End;
 };

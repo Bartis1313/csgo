@@ -23,7 +23,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bAimbot, false, "aimbot enabled");
 	CONFIG_ADD_VARIABLE(int, iAimbot, 0, "aimbot mode");
 	CONFIG_ADD_VARIABLE(float, fFovAimbot, 0.0f, "aimbot FOV");
-	CONFIG_ADD_VARIABLE(float, fSmooth, 0.0f, "smooth amount for aimbot");
+	CONFIG_ADD_VARIABLE(float, fSmooth, 1.0f, "smooth amount for aimbot");
 	CONFIG_ADD_VARIABLE(bool, bRCS, false, "recoil control system enabled");
 	CONFIG_ADD_VARIABLE(float, fRCS, 50.0f, "recoil control system percentage");
 	CONFIG_ADD_VARIABLE(bool, bTriggerbot, false, "triggerbot enabled");
@@ -54,6 +54,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cDlight, Color(20, 70, 150, 255), "Dlight color");
 	CONFIG_ADD_VARIABLE(bool, bShowInfo, false, "show info enabled");
 	CONFIG_ADD_VARIABLE(bool, bShowFlags, false, "show flags enabled");
+	CONFIG_ADD_VARIABLE(bool, bBacktrackChams, false, "enabled backtrack chams");
 	CONFIG_ADD_VARIABLE(int, iBacktrackChams, 0, "backtrack chams type");
 	CONFIG_ADD_VARIABLE(bool, bDLight, false, "DLight enabled");
 	CONFIG_ADD_VARIABLE(bool, bEspLasers, false, "Esp Lasers enabled");
@@ -97,6 +98,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bSoundEsp, false, "sound esp enabled");
 	CONFIG_ADD_VARIABLE(float, fFOV, 0, "fov for +/- view");
 	CONFIG_ADD_VARIABLE(bool, bThirdp, false, "third person enabled");
+	CONFIG_ADD_VARIABLE(bool, bCrosshair, false, "enable crosshair");
 	CONFIG_ADD_VARIABLE(int, iCrosshair, 0, "crosshair mode");
 	CONFIG_ADD_VARIABLE(bool, bBacktrack, false, "backtrack enabled");
 	CONFIG_ADD_VARIABLE(float, fBacktrackTick, 200.0f, "backtrack amount of ticks to manipulate");
@@ -115,6 +117,5 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fRadarThickness, 5.0f, "radar thickness");
 	CONFIG_ADD_VARIABLE(float, fRadarLenght, 20.0f, "radar lenght of line");
 	CONFIG_ADD_VARIABLE(float, fRadarScale, 1.8f, "radar scaling");
-
 
 } inline vars;

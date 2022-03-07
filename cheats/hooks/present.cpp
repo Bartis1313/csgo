@@ -4,8 +4,6 @@
 #include "../../dependencies/ImGui/imgui.h"
 #include "../menu/GUI-ImGui/menu.hpp"
 #include "../../utilities/renderer/renderer.hpp"
-#include "../features/visuals/player.hpp"
-#include "../features/visuals/world.hpp"
 
 long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {
@@ -24,17 +22,21 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		return true;
 	} ();
 
+	IDirect3DVertexDeclaration9* ppdecl;
+	IDirect3DVertexShader9* ppshader;
+	device->GetVertexDeclaration(&ppdecl);
+	device->GetVertexShader(&ppshader);
+
 	// BEGIN DRAW
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	imRender.m_drawing = ImGui::GetBackgroundDrawList();
-	// PUT CONTENT TO DRAW
+	// anything that is responsible by imgui to be drawn, not including the game's w2s
 	{
-		world::drawZeusRange();
-
 		ImGuiMenu::draw();
+		imRender.renderPresent(ImGui::GetBackgroundDrawList());
 	}
+
 	// END DRAW
 	ImGui::EndFrame();
 	ImGui::Render();
@@ -45,6 +47,9 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 		device->EndScene();
 	}
+
+	device->SetVertexDeclaration(ppdecl);
+	device->SetVertexShader(ppshader);
 
 	return original(device, srcRect, dstRect, window, region);
 }

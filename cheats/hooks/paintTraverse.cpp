@@ -8,29 +8,7 @@
 #include "../../config/vars.hpp"
 
 #pragma region "Paint Helpers"
-bool isValidWindow()
-{
-	// sub window is better, for cs as they recently updated main window name
-#ifdef _DEBUG
-	if (auto window = FindWindowA("Valve001", NULL); GetForegroundWindow() != window)
-		return false;
-#else
-	if (auto window = LF(FindWindowA).cached()(XOR("Valve001"), NULL); LF(GetForegroundWindow).cached()() != window)
-		return false;
-#endif
-	return true;
-}
-
-// run current screensize
-void getScreen()
-{
-	int x, y;
-	interfaces::engine->getScreenSize(x, y);
-	globals::screenX = x;
-	globals::screenY = y;
-}
-
-// draw all painting
+// all paint
 void paintHandle()
 {
 	esp::run();
@@ -46,16 +24,28 @@ void paintHandle()
 	legitbot::drawFov();
 }
 
+// run current screensize
+void getScreen()
+{
+	int x, y;
+	interfaces::engine->getScreenSize(x, y);
+	globals::screenX = x;
+	globals::screenY = y;
+}
 #pragma endregion
 
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
 {
+	//if (!utilities::isValidWindow()) // should check it less
+		//return;
+
 	getScreen();
 
 	if (interfaces::engine->isTakingScreenshot())
 		return;
 
 	static unsigned int panelScope = 0;
+	static unsigned int panelID = 0;
 
 	const auto panelName = interfaces::panel->getName(panel);
 
@@ -71,4 +61,16 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	}
 
 	original(interfaces::panel, panel, forceRepaint, allowForce);
+
+	if (!panelID)
+	{
+		if (strstr(panelName, XOR("MatSystemTopPanel")))
+			panelID = panel;
+	}
+	else if (panelID == panel)
+	{
+		imRender.clearData();
+		imRender.addToRender(&paintHandle);
+		imRender.swapData();
+	}
 }

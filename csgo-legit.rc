@@ -1,3 +1,0 @@
-#include "resource.h"
-
-IMAGE_PNG1 PNG "dependencies/images/fatchad.png"

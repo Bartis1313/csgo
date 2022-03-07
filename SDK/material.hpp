@@ -61,7 +61,7 @@ public:
     VFUNC(IMaterialVar*, findVar, 11, (const char* name, bool* found = nullptr, bool complain = true), (this, name, found, complain));
     VFUNC(void, alphaModulate, 27, (float alpha), (this, alpha));   
     VFUNC(void, colorModulate, 28, (float r, float g, float b), (this, r, g, b));
-    VFUNC(void, colorModulate, 28, (Color color), (this, color.rDevided(), color.gDevided(), color.bDevided()));
+    VFUNC(void, colorModulate, 28, (Color color), (this, color.r(), color.g(), color.b()));
    /* void colorModulate(Color color)
     {
         colorModulate(color.rDevided(), color.gDevided(), color.bDevided());

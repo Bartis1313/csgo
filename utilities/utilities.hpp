@@ -45,4 +45,6 @@ namespace utilities
     } 
     _NODISCARD std::vector<std::string> splitStr(const std::string& str, char limit = ' ');
     _NODISCARD SHORT getKey(const UINT vKey);
+    // it's better to create thread with sleep, TODO: check hwnd by globals from main
+    _NODISCARD bool isValidWindow();
 }

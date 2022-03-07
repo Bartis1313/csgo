@@ -1,25 +1,9 @@
 #include "Color.hpp"
 #include "../dependencies/ImGui/imgui.h" // for struct
-#include <algorithm>
 
 float Rainbow::hue = 0.0f;
 
-Color::Color()
-{
-	setColor(255, 255, 255, 255);
-}
-
-Color::Color(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
-{
-	setColor(r, g, b, a);
-}
-
-Color::Color(const Color& clr, uint8_t a)
-{
-	setColor(clr.r(), clr.g(), clr.b(), a);
-}
-
-void Color::setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
+constexpr void Color::setColor(float r, float g, float b, float a)
 {
 	m_color.at(0) = r;
 	m_color.at(1) = g;
@@ -27,17 +11,17 @@ void Color::setColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a)
 	m_color.at(3) = a;
 }
 
-void Color::setAlpha(uint8_t a)
+constexpr void Color::setAlpha(float a)
 {
 	m_color.at(3) = a;
 }
 
-ImColor Color::getImguiColor(const Color& color)
+ImVec4 Color::getImguiColor(const Color& color)
 {
-	return ImColor{ color.rDevided(), color.gDevided(), color.bDevided(), color.aDevided() };
+	return ImVec4{ color.r(), color.g(), color.b(), color.a() };
 }
 
-Color& Color::getColorEditAlpha(const uint8_t amount)
+constexpr Color& Color::getColorEditAlpha(const float amount)
 {
 	m_color.at(3) = amount;
 	return *this;
@@ -46,58 +30,34 @@ Color& Color::getColorEditAlpha(const uint8_t amount)
 Color Color::fromHSB(float hue, float saturation, float brightness)
 {
 	float h = hue == 1.0f ? 0.0f : hue * 6.0f;
-	float f = h - static_cast<uint8_t>(h);
+	float f = h - h;
 	float p = brightness * (1.0f - saturation);
 	float q = brightness * (1.0f - saturation * f);
 	float t = brightness * (1.0f - (saturation * (1.0f - f)));
 
 	if (h < 1)
 	{
-		return Color(
-			static_cast<uint8_t>(brightness * 255.0f),
-			static_cast<uint8_t>(t * 255.0f),
-			static_cast<uint8_t>(p * 255.0f)
-		);
+		return Color(brightness, t, p);
 	}
 	else if (h < 2)
 	{
-		return Color(
-			static_cast<uint8_t>(q * 255.0f),
-			static_cast<uint8_t>(brightness * 255.0f),
-			static_cast<uint8_t>(p * 255.0f)
-		);
+		return Color(q, brightness, p);
 	}
 	else if (h < 3)
 	{
-		return Color(
-			static_cast<uint8_t>(p * 255.0f),
-			static_cast<uint8_t>(brightness * 255.0f),
-			static_cast<uint8_t>(t * 255.0f)
-		);
+		return Color(p, brightness, t);
 	}
 	else if (h < 4)
 	{
-		return Color(
-			static_cast<uint8_t>(p * 255.0f),
-			static_cast<uint8_t>(q * 255.0f),
-			static_cast<uint8_t>(brightness * 255.0f)
-		);
+		return Color(p, q, brightness);
 	}
 	else if (h < 5)
 	{
-		return Color(
-			static_cast<uint8_t>(t * 255.0f),
-			static_cast<uint8_t>(p * 255.0f),
-			static_cast<uint8_t>(brightness * 255.0f)
-		);
+		return Color(t, p, brightness);
 	}
 	else
 	{
-		return Color(
-			static_cast<uint8_t>(brightness * 255.0f),
-			static_cast<uint8_t>(p * 255.0f),
-			static_cast<uint8_t>(q * 255.0f)
-		);
+		return Color(brightness, p, q);
 	}
 }
 
@@ -131,48 +91,7 @@ Color Color::hslToRGB(float hue, float saturation, float lightness)
 		b = huetoRGB(p, q, hue - 1.0f / 3.0f);
 	}
 
-	return Color(
-		static_cast<uint8_t>(r * 255),
-		static_cast<uint8_t>(g * 255),
-		static_cast<uint8_t>(b * 255));
-}
-
-#undef max
-#undef min
-
-float Color::getHueFromColor(const Color& clr)
-{
-	float r = (std::clamp<int>(clr[0], 0, 255) / 255.0f);
-	float g = (std::clamp<int>(clr[1], 0, 255) / 255.0f);
-	float b = (std::clamp<int>(clr[2], 0, 255) / 255.0f);
-	float max = std::max(std::max(r, g), b);
-	float min = std::min(std::min(r, g), b);
-	float delta = max - min;
-
-	if (!delta)
-		return 0.0f;
-
-	float hue = 0.0f;
-
-	if (max == r)
-	{
-		hue = (g - b) / delta;
-	}
-	else if (max == g)
-	{
-		hue = 2.0f + (b - r) / delta;
-	}
-	else
-	{
-		hue = 4.0f + (r - g) / delta;
-	}
-
-	hue *= 60.0f;
-
-	if (hue < 0.0f)
-		hue += 360.0f;
-
-	return hue / 360.f;
+	return Color(r, g, b);
 }
 
 Color Rainbow::drawRainbow(float frameTime, float saturation, float alpha, float multiply)
@@ -181,4 +100,9 @@ Color Rainbow::drawRainbow(float frameTime, float saturation, float alpha, float
 	if (hue > 1.0f)
 		hue = 0.0f;
 	return Color::fromHSB(hue, saturation, alpha);
+}
+
+ImU32 U32(const Color& color)
+{
+	return ImGui::GetColorU32(Color::getImguiColor(color));
 }

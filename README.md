@@ -52,9 +52,8 @@ I can't compile
  </details>
 
 # Keybinds
- - ARROW UP/DOWN (Set current index of feature, it will highlight at as grey color)
- - ARROW RIGHT/LEFT (Vector - switches index of vector, Int - add/minus, Bool - ON/OFF)
- - INSERT (Close menu)
+ - INSERT (Close/open menu)
+ - DELETE (Panic key - shutdowns whole hack thread)
 
 # Issues or requests
 For now the cheat may have them many as during development my main goal is to learn how to write optimized and simple code
@@ -62,11 +61,14 @@ For now the cheat may have them many as during development my main goal is to le
 About requests, when I personally think the feature provided is alright,
 I will try to implement it in a short time perioid, eventually people who commit prs will be contributors
 
-# Ending Goals
-- More features, especially visual friendly
-- <del>Fix performance, to keep it very stable </del> done
-- Create custom UI, with quake looking set, starting from icons, ending on killfeed
-- <del>Add option to either use x88 style menu or dynamic gui wiritten with game's engine or even ImGui</del> done, not ImGui part
+# TODO (05 03 2022):
+- Fix/finish everything that is commented TODO or FIXME.
+- Make config enums to access globally by including vars.
+- Remove bloat includes, eg: currently the includes for classes are in headers rather than declaring the class/struct name in the header.
+- Use ImGui window to render any addon such as radar, plots, and maybe logger.
+- More features, especially visual friendly.
+- Create custom UI, with quake looking set, starting from icons, ending on killfeed.
+- Generally improve code quality.
 
 # Log
 <details>
@@ -99,6 +101,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.2.5 - Made surface GUI example to be working correctly. Added ImGui + freetype libraries, as it's next goal to use this GUI framework as example + solid rendering. Fixed code in few places, and removed oftently changed files from precompilation, which could lead to errors.
 * 1.2.6 - Added ImGui example, added ghetto fix for sendpacket, although it's not used. It's a temp fix. Made hooking even easier to use now.
 * 1.2.7 - Added ImGuiRender class which has a rich amount of functions, arguments are almost everywhere same as in surface rendering. GUI made with surface has been deleted aswell as x88 menu, if you need to know how was it done, search old repo commits. Cleaned up whole sdk and code in few places.
+* 1.2.8 - Fixed few rendering bugs. Added basic imgui menu, if you care for styling etc... go make a pull request so people can use it as some replacement. Keep in mind - any imgui addons that are not included in the lib should be made in imguiaddons.hpp at all. Color now has a different type, due to making it easier for floating points. You will still be able to use it as 0-255 range.
 </details>
 
 # Dependencies

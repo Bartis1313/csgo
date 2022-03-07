@@ -5,6 +5,24 @@
 #include "../math/math.hpp"
 #include <filesystem>
 
+enum FontFlags
+{
+	FONTFLAG_NONE,
+	FONTFLAG_ITALIC = 0x001,
+	FONTFLAG_UNDERLINE = 0x002,
+	FONTFLAG_STRIKEOUT = 0x004,
+	FONTFLAG_SYMBOL = 0x008,
+	FONTFLAG_ANTIALIAS = 0x010,
+	FONTFLAG_GAUSSIANBLUR = 0x020,
+	FONTFLAG_ROTARY = 0x040,
+	FONTFLAG_DROPSHADOW = 0x080,
+	FONTFLAG_ADDITIVE = 0x100,
+	FONTFLAG_OUTLINE = 0x200,
+	FONTFLAG_CUSTOM = 0x400,
+	FONTFLAG_BITMAP = 0x800,
+};
+
+
 unsigned long Render::__createFont(const char* fontName, const int size, const int weight, const unsigned long flags)
 {
 	auto result = interfaces::surface->fontCreate();
@@ -131,7 +149,7 @@ void Render::drawFilledCircle3D(const Vector& pos, const int radius, const int p
 
 	Vector screenStart = {};
 	float step = std::numbers::pi_v<float> *2.0f / points;
-	static Vector before = {};
+	Vector before = {};
 
 	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
 	{
@@ -402,7 +420,7 @@ void Render::drawBox3D(const std::array<Vector, 8>& box, const Color& color, boo
 	}
 
 	// anything with low alpha
-	Color fill{ color.r(), color.g(), color.b(), 30 };
+	Color fill{ color.rMultiplied(), color.gMultiplied(), color.bMultiplied(), 30 };
 
 	// lines to draw
 	std::array<Vector2D, SIZE> lines = {};
@@ -562,6 +580,7 @@ void Render::drawProgressRing(const int x, const int y, float radius, const int 
 */
 
 #include <ShlObj.h>
+#include "../../dependencies/ImGui/imgui.h"
 
 void ImGuiRender::init(ImGuiIO& io)
 {
@@ -602,42 +621,42 @@ void ImGuiRender::init(ImGuiIO& io)
 
 void ImGuiRender::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)
 {
-	m_drawing->AddLine({ x, y }, { x2, y2 }, U32(color), thickness);
+	m_drawData.emplace_back(DrawType::LINE, std::make_any<LineObject_t>(LineObject_t(ImVec2{ x, y }, ImVec2{ x2, y2 }, U32(color), thickness)));
 }
 
 void ImGuiRender::drawLine(const Vector2D& start, const Vector2D& end, const Color& color, const float thickness)
 {
-	m_drawing->AddLine({ start.x, start.y }, { end.x, end.y }, U32(color), thickness);
+	m_drawData.emplace_back(DrawType::LINE, std::make_any<LineObject_t>(LineObject_t(ImVec2{ start.x, start.y }, ImVec2{ end.x, end.y }, U32(color), thickness)));
 }
 
 void ImGuiRender::drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	m_drawing->AddRect({ x, y }, { x + w, y + h }, U32(color), 0.0f, flags, thickness);
+	m_drawData.emplace_back(DrawType::RECT, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h }, U32(color), 0.0f, flags, thickness)));
 }
 
 void ImGuiRender::drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags)
 {
-	m_drawing->AddRectFilled({ x, y }, { x + w, y + h }, U32(color), 0.0f, flags);
+	m_drawData.emplace_back(DrawType::RECT_FILLED, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h }, U32(color), 0.0f, flags)));
 }
 
 void ImGuiRender::drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	m_drawing->AddRect({ x, y }, { x + w, y + h }, U32(color), rounding, flags, thickness);
+	m_drawData.emplace_back(DrawType::RECT, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h }, U32(color), rounding, flags, thickness)));
 }
 
 void ImGuiRender::drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags)
 {
-	m_drawing->AddRectFilled({ x, y }, { x + w, y + h }, U32(color), rounding, flags);
+	m_drawData.emplace_back(DrawType::RECT_FILLED, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h }, U32(color), rounding, flags)));
 }
 
 void ImGuiRender::drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness)
 {
-	m_drawing->AddCircle({ x, y }, radius, U32(color), points, thickness);
+	m_drawData.emplace_back(DrawType::CIRCLE, std::make_any<CircleObject_t>(CircleObject_t(ImVec2{ x, y }, radius, points, U32(color), thickness)));
 }
 
 void ImGuiRender::drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color)
 {
-	m_drawing->AddCircleFilled({ x, y }, radius, U32(color), points);
+	m_drawData.emplace_back(DrawType::CIRCLE_FILLED, std::make_any<CircleObject_t>(CircleObject_t(ImVec2{ x, y }, radius, points, U32(color))));
 }
 
 void ImGuiRender::drawCircle3D(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
@@ -653,7 +672,7 @@ void ImGuiRender::drawCircle3D(const Vector& pos, const float radius, const int 
 			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
 	}
 
-	m_drawing->AddPolyline(pointsVec.data(), pointsVec.size(), U32(color), flags, thickness);
+	m_drawData.emplace_back(DrawType::CIRCLE_3D, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
 }
 
 void ImGuiRender::drawCircle3DTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
@@ -675,7 +694,7 @@ void ImGuiRender::drawCircle3DTraced(const Vector& pos, const float radius, cons
 			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
 	}
 
-	m_drawing->AddPolyline(pointsVec.data(), pointsVec.size(), U32(color), flags, thickness);
+	m_drawData.emplace_back(DrawType::CIRCLE_3D, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
 }
 
 void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
@@ -687,12 +706,11 @@ void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, cons
 	{
 		Vector point(radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z);
 
-		if (Vector screenStart; render.worldToScreen(point, screenStart))
-			pointsVec.emplace_back(ImVec2{ screenStart.x, screenStart.y });
+		if (Vector screenStart; imRender.worldToScreen(point, screenStart))
+			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
 	}
 
-	m_drawing->AddConvexPolyFilled(pointsVec.data(), pointsVec.size(), U32(color));
-	m_drawing->AddPolyline(pointsVec.data(), pointsVec.size(), U32(color), flags, thickness);
+	m_drawData.emplace_back(DrawType::CIRCLE_3D_FILLED, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
 }
 
 void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
@@ -714,77 +732,51 @@ void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius
 			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
 	}
 
-	m_drawing->AddConvexPolyFilled(pointsVec.data(), pointsVec.size(), U32(color));
-	m_drawing->AddPolyline(pointsVec.data(), pointsVec.size(), U32(color), flags, thickness);
+	m_drawData.emplace_back(DrawType::CIRCLE_3D_FILLED, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
 }
 
 void ImGuiRender::drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color, const float thickness)
 {
-	m_drawing->AddTriangle({ p1.x, p2.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color), thickness);
+	m_drawData.emplace_back(DrawType::TRIANGLE, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p2.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color), thickness)));
 }
 
 void ImGuiRender::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
 {
-	m_drawing->AddTriangleFilled({ p1.x, p2.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color));
+	m_drawData.emplace_back(DrawType::TRIANGLE_FILLED, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p2.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color))));
 }
 
 void ImGuiRender::drawTrapezian(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness)
 {
-	m_drawing->AddQuad({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color), thickness);
+	m_drawData.emplace_back(DrawType::QUAD, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color), thickness)));
 }
 
 void ImGuiRender::drawTrapezianFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
 {
-	m_drawing->AddQuadFilled({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color));
+	m_drawData.emplace_back(DrawType::QUAD_FILLED, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color))));
 }
 
 void ImGuiRender::drawPolyLine(const int count, ImVec2* verts, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	m_drawing->AddPolyline(verts, count, U32(color), flags, thickness);
+	m_drawData.emplace_back(DrawType::POLYGON, std::make_any<PolygonObject_t>(PolygonObject_t(count, verts, U32(color), flags, thickness)));
+}
+
+void ImGuiRender::drawPolyGon(const int count, ImVec2* verts, const Color& color)
+{
+	m_drawData.emplace_back(DrawType::POLYGON_FILLED, std::make_any<PolygonObject_t>(PolygonObject_t(count, verts, U32(color))));
 }
 
 void ImGuiRender::drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal)
 {
-	if (!horizontal)
-		m_drawing->AddRectFilledMultiColor({ x, y }, { x + w, y + h }, U32(first), U32(second), U32(second), U32(first));
-	else
-		m_drawing->AddRectFilledMultiColor({ x, y }, { x + w, y + h }, U32(first), U32(first), U32(second), U32(second));
+	m_drawData.emplace_back(DrawType::RECT_GRADIENT, std::make_any<RectObject_t>(RectObject_t({ x, y }, { x + w, y + h }, U32(first), U32(second), horizontal)));
 }
 
-void ImGuiRender::text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, FontFlags flags)
+void ImGuiRender::text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
 {
-	ImGuiWindow* window = ImGui::GetCurrentWindow();
-
-	Vector2D pos = { x, y };
-
-	m_drawing->PushTextureID(font->ContainerAtlas->TexID);
-
-	auto tsize = ImGui::CalcTextSize(text.c_str());
-
-	if (centered)
-		pos.x -= tsize.x / 2.0f;
-
-	Color outline = Color(0, 0, 0, color.a());
-
-	if (flags & FONTFLAG_OUTLINE)
-	{
-		m_drawing->AddText(font, font->FontSize, { pos.x + 1, pos.y + 1 }, U32(outline), text.c_str());
-		m_drawing->AddText(font, font->FontSize, { pos.x - 1, pos.y - 1 }, U32(outline), text.c_str());
-	}
-	else if (flags & FONTFLAG_DROPSHADOW)
-	{
-		m_drawing->AddText(font, font->FontSize, { pos.x + 1, pos.y - 1 }, U32(outline), text.c_str());
-	}
-
-	m_drawing->AddText(font, font->FontSize, { pos.x, pos.y }, U32(color), text.c_str());
-
-	m_drawing->PopTextureID();
+	m_drawData.emplace_back(DrawType::TEXT, std::make_any<TextObject_t>(TextObject_t(font, { x, y }, U32(color), text, dropShadow, centered)));
 }
 
-void ImGuiRender::text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, FontFlags flags)
+void ImGuiRender::text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow)
 {
-	Vector2D pos = { x, y };
-
 	std::string _text(text.length(), 0);
 	// because warning
 	std::transform(text.begin(), text.end(), _text.begin(), [](wchar_t wc)
@@ -792,31 +784,10 @@ void ImGuiRender::text(const float x, const float y, ImFont* font, const std::ws
 			return static_cast<char>(wc);
 		});
 
-	m_drawing->PushTextureID(font->ContainerAtlas->TexID);
-
-	auto tsize = ImGui::CalcTextSize(_text.c_str());
-
-	if (centered)
-		pos.x -= tsize.x / 2.0f;
-
-	Color outline = Color(0, 0, 0, color.a());
-
-	if (flags & FONTFLAG_OUTLINE)
-	{
-		m_drawing->AddText(font, font->FontSize, { pos.x + 1, pos.y + 1 }, U32(outline), _text.c_str());
-		m_drawing->AddText(font, font->FontSize, { pos.x - 1, pos.y - 1 }, U32(outline), _text.c_str());
-	}
-	else if (flags & FONTFLAG_DROPSHADOW)
-	{
-		m_drawing->AddText(font, font->FontSize, { pos.x + 1, pos.y - 1 }, U32(outline), _text.c_str());
-	}
-
-	m_drawing->AddText(font, font->FontSize, { pos.x, pos.y }, U32(color), _text.c_str());
-
-	m_drawing->PopTextureID();
+	m_drawData.emplace_back(DrawType::TEXT, std::make_any<TextObject_t>(TextObject_t(font, { x, y }, U32(color), _text, dropShadow, centered)));
 }
 
-void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, FontFlags flags, const char* fmt, ...)
+void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...)
 {
 	if (!fmt)
 		return;
@@ -834,7 +805,7 @@ void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool c
 	buf[sizeof(buf) - 1] = 0;
 	va_end(args);
 
-	text(x, y, font, buf, centered, color, flags);
+	text(x, y, font, buf, centered, color, dropShadow);
 }
 
 // FIXME: fix drawing 3d box for quads + filled
@@ -842,41 +813,36 @@ void ImGuiRender::drawBox3D(const std::array<Vector, 8>& box, const Color& color
 {
 	constexpr size_t SIZE = 8;
 	// transormed points to get pos.x/.y
-	std::array<Vector, SIZE> points = {};
+	std::array<Vector2D, SIZE> points = {};
 
 	for (size_t i = 0; i < box.size(); i++)
 	{
-		if (!render.worldToScreen(box.at(i), points.at(i)))
+		if (!imRender.worldToScreen(box.at(i), points.at(i)))
 			return;
 	}
 
 	// anything with low alpha
-	Color fill{ color.r(), color.g(), color.b(), 30 };
-
-	// lines to draw
-	std::array<Vector2D, SIZE> lines = {};
-	for (size_t i = 0; i < SIZE; i++)
-		lines.at(i) = { points.at(i).x, points.at(i).y };
+	Color fill{ color.rMultiplied(), color.gMultiplied(), color.bMultiplied(), 30 };
 
 	// bottom parts
 	for (int i = 0; i < 3; i++)
 	{
-		drawLine(lines.at(i), lines.at(i + 1), color, thickness);
+		drawLine(points.at(i), points.at(i + 1), color, thickness);
 	}
 	// missing part at the bottom
-	drawLine(lines.at(0), lines.at(3), color, thickness);
+	drawLine(points.at(0), points.at(3), color, thickness);
 	// top parts
 	for (int i = 4; i < 7; i++)
 	{
-		drawLine(lines.at(i), lines.at(i + 1), color, thickness);
+		drawLine(points.at(i), points.at(i + 1), color, thickness);
 	}
 	// missing part at the top
-	drawLine(lines.at(4), lines.at(7), color, thickness);
+	drawLine(points.at(4), points.at(7), color, thickness);
 
 	// now all 4 lines missing parts for 3d box
 	for (int i = 0; i < 4; i++)
 	{
-		drawLine(lines.at(i), lines.at(i + 4), color, thickness);
+		drawLine(points.at(i), points.at(i + 4), color, thickness);
 	}
 }
 
@@ -913,10 +879,30 @@ bool ImGuiRender::worldToScreen(const Vector& in, Vector& out)
 	return true;
 }
 
+bool ImGuiRender::worldToScreen(const Vector& in, Vector2D& out)
+{
+	static auto addr = utilities::patternScan(CLIENT_DLL, VIEW_MATRIX_CLIENT);
+	auto viewMatrix = *reinterpret_cast<uintptr_t*>(addr + 0x3) + 0xB0;
+
+	const auto& screenMatrix = *reinterpret_cast<VMatrix*>(viewMatrix);
+
+	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
+
+	if (w < 0.001f)
+		return false;
+
+	ImVec2 viewport = ImGui::GetIO().DisplaySize;
+
+	float inversed = 1.0f / w;
+	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
+	out.y = (viewport.y / 2.0f) - (0.5f * ((screenMatrix[1][0] * in.x + screenMatrix[1][1] * in.y + screenMatrix[1][2] * in.z + screenMatrix[1][3]) * inversed) * viewport.y + 0.5f);
+
+	return true;
+}
+
 void ImGuiRender::drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags)
 {
-	m_drawing->PathArcTo({ x, y }, radius, DEG2RAD(angleMin), DEG2RAD(angleMax), points);
-	m_drawing->PathStroke(U32(color), flags, thickness);
+	m_drawData.emplace_back(DrawType::ARC, std::make_any<ArcObject_t>(ArcObject_t({ x, y }, radius, DEG2RAD(angleMin), DEG2RAD(angleMax), points, U32(color), flags, thickness)));
 }
 
 void ImGuiRender::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
@@ -924,9 +910,158 @@ void ImGuiRender::drawProgressRing(const float x, const float y, const float rad
 	percent = std::clamp(percent, 0.0f, 100.0f);
 	float alfa = percent / 100.0f;
 
-	float maxAngle = std::numbers::pi_v<float> *2.0f * alfa;
+	float maxAngle = RAD2DEG(std::numbers::pi_v<float> *2.0f * alfa) + angleMin;
 
-	m_drawing->PathArcTo({ x, y }, radius, DEG2RAD(angleMin), maxAngle, points);
-	// prob should care if percent is a max value for flags arg
-	m_drawing->PathStroke(U32(color), flags, thickness);
+	m_drawData.emplace_back(DrawType::ARC, std::make_any<ArcObject_t>(ArcObject_t({ x, y }, radius, DEG2RAD(angleMin), DEG2RAD(maxAngle), points, U32(color), flags, thickness)));
+}
+
+void ImGuiRender::renderPresent(ImDrawList* draw)
+{
+	std::unique_lock<std::shared_mutex> lock(m_mutex);
+
+	if (m_drawDataSafe.empty())
+		return;
+
+	for (const auto& data : m_drawDataSafe)
+	{
+		if (!data.m_drawingObj.has_value())
+			continue;
+
+		switch (const auto val = data.m_drawingObj; data.m_type)
+		{
+		case DrawType::LINE:
+		{
+			const auto& obj = std::any_cast<LineObject_t>(val);
+			draw->AddLine(obj.m_start, obj.m_end, obj.m_color, obj.m_thickness);
+			break;
+		}
+		case DrawType::RECT:
+		{
+			const auto& obj = std::any_cast<RectObject_t>(val);
+			draw->AddRect(obj.m_min, obj.m_max, obj.m_color1, obj.m_rounding, obj.m_flags, obj.m_thickness);
+			break;
+		}
+		case DrawType::RECT_FILLED:
+		{
+			const auto& obj = std::any_cast<RectObject_t>(val);
+			draw->AddRectFilled(obj.m_min, obj.m_max, obj.m_color1, obj.m_rounding, obj.m_flags);
+			break;
+		}
+		case DrawType::RECT_GRADIENT: // FIXME: add possibility to draw multicolor gradient
+		{
+			const auto& obj = std::any_cast<RectObject_t>(val);
+
+			if (!obj.m_horizontal)
+				draw->AddRectFilledMultiColor(obj.m_min, obj.m_max, obj.m_color1, obj.m_color2, obj.m_color2, obj.m_color1);
+			else
+				draw->AddRectFilledMultiColor(obj.m_min, obj.m_max, obj.m_color1, obj.m_color1, obj.m_color2, obj.m_color2);
+
+			break;
+		}
+		case DrawType::CIRCLE:
+		{
+			const auto& obj = std::any_cast<CircleObject_t>(val);
+			draw->AddCircle(obj.m_centre, obj.m_radius, obj.m_color, obj.m_segments, obj.m_thickness);
+			break;
+		}
+		case DrawType::CIRCLE_FILLED:
+		{
+			const auto& obj = std::any_cast<CircleObject_t>(val);
+			draw->AddCircleFilled(obj.m_centre, obj.m_radius, obj.m_color, obj.m_segments);
+			break;
+		}
+		case DrawType::CIRCLE_3D:
+		{
+			const auto& obj = std::any_cast<CircleObject_t>(val);
+			draw->AddPolyline(obj.m_pointsVec.data(), obj.m_pointsVec.size(), obj.m_color, obj.m_flags, obj.m_thickness);
+			break;
+		}
+		case DrawType::CIRCLE_3D_FILLED:
+		{
+			const auto& obj = std::any_cast<CircleObject_t>(val);
+			draw->AddConvexPolyFilled(obj.m_pointsVec.data(), obj.m_pointsVec.size(), obj.m_color);
+			draw->AddPolyline(obj.m_pointsVec.data(), obj.m_pointsVec.size(), obj.m_color, obj.m_flags, obj.m_thickness);
+			break;
+		}
+		case DrawType::TRIANGLE:
+		{
+			const auto& obj = std::any_cast<TriangleObject_t>(val);
+			draw->AddTriangle(obj.m_p1, obj.m_p2, obj.m_p3, obj.m_color, obj.m_thickness);
+			break;
+		}
+		case DrawType::TRIANGLE_FILLED:
+		{
+			const auto& obj = std::any_cast<TriangleObject_t>(val);
+			draw->AddTriangleFilled(obj.m_p1, obj.m_p2, obj.m_p3, obj.m_color);
+			break;
+		}
+		case DrawType::QUAD:
+		{
+			const auto& obj = std::any_cast<QuadObject_t>(val);
+			draw->AddQuad(obj.m_p1, obj.m_p2, obj.m_p3, obj.m_p4, obj.m_color, obj.m_thickness);
+			break;
+		}
+		case DrawType::QUAD_FILLED:
+		{
+			const auto& obj = std::any_cast<QuadObject_t>(val);
+			draw->AddQuadFilled(obj.m_p1, obj.m_p2, obj.m_p3, obj.m_p4, obj.m_color);
+			break;
+		}
+		case DrawType::POLYGON:
+		{
+			const auto& obj = std::any_cast<PolygonObject_t>(val);
+			draw->AddPolyline(obj.m_verts, obj.m_count, obj.m_color, obj.m_flags, obj.m_thickness);
+			break;
+		}
+		case DrawType::POLYGON_FILLED:
+		{
+			const auto& obj = std::any_cast<PolygonObject_t>(val);
+			draw->AddConvexPolyFilled(obj.m_verts, obj.m_count, obj.m_color);
+			break;
+		}
+		case DrawType::TEXT:
+		{
+			const auto& obj = std::any_cast<TextObject_t>(val);
+			ImVec2 pos = { obj.m_pos.x, obj.m_pos.y };
+
+			ImGui::PushFont(obj.m_font);
+
+			if (auto tsize = ImGui::CalcTextSize(obj.m_text.c_str()); obj.m_centred)
+				pos.x -= tsize.x / 2.0f;
+
+			if (obj.m_dropShadow)
+			{
+				const auto alpha = ImGui::ColorConvertU32ToFloat4(obj.m_color).z;
+				Color outline = Color(0.0f, 0.0f, 0.0f, alpha);
+				draw->AddText({ pos.x + 1, pos.y + 1 }, U32(outline), obj.m_text.c_str());
+			}
+			draw->AddText(pos, obj.m_color, obj.m_text.c_str());
+
+			ImGui::PopFont();
+
+			break;
+		}
+		case DrawType::ARC:
+		{
+			const auto& obj = std::any_cast<ArcObject_t>(val);
+			draw->PathArcTo(obj.m_centre, obj.m_radius, obj.m_aMax, obj.m_aMax, obj.m_segments);
+			draw->PathStroke(obj.m_color, obj.m_flags, obj.m_thickness);
+			break;
+		}
+		default:
+			break;
+		}
+	}
+}
+
+void ImGuiRender::clearData()
+{
+	if (!m_drawData.empty())
+		m_drawData.clear();
+}
+
+void ImGuiRender::swapData()
+{
+	std::unique_lock<std::shared_mutex> lock(m_mutex);
+	m_drawData.swap(m_drawDataSafe);
 }

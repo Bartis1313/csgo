@@ -174,7 +174,7 @@ void esp::drawArmor(Player_t* ent, const Box& box)
 			box.h + 2,
 		};
 
-		Color armorCol = Color(0, armor * 1.4f, 250, 255); // light to blue, something simple
+		Color armorCol = Color(0, static_cast<int>(armor * 1.4f), 250, 255); // light to blue, something simple
 
 		imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
 		imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, armorCol);

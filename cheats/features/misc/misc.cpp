@@ -31,7 +31,8 @@ void misc::thirdperson()
 
 enum CrossHairTypes
 {
-	STATIC = 0,
+	OFF,
+	STATIC,
 	RECOIL,
 	ENGINE
 };
@@ -41,9 +42,9 @@ void misc::drawCrosshair()
 	int cfgCross = config.get<int>(vars.iCrosshair);
 
 	const static auto crosshair = interfaces::console->findVar(XOR("cl_crosshair_recoil"));
-	crosshair->setValue(cfgCross == ENGINE ? true : false);
+	crosshair->setValue(cfgCross == CrossHairTypes::ENGINE ? true : false);
 
-	if (cfgCross == -1)
+	if (!cfgCross)
 		return;
 
 	if (!game::localPlayer)

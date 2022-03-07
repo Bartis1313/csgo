@@ -1,4 +1,5 @@
 #include "config.hpp"
+#include "../dependencies/json.hpp"
 #include <shlobj.h>
 #include <stdexcept>
 #include <format>
@@ -42,9 +43,22 @@ Config::Config(const std::string& file, const std::string& folder)
 	: m_defaultName{ file }, m_folder{ folder }
 {}
 
-bool Config::save(const std::string& file)
+bool Config::save(const std::string& file, const bool forceSave)
 {
+	if (file.empty())
+	{
+		LOG(LOG_ERR, XOR("provided config name was empty"));
+		return false;
+	}
+
+	if (getPathForConfig(file).string() == getDefaultConfigName() && !forceSave)
+	{
+		LOG(LOG_ERR, XOR("provided config name was same as default"));
+		return false;
+	}
+
 	const auto toWrite = getPathForSave(getPathForConfig(file).string());
+
 	json config;
 
 	for (const auto& var : m_allVars)
@@ -71,7 +85,7 @@ bool Config::save(const std::string& file)
 		}
 		else if (std::holds_alternative<Color>(var.getType()))
 		{
-			auto col = var.getRef<Color>();
+			auto col = var.get<Color>();
 
 			json arr =
 			{
@@ -85,7 +99,7 @@ bool Config::save(const std::string& file)
 		}
 		else if (std::holds_alternative<std::vector<bool>>(var.getType()))
 		{
-			auto vec = var.getRef<std::vector<bool>>();
+			auto vec = var.get<std::vector<bool>>();
 
 			json arr;
 
@@ -166,10 +180,10 @@ bool Config::load(const std::string& file)
 
 			entry.set(
 				Color(
-					parsed.at(0).get<uint8_t>(),
-					parsed.at(1).get<uint8_t>(),
-					parsed.at(2).get<uint8_t>(),
-					parsed.at(3).get<uint8_t>()
+					parsed.at(0).get<float>(),
+					parsed.at(1).get<float>(),
+					parsed.at(2).get<float>(),
+					parsed.at(3).get<float>()
 				)
 			);
 		}
@@ -236,7 +250,7 @@ bool Config::init()
 	{
 		LOG(LOG_INFO, std::format(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
 
-		if (!save(getDefaultConfigName()))
+		if (!save(getDefaultConfigName(), true))
 			return false;
 	}
 
@@ -269,7 +283,7 @@ void Config::reload()
 std::filesystem::path Config::getHacksPath() const
 {
 #ifdef _DEBUG
-	// if possible to get the path, if so, return it
+// if possible to get the path, if so, return it
 	if (CHAR documents[MAX_PATH]; SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
 	{
 		std::filesystem::path toReturn;
@@ -300,7 +314,10 @@ void Config::deleteCfg(const std::string& file)
 	auto path = getPathForConfig(file);
 
 	if (path.string() == m_defaultConfig)
+	{
 		LOG(LOG_ERR, XOR("Can't delete default config"));
+		return;
+	}
 
 	if (auto toDel = getPathForSave(path.string()); std::filesystem::remove(toDel))
 		LOG(LOG_INFO, std::format(XOR("Removed config {}"), toDel.filename().string()));

@@ -108,10 +108,11 @@ void world::drawBomb(Entity_t* ent)
 		imRender.text(box.x, box.y, ImFonts::tahoma, XOR("Planted Bomb"), false, config.get<Color>(vars.cDrawBomb));
 	}
 
-	uint8_t r = static_cast<uint8_t>(255.0f - bombtime / tickbomb * 255.0f);
-	uint8_t g = static_cast<uint8_t>(bombtime / tickbomb * 255.0f);
+	float r = (255.0f - bombtime / tickbomb * 255.0f);
+	float g = (bombtime / tickbomb * 255.0f);
 
-	imRender.text(5, 800, ImFonts::tahoma, isSafe ? std::format(XOR("TIME {:.2f} DMG {:.2f} SAFE"), bombtime, dmg) : std::format(XOR("TIME {:.2f} DMG {:.2f} YOU DIE"), bombtime, dmg), false, Color{ r, g, 0, 200 });
+	imRender.text(5, 800, ImFonts::tahoma, isSafe ? std::format(XOR("TIME {:.2f} DMG {:.2f} SAFE"), bombtime, dmg) : std::format(XOR("TIME {:.2f} DMG {:.2f} YOU DIE"), bombtime, dmg), false,
+		Color{ static_cast<int>(r), static_cast<int>(g), 0, 200 });
 }
 
 

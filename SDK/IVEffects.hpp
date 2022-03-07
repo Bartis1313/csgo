@@ -24,7 +24,7 @@ private:
 			: r{ _r }, g{ _g }, b{ _b }
 		{}
 		DColor(const Color& clr)
-			: r{ clr.r() }, g{ clr.g() }, b{ clr.b() }
+			: r{ clr.rMultiplied() }, g{ clr.gMultiplied() }, b{ clr.bMultiplied() }
 		{}
 
 		uint8_t r, g, b;
