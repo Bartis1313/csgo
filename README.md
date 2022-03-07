@@ -1,7 +1,7 @@
 # Csgo
 Very short and commented source aimed for legit gameplay
 
-![Bartis internal CSGO](https://imgur.com/QwPgxMp.jpg)
+![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/157115029-a0fa00b7-4148-477e-aae1-7d25c541ab93.png)
 
 # Information
 In development, not every feature may work perfectly.
