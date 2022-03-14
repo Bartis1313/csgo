@@ -4,8 +4,6 @@
 class IEffects
 {
 public:
-	virtual ~IEffects() {};
-
 	VFUNC(void, beam, 1,
 		(const Vector& start, const Vector& end, int modelIndex,
 			int haloIndex, unsigned char frameStart, unsigned char frameRate,
