@@ -13,7 +13,6 @@ void paintHandle()
 {
 	esp::run();
 	world::drawMisc();
-	radar::run();
 	misc::drawLocalInfo();
 	misc::drawFpsPlot();
 	misc::drawVelocityPlot();
@@ -22,6 +21,7 @@ void paintHandle()
 	misc::drawNoScope();
 	misc::drawCrosshair();
 	legitbot::drawFov();
+	world::drawMovementTrail();
 }
 
 // run current screensize

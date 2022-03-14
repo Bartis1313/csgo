@@ -56,7 +56,7 @@ void renderAimbot()
 	// using columns, it will be easier, imgui by default recommends begintable(), but in this case columns do stuff like padding each column for us.
 	ImGui::Columns(1, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("aimbot.main"), {}, true))
+		if (ImGui::BeginChild(XOR("aimbot.main"), {}, true), ImGuiWindowFlags_AlwaysAutoResize)
 		{
 			ImGui::BeginGroupPanel(XOR("Aimbot general"), { -1.0f, 0.0f });
 			{
@@ -98,7 +98,7 @@ void renderVisuals()
 {
 	ImGui::Columns(2, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("visuals"), {}, true))
+		if (ImGui::BeginChild(XOR("visuals"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::BeginGroupPanel(XOR("Players"));
 			{
@@ -144,7 +144,7 @@ void renderVisuals()
 	}
 	ImGui::NextColumn();
 	{
-		if (ImGui::BeginChild("wpns", {}, true))
+		if (ImGui::BeginChild("wpns", {}, true, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::BeginGroupPanel(XOR("Weapons"));
 			{
@@ -203,7 +203,7 @@ void renderMisc()
 {
 	ImGui::Columns(2, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("Misc"), {}, true))
+		if (ImGui::BeginChild(XOR("Misc"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::BeginGroupPanel(XOR("Misc"));
 			{
@@ -235,7 +235,10 @@ void renderMisc()
 				ImGui::Text(XOR("Players"));
 				ImGui::SliderFloat(XOR("Thickness"), &config.getRef<float>(vars.fRadarThickness), 0.0f, 20.0f);
 				ImGui::SliderFloat(XOR("Length"), &config.getRef<float>(vars.fRadarLenght), 0.0f, 40.0f);
-				ImGui::SliderFloat(XOR("Scale"), &config.getRef<float>(vars.fRadarThickness), 0.0f, 10.0f);
+				ImGui::SliderFloat(XOR("Scale"), &config.getRef<float>(vars.fRadarScale), 0.0f, 10.0f);
+				ImGui::Checkbox(XOR("Draw out of radar"), &config.getRef<bool>(vars.bRadarRanges));
+				ImGui::SameLine();
+				ImGui::HelpMarker(XOR("If enemy is out of the radar\nThen icons will still appear but clamped"));
 			}
 			ImGui::EndGroupPanel();
 
@@ -244,7 +247,7 @@ void renderMisc()
 	}
 	ImGui::NextColumn();
 	{
-		if (ImGui::BeginChild(XOR("Miscother"), {}, true))
+		if (ImGui::BeginChild(XOR("Miscother"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::BeginGroupPanel(XOR("Misc other"));
 			{
@@ -258,6 +261,26 @@ void renderMisc()
 				ImGui::Checkbox(XOR("FPS Plot"), &config.getRef<bool>(vars.bShowFpsPlot));
 				ImGui::Checkbox(XOR("Velocity Plot"), &config.getRef<bool>(vars.bShowVelocityPlot));
 				ImGui::Checkbox(XOR("Draw misc info"), &config.getRef<bool>(vars.bDrawMiscInfo));
+				bool& tref = config.getRef<bool>(vars.bRunMovementTrail);
+				ImGui::Checkbox(XOR("Movement trail"), &tref);
+				if (tref)
+				{
+					bool& rref = config.getRef<bool>(vars.bMovementRainbow);
+					ImGui::Checkbox(XOR("Run rainbow"), &rref);
+					{
+						if (!rref)
+						{
+							ImGui::SameLine();
+							ImGui::ColorPicker(XOR("Movement trail color"), &config.getRef<Color>(vars.cMovementTrail), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+						}
+						else
+						{
+							ImGui::SliderFloat(XOR("Rainbow speed"), &config.getRef<float>(vars.fMovementRainbowSpeed), 0.2f, 10.0f);
+						}
+						ImGui::SliderFloat(XOR("Trail speed"), &config.getRef<float>(vars.fMovementBeamSpeed), 1.0f, 10.0f);
+						ImGui::SliderFloat(XOR("Trail life"), &config.getRef<float>(vars.fMovementLife), 1.0f, 10.0f);
+					}
+				}
 			}
 			ImGui::EndGroupPanel();
 
@@ -278,7 +301,7 @@ void renderConfig()
 
 	ImGui::Columns(1, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("cfg"), {}, true))
+		if (ImGui::BeginChild(XOR("cfg"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			ImGui::BeginGroupPanel(XOR("Config"));
 			{
@@ -300,7 +323,7 @@ void renderConfig()
 				ImGui::SameLine();
 				if (ImGui::Button(XOR("Save")))
 				{
-					config.save(allcfg.at(currentcfg));
+					config.save(allcfg.at(currentcfg), true);
 				}
 				ImGui::SameLine();
 				if (ImGui::Button(XOR("Load")))
@@ -328,23 +351,32 @@ std::array tabs =
 };
 #pragma endregion
 
+#include "../../../dependencies/ImGui/imgui_internal.h"
+
 void ImGuiMenu::draw()
 {
 	if (isMenuActive)
 	{
 		if (ImGui::Begin(XOR("csgo legit"), &isMenuActive, ImGuiWindowFlags_NoCollapse))
 		{
-			ImGui::PushStyleColor(ImGuiCol_TabActive, IM_COL32(0, 0, 0, 0));
-			ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, IM_COL32(0, 0, 0, 0));
+			ImGuiStyle& style = ImGui::GetStyle();
+			ImVec2 backupPadding = style.FramePadding;
+			float width = ImGui::GetCurrentWindow()->Size.x;
+
+			// remove tab underline
+			ImGui::PushStyleColor(ImGuiCol_TabActive, U32(Colors::Blank));
+			ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, U32(Colors::Blank));
 
 			if (ImGui::BeginTabBar(XOR("tabbar")))
 			{
+				style.FramePadding = { width / tabs.size(), backupPadding.y }; // still this is clamped by imgui in tabs
 				ImGui::PopStyleColor();
 				ImGui::PopStyleColor();
 				for (const auto& el : tabs)
 				{
 					if (ImGui::BeginTabItem(el.m_name))
 					{
+						style.FramePadding = backupPadding;
 						if (el.funcExist())
 							el.m_func();
 

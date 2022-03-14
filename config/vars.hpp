@@ -15,6 +15,7 @@
 #define CONFIG_ADD_VEC(type, name, amount, defVal, nameSave) \
 	const size_t name = config.addVar<std::vector<type>>(utilities::getFilledVec<type, amount>(defVal), XOR(nameSave));
 
+#pragma region vars
 struct Variables
 {
 
@@ -117,5 +118,58 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fRadarThickness, 5.0f, "radar thickness");
 	CONFIG_ADD_VARIABLE(float, fRadarLenght, 20.0f, "radar lenght of line");
 	CONFIG_ADD_VARIABLE(float, fRadarScale, 1.8f, "radar scaling");
+	CONFIG_ADD_VARIABLE(bool, bRadarRanges, true, "enable radar ranges");
+	CONFIG_ADD_VARIABLE(bool, bRunMovementTrail, false, "enable movement trail line");
+	CONFIG_ADD_VARIABLE(Color, cMovementTrail, Colors::Coral, "movement trail color");
+	CONFIG_ADD_VARIABLE(bool, bMovementRainbow, false, "prefer rainbow color for trail");
+	CONFIG_ADD_VARIABLE(float, fMovementRainbowSpeed, 3.0f, "speed of color change (movement trail)");
+	CONFIG_ADD_VARIABLE(float, fMovementBeamSpeed, 2.0f, "speed of beam movement");
+	CONFIG_ADD_VARIABLE(float, fMovementLife, 4.0f, "life of beam movement");
 
 } inline vars;
+#pragma endregion
+
+#pragma region enums
+enum class AimbotID : int
+{
+	NEAREST = 0,
+	HEAD,
+	CHEST
+};
+
+enum class CrossHairTypes : int
+{
+	OFF,
+	STATIC,
+	RECOIL,
+	ENGINE
+};
+
+enum class ChamsID : int
+{
+	STATIC = 1,
+	XYZ,
+};
+
+enum class BTChamsID : int
+{
+	STABLE = 1,
+	LAST_TICK,
+	RAINBOW,
+};
+
+enum class HandTypes : int
+{
+	COLOR = 0,
+	NO_HANDS,
+	NO_WEAPON,
+};
+
+enum class BoxTypes : int
+{
+	BOX2D = 0,
+	FILLED2D,
+	BOX3D,
+	FILLED3D
+};
+#pragma endregion

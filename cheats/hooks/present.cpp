@@ -5,6 +5,8 @@
 #include "../menu/GUI-ImGui/menu.hpp"
 #include "../../utilities/renderer/renderer.hpp"
 
+#include "../features/visuals/radar.hpp"
+
 long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {
 	// check if there is any context, needed when shutdown
@@ -35,6 +37,7 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 	{
 		ImGuiMenu::draw();
 		imRender.renderPresent(ImGui::GetBackgroundDrawList());
+		radar::run();
 	}
 
 	// END DRAW

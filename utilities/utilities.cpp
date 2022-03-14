@@ -6,6 +6,7 @@
 #include <sstream>
 #include <algorithm>
 #include <chrono>
+#include <numeric>
 
 #undef max
 #undef min
@@ -72,7 +73,7 @@ bool utilities::getBox(Entity_t* ent, Box& box)
 	const auto& min = col->OBBMins();
 	const auto& max = col->OBBMaxs();
 
-	std::array<Vector, 8> points =
+	std::array points =
 	{
 		Vector(min.x, min.y, min.z),
 		Vector(min.x, max.y, min.z),
@@ -94,7 +95,7 @@ bool utilities::getBox(Entity_t* ent, Box& box)
 	float right = -std::numeric_limits<float>::max();
 	float bottom = -std::numeric_limits<float>::max();
 
-	std::array<Vector, 8> screen = {};
+	std::array<Vector2D, 8> screen = {};
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -111,6 +112,52 @@ bool utilities::getBox(Entity_t* ent, Box& box)
 	box.y = top;
 	box.w = right - left;
 	box.h = bottom - top;
+
+	return true;
+}
+
+bool utilities::getBox3D(Entity_t* ent, Box3D& box)
+{
+	const auto col = ent->collideable();
+	if (!col)
+		return false;
+
+	const auto& min = col->OBBMins();
+	const auto& max = col->OBBMaxs();
+
+	std::array points =
+	{
+		Vector(min.x, min.y, min.z),
+		Vector(min.x, max.y, min.z),
+		Vector(max.x, max.y, min.z),
+		Vector(max.x, min.y, min.z),
+		Vector(min.x, min.y, max.z),
+		Vector(min.x, max.y, max.z),
+		Vector(max.x, max.y, max.z),
+		Vector(max.x, min.y, max.z)
+	};
+
+	if (!points.data())
+		return false;
+
+	const auto& tranFrame = ent->m_rgflCoordinateFrame();
+
+	std::array<Vector2D, 8> screen = {};
+
+	for (int i = 0; i < 8; i++)
+	{
+		if (!imRender.worldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
+			return false;
+
+		box.points.at(i) = screen.at(i); // get all 3D points
+	}
+
+	// get important points, eg: if you use 3d box, you want to render health by quads, not rects
+
+	box.topleft = screen.at(7);
+	box.topright = screen.at(6);
+	box.bottomleft = screen.at(3);
+	box.bottomright = screen.at(2);
 
 	return true;
 }
@@ -168,7 +215,7 @@ std::string utilities::getKeyName(const UINT virtualKey)
 	if (char keyName[50]; GetKeyNameTextA(scanCode << 16, keyName, sizeof(keyName)) != 0)
 	{
 		return keyName;
-}
+	}
 	else
 	{
 		return XOR("[None]");
@@ -186,7 +233,7 @@ std::string utilities::getKeyName(const UINT virtualKey)
 }
 
 std::string utilities::toLowerCase(const std::string& str)
-{	
+{
 	std::string result = str;
 	std::for_each(result.begin(), result.end(), [](char& el)
 		{

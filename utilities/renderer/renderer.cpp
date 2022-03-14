@@ -697,7 +697,7 @@ void ImGuiRender::drawCircle3DTraced(const Vector& pos, const float radius, cons
 	m_drawData.emplace_back(DrawType::CIRCLE_3D, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
 }
 
-void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
 	float step = std::numbers::pi_v<float> *2.0f / points;
 
@@ -710,10 +710,10 @@ void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, cons
 			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
 	}
 
-	m_drawData.emplace_back(DrawType::CIRCLE_3D_FILLED, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
+	m_drawData.emplace_back(DrawType::CIRCLE_3D_FILLED, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), U32(outline), flags, thickness)));
 }
 
-void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
 	float step = std::numbers::pi_v<float> *2.0f / points;
 
@@ -732,7 +732,7 @@ void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius
 			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
 	}
 
-	m_drawData.emplace_back(DrawType::CIRCLE_3D_FILLED, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
+	m_drawData.emplace_back(DrawType::CIRCLE_3D_FILLED, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), U32(outline), flags, thickness)));
 }
 
 void ImGuiRender::drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color, const float thickness)
@@ -745,12 +745,12 @@ void ImGuiRender::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, con
 	m_drawData.emplace_back(DrawType::TRIANGLE_FILLED, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p2.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color))));
 }
 
-void ImGuiRender::drawTrapezian(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness)
+void ImGuiRender::drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness)
 {
 	m_drawData.emplace_back(DrawType::QUAD, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color), thickness)));
 }
 
-void ImGuiRender::drawTrapezianFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
+void ImGuiRender::drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
 {
 	m_drawData.emplace_back(DrawType::QUAD_FILLED, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color))));
 }
@@ -806,44 +806,6 @@ void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool c
 	va_end(args);
 
 	text(x, y, font, buf, centered, color, dropShadow);
-}
-
-// FIXME: fix drawing 3d box for quads + filled
-void ImGuiRender::drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled, const float thickness)
-{
-	constexpr size_t SIZE = 8;
-	// transormed points to get pos.x/.y
-	std::array<Vector2D, SIZE> points = {};
-
-	for (size_t i = 0; i < box.size(); i++)
-	{
-		if (!imRender.worldToScreen(box.at(i), points.at(i)))
-			return;
-	}
-
-	// anything with low alpha
-	Color fill{ color.rMultiplied(), color.gMultiplied(), color.bMultiplied(), 30 };
-
-	// bottom parts
-	for (int i = 0; i < 3; i++)
-	{
-		drawLine(points.at(i), points.at(i + 1), color, thickness);
-	}
-	// missing part at the bottom
-	drawLine(points.at(0), points.at(3), color, thickness);
-	// top parts
-	for (int i = 4; i < 7; i++)
-	{
-		drawLine(points.at(i), points.at(i + 1), color, thickness);
-	}
-	// missing part at the top
-	drawLine(points.at(4), points.at(7), color, thickness);
-
-	// now all 4 lines missing parts for 3d box
-	for (int i = 0; i < 4; i++)
-	{
-		drawLine(points.at(i), points.at(i + 4), color, thickness);
-	}
 }
 
 ImVec2 ImGuiRender::getTextSize(ImFont* font, const std::string& text)
@@ -917,7 +879,7 @@ void ImGuiRender::drawProgressRing(const float x, const float y, const float rad
 
 void ImGuiRender::renderPresent(ImDrawList* draw)
 {
-	std::unique_lock<std::shared_mutex> lock(m_mutex);
+	std::unique_lock<std::shared_mutex> lock{ m_mutex };
 
 	if (m_drawDataSafe.empty())
 		return;
@@ -980,7 +942,7 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 		{
 			const auto& obj = std::any_cast<CircleObject_t>(val);
 			draw->AddConvexPolyFilled(obj.m_pointsVec.data(), obj.m_pointsVec.size(), obj.m_color);
-			draw->AddPolyline(obj.m_pointsVec.data(), obj.m_pointsVec.size(), obj.m_color, obj.m_flags, obj.m_thickness);
+			draw->AddPolyline(obj.m_pointsVec.data(), obj.m_pointsVec.size(), obj.m_outline, obj.m_flags, obj.m_thickness);
 			break;
 		}
 		case DrawType::TRIANGLE:
@@ -1062,6 +1024,66 @@ void ImGuiRender::clearData()
 
 void ImGuiRender::swapData()
 {
-	std::unique_lock<std::shared_mutex> lock(m_mutex);
+	std::unique_lock<std::shared_mutex> lock{ m_mutex };
 	m_drawData.swap(m_drawDataSafe);
+}
+
+// DRAWING HELPER WRAPPER
+
+#define RUNTIME_CHECK assert(m_drawing && "Did you call ImGuiRenderWindow::addList() ?")
+
+void ImGuiRenderWindow::addList()
+{
+	m_drawing = ImGui::GetWindowDrawList();
+	m_pos = ImGui::GetCursorScreenPos();
+	auto limits = ImGui::GetContentRegionAvail(); // limits for width & height
+	m_rect = { limits.x, limits.y };
+}
+
+void ImGuiRenderWindow::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)
+{
+	RUNTIME_CHECK;
+	m_drawing->AddLine({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x2, m_pos.y + y2 }, U32(color), thickness);
+}
+
+void ImGuiRenderWindow::drawLine(const Vector2D& start, const Vector2D& end, const Color& color, const float thickness)
+{
+	RUNTIME_CHECK;
+	m_drawing->AddLine({ m_pos.x + start.x, m_pos.y + start.y }, { m_pos.x + end.x, m_pos.y + end.y }, U32(color), thickness);
+}
+
+void ImGuiRenderWindow::drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags, const float thickness)
+{
+	RUNTIME_CHECK;
+	m_drawing->AddRect({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x + w, m_pos.y + y + h }, U32(color), 0.0f, flags, thickness);
+}
+
+void ImGuiRenderWindow::drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags)
+{
+	RUNTIME_CHECK;
+	m_drawing->AddRectFilled({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x + w, m_pos.y + y + h }, U32(color), 0.0f, flags);
+}
+
+void ImGuiRenderWindow::drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags, const float thickness)
+{
+	RUNTIME_CHECK;
+	m_drawing->AddRect({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x + w, m_pos.y + y + h }, U32(color), rounding, flags, thickness);
+}
+
+void ImGuiRenderWindow::drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags)
+{
+	RUNTIME_CHECK;
+	m_drawing->AddRectFilled({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x + w, m_pos.y + y + h }, U32(color), rounding, flags);
+}
+
+void ImGuiRenderWindow::drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness)
+{
+	RUNTIME_CHECK;
+	m_drawing->AddCircle({ m_pos.x + x, m_pos.y + y }, radius, U32(color), points, thickness);
+}
+
+void ImGuiRenderWindow::drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color)
+{
+	RUNTIME_CHECK;
+	m_drawing->AddCircleFilled({ m_pos.x + x, m_pos.y + y }, radius, U32(color), points);
 }

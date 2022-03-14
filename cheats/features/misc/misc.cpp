@@ -29,20 +29,12 @@ void misc::thirdperson()
 	interfaces::input->m_cameraOffset.z = 220.0f;
 }
 
-enum CrossHairTypes
-{
-	OFF,
-	STATIC,
-	RECOIL,
-	ENGINE
-};
-
 void misc::drawCrosshair()
 {
 	int cfgCross = config.get<int>(vars.iCrosshair);
 
 	const static auto crosshair = interfaces::console->findVar(XOR("cl_crosshair_recoil"));
-	crosshair->setValue(cfgCross == CrossHairTypes::ENGINE ? true : false);
+	crosshair->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
 
 	if (!cfgCross)
 		return;
@@ -63,7 +55,7 @@ void misc::drawCrosshair()
 
 	switch (cfgCross)
 	{
-	case STATIC:
+	case E2T(CrossHairTypes::STATIC):
 		// -1 for y because elselike it will be not aligned
 		// imo the best is to always throw w,h as odd num
 		imRender.drawRectFilled(x - 5, y - 1, 11, 3, Colors::Black);
@@ -72,7 +64,7 @@ void misc::drawCrosshair()
 		imRender.drawLine(x - 4, y, x + 5, y, Colors::LightBlue);
 		imRender.drawLine(x, y + 4, x, y - 5, Colors::LightBlue);
 		break;
-	case RECOIL:
+	case E2T(CrossHairTypes::RECOIL):
 	{
 		Vector vAngles;
 		interfaces::engine->getViewAngles(vAngles);

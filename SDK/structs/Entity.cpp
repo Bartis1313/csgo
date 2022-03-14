@@ -265,7 +265,7 @@ int Player_t::getPing()
 	return 0;
 }
 
-bool Player_t::isPossibleToSee(Player_t* ent, const Vector& pos)
+bool Player_t::isPossibleToSee(const Vector& pos)
 {
 	Trace_t tr;
 	TraceFilter filter;
@@ -281,3 +281,11 @@ uintptr_t Player_t::getLiteralAddress()
 }
 
 ////////////////////////////////////////////////////////////////
+
+Vector Inferno_t::getInfernoPos(size_t indexFire)
+{
+	return Vector{
+		static_cast<float>(m_fireXDelta()[indexFire]),
+		static_cast<float>(m_fireYDelta()[indexFire]),
+		static_cast<float>(m_fireZDelta()[indexFire]) };
+}

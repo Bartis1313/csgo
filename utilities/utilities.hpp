@@ -4,9 +4,11 @@
 #include "console/console.hpp"
 #include <string>
 #include <vector>
+#include <utility>
 
 class Entity_t;
 struct Box;
+struct Box3D;
 
 #define SECURE
 
@@ -23,6 +25,9 @@ struct Box;
 
 // logs: into console, into log and into game's console
 inline void LOG(const short type, const std::string& str) { console::log(type, str); }
+// enum to type
+template<typename T>
+_NODISCARD constexpr auto E2T(T en) { return static_cast<std::underlying_type_t<T>>(en); }
 
 namespace utilities
 {
@@ -31,6 +36,7 @@ namespace utilities
     _NODISCARD uintptr_t patternScan(const std::string& mod, const std::string& mask);
     // https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bounding_ESP_Boxes
     _NODISCARD bool getBox(Entity_t* ent, Box& box);
+    _NODISCARD bool getBox3D(Entity_t* ent, Box3D& box);
     _NODISCARD size_t inByteOrder(const size_t netLong);
     _NODISCARD std::string getKeyName(const UINT virtualKey);
     _NODISCARD std::string toLowerCase(const std::string& str);

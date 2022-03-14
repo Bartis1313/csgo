@@ -61,9 +61,8 @@ For now the cheat may have them many as during development my main goal is to le
 About requests, when I personally think the feature provided is alright,
 I will try to implement it in a short time perioid, eventually people who commit prs will be contributors
 
-# TODO (05 03 2022):
+# TODO:
 - Fix/finish everything that is commented TODO or FIXME.
-- Make config enums to access globally by including vars.
 - Remove bloat includes, eg: currently the includes for classes are in headers rather than declaring the class/struct name in the header.
 - Use ImGui window to render any addon such as radar, plots, and maybe logger.
 - More features, especially visual friendly.
@@ -102,13 +101,13 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.2.6 - Added ImGui example, added ghetto fix for sendpacket, although it's not used. It's a temp fix. Made hooking even easier to use now.
 * 1.2.7 - Added ImGuiRender class which has a rich amount of functions, arguments are almost everywhere same as in surface rendering. GUI made with surface has been deleted aswell as x88 menu, if you need to know how was it done, search old repo commits. Cleaned up whole sdk and code in few places.
 * 1.2.8 - Fixed few rendering bugs. Added basic imgui menu, if you care for styling etc... go make a pull request so people can use it as some replacement. Keep in mind - any imgui addons that are not included in the lib should be made in imguiaddons.hpp at all. Color now has a different type, due to making it easier for floating points. You will still be able to use it as 0-255 range.
+* 1.2.9 - Few fixes in some places, nothing really big. I will start making commits comments a bit better from now on, more detailed.
 </details>
 
 # Dependencies
 * [minhook](https://github.com/TsudaKageyu/minhook)
 * [lazy importer](https://github.com/JustasMasiulis/lazy_importer)
 * [xorstr](https://github.com/JustasMasiulis/xorstr)
-* [lodepng](https://github.com/lvandeve/lodepng)
 * [json](https://github.com/nlohmann/json)
 * [ImGui](https://github.com/ocornut/imgui)
 

@@ -16,4 +16,6 @@ namespace world
 	void drawSmokeTimer(Entity_t* ent);
 	void drawMolotovTimer(Entity_t* ent);
 	void drawZeusRange();
+
+	void drawMovementTrail();
 }

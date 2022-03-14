@@ -1,21 +1,10 @@
 #pragma once
 #include <cstdint>
 #include <array>
+#include <stdexcept>
 
 using ImU32 = unsigned int;
 struct ImVec4;
-
-class Color;
-// 0-255 & 1byte type
-struct SDKColor
-{
-	SDKColor() = default;
-	SDKColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
-		: r{ r }, g{ g }, b{ b }, a{ a }
-	{}
-
-	uint8_t r, g, b, a;
-};
 
 // 0.0 - 1.0, you can pass ints as 0-255 though
 class Color
@@ -31,8 +20,9 @@ public:
 		setColor(r / 255.0f, g / 255.0f, b / 255.0f, a / 255.0f);
 	}
 
-	constexpr void setColor(float r, float g, float b, float a = 1.0f);
-	constexpr void setAlpha(float a);
+	constexpr void setColor(float r, float g, float b, float a = 1.0f) { m_color.at(0) = r; m_color.at(1) = g; m_color.at(2) = b; m_color.at(3) = a; }
+	constexpr void setAlpha(float a) { m_color.at(3) = a; }
+	constexpr void setAlphaInt(int a) { m_color.at(3) = a / 255.0f; }
 
 	_NODISCARD constexpr float r() const { return m_color.at(0); }
 	_NODISCARD constexpr float g() const { return m_color.at(1); }
@@ -41,7 +31,7 @@ public:
 
 	_NODISCARD static ImVec4 getImguiColor(const Color& color);
 	// edits alpha
-	_NODISCARD constexpr Color& getColorEditAlpha(const float amount);
+	_NODISCARD Color& getColorEditAlpha(const float amount);
 
 	_NODISCARD constexpr uint8_t rMultiplied() const { return static_cast<uint8_t>(m_color.at(0) * 255.0f); }
 	_NODISCARD constexpr uint8_t gMultiplied() const { return static_cast<uint8_t>(m_color.at(1) * 255.0f); }
@@ -49,22 +39,31 @@ public:
 	_NODISCARD constexpr uint8_t aMultiplied() const { return static_cast<uint8_t>(m_color.at(3) * 255.0f); }
 
 	constexpr const float& operator[](int index) const { return m_color.at(index); }
-	constexpr const float& at(int index) const { return m_color.at(index); }
+	constexpr float& operator[](int index) { return m_color.at(index); }
+	constexpr const float& at(int index) const { if (index >= m_color.size() || index < 0) throw std::runtime_error("Out of range!"); return m_color.at(index); } // as std, at() is safe
+	constexpr float& at(int index) { if (index >= m_color.size() || index < 0) throw std::runtime_error("Out of range!"); return m_color.at(index); }
 	constexpr bool operator == (const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
 	constexpr bool operator != (const Color& rhs) const { return !(operator==(rhs)); }
 	static Color fromHSB(float hue, float saturation, float brightness);
 	//https://gist.github.com/mjackson/5311256
 	static Color hslToRGB(float hue, float saturation, float lightness);
+	static Color rainbowColor(const float gameTime, const float multiply = 0.5f); // http://basecase.org/env/on-rainbows
 private:
 	std::array<float, 4> m_color;
 };
 
-class Rainbow
+// 0-255 & 1byte type
+struct SDKColor
 {
-public:
-	Color drawRainbow(float frameTime, float saturation, float alpha, float multiply = 0.05f);
-private:
-	static float hue;
+	SDKColor() = default;
+	constexpr SDKColor(uint8_t r, uint8_t g, uint8_t b, uint8_t a = 255)
+		: r{ r }, g{ g }, b{ b }, a{ a }
+	{}
+	constexpr SDKColor(const Color& color)
+		: r{ color.rMultiplied() }, g{ color.gMultiplied() }, b{ color.bMultiplied() }, a{ color.aMultiplied() }
+	{}
+
+	uint8_t r, g, b, a;
 };
 
 namespace Colors

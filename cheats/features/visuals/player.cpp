@@ -11,13 +11,7 @@
 #undef min
 #undef max
 
-enum boxTypes
-{
-	BOX2D = 0,
-	FILLED2D,
-	BOX3D,
-	FILLED3D
-};
+void drawBox3D(const Box3D& box, const Color& color, bool filled, const float thickness = 2.0f);
 
 // very simple implementation of what to add as color
 inline Color playerColor(Player_t* ent, bool isAimbotColor = false)
@@ -43,7 +37,7 @@ void esp::run()
 	if (!game::localPlayer)
 		return;
 
-	for (int i = 1; i < interfaces::globalVars->m_maxClients; i++)
+	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 	{
 		auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
 
@@ -76,35 +70,47 @@ void esp::run()
 
 void esp::renderBox3D(Entity_t* ent, bool fill)
 {
-	const auto col = ent->collideable();
-	if (!col)
+	Box3D box;
+	if (!utilities::getBox3D(ent, box))
 		return;
 
-	const auto& min = col->OBBMins();
-	const auto& max = col->OBBMaxs();
-
-	std::array<Vector, 8> points =
-	{
-		Vector(min.x, min.y, min.z),
-		Vector(min.x, max.y, min.z),
-		Vector(max.x, max.y, min.z),
-		Vector(max.x, min.y, min.z),
-
-		Vector(min.x, min.y, max.z),
-		Vector(min.x, max.y, max.z),
-		Vector(max.x, max.y, max.z),
-		Vector(max.x, min.y, max.z)
-	};
-
-	const auto& tranFrame = ent->m_rgflCoordinateFrame();
-
-	std::array<Vector, 8> transformed = {};
-
-	for (int i = 0; i < 8; i++)
-		transformed.at(i) = math::transformVector(points.at(i), tranFrame);
-	
-	imRender.drawBox3D(transformed, playerColor(reinterpret_cast<Player_t*>(ent), true), fill ? true : false);
+	drawBox3D(box, Colors::Purple, fill);
 }
+
+void drawBox3D(const Box3D& box, const Color& color, bool filled, const float thickness)
+{
+	// this could be simplified in some loop, maybe...
+	if (filled)
+	{
+		// anything with low alpha - TEMP color! will add optionality later
+		Color fill{ color.rMultiplied(), color.gMultiplied(), color.bMultiplied(), 30 };
+
+		imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), fill);
+		// top
+		imRender.drawQuadFilled(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), fill);
+		// front
+		imRender.drawQuadFilled(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), fill);
+		// back
+		imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), fill);
+		// right
+		imRender.drawQuadFilled(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), fill);
+		// left
+		imRender.drawQuadFilled(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), fill);
+	}
+
+	imRender.drawQuad(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), color, thickness);
+	// top
+	imRender.drawQuad(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), color, thickness);
+	// front
+	imRender.drawQuad(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), color, thickness);
+	// back
+	imRender.drawQuad(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), color, thickness);
+	// right
+	imRender.drawQuad(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), color, thickness);
+	// left
+	imRender.drawQuad(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), color, thickness);
+}
+
 
 void esp::drawBox2D(Player_t* ent, const Box& box)
 {
@@ -377,16 +383,16 @@ void esp::drawPlayer(Player_t* ent)
 
 	switch (config.get<int>(vars.iEsp))
 	{
-	case BOX2D:
+	case E2T(BoxTypes::BOX2D):
 		drawBox2D(ent, box);
 		break;
-	case FILLED2D:
+	case E2T(BoxTypes::FILLED2D):
 		drawBox2DFilled(ent, box);
 		break;
-	case BOX3D:
+	case E2T(BoxTypes::BOX3D):
 		renderBox3D(ent, false);
 		break;
-	case FILLED3D:
+	case E2T(BoxTypes::FILLED3D):
 		renderBox3D(ent, true);
 		break;
 	default:
@@ -478,7 +484,7 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 		dp = curEnemyAngle.x - idealAimAngle.x;
 
 	float fovDist = std::sqrt(dy * dy + dp * dp);
-	bool check = ent->isPossibleToSee(game::localPlayer, game::localPlayer->getEyePos());
+	bool check = ent->isPossibleToSee(game::localPlayer->getEyePos());
 
 	// hardcoded, when enemies use 3rd cam or some fov changer, it won't be accurate
 	if (check && fovDist <= 60.0f)

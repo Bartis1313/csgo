@@ -19,6 +19,16 @@ struct Box
 	float x, y, w, h;
 };
 
+struct Box3D
+{
+	std::array<Vector2D, 8> points;
+
+	Vector2D topleft;
+	Vector2D topright;
+	Vector2D bottomleft;
+	Vector2D bottomright;
+};
+
 namespace fonts
 {
 	inline unsigned long tahoma;
@@ -163,12 +173,17 @@ struct CircleObject_t
 	CircleObject_t(const Vector& pos, const std::vector<ImVec2>& pointsVec, float radius, int segments, ImU32 color, ImDrawFlags flags, float thickness)
 		: m_pos{ pos }, m_pointsVec{ pointsVec }, m_radius{ radius }, m_segments{ segments }, m_color{ color }, m_flags{ flags }, m_thickness{ thickness }
 	{}
+	// circle 3D + outline for filled
+	CircleObject_t(const Vector& pos, const std::vector<ImVec2>& pointsVec, float radius, int segments, ImU32 color, ImU32 outline, ImDrawFlags flags, float thickness)
+		: m_pos{ pos }, m_pointsVec{ pointsVec }, m_radius{ radius }, m_segments{ segments }, m_color{ color }, m_outline{ outline }, m_flags{ flags }, m_thickness{ thickness }
+	{}
 
 	ImVec2 m_centre;
 	Vector m_pos; // 3d
 	std::vector<ImVec2> m_pointsVec; // 3d
 	float m_radius;
 	ImU32 m_color;
+	ImU32 m_outline;
 	int m_segments;
 	ImDrawFlags m_flags;
 	float m_thickness;
@@ -196,11 +211,11 @@ struct QuadObject_t
 {
 	// normal quad
 	QuadObject_t(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 color, float thickness)
-		: m_p1{ p1 }, m_p2{ p2 }, m_p3{ p3 }, m_color{ color }, m_thickness{ thickness }
+		: m_p1{ p1 }, m_p2{ p2 }, m_p3{ p3 }, m_p4{ p4 }, m_color{ color }, m_thickness{ thickness }
 	{}
 	// filled quad
 	QuadObject_t(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 color)
-		: m_p1{ p1 }, m_p2{ p2 }, m_p3{ p3 }, m_color{ color }
+		: m_p1{ p1 }, m_p2{ p2 }, m_p3{ p3 }, m_p4{ p4 }, m_color{ color }
 	{}
 
 	ImVec2 m_p1;
@@ -210,6 +225,15 @@ struct QuadObject_t
 	ImU32 m_color;
 	ImDrawFlags m_flags;
 	float m_thickness;
+};
+
+struct TrapezObject_t
+{
+	ImVec2 m_p1;
+	ImVec2 m_p2;
+	ImVec2 m_p3;
+	ImVec2 m_p4;
+	ImU32 m_color;
 };
 
 struct PolygonObject_t
@@ -284,20 +308,19 @@ public:
 	void drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness = 1.0f);
 	void drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color);
 	void drawCircle3D(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);
-	void drawCircle3DTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);
-	void drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);
-	void drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawCircle3DTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 	void drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color, const float thickness = 1.0f);
 	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
-	void drawTrapezian(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness = 1.0f);
-	void drawTrapezianFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
+	void drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness = 1.0f);
+	void drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
 	void drawPolyLine(const int count, ImVec2* verts, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 	void drawPolyGon(const int count, ImVec2* verts, const Color& color);
 	void drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal);
 	void text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...);
-	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false, const float thickness = 3.0f);
 
 	/*
 	* arcs - there are few problems with them. Especially you can see it when trying to do arc that is a full circle.
@@ -327,3 +350,36 @@ public:
 	std::deque<DrawObject_t> m_drawDataSafe;
 	std::shared_mutex m_mutex;
 } inline imRender;
+
+// simple wrapper, use for anything that is not needed for w2s, and by itself draws inside destination window
+class ImGuiRenderWindow
+{
+public:
+	// also corrects the pos!
+	void addList();
+
+	void drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness = 1.0f);
+	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color, const float thickness = 1.0f);
+	void drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
+	void drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags = 0);
+	void drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
+	void drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0);
+	void drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness = 1.0f);
+	void drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color);
+	ImVec2 m_pos; // additional pos, it corrects the drawing pos, so we can pass literal destination to window, see comment below
+	ImVec2 m_rect; // width and height
+private:
+	ImDrawList* m_drawing;
+} inline imRenderWindow;
+
+/*
+* This is out destination window
+*	-------------------------	lets say it's 30px x 4
+*	|						|
+*	|						|
+*	|						|
+*	|						|
+*	-------------------------
+*	Now, using the for eg: drawRect(x1, y1, x2, y2) -> the position to draw will be added for us automatically
+*	So you pass position that is inside the window, imagine this window as your new screen and you are based on passing coords to it.
+*/

@@ -312,7 +312,7 @@ void world::skyboxLoad(int stage)
 
 	// remove sky, not in meaning as full color
 	static const auto removeSky = interfaces::console->findVar(XOR("r_3dsky"));
-	removeSky->setValue(config.get<bool>(vars.bRunNight) ? false : true);	
+	removeSky->setValue(config.get<bool>(vars.bRunNight) ? false : true);
 }
 
 // TODO: add points, as drawing one circle is not accurate
@@ -325,23 +325,32 @@ void world::drawMolotovPoints(Entity_t* ent)
 	if (!molotov)
 		return;
 
-	Vector screen = {};
-	if (!imRender.worldToScreen(molotov->absOrigin(), screen))
-		return;
-
 	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/master/game/server/cstrike15/Effects/inferno.cpp
 	// here you can see ratios and everything
 
-	Vector min = {}, max = {};
-	ent->getRenderBounds(min, max);
-	imRender.drawCircle3DFilled(molotov->absOrigin(), 0.5f * Vector(max - min).length2D(), 32, config.get<Color>(vars.cMolotovRange));
+	//Vector min = {}, max = {};
+	//ent->getRenderBounds(min, max);
+	//imRender.drawCircle3DFilled(molotov->absOrigin(), 0.5f * Vector(max - min).length2D(), 32, config.get<Color>(vars.cMolotovRange));
 
-	imRender.text(screen.x, screen.y, ImFonts::tahoma, XOR("Molotov"), false, config.get<Color>(vars.cMolotovRangeText));
-}
+	//imRender.text(screen.x, screen.y, ImFonts::tahoma, XOR("Molotov"), false, config.get<Color>(vars.cMolotovRangeText));
 
-bool w2s(const Vector& in, Vector& out)
-{
-	return interfaces::debugOverlay->worldToScreen(in, out) != 1;
+	const auto& origin = molotov->absOrigin();
+	constexpr int molotovRadius = 60; // 30 * 2
+
+	//std::vector<ImVec2> points = {};
+
+	for (int i = 0; i < molotov->m_fireCount(); i++)
+	{
+		auto pos = origin + molotov->getInfernoPos(i);
+		imRender.drawCircle3DFilled(pos, molotovRadius, 32, Colors::Coral, Colors::Black);
+
+		/*Vector2D posw;
+		if (!imRender.worldToScreen(pos, posw))
+			break;
+
+		imRender.text(posw.x, posw.y, ImFonts::tahoma, std::to_string(i), false, Colors::Cyan);*/
+		// points are not on edge, this will need some graph path logic, and will be done soon
+	}
 }
 
 void world::drawZeusRange()
@@ -364,8 +373,61 @@ void world::drawZeusRange()
 		const static float range = weapon->getWpnInfo()->m_range;
 		const Vector abs = game::localPlayer->absOrigin() + Vector(0.0f, 0.0f, 30.0f); // small correction to get correct trace visually, will still throw false positives on stairs etc...
 
-		//imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer, Colors::Palevioletred);
-		 
-		imRender.drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, config.get<Color>(vars.cZeusRange), true, 2.0f);
+		imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer, config.get<Color>(vars.cZeusRange), true, 2.5f);
+
+		//imRender.drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, config.get<Color>(vars.cZeusRange), true, 2.0f);
 	}
+}
+
+void world::drawMovementTrail()
+{
+	static Vector end;
+
+	// check this first, special case here
+	if (!game::localPlayer)
+		return;
+
+	if (!config.get<bool>(vars.bRunMovementTrail))
+	{
+		// prepare the point to be corrected
+		end = game::localPlayer->m_vecOrigin();
+		return;
+	}
+	Color color;
+	config.get<bool>(vars.bMovementRainbow)
+		? color = Color::rainbowColor(interfaces::globalVars->m_realtime, config.get<float>(vars.fMovementRainbowSpeed))
+		: color = config.get<Color>(vars.cMovementTrail);
+	const static auto modelIndex = interfaces::modelInfo->getModelIndex(XOR("sprites/purplelaser1.vmt"));
+
+	const Vector start = game::localPlayer->m_vecOrigin();
+
+	BeamInfo_t info = {};
+
+	info.m_type = TE_BEAMPOINTS;
+	info.m_modelName = XOR("sprites/purplelaser1.vmt");
+	info.m_modelIndex = modelIndex;
+	info.m_vecStart = start;
+	info.m_vecEnd = end;
+	info.m_haloIndex = -1;
+	info.m_haloScale = 0.0f;
+	info.m_life = config.get<float>(vars.fMovementLife);
+	info.m_width = 5.0f;
+	info.m_endWidth = 5.0f;
+	info.m_fadeLength = 0.0f;
+	info.m_amplitude = 2.0;
+	info.m_brightness = 255.0f;
+	info.m_red = color.rMultiplied();
+	info.m_green = color.gMultiplied();
+	info.m_blue = color.bMultiplied();
+	info.m_speed = config.get<float>(vars.fMovementBeamSpeed);
+	info.m_startFrame = 0.0f;
+	info.m_frameRate = 0.0f;
+	info.m_segments = 2;
+	info.m_renderable = true;
+
+	if (auto myBeam = interfaces::beams->createBeamPoints(info); myBeam)
+		interfaces::beams->drawBeam(myBeam);
+
+	// change to pos after beam is drawn, since it's static it's possible
+	end = start;
 }

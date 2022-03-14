@@ -23,6 +23,11 @@ struct matrix3x4_t
 		return m_flMatVal[i];
 	}
 
+	constexpr float* operator[](int i)
+	{
+		return m_flMatVal[i];
+	}
+
 	float m_flMatVal[3][4];
 };
 

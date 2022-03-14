@@ -4,16 +4,6 @@
 #include "../../../config/vars.hpp"
 #include "../../game.hpp"
 
-enum AimbotID
-{
-    NEAREST = 0,
-    HEAD,
-    CHEST
-};
-
-// because called in paint hook just check if engine in game
-// draw simple fov circle that represents aimbot distance
-// additionally adds the ratio scale scope
 void legitbot::drawFov()
 {
     if (interfaces::engine->isConnected() && interfaces::engine->isInGame())
@@ -102,13 +92,13 @@ void legitbot::run(CUserCmd* cmd)
                 Vector hitPos = Vector{ 0.0f, 0.0f, 0.0f };
                 switch (config.get<int>(vars.iAimbot))
                 {
-                case NEAREST:
+                case E2T(AimbotID::NEAREST):
                     hitPos = ent->getHitboxPos(pos);
                     break;
-                case HEAD:
+                case E2T(AimbotID::HEAD):
                     hitPos = ent->getHitboxPos(HITBOX_HEAD);
                     break;
-                case CHEST:
+                case E2T(AimbotID::CHEST):
                     hitPos = ent->getHitboxPos(HITBOX_LOWER_CHEST);
                     break;
                 default:
@@ -117,7 +107,7 @@ void legitbot::run(CUserCmd* cmd)
                 auto angles = cmd->m_viewangles + punch;
                 angles.clamp();
 
-                if (!game::localPlayer->isPossibleToSee(ent, hitPos))
+                if (!game::localPlayer->isPossibleToSee(hitPos))
                     continue;
 
                 auto fov = math::calcFov(myEye, hitPos, angles);
@@ -128,7 +118,7 @@ void legitbot::run(CUserCmd* cmd)
                     bestPos = hitPos;
                     bestEnt = ent;
                 }
-                if (config.get<int>(vars.iAimbot) != NEAREST)
+                if (config.get<int>(vars.iAimbot) != E2T(AimbotID::NEAREST))
                     break;
             }
         }
@@ -150,7 +140,7 @@ void legitbot::run(CUserCmd* cmd)
         bestEnt = nullptr;
 }
 
-void legitbot::RCS(CUserCmd* cmd)
+void RCS(CUserCmd* cmd)
 {
     static Vector oldPunch{ 0.0f, 0.0f, 0.0f };
     auto punch = game::localPlayer->m_aimPunchAngle() * 2.0f;

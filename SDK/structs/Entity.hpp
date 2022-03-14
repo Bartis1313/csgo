@@ -109,9 +109,11 @@ class Inferno_t : public Entity_t
 public:
 	_NODISCARD static float expireTime() { return 7.0f; }
 	OFFSET(float, spawnTime, 0x20);
+	NETVAR(int, m_fireCount, "DT_Inferno", "m_fireCount");
 	NETVAR(int[100], m_fireXDelta, "DT_Inferno", "m_fireXDelta");
 	NETVAR(int[100], m_fireYDelta, "DT_Inferno", "m_fireYDelta");
 	NETVAR(int[100], m_fireZDelta, "DT_Inferno", "m_fireZDelta");
+	_NODISCARD Vector getInfernoPos(size_t indexFire);
 
 };
 
@@ -163,7 +165,7 @@ public:
 	_NODISCARD int getKills();
 	_NODISCARD int getDeaths();
 	_NODISCARD int getPing();
-	_NODISCARD bool isPossibleToSee(Player_t* ent, const Vector& pos);
+	_NODISCARD bool isPossibleToSee(const Vector& pos);
 	// address as number
 	_NODISCARD uintptr_t getLiteralAddress();
 };

@@ -4,23 +4,13 @@
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../backtrack/backtrack.hpp"
 
+// this code someday needs proper rewrite, it's a mess
+
+
 inline constexpr void CALL(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix)
 {
 	hooks::drawModel::original(interfaces::modelRender, ctx, state, info, matrix);
 }
-
-enum ChamsIDs
-{
-	STATIC = 1,
-	XYZ,
-};
-
-enum BTChamsIDs
-{
-	STABLE = 1,
-	LAST_TICK,
-	RAINBOW,
-};
 
 void chams::overrideChams(bool ignore, bool wireframe, Color color)
 {
@@ -36,11 +26,11 @@ void chams::drawChams(Player_t* ent, void* ctx, const DrawModelState_t& state, c
 {
 	switch (config.get<int>(vars.iChams))
 	{
-	case STATIC:
+	case E2T(ChamsID::STATIC):
 		overrideChams(false, false, config.get<Color>(vars.cChams));
 		CALL(ctx, state, info, matrix);
 		break;
-	case XYZ:
+	case E2T(ChamsID::XYZ):
 		overrideChams(true, false, config.get<Color>(vars.cChamsXYZ));
 		CALL(ctx, state, info, matrix);
 		overrideChams(false, false, config.get<Color>(vars.cChams));
@@ -55,7 +45,7 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 {
 	switch (config.get<int>(vars.iBacktrackChams))
 	{
-	case STABLE:
+	case E2T(BTChamsID::STABLE):
 	{
 		auto record = !backtrack::records[info.m_entIndex].empty() ? &backtrack::records[info.m_entIndex] : nullptr;
 		if (record)
@@ -75,7 +65,7 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 		}
 		break;
 	}
-	case LAST_TICK:
+	case E2T(BTChamsID::LAST_TICK):
 	{
 		auto record = !backtrack::records[info.m_entIndex].empty() ? &backtrack::records[info.m_entIndex] : nullptr;
 		if (record)
@@ -88,7 +78,7 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 		}
 		break;
 	}
-	case RAINBOW:
+	case E2T(BTChamsID::RAINBOW):
 	{
 		auto record = !backtrack::records[info.m_entIndex].empty() ? &backtrack::records[info.m_entIndex] : nullptr;
 		if (record)
@@ -100,9 +90,8 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 				{
 					if (backtrack::isValid(record->at(i).simTime))
 					{
-						Rainbow color;
-						// fine effect: (float)i / (float)size as saturation arg
-						overrideChams(false, false, color.drawRainbow(interfaces::globalVars->m_frametime * 10, 0.7f, 0.8f, 0.01f)); // 10x faster cuz looks better imo - Trophy
+						Color color = Color::rainbowColor(interfaces::globalVars->m_realtime, 5.0f);
+						overrideChams(false, false, color);
 						CALL(ctx, state, info, record->at(i).matrix);
 					}
 				}
@@ -115,14 +104,6 @@ void chams::drawBacktrackChams(Player_t* ent, void* ctx, const DrawModelState_t&
 	}
 }
 
-enum HandTypes
-{
-	COLOR = 0,
-	NO_HANDS,
-	NO_WEAPON,
-};
-
-// TODO: fix performance
 void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix)
 {
 	if (!game::localPlayer)
@@ -145,7 +126,7 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 			{
 				static auto material = interfaces::matSys->findMaterial(name.c_str(), XOR(TEXTURE_GROUP_MODEL));
 				overrideChams(false, false, Color(0, 180, 250, 255));
-				if (vars.iHandChams == NO_HANDS)
+				if (vars.iHandChams == E2T(HandTypes::NO_HANDS))
 				{
 					material->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
 					interfaces::modelRender->overrideMaterial(material);
@@ -165,7 +146,7 @@ void chams::drawModel(void* ctx, const DrawModelState_t& state, const ModelRende
 
 				static auto material = interfaces::matSys->findMaterial(name.c_str(), XOR(TEXTURE_GROUP_MODEL));
 				overrideChams(false, false, Colors::Palevioletred); // - Trophy
-				if (vars.iWeaponChams == NO_WEAPON)
+				if (vars.iWeaponChams == E2T(HandTypes::NO_WEAPON))
 				{
 					material->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
 					interfaces::modelRender->overrideMaterial(material);

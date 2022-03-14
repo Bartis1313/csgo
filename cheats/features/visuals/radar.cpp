@@ -3,9 +3,11 @@
 #include "../../game.hpp"
 #include "../../../config/vars.hpp"
 #include "../../globals.hpp"
+#include "../../../dependencies/ImGui/imgui.h"
+#include "../../../dependencies/ImGui/imgui_internal.h"
 #include <format>
 
-#define VEC2D_NONE Vector2D(0.0f, 0.0f);
+// TODO: those renders should be moved in some more obvious way to never put it in the pt
 
 Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale)
 {
@@ -29,101 +31,110 @@ Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 	dotX += size.x / 2;
 	dotY += size.y / 2;
 
-	// do not draw out of range
-	if (dotX < dotThickness)
-		return VEC2D_NONE;
+	// do not draw out of range, added pos, even we pass 0, but for clarity
+	if (!config.get<bool>(vars.bRadarRanges))
+	{
+		if (dotX < pos.x)
+			return {}; // this is zero vector
 
-	if (dotX > size.x)
-		return VEC2D_NONE;
+		if (dotX > pos.y + size.x - dotThickness)
+			return {};
 
-	if (dotY < dotThickness)
-		return VEC2D_NONE;
+		if (dotY < pos.y)
+			return {};
 
-	if (dotY > size.y)
-		return VEC2D_NONE;
+		if (dotY > pos.y + size.y - dotThickness)
+			return {};
+	}
+	else
+	{
+		if (dotX < pos.x)
+			dotX = pos.x;
+
+		if (dotX > pos.y + size.x - dotThickness)
+			dotX = pos.y + size.x - dotThickness;
+
+		if (dotY < pos.y)
+			dotY = pos.y;
+
+		if (dotY > pos.y + size.y - dotThickness)
+			dotY = pos.y + size.y - dotThickness;
+	}
 
 	// again correct for out center...
 	dotX += pos.x;
 	dotY += pos.y;
 
-	// should be just 2d vec, 3rd z value for 3d is empty because radar is a normal rectnagle -> 2D
-	return Vector2D(dotX, dotY);
+	return { dotX, dotY };
 }
 
 void radar::run()
 {
-	if (!config.get<bool>(vars.bRadar))
-		return;
-
-	if (!interfaces::engine->isInGame())
-		return;
-
-	// boi is angry so i give him localPlayer here
-	auto localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
-
-	if (!localPlayer)
-		return;
-
-	int x = globals::screenX;
-	int y = globals::screenY;
-	static int centerx = x / 2 - 20;
-	static int centery = y - 110;
-	static int size = 90;
-
-	imRender.drawRectFilled(centerx - size, centery - size, 2 * size, 2 * size, Color(128, 128, 128, 190));
-	imRender.drawRect(centerx - size - 1, centery - size - 1, 2 * size + 1, 2 * size + 1, Colors::Black);
-
-	imRender.text(centerx, centery - size - 14, ImFonts::tahoma, XOR("Radar"), true, Colors::LightBlue);
-
-	imRender.drawRectFilled(centerx - 5, centery - 1, 11, 3, Colors::Black);
-	imRender.drawRectFilled(centerx - 1, centery - 5, 3, 11, Colors::Black);
-
-	imRender.drawLine(centerx - 4, centery, centerx + 5, centery, Colors::Green);
-	imRender.drawLine(centerx, centery + 4, centerx, centery - 5, Colors::Green);
-	
-	const auto myEye = localPlayer->getEyePos();
-	Vector ang = {};
-	interfaces::engine->getViewAngles(ang);
-
-	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+	if (bool& ref = config.getRef<bool>(vars.bRadar))
 	{
-		auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+		if (!game::localPlayer)
+			return;
 
-		if (!ent)
-			continue;
+		if (!interfaces::engine->isInGame())
+			return;
 
-		if (ent->isDormant())
-			continue;
-
-		if (ent == localPlayer)
-			continue;
-
-		if (!ent->isAlive() || !game::localPlayer->isAlive())
-			continue;
-
-		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
-			continue;
-
-		const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D(centerx - size, centery - size), Vector2D(2.0f * size, 2.0f * size), config.get<float>(vars.fRadarScale));
-
-		auto entYaw = ent->m_angEyeAngles().y;
-
-		if (entYaw < 0.0f)
-			entYaw = 360.0f + entYaw;
-
-		const auto rotated = 270.0f - entYaw + ang.y;
-
-		auto dotRad = config.get<float>(vars.fRadarLenght);
-
-		const auto finalX = dotRad * std::cos(DEG2RAD(rotated));
-		const auto finalY = dotRad * std::sin(DEG2RAD(rotated));
-
-		if (!entRotatedPos.isZero())
+		if (ImGui::Begin("Radar", &ref))
 		{
-			auto dotThickness = config.get<float>(vars.fRadarThickness);
+			imRenderWindow.addList();
+			imRenderWindow.drawRectFilled(0, 0, imRenderWindow.m_rect.x, imRenderWindow.m_rect.y, Color(128, 128, 128, 190));
+			imRenderWindow.drawRect(0, 0, imRenderWindow.m_rect.x + 1, imRenderWindow.m_rect.y + 1, Colors::Black);
 
-			imRender.drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY, config.get<Color>(vars.cRadarLine));
-			imRender.drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32, config.get<Color>(vars.cRadarPlayer));
+			const auto myEye = game::localPlayer->getEyePos();
+			Vector ang = {};
+			interfaces::engine->getViewAngles(ang);
+
+			for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+			{
+				auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+
+				if (!ent)
+					continue;
+
+				if (ent->isDormant())
+					continue;
+
+				if (ent == game::localPlayer)
+					continue;
+
+				if (!ent->isAlive() || !game::localPlayer->isAlive())
+					continue;
+
+				if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+					continue;
+
+				const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D{}, Vector2D(imRenderWindow.m_rect.x, imRenderWindow.m_rect.y), config.get<float>(vars.fRadarScale));
+
+				auto entYaw = ent->m_angEyeAngles().y;
+
+				if (entYaw < 0.0f)
+					entYaw = 360.0f + entYaw;
+
+				const auto rotated = 270.0f - entYaw + ang.y;
+
+				auto dotRad = config.get<float>(vars.fRadarLenght);
+
+				const auto finalX = dotRad * std::cos(DEG2RAD(rotated));
+				const auto finalY = dotRad * std::sin(DEG2RAD(rotated));
+
+				if (config.get<bool>(vars.bRadarRanges) ? true : !entRotatedPos.isZero())
+				{
+					auto dotThickness = config.get<float>(vars.fRadarThickness);
+
+					auto colLine = config.get<Color>(vars.cRadarLine);
+					imRenderWindow.drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY,
+						game::localPlayer->isPossibleToSee(ent->getBonePosition(8)) ? colLine : colLine.getColorEditAlpha(0.5f));
+					auto colPlayer = config.get<Color>(vars.cRadarPlayer);
+					imRenderWindow.drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32,
+						game::localPlayer->isPossibleToSee(ent->getBonePosition(8)) ? colPlayer : colPlayer.getColorEditAlpha(0.5f));
+			
+				}
+			}
+			ImGui::End();
 		}
 	}
 }

@@ -43,7 +43,7 @@ DWORD WINAPI init(PVOID instance)
     }
 
     initTimer.end();
-    LOG(LOG_INFO, std::format(XOR("{} {:.5f}ms"), XOR("hooks took"), initTimer.getSec()));
+    LOG(LOG_INFO, std::format(XOR("{} {:.5f}ms"), XOR("main thread took"), initTimer.getSec()));
 
     return TRUE;
 }
