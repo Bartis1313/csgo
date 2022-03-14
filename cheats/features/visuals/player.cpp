@@ -361,7 +361,7 @@ void esp::runDLight(Player_t* ent)
 	if (!config.get<bool>(vars.bDLight))
 		return;
 
-	auto DLight = interfaces::effects->clAllocDlight(ent->getIndex());
+	auto DLight = interfaces::efx->clAllocDlight(ent->getIndex());
 	DLight->m_style = DLIGHT_NO_WORLD_ILLUMINATION;
 	DLight->m_color = { config.get<Color>(vars.cDlight) };
 	DLight->m_origin = ent->absOrigin();

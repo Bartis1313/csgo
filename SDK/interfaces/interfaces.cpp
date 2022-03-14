@@ -22,8 +22,9 @@ void interfaces::init()
 	modelRender = getInterface<IVModelRender>(ENGINE_DLL, XOR("VEngineModel016"));
 	studioRender = getInterface<IVStudioRender>(STUDIORENDER_DLL, XOR("VStudioRender026"));
 	eventManager = getInterface<IGameEventManager>(ENGINE_DLL, XOR("GAMEEVENTSMANAGER002"));
-	effects = getInterface<IVEfx>(ENGINE_DLL, XOR("VEngineEffects001"));
+	efx = getInterface<IVEfx>(ENGINE_DLL, XOR("VEngineEffects001"));
 	iSystem = getInterface<InputSystem>(INPUTSYSTEM_DLL, XOR("InputSystemVersion001"));
+	effects = getInterface<IEffects>(CLIENT_DLL, XOR("IEffects001"));
 	
 	globalVars = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(client))[0] + 0x1F);
 	clientMode = **reinterpret_cast<ClientMode***>((*reinterpret_cast<uintptr_t**>(client))[10] + 0x5);

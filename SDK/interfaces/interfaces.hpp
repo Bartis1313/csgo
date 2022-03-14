@@ -39,6 +39,7 @@
 #include "../Recv.hpp"
 #include "../vars.hpp"
 #include "../InputSystem.hpp"
+#include "../IEffects.hpp"
 
 #include "../math/Vector.hpp"
 #include "../UtlVector.hpp"
@@ -122,9 +123,10 @@ namespace interfaces
 	inline IVStudioRender* studioRender;
 	// remember to dereference!
 	inline PlayerResource** resource;
-	inline IVEfx* effects;
+	inline IVEfx* efx;
 	inline InputSystem* iSystem;
 	inline IDirect3DDevice9* dx9Device;
+	inline IEffects* effects;
 
 	// shoudl be called once
 	void init();

@@ -436,6 +436,7 @@
     <ClInclude Include="SDK\checksum_crc.hpp" />
     <ClInclude Include="SDK\ClientMode.hpp" />
     <ClInclude Include="SDK\CPlayerResource.hpp" />
+    <ClInclude Include="SDK\IEffects.hpp" />
     <ClInclude Include="SDK\InputSystem.hpp" />
     <ClInclude Include="source.hpp" />
     <ClInclude Include="config\config.hpp" />
