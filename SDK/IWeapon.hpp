@@ -29,7 +29,8 @@ public:
 	PAD(8);
 	float m_range;
 	float m_rangeModyfier;
-	PAD(16);
+	float m_throwVelocity;
+	PAD(12);
 	bool isSilenced;
 	PAD(123);
 	//float m_recoil; not sure

@@ -53,4 +53,5 @@ namespace utilities
     _NODISCARD SHORT getKey(const UINT vKey);
     // it's better to create thread with sleep, TODO: check hwnd by globals from main
     _NODISCARD bool isValidWindow();
+    _NODISCARD float scaleDamageArmor(float dmg, const float armor);
 }

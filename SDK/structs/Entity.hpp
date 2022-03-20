@@ -55,6 +55,8 @@ public:
 	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
 	_NODISCARD AnimationLayer* getAnimOverlays();
 	_NODISCARD size_t getSequenceActivity(size_t sequence);
+
+	_NODISCARD bool isBreakable();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,6 +85,9 @@ public:
 	NETVAR(bool, m_bBurstMode, "DT_BaseCombatWeapon", "m_bBurstMode");
 	NETVAR(int, m_iBurstShotsRemaining, "DT_BaseCombatWeapon", "m_iBurstShotsRemaining");
 	NETVAR(int, m_zoomLevel, "DT_WeaponCSBaseGun", "m_zoomLevel");
+	NETVAR(bool, m_bPinPulled, "DT_BaseCSGrenade", "m_bPinPulled");
+	NETVAR(float, m_fThrowTime, "DT_BaseCSGrenade", "m_fThrowTime");
+	NETVAR(float, m_flThrowStrength, "DT_BaseCSGrenade", "m_flThrowStrength");
 
 	VFUNC(float, getInaccuracy, INACCURACY, (), (this));
 	VFUNC(float, getSpread, SPREAD, (), (this));
@@ -99,6 +104,8 @@ public:
 	_NODISCARD bool isGrenade();
 	_NODISCARD bool isKnife();
 	_NODISCARD bool isNonAimable();
+
+	_NODISCARD size_t getNadeRadius();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

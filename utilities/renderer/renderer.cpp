@@ -649,6 +649,111 @@ void ImGuiRender::drawRoundedRectFilled(const float x, const float y, const floa
 	m_drawData.emplace_back(DrawType::RECT_FILLED, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h }, U32(color), rounding, flags)));
 }
 
+void ImGuiRender::drawBox3D(const Vector& pos, const float width, const float height, const Color& color, const float thickness)
+{
+	float boxW = width / 2.0f;
+	float boxH = height / 2.0f;
+
+	std::array box =
+	{
+		Vector(pos.x - boxW, pos.y - boxH, pos.z - boxW),
+		Vector(pos.x - boxW, pos.y - boxH, pos.z + boxW),
+		Vector(pos.x + boxW, pos.y - boxH, pos.z + boxW),
+		Vector(pos.x + boxW, pos.y - boxH, pos.z - boxW),
+		Vector(pos.x - boxW, pos.y + boxH, pos.z - boxW),
+		Vector(pos.x - boxW, pos.y + boxH, pos.z + boxW),
+		Vector(pos.x + boxW, pos.y + boxH, pos.z + boxW),
+		Vector(pos.x + boxW, pos.y + boxH, pos.z - boxW),
+	};
+
+	// transormed points to get pos.x/.y
+	std::array<Vector2D, box.size()> lines = {};
+
+	for (size_t i = 0; i < box.size(); i++)
+	{
+		if (!worldToScreen(box.at(i), lines.at(i)))
+			return;
+	}
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		drawLine(lines.at(i), lines.at(i + 1), color);
+	}
+	// missing part at the bottom
+	drawLine(lines.at(0), lines.at(3), color);
+	// top parts
+	for (size_t i = 4; i < 7; i++)
+	{
+		drawLine(lines.at(i), lines.at(i + 1), color);
+	}
+	// missing part at the top
+	drawLine(lines.at(4), lines.at(7), color);
+	// now all 4 lines missing parts for 3d box
+	for (size_t i = 0; i < 4; i++)
+	{
+		drawLine(lines.at(i), lines.at(i + 4), color);
+	}
+}
+
+void ImGuiRender::drawBox3DFilled(const Vector& pos, const float width, const float height, const Color& color, const Color& filling, const float thickness)
+{
+	float boxW = width / 2.0f;
+	float boxH = height / 2.0f;
+
+	std::array box =
+	{
+		Vector(pos.x - boxW, pos.y - boxH, pos.z - boxW),
+		Vector(pos.x - boxW, pos.y - boxH, pos.z + boxW),
+		Vector(pos.x + boxW, pos.y - boxH, pos.z + boxW),
+		Vector(pos.x + boxW, pos.y - boxH, pos.z - boxW),
+		Vector(pos.x - boxW, pos.y + boxH, pos.z - boxW),
+		Vector(pos.x - boxW, pos.y + boxH, pos.z + boxW),
+		Vector(pos.x + boxW, pos.y + boxH, pos.z + boxW),
+		Vector(pos.x + boxW, pos.y + boxH, pos.z - boxW),
+	};
+
+	// transormed points to get pos.x/.y
+	std::array<Vector2D, box.size()> lines = {};
+
+	for (size_t i = 0; i < box.size(); i++)
+	{
+		if (!worldToScreen(box.at(i), lines.at(i)))
+			return;
+	}
+
+	// yes ik, this is a mess to mix surface in here, quads in drawlist are weird with aa
+	render.drawTrapezFilled(lines.at(0), lines.at(1), lines.at(2), lines.at(3), filling);
+	// top
+	render.drawTrapezFilled(lines.at(4), lines.at(5), lines.at(6), lines.at(7), filling);
+	// front
+	render.drawTrapezFilled(lines.at(3), lines.at(2), lines.at(6), lines.at(7), filling);
+	// back
+	render.drawTrapezFilled(lines.at(0), lines.at(1), lines.at(5), lines.at(4), filling);
+	// right
+	render.drawTrapezFilled(lines.at(2), lines.at(1), lines.at(5), lines.at(6), filling);
+	// left
+	render.drawTrapezFilled(lines.at(3), lines.at(0), lines.at(4), lines.at(7), filling);
+	
+	for (size_t i = 0; i < 3; i++)
+	{
+		drawLine(lines.at(i), lines.at(i + 1), color);
+	}
+	// missing part at the bottom
+	drawLine(lines.at(0), lines.at(3), color);
+	// top parts
+	for (size_t i = 4; i < 7; i++)
+	{
+		drawLine(lines.at(i), lines.at(i + 1), color);
+	}
+	// missing part at the top
+	drawLine(lines.at(4), lines.at(7), color);
+	// now all 4 lines missing parts for 3d box
+	for (size_t i = 0; i < 4; i++)
+	{
+		drawLine(lines.at(i), lines.at(i + 4), color);
+	}
+}
+
 void ImGuiRender::drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness)
 {
 	m_drawData.emplace_back(DrawType::CIRCLE, std::make_any<CircleObject_t>(CircleObject_t(ImVec2{ x, y }, radius, points, U32(color), thickness)));

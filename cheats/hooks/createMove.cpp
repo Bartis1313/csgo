@@ -8,6 +8,7 @@
 #include "../globals.hpp"
 #include "../features/visuals/world.hpp"
 #include "../features/misc/misc.hpp"
+#include "../features/prediction/nadepred.hpp"
 
 //bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 //{
@@ -43,6 +44,7 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	game::serverTime(cmd);
 	bunnyhop::run(cmd);
 	bunnyhop::strafe(cmd);
+	nedpred.createMove(cmd->m_buttons);
 
 	prediction::start(cmd);
 	{

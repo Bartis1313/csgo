@@ -5,11 +5,11 @@ Vector math::calcAngleRelative(const Vector& source, const Vector& destination, 
 	const auto delta = destination - source;
 
 	Vector angles(
-		RAD2DEG(std::atan2(-delta.z , std::hypot(delta.x, delta.y))) - viewAngles.x,
+		RAD2DEG(std::atan2(-delta.z, std::hypot(delta.x, delta.y))) - viewAngles.x,
 		RAD2DEG(std::atan2(delta.y, delta.x)) - viewAngles.y,
 		0.0f
 	);
-;
+	;
 	return angles.normalize();
 }
 
@@ -46,6 +46,17 @@ float math::normalizeYaw(float yaw)
 		yaw += 360.0f;
 
 	return yaw;
+}
+
+float math::normalizePitch(float pitch)
+{
+	while (pitch > 89.0f)
+		pitch -= 180.0f;
+
+	while (pitch < -89.0f)
+		pitch += 180.0f;
+
+	return pitch;
 }
 
 Vector math::vectorToAngle(const Vector& vec)

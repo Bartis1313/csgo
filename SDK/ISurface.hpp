@@ -25,8 +25,8 @@ struct Vertex_t
 class ISurface
 {
 public:
-	VFUNC(void, drawSetColor, 14, (Color color), (this, color));
-	VFUNC(void, setTextColor, 24, (Color color), (this, color));
+	VFUNC(void, drawSetColor, 14, (SDKColor color), (this, color));
+	VFUNC(void, setTextColor, 24, (SDKColor color), (this, color));
 	VFUNC(void, drawTexturedPolygon, 106, (int n, Vertex_t* vertice, bool clip = true), (this, n, vertice, clip));
 	VFUNC(void, drawFilledRectangle, 16, (int x, int y, int w, int h), (this, x, y, x + w, y + h));
 	VFUNC(void, drawSetTexture, 38, (int id), (this, id));

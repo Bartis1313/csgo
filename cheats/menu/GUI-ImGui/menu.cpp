@@ -261,6 +261,13 @@ void renderMisc()
 				ImGui::Checkbox(XOR("FPS Plot"), &config.getRef<bool>(vars.bShowFpsPlot));
 				ImGui::Checkbox(XOR("Velocity Plot"), &config.getRef<bool>(vars.bShowVelocityPlot));
 				ImGui::Checkbox(XOR("Draw misc info"), &config.getRef<bool>(vars.bDrawMiscInfo));
+				bool& naderef = config.getRef<bool>(vars.bNadePred);
+				ImGui::Checkbox(XOR("Nade pred"), &naderef);
+				if (naderef)
+				{
+					ImGui::SameLine();
+					ImGui::Checkbox(XOR("Show always"), &config.getRef<bool>(vars.bNadePredAlways));
+				}
 				bool& tref = config.getRef<bool>(vars.bRunMovementTrail);
 				ImGui::Checkbox(XOR("Movement trail"), &tref);
 				if (tref)

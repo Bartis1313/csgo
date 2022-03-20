@@ -156,6 +156,7 @@
     <ClCompile Include="cheats\features\misc\misc.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\features\prediction\nadepred.cpp" />
     <ClCompile Include="cheats\features\prediction\prediction.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -297,6 +298,7 @@
     <ClInclude Include="cheats\features\misc\bunnyhop.hpp" />
     <ClInclude Include="cheats\features\misc\events.hpp" />
     <ClInclude Include="cheats\features\misc\misc.hpp" />
+    <ClInclude Include="cheats\features\prediction\nadepred.hpp" />
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
     <ClInclude Include="cheats\features\visuals\chams.hpp" />
     <ClInclude Include="cheats\features\visuals\player.hpp" />

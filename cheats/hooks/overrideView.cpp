@@ -2,6 +2,7 @@
 #include "../globals.hpp"
 #include "../game.hpp"
 #include "../../config/vars.hpp"
+#include "../features/prediction/nadepred.hpp"
 
 void __stdcall hooks::overrideView::hooked(CViewSetup* view)
 {	
@@ -13,6 +14,8 @@ void __stdcall hooks::overrideView::hooked(CViewSetup* view)
 			view->m_fov += fov;
 
 	globals::FOV = view->m_fov;
+
+	nedpred.viewSetup();
 
 	original(view);
 }

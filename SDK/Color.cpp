@@ -12,6 +12,12 @@ Color& Color::getColorEditAlpha(const float amount)
 	return *this;
 }
 
+Color& Color::getColorEditAlphaInt(const int amount)
+{
+	m_color.at(3) = amount / 255.0f;
+	return *this;
+}
+
 Color Color::fromHSB(float hue, float saturation, float brightness)
 {
 	float h = hue == 1.0f ? 0.0f : hue * 6.0f;

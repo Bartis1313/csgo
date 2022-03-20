@@ -39,7 +39,7 @@ public:
 		return (x * x + y * y);
 	}
 
-	_NODISCARD float length()
+	_NODISCARD float length() const
 	{
 		return std::sqrt(x * x + y * y + z * z);
 	}
@@ -77,6 +77,19 @@ public:
 		return *this;
 	}
 
+	_NODISCARD Vector normalized() const
+	{
+		Vector vec = *this;
+		float len = vec.length();
+
+		if (len)
+			vec /= len;
+		else
+			vec = {};
+
+		return vec;
+	}
+
 	_NODISCARD constexpr float dot(const Vector& v) const
 	{
 		return (x * v.x + y * v.y + z * v.z);
@@ -105,6 +118,16 @@ public:
 	constexpr bool operator!=(const Vector& src) const
 	{
 		return (src.x != x) || (src.y != y) || (src.z != z);
+	}
+
+	constexpr auto operator<=>(const Vector&) const = default;
+
+	constexpr Vector& operator=(const Vector& v)
+	{
+		x = v.x;
+		y = v.y;
+		z = v.z;
+		return *this;
 	}
 
 	constexpr Vector& operator+=(const Vector& v)
@@ -198,4 +221,26 @@ public:
 	}
 
 	float x, y, z;
+};
+
+class __declspec(align(16)) VectorAligned : public Vector
+{
+public:
+	VectorAligned() = default;
+
+	constexpr VectorAligned(const Vector& v)
+		: Vector{ v }, w{ 0.0f }
+	{}
+
+	constexpr VectorAligned& operator=(const Vector& v)
+	{
+		x = v.x;
+		y = v.y;
+		z = v.z;
+		w = 0.0f;
+		return *this;
+	}
+
+public:
+	float w;
 };

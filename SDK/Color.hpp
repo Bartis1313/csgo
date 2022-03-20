@@ -32,6 +32,7 @@ public:
 	_NODISCARD static ImVec4 getImguiColor(const Color& color);
 	// edits alpha
 	_NODISCARD Color& getColorEditAlpha(const float amount);
+	_NODISCARD Color& getColorEditAlphaInt(const int amount);
 
 	_NODISCARD constexpr uint8_t rMultiplied() const { return static_cast<uint8_t>(m_color.at(0) * 255.0f); }
 	_NODISCARD constexpr uint8_t gMultiplied() const { return static_cast<uint8_t>(m_color.at(1) * 255.0f); }
@@ -44,10 +45,10 @@ public:
 	constexpr float& at(int index) { if (index >= m_color.size() || index < 0) throw std::runtime_error("Out of range!"); return m_color.at(index); }
 	constexpr bool operator == (const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
 	constexpr bool operator != (const Color& rhs) const { return !(operator==(rhs)); }
-	static Color fromHSB(float hue, float saturation, float brightness);
+	_NODISCARD static Color fromHSB(float hue, float saturation, float brightness);
 	//https://gist.github.com/mjackson/5311256
-	static Color hslToRGB(float hue, float saturation, float lightness);
-	static Color rainbowColor(const float gameTime, const float multiply = 0.5f); // http://basecase.org/env/on-rainbows
+	_NODISCARD static Color hslToRGB(float hue, float saturation, float lightness);
+	_NODISCARD static Color rainbowColor(const float gameTime, const float multiply = 0.5f); // http://basecase.org/env/on-rainbows
 private:
 	std::array<float, 4> m_color;
 };
@@ -85,4 +86,4 @@ namespace Colors
 	inline Color Blank = Color(0, 0, 0, 0);
 }
 
-ImU32 U32(const Color& color);
+_NODISCARD ImU32 U32(const Color& color);

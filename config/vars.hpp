@@ -125,6 +125,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fMovementRainbowSpeed, 3.0f, "speed of color change (movement trail)");
 	CONFIG_ADD_VARIABLE(float, fMovementBeamSpeed, 2.0f, "speed of beam movement");
 	CONFIG_ADD_VARIABLE(float, fMovementLife, 4.0f, "life of beam movement");
+	CONFIG_ADD_VARIABLE(bool, bNadePred, false, "nade prediction trace");
+	CONFIG_ADD_VARIABLE(bool, bNadePredAlways, false, "nade prediction will show line even if not throwing nade");
 
 } inline vars;
 #pragma endregion

@@ -11,28 +11,36 @@ class Player_t;
 class Ray_t
 {
 public:
-	Vector m_start;
-private:
-	float w = 0;
-public:
-	Vector m_delta;
-	PAD(40); // matrix
-	bool m_isRay = true;
+	VectorAligned m_start;
+	VectorAligned m_delta;
+	VectorAligned m_startOffset;
+	VectorAligned m_extents;
+	const matrix3x4_t* m_mattrixWorldAxis;
+	bool m_isRay;
 	bool m_isSwept;
 
-	void initialize(const Vector& src, const Vector& dest)
-	{
-		m_start = src;
-		m_delta = dest - src;
-		m_isSwept = m_delta.x || m_delta.y || m_delta.z;
-	}
-
-	Ray_t(const Vector& src, const Vector& dest) :
-		m_start(src), m_delta(dest - src)
-	{
-		m_isSwept = m_delta.x || m_delta.y || m_delta.z;
-	}
 	Ray_t() = default;
+	Ray_t(const Vector& src, const Vector& dest) :
+		m_start{ src }, m_delta{ dest - src }, m_mattrixWorldAxis{ nullptr }, m_isRay{ true }
+	{
+		m_isSwept = m_delta.lengthSqrt();
+	}
+	Ray_t(const Vector& src, const Vector& dest, const Vector& min, const Vector& max)
+	{
+		m_delta = (dest - src);
+
+		m_mattrixWorldAxis = nullptr;
+		m_isSwept = m_delta.lengthSqrt();
+
+		m_extents = max - min;
+		m_extents *= 0.5f;
+		m_isRay = m_extents.lengthSqrt() < 1e-6f;
+
+		m_startOffset = min + max;
+		m_startOffset *= 0.5f;
+		m_start = src + m_startOffset;
+		m_startOffset *= -1.0f;
+	}
 };
 
 struct Csurface_t
@@ -67,24 +75,33 @@ struct Trace_t
 	short m_physicsBone;
 	Player_t* m_entity;
 	int m_hitbox;
+
+	bool didHit() const
+	{
+		return m_fraction < 1.0f || m_allSolid || m_startSolid;
+	}
 };
 
 class TraceFilter
 {
 public:
-	TraceFilter(Player_t* entity) :
+	TraceFilter() = default;
+	TraceFilter(void* entity) :
 		m_skip{ entity }
 	{}
-	TraceFilter() = default;
+	TraceFilter(void* entity, Collision_Group_t group) :
+		m_skip{ entity }, m_collisionGroup{ group }
+	{}
 	virtual bool shouldHitEntity(Player_t* ent, int) const
 	{
 		return ent != m_skip;
 	}
 	virtual int getTraceType() const
 	{
-		return 0;
+		return m_collisionGroup;
 	}
 	void* m_skip;
+	Collision_Group_t m_collisionGroup = COLLISION_GROUP_NONE;
 };
 
 

@@ -6,6 +6,7 @@
 #include "../features/misc/misc.hpp"
 #include "../globals.hpp"
 #include "../../config/vars.hpp"
+#include "../features/prediction/nadepred.hpp"
 
 #pragma region "Paint Helpers"
 // all paint
@@ -22,6 +23,7 @@ void paintHandle()
 	misc::drawCrosshair();
 	legitbot::drawFov();
 	world::drawMovementTrail();
+	nedpred.draw();
 }
 
 // run current screensize

@@ -42,3 +42,4 @@ enum VTableIndexes
 #define NEW_CHECK				XOR("55 8B EC 56 8B F1 33 C0 57 8B 7D 08 8B 8E") // direct sig, sub_10797090
 #define DX9_DEVICE				XOR("A1 ? ? ? ? 50 8B 08 FF 51 0C")
 #define VIEW_MATRIX_CLIENT		XOR("0F 10 05 ? ? ? ? 8D 85 ? ? ? ? B9")
+#define IS_BREAKBLE				XOR("55 8B EC 51 56 8B F1 85 F6 74 68")

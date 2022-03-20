@@ -80,7 +80,7 @@ public:
 	void initNewTexture(int& id, unsigned char* RGBA, const int w, const int h);
 	// color argument is very sometimes needed, because texture is mostly supposed to be all filled
 	void drawFromTexture(const int id, const int x, const int y, const int w, const int h, const Color& color);
-} inline [[deprecated("This is not updated anymore! To turn off this warning, remove attribute and edit surface drawing yourself, and replace Color to SDKColor!")]] render;
+} inline /*[[deprecated("This is not updated anymore! To turn off this warning, remove attribute and edit surface drawing yourself, and replace Color to SDKColor!")]]*/ render;
 
 namespace ImFonts
 {
@@ -315,12 +315,16 @@ public:
 	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
 	void drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness = 1.0f);
 	void drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
-	void drawPolyLine(const int count, ImVec2* verts, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawPolyLine(const int count, ImVec2* verts, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
 	void drawPolyGon(const int count, ImVec2* verts, const Color& color);
 	void drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal);
 	void text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...);
+	// pass pos from world
+	void drawBox3D(const Vector& pos, const float width, const float height, const Color& color, const float thickness = 2.0f);
+	// pass pos from world
+	void drawBox3DFilled(const Vector& pos, const float width, const float height, const Color& color, const Color& filling = {}, const float thickness = 2.0f);
 
 	/*
 	* arcs - there are few problems with them. Especially you can see it when trying to do arc that is a full circle.

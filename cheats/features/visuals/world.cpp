@@ -63,25 +63,6 @@ void world::drawBombDropped(Entity_t* ent)
 	}
 }
 
-
-float scaleDamageArmor(float dmg, const float armor)
-{
-	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/183347-bomb-damage-indicator.html
-	if (armor > 0)
-	{
-		float flNew = dmg * 0.5f;
-		float flArmor = (dmg - flNew) * 0.5f;
-
-		if (flArmor > armor)
-		{
-			flArmor = armor * (1.f / 0.5f);
-			flNew = dmg - flArmor;
-		}
-		dmg = flNew;
-	}
-
-	return dmg;
-}
 void world::drawBomb(Entity_t* ent)
 {
 	if (!config.get<bool>(vars.bDrawBomb))
@@ -99,7 +80,7 @@ void world::drawBomb(Entity_t* ent)
 	constexpr float sigma = (500.0f * 3.5f) / 3.0f;
 
 	const float hypDist = (ent->getEyePos() - game::localPlayer->getEyePos()).length();
-	const float dmg = scaleDamageArmor((500.f * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
+	const float dmg = utilities::scaleDamageArmor((500.f * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
 
 	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 

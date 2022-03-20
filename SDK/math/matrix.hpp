@@ -13,6 +13,8 @@ struct matrix3x4_t
 		m_flMatVal[2][0] = m20;	m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
 	}
 
+	constexpr auto operator<=>(const matrix3x4_t&) const = default;
+
 	_NODISCARD constexpr Vector origin() const
 	{
 		return Vector{ m_flMatVal[0][3], m_flMatVal[1][3], m_flMatVal[2][3] };

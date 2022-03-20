@@ -29,6 +29,42 @@ size_t Entity_t::getSequenceActivity(size_t sequence)
 	return originalGSA(this, studio, sequence);
 }
 
+bool Entity_t::isBreakable()
+{
+	if (!this)
+		return false;
+
+	if (!this->getIndex())
+		return false;
+
+	using fn = bool(__thiscall*)(void*);
+	const static auto isBreakablefn = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, IS_BREAKBLE));
+
+	if (bool res = isBreakablefn(this); !res)
+		return false;
+
+	auto cl = this->clientClass();
+	if (!cl)
+		return false;
+
+	auto id = cl->m_classID;
+
+	constexpr std::array breakableIds = // for surface ids ONLY!
+	{
+		CBaseDoor,
+		CBreakableSurface,
+	};
+
+	if (auto it = std::find(std::cbegin(breakableIds), std::cend(breakableIds), id); it != breakableIds.cend()) // if id was found from surface
+		return true;
+
+	// there we finally check actual entity
+	if (id = CBaseEntity && this->collideable()->getSolid() == 1) // can mess with masks, but it's the same
+		return true;
+
+	return false;
+}
+
 ////////////////////////////////////////////////////////////////////////
 
 std::string Weapon_t::getWpnName()
@@ -163,6 +199,22 @@ bool Weapon_t::isNonAimable()
 		return true;
 
 	return false;
+}
+
+size_t Weapon_t::getNadeRadius()
+{
+	switch (this->m_iItemDefinitionIndex())
+	{
+	case WEAPON_MOLOTOV:
+	case WEAPON_INCGRENADE:
+		return 180;
+	case WEAPON_SMOKEGRENADE:
+		return 144;
+	case WEAPON_HEGRENADE:
+		return 50;
+	default:
+		return 10; // because we need to somewhat render it, it's fake
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////

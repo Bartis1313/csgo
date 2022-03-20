@@ -284,3 +284,22 @@ bool utilities::isValidWindow()
 #endif
 	return true;
 }
+
+float utilities::scaleDamageArmor(float dmg, const float armor)
+{
+	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/183347-bomb-damage-indicator.html
+	if (armor > 0.0f)
+	{
+		float newDmg = dmg * 0.5f;
+		float scaledArmor = (dmg - newDmg) * 0.5f;
+
+		if (scaledArmor > armor)
+		{
+			scaledArmor = armor * (1.0f / 0.5f);
+			newDmg = dmg - scaledArmor;
+		}
+		dmg = newDmg;
+	}
+
+	return dmg;
+}
