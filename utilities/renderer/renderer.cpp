@@ -649,21 +649,24 @@ void ImGuiRender::drawRoundedRectFilled(const float x, const float y, const floa
 	m_drawData.emplace_back(DrawType::RECT_FILLED, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h }, U32(color), rounding, flags)));
 }
 
-void ImGuiRender::drawBox3D(const Vector& pos, const float width, const float height, const Color& color, const float thickness)
+void ImGuiRender::drawBox3D(const Vector& pos, const Vector2D& width, const float height, const Color& color, const float thickness)
 {
-	float boxW = width / 2.0f;
-	float boxH = height / 2.0f;
+	// dividing to get a centre to world position
+	float boxW = width.x / 2.0f;
+	float boxH = height;
+
+	float boxWidthSide = width.y / 2.0f;
 
 	std::array box =
 	{
-		Vector(pos.x - boxW, pos.y - boxH, pos.z - boxW),
-		Vector(pos.x - boxW, pos.y - boxH, pos.z + boxW),
-		Vector(pos.x + boxW, pos.y - boxH, pos.z + boxW),
-		Vector(pos.x + boxW, pos.y - boxH, pos.z - boxW),
-		Vector(pos.x - boxW, pos.y + boxH, pos.z - boxW),
-		Vector(pos.x - boxW, pos.y + boxH, pos.z + boxW),
-		Vector(pos.x + boxW, pos.y + boxH, pos.z + boxW),
-		Vector(pos.x + boxW, pos.y + boxH, pos.z - boxW),
+		Vector(pos.x - boxW, pos.y - boxWidthSide, pos.z),
+		Vector(pos.x - boxW, pos.y - boxWidthSide, pos.z + boxH),
+		Vector(pos.x + boxW, pos.y - boxWidthSide, pos.z + boxH),
+		Vector(pos.x + boxW, pos.y - boxWidthSide, pos.z),
+		Vector(pos.x - boxW, pos.y + boxWidthSide, pos.z),
+		Vector(pos.x - boxW, pos.y + boxWidthSide, pos.z + boxH),
+		Vector(pos.x + boxW, pos.y + boxWidthSide, pos.z + boxH),
+		Vector(pos.x + boxW, pos.y + boxWidthSide, pos.z),
 	};
 
 	// transormed points to get pos.x/.y
@@ -675,6 +678,7 @@ void ImGuiRender::drawBox3D(const Vector& pos, const float width, const float he
 			return;
 	}
 
+	// bottom
 	for (size_t i = 0; i < 3; i++)
 	{
 		drawLine(lines.at(i), lines.at(i + 1), color);
@@ -695,21 +699,24 @@ void ImGuiRender::drawBox3D(const Vector& pos, const float width, const float he
 	}
 }
 
-void ImGuiRender::drawBox3DFilled(const Vector& pos, const float width, const float height, const Color& color, const Color& filling, const float thickness)
+void ImGuiRender::drawBox3DFilled(const Vector& pos, const Vector2D& width, const float height, const Color& color, const Color& filling, const float thickness)
 {
-	float boxW = width / 2.0f;
-	float boxH = height / 2.0f;
+	// dividing to get a centre to world position
+	float boxW = width.x / 2.0f;
+	float boxH = height;
+
+	float boxWidthSide = width.y / 2.0f;
 
 	std::array box =
 	{
-		Vector(pos.x - boxW, pos.y - boxH, pos.z - boxW),
-		Vector(pos.x - boxW, pos.y - boxH, pos.z + boxW),
-		Vector(pos.x + boxW, pos.y - boxH, pos.z + boxW),
-		Vector(pos.x + boxW, pos.y - boxH, pos.z - boxW),
-		Vector(pos.x - boxW, pos.y + boxH, pos.z - boxW),
-		Vector(pos.x - boxW, pos.y + boxH, pos.z + boxW),
-		Vector(pos.x + boxW, pos.y + boxH, pos.z + boxW),
-		Vector(pos.x + boxW, pos.y + boxH, pos.z - boxW),
+		Vector(pos.x - boxW, pos.y - boxWidthSide, pos.z),
+		Vector(pos.x - boxW, pos.y - boxWidthSide, pos.z + boxH),
+		Vector(pos.x + boxW, pos.y - boxWidthSide, pos.z + boxH),
+		Vector(pos.x + boxW, pos.y - boxWidthSide, pos.z),
+		Vector(pos.x - boxW, pos.y + boxWidthSide, pos.z),
+		Vector(pos.x - boxW, pos.y + boxWidthSide, pos.z + boxH),
+		Vector(pos.x + boxW, pos.y + boxWidthSide, pos.z + boxH),
+		Vector(pos.x + boxW, pos.y + boxWidthSide, pos.z),
 	};
 
 	// transormed points to get pos.x/.y
@@ -722,6 +729,7 @@ void ImGuiRender::drawBox3DFilled(const Vector& pos, const float width, const fl
 	}
 
 	// yes ik, this is a mess to mix surface in here, quads in drawlist are weird with aa
+	// bottom
 	render.drawTrapezFilled(lines.at(0), lines.at(1), lines.at(2), lines.at(3), filling);
 	// top
 	render.drawTrapezFilled(lines.at(4), lines.at(5), lines.at(6), lines.at(7), filling);
@@ -842,12 +850,12 @@ void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius
 
 void ImGuiRender::drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(DrawType::TRIANGLE, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p2.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color), thickness)));
+	m_drawData.emplace_back(DrawType::TRIANGLE, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color), thickness)));
 }
 
 void ImGuiRender::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
 {
-	m_drawData.emplace_back(DrawType::TRIANGLE_FILLED, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p2.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color))));
+	m_drawData.emplace_back(DrawType::TRIANGLE_FILLED, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color))));
 }
 
 void ImGuiRender::drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness)

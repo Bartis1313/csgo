@@ -3,6 +3,7 @@
 #include "Vector2D.hpp"
 #include <cmath>
 #include <algorithm>
+#include <compare>
 
 struct Vector
 {

@@ -321,10 +321,16 @@ public:
 	void text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...);
-	// pass pos from world
-	void drawBox3D(const Vector& pos, const float width, const float height, const Color& color, const float thickness = 2.0f);
-	// pass pos from world
-	void drawBox3DFilled(const Vector& pos, const float width, const float height, const Color& color, const Color& filling = {}, const float thickness = 2.0f);
+	// pass pos from world. this box is static!, so you will often pass width.x == width.y
+	// width.x -> pass starting width at front
+	// width.y -> pass width of the box, between points at side
+	// also see: https://cdn.discordapp.com/attachments/832240559468576802/955504104355037214/unknown.png to get where points are
+	void drawBox3D(const Vector& pos, const Vector2D& width, const float height, const Color& color, const float thickness = 2.0f);
+	// pass pos from world. this box is static!, so you will often pass width.x == width.y
+	// width.x -> pass starting width at front
+	// width.y -> pass width of the box, between points at side
+	// also see: https://cdn.discordapp.com/attachments/832240559468576802/955504104355037214/unknown.png to get where points are
+	void drawBox3DFilled(const Vector& pos, const Vector2D& width, const float height, const Color& color, const Color& filling = Colors::Grey, const float thickness = 2.0f);
 
 	/*
 	* arcs - there are few problems with them. Especially you can see it when trying to do arc that is a full circle.

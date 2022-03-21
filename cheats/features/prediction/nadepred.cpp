@@ -96,7 +96,7 @@ void GrenadePrediction::draw()
 
 	for (const auto& el : m_bounces)
 	{
-		imRender.drawBox3DFilled(el, 5.0f, 5.0f, Colors::Green, Colors::Green);
+		imRender.drawBox3DFilled(el, { 5.0f, 5.0f }, 5.0f, Colors::Green, Colors::Green);
 	}
 
 	imRender.drawCircle3D(m_path.back(), weapon->getNadeRadius(), 32, Colors::White);

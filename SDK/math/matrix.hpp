@@ -1,5 +1,6 @@
 #pragma once
 #include "Vector.hpp"
+#include <compare>
 
 struct matrix3x4_t
 {
