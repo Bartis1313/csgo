@@ -1,32 +1,9 @@
 #pragma once
-#include "IEngineTrace.hpp"
-#include "material.hpp"
+#include "math/Vector.hpp"
+#include "../utilities/pad.hpp"
+#include "../utilities/vfunc.hpp"
 
-enum Hitboxes
-{
-	HITBOX_HEAD,
-	HITBOX_NECK,
-	HITBOX_PELVIS,
-	HITBOX_BELLY,
-	HITBOX_THORAX,
-	HITBOX_LOWER_CHEST,
-	HITBOX_UPPER_CHEST,
-	HITBOX_RIGHT_THIGH,
-	HITBOX_LEFT_THIGH,
-	HITBOX_RIGHT_CALF,
-	HITBOX_LEFT_CALF,
-	HITBOX_RIGHT_FOOT,
-	HITBOX_LEFT_FOOT,
-	HITBOX_RIGHT_HAND,
-	HITBOX_LEFT_HAND,
-	HITBOX_RIGHT_UPPER_ARM,
-	HITBOX_RIGHT_FOREARM,
-	HITBOX_LEFT_UPPER_ARM,
-	HITBOX_LEFT_FOREARM,
-	HITBOX_MAX
-};
-
-struct mstudiobone_t
+struct Mstudiobone_t
 {
 	int m_nameIndex;
 	int m_parent;
@@ -35,7 +12,7 @@ struct mstudiobone_t
 	PAD(52);
 };
 
-struct mstudiobbox_t
+struct Mstudiobbox_t
 {
 	int m_bone;
 	int m_group;
@@ -52,7 +29,7 @@ struct mstudiobbox_t
 	}
 };
 
-struct mstudiohitboxset_t
+struct Mstudiohitboxset_t
 {
 	int m_nameIndex;
 	int m_hitboxesCount;
@@ -63,13 +40,13 @@ struct mstudiohitboxset_t
 		return (!m_nameIndex) ? nullptr : reinterpret_cast<const char*>((uint8_t*)this + m_hitboxesIndex);
 	}
 
-	mstudiobbox_t* getHitbox(int i) const
+	Mstudiobbox_t* getHitbox(int i) const
 	{
-		return (i > m_hitboxesCount) ? nullptr : reinterpret_cast<mstudiobbox_t*>((uint8_t*)this + m_hitboxesIndex) + i;
+		return (i > m_hitboxesCount) ? nullptr : reinterpret_cast<Mstudiobbox_t*>((uint8_t*)this + m_hitboxesIndex) + i;
 	}
 };
 
-struct model_t
+struct Model_t
 {
 	void* m_handle;
 	char m_name[260];
@@ -83,7 +60,7 @@ struct model_t
 	PAD(28);
 };
 
-struct studiohdr_t
+struct Studiohdr_t
 {
 	int m_id;
 	int m_version;
@@ -104,13 +81,13 @@ struct studiohdr_t
 	int m_hitboxSetsCount;
 	int m_hitboxSetIndex;
 
-	mstudiohitboxset_t* getHitboxSet(int i) const
+	Mstudiohitboxset_t* getHitboxSet(int i) const
 	{
-		return (i > m_hitboxSetsCount) ? nullptr : reinterpret_cast<mstudiohitboxset_t*>((uint8_t*)this + m_hitboxSetIndex) + i;
+		return (i > m_hitboxSetsCount) ? nullptr : reinterpret_cast<Mstudiohitboxset_t*>((uint8_t*)this + m_hitboxSetIndex) + i;
 	}
-	mstudiobone_t* bone(int i) const
+	Mstudiobone_t* bone(int i) const
 	{
-		return (i > m_bonesCount) ? nullptr : reinterpret_cast<mstudiobone_t*>((uint8_t*)this + m_boneIndex) + i;
+		return (i > m_bonesCount) ? nullptr : reinterpret_cast<Mstudiobone_t*>((uint8_t*)this + m_boneIndex) + i;
 	}
 };
 
@@ -118,5 +95,5 @@ class IVModelInfo
 {
 public:
 	VFUNC(int, getModelIndex, 2, (const char* name), (this, name));
-	VFUNC(studiohdr_t*, getStudioModel, 32, (const model_t* model), (this, model));
+	VFUNC(Studiohdr_t*, getStudioModel, 32, (const Model_t* model), (this, model));
 };

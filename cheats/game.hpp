@@ -1,5 +1,8 @@
 #pragma once
+
 #include "../SDK/structs/Entity.hpp"
+
+class CUserCmd;
 
 namespace game
 {

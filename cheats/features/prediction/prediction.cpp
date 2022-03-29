@@ -1,22 +1,18 @@
 #include "prediction.hpp"
+
+#include "../../../SDK/CGameMovement.hpp"
+#include "../../../SDK/CUserCmd.hpp"
+#include "../../../SDK/CGlobalVars.hpp"
+
 #include "../../game.hpp"
 
-// some globals
-namespace
-{
-	float curTime;
-	float frameTime;
-	uintptr_t* predicionRandomSeed;
-	CMoveData data = {};
-}
-
-void prediction::start(CUserCmd* cmd)
+void Prediction::start(CUserCmd* cmd)
 {
 	if (!game::localPlayer)
 		return;
 
 	// init once
-	static auto bOnce = []()
+	static auto bOnce = [this]()
 	{
 		predicionRandomSeed = *reinterpret_cast<uintptr_t**>(utilities::patternScan(CLIENT_DLL, PREDICTIONRANDOMSEED) + 0x2);
 		return true;
@@ -45,7 +41,7 @@ void prediction::start(CUserCmd* cmd)
 	interfaces::prediction->finishMove(game::localPlayer, cmd, &data);
 }
 
-void prediction::end()
+void Prediction::end()
 {
 	if (!game::localPlayer)
 		return;
@@ -59,4 +55,11 @@ void prediction::end()
 
 	interfaces::globalVars->m_curtime = curTime;
 	interfaces::globalVars->m_frametime = frameTime;
+}
+
+void Prediction::addToPrediction(CUserCmd* cmd, const std::function<void()>& fun)
+{
+	start(cmd);
+	fun();
+	end();
 }

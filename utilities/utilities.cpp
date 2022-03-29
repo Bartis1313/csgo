@@ -1,15 +1,16 @@
 #include "utilities.hpp"
-#include "renderer/renderer.hpp"
-#include "../SDK/structs/Entity.hpp"
+
+#include <Windows.h>
 #include <Psapi.h>
 #include <optional>
 #include <sstream>
 #include <algorithm>
 #include <chrono>
 #include <numeric>
+#include <cstddef>
 
-#undef max
-#undef min
+#pragma warning(disable: 6001) // memory unallocated
+#pragma warning(disable: 6054) // string terminated
 
 std::string utilities::getTime()
 {
@@ -20,7 +21,7 @@ std::string utilities::getTime()
 	return ss.str();
 }
 
-uintptr_t utilities::patternScan(const std::string& mod, const std::string& mask)
+uintptr_t utilities::patternScan(const std::string& mod, const std::string& mask, const uintptr_t offsetToAdd)
 {
 	MODULEINFO modInfo;
 #ifndef _DEBUG
@@ -31,19 +32,19 @@ uintptr_t utilities::patternScan(const std::string& mod, const std::string& mask
 	uintptr_t ranageStart = reinterpret_cast<uintptr_t>(modInfo.lpBaseOfDll);
 	std::istringstream iss{ mask };
 	std::vector<std::string> parts{ std::istream_iterator<std::string>{ iss }, std::istream_iterator<std::string>{} };
-	std::vector<std::optional<byte>> actualPattern = {};
+	std::vector<std::optional<std::byte>> actualPattern = {};
 
-	std::for_each(parts.cbegin(), parts.cend(), [&](const std::string& str) -> void
+	std::for_each(parts.cbegin(), parts.cend(), [&](const std::string& str)
 		{
 			if (str == "?" || str == "??")
 				actualPattern.emplace_back(std::nullopt);
 			else
-				actualPattern.emplace_back(static_cast<byte>(std::stoi(str, nullptr, 16)));
+				actualPattern.emplace_back(static_cast<std::byte>(std::stoi(str, nullptr, 16)));
 		});
 
-	for (int i = 0; i < modInfo.SizeOfImage; i++)
+	for (size_t i = 0; i < modInfo.SizeOfImage; i++)
 	{
-		if (auto check = [](byte* data, const std::vector<std::optional<byte>>& _mask) -> bool
+		if (auto check = [](std::byte* data, const std::vector<std::optional<std::byte>>& _mask)
 			{
 				for (const auto& _byte : _mask)
 				{
@@ -52,9 +53,9 @@ uintptr_t utilities::patternScan(const std::string& mod, const std::string& mask
 						data++;
 				}
 				return true;
-			}; check(reinterpret_cast<byte*>(ranageStart + i), actualPattern))
+			}; check(reinterpret_cast<std::byte*>(ranageStart + i), actualPattern))
 		{
-			return ranageStart + i;
+			return ranageStart + i + offsetToAdd;
 		}
 	}
 
@@ -62,6 +63,11 @@ uintptr_t utilities::patternScan(const std::string& mod, const std::string& mask
 
 	return 0;
 }
+
+#include "../SDK/structs/Entity.hpp"
+#include "../SDK/ICollideable.hpp"
+#include "renderer/renderer.hpp"
+#include "math/math.hpp"
 
 bool utilities::getBox(Entity_t* ent, Box& box)
 {
@@ -75,18 +81,19 @@ bool utilities::getBox(Entity_t* ent, Box& box)
 
 	std::array points =
 	{
-		Vector(min.x, min.y, min.z),
-		Vector(min.x, max.y, min.z),
-		Vector(max.x, max.y, min.z),
-		Vector(max.x, min.y, min.z),
-		Vector(max.x, max.y, max.z),
-		Vector(min.x, max.y, max.z),
-		Vector(min.x, min.y, max.z),
-		Vector(max.x, min.y, max.z)
+		Vector{ min.x, min.y, min.z },
+		Vector{ min.x, max.y, min.z },
+		Vector{ max.x, max.y, min.z },
+		Vector{ max.x, min.y, min.z },
+		Vector{ min.x, min.y, max.z },
+		Vector{ min.x, max.y, max.z },
+		Vector{ max.x, max.y, max.z },
+		Vector{ max.x, min.y, max.z }
 	};
 
-	if (!points.data())
-		return false;
+	// will never happen
+	/*if (!points.data())
+		return false;*/
 
 	const auto& tranFrame = ent->m_rgflCoordinateFrame();
 
@@ -127,18 +134,19 @@ bool utilities::getBox3D(Entity_t* ent, Box3D& box)
 
 	std::array points =
 	{
-		Vector(min.x, min.y, min.z),
-		Vector(min.x, max.y, min.z),
-		Vector(max.x, max.y, min.z),
-		Vector(max.x, min.y, min.z),
-		Vector(min.x, min.y, max.z),
-		Vector(min.x, max.y, max.z),
-		Vector(max.x, max.y, max.z),
-		Vector(max.x, min.y, max.z)
+		Vector{ min.x, min.y, min.z },
+		Vector{ min.x, max.y, min.z },
+		Vector{ max.x, max.y, min.z },
+		Vector{ max.x, min.y, min.z },
+		Vector{ min.x, min.y, max.z },
+		Vector{ min.x, max.y, max.z },
+		Vector{ max.x, max.y, max.z },
+		Vector{ max.x, min.y, max.z }
 	};
 
-	if (!points.data())
-		return false;
+	// will never happen
+	/*if (!points.data())
+		return false;*/
 
 	const auto& tranFrame = ent->m_rgflCoordinateFrame();
 
@@ -164,7 +172,7 @@ bool utilities::getBox3D(Entity_t* ent, Box3D& box)
 
 size_t utilities::inByteOrder(const size_t netLong)
 {
-	std::array<byte, 4> data = {};
+	std::array<std::byte, 4> data = {};
 	memcpy(&data, &netLong, data.size());
 
 	return (static_cast<size_t>(data.at(3)) << 0)
@@ -173,12 +181,12 @@ size_t utilities::inByteOrder(const size_t netLong)
 		| (static_cast<size_t>(data.at(0)) << 24);
 }
 
-std::string utilities::getKeyName(const UINT virtualKey)
+std::string utilities::getKeyName(const uint32_t virtualKey)
 {
 #ifdef _DEBUG
-	UINT scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
+	uint32_t scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
 #else
-	UINT scanCode = LF(MapVirtualKeyA).cached()(virtualKey, MAPVK_VK_TO_VSC);
+	uint32_t scanCode = LF(MapVirtualKeyA).cached()(virtualKey, MAPVK_VK_TO_VSC);
 #endif
 
 	// because MapVirtualKey strips the extended bit for some keys
@@ -239,7 +247,7 @@ std::string utilities::toLowerCase(const std::string& str)
 		{
 			el = ::tolower(el);
 		});
-	return std::move(result);
+	return result;
 }
 
 std::string utilities::toUpperCase(const std::string& str)
@@ -249,7 +257,7 @@ std::string utilities::toUpperCase(const std::string& str)
 		{
 			el = ::toupper(el);
 		});
-	return std::move(result);
+	return result;
 }
 
 std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
@@ -259,30 +267,18 @@ std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
 	std::string word;
 	while (std::getline(content, word, limit))
 	{
-		res.emplace_back(word);
+		res.push_back(word);
 	}
 	return res;
 }
 
-SHORT utilities::getKey(const UINT vKey)
+uint32_t utilities::getKey(const uint32_t vKey)
 {
 #ifdef _DEBUG
 	return GetAsyncKeyState(vKey);
 #else
 	return LF(GetAsyncKeyState).cached()(vKey);
 #endif
-}
-
-bool utilities::isValidWindow()
-{
-#ifdef _DEBUG
-	if (auto window = FindWindowA("Valve001", NULL); GetForegroundWindow() != window)
-		return false;
-#else
-	if (auto window = LF(FindWindowA).cached()(XOR("Valve001"), NULL); LF(GetForegroundWindow).cached()() != window)
-		return false;
-#endif
-	return true;
 }
 
 float utilities::scaleDamageArmor(float dmg, const float armor)

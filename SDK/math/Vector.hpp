@@ -17,6 +17,9 @@ public:
 	constexpr Vector(const float* arr)
 		: x{ arr[0] }, y{ arr[1] }, z{ arr[2] }
 	{}
+	constexpr Vector(float* arr)
+		: x{ arr[0] }, y{ arr[1] }, z{ arr[2] }
+	{}
 
 	constexpr void clamp()
 	{
@@ -104,11 +107,6 @@ public:
 	constexpr const float& operator[](int i) const
 	{
 		return ((float*)this)[i];
-	}
-
-	bool operator!() const
-	{
-		return !isZero() && isValid();
 	}
 
 	constexpr bool operator==(const Vector& src) const

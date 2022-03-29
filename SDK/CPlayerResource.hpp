@@ -17,7 +17,7 @@ public:
 	NETVAR_BY_INDEX(int, getDeaths, m_iDeaths);
 	NETVAR_BY_INDEX(int, getPing, m_iPing);
 private: // 65 is supposed to be max players, correct if this is higher, who plays on such big servers though?
-	NETVAR(int[65], m_iKills, "DT_PlayerResource", "m_iKills");
-	NETVAR(int[65], m_iDeaths, "DT_PlayerResource", "m_iDeaths");
-	NETVAR(int[65], m_iPing, "DT_PlayerResource", "m_iPing");
+	NETVAR(int[65], &m_iKills, "DT_PlayerResource", "m_iKills");
+	NETVAR(int[65], &m_iDeaths, "DT_PlayerResource", "m_iDeaths");
+	NETVAR(int[65], &m_iPing, "DT_PlayerResource", "m_iPing");
 };

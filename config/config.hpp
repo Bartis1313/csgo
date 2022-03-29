@@ -121,5 +121,7 @@ private:
 	const std::string m_defaultConfig = XOR("default.cfg");
 	// your desire to name it
 	static std::string m_mainEntryFolder;
-} inline config{ XOR("default.cfg"), XOR("csgo") }; /*should be stored somewhere else for many places and so instances
+};
+
+inline Config config{ XOR("default.cfg"), XOR("csgo") }; /*should be stored somewhere else for many places and so instances
 													 also iif you want "load this config on start" thing, just pass the name to constructor*/

@@ -3,7 +3,9 @@
 
 #include "math/matrix.hpp"
 #include "math/Vector.hpp"
-#include "../utilities/utilities.hpp"
+
+#include "../utilities/pad.hpp"
+#include "../utilities/vfunc.hpp"
 
 #define FLOW_OUTGOING	0
 #define FLOW_INCOMING	1
@@ -12,33 +14,37 @@
 class INetChannelInfo
 {
 public:
+	VFUNC(char*, getAddress, 1, (), (this));
+	VFUNC(float, getTime, 2, (), (this));
+	VFUNC(bool, isLoopBack, 6, (), (this));
+	VFUNC(bool, isPlayBack, 8, (), (this));
 	VFUNC(float, getLatency, 9, (int flow), (this, flow));
 	PAD(44);
 	int chockedPackets;
 };
 
-typedef struct playerInfo_t
+struct PlayerInfo_t
 {
-	long long unknown;
+	PAD(8);
 	union
 	{
-		long long steamID64;
+		uint64_t m_steamID64;
 		struct
 		{
-			int xuidlow;
-			int xuidhigh;
+			int m_xuidlow;
+			int m_xuidhigh;
 		};
 	};
-	char name[128];
-	int userId;
-	char guid[33];
-	unsigned int friendsid;
-	char friendsname[128];
-	bool fakeplayer;
-	bool ishltv;
-	unsigned int customfiles[4];
-	unsigned char filesdownloaded;
-} playerInfo_t;
+	char m_name[128];
+	int m_userID;
+	char m_guid[33];
+	uint32_t m_friendsID;
+	char m_friendsName[128];
+	bool m_fakePlayer;
+	bool m_ishltv;
+	size_t m_cutomFiles[4];
+	uint8_t m_filesDownloaded;
+};
 
 class IVEngineClient
 {
@@ -47,15 +53,13 @@ public:
 	VFUNC(bool, isConnected, 27, (), (this));
 	VFUNC(int, getLocalPlayer, 12, (), (this));
 	VFUNC(int, getPlayerID, 9, (int id), (this, id));
-	// need to be const
 	VFUNC(void, setViewAngles, 19, (const Vector& angles), (this, std::cref(angles)));
 	VFUNC(void, getViewAngles, 18, (Vector& angles), (this, std::ref(angles)));
 	VFUNC(int, getMaxClients, 20, (), (this));
-	VFUNC(int, getPlayerInfo, 8, (int index, playerInfo_t* info), (this, index, info));
+	VFUNC(int, getPlayerInfo, 8, (int index, PlayerInfo_t* info), (this, index, info));
 	VFUNC(void, getScreenSize, 5, (int& width, int& height), (this, std::ref(width), std::ref(height)));
-	// this is not really this command, but another one, the delay is smth with bytes, go look ida parameters
-	VFUNC(void, executeClientCMD, 114, (const char* cmd, char delay = 0), (this, cmd, 0));
-	VFUNC(VMatrix&, worldToScreenMatrix, 37, (), (this));
+	VFUNC(void, executeClientCMD, 114, (const char* cmd, char delay = 0), (this, cmd, delay));
+	VFUNC(Matrix4x4&, worldToScreenMatrix, 37, (), (this));
 	VFUNC(const char*, getLevelName, 53, (), (this));
 	VFUNC(INetChannelInfo*, getNameNetChannel, 78, (), (this));
 	VFUNC(bool, isTakingScreenshot, 92, (), (this));

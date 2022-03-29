@@ -1,5 +1,10 @@
 #include "game.hpp"
 
+#include "../SDK/IVEngineClient.hpp"
+#include "../SDK/CUserCmd.hpp"
+#include "../SDK/CGlobalVars.hpp"
+#include "../SDK/interfaces/interfaces.hpp"
+
 namespace game
 {
 	bool isAvailable()

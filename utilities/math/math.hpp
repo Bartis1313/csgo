@@ -13,7 +13,7 @@ namespace math
 {
 	_NODISCARD Vector calcAngleRelative(const Vector& src, const Vector& dest, const Vector& viewAngle);
 	_NODISCARD float calcFov(const Vector& source, const Vector& destination, const Vector& viewAngles);
-	_NODISCARD Vector transformVector(const Vector& in, const matrix3x4_t& matrix);
+	_NODISCARD Vector transformVector(const Vector& in, const Matrix3x4& matrix);
 	_NODISCARD Vector angleVec(const Vector& angle);
 	_NODISCARD float normalizeYaw(float yaw);
 	_NODISCARD float normalizePitch(float pitch);

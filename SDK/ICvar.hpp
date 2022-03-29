@@ -1,9 +1,9 @@
 #pragma once
-#include "Color.hpp"
 #include "../utilities/vfunc.hpp"
 
 class ConCommand;
 class IConVar;
+struct SDKColor;
 
 class ICvar
 {

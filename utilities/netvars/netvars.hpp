@@ -1,9 +1,10 @@
 #pragma once
-#include <cstdint>
+
 #include <fstream>
 #include <unordered_map>
+#include <type_traits>
+
 #include "../../utilities/utilities.hpp"
-#include "../../SDK/Recv.hpp"
 
 // generate netvar address
 // type - template type for return type
@@ -48,6 +49,9 @@ _NODISCARD std::add_lvalue_reference_t<type> name() { \
 	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset + addr); \
 	}
 
+class RecvTable;
+class RecvProp;
+
 class NetvarManager
 {
 public:
@@ -56,8 +60,8 @@ public:
 	void dump();
 private:
 	std::unordered_map<std::string, RecvTable*> m_Tables;
-	uintptr_t getProp(const char* tableName, const char* propName, RecvProp** prop = 0) const;
-	uintptr_t getProp(RecvTable* recvTable, const char* propName, RecvProp** prop = 0) const;
+	uintptr_t getProp(const char* tableName, const char* propName, RecvProp** prop = nullptr) const;
+	uintptr_t getProp(RecvTable* recvTable, const char* propName, RecvProp** prop = nullptr) const;
 	RecvTable* getTable(const char* tableName) const;
 	std::string getType(RecvProp* recvTable) const;
 	void dump(RecvTable* recvTable);

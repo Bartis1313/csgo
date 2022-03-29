@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 #include "../utilities/vfunc.hpp"
 
 class IClientEntityList

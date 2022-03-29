@@ -1,17 +1,18 @@
 #pragma once
-
-#include <cstddef>
 #include <string>
+
 #include "material.hpp"
+
 #include "../utilities/utilities.hpp"
+#include "../utilities/pad.hpp"
 
 class IVStudioRender
 {
+    PAD(592);
 private:
-    // no PAD because fail with public what I don't want
-    char pad0[592];
     IMaterial* materialOverride;
-    char pad1[12];
+    PAD(12);
+private:
     OverrideType_t ovverideType;
 public:
     bool isForced()

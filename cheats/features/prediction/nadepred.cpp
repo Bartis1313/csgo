@@ -1,8 +1,19 @@
 #include "nadepred.hpp"
-#include "../../game.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../globals.hpp"
+
+#include "../../../SDK/math/Vector.hpp"
+#include "../../../SDK/IWeapon.hpp"
+#include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/CGlobalVars.hpp"
+#include "../../../SDK/IEngineTrace.hpp"
+#include "../../../SDK/ICvar.hpp"
+#include "../../../SDK/Convar.hpp"
+#include "../../../SDK/Enums.hpp"
+
 #include "../../../config/vars.hpp"
+#include "../../game.hpp"
+#include "../../globals.hpp"
+#include "../../../utilities/renderer/renderer.hpp"
+#include "../../../utilities/math/math.hpp"
 
 #define DETONATE 1
 #define BOUNCE 2
@@ -101,9 +112,6 @@ void GrenadePrediction::draw()
 
 	imRender.drawCircle3D(m_path.back(), weapon->getNadeRadius(), 32, Colors::White);
 }
-
-#undef min
-#undef max
 
 // not using magic value given by valve, so we never are based on buttons
 void GrenadePrediction::setup(Vector& src, Vector& vecThrow, const Vector& viewangles)
@@ -228,8 +236,8 @@ bool GrenadePrediction::checkDetonate(const Vector& vecThrow, const Trace_t& tr,
 	case WEAPON_MOLOTOV:
 	case WEAPON_FIREBOMB:
 	{
-		const static float molotov_throw_detonate_time = interfaces::console->findVar(XOR("molotov_throw_detonate_time"))->getFloat();
-		const static float weapon_molotov_maxdetonateslope = interfaces::console->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
+		const static float molotov_throw_detonate_time = interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"))->getFloat();
+		const static float weapon_molotov_maxdetonateslope = interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
 
 		if (tr.didHit() && tr.m_plane.m_normal.z >= std::cos(DEG2RAD(weapon_molotov_maxdetonateslope)))
 			return true;
@@ -259,7 +267,7 @@ void GrenadePrediction::addGravityMove(Vector& move, Vector& vel, float frametim
 	move.x = vel.x * frametime;
 	move.y = vel.y * frametime;
 
-	const static float svgrav = interfaces::console->findVar(XOR("sv_gravity"))->getFloat();
+	const static float svgrav = interfaces::cvar->findVar(XOR("sv_gravity"))->getFloat();
 	float gravity = svgrav * 0.4f;
 	float z = vel.z - (gravity * frametime);
 	move.z = ((vel.z + z) / 2.0f) * frametime;

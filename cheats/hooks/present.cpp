@@ -1,11 +1,18 @@
 #include "hooks.hpp"
+
+#include <d3d9.h>
+
 #include "../../dependencies/ImGui/imgui_impl_dx9.h"
 #include "../../dependencies/ImGui/imgui_impl_win32.h"
 #include "../../dependencies/ImGui/imgui.h"
 #include "../menu/GUI-ImGui/menu.hpp"
-#include "../../utilities/renderer/renderer.hpp"
 
 #include "../features/visuals/radar.hpp"
+#include "../features/misc/misc.hpp"
+
+#include "../../utilities/renderer/renderer.hpp"
+#include "../../utilities/utilities.hpp"
+#include "../../utilities/console/console.hpp"
 
 long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {
@@ -17,9 +24,9 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 	{
 		ImGui_ImplDX9_Init(device);
 		// style, colors, ini file etc.
-		ImGuiMenu::init();
+		menu.init();
 
-		LOG(LOG_INFO, XOR("init for present success"));
+		console.log(TypeLogs::LOG_INFO, XOR("init for present success"));
 
 		return true;
 	} ();
@@ -35,9 +42,12 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 	ImGui::NewFrame();
 	// anything that is responsible by imgui to be drawn, not including the game's w2s
 	{
-		ImGuiMenu::draw();
+		menu.draw();
+		console.drawLog();
 		imRender.renderPresent(ImGui::GetBackgroundDrawList());
-		radar::run();
+		radar.run();
+		misc.drawFpsPlot();
+		misc.drawVelocityPlot();
 	}
 
 	// END DRAW

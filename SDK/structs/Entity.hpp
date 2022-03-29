@@ -1,18 +1,21 @@
 #pragma once
 
 #include "../../utilities/netvars/netvars.hpp"
+#include "../../utilities/vfunc.hpp"
 #include "../interfaces/interfaces.hpp"
+#include "../vars.hpp"
 #include "IDXandPaterrns.hpp"
-#include "../../utilities/math/math.hpp"
-#include "../animations.hpp"
 
+#include "../math/Vector.hpp"
+#include "../math/matrix.hpp"
 
 class Weapon_t;
 class Player_t;
-
-// Virtual functions
-// 0x4 - renderable
-// 0x8 - networkable
+class ClientClass;
+class ICollideable;
+class AnimationLayer;
+struct Model_t;
+class WeaponInfo;
 
 /*
 * This file is so far probably the easiest when it comes to netvar usage
@@ -22,8 +25,10 @@ class Player_t;
 * Try to keep longer methods in cpp file
 */
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////
+
+#define RENDERABLE 0x4
+#define NETWORKABLE 0x8
 
 class Entity_t
 {
@@ -36,20 +41,20 @@ public:
 	NETVAR(bool, m_bSpotted, "DT_BaseEntity", "m_bSpotted");
 	NETVAR(float, m_flSimulationTime, "DT_BasePlayer", "m_flSimulationTime");
 	NETVAR_ADDR(int, m_nRenderMode, "DT_BasePlayer", "m_nRenderMode", 0x1);
-	NETVAR_ADDR(matrix3x4_t, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
+	NETVAR_ADDR(Matrix3x4, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
 
 	VFUNC(Vector&, absOrigin, 10, (), (this));
 	VFUNC(Vector&, absAngles, 11, (), (this));
-	VFUNC(ClientClass*, clientClass, 2, (), (this + 0x8));
+	VFUNC(ClientClass*, clientClass, 2, (), (this + NETWORKABLE));
 	VFUNC(ICollideable*, collideable, 3, (), (this));
-	VFUNC(int, getIndex, 10, (), (this + 0x8));
-	VFUNC(void, getRenderBounds, 17, (Vector& mins, Vector& maxs), (this + 0x4, std::ref(mins), std::ref(maxs)));
+	VFUNC(int, getIndex, 10, (), (this + NETWORKABLE));
+	VFUNC(void, getRenderBounds, 17, (Vector& mins, Vector& maxs), (this + RENDERABLE, std::ref(mins), std::ref(maxs)));
 	VFUNC(bool, isPlayer, ISPLAYER, (), (this));
 	VFUNC(bool, isWeapon, ISWEAPON, (), (this));
-	VFUNC(bool, setupBones, 13, (matrix3x4_t* out, int maxBones, int mask, float time), (this + 0x4, out, maxBones, mask, time));
-	VFUNC(model_t*, getModel, 8, (), (this + 0x4));
-	VFUNC(int, drawModel, 9, (int flags, uint8_t alpha), (this + 0x4, flags, alpha));
-	VFUNC(bool, isDormant, 9, (), (this + 0x8));
+	VFUNC(bool, setupBones, 13, (Matrix3x4* out, int maxBones, int mask, float time), (this + RENDERABLE, out, maxBones, mask, time));
+	VFUNC(Model_t*, getModel, 8, (), (this + RENDERABLE));
+	VFUNC(int, drawModel, 9, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
+	VFUNC(bool, isDormant, 9, (), (this + NETWORKABLE));
 
 	_NODISCARD Vector getAimPunch();
 	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
@@ -91,7 +96,7 @@ public:
 
 	VFUNC(float, getInaccuracy, INACCURACY, (), (this));
 	VFUNC(float, getSpread, SPREAD, (), (this));
-	VFUNC(WeaponInfo*, getWpnInfo, WEAPONINFO, (), (this))
+	VFUNC(WeaponInfo*, getWpnInfo, WEAPONINFO, (), (this));
 
 	_NODISCARD std::string getWpnName();
 
@@ -110,16 +115,15 @@ public:
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-// TODO: add more to points
 class Inferno_t : public Entity_t
 {
 public:
 	_NODISCARD static float expireTime() { return 7.0f; }
 	OFFSET(float, spawnTime, 0x20);
 	NETVAR(int, m_fireCount, "DT_Inferno", "m_fireCount");
-	NETVAR(int[100], m_fireXDelta, "DT_Inferno", "m_fireXDelta");
-	NETVAR(int[100], m_fireYDelta, "DT_Inferno", "m_fireYDelta");
-	NETVAR(int[100], m_fireZDelta, "DT_Inferno", "m_fireZDelta");
+	PTRNETVAR(int, m_fireXDelta, "DT_Inferno", "m_fireXDelta");
+	PTRNETVAR(int, m_fireYDelta, "DT_Inferno", "m_fireYDelta");
+	PTRNETVAR(int, m_fireZDelta, "DT_Inferno", "m_fireZDelta");
 	_NODISCARD Vector getInfernoPos(size_t indexFire);
 
 };
@@ -129,13 +133,10 @@ public:
 class Player_t : public Entity_t
 {
 public:
-	// added many here, it's late night as I am writing it, I think those will be enough for all time this cheat is developed
-
 	NETVAR(Vector, m_angEyeAngles, "DT_CSPlayer", "m_angEyeAngles");
 	NETVAR(Vector, m_viewPunchAngle, "DT_BasePlayer", "m_viewPunchAngle");
 	NETVAR(Vector, m_aimPunchAngle, "DT_BasePlayer", "m_aimPunchAngle");
 	NETVAR(Vector, m_vecVelocity, "DT_BasePlayer", "m_vecVelocity[0]");
-	NETVAR(Vector, m_vecViewOffset, "DT_BasePlayer", "m_vecViewOffset[0]");
 	NETVAR(int, m_iHealth, "DT_CSPlayer", "m_iHealth");
 	NETVAR(int, m_ArmorValue, "DT_CSPlayer", "m_ArmorValue");
 	NETVAR(bool, m_bIsScoped, "DT_CSPlayer", "m_bIsScoped");
@@ -166,7 +167,7 @@ public:
 	_NODISCARD bool IsValid() { return (isAlive() && !isDormant()); }
 
 	_NODISCARD Vector getHitboxPos(const int id);
-	_NODISCARD Vector getBonePosition(const int id);
+	_NODISCARD Vector getBonePos(const int id);
 	_NODISCARD bool isC4Owner();
 	_NODISCARD std::string getName();
 	_NODISCARD int getKills();
@@ -176,5 +177,8 @@ public:
 	// address as number
 	_NODISCARD uintptr_t getLiteralAddress();
 };
+
+#undef RENDERABLE
+#undef NETWORKABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////

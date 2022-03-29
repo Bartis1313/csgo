@@ -3,7 +3,7 @@
 #include <array>
 #include <stdexcept>
 
-using ImU32 = unsigned int;
+using ImU32 = size_t;
 struct ImVec4;
 
 // 0.0 - 1.0, you can pass ints as 0-255 though

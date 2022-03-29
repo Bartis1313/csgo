@@ -1,16 +1,21 @@
 #include "hooks.hpp"
-#include "../features/misc/events.hpp"
-#include "../../dependencies/minhook/Minhook.h"
-#include "../../SDK/structs/IDXandPaterrns.hpp"
-#include "../../config/vars.hpp"
-#include "../../cheats/menu/GUI-ImGui/menu.hpp"
 #include "helpers/helper.hpp"
-#include "../../utilities/renderer/renderer.hpp"
+
+#include "../../SDK/structs/IDXandPaterrns.hpp"
+#include "../../SDK/interfaces/interfaces.hpp"
+
+#include "../../dependencies/minhook/Minhook.h"
 #include "../../dependencies/ImGui/imgui.h"
 #include "../../dependencies/ImGui/imgui_impl_win32.h"
+#include "../../cheats/menu/GUI-ImGui/menu.hpp"
+
+#include "../features/misc/events.hpp"
 #include "../features/visuals/player.hpp"
 #include "../features/visuals/world.hpp"
-#include <format>
+
+#include "../../config/vars.hpp"
+#include "../../utilities/renderer/renderer.hpp"
+#include "../../utilities/console/console.hpp"
 
 void hooks::init()
 {
@@ -28,12 +33,21 @@ void hooks::init()
 #pragma region checks
 	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK);
 	const auto clientValidAddrTarget = reinterpret_cast<void*>(addrClient);
+
 	const auto addrEngine = utilities::patternScan(ENGINE_DLL, NEW_CHECK);
 	const auto engineValidAddrTarget = reinterpret_cast<void*>(addrEngine);
+
 	const auto addrStudio = utilities::patternScan(STUDIORENDER_DLL, NEW_CHECK);
 	const auto studioValidAddrTarget = reinterpret_cast<void*>(addrStudio);
+
 	const auto addrMaterial = utilities::patternScan(MATERIAL_DLL, NEW_CHECK);
 	const auto matertialValidAddrTarget = reinterpret_cast<void*>(addrMaterial);
+
+	const auto addrIsusingDebugProps = utilities::patternScan(ENGINE_DLL, IS_USING_PROP_DEBUG);
+	const auto IsusingDebugPropsTarget = reinterpret_cast<void*>(addrIsusingDebugProps);
+
+	const auto addrgetColorModulation = utilities::patternScan(MATERIAL_DLL, GET_COLOR_MODULATION);
+	const auto getColorModulationTarget = reinterpret_cast<void*>(addrgetColorModulation);
 #pragma endregion
 
 #pragma region DX9
@@ -44,28 +58,35 @@ void hooks::init()
 
 	hookHelper::initMinhook();
 
-	//hookHelper::tryHook(creteMoveTarget, &createMove::hooked, hookHelper::ORIGINAL(createMove::original), XOR("createMove"));
-	hookHelper::tryHook(createMoveProxyTarget, &proxyCreateMove::hooked, hookHelper::ORIGINAL(proxyCreateMove::original), XOR("createmoveProxy"));
-	hookHelper::tryHook(paintTraverseTarget, &paintTraverse::hooked, hookHelper::ORIGINAL(paintTraverse::original), XOR("paintTraverse"));
-	hookHelper::tryHook(drawModelTarget, &drawModel::hooked, hookHelper::ORIGINAL(drawModel::original), XOR("drawModel"));
-	hookHelper::tryHook(overrideViewTarget, &overrideView::hooked, hookHelper::ORIGINAL(overrideView::original), "overrideView");
-	hookHelper::tryHook(doPostScreenEffectsTarget, &doPostScreenEffects::hooked, hookHelper::ORIGINAL(doPostScreenEffects::original), XOR("doPostScreenEffects"));
-	hookHelper::tryHook(frameStageNotifyTarget, &frameStageNotify::hooked, hookHelper::ORIGINAL(frameStageNotify::original), XOR("frameStageNotify"));
-	hookHelper::tryHook(clientValidAddrTarget, &clientValidAddr::hooked, hookHelper::ORIGINAL(clientValidAddr::original), XOR("clientValidAddr"));
-	hookHelper::tryHook(engineValidAddrTarget, &engineValidAddr::hooked, hookHelper::ORIGINAL(engineValidAddr::original), XOR("engineValidAddr"));
-	hookHelper::tryHook(studioValidAddrTarget, &studioRenderValidAddr::hooked, hookHelper::ORIGINAL(studioRenderValidAddr::original), XOR("studioValidAddr"));
-	hookHelper::tryHook(matertialValidAddrTarget, &materialSystemValidAddr::hooked, hookHelper::ORIGINAL(materialSystemValidAddr::original), XOR("matertialValidAddr"));
-	hookHelper::tryHook(resetTarget, &reset::hooked, hookHelper::ORIGINAL(reset::original), XOR("reset"));
-	hookHelper::tryHook(presentTagret, &present::hooked, hookHelper::ORIGINAL(present::original), XOR("present"));
+#define HOOK_SAFE(target, hookStructName) \
+hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName));
+
+	//HOOK_SAFE(creteMoveTarget, createMove);
+	HOOK_SAFE(createMoveProxyTarget, proxyCreateMove);
+	HOOK_SAFE(paintTraverseTarget, paintTraverse);
+	HOOK_SAFE(drawModelTarget, drawModel);
+	HOOK_SAFE(overrideViewTarget, overrideView);
+	HOOK_SAFE(doPostScreenEffectsTarget, doPostScreenEffects);
+	HOOK_SAFE(frameStageNotifyTarget, frameStageNotify);
+	HOOK_SAFE(clientValidAddrTarget, clientValidAddr);
+	HOOK_SAFE(engineValidAddrTarget, engineValidAddr);
+	HOOK_SAFE(studioValidAddrTarget, studioRenderValidAddr);
+	HOOK_SAFE(matertialValidAddrTarget, materialSystemValidAddr);
+	HOOK_SAFE(IsusingDebugPropsTarget, isUsingStaticPropDebugModes);
+	HOOK_SAFE(getColorModulationTarget, getColorModulation);
+	HOOK_SAFE(resetTarget, reset);
+	HOOK_SAFE(presentTagret, present);
 	// use if endscene needed
-	//hookHelper::tryHook(endTarget, &endScene::hooked, hookHelper::ORIGINAL(endScene::original), XOR("endscene"));
-	hookHelper::tryHook(lockCursorTarget, &lockCursor::hooked, hookHelper::ORIGINAL(lockCursor::original), XOR("lock cursor"));
+	//HOOK_SAFE(endTarget, endScene);
+	HOOK_SAFE(lockCursorTarget, lockCursor);
+
+#undef HOOK_SAFE
 
 	events.init();
 
 	hookHelper::checkAllHooks();
 
-	LOG(LOG_INFO, XOR("hooks success"));
+	console.log(TypeLogs::LOG_INFO, XOR("hooks success"));
 }
 
 #pragma region wndproc
@@ -81,6 +102,8 @@ void hooks::wndProcSys::init()
 	wndProcOriginal = reinterpret_cast<WNDPROC>(LF(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndproc)));
 }
 
+#include "../../SDK/InputSystem.hpp"
+
 void hooks::wndProcSys::shutdown()
 {
 	LF(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndProcOriginal));
@@ -95,20 +118,24 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(hwnd);
 
-		LOG(LOG_INFO, XOR("init for wndProc success"));
+		console.log(TypeLogs::LOG_INFO, XOR("init for wndProc success"));
 
 		return true;
 	} ();
 
 	// here, don't call getasynckeystate, it's another call for something that is already given by arg
-	if (message == WM_KEYDOWN)
+	if (message == WM_KEYDOWN) // should run some key struct for this
+	{
 		if (LOWORD(wparam) == config.get<int>(vars.iKeyMenu))
-			ImGuiMenu::isMenuActive = !ImGuiMenu::isMenuActive;
+			menu.changeActive();
+		if (LOWORD(wparam) == config.get<int>(vars.iKeyConsoleLog))
+			console.changeActiveLog();
+	}
 
-	interfaces::iSystem->enableInput(!ImGuiMenu::isMenuActive);
+	interfaces::iSystem->enableInput(!menu.isMenuActive());
 
 	// this needs to check it! this way we skip man flickering problems, maybe this is not like the best way
-	if (ImGuiMenu::isMenuActive && ImGui_ImplWin32_WndProcHandler(hwnd, message, wparam, lparam))
+	if (menu.isMenuActive() && ImGui_ImplWin32_WndProcHandler(hwnd, message, wparam, lparam))
 		return TRUE;
 #if _DEBUG
 	return CallWindowProcA(wndProcOriginal, hwnd, message, wparam, lparam);

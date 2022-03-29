@@ -29,7 +29,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -65,7 +65,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -95,14 +95,14 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level1</WarningLevel>
-      <Optimization>Full</Optimization>
+      <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest /Gw %(AdditionalOptions)</AdditionalOptions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <DebugInformationFormat>None</DebugInformationFormat>
@@ -111,12 +111,11 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <OmitFramePointers>true</OmitFramePointers>
-      <StringPooling>
-      </StringPooling>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <StringPooling>true</StringPooling>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <ExceptionHandling>Sync</ExceptionHandling>
       <BufferSecurityCheck>true</BufferSecurityCheck>
-      <FloatingPointModel>Precise</FloatingPointModel>
+      <FloatingPointModel>Fast</FloatingPointModel>
       <FloatingPointExceptions>
       </FloatingPointExceptions>
       <CreateHotpatchableImage>
@@ -160,6 +159,9 @@
     <ClCompile Include="cheats\features\prediction\prediction.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
+    <ClCompile Include="cheats\hooks\setupbones.cpp" />
+    <ClCompile Include="SEHcatch.cpp" />
     <ClCompile Include="cheats\features\visuals\chams.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -300,6 +302,7 @@
     <ClInclude Include="cheats\features\misc\misc.hpp" />
     <ClInclude Include="cheats\features\prediction\nadepred.hpp" />
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
+    <ClInclude Include="SEHcatch.hpp" />
     <ClInclude Include="cheats\features\visuals\chams.hpp" />
     <ClInclude Include="cheats\features\visuals\player.hpp" />
     <ClInclude Include="cheats\features\visuals\glow.hpp" />
@@ -440,7 +443,6 @@
     <ClInclude Include="SDK\CPlayerResource.hpp" />
     <ClInclude Include="SDK\IEffects.hpp" />
     <ClInclude Include="SDK\InputSystem.hpp" />
-    <ClInclude Include="source.hpp" />
     <ClInclude Include="config\config.hpp" />
     <ClInclude Include="dependencies\lazy_importer.hpp" />
     <ClInclude Include="dependencies\minhook\Minhook.h" />

@@ -1,10 +1,12 @@
 #pragma once
-#include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../config/vars.hpp"
 
-// TODO: Legit
-namespace bunnyhop
+class CUserCmd;
+
+class Bunnyhop final
 {
+public:
 	void run(CUserCmd* cmd);
 	void strafe(CUserCmd* cmd);
-}
+};
+
+inline Bunnyhop bunnyhop;

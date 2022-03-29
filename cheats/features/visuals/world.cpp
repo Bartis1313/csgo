@@ -1,12 +1,25 @@
 #include "world.hpp"
-#include "../../../utilities/utilities.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../game.hpp"
-#include "../../../config/vars.hpp"
-#include <format>
 
-void world::drawMisc()
+#include "../../../SDK/CGlobalVars.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
+#include "../../../SDK/ClientClass.hpp"
+#include "../../../SDK/IMaterialSystem.hpp"
+#include "../../../SDK/IVModelInfo.hpp"
+#include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/IViewRenderBeams.hpp"
+#include "../../../SDK/ICvar.hpp"
+#include "../../../SDK/ConVar.hpp"
+#include "../../../SDK/IWeapon.hpp"
+#include "../../../SDK/structs/Entity.hpp"
+#include "../../../SDK/interfaces/interfaces.hpp"
+
+#include "../../../config/vars.hpp"
+#include "../../game.hpp"
+#include "../../../utilities/renderer/renderer.hpp"
+#include "../../../utilities/math/math.hpp"
+#include "../../globals.hpp"
+
+void World::drawMisc()
 {
 	const auto maxIndex = interfaces::entList->getHighestIndex();
 	for (int i = 1; i <= maxIndex; i++)
@@ -48,7 +61,7 @@ void world::drawMisc()
 	}
 }
 
-void world::drawBombDropped(Entity_t* ent)
+void World::drawBombDropped(Entity_t* ent)
 {
 	if (!config.get<bool>(vars.bDrawDroppedC4))
 		return;
@@ -63,12 +76,12 @@ void world::drawBombDropped(Entity_t* ent)
 	}
 }
 
-void world::drawBomb(Entity_t* ent)
+void World::drawBomb(Entity_t* ent)
 {
 	if (!config.get<bool>(vars.bDrawBomb))
 		return;
 
-	const static auto tickbomb = interfaces::console->findVar(XOR("mp_c4timer"))->getFloat();
+	const static auto tickbomb = interfaces::cvar->findVar(XOR("mp_c4timer"))->getFloat();
 	const auto bombent = reinterpret_cast<Bomb_t*>(ent);
 	const auto bombtime = bombent->m_flC4Blow() - interfaces::globalVars->m_curtime;
 
@@ -106,7 +119,7 @@ static bool isNade(const int classid)
 	return false;
 }
 
-void world::drawProjectiles(Entity_t* ent)
+void World::drawProjectiles(Entity_t* ent)
 {
 	if (!config.get<bool>(vars.bDrawProjectiles))
 		return;
@@ -189,115 +202,128 @@ void world::drawProjectiles(Entity_t* ent)
 	}
 }
 
-void loadSkyBoxFunction(const char* name)
+static void loadSkyBoxFunction(const char* name)
 {
 	using fn = void(__fastcall*)(const char*);
 	static const auto forceSky = reinterpret_cast<fn>(utilities::patternScan(ENGINE_DLL, LOAD_SKY));
 	forceSky(name);
 }
 
-namespace skyGlobals
-{
-	bool done = false;
-	IConVar* sky = nullptr;
-}
+#include "../../menu/GUI-ImGui/selections.hpp"
 
-void implySky()
-{
-	if (skyGlobals::done)
-		return;
-
-	for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
-	{
-		auto material = interfaces::matSys->getMaterial(handle);
-
-		if (!material)
-			continue;
-
-		if (material->isError())
-			continue;
-
-		float brightness = config.get<float>(vars.fBrightnessWorld) / 100.0f;
-
-		if (strstr(material->getTextureGroupName(), XOR("World textures")))
-		{
-			material->colorModulate(brightness, brightness, brightness);
-		}
-
-		if (strstr(material->getTextureGroupName(), XOR("StaticProp")))
-		{
-			material->colorModulate(brightness, brightness, brightness);
-		}
-
-		if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
-		{
-			material->colorModulate(config.get<Color>(vars.cSky));
-		}
-	}
-	// force to new sky
-	loadSkyBoxFunction(XOR("sky_csgo_night2"));
-	skyGlobals::done = true;
-}
-
-void destroySky()
-{
-	if (!skyGlobals::done)
-		return;
-
-	for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
-	{
-		auto material = interfaces::matSys->getMaterial(handle);
-
-		if (!material)
-			continue;
-
-		if (material->isError())
-			continue;
-
-		if (strstr(material->getTextureGroupName(), XOR("StaticProp")))
-		{
-			material->colorModulate(Colors::White);
-		}
-
-		if (strstr(material->getTextureGroupName(), XOR("World textures")))
-		{
-			material->colorModulate(Colors::White);
-		}
-
-		if (strstr(material->getTextureGroupName(), XOR("SkyBox")))
-		{
-			material->colorModulate(Colors::White);
-		}
-	}
-	// restore the sky
-	loadSkyBoxFunction(skyGlobals::sky->m_name);
-	skyGlobals::done = false;
-}
-
-void world::skyboxLoad(int stage)
+void World::skyboxLoad(int stage, bool isShutdown)
 {
 	if (!interfaces::engine->isInGame())
-		return;
-
-	if (!game::localPlayer)
 		return;
 
 	// do not run when stage frames are not reached
 	if (stage != FRAME_RENDER_START)
 		return;
 
-	skyGlobals::sky = interfaces::console->findVar(XOR("sv_skyname"));
+	if (int index = config.get<int>(vars.iSkyBox); index != 0 && !isShutdown) // is not none and there is no shutdown
+		loadSkyBoxFunction(selections::skyboxes.at(index));
+	else
+	{
+		static bool bOnce = [this]()
+		{
+			m_oldSky = interfaces::cvar->findVar(XOR("sv_skyname"));
+			return true;
+		} ();
+		// restore the sky
+		loadSkyBoxFunction(m_oldSky->m_string);
+	}
+}
 
-	bool enabled = config.get<bool>(vars.bRunNight);
-	enabled ? implySky() : destroySky();
+void World::removeSky(bool isShutdown)
+{
+	const static auto r_3dsky = interfaces::cvar->findVar(XOR("r_3dsky"));
+	r_3dsky->setValue(!config.get<bool>(vars.bRemoveSky));
+	if (isShutdown) // default val reset
+		r_3dsky->setValue(true);
+}
 
-	// remove sky, not in meaning as full color
-	static const auto removeSky = interfaces::console->findVar(XOR("r_3dsky"));
-	removeSky->setValue(config.get<bool>(vars.bRunNight) ? false : true);
+//#include <map>
+
+void World::modulateWorld(void* thisptr, void* edx, float* r, float* g, float* b, bool isShutdown) // shutdown not needed, I don't know how to edit alpha properly
+{
+	if (!config.get<bool>(vars.bModulateColor))
+		return;
+
+	// to use this, you need to edit the hook and check for the valid address. The isusingdebugprops one. But forcing return is fairly easier
+	//const static auto r_drawspecificstaticprop = interfaces::cvar->findVar("r_drawspecificstaticprop");
+	//r_drawspecificstaticprop->setValue(!config.get<bool>(vars.bFixProps));
+
+	/*std::map<const char*, Color> materialNames =
+	{
+		{ "World", config.get<Color>(vars.cWorldTexture) },
+		{ "StaticProp", config.get<Color>(vars.cWorldProp) },
+		{ "SkyBox", config.get<Color>(vars.cSkyBox) },
+	};*/
+
+	auto editColor = [=](const Color& color)
+	{
+		*r = color.r();
+		*g = color.g();
+		*b = color.b();
+	};
+
+	/*for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
+	{*/
+	auto material = reinterpret_cast<IMaterial*>(thisptr);
+
+	if (!material)
+		return;
+
+	if (material->isError())
+		return;
+
+	auto matName = material->getTextureGroupName();
+
+	/*for (const auto& [name, color] : materialNames)
+	{
+		if (auto check = matName.starts_with(name); check && !isShutdown)
+			editColor(color);
+		else if (check && isShutdown)
+			editColor(Colors::White);
+	}*/
+
+	bool isGoodMat = false;
+
+	// using strstr will just be useless, don't do this. We know expected strings
+	// you can cast matName as string and use .compare or ==. Performance should be the same
+
+	if (!strcmp(matName, XOR("World textures")))
+	{
+		editColor(config.get<Color>(vars.cWorldTexture));
+		isGoodMat = true;
+	}
+
+	if (!strcmp(matName, XOR("StaticProp textures")))
+	{
+		editColor(config.get<Color>(vars.cWorldProp));
+		isGoodMat = true;
+	}
+
+	if (!strcmp(matName, XOR("SkyBox textures")))
+	{
+		editColor(config.get<Color>(vars.cSkyBox));
+		isGoodMat = true;
+	}
+
+	//constexpr int shaderAlpha = 5;
+
+	//// this might be bugged, remove if needed
+	//if (auto shader = material->getShaderParams()[shaderAlpha]; isGoodMat)
+	//{
+	//	!isShutdown
+	//		? shader->setValue(config.get<float>(vars.fShaderParam) / 100.0f)
+	//		: shader->setValue(1.0f); // default val reset
+	//}
+	//}
 }
 
 // TODO: add points, as drawing one circle is not accurate
-void world::drawMolotovPoints(Entity_t* ent)
+void World::drawMolotovPoints(Entity_t* ent)
 {
 	if (!config.get<bool>(vars.bDrawmolotovRange))
 		return;
@@ -323,7 +349,7 @@ void world::drawMolotovPoints(Entity_t* ent)
 	for (int i = 0; i < molotov->m_fireCount(); i++)
 	{
 		auto pos = origin + molotov->getInfernoPos(i);
-		imRender.drawCircle3DFilled(pos, molotovRadius, 32, Colors::Coral, Colors::Black);
+		imRender.drawCircle3DFilled(pos, molotovRadius, 32, Colors::Coral, Colors::Coral);
 
 		/*Vector2D posw;
 		if (!imRender.worldToScreen(pos, posw))
@@ -334,7 +360,7 @@ void world::drawMolotovPoints(Entity_t* ent)
 	}
 }
 
-void world::drawZeusRange()
+void World::drawZeusRange()
 {
 	if (!config.get<bool>(vars.bDrawZeusRange))
 		return;
@@ -360,7 +386,7 @@ void world::drawZeusRange()
 	}
 }
 
-void world::drawMovementTrail()
+void World::drawMovementTrail()
 {
 	static Vector end;
 

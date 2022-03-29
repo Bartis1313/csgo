@@ -1,5 +1,6 @@
 #pragma once
 #include "config.hpp"
+#include <Windows.h>
 
 // type - template
 // name - name of var
@@ -31,6 +32,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fTriggerDelay, 0.0f, "triggerbot amount of delay in ms");
 	CONFIG_ADD_VARIABLE(bool, bDrawFov, false, "draw fov representing aimbot range");
 	CONFIG_ADD_VARIABLE(Color, cDrawFov, Colors::LightBlue, "draw fov representing aimbot range color");
+	CONFIG_ADD_VARIABLE(bool, bDrawBestPoint, false, "draw best point of hitbox");
 
 	// VISUALS
 
@@ -78,9 +80,14 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cSmoke, Color(20, 70, 30, 255), "smoke color");
 	CONFIG_ADD_VARIABLE(Color, cDecoy, Color(0, 30, 60, 255), "decoy color");
 	CONFIG_ADD_VARIABLE(Color, cDropped, Colors::White, "dropped weapons color");
-	CONFIG_ADD_VARIABLE(bool, bRunNight, false, "run night enabled");
-	CONFIG_ADD_VARIABLE(Color, cSky, Colors::White, "sky color");
-	CONFIG_ADD_VARIABLE(float, fBrightnessWorld, 40.0f, "Brightness World");
+	CONFIG_ADD_VARIABLE(int, iSkyBox, 0, "custom skybox index");
+	CONFIG_ADD_VARIABLE(bool, bRemoveSky, false, "removes the sky");
+	CONFIG_ADD_VARIABLE(bool, bFixProps, false, "fix props in world");
+	CONFIG_ADD_VARIABLE(bool, bModulateColor, false, "world edit enabled");
+	CONFIG_ADD_VARIABLE(Color, cWorldTexture, Colors::White, "world textture color");
+	CONFIG_ADD_VARIABLE(Color, cWorldProp, Colors::White, "world prop color");
+	CONFIG_ADD_VARIABLE(Color, cSkyBox, Colors::White, "world skybox color");
+	CONFIG_ADD_VARIABLE(float, fShaderParam, 100.0f, "shader percent param");
 	CONFIG_ADD_VARIABLE(bool, bDrawmolotovRange, false, "draw mololotov range enabled");
 	CONFIG_ADD_VARIABLE(Color, cMolotovRange, Colors::Red, "mololotov range color");
 	CONFIG_ADD_VARIABLE(Color, cMolotovRangeText, Colors::White, "mololotov range color for text");
@@ -92,6 +99,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bMenuOpenedx88, true, "x88 menu enabled");
 	CONFIG_ADD_VARIABLE(int, iKeyMenu, VK_INSERT, "key for imgui menu");
 	CONFIG_ADD_VARIABLE(int, iKeyPanic, VK_DELETE, "key for shutdown");
+	CONFIG_ADD_VARIABLE(int, iKeyConsoleLog, VK_HOME, "key for log console");
 	
 
 	// MISC
@@ -127,19 +135,35 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fMovementLife, 4.0f, "life of beam movement");
 	CONFIG_ADD_VARIABLE(bool, bNadePred, false, "nade prediction trace");
 	CONFIG_ADD_VARIABLE(bool, bNadePredAlways, false, "nade prediction will show line even if not throwing nade");
+	CONFIG_ADD_VARIABLE(bool, bHat, false, "draw a cone on local player's head");
+	CONFIG_ADD_VARIABLE(bool, bHatRainbow, false, "is hat a rainbow");
+	CONFIG_ADD_VARIABLE(float, fHatSpeed, 3.0f, "rainbow hat speed");
+	CONFIG_ADD_VARIABLE(float, fHatSize, -30.0f, "hat size");
+	CONFIG_ADD_VARIABLE(float, fHatRadius, 20.0f, "hat radius");
+	CONFIG_ADD_VARIABLE(int, iHatTriangleAlpha, 70, "hat rainbow triangle alpha");
+	CONFIG_ADD_VARIABLE(int, iHatLinesAlpha, 180, "hat rainbow lines alpha");
+	CONFIG_ADD_VARIABLE(Color, cHatTriangle, Colors::Palevioletred, "color for the hat, triangle");
+	CONFIG_ADD_VARIABLE(Color, cHatLine, Colors::Palevioletred, "color for the hat, line");
+	CONFIG_ADD_VARIABLE(float, fFPSCap, false, "FPS value for plot (in game)");
+	CONFIG_ADD_VARIABLE(bool, bFPSCustom, false, "helper window for fps");
+	CONFIG_ADD_VARIABLE(bool, bVelocityCustom, false , "helper window for velocity");
+
+	// STYLING
+
+	CONFIG_ADD_VARIABLE(int, iStyleMenu, 0, "style of the menu");
 
 } inline vars;
 #pragma endregion
 
 #pragma region enums
-enum class AimbotID : int
+enum class AimbotID : size_t
 {
 	NEAREST = 0,
 	HEAD,
 	CHEST
 };
 
-enum class CrossHairTypes : int
+enum class CrossHairTypes : size_t
 {
 	OFF,
 	STATIC,
@@ -147,31 +171,32 @@ enum class CrossHairTypes : int
 	ENGINE
 };
 
-enum class ChamsID : int
+enum class ChamsID : size_t
 {
 	STATIC = 1,
 	XYZ,
 };
 
-enum class BTChamsID : int
+enum class BTChamsID : size_t
 {
 	STABLE = 1,
 	LAST_TICK,
 	RAINBOW,
 };
 
-enum class HandTypes : int
+enum class HandTypes : size_t
 {
 	COLOR = 0,
 	NO_HANDS,
 	NO_WEAPON,
 };
 
-enum class BoxTypes : int
+enum class BoxTypes : size_t
 {
 	BOX2D = 0,
 	FILLED2D,
 	BOX3D,
 	FILLED3D
 };
+
 #pragma endregion

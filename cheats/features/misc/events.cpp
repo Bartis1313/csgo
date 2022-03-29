@@ -1,9 +1,18 @@
 #include "events.hpp"
-#include "../../game.hpp"
+
+#include "../../../SDK/IClientEntityList.hpp"
+#include "../../../SDK/ICvar.hpp"
+#include "../../../SDK/IVEngineClient.hpp"
+
+#include "../../../SDK/interfaces/interfaces.hpp"
+
 #include "../visuals/player.hpp"
-#include "../../../SDK/IGameEvent.hpp"
-#include "misc.hpp"
+#include "../misc/misc.hpp"
+
+#include "../../game.hpp"
 #include "../../globals.hpp"
+#include "../../../utilities/console/console.hpp"
+
 
 void Events::init() const
 {
@@ -12,19 +21,19 @@ void Events::init() const
 	interfaces::eventManager->addListener(&events, XOR("round_start"));
 	interfaces::eventManager->addListener(&events, XOR("player_hurt"));
 	interfaces::eventManager->addListener(&events, XOR("weapon_fire"));
-	LOG(LOG_INFO, XOR("events hooked"));
+	console.log(TypeLogs::LOG_INFO, XOR("events hooked"));
 }
 
 void Events::FireGameEvent(IGameEvent* event)
 {
 	if (!strcmp(event->getName(), XOR("player_footstep")))
 	{
-		esp::drawSound(event);
+		visuals.drawSound(event);
 	}
 	else if (!strcmp(event->getName(), XOR("player_death")))
 	{
 		// testing
-		interfaces::console->consolePrintf("Died\n");
+		interfaces::cvar->consolePrintf("Died\n");
 	}
 	else if (!strcmp(event->getName(), XOR("game_start")))
 	{
@@ -32,7 +41,8 @@ void Events::FireGameEvent(IGameEvent* event)
 	}
 	else if (!strcmp(event->getName(), XOR("player_hurt")))
 	{
-		misc::playHitmarker(event);
+		globals::shotsHit++;
+		misc.playHitmarker(event);
 	}
 	else if (!strcmp(event->getName(), XOR("weapon_fire")))
 	{

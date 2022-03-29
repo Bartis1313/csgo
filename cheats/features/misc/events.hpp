@@ -1,12 +1,15 @@
 #pragma once
-#include "../../../SDK/interfaces/interfaces.hpp"
+
+#include "../../../SDK/IGameEvent.hpp"
 
 // TODO: Add more events!
-class Events : public IGameEventListener
+class Events final : public IGameEventListener
 {
 public:
 	void init() const;
 	void shutdown() const;
 protected:
 	void FireGameEvent(IGameEvent* event) override;
-} inline events;
+};
+
+inline Events events;

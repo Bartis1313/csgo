@@ -1,10 +1,8 @@
 #pragma once
-#include "math/matrix.hpp"
+#include "../utilities/pad.hpp"
+#include "../utilities/vfunc.hpp"
+#include "Color.hpp"
 #include "math/Vector.hpp"
-#include "IMaterialSystem.hpp"
-#include <array>
-#include <tuple>
-
 
 enum OverrideType_t
 {
@@ -61,13 +59,9 @@ public:
     VFUNC(IMaterialVar*, findVar, 11, (const char* name, bool* found = nullptr, bool complain = true), (this, name, found, complain));
     VFUNC(void, alphaModulate, 27, (float alpha), (this, alpha));   
     VFUNC(void, colorModulate, 28, (float r, float g, float b), (this, r, g, b));
-    VFUNC(void, colorModulate, 28, (Color color), (this, color.r(), color.g(), color.b()));
-   /* void colorModulate(Color color)
-    {
-        colorModulate(color.rDevided(), color.gDevided(), color.bDevided());
-        alphaModulate(color.aDevided());
-    }*/
+    VFUNC(void, colorModulate, 28, (const Color& color), (this, color.r(), color.g(), color.b()));
     VFUNC(void, setMaterialVarFlag, 29, (MaterialVarFlags_t flag, bool on), (this, flag, on));
+    VFUNC(IMaterialVar**, getShaderParams, 41, (), (this));
     VFUNC(bool, isError, 42, (), (this));
 };
 
@@ -76,7 +70,7 @@ class IMaterialVar
 {
 public:
     VFUNC(void, setValue, 4, (float val), (this, val));
-    VFUNC(void, setValues, 5, (int val), (this, val));
-    VFUNC(void, setValues, 6, (const char* val), (this, val));
+    VFUNC(void, setValue, 5, (int val), (this, val));
+    VFUNC(void, setValue, 6, (const char* val), (this, val));
     VFUNC(void, setValues, 11, (Vector val), (this, val));
 };

@@ -1,47 +1,43 @@
 #include "hooks.hpp"
+
+#include "../../SDK/IVEngineClient.hpp"
+#include "../../SDK/IPanel.hpp"
+#include "../../SDK/interfaces/interfaces.hpp"
+
 #include "../features/visuals/player.hpp"
 #include "../features/aimbot/aimbot.hpp"
 #include "../features/visuals/world.hpp"
 #include "../features/visuals/radar.hpp"
 #include "../features/misc/misc.hpp"
-#include "../globals.hpp"
-#include "../../config/vars.hpp"
 #include "../features/prediction/nadepred.hpp"
 
-#pragma region "Paint Helpers"
-// all paint
-void paintHandle()
-{
-	esp::run();
-	world::drawMisc();
-	misc::drawLocalInfo();
-	misc::drawFpsPlot();
-	misc::drawVelocityPlot();
-	misc::drawHitmarker();
-	world::drawZeusRange();
-	misc::drawNoScope();
-	misc::drawCrosshair();
-	legitbot::drawFov();
-	world::drawMovementTrail();
-	nedpred.draw();
-}
+#include "../globals.hpp"
+#include "../../config/vars.hpp"
+#include "../../utilities/renderer/renderer.hpp"
 
+#pragma region "Paint Helpers"
 // run current screensize
-void getScreen()
+static void getScreen()
 {
 	int x, y;
 	interfaces::engine->getScreenSize(x, y);
 	globals::screenX = x;
 	globals::screenY = y;
 }
+
+static void getMouse()
+{
+	int x, y;
+	interfaces::surface->getCursor(x, y);
+	globals::mouseX = x;
+	globals::mouseY = y;
+}
 #pragma endregion
 
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
 {
-	//if (!utilities::isValidWindow()) // should check it less
-		//return;
-
 	getScreen();
+	getMouse();
 
 	if (interfaces::engine->isTakingScreenshot())
 		return;
@@ -71,8 +67,22 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	}
 	else if (panelID == panel)
 	{
-		imRender.clearData();
-		imRender.addToRender(&paintHandle);
-		imRender.swapData();
+		imRender.addToRender([]()
+			{
+				visuals.run();
+				world.drawMisc();
+				misc.drawLocalInfo();
+				//misc.drawFpsPlot();
+				//misc.drawVelocityPlot();
+				misc.drawHitmarker();
+				world.drawZeusRange();
+				misc.drawNoScope();
+				misc.drawCrosshair();
+				aimbot.drawFov();
+				world.drawMovementTrail();
+				nadePred.draw();
+				misc.drawHat();
+				aimbot.drawBestPoint();
+			});
 	}
 }

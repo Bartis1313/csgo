@@ -1,8 +1,12 @@
 #pragma once
-#include "material.hpp"
+#include "math/Vector.hpp"
 #include "math/matrix.hpp"
-#include "../utilities/utilities.hpp"
+#include "../utilities/pad.hpp"
+#include "../utilities/vfunc.hpp"
 
+struct Model_t;
+struct Studiohdr_t;
+class IMaterial;
 
 struct ModelRenderInfo_t
 {
@@ -10,9 +14,9 @@ struct ModelRenderInfo_t
 	Vector m_angles;
 	PAD(4);
 	void* m_renderable;
-	const model_t* m_model;
-	const matrix3x4_t* m_modelWorld;
-	const matrix3x4_t* m_lightOffset;
+	const Model_t* m_model;
+	const Matrix3x4* m_modelWorld;
+	const Matrix3x4* m_lightOffset;
 	const Vector* m_lightOrigin;
 	int m_flags;
 	int m_entIndex;
@@ -30,10 +34,10 @@ struct ModelRenderInfo_t
 
 struct DrawModelState_t
 {
-	studiohdr_t* m_pStudioHdr;
+	Studiohdr_t* m_pStudioHdr;
 	void* m_pStudioHWData;
 	void* m_pRenderable;
-	const matrix3x4_t* m_pModelToWorld;
+	const Matrix3x4* m_pModelToWorld;
 	void* m_decals;
 	int m_drawFlags;
 	int m_lod;

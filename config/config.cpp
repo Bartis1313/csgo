@@ -1,12 +1,15 @@
 #include "config.hpp"
+
 #include "../dependencies/json.hpp"
+#include "../utilities/console/console.hpp"
+
 #include <shlobj.h>
 #include <stdexcept>
 #include <format>
 #include <fstream>
 #include <filesystem>
 
-using namespace nlohmann;
+using json = nlohmann::json;
 
 std::string Config::m_mainEntryFolder = XOR("Bartis_internal");
 
@@ -47,17 +50,17 @@ bool Config::save(const std::string& file, const bool forceSave)
 {
 	if (file.empty())
 	{
-		LOG(LOG_ERR, XOR("provided config name was empty"));
+		console.log(TypeLogs::LOG_ERR, XOR("provided config name was empty"));
 		return false;
 	}
 
-	if (getPathForConfig(file).string() == getDefaultConfigName() && !forceSave)
+	if (utilities::toLowerCase(getPathForConfig(file).string()) == getDefaultConfigName() && !forceSave)
 	{
-		LOG(LOG_ERR, XOR("provided config name was same as default"));
+		console.log(TypeLogs::LOG_ERR, XOR("provided config name was same as default"));
 		return false;
 	}
 
-	const auto toWrite = getPathForSave(getPathForConfig(file).string());
+	const auto toWrite = utilities::toLowerCase(getPathForSave(getPathForConfig(file).string()).string());
 
 	json config;
 
@@ -104,12 +107,12 @@ bool Config::save(const std::string& file, const bool forceSave)
 			json arr;
 
 			for (bool el : vec)
-				arr.emplace_back(std::move(el));
+				arr.push_back(el);
 
 			entry[XOR("value")] = arr.dump();
 		}
 
-		config.emplace_back(std::move(entry));
+		config.push_back(entry);
 	}
 
 	std::ofstream stream{ toWrite };
@@ -123,10 +126,10 @@ bool Config::save(const std::string& file, const bool forceSave)
 	}
 	catch (const std::ofstream::failure& err)
 	{
-		LOG(LOG_ERR, std::format(XOR("Saving {} file has failed: {}"), file, err.what()));
+		console.log(TypeLogs::LOG_ERR, std::format(XOR("Saving {} file has failed: {}"), file, err.what()));
 	}
 
-	LOG(LOG_INFO, std::format(XOR("Saving {} file success"), file));
+	console.log(TypeLogs::LOG_INFO, std::format(XOR("Saving {} file success"), file));
 	return true;
 }
 
@@ -146,7 +149,7 @@ bool Config::load(const std::string& file)
 	}
 	catch (const std::ifstream::failure& err)
 	{
-		LOG(LOG_ERR, std::format(XOR("Loading {} file has failed: {}"), file, err.what()));
+		console.log(TypeLogs::LOG_ERR, std::format(XOR("Loading {} file has failed: {}"), file, err.what()));
 	}
 
 	for (const auto& var : config)
@@ -199,7 +202,7 @@ bool Config::load(const std::string& file)
 		}
 	}
 
-	LOG(LOG_INFO, std::format(XOR("Loading {} file success"), file));
+	console.log(TypeLogs::LOG_INFO, std::format(XOR("Loading {} file success"), file));
 	return true;
 }
 
@@ -248,7 +251,7 @@ bool Config::init()
 	// TODO: detect any changes, replace them with new file. Only idea for now is to compare file size (kb)
 	if (auto path = m_documentsPath / m_folder / getDefaultConfigName(); !std::filesystem::exists(path))
 	{
-		LOG(LOG_INFO, std::format(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
+		console.log(TypeLogs::LOG_INFO, std::format(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
 
 		if (!save(getDefaultConfigName(), true))
 			return false;
@@ -275,7 +278,7 @@ void Config::reload()
 		if (std::string name = entry.path().filename().string();
 			entry.path().extension() == XOR(".cfg") && !name.empty())
 		{
-			m_allFilesInFolder.emplace_back(std::move(name));
+			m_allFilesInFolder.push_back(name);
 		}
 	}
 }
@@ -315,10 +318,10 @@ void Config::deleteCfg(const std::string& file)
 
 	if (path.string() == m_defaultConfig)
 	{
-		LOG(LOG_ERR, XOR("Can't delete default config"));
+		console.log(TypeLogs::LOG_ERR, XOR("Can't delete default config"));
 		return;
 	}
 
 	if (auto toDel = getPathForSave(path.string()); std::filesystem::remove(toDel))
-		LOG(LOG_INFO, std::format(XOR("Removed config {}"), toDel.filename().string()));
+		console.log(TypeLogs::LOG_INFO, std::format(XOR("Removed config {}"), toDel.filename().string()));
 }

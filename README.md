@@ -1,10 +1,10 @@
 # Csgo
 Very short and commented source aimed for legit gameplay
 
-![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/157115029-a0fa00b7-4148-477e-aae1-7d25c541ab93.png)
+![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/160652885-0bd3180b-04db-4e19-ad2b-41e75faba57c.png)
 
 # Information
-In development, not every feature may work perfectly.
+In development, not every feature may work perfectly. Features marked ``(rebuild needed)`` need recode or better version.
 <br />
 Menu key is insert, panic key is delete, you can change it in config if it matters.
 <br />
@@ -24,10 +24,10 @@ I can't compile
 <details>
 
  * BunnyHop
- * Chams (Normal, Xyz)
+ * Chams (Normal, Xyz) (rebuild needed)
  * ESP (2D, 2D Filled, 3D, 3D Filled)
  * Glow
- * Sound ESP
+ * Sound ESP (rebuild needed)
  * Fov (Changing your local FOV)
  * Third Person (no bypass for sv_cheats included yet)
  * Aimbot (Nearest, Head, Chest)
@@ -42,32 +42,25 @@ I can't compile
  * Esp Flags (Some information about enemies, their hp, armor etc...)
  * Esp Info (For now only name and C4 holder)
  * Esp Skeleton (Skeleton drawn by lines, working with backtrack too)
- * Backtrack Chams (Static, Rainbow, Last Tick)
+ * Backtrack Chams (Static, Rainbow, Last Tick) (rebuild needed)
  * DLight (Uses engine to highlight the player)
  * Nigtmode (Chnages materials to be darker including chnage of the sky)
  * Esp Lines (They will only show on selected target by aimbot)
- * Plots (Represent current FPS and Velocity in stored records and then drawn using lines and difference between them)
- * Arm Chams (Color, no arms)
- * Weapon Chams (Color, no weapon)
+ * Plots (Represent current FPS and Velocity in stored records and then drawn using lines and difference between them, fully custom)
+ * Arm Chams (Color, no arms) (rebuild needed)
+ * Weapon Chams (Color, no weapon) (rebuild needed)
  </details>
 
 # Keybinds
  - INSERT (Close/open menu)
  - DELETE (Panic key - shutdowns whole hack thread)
+ - HOME (Console key - shows the console window rendered with ImGui)
 
 # Issues or requests
 For now the cheat may have them many as during development my main goal is to learn how to write optimized and simple code
 
 About requests, when I personally think the feature provided is alright,
 I will try to implement it in a short time perioid, eventually people who commit prs will be contributors
-
-# TODO:
-- Fix/finish everything that is commented TODO or FIXME.
-- Remove bloat includes, eg: currently the includes for classes are in headers rather than declaring the class/struct name in the header.
-- Use ImGui window to render any addon such as radar, plots, and maybe logger.
-- More features, especially visual friendly.
-- Create custom UI, with quake looking set, starting from icons, ending on killfeed.
-- Generally improve code quality.
 
 # Log
 <details>
@@ -102,6 +95,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.2.7 - Added ImGuiRender class which has a rich amount of functions, arguments are almost everywhere same as in surface rendering. GUI made with surface has been deleted aswell as x88 menu, if you need to know how was it done, search old repo commits. Cleaned up whole sdk and code in few places.
 * 1.2.8 - Fixed few rendering bugs. Added basic imgui menu, if you care for styling etc... go make a pull request so people can use it as some replacement. Keep in mind - any imgui addons that are not included in the lib should be made in imguiaddons.hpp at all. Color now has a different type, due to making it easier for floating points. You will still be able to use it as 0-255 range.
 * 1.2.9 - Few fixes in some places, nothing really big. I will start making commits comments a bit better from now on, more detailed.
+* 1.3.0 - Huge recode, cleaned up most of bloat header includes. Features are now not in namespace but class. Improved code quality almost everywhere. Fixed unloading the cheat not causing any errors. Plots are totally rewritten. Fixed couple of features, although chams are temporiarly not possible. I am thinking of clean solution for them. Added console from imgui demo which will show current loggings. Still a lot of code needs rewrite.
 </details>
 
 # Dependencies
@@ -112,6 +106,6 @@ I will try to implement it in a short time perioid, eventually people who commit
 * [ImGui](https://github.com/ocornut/imgui)
 
 # People who helped
-* [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs15 leak which made reversing even easier.
+* [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs18 leak which made reversing even easier.
 * [Pawel Gozdur](https://github.com/carlos-konewka) - helping me with math, especially plot logic.
 * [UC Wiki](https://www.unknowncheats.me/wiki/UnKnoWnCheaTs_Game_Hacking_Wiki) - for very helpful sources.

@@ -1,14 +1,12 @@
 #pragma once
 #include "Color.hpp"
-#include "../utilities/pad.hpp"
 #include "math/Vector.hpp"
-
-// don't input color class to the struct, here they use 4 bytes for each rgba
+#include "../utilities/pad.hpp"
 
 class CGlowObject_t
 {
 public:
-	void set(Color color)
+	void set(const Color& color)
 	{
 		rgb = Vector(color.r(), color.g(), color.b());
 		a = color.a();

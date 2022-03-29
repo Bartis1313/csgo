@@ -4,7 +4,6 @@
 #include "../../SDK/ISurface.hpp"
 #include "../../SDK/math/Vector.hpp"
 #include "../../SDK/math/Vector2D.hpp"
-#include "../../dependencies/ImGui/imgui.h"
 #include <string>
 #include <mutex>
 #include <shared_mutex>
@@ -37,7 +36,8 @@ namespace fonts
 	inline unsigned long menuFont;
 }
 
-class Render
+// rendering with game's engine
+class SurfaceRender
 {
 public:
 	void init();
@@ -46,27 +46,29 @@ public:
 
 	void drawLine(const int x, const int y, const int x2, const int y2, const Color& color);
 	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color);
-	void drawOutlineRect(const int x, const int y, const int w, const int h, const Color& color);
-	void drawOutlineRect(const Vector2D& start, const Vector2D& end, const Color& color);
-	void drawOutlineRect(const int x, const int y, const int w, const int h, const Color& color, const Color& colorOutline);
-	void drawFilledRect(const int x, const int y, const int w, const int h, const Color& color);
-	void drawFilledRect(const int x, const int y, const int w, const int h, const Color& color, const Color& colorOutline);
+	void drawRect(const int x, const int y, const int w, const int h, const Color& color);
+	void drawRect(const Vector2D& start, const Vector2D& end, const Color& color);
+	void drawRectFilled(const int x, const int y, const int w, const int h, const Color& color);
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/181578-draw-rounded-box-static-dynamic.html
 	void drawRoundedRect(const int x, const int y, const int w, const int h, const int radius, const int numberOfVertices, const Color& color);
+	void drawRoundedRectFilled(const int x, const int y, const int w, const int h, const int radius, const int numberOfVertices, const Color& color);
 	void drawCircle(const int x, const int y, const int radius, const int points, const Color& color);
 	void drawCircleFilled(const int x, const int y, const int radius, const int points, const Color& color);
 	void drawCircle3D(const Vector& pos, const int radius, const int points, const Color& color);
 	void drawFilledCircle3D(const Vector& pos, const int radius, const int points, const Color& color);
 	void drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
-	void drawTrapezFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
-	void drawTrapezOutline(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
+	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
+	void drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
+	void drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
 	void drawPolyLine(int* x, int* y, const int count, const Color& color);
 	void drawPolyLine(const int count, Vertex_t* verts, const Color& color);
+	void drawPolyGon(const int count, Vertex_t* verts, const Color& color, const bool clipped = true);
 	void drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, bool horizontal, bool blend = true);
 	void drawGradient(const int x, const int y, const int w, const int h, const Color& first, const Color& second, const Color& third, bool horizontal, bool blend = true);
 	void text(const int x, const int y, const unsigned long font, const wchar_t* text, const bool centered, const Color& color);
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
+	[[deprecated("You should only read comments from there, better results are with ImGuiRender class")]]
 	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
 	// percent should be passed in 0-100 range, credits for helping Carlos1216
 	void drawProgressRing(const int x, const int y, float radius, const int points, float percent, const float thickness, const Color& color);
@@ -74,13 +76,17 @@ public:
 	_NODISCARD int getTextSize(const unsigned long font, const std::string& text);
 	// width and height
 	_NODISCARD Vector2D getTextSizeXY(const unsigned long font, const std::string& text);
-	// use this function for any rendering struct
 	_NODISCARD bool worldToScreen(const Vector& in, Vector& out);
+	_NODISCARD bool worldToScreen(const Vector& in, Vector2D& out);
 	void initNewTexture(int& id, Color* RGBA, const int w, const int h);
 	void initNewTexture(int& id, unsigned char* RGBA, const int w, const int h);
 	// color argument is very sometimes needed, because texture is mostly supposed to be all filled
 	void drawFromTexture(const int id, const int x, const int y, const int w, const int h, const Color& color);
-} inline /*[[deprecated("This is not updated anymore! To turn off this warning, remove attribute and edit surface drawing yourself, and replace Color to SDKColor!")]]*/ render;
+};
+
+inline SurfaceRender surfaceRender;
+
+#include "../../dependencies/ImGui/imgui.h"
 
 namespace ImFonts
 {
@@ -89,7 +95,7 @@ namespace ImFonts
 	inline ImFont* menuFont;
 }
 
-enum class DrawType : int
+enum class DrawType : size_t
 {
 	NONE = 0,
 	LINE,
@@ -324,13 +330,12 @@ public:
 	// pass pos from world. this box is static!, so you will often pass width.x == width.y
 	// width.x -> pass starting width at front
 	// width.y -> pass width of the box, between points at side
-	// also see: https://cdn.discordapp.com/attachments/832240559468576802/955504104355037214/unknown.png to get where points are
 	void drawBox3D(const Vector& pos, const Vector2D& width, const float height, const Color& color, const float thickness = 2.0f);
 	// pass pos from world. this box is static!, so you will often pass width.x == width.y
 	// width.x -> pass starting width at front
 	// width.y -> pass width of the box, between points at side
-	// also see: https://cdn.discordapp.com/attachments/832240559468576802/955504104355037214/unknown.png to get where points are
 	void drawBox3DFilled(const Vector& pos, const Vector2D& width, const float height, const Color& color, const Color& filling = Colors::Grey, const float thickness = 2.0f);
+	void drawCone(const Vector& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 
 	/*
 	* arcs - there are few problems with them. Especially you can see it when trying to do arc that is a full circle.
@@ -350,16 +355,18 @@ public:
 	// add to present
 	void renderPresent(ImDrawList* draw);
 	// add to surface
+	void addToRender(const std::function<void()>& fun);
+private:
+	// add to surface
 	void clearData();
 	// add to surface
 	void swapData();
-	// add to surface
-	__declspec(noinline) void addToRender(const std::function<void()>& fun) { fun(); }
-
 	std::deque<DrawObject_t> m_drawData;
 	std::deque<DrawObject_t> m_drawDataSafe;
 	std::shared_mutex m_mutex;
-} inline imRender;
+};
+
+inline ImGuiRender imRender;
 
 // simple wrapper, use for anything that is not needed for w2s, and by itself draws inside destination window
 class ImGuiRenderWindow
@@ -367,6 +374,8 @@ class ImGuiRenderWindow
 public:
 	// also corrects the pos!
 	void addList();
+	// there is no need, very optional method
+	void end();
 
 	void drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness = 1.0f);
 	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color, const float thickness = 1.0f);
@@ -376,9 +385,18 @@ public:
 	void drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0);
 	void drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness = 1.0f);
 	void drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color);
+	void drawPolyLine(const int count, ImVec2* verts, const Color& color, ImDrawFlags flags = 0, float thickness = 1.0f);
+	void drawText(const float x, const float y, const float size, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
+
+	// remember it's a "cursor window pos"
+	ImVec2 getPos() const { return m_pos; }
+	ImVec2 getRect() const { return m_rect; }
+	float getWidth() const { return m_rect.x; }
+	float getHeight() const { return m_rect.y; }
+	ImDrawList* getDrawList() const { return m_drawing; }
+private:
 	ImVec2 m_pos; // additional pos, it corrects the drawing pos, so we can pass literal destination to window, see comment below
 	ImVec2 m_rect; // width and height
-private:
 	ImDrawList* m_drawing;
 } inline imRenderWindow;
 

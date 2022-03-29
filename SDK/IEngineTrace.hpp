@@ -1,8 +1,9 @@
 #pragma once
-#include "vars.hpp"
 #include "math/Vector.hpp"
 #include "math/matrix.hpp"
 #include "../utilities/pad.hpp"
+#include "../utilities/vfunc.hpp"
+#include "Enums.hpp"
 
 #pragma warning(disable: 26495)
 
@@ -15,7 +16,7 @@ public:
 	VectorAligned m_delta;
 	VectorAligned m_startOffset;
 	VectorAligned m_extents;
-	const matrix3x4_t* m_mattrixWorldAxis;
+	const Matrix3x4* m_mattrixWorldAxis;
 	bool m_isRay;
 	bool m_isSwept;
 

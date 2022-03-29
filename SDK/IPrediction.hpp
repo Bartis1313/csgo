@@ -1,9 +1,10 @@
 #pragma once
-#include "IClientEntityList.hpp"
 #include "CUserCmd.hpp"
 #include "math/Vector.hpp"
 #include "../utilities/vfunc.hpp"
 #include "../utilities/pad.hpp"
+
+class Player_t;
 
 class IMoveHelper
 {

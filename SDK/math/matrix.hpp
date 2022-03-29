@@ -2,10 +2,10 @@
 #include "Vector.hpp"
 #include <compare>
 
-struct matrix3x4_t
+struct Matrix3x4
 {
-	matrix3x4_t() = default;
-	constexpr matrix3x4_t(float m00, float m01, float m02, float m03,
+	Matrix3x4() = default;
+	constexpr Matrix3x4(float m00, float m01, float m02, float m03,
 		float m10, float m11, float m12, float m13,
 		float m20, float m21, float m22, float m23)
 	{
@@ -14,7 +14,7 @@ struct matrix3x4_t
 		m_flMatVal[2][0] = m20;	m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
 	}
 
-	constexpr auto operator<=>(const matrix3x4_t&) const = default;
+	constexpr auto operator<=>(const Matrix3x4&) const = default;
 
 	_NODISCARD constexpr Vector origin() const
 	{
@@ -34,10 +34,10 @@ struct matrix3x4_t
 	float m_flMatVal[3][4];
 };
 
-struct VMatrix
+struct Matrix4x4
 {
-	VMatrix() = default;
-	constexpr VMatrix(float m00, float m01, float m02, float m03,
+	Matrix4x4() = default;
+	constexpr Matrix4x4(float m00, float m01, float m02, float m03,
 		float m10, float m11, float m12, float m13,
 		float m20, float m21, float m22, float m23,
 		float m30, float m31, float m32, float m33)
@@ -47,6 +47,8 @@ struct VMatrix
 		m_flMatVal[2][0] = m20;	m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
 		m_flMatVal[3][0] = m30;	m_flMatVal[3][1] = m31; m_flMatVal[3][2] = m32; m_flMatVal[3][3] = m33;
 	}
+
+	constexpr auto operator<=>(const Matrix4x4&) const = default;
 
 	constexpr float* operator[](int i)
 	{

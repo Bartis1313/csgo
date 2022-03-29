@@ -1,6 +1,7 @@
 #pragma once
 #include "Recv.hpp"
 #include "math/Vector.hpp"
+#include "../utilities/pad.hpp"
 
 class CViewSetup
 {

@@ -1,19 +1,22 @@
 #include "glow.hpp"
+
+#include "../../../SDK/IMaterialSystem.hpp"
+#include "../../../SDK/IVModelRender.hpp"
+#include "../../../SDK/CGlowManager.hpp"
+#include "../../../SDK/ClientClass.hpp"
+#include "../../../SDK/Enums.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
+
 #include "../../game.hpp"
 #include "../../../config/vars.hpp"
 
-void glow::run()
+void Glow::run()
 {
 	if (!config.get<bool>(vars.bGlow))
 		return;
 
-	if (!game::localPlayer)
+	if (!game::isAvailable())
 		return;
-
-	auto material = interfaces::matSys->findMaterial(XOR("dev/glow_color"), TEXTURE_GROUP_OTHER, true);
-	interfaces::modelRender->overrideMaterial(material);
-
 
 	for (int i = 0; i < interfaces::glowManager->m_size; i++)
 	{

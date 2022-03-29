@@ -5,12 +5,18 @@
 #include "utilities/renderer/renderer.hpp"
 #include "utilities/netvars/netvars.hpp"
 #include "config/vars.hpp" // so vars load
-#include "source.hpp"
 #include "cheats/globals.hpp"
 #include "cheats/features/misc/events.hpp"
 #include "utilities/simpleTimer.hpp"
 #include "cheats/menu/GUI-ImGui/menu.hpp"
+#include "utilities/console/console.hpp"
+#include "SEHcatch.hpp"
+
 #include <thread>
+
+#if !(defined _WIN32)
+#error This is only for windows and x86
+#endif
 
 using namespace std::literals;
 
@@ -18,12 +24,12 @@ VOID WINAPI _shutdown(PVOID instance);
 
 DWORD WINAPI init(PVOID instance)
 {
-    AddVectoredExceptionHandler(TRUE, memErrorCatch);
+    AddVectoredExceptionHandler(TRUE, SEHcatch::memErrorCatch);
 
-    console::init(XOR("CSGO DEBUG"));
+    console.init(XOR("CSGO DEBUG"));
+    console.setLogName(XOR("hack.log"));
 
-    TimeCount initTimer;
-    initTimer.start();
+    TimeCount initTimer{};
 
     // warning: if you do wrong hierarchy - crash
     try
@@ -43,7 +49,8 @@ DWORD WINAPI init(PVOID instance)
     }
 
     initTimer.end();
-    LOG(LOG_INFO, std::format(XOR("{} {:.5f}ms"), XOR("main thread took"), initTimer.getSec()));
+    console.log(TypeLogs::LOG_INFO, XOR("main thread took {:.5f}s"), initTimer.getSec());
+
 
     return TRUE;
 }
@@ -51,17 +58,17 @@ DWORD WINAPI init(PVOID instance)
 VOID WINAPI _shutdown(PVOID instance)
 {
     while (!utilities::getKey(config.get<int>(vars.iKeyPanic)))
-    {
         std::this_thread::sleep_for(100ms);
-    }
+
+    globals::isShutdown = true;
 
     RemoveVectoredExceptionHandler(globals::instance);
     hooks::wndProcSys::shutdown();
-    ImGuiMenu::shutdown();
     events.shutdown();
     hooks::shutdown();
-    LOG(LOG_INFO, XOR("Hack shutdown"));
-    console::shutdown();
+    menu.shutdown();
+    console.log(TypeLogs::LOG_INFO, XOR("Hack shutdown"));
+    console.shutdown();
 
    // LF(MessageBoxA)(nullptr, XOR("Hack shutdown"), XOR("Confirmed hack shutdown"), MB_OK | MB_ICONERROR);
     LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);

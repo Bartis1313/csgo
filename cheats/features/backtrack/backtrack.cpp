@@ -1,9 +1,20 @@
 #include "backtrack.hpp"
+
+#include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/CUserCmd.hpp"
+#include "../../../SDK/CGlobalVars.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
+#include "../../../SDK/vars.hpp"
+#include "../../../SDK/Enums.hpp"
+#include "../../../SDK/structs/Entity.hpp"
+#include "../../../SDK/ICvar.hpp"
+#include "../../../SDK/ConVar.hpp"
+#include "../../../SDK/interfaces/interfaces.hpp"
+
 #include "../../game.hpp"
 #include "../../../config/vars.hpp"
-// useless windefs
-#undef min
-#undef max
+
+#include "../../../utilities/math/math.hpp"
 
 static constexpr int TIME_TO_TICKS(float t)
 {
@@ -30,101 +41,122 @@ struct convarRatios
 	float maxUnlag;
 } static cvarsRatios;
 
-void backtrack::init()
+void Backtrack::init()
 {
-	cvars.updateRate = interfaces::console->findVar(XOR("cl_updaterate"));
-	cvars.maxUpdateRate = interfaces::console->findVar(XOR("sv_maxupdaterate"));
-	cvars.minUpdateRate = interfaces::console->findVar(XOR("sv_minupdaterate"));
+	cvars.updateRate = interfaces::cvar->findVar(XOR("cl_updaterate"));
+	cvars.maxUpdateRate = interfaces::cvar->findVar(XOR("sv_maxupdaterate"));
+	cvars.minUpdateRate = interfaces::cvar->findVar(XOR("sv_minupdaterate"));
 
-	cvarsRatios.interp = interfaces::console->findVar(XOR("cl_interp"))->getFloat();
-	cvarsRatios.interpRatio = interfaces::console->findVar(XOR("cl_interp_ratio"))->getFloat();
-	cvarsRatios.minInterpRatio = interfaces::console->findVar(XOR("sv_client_min_interp_ratio"))->getFloat();
-	cvarsRatios.maxInterpRatio = interfaces::console->findVar(XOR("sv_client_max_interp_ratio"))->getFloat();
-	cvarsRatios.maxUnlag = interfaces::console->findVar(XOR("sv_maxunlag"))->getFloat();
+	cvarsRatios.interp = interfaces::cvar->findVar(XOR("cl_interp"))->getFloat();
+	cvarsRatios.interpRatio = interfaces::cvar->findVar(XOR("cl_interp_ratio"))->getFloat();
+	cvarsRatios.minInterpRatio = interfaces::cvar->findVar(XOR("sv_client_min_interp_ratio"))->getFloat();
+	cvarsRatios.maxInterpRatio = interfaces::cvar->findVar(XOR("sv_client_max_interp_ratio"))->getFloat();
+	cvarsRatios.maxUnlag = interfaces::cvar->findVar(XOR("sv_maxunlag"))->getFloat();
 };
 
-float backtrack::getLerp()
+float Backtrack::getLerp() const
 {
 	// get the correct value from ratio cvars, this can be done by only this way
 	auto ratio = std::clamp(cvarsRatios.interpRatio, cvarsRatios.minInterpRatio, cvarsRatios.maxInterpRatio);
-	return (std::max)(cvarsRatios.interp, (ratio / ((cvars.maxUpdateRate) ? cvars.maxUpdateRate->getFloat() : cvars.updateRate->getFloat())));
+	return std::max(cvarsRatios.interp, (ratio / ((cvars.maxUpdateRate) ? cvars.maxUpdateRate->getFloat() : cvars.updateRate->getFloat())));
 }
 
-bool backtrack::isValid(float simtime)
+bool Backtrack::isValid(float simtime) const
 {
 	auto network = interfaces::engine->getNameNetChannel();
 	if (!network)
 		return false;
 	// from my experience making it with game::serverTime() works slightly better
-	auto delta = std::clamp(network->getLatency(0) + network->getLatency(1) + getLerp(), 0.f, cvarsRatios.maxUnlag) - (game::serverTime() - simtime);
+	auto delta = std::clamp(network->getLatency(FLOW_OUTGOING) + network->getLatency(FLOW_INCOMING) + getLerp(), 0.0f, cvarsRatios.maxUnlag) - (game::serverTime() - simtime);
 	// this is not used, that's why this is commented, feel free to use it and config it yourself
 	// auto limit = std::clamp(vars::iBacktrackTick, 0.0f, 2.0f);
 	// if limit is used return looks like: return std::abs(delta) <= limit;
 	return std::abs(delta) <= 0.2f;
 }
 
-static float extraTicks()
+float Backtrack::extraTicks() const
 {
 	auto network = interfaces::engine->getNameNetChannel();
 	if (!network)
 		return 0.0f;
-	// extra ticks, sometimes due to latency, also by this don't add lerp to cmd tick
-	return std::clamp(network->getLatency(1) - network->getLatency(0), 0.f, 0.2f);
+	// extra ticks, due to latency you might store wrong ticks
+	return std::clamp(network->getLatency(FLOW_INCOMING) - network->getLatency(FLOW_OUTGOING), 0.0f, 0.2f);
 }
 
-void backtrack::update()
+void Backtrack::update()
 {
-	if (!game::localPlayer || !vars.bBacktrack || !game::localPlayer->isAlive())
+	if (!game::localPlayer || !config.get<bool>(vars.bBacktrack) || !game::localPlayer->isAlive())
 	{
 		// basically reset all
-		for (auto& el : records)
+		for (auto& el : m_records)
 			el.clear();
 		return;
 	}
 
+	auto isGoodEnt = [](Player_t* ent)
+	{
+		if (!ent)
+			return false;
+
+		if (ent == game::localPlayer)
+			return false;
+
+		if (ent->isDormant())
+			return false;
+
+		if (!ent->isAlive())
+			return false;
+
+		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+			return false;
+
+		return true;
+	};
+
 	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 	{
 		auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
-		if (!entity || entity == game::localPlayer || entity->isDormant() || !entity->isAlive() || entity->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+
+		if (!isGoodEnt(entity))
 		{
-			// don't add bucch of useless records
-			records.at(i).clear();
+			// don't add bunch of useless records
+			m_records.at(i).clear();
 			continue;
 		}
 		// if record at this index is filled and has exactly same simulation time, don't update it
-		if (records.at(i).size() && (records.at(i).front().simTime == entity->m_flSimulationTime()))
+		if (m_records.at(i).size() && (m_records.at(i).front().m_simtime == entity->m_flSimulationTime()))
 			continue;
 
 		StoredRecord record = {};
 		// head will be used for calculations, from my testing it seemed to be better
-		record.origin = entity->absOrigin();
-		record.simTime = entity->m_flSimulationTime();
-		record.head = entity->getBonePosition(8);
+		record.m_origin = entity->absOrigin();
+		record.m_simtime = entity->m_flSimulationTime();
+		record.m_head = entity->getBonePos(8);
 
 		// setup bones for us, will be needed for basically get good matrix, can draw backtrack'ed models etc...
-		entity->setupBones(record.matrix, BONE_USED_BY_HITBOX, BONE_USED_MASK, interfaces::globalVars->m_curtime);
+		entity->setupBones(record.m_matrix, BONE_USED_BY_HITBOX, BONE_USED_MASK, interfaces::globalVars->m_curtime);
 
 		// fill them
-		records.at(i).push_front(record);
+		m_records.at(i).push_front(record);
 
 		// when records are FULL and bigger than ticks we set in backtrack, then pop them
-		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(config.get<float>(vars.fBacktrackTick) / 1000.0f + extraTicks())))
-			records.at(i).pop_back();
+		while (m_records.at(i).size() > 3 && m_records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(config.get<float>(vars.fBacktrackTick) / 1000.0f + extraTicks())))
+			m_records.at(i).pop_back();
 
 		// lambda check for valid time simulation
 		// check every record with simtime
-		const auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [](const StoredRecord& rec)
+		const auto invalid = std::find_if(std::cbegin(m_records.at(i)), std::cend(m_records.at(i)), [this](const StoredRecord& rec)
 			{
-				return !isValid(rec.simTime);
+				return !isValid(rec.m_simtime);
 			});
 
 		// if it's not valid then clean up everything on this record
-		if (invalid != std::cend(records.at(i)))
-			records.at(i).erase(invalid, std::cend(records.at(i)));
+		if (invalid != std::cend(m_records.at(i)))
+			m_records.at(i).erase(invalid, std::cend(m_records.at(i)));
 	}
 }
 
-void backtrack::run(CUserCmd* cmd)
+void Backtrack::run(CUserCmd* cmd)
 {
 	// this is same in working like an aimbot, but in here we don't set any angles
 	// we set origin and that's it, and go through nodes of records
@@ -166,7 +198,7 @@ void backtrack::run(CUserCmd* cmd)
 		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 			continue;
 
-		const auto& pos = ent->getBonePosition(8);
+		const auto& pos = ent->getBonePos(8);
 
 		const auto fov = math::calcFov(myEye, pos, cmd->m_viewangles + aimPunch);
 		if (fov < bestFov)
@@ -179,18 +211,18 @@ void backtrack::run(CUserCmd* cmd)
 
 	if (bestPlayer && bestPlayerIdx != -1)
 	{
-		if (records.at(bestPlayerIdx).size() <= 3)
+		if (m_records.at(bestPlayerIdx).size() <= 3)
 			return;
 
 		bestFov = 180.0f;
 
-		for (int i = 0; i < records.at(bestPlayerIdx).size(); i++)
+		for (int i = 0; i < m_records.at(bestPlayerIdx).size(); i++)
 		{
-			const auto& record = records.at(bestPlayerIdx).at(i);
-			if (!isValid(record.simTime))
+			const auto& record = m_records.at(bestPlayerIdx).at(i);
+			if (!isValid(record.m_simtime))
 				continue;
 
-			const auto fov = math::calcFov(myEye, record.head, cmd->m_viewangles + aimPunch);
+			const auto fov = math::calcFov(myEye, record.m_head, cmd->m_viewangles + aimPunch);
 
 			if (fov < bestFov)
 			{
@@ -202,7 +234,7 @@ void backtrack::run(CUserCmd* cmd)
 
 	if (bestRecordIdx != -1)
 	{
-		const auto& record = records.at(bestPlayerIdx).at(bestRecordIdx);
-		cmd->m_tickcount = TIME_TO_TICKS(record.simTime);
+		const auto& record = m_records.at(bestPlayerIdx).at(bestRecordIdx);
+		cmd->m_tickcount = TIME_TO_TICKS(record.m_simtime);
 	}
 }

@@ -1,5 +1,6 @@
 #pragma once
-#include "../../SDK/interfaces/interfaces.hpp"
+
+#include <d3d9.h>
 
 enum hookIndexes
 {
@@ -15,6 +16,14 @@ enum hookIndexes
 	PROXY_MOVE = 22,
 	END_SCENE = 42,
 };
+
+class IPanel;
+class CViewSetup;
+struct DrawModelState_t;
+struct ModelRenderInfo_t;
+struct Matrix3x4;
+
+#define FAST_ARGS void* thisptr, void* edx
 
 namespace hooks
 {
@@ -39,8 +48,8 @@ namespace hooks
 
 	struct drawModel
 	{
-		using fn = void(__thiscall*)(void*, void*, const DrawModelState_t&, const ModelRenderInfo_t&, matrix3x4_t*);
-		static void __stdcall hooked(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, matrix3x4_t* matrix);
+		using fn = void(__thiscall*)(void*, void*, const DrawModelState_t&, const ModelRenderInfo_t&, Matrix3x4*);
+		static void __stdcall hooked(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 		inline static fn original = nullptr;
 		static const int index = DRAWMODEL;
 	};
@@ -71,29 +80,36 @@ namespace hooks
 
 	struct clientValidAddr
 	{
-		using fn = char(__fastcall*)(void*, void*, const char*);
-		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
+		using fn = char(__fastcall*)(void*, const char*);
+		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct engineValidAddr
 	{
-		using fn = char(__fastcall*)(void*, void*, const char*);
-		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
+		using fn = char(__fastcall*)(void*, const char*);
+		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct studioRenderValidAddr
 	{
-		using fn = char(__fastcall*)(void*, void*, const char*);
-		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
+		using fn = char(__fastcall*)(void*, const char*);
+		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct materialSystemValidAddr
 	{
-		using fn = char(__fastcall*)(void*, void*, const char*);
-		static char __fastcall hooked(void* thisptr, void* edx, const char* lpModuleName);
+		using fn = char(__fastcall*)(void*, const char*);
+		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
+		inline static fn original = nullptr;
+	};
+
+	struct isUsingStaticPropDebugModes
+	{
+		using fn = bool(__fastcall*)(void*);
+		static bool __fastcall hooked(FAST_ARGS);
 		inline static fn original = nullptr;
 	};
 
@@ -141,9 +157,23 @@ namespace hooks
 
 	struct proxyCreateMove
 	{
-		using fn = void(__fastcall*)(void*, int, int, float, bool);
-		static void __fastcall hooked(void*, int, int sequence, float inputFrame, bool active);
+		using fn = void(__stdcall*)(int, float, bool);
+		static void __stdcall hooked(int sequence, float inputFrame, bool active);
 		inline static fn original = nullptr;
 		static const int index = PROXY_MOVE;
+	};
+
+	struct getColorModulation
+	{
+		using fn = void(__fastcall*)(FAST_ARGS, float*, float*, float*);
+		static void __fastcall hooked(FAST_ARGS, float* r, float* g, float* b);
+		inline static fn original = nullptr;
+	};
+
+	struct setupBones
+	{
+		using fn = bool(__fastcall*)(FAST_ARGS, Matrix3x4*, int, int, float);
+		static bool __fastcall hooked(FAST_ARGS, Matrix3x4*, int maxBones, int boneMask, float curtime);
+		inline static fn original = nullptr;
 	};
 }

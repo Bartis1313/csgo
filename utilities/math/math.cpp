@@ -20,7 +20,7 @@ float math::calcFov(const Vector& source, const Vector& destination, const Vecto
 	return fov;
 }
 
-Vector math::transformVector(const Vector& in, const matrix3x4_t& matrix)
+Vector math::transformVector(const Vector& in, const Matrix3x4& matrix)
 {
 	return Vector(in.dot(matrix[0]) + matrix[0][3], in.dot(matrix[1]) + matrix[1][3],
 		in.dot(matrix[2]) + matrix[2][3]);

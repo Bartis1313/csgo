@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cstring>
-
 template <typename T>
 class UtlVector
 {

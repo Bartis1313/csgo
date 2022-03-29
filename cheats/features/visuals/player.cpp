@@ -1,22 +1,36 @@
 #include "player.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
+
+#include "../../../SDK/CGlobalVars.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
+#include "../../../SDK/IVModelInfo.hpp"
+#include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/IVEffects.hpp"
+#include "../../../SDK/IGameEvent.hpp"
+#include "../../../SDK/IViewRenderBeams.hpp"
+#include "../../../SDK/animations.hpp"
+#include "../../../SDK/ICvar.hpp"
+#include "../../../SDK/ConVar.hpp"
+#include "../../../SDK/IWeapon.hpp"
+#include "../../../SDK/structs/Entity.hpp"
+#include "../../../SDK/interfaces/interfaces.hpp"
+
 #include "../../../config/vars.hpp"
 #include "../../game.hpp"
-#include "../../../SDK/Enums.hpp"
+#include "../../../utilities/renderer/renderer.hpp"
+#include "../../../utilities/math/math.hpp"
 #include "../../globals.hpp"
-#include "../aimbot/aimbot.hpp"
-#include "../backtrack/backtrack.hpp"
-#include <format>
 
-#undef min
-#undef max
+#include "../../features/aimbot/aimbot.hpp"
+#include "../../features/backtrack/backtrack.hpp"
+
+// TODO: recode all
 
 void drawBox3D(const Box3D& box, const Color& color, bool filled, const float thickness = 2.0f);
 
 // very simple implementation of what to add as color
 inline Color playerColor(Player_t* ent, bool isAimbotColor = false)
 {
-	if (legitbot::bestEnt == ent && isAimbotColor)
+	if (aimbot.getBest() == ent && isAimbotColor)
 		return Colors::Purple;
 
 	uint8_t health = ent->m_iHealth();
@@ -32,9 +46,9 @@ inline Color playerColor(Player_t* ent, bool isAimbotColor = false)
 
 // dead esp - true = draw when dead, TODO
 
-void esp::run()
+void Visuals::run()
 {
-	if (!game::localPlayer)
+	if (!game::isAvailable())
 		return;
 
 	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
@@ -47,7 +61,7 @@ void esp::run()
 		if (game::localPlayer == entity)
 			continue;
 
-		if (entity->isDormant())
+		if (entity->isDormant()) // TODO: put fading
 			continue;
 
 		if (!entity->isAlive())
@@ -56,19 +70,15 @@ void esp::run()
 		if (entity->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 			continue;
 
-		// draw only when ent is valid, don't remove this if
-		if (entity)
-		{
-			drawPlayer(entity);
-			drawSkeleton(entity);
-			runDLight(entity);
-			drawLaser(entity);
-			enemyIsAimingAtYou(entity);
-		}
+		drawPlayer(entity);
+		drawSkeleton(entity);
+		runDLight(entity);
+		drawLaser(entity);
+		enemyIsAimingAtYou(entity);
 	}
 }
 
-void esp::renderBox3D(Entity_t* ent, bool fill)
+void Visuals::renderBox3D(Entity_t* ent, bool fill)
 {
 	Box3D box;
 	if (!utilities::getBox3D(ent, box))
@@ -98,40 +108,45 @@ void drawBox3D(const Box3D& box, const Color& color, bool filled, const float th
 		imRender.drawQuadFilled(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), fill);
 	}
 
-	imRender.drawQuad(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), color, thickness);
-	// top
-	imRender.drawQuad(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), color, thickness);
-	// front
-	imRender.drawQuad(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), color, thickness);
-	// back
-	imRender.drawQuad(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), color, thickness);
-	// right
-	imRender.drawQuad(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), color, thickness);
-	// left
-	imRender.drawQuad(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), color, thickness);
+	for (size_t i = 0; i < 3; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+	}
+	// missing part at the bottom
+	imRender.drawLine(box.points.at(0), box.points.at(3), color);
+	// top parts
+	for (size_t i = 4; i < 7; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+	}
+	// missing part at the top
+	imRender.drawLine(box.points.at(4), box.points.at(7), color);
+	// now all 4 box.points missing parts for 3d box
+	for (size_t i = 0; i < 4; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color);
+	}
 }
 
 
-void esp::drawBox2D(Player_t* ent, const Box& box)
+void Visuals::drawBox2D(Player_t* ent, const Box& box)
 {
 	Color cfgCol = config.get<Color>(vars.cBox);
 
-	imRender.drawRect(box.x - 1, box.y - 1, box.w + 2, box.h + 2, Color(0, 0, 0,  200));
+	imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Color(0, 0, 0,  200));
+	imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Color(0, 0, 0, 200));
 	imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol);
-	imRender.drawRect(box.x + 1, box.y + 1, box.w - 2, box.h - 2, Color(0, 0, 0, 200));
 }
 
-void esp::drawBox2DFilled(Player_t* ent, const Box& box)
+void Visuals::drawBox2DFilled(Player_t* ent, const Box& box)
 {
 	Color fill = config.get<Color>(vars.cBoxFill);
 
-	// first create rectangle then do outlines
-
-	imRender.drawRectFilled(box.x - 1, box.y - 1, box.w + 2, box.h + 2, fill);
+	imRender.drawRectFilled(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, fill);
 	drawBox2D(ent, box);
 }
 
-void esp::drawHealth(Player_t* ent, const Box& box)
+void Visuals::drawHealth(Player_t* ent, const Box& box)
 {
 	if (!config.get<bool>(vars.bDrawHealth))
 		return;
@@ -161,7 +176,7 @@ void esp::drawHealth(Player_t* ent, const Box& box)
 	}
 }
 
-void esp::drawArmor(Player_t* ent, const Box& box)
+void Visuals::drawArmor(Player_t* ent, const Box& box)
 {
 	if(!config.get<bool>(vars.bDrawArmor))
 		return;
@@ -192,7 +207,7 @@ void esp::drawArmor(Player_t* ent, const Box& box)
 	}
 }
 
-void esp::drawWeapon(Player_t* ent, const Box& box)
+void Visuals::drawWeapon(Player_t* ent, const Box& box)
 {
 	if (!config.get<bool>(vars.bDrawWeapon))
 		return;
@@ -240,7 +255,7 @@ void esp::drawWeapon(Player_t* ent, const Box& box)
 		imRender.text(newBox.x + barWidth, newBox.y + 1, ImFonts::espBar, std::to_string(currentAmmo), false, tex);
 }
 
-void esp::drawInfo(Player_t* ent, const Box& box)
+void Visuals::drawInfo(Player_t* ent, const Box& box)
 {
 	if (!config.get<bool>(vars.bDrawInfos))
 		return;
@@ -252,7 +267,7 @@ void esp::drawInfo(Player_t* ent, const Box& box)
 }
 
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
-void esp::drawSkeleton(Player_t* ent)
+void Visuals::drawSkeleton(Player_t* ent)
 {
 	if (!config.get<bool>(vars.bDrawSkeleton))
 		return;
@@ -266,7 +281,15 @@ void esp::drawSkeleton(Player_t* ent)
 		return;
 
 	// have to check if selected record is filled, if no then just skip
-	auto record = !backtrack::records[ent->getIndex()].empty() ? &backtrack::records[ent->getIndex()] : nullptr;
+	auto record = !backtrack.getAllRecords().at(ent->getIndex()).empty()  ? &backtrack.getAllRecords().at(ent->getIndex()) : nullptr;
+	auto backtrackPos = [=](const size_t idx)
+	{
+		return record->back().m_matrix[idx].origin();
+	};
+
+	// bone IDs
+	constexpr auto chest = 6;
+	constexpr auto lowerChest = 5;
 
 	for (int i = 0; i < studio->m_bonesCount; i++)
 	{
@@ -281,23 +304,21 @@ void esp::drawSkeleton(Player_t* ent)
 			continue;
 
 		// skip like here
-		auto child = record
-			? record->back().matrix[i].origin()
-			: ent->getBonePosition(i);
+		auto child = record != nullptr
+			? backtrackPos(i)
+			: ent->getBonePos(i);
 
-		auto parent = record
-			? record->back().matrix[bone->m_parent].origin()
-			: ent->getBonePosition(bone->m_parent);
+		auto parent = record != nullptr
+			? backtrackPos(bone->m_parent)
+			: ent->getBonePos(bone->m_parent);
 
-		auto chest = 6;
+		auto upper = record != nullptr
+			? backtrackPos(chest + 1) - backtrackPos(chest)
+			: ent->getBonePos(chest + 1) - ent->getBonePos(chest);
 
-		auto upper = record
-			? record->back().matrix[chest + 1].origin() - record->back().matrix[chest].origin()
-			: ent->getBonePosition(chest + 1) - ent->getBonePosition(chest);
-
-		auto breast = record
-			? record->back().matrix[chest].origin() + upper / 2
-			: ent->getBonePosition(chest) + upper / 2;
+		auto breast = record != nullptr
+			? backtrackPos(chest) + upper / 2.0f
+			: ent->getBonePos(chest) + upper / 2.0f;
 
 		auto deltachild = child - breast;
 		auto deltaparent = parent - breast;
@@ -305,40 +326,33 @@ void esp::drawSkeleton(Player_t* ent)
 		if (deltaparent.length() < 9.0f && deltachild.length() < 9.0f)
 			parent = breast;
 
-		if (i == 5)
+		if (i == lowerChest)
 			child = breast;
 
-		if (abs(deltachild.z) < 5.0f && deltaparent.length() < 5.0f && deltachild.length() < 5.0f || i == 6)
+		if (std::abs(deltachild.z) < 5.0f && deltaparent.length() < 5.0f && deltachild.length() < 5.0f || i == chest)
 			continue;
 
-		if (Vector screenp, screenc; imRender.worldToScreen(parent, screenp) && imRender.worldToScreen(child, screenc))
-		{
-			Color skel = config.get<Color>(vars.cSkeleton);
-
-			if(record && backtrack::isValid(record->front().simTime))
-				imRender.drawLine(screenp.x, screenp.y, screenc.x, screenc.y, skel);
-			else if(!record)
-				imRender.drawLine(screenp.x, screenp.y, screenc.x, screenc.y, skel);
-		}
+		if (Vector2D start, end; imRender.worldToScreen(parent, start) && imRender.worldToScreen(child, end))
+			imRender.drawLine(start, end, config.get<Color>(vars.cSkeleton));
 	}
 }
 
-void esp::drawSnapLine(Player_t* ent, const Box& box)
+void Visuals::drawSnapLine(Player_t* ent, const Box& box)
 {
-	if (ent == legitbot::bestEnt)
+	if (ent == aimbot.getBest())
 	{
 		// lines on the bottom and center bottom box
 		imRender.drawLine(globals::screenX / 2, globals::screenY, box.x + box.w / 2, box.y + box.h, Colors::Purple);
 	}
 }
 
-void esp::drawLaser(Player_t* ent)
+void Visuals::drawLaser(Player_t* ent)
 {
 	if (!config.get<bool>(vars.bEspLasers))
 		return;
 
 	// get from where to start, "laser ESP" is always starting from head I think
-	auto start = ent->getBonePosition(8);
+	auto start = ent->getBonePos(8);
 	// get angle to draw with correct view
 	auto forward = math::angleVec(ent->m_angEyeAngles());
 	// end is where lines just ends, this 70 is hardcoded, but whatever here tbh
@@ -351,7 +365,7 @@ void esp::drawLaser(Player_t* ent)
 	}
 }
 
-void esp::runDLight(Player_t* ent)
+void Visuals::runDLight(Player_t* ent)
 {
 	// https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/client/c_spotlight_end.cpp#L112
 
@@ -372,7 +386,7 @@ void esp::runDLight(Player_t* ent)
 	DLight->m_key = ent->getIndex();
 }
 
-void esp::drawPlayer(Player_t* ent)
+void Visuals::drawPlayer(Player_t* ent)
 {
 	if (!config.get<bool>(vars.bEsp))
 		return;
@@ -407,7 +421,7 @@ void esp::drawPlayer(Player_t* ent)
 }
 
 // add this to events manager 
-void esp::drawSound(IGameEvent* event)
+void Visuals::drawSound(IGameEvent* event)
 {
 	if (!config.get<bool>(vars.bSoundEsp))
 		return;
@@ -458,7 +472,7 @@ void esp::drawSound(IGameEvent* event)
 		interfaces::beams->drawBeam(beamDraw);
 }
 
-void esp::enemyIsAimingAtYou(Player_t* ent)
+void Visuals::enemyIsAimingAtYou(Player_t* ent)
 {
 	if (!config.get<bool>(vars.bAimingWarn))
 		return;
@@ -473,7 +487,7 @@ void esp::enemyIsAimingAtYou(Player_t* ent)
 	Vector idealAimAngle = math::vectorToAngle(posDelta);
 
 	// account for their spray control
-	static const auto scale = interfaces::console->findVar(XOR("weapon_recoil_scale"))->getFloat();
+	static const auto scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"))->getFloat();
 	idealAimAngle -= ent->m_aimPunchAngle() * scale;
 
 	Vector curEnemyAngle = ent->m_angEyeAngles();

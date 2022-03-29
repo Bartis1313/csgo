@@ -1,14 +1,25 @@
 #include "hooks.hpp"
-#include "../game.hpp"
+
+#include "../../SDK/CUserCmd.hpp"
+#include "../../SDK/Input.hpp"
+#include "../../SDK/IClientEntityList.hpp"
+#include "../../SDK/IVEngineClient.hpp"
+#include "../../SDK/ClientClass.hpp"
+#include "../../SDK/interfaces/interfaces.hpp"
+
 #include "../features/aimbot/aimbot.hpp"
 #include "../features/prediction/prediction.hpp"
 #include "../features/backtrack/backtrack.hpp"
 #include "../features/misc/bunnyhop.hpp"
 #include "../features/aimbot/triggerbot.hpp"
-#include "../globals.hpp"
 #include "../features/visuals/world.hpp"
 #include "../features/misc/misc.hpp"
 #include "../features/prediction/nadepred.hpp"
+
+#include "../game.hpp"
+#include "../globals.hpp"
+
+#pragma warning(disable: 4409)
 
 //bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
 //{
@@ -29,7 +40,7 @@
 // to get the sendPacket correctly and no need to define it anywhere in headers
 void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool& sendPacket)
 {
-	hooks::proxyCreateMove::original(interfaces::client, 0, sequence, inputTime, active);
+	hooks::proxyCreateMove::original(sequence, inputTime, active);
 
 	CUserCmd* cmd = interfaces::input->getUserCmd(0, sequence);
 	if (!cmd || !cmd->m_commandNumber)
@@ -42,36 +53,39 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
 	game::serverTime(cmd);
-	bunnyhop::run(cmd);
-	bunnyhop::strafe(cmd);
-	nedpred.createMove(cmd->m_buttons);
+	bunnyhop.run(cmd);
+	bunnyhop.strafe(cmd);
+	nadePred.createMove(cmd->m_buttons);
 
-	prediction::start(cmd);
-	{
-		backtrack::run(cmd);
-		legitbot::run(cmd);
-		legitbot::runRCS(cmd);
-		triggerbot::run(cmd);
-		misc::getVelocityData();
-	}
-	prediction::end();
+	prediction.addToPrediction(cmd, [=]()
+		{
+			backtrack.run(cmd);
+			aimbot.run(cmd);
+			aimbot.runRCS(cmd);
+			triggerbot.run(cmd);
+			misc.getVelocityData();
+		});
 
 	verifiedCmd->m_cmd = *cmd;
 	verifiedCmd->m_crc = cmd->getChecksum();
 }
 
 // wrapper for function
-__declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(void*, int, int sequence, float inputFrame, bool active)
+__declspec(naked) void __stdcall hooks::proxyCreateMove::hooked(int sequence, float inputFrame, bool active)
 {
 	__asm
 	{
 		push ebp
 		mov ebp, esp
 		push ebx
-		push esp
-		push dword ptr[active]
+		lea ecx, [esp]
+		push ecx
+		/*push dword ptr[active]
 		push dword ptr[inputFrame]
-		push dword ptr[sequence]
+		push dword ptr[sequence]*/
+		push active
+		push inputFrame
+		push sequence
 		call createMoveProxy
 		pop ebx
 		pop ebp

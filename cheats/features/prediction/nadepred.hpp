@@ -1,7 +1,9 @@
 #pragma once
+
 #include <vector>
-#include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../SDK/structs/Entity.hpp"
+
+struct Trace_t;
+struct Vector;
 
 // a lot of code is in cstrike15 leak, as I tried to do this I run on few cases where it was not pixel perfect
 // fix is def needed, for breakables bounces
@@ -29,4 +31,6 @@ protected: // protected because you may with to make something after nade is thr
 	virtual void pushEntity(Vector& src, const Vector& move, Trace_t& tr);
 	virtual void resolveFlyCollisionCustom(Trace_t& tr, Vector& velocity, const Vector& move, float interval);
 	virtual void physicsClipVelocity(const Vector& in, const Vector& normal, Vector& out, float overbounce);
-} inline nedpred;
+};
+
+inline GrenadePrediction nadePred;

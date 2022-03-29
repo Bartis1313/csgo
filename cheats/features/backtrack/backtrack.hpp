@@ -1,24 +1,38 @@
 #pragma once
-#include "../../../SDK/interfaces/interfaces.hpp"
+
+#include "../../../SDK/math/matrix.hpp"
+#include "../../../SDK/math/Vector.hpp"
+#include "../../../SDK/vars.hpp"
+
 #include <deque>
 #include <array>
-// TODO: fix setupbones for better results
 
-namespace backtrack
+class CUserCmd;
+struct Vector;
+
+class Backtrack final
 {
-	struct StoredRecord
-	{
-		float simTime = 0.0f;
-		Vector head = { 0, 0, 0 };
-		// use origin to set abs or for whatever need
-		Vector origin = { 0, 0 , 0 };
-		matrix3x4_t matrix[BONE_USED_BY_HITBOX] = {};
-	};
-
+public:
 	void run(CUserCmd* cmd);
 	void update();
 	void init();
-	bool isValid(float simtime);
-	float getLerp();
-	inline std::array<std::deque<StoredRecord>, 65> records;
+	_NODISCARD bool isValid(float simtime) const;
+private:
+	_NODISCARD float getLerp() const;
+	_NODISCARD float extraTicks() const;
+private:
+	struct StoredRecord
+	{
+		float m_simtime = 0.0f;
+		Vector m_head = {};
+		// use origin to set abs or for whatever need
+		Vector m_origin = {};
+		Matrix3x4 m_matrix[BONE_USED_BY_HITBOX];
+	};
+private:
+	std::array<std::deque<StoredRecord>, 65> m_records;
+public:
+	_NODISCARD auto& getAllRecords() const { return m_records; }
 };
+
+inline Backtrack backtrack;

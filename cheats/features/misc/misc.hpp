@@ -1,18 +1,27 @@
 #pragma once
-#include "../../../SDK/interfaces/interfaces.hpp"
 
-namespace misc
+#include <deque>
+
+class IGameEvent;
+
+class Misc final
 {
+public:
 	void thirdperson();
 	void drawCrosshair();
 	void drawLocalInfo();
-	// PLOTS: if anyone can fix it to work with polylines I am impressed
-	// the result I got: https://cdn.discordapp.com/attachments/826945218355658753/911933573211250708/unknown.png
 	void drawFpsPlot();
 	void drawVelocityPlot();
 	void getVelocityData();
 	void drawHitmarker();
 	void playHitmarker(IGameEvent* event);
 	void drawNoScope();
-	inline int hitAlpha = 0;
-}
+	void drawHat();
+private:
+	int hitAlpha = 0;
+	std::deque<float> velRecords;
+	constexpr static size_t RECORDS_SIZE_VEL = 300;
+	float acceptanceVelocityCustom = 1.0f;
+};
+
+inline Misc misc;

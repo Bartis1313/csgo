@@ -1,17 +1,27 @@
 #include "misc.hpp"
+
+#include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/Input.hpp"
+#include "../../../SDK/ICvar.hpp"
+#include "../../../SDK/ConVar.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
+#include "../../../SDK/CGlobalVars.hpp"
+#include "../../../SDK/IGameEvent.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../game.hpp"
+
 #include "../../../config/vars.hpp"
-#include "../aimbot/aimbot.hpp"
+#include "../../game.hpp"
 #include "../../globals.hpp"
-#include <format>
-#include <deque>
+#include "../../../utilities/math/math.hpp"
+#include "../../../utilities/renderer/renderer.hpp"
+
+#include "../aimbot/aimbot.hpp"
+
 
 constexpr int VK_VKEY = 0x56;
 
 // TODO: rewrite this and fix lol
-void misc::thirdperson()
+void Misc::thirdperson()
 {
 	if (!config.get<bool>(vars.bThirdp))
 		return;
@@ -29,11 +39,11 @@ void misc::thirdperson()
 	interfaces::input->m_cameraOffset.z = 220.0f;
 }
 
-void misc::drawCrosshair()
+void Misc::drawCrosshair()
 {
 	int cfgCross = config.get<int>(vars.iCrosshair);
 
-	const static auto crosshair = interfaces::console->findVar(XOR("cl_crosshair_recoil"));
+	const static auto crosshair = interfaces::cvar->findVar(XOR("cl_crosshair_recoil"));
 	crosshair->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
 
 	if (!cfgCross)
@@ -98,7 +108,7 @@ void misc::drawCrosshair()
 	}
 }
 
-void misc::drawLocalInfo()
+void Misc::drawLocalInfo()
 {
 	if (!config.get<bool>(vars.bDrawMiscInfo))
 		return;
@@ -135,68 +145,96 @@ void misc::drawLocalInfo()
 	imRender.text(width, 115, ImFonts::tahoma, std::format(XOR("Accuracy [{} / {}] {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy), false, Colors::Yellow);
 
 	width *= 1.25f;
-	imRender.text(width, 15, ImFonts::tahoma, legitbot::bestEnt ? std::format(XOR("Aimbot working on: {}"), legitbot::bestEnt->getName()) : "", false, Colors::LightBlue);
+	imRender.text(width, 15, ImFonts::tahoma, aimbot.getBest() ? std::format(XOR("Aimbot working on: {}"), aimbot.getBest()->getName()) : "", false, Colors::LightBlue);
 }
 
-struct Record
-{
-	float fps;
-};
+#include "../../../utilities/console/console.hpp"
+#include "../../menu/GUI-ImGui/imguiaddons.hpp"
 
-void misc::drawFpsPlot()
+void Misc::drawFpsPlot()
 {
-	if (!config.get<bool>(vars.bShowFpsPlot))
+	bool& plotRef = config.getRef<bool>(vars.bShowFpsPlot);
+	if (!plotRef)
 		return;
 
 	// static so we can get records get saved
-	static std::deque<Record> records;
+	static std::deque<float> records;
 
-	int x = globals::screenX;
-	int y = globals::screenY;
-	x /= 2, y /= 2;
+	auto getfps = []() -> float // this is how they do it
+	{
+		static float realfps = 0.0f;
+		realfps = 0.9f * realfps + (1.0f - 0.9f) * interfaces::globalVars->m_absoluteframetime;
 
-	// get position to startdrawing, although this time I am goona start from right pos, because of the loop under
-	auto widthPoint = x + (x * 0.97f);
+		return 1.0f / realfps;
+	};
 
-	// a bit of hardcode here
-	imRender.drawRectFilled(widthPoint - records.size() - 1, y - 250 + 2, records.size() + 5, 150, Colors::Grey);
-	imRender.drawRect(widthPoint - records.size() - 1, y - 250 + 2, records.size() + 5, 150, Colors::Black);
+	const float fps = getfps();
+	// when loading, you have a chance of freezing
+	if (std::isinf(fps))
+	{
+		console.log(TypeLogs::LOG_WARN, XOR("record for plot got skipped due to infinity"));
+		return;
+	}
 
-	imRender.text(widthPoint - records.size() / 2, y - 250 - 14, ImFonts::tahoma, XOR("FPS Plot"), true, Colors::LightBlue);
+	constexpr size_t RECORDS_SIZE = 300;
 
-	records.push_back(Record{ 1.f / interfaces::globalVars->m_frametime });
-	
-	// width
-	while (records.size() > 300)
+	static float acceptanceCustom = 1.0f;
+
+	records.push_back(fps);
+
+	while (records.size() > static_cast<size_t>(RECORDS_SIZE / acceptanceCustom))
 		records.pop_front();
 
-	// ratios: put anything you find good
-	const auto a = 1.0f;
-	const auto b = 10.0f;
+	static float MAX_FPS = interfaces::engine->isInGame() ? 350.0f : 120.0f; // fps are limied in menu, then in game use whatever u want
+	static Color cLine = Colors::White;
 
-	float lx = 0, ly = 0;
-	for (int i = 0; i < records.size(); i++)
+	bool& sliderRef = config.getRef<bool>(vars.bFPSCustom);
+	// i should fix this
+	if (sliderRef)
 	{
-		// because frames sometimes may be stupid, like on loading new map
-		auto currentVal = std::clamp(records.at(i).fps, 0.0f, 500.0f);
-		float cx = widthPoint - (i - 1);
-		float cy = y - 100 - a * std::sqrt(currentVal * b);
+		if (ImGui::Begin(XOR("Sliders for plot"), &sliderRef, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			if (interfaces::engine->isInGame()) // not enaled in menu
+				ImGui::SliderFloat(XOR("Set max FPS"), &MAX_FPS, 100.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // hardcoded ranges, we should maybe run some avg fps getter
+			ImGui::SliderFloat(XOR("Acceptance multiply"), &acceptanceCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
+			ImGui::ColorPicker(XOR("Color lines plot"), &cLine);
+			ImGui::SameLine();
+			ImGui::Text(XOR("Color line"));
 
-		if (i > 0)
-			imRender.drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
-		lx = cx; ly = cy;
+			ImGui::End();
+		}
 	}
+
+	if (ImGui::Begin(XOR("Plot FPS"), &plotRef, ImGuiWindowFlags_NoCollapse))
+	{
+		imRenderWindow.addList(); // correct pos, so we start from x = 0 y = 0
+		float acceptance = imRenderWindow.getWidth() / static_cast<float>(RECORDS_SIZE / acceptanceCustom);
+		float prevX = 0.0f, prevY = 0.0f;
+		float scaledavg = MAX_FPS / imRenderWindow.getHeight(); // might run some better logic...
+		for (size_t i = 0; const auto & currentFPS : records)
+		{
+			float currentX = i * acceptance; // no need for clamping
+
+			float currentY = imRenderWindow.getHeight() - (currentFPS / scaledavg); // is there any better way for this?
+			if (currentY < 1.0f)
+				currentY = 1.0f; // stay on top to clamp
+
+			// start drawing after there is any change, we could use polylines here
+			if (i > 0)
+				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, cLine);
+			prevX = currentX; prevY = currentY;
+
+			i++;
+		}
+
+		ImGui::End();
+	}
+	if (!plotRef)
+		sliderRef = false;
 }
 
-struct RecordVelocity
-{
-	float velocity;
-};
-
-std::deque<RecordVelocity> velRecords;
-
 // because without prediction the values might not be that accurate
-void misc::getVelocityData()
+void Misc::getVelocityData()
 {
 	if (!config.get<bool>(vars.bShowVelocityPlot))
 		return;
@@ -204,58 +242,76 @@ void misc::getVelocityData()
 	if (!game::localPlayer)
 		return;
 
-	if (!interfaces::engine->isInGame())
+	if (!interfaces::engine->isInGame() || !game::localPlayer->isAlive())
 	{
 		velRecords.clear();
 		return;
 	}
-	
-	velRecords.push_back(RecordVelocity{ game::localPlayer->m_vecVelocity().length2D() });
+
+	velRecords.emplace_back(game::localPlayer->m_vecVelocity().length2D());
 
 	// width
-	while (velRecords.size() > 300)
+	while (velRecords.size() > static_cast<size_t>(RECORDS_SIZE_VEL / acceptanceVelocityCustom))
 		velRecords.pop_front();
 }
 
-void misc::drawVelocityPlot()
+void Misc::drawVelocityPlot()
 {
-	if (!config.get<bool>(vars.bShowVelocityPlot))
+	bool& plotVelRef = config.getRef<bool>(vars.bShowVelocityPlot);
+	if (!plotVelRef)
 		return;
 
-	if (!game::localPlayer)
+	if (!interfaces::engine->isInGame() || !game::localPlayer->isAlive())
 		return;
 
-	if (!interfaces::engine->isInGame())
-		return;
+	static float MAX_SPEEED_MOVE = 450.0f; // sv_maxspeed will print huge number so when playing on cutom serv, adjust it
+	static Color cLine = Colors::White;
 
-	int x = globals::screenX;
-	int y = globals::screenY;
-	x /= 2, y /= 2;
-
-	auto widthPoint = x + (x * 0.97f);
-
-	imRender.drawRectFilled(widthPoint - velRecords.size() - 1, y - 50 + 2, velRecords.size() + 5, 50, Colors::Grey);
-	imRender.drawRect(widthPoint - velRecords.size() - 1, y - 50 + 2, velRecords.size() + 5, 50, Colors::Black);
-
-	imRender.text(widthPoint - velRecords.size() / 2, y - 50 - 14, ImFonts::tahoma, XOR("Velocity Plot"), true, Colors::LightBlue);
-
-	const auto a = 1.0f;
-	const auto b = 2.0f;
-
-	float lx = 0, ly = 0;
-	for (int i = 0; i < velRecords.size(); i++)
+	bool& sliderRef = config.getRef<bool>(vars.bVelocityCustom);
+	if (sliderRef)
 	{
-		auto currentVal = velRecords.at(i).velocity;
-		float cx = widthPoint - (i - 1);
-		float cy = y - a * std::sqrt(currentVal * b);
+		// there, no need for hard logic, we will make max vel as 450
+		if (ImGui::Begin(XOR("Sliders for velocity plot"), &sliderRef, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			ImGui::SliderFloat(XOR("Set max velocity"), &MAX_SPEEED_MOVE, 450.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // who will ever get this velocity? adjust if needed
+			ImGui::SliderFloat(XOR("Acceptance multiply##vel"), &acceptanceVelocityCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
+			ImGui::ColorPicker(XOR("Color lines plot##vel"), &cLine);
+			ImGui::SameLine();
+			ImGui::Text(XOR("Color line"));
 
-		if (i > 0)
-			imRender.drawLine(cx, cy, lx, ly, Color(170, 200, 180, 200));
-		lx = cx; ly = cy;
+			ImGui::End();
+		}
 	}
+
+	if (ImGui::Begin(XOR("Plot Velocity"), &plotVelRef, ImGuiWindowFlags_NoCollapse))
+	{
+		imRenderWindow.addList(); // correct pos, so we start from x = 0 y = 0
+		float acceptance = imRenderWindow.getWidth() / static_cast<float>(RECORDS_SIZE_VEL / acceptanceVelocityCustom);
+		float prevX = 0.0f, prevY = 0.0f;
+		float scaledavg = MAX_SPEEED_MOVE / imRenderWindow.getHeight(); // might run some better logic...
+		for (size_t i = 0; const auto & currentVel : velRecords)
+		{
+			float currentX = i * acceptance; // no need for clamping
+
+			float currentY = imRenderWindow.getHeight() - (currentVel / scaledavg); // is there any better way for this?
+			if (currentY < 1.0f)
+				currentY = 1.0f; // stay on top to clamp
+
+			// start drawing after there is any change, we could use polylines here
+			if (i > 0)
+				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, cLine);
+			prevX = currentX; prevY = currentY;
+
+			i++;
+		}
+
+		ImGui::End();
+	}
+	if (!plotVelRef)
+		sliderRef = false;
 }
 
-void misc::playHitmarker(IGameEvent* event)
+void Misc::playHitmarker(IGameEvent* event)
 {
 	if (!config.get<bool>(vars.bPlayHitmarker))
 		return;
@@ -267,18 +323,17 @@ void misc::playHitmarker(IGameEvent* event)
 	// very important
 	if (attacker == game::localPlayer)
 	{
-		globals::shotsHit++;
 		// new hit = new hitmarker
 		hitAlpha = interfaces::globalVars->m_curtime;
 		// browse those files for more
 		interfaces::surface->playSound(XOR("buttons\\arena_switch_press_02.wav"));
-	}	
+	}
 }
 
 // TODO: Add hitmarker when ent died from local player
-void misc::drawHitmarker()
+void Misc::drawHitmarker()
 {
-	if(!config.get<bool>(vars.bDrawHitmarker))
+	if (!config.get<bool>(vars.bDrawHitmarker))
 		return;
 
 	if (!game::localPlayer)
@@ -304,7 +359,7 @@ void misc::drawHitmarker()
 	}
 }
 
-void misc::drawNoScope()
+void Misc::drawNoScope()
 {
 	if (!config.get<bool>(vars.bNoScope))
 		return;
@@ -328,5 +383,52 @@ void misc::drawNoScope()
 		int y = globals::screenY;
 		imRender.drawLine(x / 2, 0, x / 2, y, Colors::Black);
 		imRender.drawLine(0, y / 2, x, y / 2, Colors::Black);
+	}
+}
+
+// because this is special case... I had to copy this with few edits
+static void drawConeEditedRainbow(const Vector& pos, const float radius, const int points, const float size, const float speed, const int trianglesAlpha, const int linesAlpha, const float thickness = 2.0f)
+{
+	Vector2D orignalW2S = {};
+	if (!imRender.worldToScreen(pos, orignalW2S))
+		return;
+
+	float step = std::numbers::pi_v<float> *2.0f / points;
+	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	{
+		Vector startWorld = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
+		Vector endWorld = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
+
+		if (Vector2D start, end; imRender.worldToScreen(startWorld, start) && imRender.worldToScreen(endWorld, end))
+		{
+			imRender.drawLine(start, end, Color::rainbowColor(interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(linesAlpha), thickness);
+			surfaceRender.drawTriangleFilled({ orignalW2S.x, orignalW2S.y + size }, start, end, Color::rainbowColor(interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(trianglesAlpha));
+		}
+	}
+}
+
+// more points - more clean
+void Misc::drawHat()
+{
+	if (!config.get<bool>(vars.bHat))
+		return;
+
+	if (!game::isAvailable())
+		return;
+
+	if (!interfaces::input->m_cameraInThirdPerson)
+		return;
+
+	auto pos = game::localPlayer->getBonePos(8); // you can play around with vec.z
+
+	// config.get<> enjoyer
+
+	if (config.get<bool>(vars.bHatRainbow))
+	{
+		drawConeEditedRainbow(pos, config.get<float>(vars.fHatRadius), 86, config.get<float>(vars.fHatSize), config.get<float>(vars.fHatSpeed), config.get<int>(vars.iHatTriangleAlpha), config.get<int>(vars.iHatLinesAlpha));
+	}
+	else
+	{
+		imRender.drawCone(pos, config.get<float>(vars.fHatRadius), 86, config.get<float>(vars.fHatSize), config.get<Color>(vars.cHatTriangle), config.get<Color>(vars.cHatLine), true, 2.0f);
 	}
 }

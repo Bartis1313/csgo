@@ -1,7 +1,18 @@
 #include "Entity.hpp"
-#include <format>
+#include <array>
 
-#undef max
+#include "../IVModelInfo.hpp"
+#include "../ClientClass.hpp"
+#include "../Enums.hpp"
+#include "../ICollideable.hpp"
+#include "../IClientEntityList.hpp"
+#include "../math/matrix.hpp"
+#include "../math/Vector.hpp"
+#include "../../utilities/math/math.hpp"
+#include "../IVEngineClient.hpp"
+#include "../CPlayerResource.hpp"
+#include "../IEngineTrace.hpp"
+#include "../IWeapon.hpp"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -14,7 +25,7 @@ Vector Entity_t::getAimPunch()
 
 AnimationLayer* Entity_t::getAnimOverlays()
 {
-	const static auto offset = *reinterpret_cast<uintptr_t*>(utilities::patternScan(CLIENT_DLL, ANIMATION_LAYER) + 0x2); // 0x2990
+	const static auto offset = *reinterpret_cast<uintptr_t*>(utilities::patternScan(CLIENT_DLL, ANIMATION_LAYER, 0x2)); // 0x2990
 	return *reinterpret_cast<AnimationLayer**>(uintptr_t(this) + offset);
 }
 
@@ -233,7 +244,7 @@ Weapon_t* Player_t::getActiveWeapon()
 
 Vector Player_t::getHitboxPos(const int id)
 {
-	if (matrix3x4_t matBone[BONE_USED_BY_HITBOX]; setupBones(matBone, BONE_USED_BY_HITBOX, BONE_USED_BY_HITBOX, 0.0f))
+	if (Matrix3x4 matBone[BONE_USED_BY_HITBOX]; setupBones(matBone, BONE_USED_BY_HITBOX, BONE_USED_BY_HITBOX, 0.0f))
 	{
 		if (auto modelStudio = interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
 		{
@@ -250,9 +261,9 @@ Vector Player_t::getHitboxPos(const int id)
 	return {};
 }
 
-Vector Player_t::getBonePosition(const int id)
+Vector Player_t::getBonePos(const int id)
 {
-	if (matrix3x4_t matBone[128]; setupBones(matBone, 128, BONE_USED_BY_HITBOX, 0.0f))
+	if (Matrix3x4 matBone[BONE_USED_BY_HITBOX]; setupBones(matBone, BONE_USED_BY_HITBOX, BONE_USED_BY_HITBOX, 0.0f))
 		return matBone[id].origin();
 	
 	return {};
@@ -267,19 +278,20 @@ bool Player_t::isC4Owner()
 
 std::string Player_t::getName()
 {
-	playerInfo_t info;
+	PlayerInfo_t info;
 	interfaces::engine->getPlayerInfo(this->getIndex(), &info);
 
-	std::string name = info.name;
+	std::string name = info.m_name;
 
 	if (name.length() > 20)
 		name = name.substr(0, 20).append(XOR("..."));
 
-	std::for_each(name.begin(), name.end(), [](char& el)
+	// use when surface
+	/*std::for_each(name.begin(), name.end(), [](char& el)
 		{
 			if (el < 0 || el > 128)
 				el = '?';
-		});
+		});*/
 
 	return name;
 }
@@ -288,10 +300,8 @@ int Player_t::getKills()
 {
 	const static auto res = *interfaces::resource;
 	if (res)
-	{
-		const auto kills = res->getKills(this->getIndex());
-		return kills;
-	}
+		return res->getKills(this->getIndex());
+
 	return 0;
 }
 
@@ -299,10 +309,8 @@ int Player_t::getDeaths()
 {
 	const static auto res = *interfaces::resource;
 	if (res)
-	{
-		const auto deaths = res->getDeaths(this->getIndex());
-		return deaths;
-	}
+		return res->getDeaths(this->getIndex());
+
 	return 0;
 }
 
@@ -310,10 +318,8 @@ int Player_t::getPing()
 {
 	const static auto res = *interfaces::resource;
 	if (res)
-	{
-		const auto ping = res->getPing(this->getIndex());
-		return ping;
-	}
+		return res->getPing(this->getIndex());
+
 	return 0;
 }
 

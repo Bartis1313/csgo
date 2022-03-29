@@ -1,7 +1,12 @@
-#include <iomanip>
 #include "netvars.hpp"
+
+#include "../../SDK/Recv.hpp"
+#include "../../SDK/IBaseClientDll.hpp"
+#include "../../SDK/ClientClass.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 #include "../../config/config.hpp"
+
+#include <iomanip>
 
 void NetvarManager::init()
 {

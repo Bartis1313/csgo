@@ -1,128 +1,52 @@
 #include "console.hpp"
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <format>
-#include <map>
-#include "../../config/config.hpp"
-#include "../../SDK/Color.hpp"
-#include "../../cheats/globals.hpp"
-#include "../../SDK/interfaces/interfaces.hpp"
 
-enum consoleColors
-{
-	CONSOLE_WHITE = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-	CONSOLE_BLACK = 0,
-	CONSOLE_DARKBLUE = FOREGROUND_BLUE,
-	CONSOLE_DARKGREEN = FOREGROUND_GREEN,
-	CONSOLE_DARKCYAN = FOREGROUND_GREEN | FOREGROUND_BLUE,
-	CONSOLE_DARKRED = FOREGROUND_RED,
-	CONSOLE_DARKMAGENTA = FOREGROUND_RED | FOREGROUND_BLUE,
-	CONSOLE_DARKYELLOW = FOREGROUND_RED | FOREGROUND_GREEN,
-	CONSOLE_DARKGRAY = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE,
-	CONSOLE_GRAY = FOREGROUND_INTENSITY,
-	CONSOLE_BLUE = FOREGROUND_INTENSITY | FOREGROUND_BLUE,
-	CONSOLE_GREEN = FOREGROUND_INTENSITY | FOREGROUND_GREEN,
-	CONSOLE_CYAN = FOREGROUND_INTENSITY | FOREGROUND_GREEN | FOREGROUND_BLUE,
-	CONSOLE_RED = FOREGROUND_INTENSITY | FOREGROUND_RED,
-	CONSOLE_MAGENTA = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_BLUE,
-	CONSOLE_YELLOW = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN,
-};
+#include <Windows.h>
 
-void console::setColor(WORD color)
+void Console::setColor(ColorsConsole color)
 {
 #ifdef _DEBUG
-	LF(SetConsoleTextAttribute)(LF(GetStdHandle)(STD_OUTPUT_HANDLE), color);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(color));
 #endif
 	return;
 }
 
-void console::reset()
+void Console::reset()
 {
 #ifdef _DEBUG
-	LF(SetConsoleTextAttribute)(LF(GetStdHandle)(STD_OUTPUT_HANDLE), CONSOLE_WHITE);
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(ColorsConsole::CONSOLE_WHITE));
 #endif
 	return;
 }
 
-bool console::init(const char* title)
+bool Console::init(const std::string& title)
 {
 #ifdef _DEBUG
-	static bool bOnce = false;
-	if (bOnce)
-		return false;
+	static bool bOnce = [=]()
+	{
+		AllocConsole();
 
-	LF(AllocConsole)();
+		freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
 
-	freopen_s(reinterpret_cast<FILE**>(__acrt_iob_func(1)), XOR("CONOUT$"), XOR("w"), __acrt_iob_func(1));
+		SetConsoleTitleA(title.c_str());
 
-	LF(SetConsoleTitleA)(title);
-
-	bOnce = true;
-#endif
+		return true;
+	} ();
 	return true;
+#endif
+	return false;
 }
 
-void console::shutdown() 
+void Console::shutdown() 
 {
 #ifdef _DEBUG
-	fclose(__acrt_iob_func(1));
-	LF(FreeConsole)();
+	fclose(stdout);
+	FreeConsole();
 #endif
 	return;
 }
 
-std::map<short, WORD> colorsConsole =
+void Console::drawLog()
 {
-	{LOG_NO, CONSOLE_WHITE},
-	{LOG_INFO, CONSOLE_GREEN},
-	{LOG_WELCOME, CONSOLE_CYAN},
-	{LOG_ERR, CONSOLE_RED}
-};
-
-std::map<short, const char*> consoleStrings =
-{
-	{LOG_NO, ""},
-	{LOG_INFO, "[info] "},
-	{LOG_WELCOME, "[welcome] "},
-	{LOG_ERR, "[err] "}
-};
-
-std::map<short, SDKColor> consoleColors =
-{
-	{LOG_NO, { 255, 255, 255, 255 } },
-	{LOG_INFO, { 0, 255, 0, 255 } },
-	{LOG_WELCOME, { 0, 255, 255, 255 } },
-	{LOG_ERR, { 255, 0, 0, 255 } }
-};
-
-void console::log(const short type, const std::string& str, const bool useNewLine)
-{
-	if (str.empty())
-		return;
-	
-	std::ofstream log{ config.getPathForSave(XOR("hack.log")), std::ofstream::out | std::ofstream::app};
-	std::stringstream ss;
-
-#ifdef _DEBUG
-	console::setColor(colorsConsole[type]);
-	std::cout << consoleStrings[type];
-	console::reset();
-#endif
-	ss << "[" << utilities::getTime() << "] " << str;
-	if (useNewLine)
-		ss << "\n";
-
-	if (globals::interfacesDone)
-		interfaces::console->consoleColorPrintf(consoleColors[type], consoleStrings[type]);
-
-	log << consoleStrings[type] << ss.str();
-
-	if (globals::interfacesDone)
-		interfaces::console->consoleColorPrintf( { 255, 255, 255, 255 }, ss.str().c_str());
-	
-	log.close();
-#ifdef _DEBUG
-	std::cout << ss.str();
-#endif
+	if(m_activeLog)
+		m_log.Draw(XOR("Logging Console"), &m_activeLog);
 }

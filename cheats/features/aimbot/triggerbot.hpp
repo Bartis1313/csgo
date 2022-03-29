@@ -1,7 +1,11 @@
 #pragma once
-#include "../../../SDK/interfaces/interfaces.hpp"
 
-namespace triggerbot
+class CUserCmd;
+
+class Triggerbot final
 {
+public:
 	void run(CUserCmd* cmd);
-}
+};
+
+inline Triggerbot triggerbot;

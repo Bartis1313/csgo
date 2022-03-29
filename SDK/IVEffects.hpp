@@ -1,5 +1,7 @@
 #pragma once
 #include "math/Vector.hpp"
+#include "Color.hpp"
+#include "../utilities/vfunc.hpp"
 
 enum
 {

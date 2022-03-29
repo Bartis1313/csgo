@@ -1,15 +1,22 @@
 #include "radar.hpp"
+
+#include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/CGlobalVars.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
+#include "../../../SDK/math/Vector.hpp"
+#include "../../../SDK/math/Vector2D.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
+
 #include "../../game.hpp"
 #include "../../../config/vars.hpp"
 #include "../../globals.hpp"
+#include "../../../utilities/renderer/renderer.hpp"
+#include "../../../utilities/math/math.hpp"
+
 #include "../../../dependencies/ImGui/imgui.h"
 #include "../../../dependencies/ImGui/imgui_internal.h"
-#include <format>
 
-// TODO: those renders should be moved in some more obvious way to never put it in the pt
-
-Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale)
+Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale)
 {
 	auto dotThickness = config.get<float>(vars.fRadarThickness);
 
@@ -28,8 +35,8 @@ Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 	dotX *= scale;
 	dotY *= scale;
 	// correct it for our center screen of rectangle radar
-	dotX += size.x / 2;
-	dotY += size.y / 2;
+	dotX += size.x / 2.0f;
+	dotY += size.y / 2.0f;
 
 	// do not draw out of range, added pos, even we pass 0, but for clarity
 	if (!config.get<bool>(vars.bRadarRanges))
@@ -68,7 +75,7 @@ Vector2D radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 	return { dotX, dotY };
 }
 
-void radar::run()
+void Radar::run()
 {
 	if (bool& ref = config.getRef<bool>(vars.bRadar))
 	{
@@ -81,8 +88,6 @@ void radar::run()
 		if (ImGui::Begin("Radar", &ref))
 		{
 			imRenderWindow.addList();
-			imRenderWindow.drawRectFilled(0, 0, imRenderWindow.m_rect.x, imRenderWindow.m_rect.y, Color(128, 128, 128, 190));
-			imRenderWindow.drawRect(0, 0, imRenderWindow.m_rect.x + 1, imRenderWindow.m_rect.y + 1, Colors::Black);
 
 			const auto myEye = game::localPlayer->getEyePos();
 			Vector ang = {};
@@ -107,7 +112,7 @@ void radar::run()
 				if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 					continue;
 
-				const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D{}, Vector2D(imRenderWindow.m_rect.x, imRenderWindow.m_rect.y), config.get<float>(vars.fRadarScale));
+				const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D{}, Vector2D{ imRenderWindow.getWidth(), imRenderWindow.getHeight() }, config.get<float>(vars.fRadarScale));
 
 				auto entYaw = ent->m_angEyeAngles().y;
 
@@ -127,11 +132,11 @@ void radar::run()
 
 					auto colLine = config.get<Color>(vars.cRadarLine);
 					imRenderWindow.drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY,
-						game::localPlayer->isPossibleToSee(ent->getBonePosition(8)) ? colLine : colLine.getColorEditAlpha(0.5f));
+						game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colLine : colLine.getColorEditAlpha(0.5f));
 					auto colPlayer = config.get<Color>(vars.cRadarPlayer);
 					imRenderWindow.drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32,
-						game::localPlayer->isPossibleToSee(ent->getBonePosition(8)) ? colPlayer : colPlayer.getColorEditAlpha(0.5f));
-			
+						game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colPlayer : colPlayer.getColorEditAlpha(0.5f));
+
 				}
 			}
 			ImGui::End();

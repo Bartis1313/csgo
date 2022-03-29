@@ -1,37 +1,77 @@
 #include "aimbot.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../globals.hpp"
+
+#include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/CUserCmd.hpp"
+#include "../../../SDK/CGlobalVars.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
+#include "../../../SDK/vars.hpp"
+#include "../../../SDK/Enums.hpp"
+#include "../../../SDK/ICvar.hpp"
+#include "../../../SDK/ConVar.hpp"
+#include "../../../SDK/structs/Entity.hpp"
+#include "../../../SDK/interfaces/interfaces.hpp"
+
 #include "../../../config/vars.hpp"
+#include "../../globals.hpp"
 #include "../../game.hpp"
 
-void legitbot::drawFov()
+#include "../../../utilities/renderer/renderer.hpp"
+#include "../../../utilities/math/math.hpp"
+
+Player_t* Aimbot::getBest() const
 {
-    if (interfaces::engine->isConnected() && interfaces::engine->isInGame())
-    {
-        if (!config.get<bool>(vars.bDrawFov))
-            return;
-
-        if (!game::localPlayer)
-            return;
-
-        if (!game::localPlayer->isAlive())
-            return;
-
-        const auto weapon = game::localPlayer->getActiveWeapon();
-
-        if (!weapon)
-            return;
-
-        if (weapon->isNonAimable())
-            return;
-
-        float radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
-
-        imRender.drawCircle(globals::screenX / 2, globals::screenY / 2, radius, 32, config.get<Color>(vars.cDrawFov));
-    }
+    return m_bestEnt;
 }
 
-void legitbot::run(CUserCmd* cmd)
+void Aimbot::resetBests()
+{
+    m_bestEnt = nullptr;
+    m_bestHitpos = {};
+}
+
+void Aimbot::drawBestPoint()
+{
+    if (!config.get<bool>(vars.bDrawBestPoint))
+        return;
+
+    if (!game::isAvailable())
+        return;
+
+    if (!m_bestEnt)
+        return;
+
+    if (m_bestHitpos.isZero())
+        return;
+
+    if (Vector2D p; imRender.worldToScreen(m_bestHitpos, p))
+        imRender.drawCircleFilled(p.x, p.y, 5, 12, Colors::Cyan);
+}
+
+void Aimbot::drawFov()
+{
+    if (!config.get<bool>(vars.bDrawFov))
+        return;
+
+    if (!config.get<float>(vars.fFovAimbot))
+        return;
+
+    if (!game::isAvailable())
+        return;
+
+    const auto weapon = game::localPlayer->getActiveWeapon();
+
+    if (!weapon)
+        return;
+
+    if (weapon->isNonAimable())
+        return;
+
+    float radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
+
+    imRender.drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, config.get<Color>(vars.cDrawFov));
+}
+
+void Aimbot::run(CUserCmd* cmd)
 {
     if (!config.get<bool>(vars.bAimbot))
         return;
@@ -39,18 +79,15 @@ void legitbot::run(CUserCmd* cmd)
     if (!game::localPlayer)
         return;
 
+    resetBests();
+
     auto weapon = game::localPlayer->getActiveWeapon();
 
     if (!weapon)
         return;
 
     if (weapon->isNonAimable())
-    {
-        // in special cases when weapon that got accepted with aimbot
-        // and later on gun got switched to nonaimable, in past snapline was shown, now no
-        bestEnt = nullptr;
         return;
-    }
 
     if (weapon->isSniper() && !game::localPlayer->m_bIsScoped())
         return;
@@ -59,7 +96,7 @@ void legitbot::run(CUserCmd* cmd)
     {
         float bestFov = config.get<float>(vars.fFovAimbot);
         Vector bestPos = Vector{ 0.0f, 0.0f, 0.0f };
-        const auto punch = weapon->isRifle() || weapon->isSmg() ? game::localPlayer->getAimPunch() : Vector{ 0.0f, 0.0f, 0.0f };
+        const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::localPlayer->getAimPunch() : Vector{};
         const auto myEye = game::localPlayer->getEyePos();
 
         for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
@@ -89,7 +126,7 @@ void legitbot::run(CUserCmd* cmd)
             // https://cdn.discordapp.com/attachments/829304849027170305/916477147261051000/unknown.png
             for (int pos = HITBOX_HEAD; pos < HITBOX_MAX; pos++)
             {
-                Vector hitPos = Vector{ 0.0f, 0.0f, 0.0f };
+                Vector hitPos = {};
                 switch (config.get<int>(vars.iAimbot))
                 {
                 case E2T(AimbotID::NEAREST):
@@ -116,7 +153,8 @@ void legitbot::run(CUserCmd* cmd)
                 {
                     bestFov = fov;
                     bestPos = hitPos;
-                    bestEnt = ent;
+                    m_bestEnt = ent;
+                    m_bestHitpos = hitPos;
                 }
                 if (config.get<int>(vars.iAimbot) != E2T(AimbotID::NEAREST))
                     break;
@@ -136,14 +174,13 @@ void legitbot::run(CUserCmd* cmd)
             interfaces::engine->setViewAngles(cmd->m_viewangles);
         }
     }
-    else
-        bestEnt = nullptr;
 }
 
-void RCS(CUserCmd* cmd)
+void Aimbot::RCS(CUserCmd* cmd)
 {
-    static Vector oldPunch{ 0.0f, 0.0f, 0.0f };
-    auto punch = game::localPlayer->m_aimPunchAngle() * 2.0f;
+    static Vector oldPunch = {};
+    const static auto scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"))->getFloat();
+    auto punch = game::localPlayer->m_aimPunchAngle() * scale;
 
     punch.x *= config.get<float>(vars.fRCS) / 100.0f;
     punch.y *= config.get<float>(vars.fRCS) / 100.0f;
@@ -157,12 +194,12 @@ void RCS(CUserCmd* cmd)
 }
 
 
-void legitbot::runRCS(CUserCmd* cmd)
+void Aimbot::runRCS(CUserCmd* cmd)
 {
     if (!config.get<bool>(vars.bRCS))
         return;
 
-    if (!game::localPlayer)
+    if (!game::isAvailable())
         return;
 
     auto weapon = game::localPlayer->getActiveWeapon();

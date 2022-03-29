@@ -2,7 +2,19 @@
 #include "../../game.hpp"
 #include "../../../config/vars.hpp"
 
-void triggerbot::run(CUserCmd* cmd)
+#include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/CUserCmd.hpp"
+#include "../../../SDK/CGlobalVars.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
+#include "../../../SDK/vars.hpp"
+#include "../../../SDK/structs/Entity.hpp"
+#include "../../../SDK/IWeapon.hpp"
+#include "../../../SDK/IEngineTrace.hpp"
+#include "../../../SDK/interfaces/interfaces.hpp"
+
+#include "../../../utilities/math/math.hpp"
+
+void Triggerbot::run(CUserCmd* cmd)
 {
 	if (!config.get<bool>(vars.bTriggerbot))
 		return;
