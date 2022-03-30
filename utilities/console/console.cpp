@@ -18,8 +18,10 @@ void Console::reset()
 	return;
 }
 
-bool Console::init(const std::string& title)
+bool Console::init(const std::string& title, const std::string& logName)
 {
+	if (!logName.empty())
+		m_logName = logName;
 #ifdef _DEBUG
 	static bool bOnce = [=]()
 	{

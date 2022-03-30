@@ -15,16 +15,16 @@ enum VTableIndexes
 	PUNCH = 346
 };
 
-#define ENGINE_DLL			XOR("engine.dll")
-#define CLIENT_DLL			XOR("client.dll")
-#define VSTD_DLL			XOR("vstdlib.dll")
-#define VGUI_DLL			XOR("vgui2.dll")
-#define VGUIMAT_DLL			XOR("vguimatsurface.dll")
-#define MATERIAL_DLL		XOR("materialsystem.dll")
-#define LOCALIZE_DLL		XOR("localize.dll")
-#define STUDIORENDER_DLL	XOR("studiorender.dll")
-#define INPUTSYSTEM_DLL		XOR("inputsystem.dll")
-#define SHARED_API			XOR("shaderapidx9.dll")
+#define ENGINE_DLL				XOR("engine.dll")
+#define CLIENT_DLL				XOR("client.dll")
+#define VSTD_DLL				XOR("vstdlib.dll")
+#define VGUI_DLL				XOR("vgui2.dll")
+#define VGUIMAT_DLL				XOR("vguimatsurface.dll")
+#define MATERIAL_DLL			XOR("materialsystem.dll")
+#define LOCALIZE_DLL			XOR("localize.dll")
+#define STUDIORENDER_DLL		XOR("studiorender.dll")
+#define INPUTSYSTEM_DLL			XOR("inputsystem.dll")
+#define SHARED_API				XOR("shaderapidx9.dll")
 
 #define GLOWMANAGER				XOR("0F 11 05 ? ? ? ? 83 C8 01")
 #define BEAMS					XOR("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")
@@ -45,6 +45,6 @@ enum VTableIndexes
 #define DX9_DEVICE				XOR("A1 ? ? ? ? 50 8B 08 FF 51 0C")
 #define VIEW_MATRIX_CLIENT		XOR("0F 10 05 ? ? ? ? 8D 85 ? ? ? ? B9")
 #define IS_BREAKBLE				XOR("55 8B EC 51 56 8B F1 85 F6 74 68")
-// this is needed because this convar will rely on many things, we do not ever need it
+// this is needed because this convar will rely on many things, the r_drawspecificstaticprop and forcing isn't enough
 #define IS_USING_PROP_DEBUG		XOR("8B 0D ? ? ? ? 81 F9 ? ? ? ? 75 ? A1 ? ? ? ? 35 ? ? ? ? EB ? 8B 01 FF 50 ? 83 F8 ? 0F 85 ? ? ? ? 8B 0D")
 #define GET_COLOR_MODULATION	XOR("55 8B EC 83 EC ? 56 8B F1 8A 46")

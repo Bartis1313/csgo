@@ -349,11 +349,11 @@ static void renderMisc()
 
 #include "../../../dependencies/ImGui/imgui_stdlib.h"
 
-static std::string text = XOR("Your new config name");
-static int currentcfg = 0;
-
 static void renderConfig()
 {
+	static std::string text = XOR("Your new config name");
+	static int currentcfg = 0;
+
 	ImGui::Columns(1, nullptr, false);
 	{
 		if (ImGui::BeginChild(XOR("cfg"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
@@ -385,7 +385,20 @@ static void renderConfig()
 				if (ImGui::Button(XOR("Load")))
 				{
 					config.load(allcfg.at(currentcfg));
+					runStyle(config.get<int>(vars.iStyleMenu));
 				}
+				if (ImGui::Button(XOR("Load on start")))
+				{
+					config.getRef<std::string>(vars.sLoadName) = allcfg.at(currentcfg);
+
+					console.log(TypeLogs::LOG_INFO, XOR("{} will be now loaded config on the start"), allcfg.at(currentcfg));
+
+					// yes this is confusing, but this is also simple, perfect solution is to get the line where this var is located and edit it
+					// this will be done soon
+					config.save(config.getDefaultConfigName(), true);
+				}
+				ImGui::SameLine();
+				ImGui::HelpMarker(XOR("This config will load on the start\nThis button saves default config!"));
 				static int testkey = 0x4;
 				ImGui::Hotkey(XOR("Testing hotkey!"), &testkey);
 			}

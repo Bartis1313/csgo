@@ -26,10 +26,8 @@ enum class TypeLogs : size_t
 class Console
 {
 public:
-	bool init(const std::string& title);
+	bool init(const std::string& title, const std::string& logName);
 	void shutdown();
-	// you should call it once
-	constexpr void setLogName(const std::string& logName) /*[[expects: !logName.empty()]]*/ { if (!logName.empty()) m_logName = logName; }
 	constexpr std::string getLogName() const { return m_logName; }
 	void drawLog();
 	constexpr void changeActiveLog() { m_activeLog = !m_activeLog; }

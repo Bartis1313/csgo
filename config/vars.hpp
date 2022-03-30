@@ -100,6 +100,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(int, iKeyMenu, VK_INSERT, "key for imgui menu");
 	CONFIG_ADD_VARIABLE(int, iKeyPanic, VK_DELETE, "key for shutdown");
 	CONFIG_ADD_VARIABLE(int, iKeyConsoleLog, VK_HOME, "key for log console");
+	CONFIG_ADD_VARIABLE(std::string, sLoadName, XOR("default.cfg"), "config to load (you only care for this in default cfg)");
 	
 
 	// MISC

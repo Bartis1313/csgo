@@ -26,16 +26,17 @@ DWORD WINAPI init(PVOID instance)
 {
     AddVectoredExceptionHandler(TRUE, SEHcatch::memErrorCatch);
 
-    console.init(XOR("CSGO DEBUG"));
-    console.setLogName(XOR("hack.log"));
+    console.init(XOR("CSGO DEBUG"), XOR("hack.log"));
 
     TimeCount initTimer{};
 
     // warning: if you do wrong hierarchy - crash
     try
     {
-        interfaces::init();
         config.init();
+        if (auto name = config.get<std::string>(vars.sLoadName); name != config.getDefaultConfigName()) // custom load
+            config.load(name);
+        interfaces::init();
         netvarMan.init();
         netvarMan.dump();
         //render.init();

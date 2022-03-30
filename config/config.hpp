@@ -66,17 +66,11 @@ class Config
 {
 public:
 	Config() = default;
-	/// <summary>
-	/// Constructs default config
-	/// </summary>
-	/// <param name="file">default file name to get config from</param>
-	/// <param name="folder"></param>
-	Config(const std::string& file, const std::string& folder);
 
 	bool save(const std::string& file, const bool forceSave = false);
 	bool load(const std::string& file);
 	void deleteCfg(const std::string& file);
-	// pass default file here
+	// will init the config for default cfg
 	bool init();
 	void reload();
 	// adds variable into the vector of variables, returns size due to getting "ID" from every varaible
@@ -100,8 +94,8 @@ public:
 	}
 	// get main folder
 	_NODISCARD std::filesystem::path getHacksPath() const;
-	// usefull in case of x88 menu
-	_NODISCARD std::string getDefaultConfigName() const { return m_defaultName; }
+	// get DEFAULT name, returns the field m_defaultConfig which never change
+	_NODISCARD std::string getDefaultConfigName() const { return m_defaultConfig; }
 	// get correct path for savings
 	_NODISCARD std::filesystem::path getPathForSave(const std::string& file) const;
 	// get all files
@@ -115,13 +109,10 @@ private:
 
 	std::vector<ConfigType> m_allVars;
 	std::vector<std::string> m_allFilesInFolder;
-	std::string m_folder;
-	std::string m_defaultName;
-	// DO NOT CHANGE
-	const std::string m_defaultConfig = XOR("default.cfg");
 	// your desire to name it
-	static std::string m_mainEntryFolder;
+	const std::string m_defaultConfig = XOR("default.cfg");
+	const std::string m_folder = XOR("csgo");
+	const std::string m_mainEntryFolder = XOR("Bartis_internal");
 };
 
-inline Config config{ XOR("default.cfg"), XOR("csgo") }; /*should be stored somewhere else for many places and so instances
-													 also iif you want "load this config on start" thing, just pass the name to constructor*/
+inline Config config;

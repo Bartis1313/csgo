@@ -11,8 +11,6 @@
 
 using json = nlohmann::json;
 
-std::string Config::m_mainEntryFolder = XOR("Bartis_internal");
-
 ConfigType::ConfigType(const Types var, const std::string& name)
 	: m_type{ var }, m_name{ name }
 {
@@ -41,10 +39,6 @@ ConfigType::ConfigType(const Types var, const std::string& name)
 	if (!m_isGoodType)
 		throw std::runtime_error(XOR("unknown type, check the variant"));
 }
-
-Config::Config(const std::string& file, const std::string& folder)
-	: m_defaultName{ file }, m_folder{ folder }
-{}
 
 bool Config::save(const std::string& file, const bool forceSave)
 {
