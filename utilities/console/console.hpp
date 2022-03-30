@@ -100,7 +100,7 @@ template<typename... Args_t>
 void Console::log(TypeLogs type, const std::string& fmt, const Args_t&... args)
 {
 	if (m_logName.empty())
-		assert("Did you call Console::setLogName ?");
+		assert("Did you call Console::init ?");
 
 	if (fmt.empty())
 		return;
@@ -125,7 +125,7 @@ void Console::log(TypeLogs type, const std::string& fmt, const Args_t&... args)
 	std::cout << ss.str();
 #endif
 	log << consoleStrings[type] << ss.str();
-	m_log.AddLog(ss.str().c_str());
+	m_log.AddLog(ss.str());
 	log.close();
 }
 
