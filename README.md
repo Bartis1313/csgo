@@ -97,6 +97,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.2.9 - Few fixes in some places, nothing really big. I will start making commits comments a bit better from now on, more detailed.
 * 1.3.0 - Huge recode, cleaned up most of bloat header includes. Features are now not in namespace but class. Improved code quality almost everywhere. Fixed unloading the cheat not causing any errors. Plots are totally rewritten. Fixed couple of features, although chams are temporiarly not possible. I am thinking of clean solution for them. Added console from imgui demo which will show current loggings. Still a lot of code needs rewrite.
 * 1.3.1 - Added option "load on start", which will load selected config on the start.
+* 1.3.2 - The hitmarker is now finished. Nothing more in this version.
 </details>
 
 # Dependencies
