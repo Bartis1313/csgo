@@ -69,6 +69,69 @@ uintptr_t utilities::patternScan(const std::string& mod, const std::string& mask
 #include "renderer/renderer.hpp"
 #include "math/math.hpp"
 
+bool utilities::getBox(Entity_t* ent, Box& box, Box3D& box3D)
+{
+	// pretty much nothing to explain here, using engine and detect mins/maxs
+	const auto col = ent->collideable();
+	if (!col)
+		return false;
+
+	const auto& min = col->OBBMins();
+	const auto& max = col->OBBMaxs();
+
+	std::array points =
+	{
+		Vector{ min.x, min.y, min.z },
+		Vector{ min.x, max.y, min.z },
+		Vector{ max.x, max.y, min.z },
+		Vector{ max.x, min.y, min.z },
+		Vector{ min.x, min.y, max.z },
+		Vector{ min.x, max.y, max.z },
+		Vector{ max.x, max.y, max.z },
+		Vector{ max.x, min.y, max.z }
+	};
+
+	// will never happen
+	/*if (!points.data())
+		return false;*/
+
+	const auto& tranFrame = ent->m_rgflCoordinateFrame();
+
+	float left = std::numeric_limits<float>::max();
+	float top = std::numeric_limits<float>::max();
+	float right = -std::numeric_limits<float>::max();
+	float bottom = -std::numeric_limits<float>::max();
+
+	std::array<Vector2D, 8> screen = {};
+
+	for (int i = 0; i < 8; i++)
+	{
+		if (!imRender.worldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
+			return false;
+
+		left = std::min(left, screen.at(i).x);
+		top = std::min(top, screen.at(i).y);
+		right = std::max(right, screen.at(i).x);
+		bottom = std::max(bottom, screen.at(i).y);
+		
+		box3D.points.at(i) = screen.at(i);
+	}
+
+	box.x = left;
+	box.y = top;
+	box.w = right - left;
+	box.h = bottom - top;
+
+	// get important points, eg: if you use 3d box, you want to render health by quads, not rects
+	
+	box3D.topleft = screen.at(7);
+	box3D.topright = screen.at(6);
+	box3D.bottomleft = screen.at(3);
+	box3D.bottomright = screen.at(2);
+
+	return true;
+}
+
 bool utilities::getBox(Entity_t* ent, Box& box)
 {
 	// pretty much nothing to explain here, using engine and detect mins/maxs
@@ -119,53 +182,6 @@ bool utilities::getBox(Entity_t* ent, Box& box)
 	box.y = top;
 	box.w = right - left;
 	box.h = bottom - top;
-
-	return true;
-}
-
-bool utilities::getBox3D(Entity_t* ent, Box3D& box)
-{
-	const auto col = ent->collideable();
-	if (!col)
-		return false;
-
-	const auto& min = col->OBBMins();
-	const auto& max = col->OBBMaxs();
-
-	std::array points =
-	{
-		Vector{ min.x, min.y, min.z },
-		Vector{ min.x, max.y, min.z },
-		Vector{ max.x, max.y, min.z },
-		Vector{ max.x, min.y, min.z },
-		Vector{ min.x, min.y, max.z },
-		Vector{ min.x, max.y, max.z },
-		Vector{ max.x, max.y, max.z },
-		Vector{ max.x, min.y, max.z }
-	};
-
-	// will never happen
-	/*if (!points.data())
-		return false;*/
-
-	const auto& tranFrame = ent->m_rgflCoordinateFrame();
-
-	std::array<Vector2D, 8> screen = {};
-
-	for (int i = 0; i < 8; i++)
-	{
-		if (!imRender.worldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
-			return false;
-
-		box.points.at(i) = screen.at(i); // get all 3D points
-	}
-
-	// get important points, eg: if you use 3d box, you want to render health by quads, not rects
-
-	box.topleft = screen.at(7);
-	box.topright = screen.at(6);
-	box.bottomleft = screen.at(3);
-	box.bottomright = screen.at(2);
 
 	return true;
 }

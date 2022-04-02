@@ -131,6 +131,9 @@ void GrenadePrediction::setup(Vector& src, Vector& vecThrow, const Vector& viewa
 	float clampedVelWeapon = std::min(std::max(weapon->getWpnInfo()->m_throwVelocity * 0.9f, 15.0f), 750.0f);
 
 	float throwHeight = (m_flThrowStrength * 12.0f) - 12.0f;
+
+	src = game::localPlayer->getEyePos();
+
 	float finalVel = clampedVelWeapon * ((0.7f * m_flThrowStrength) + 0.3f);
 
 	Vector start = game::localPlayer->getEyePos() += { 0.0f, 0.0f, throwHeight };
@@ -172,13 +175,10 @@ void GrenadePrediction::simulate()
 		if (s & DETONATE)
 			break;
 
-		if (s & BOUNCE || logtimer >= logstep)
+		if ((s & BOUNCE) || logtimer >= logstep)
 			logtimer = 0;
 		else
 			++logtimer;
-
-		if (vecThrow.isZero())
-			break;
 	}
 
 	m_path.push_back(vecSrc);

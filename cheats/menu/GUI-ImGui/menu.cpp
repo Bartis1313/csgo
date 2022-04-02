@@ -271,6 +271,7 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Bunnyhop"), &config.getRef<bool>(vars.bBunnyHop));
 				ImGui::Checkbox(XOR("Autostrafe"), &config.getRef<bool>(vars.bAutoStrafe));
 				ImGui::Checkbox(XOR("Hitmarker"), &config.getRef<bool>(vars.bDrawHitmarker));
+				ImGui::SliderFloat(XOR("Hitmarker time"), &config.getRef<float>(vars.fHitmarkerTime), 0.0f, 2.0f);
 				ImGui::Checkbox(XOR("Play hitmarker"), &config.getRef<bool>(vars.bPlayHitmarker));
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Will play the sound after every kill"));

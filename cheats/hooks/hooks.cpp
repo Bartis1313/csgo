@@ -2,6 +2,8 @@
 #include "helpers/helper.hpp"
 
 #include "../../SDK/structs/IDXandPaterrns.hpp"
+#include "../../SDK/ConVar.hpp"
+#include "../../SDK/ICvar.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 
 #include "../../dependencies/minhook/Minhook.h"
@@ -28,6 +30,8 @@ void hooks::init()
 	const auto frameStageNotifyTarget = vfunc::getVFunc(interfaces::client, frameStageNotify::index);
 	const auto lockCursorTarget = vfunc::getVFunc(interfaces::surface, lockCursor::index);
 	const auto createMoveProxyTarget = vfunc::getVFunc(interfaces::client, proxyCreateMove::index);
+	const auto sv_cheatsAddr = interfaces::cvar->findVar(XOR("sv_cheats"));
+	const auto sv_cheatsTarget = vfunc::getVFunc(sv_cheatsAddr, sv_cheats::index);
 #pragma endregion
 
 #pragma region checks
@@ -48,6 +52,9 @@ void hooks::init()
 
 	const auto addrgetColorModulation = utilities::patternScan(MATERIAL_DLL, GET_COLOR_MODULATION);
 	const auto getColorModulationTarget = reinterpret_cast<void*>(addrgetColorModulation);
+
+	const auto addrextraBonesProccessing = utilities::patternScan(CLIENT_DLL, EXTRA_BONES_PROCCESSING);
+	const auto extraBonesProccessingTarget = reinterpret_cast<void*>(addrextraBonesProccessing);
 #pragma endregion
 
 #pragma region DX9
@@ -76,9 +83,9 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(getColorModulationTarget, getColorModulation);
 	HOOK_SAFE(resetTarget, reset);
 	HOOK_SAFE(presentTagret, present);
-	// use if endscene needed
-	//HOOK_SAFE(endTarget, endScene);
 	HOOK_SAFE(lockCursorTarget, lockCursor);
+	HOOK_SAFE(extraBonesProccessingTarget, doExtraBonesProcessing);
+	HOOK_SAFE(sv_cheatsTarget, sv_cheats);
 
 #undef HOOK_SAFE
 

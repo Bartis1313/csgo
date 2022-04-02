@@ -302,6 +302,8 @@
     <ClInclude Include="cheats\features\misc\misc.hpp" />
     <ClInclude Include="cheats\features\prediction\nadepred.hpp" />
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
+    <ClInclude Include="cheats\hooks\buildTransformations.hpp" />
+    <ClInclude Include="SDK\CStudioHdr.hpp" />
     <ClInclude Include="SEHcatch.hpp" />
     <ClInclude Include="cheats\features\visuals\chams.hpp" />
     <ClInclude Include="cheats\features\visuals\player.hpp" />

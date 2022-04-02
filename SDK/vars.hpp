@@ -17,6 +17,10 @@
 #define BONE_USED_BY_VERTEX_LOD6	0x00010000
 #define BONE_USED_BY_VERTEX_LOD7	0x00020000
 #define BONE_USED_BY_BONE_MERGE		0x00040000	// bone is available for bone merge to occur against it
+
+// 256 actually, correct me if I am wrong, but for simple stuff such as getbone or gethitbox to 3d pos
+// there is no need to go with its 256 value
+#define MAX_BONES 128
 #pragma endregion
 
 #pragma region player_masks

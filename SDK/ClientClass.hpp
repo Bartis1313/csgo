@@ -19,7 +19,8 @@ public:
 	float m_viewmodelFov;
 	Vector m_origin;
 	Vector m_angles;
-	PAD(124);
+	PAD(120);
+	int m_edgeBlur;
 };
 
 class ClientClass

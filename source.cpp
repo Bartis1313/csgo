@@ -4,7 +4,7 @@
 #include "SDK/interfaces/interfaces.hpp"
 #include "utilities/renderer/renderer.hpp"
 #include "utilities/netvars/netvars.hpp"
-#include "config/vars.hpp" // so vars load
+#include "config/vars.hpp"
 #include "cheats/globals.hpp"
 #include "cheats/features/misc/events.hpp"
 #include "utilities/simpleTimer.hpp"

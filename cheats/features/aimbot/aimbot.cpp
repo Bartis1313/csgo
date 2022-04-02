@@ -95,7 +95,7 @@ void Aimbot::run(CUserCmd* cmd)
     if (cmd->m_buttons & IN_ATTACK) // add key later
     {
         float bestFov = config.get<float>(vars.fFovAimbot);
-        Vector bestPos = Vector{ 0.0f, 0.0f, 0.0f };
+        Vector bestPos = {};
         const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::localPlayer->getAimPunch() : Vector{};
         const auto myEye = game::localPlayer->getEyePos();
 

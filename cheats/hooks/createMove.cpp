@@ -66,6 +66,10 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 			misc.getVelocityData();
 		});
 
+	// don't get untrusted
+	cmd->m_viewangles.normalize();
+	cmd->m_viewangles.clamp();
+
 	verifiedCmd->m_cmd = *cmd;
 	verifiedCmd->m_crc = cmd->getChecksum();
 }

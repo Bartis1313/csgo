@@ -244,7 +244,7 @@ Weapon_t* Player_t::getActiveWeapon()
 
 Vector Player_t::getHitboxPos(const int id)
 {
-	if (Matrix3x4 matBone[BONE_USED_BY_HITBOX]; setupBones(matBone, BONE_USED_BY_HITBOX, BONE_USED_BY_HITBOX, 0.0f))
+	if (Matrix3x4 matBone[MAX_BONES]; setupBones(matBone, MAX_BONES, BONE_USED_BY_HITBOX, 0.0f))
 	{
 		if (auto modelStudio = interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
 		{
@@ -263,7 +263,7 @@ Vector Player_t::getHitboxPos(const int id)
 
 Vector Player_t::getBonePos(const int id)
 {
-	if (Matrix3x4 matBone[BONE_USED_BY_HITBOX]; setupBones(matBone, BONE_USED_BY_HITBOX, BONE_USED_BY_HITBOX, 0.0f))
+	if (Matrix3x4 matBone[MAX_BONES]; setupBones(matBone, MAX_BONES, BONE_USED_BY_HITBOX, 0.0f))
 		return matBone[id].origin();
 	
 	return {};

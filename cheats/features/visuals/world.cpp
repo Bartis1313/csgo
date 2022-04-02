@@ -244,7 +244,7 @@ void World::removeSky(bool isShutdown)
 
 //#include <map>
 
-void World::modulateWorld(void* thisptr, void* edx, float* r, float* g, float* b, bool isShutdown) // shutdown not needed, I don't know how to edit alpha properly
+void World::modulateWorld(void* thisptr, float* r, float* g, float* b, bool isShutdown) // shutdown not needed, I don't know how to edit alpha properly
 {
 	if (!config.get<bool>(vars.bModulateColor))
 		return;

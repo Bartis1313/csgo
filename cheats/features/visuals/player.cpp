@@ -12,6 +12,7 @@
 #include "../../../SDK/ConVar.hpp"
 #include "../../../SDK/IWeapon.hpp"
 #include "../../../SDK/structs/Entity.hpp"
+#include "../../../SDK/Color.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
 
 #include "../../../config/vars.hpp"
@@ -22,29 +23,6 @@
 
 #include "../../features/aimbot/aimbot.hpp"
 #include "../../features/backtrack/backtrack.hpp"
-
-// TODO: recode all
-
-void drawBox3D(const Box3D& box, const Color& color, bool filled, const float thickness = 2.0f);
-
-// very simple implementation of what to add as color
-inline Color playerColor(Player_t* ent, bool isAimbotColor = false)
-{
-	if (aimbot.getBest() == ent && isAimbotColor)
-		return Colors::Purple;
-
-	uint8_t health = ent->m_iHealth();
-	uint8_t g = static_cast<uint8_t>(health * 2.55f);
-	uint8_t r = 255 - g;
-	return Color(
-		r,
-		g,
-		0,
-		220
-	);
-}
-
-// dead esp - true = draw when dead, TODO
 
 void Visuals::run()
 {
@@ -70,80 +48,27 @@ void Visuals::run()
 		if (entity->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 			continue;
 
-		drawPlayer(entity);
-		drawSkeleton(entity);
-		runDLight(entity);
-		drawLaser(entity);
+		if (!config.get<bool>(vars.bEsp))
+			return;
+
+		auto runFeatures = [=]()
+		{
+			drawPlayer(entity);
+			drawSkeleton(entity);
+			runDLight(entity);
+			drawLaser(entity);
+		};
+
+		if (config.get<bool>(vars.bDrawDeadOnly))
+		{
+			if (!game::localPlayer->isAlive())
+				runFeatures();
+		}
+		else
+			runFeatures();
+
 		enemyIsAimingAtYou(entity);
 	}
-}
-
-void Visuals::renderBox3D(Entity_t* ent, bool fill)
-{
-	Box3D box;
-	if (!utilities::getBox3D(ent, box))
-		return;
-
-	drawBox3D(box, Colors::Purple, fill);
-}
-
-void drawBox3D(const Box3D& box, const Color& color, bool filled, const float thickness)
-{
-	// this could be simplified in some loop, maybe...
-	if (filled)
-	{
-		// anything with low alpha - TEMP color! will add optionality later
-		Color fill{ color.rMultiplied(), color.gMultiplied(), color.bMultiplied(), 30 };
-
-		imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), fill);
-		// top
-		imRender.drawQuadFilled(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), fill);
-		// front
-		imRender.drawQuadFilled(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), fill);
-		// back
-		imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), fill);
-		// right
-		imRender.drawQuadFilled(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), fill);
-		// left
-		imRender.drawQuadFilled(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), fill);
-	}
-
-	for (size_t i = 0; i < 3; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
-	}
-	// missing part at the bottom
-	imRender.drawLine(box.points.at(0), box.points.at(3), color);
-	// top parts
-	for (size_t i = 4; i < 7; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
-	}
-	// missing part at the top
-	imRender.drawLine(box.points.at(4), box.points.at(7), color);
-	// now all 4 box.points missing parts for 3d box
-	for (size_t i = 0; i < 4; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color);
-	}
-}
-
-
-void Visuals::drawBox2D(Player_t* ent, const Box& box)
-{
-	Color cfgCol = config.get<Color>(vars.cBox);
-
-	imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Color(0, 0, 0,  200));
-	imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Color(0, 0, 0, 200));
-	imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol);
-}
-
-void Visuals::drawBox2DFilled(Player_t* ent, const Box& box)
-{
-	Color fill = config.get<Color>(vars.cBoxFill);
-
-	imRender.drawRectFilled(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, fill);
-	drawBox2D(ent, box);
 }
 
 void Visuals::drawHealth(Player_t* ent, const Box& box)
@@ -167,7 +92,7 @@ void Visuals::drawHealth(Player_t* ent, const Box& box)
 
 		// fill first
 		imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
-		imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, playerColor(ent));
+		imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, healthBased(ent));
 		imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
 
 		// if the player has health below max, then draw HP info
@@ -260,10 +185,10 @@ void Visuals::drawInfo(Player_t* ent, const Box& box)
 	if (!config.get<bool>(vars.bDrawInfos))
 		return;
 
-	imRender.text(box.x + (box.w / 2), box.y - 15, ImFonts::tahoma, ent->getName(), true, playerColor(ent));
+	imRender.text(box.x + (box.w / 2), box.y - 15, ImFonts::tahoma, ent->getName(), true, healthBased(ent));
 
 	if (ent->isC4Owner())
-		imRender.text(box.x - 25 + box.w, box.y + 5 + box.h, ImFonts::tahoma, XOR("C4"), false, playerColor(ent));
+		imRender.text(box.x - 25 + box.w, box.y + 5 + box.h, ImFonts::tahoma, XOR("C4"), false, healthBased(ent));
 }
 
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
@@ -282,9 +207,12 @@ void Visuals::drawSkeleton(Player_t* ent)
 
 	// have to check if selected record is filled, if no then just skip
 	auto record = !backtrack.getAllRecords().at(ent->getIndex()).empty()  ? &backtrack.getAllRecords().at(ent->getIndex()) : nullptr;
-	auto backtrackPos = [=](const size_t idx)
+	auto skeletPos = [=](const size_t idx)
 	{
-		return record->back().m_matrix[idx].origin();
+		auto child = record != nullptr
+			? record->back().m_matrix[idx].origin()
+			: ent->getBonePos(idx);
+		return child;
 	};
 
 	// bone IDs
@@ -303,22 +231,11 @@ void Visuals::drawSkeleton(Player_t* ent)
 		if (!(bone->m_flags & BONE_USED_BY_HITBOX))
 			continue;
 
-		// skip like here
-		auto child = record != nullptr
-			? backtrackPos(i)
-			: ent->getBonePos(i);
-
-		auto parent = record != nullptr
-			? backtrackPos(bone->m_parent)
-			: ent->getBonePos(bone->m_parent);
-
-		auto upper = record != nullptr
-			? backtrackPos(chest + 1) - backtrackPos(chest)
-			: ent->getBonePos(chest + 1) - ent->getBonePos(chest);
-
-		auto breast = record != nullptr
-			? backtrackPos(chest) + upper / 2.0f
-			: ent->getBonePos(chest) + upper / 2.0f;
+		auto child = skeletPos(i);
+		auto parent = skeletPos(bone->m_parent);
+		auto chestbone = skeletPos(chest + 1);
+		auto upper = skeletPos(chest + 1) - chestbone;
+		auto breast = chestbone + upper / 2.0f;
 
 		auto deltachild = child - breast;
 		auto deltaparent = parent - breast;
@@ -369,9 +286,6 @@ void Visuals::runDLight(Player_t* ent)
 {
 	// https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/client/c_spotlight_end.cpp#L112
 
-	if (!interfaces::engine->isInGame())
-		return;
-
 	if (!config.get<bool>(vars.bDLight))
 		return;
 
@@ -381,7 +295,7 @@ void Visuals::runDLight(Player_t* ent)
 	DLight->m_origin = ent->absOrigin();
 	DLight->m_radius = 80.0f;
 	DLight->m_die = interfaces::globalVars->m_curtime + 0.05f;
-	DLight->m_exponent = 10.0f;
+	DLight->m_exponent = true;
 	DLight->m_decay = 30.0f;
 	DLight->m_key = ent->getIndex();
 }
@@ -391,23 +305,23 @@ void Visuals::drawPlayer(Player_t* ent)
 	if (!config.get<bool>(vars.bEsp))
 		return;
 
-	Box box;
-	if (!utilities::getBox(ent, box))
+	Box box; Box3D box3d;
+	if (!utilities::getBox(ent, box, box3d))
 		return;
 
 	switch (config.get<int>(vars.iEsp))
 	{
 	case E2T(BoxTypes::BOX2D):
-		drawBox2D(ent, box);
+		drawBox2D(box);
 		break;
 	case E2T(BoxTypes::FILLED2D):
-		drawBox2DFilled(ent, box);
+		drawBox2DFilled(box);
 		break;
 	case E2T(BoxTypes::BOX3D):
-		renderBox3D(ent, false);
+		drawBox3D(box3d);
 		break;
 	case E2T(BoxTypes::FILLED3D):
-		renderBox3D(ent, true);
+		drawBox3DFilled(box3d);
 		break;
 	default:
 		break;
@@ -472,6 +386,14 @@ void Visuals::drawSound(IGameEvent* event)
 		interfaces::beams->drawBeam(beamDraw);
 }
 
+Color Visuals::healthBased(Player_t* ent)
+{
+	int health = ent->m_iHealth();
+	int g = health * 2.55f;
+	int r = 255 - g;
+	return Color(r, g, 0, 255);
+}
+
 void Visuals::enemyIsAimingAtYou(Player_t* ent)
 {
 	if (!config.get<bool>(vars.bAimingWarn))
@@ -511,3 +433,85 @@ void Visuals::enemyIsAimingAtYou(Player_t* ent)
 		imRender.text(globals::screenX / 2, 80, ImFonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
 	}
 }
+
+#pragma region drawing_boxes
+
+void Visuals::drawBox2D(const Box& box)
+{
+	Color cfgCol = config.get<Color>(vars.cBox);
+
+	imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Color(0, 0, 0, 200));
+	imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Color(0, 0, 0, 200));
+	imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol);
+}
+
+void Visuals::drawBox2DFilled(const Box& box)
+{
+	Color fill = config.get<Color>(vars.cBoxFill);
+
+	imRender.drawRectFilled(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, fill);
+	drawBox2D(box);
+}
+
+void Visuals::drawBox3DFilled(const Box3D& box, const float thickness)
+{
+	Color color = config.get<Color>(vars.cBox);
+	Color fill = config.get<Color>(vars.cBoxFill);
+
+	imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), fill);
+	// top
+	imRender.drawQuadFilled(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), fill);
+	// front
+	imRender.drawQuadFilled(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), fill);
+	// back
+	imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), fill);
+	// right
+	imRender.drawQuadFilled(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), fill);
+	// left
+	imRender.drawQuadFilled(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), fill);
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+	}
+	// missing part at the bottom
+	imRender.drawLine(box.points.at(0), box.points.at(3), color);
+	// top parts
+	for (size_t i = 4; i < 7; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+	}
+	// missing part at the top
+	imRender.drawLine(box.points.at(4), box.points.at(7), color);
+	// now all 4 box.points missing parts for 3d box
+	for (size_t i = 0; i < 4; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color);
+	}
+}
+
+void Visuals::drawBox3D(const Box3D& box, const float thickness)
+{
+	Color color = config.get<Color>(vars.cBox);
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+	}
+	// missing part at the bottom
+	imRender.drawLine(box.points.at(0), box.points.at(3), color);
+	// top parts
+	for (size_t i = 4; i < 7; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+	}
+	// missing part at the top
+	imRender.drawLine(box.points.at(4), box.points.at(7), color);
+	// now all 4 box.points missing parts for 3d box
+	for (size_t i = 0; i < 4; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color);
+	}
+}
+
+#pragma endregion

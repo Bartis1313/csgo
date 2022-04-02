@@ -7,6 +7,7 @@
 #include "../../../SDK/IClientEntityList.hpp"
 #include "../../../SDK/CGlobalVars.hpp"
 #include "../../../SDK/IGameEvent.hpp"
+#include "../../../SDK/IWeapon.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
 
 #include "../../../config/vars.hpp"
@@ -17,25 +18,23 @@
 
 #include "../aimbot/aimbot.hpp"
 
-
-constexpr int VK_VKEY = 0x56;
-
-// TODO: rewrite this and fix lol
 void Misc::thirdperson()
 {
 	if (!config.get<bool>(vars.bThirdp))
 		return;
 
-	if (!interfaces::engine->isInGame())
+	if (!game::isAvailable())
 		return;
 
-	if (!game::localPlayer || !game::localPlayer->isAlive())
+	if (!game::localPlayer->isAlive())
 		return;
 
-	/*if (GUI::isKeyPressed(VK_VKEY))
-		config.getRef<bool>(vars.bThirdp) = !config.getRef<bool>(vars.bThirdp);*/
+	constexpr int VK_VKEY = 0x56; // this is only for test now
+	static bool thirdp = false;
+	if (utilities::getKey(VK_VKEY) & 1)
+		thirdp = !thirdp;
 
-	interfaces::input->m_cameraInThirdPerson = config.get<bool>(vars.bThirdp);
+	interfaces::input->m_cameraInThirdPerson = thirdp;
 	interfaces::input->m_cameraOffset.z = 220.0f;
 }
 
@@ -85,7 +84,7 @@ void Misc::drawCrosshair()
 			break;
 
 		auto start = game::localPlayer->getEyePos();
-		auto end = start + math::angleVec(vAngles) * 10000; // I could not find anything good in all struct for this, hence why hardcode
+		auto end = start + math::angleVec(vAngles) * weapon->getWpnInfo()->m_range;
 
 		// easy crosshair
 		//int width = x / 90;
@@ -129,7 +128,7 @@ void Misc::drawLocalInfo()
 	imRender.text(width, 25, ImFonts::tahoma, std::format(XOR("Weapon {} [{} / {}]"), weapon->getWpnName(), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
 	imRender.text(width, 35, ImFonts::tahoma, std::format(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100), false, Colors::Yellow);
 	imRender.text(width, 45, ImFonts::tahoma, std::format(XOR("Zoom level {}"), weapon->m_zoomLevel()), false, Colors::Yellow);
-	imRender.text(width, 55, ImFonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->m_vecOrigin().y, game::localPlayer->m_vecOrigin().z), false, Colors::Yellow);
+	imRender.text(width, 55, ImFonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->absOrigin().y, game::localPlayer->absOrigin().z), false, Colors::Yellow);
 	imRender.text(width, 65, ImFonts::tahoma, std::format(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().length2D()), false, Colors::Yellow);
 
 	imRender.text(width, 75, ImFonts::tahoma, std::format(XOR("Kills {}"), game::localPlayer->getKills()), false, Colors::Yellow);
@@ -264,7 +263,7 @@ void Misc::drawVelocityPlot()
 	if (!interfaces::engine->isInGame() || !game::localPlayer->isAlive())
 		return;
 
-	static float MAX_SPEEED_MOVE = 450.0f; // sv_maxspeed will print huge number so when playing on cutom serv, adjust it
+	static float MAX_SPEEED_MOVE = interfaces::cvar->findVar(XOR("sv_maxspeed"))->getFloat(); // should be accurate
 	static Color cLine = Colors::White;
 
 	bool& sliderRef = config.getRef<bool>(vars.bVelocityCustom);
@@ -273,7 +272,7 @@ void Misc::drawVelocityPlot()
 		// there, no need for hard logic, we will make max vel as 450
 		if (ImGui::Begin(XOR("Sliders for velocity plot"), &sliderRef, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
-			ImGui::SliderFloat(XOR("Set max velocity"), &MAX_SPEEED_MOVE, 450.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // who will ever get this velocity? adjust if needed
+			//ImGui::SliderFloat(XOR("Set max velocity"), &MAX_SPEEED_MOVE, 450.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // who will ever get this velocity? adjust if needed
 			ImGui::SliderFloat(XOR("Acceptance multiply##vel"), &acceptanceVelocityCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
 			ImGui::ColorPicker(XOR("Color lines plot##vel"), &cLine);
 			ImGui::SameLine();
@@ -313,7 +312,7 @@ void Misc::drawVelocityPlot()
 
 void Misc::playHitmarker(IGameEvent* event)
 {
-	if (!config.get<bool>(vars.bPlayHitmarker))
+	if (!config.get<bool>(vars.bDrawHitmarker))
 		return;
 
 	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
@@ -321,16 +320,26 @@ void Misc::playHitmarker(IGameEvent* event)
 		return;
 
 	// very important
-	if (attacker == game::localPlayer)
-	{
-		// new hit = new hitmarker
-		hitAlpha = interfaces::globalVars->m_curtime;
-		// browse those files for more
+	if (attacker != game::localPlayer)
+		return;
+	
+	auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+	if (!ent) // should never happen
+		return;
+
+	auto hitgroup = event->getInt(XOR("hitgroup"));
+
+	Hitmark_t hit = {
+		interfaces::globalVars->m_curtime + config.get<float>(vars.fHitmarkerTime),
+		event->getInt(XOR("dmg_health")),
+		ent->m_iHealth() - event->getInt(XOR("dmg_health")),
+		hitgroup == 1 // head
+	};
+	m_hitmarkers.push_back(hit);
+	if (config.get<bool>(vars.bPlayHitmarker))
 		interfaces::surface->playSound(XOR("buttons\\arena_switch_press_02.wav"));
-	}
 }
 
-// TODO: Add hitmarker when ent died from local player
 void Misc::drawHitmarker()
 {
 	if (!config.get<bool>(vars.bDrawHitmarker))
@@ -344,19 +353,52 @@ void Misc::drawHitmarker()
 
 	int x = globals::screenX;
 	int y = globals::screenY;
-	x /= 2, y /= 2;
+	x /= 2.0f, y /= 2.0f;
 
-	if (hitAlpha > 0)
+	float currentAlpha = 0.0f;
+	Color actualColor;
+	for (size_t i = 0; const auto & el : m_hitmarkers)
 	{
-		// you can add ratio for coords to make this hitmarker 100% like from other games
-		imRender.drawLine(x - 10, y + 10, x - 5, y + 5, Color(255, 255, 255, hitAlpha));
-		imRender.drawLine(x + 10, y + 10, x + 5, y + 5, Color(255, 255, 255, hitAlpha));
-		imRender.drawLine(x - 10, y - 10, x - 5, y - 5, Color(255, 255, 255, hitAlpha));
-		imRender.drawLine(x + 10, y - 10, x + 5, y - 5, Color(255, 255, 255, hitAlpha));
+		float diff = el.m_expire - interfaces::globalVars->m_curtime;
 
-		// feel free to use anything that is more accurate, first multiply was just hardcoded by guessing
-		hitAlpha -= 1.8f * (interfaces::globalVars->m_curtime) * 255;
+		if (diff < 0.0f)
+		{
+			m_hitmarkers.erase(m_hitmarkers.begin() + i);
+			continue;
+		}
+
+		currentAlpha = diff / config.get<float>(vars.fHitmarkerTime);
+
+		if (el.isAvailable() && el.m_head)
+			actualColor = Colors::Pink.getColorEditAlpha(currentAlpha);
+		else if (!el.isAvailable())
+			actualColor = Colors::Green.getColorEditAlpha(currentAlpha);
+		else
+			actualColor = Colors::White.getColorEditAlpha(currentAlpha);
+
+		constexpr int moveMultiply = 25;
+		float correction = (1.0f - currentAlpha) * moveMultiply; // this maybe should have el.expire ratio to previus one
+		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
+		float Ycorrection = y - (correction * 4.0f); // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
+
+		imRender.text(Xcorrection, Ycorrection, ImFonts::tahoma, std::format(XOR("{}"), el.m_dmg), false, actualColor);
+
+		i++;
 	}
+
+	constexpr float lineX = 10.0f;
+	constexpr float lineY = 5.0f;
+	float lineAddonX = lineX / (1.0f / (currentAlpha + 0.01f)); // prevent division by 0 and make ratio
+	float lineAddonY = lineY / (1.0f / (currentAlpha + 0.01f));
+
+	if (!m_hitmarkers.empty())
+	{
+		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor);
+		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor);
+		imRender.drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor);
+		imRender.drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor);
+	}
+	
 }
 
 void Misc::drawNoScope()
@@ -381,8 +423,8 @@ void Misc::drawNoScope()
 	{
 		int x = globals::screenX;
 		int y = globals::screenY;
-		imRender.drawLine(x / 2, 0, x / 2, y, Colors::Black);
-		imRender.drawLine(0, y / 2, x, y / 2, Colors::Black);
+		imRender.drawLine(x / 2.0f, 0.0f, x / 2.0f, y, Colors::Black);
+		imRender.drawLine(0.0f, y / 2.0f, x, y / 2.0f, Colors::Black);
 	}
 }
 

@@ -64,6 +64,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(int, iHandChams, 0, "hand chams type");
 	CONFIG_ADD_VARIABLE(int, iWeaponChams, 0, "weapon chams type");
 	CONFIG_ADD_VARIABLE(Color, cBackTrackChams, Colors::LightBlue, "backtrack chams color");
+	CONFIG_ADD_VARIABLE(bool, bDrawDeadOnly, false, "draw esp only when dead");
 
 
 	// WORLD
@@ -116,6 +117,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bAutoStrafe, false, "autostrafe enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker, false, "draw hitmarker enabled");
 	CONFIG_ADD_VARIABLE(bool, bPlayHitmarker, false, "play sound hitmarker enabled");
+	CONFIG_ADD_VARIABLE(float, fHitmarkerTime, 0.8f, "hitmarker time");
 	CONFIG_ADD_VARIABLE(bool, bNoScope, false, "no scope enabled");
 	CONFIG_ADD_VARIABLE(bool, bShowFpsPlot, false, "show fps plot");
 	CONFIG_ADD_VARIABLE(bool, bShowVelocityPlot, false, "show velocity plot");

@@ -327,11 +327,11 @@ public:
 	void text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...);
-	// pass pos from world. this box is static!, so you will often pass width.x == width.y
+	// pass pos from world, you will often pass width.x == width.y
 	// width.x -> pass starting width at front
 	// width.y -> pass width of the box, between points at side
 	void drawBox3D(const Vector& pos, const Vector2D& width, const float height, const Color& color, const float thickness = 2.0f);
-	// pass pos from world. this box is static!, so you will often pass width.x == width.y
+	// pass pos from world, you will often pass width.x == width.y
 	// width.x -> pass starting width at front
 	// width.y -> pass width of the box, between points at side
 	void drawBox3DFilled(const Vector& pos, const Vector2D& width, const float height, const Color& color, const Color& filling = Colors::Grey, const float thickness = 2.0f);

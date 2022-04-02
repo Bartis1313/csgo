@@ -15,6 +15,7 @@ enum hookIndexes
 	PRESENTDX = 17,
 	PROXY_MOVE = 22,
 	END_SCENE = 42,
+	SV_CHEATS = 13
 };
 
 class IPanel;
@@ -22,6 +23,7 @@ class CViewSetup;
 struct DrawModelState_t;
 struct ModelRenderInfo_t;
 struct Matrix3x4;
+struct CStudioHdr;
 
 #define FAST_ARGS void* thisptr, void* edx
 
@@ -80,35 +82,35 @@ namespace hooks
 
 	struct clientValidAddr
 	{
-		using fn = char(__fastcall*)(void*, const char*);
+		using fn = char(__thiscall*)(void*, const char*);
 		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct engineValidAddr
 	{
-		using fn = char(__fastcall*)(void*, const char*);
+		using fn = char(__thiscall*)(void*, const char*);
 		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct studioRenderValidAddr
 	{
-		using fn = char(__fastcall*)(void*, const char*);
+		using fn = char(__thiscall*)(void*, const char*);
 		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct materialSystemValidAddr
 	{
-		using fn = char(__fastcall*)(void*, const char*);
+		using fn = char(__thiscall*)(void*, const char*);
 		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
 		inline static fn original = nullptr;
 	};
 
 	struct isUsingStaticPropDebugModes
 	{
-		using fn = bool(__fastcall*)(void*);
+		using fn = bool(__thiscall*)(void*);
 		static bool __fastcall hooked(FAST_ARGS);
 		inline static fn original = nullptr;
 	};
@@ -165,15 +167,37 @@ namespace hooks
 
 	struct getColorModulation
 	{
-		using fn = void(__fastcall*)(FAST_ARGS, float*, float*, float*);
+		using fn = void(__thiscall*)(void*, float*, float*, float*);
 		static void __fastcall hooked(FAST_ARGS, float* r, float* g, float* b);
 		inline static fn original = nullptr;
 	};
 
 	struct setupBones
 	{
-		using fn = bool(__fastcall*)(FAST_ARGS, Matrix3x4*, int, int, float);
+		using fn = bool(__thiscall*)(void*, Matrix3x4*, int, int, float);
 		static bool __fastcall hooked(FAST_ARGS, Matrix3x4*, int maxBones, int boneMask, float curtime);
 		inline static fn original = nullptr;
+	};
+
+	struct buildTransformations
+	{
+		using fn = void(__thiscall*)(void*, CStudioHdr*, void*, void*, const Matrix3x4&, int, void*);
+		static void __fastcall hooked(FAST_ARGS, CStudioHdr* hdr, void* pos, void* q, const Matrix3x4& matrix, int boneMask, void* computed);
+		inline static fn original = nullptr;
+	};
+
+	struct doExtraBonesProcessing
+	{
+		using fn = void(__thiscall*)(void*, void*, void*, const Matrix3x4&, void*, void*);
+		static void __fastcall hooked(FAST_ARGS, void* hdr, void* pos, void* q, const Matrix3x4& matrix, void* computed, void* contex);
+		inline static fn original = nullptr;
+	};
+
+	struct sv_cheats
+	{
+		using fn = bool(__thiscall*)(void*);
+		static bool __fastcall hooked(FAST_ARGS);
+		inline static fn original = nullptr;
+		static const int index = SV_CHEATS;
 	};
 }

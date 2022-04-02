@@ -34,8 +34,10 @@ namespace utilities
     // old style: "A0 15 ?? FF A3"
     _NODISCARD uintptr_t patternScan(const std::string& mod, const std::string& mask, const uintptr_t offsetToAdd = 0);
     // https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bounding_ESP_Boxes
+    // 2d & 3d
+    _NODISCARD bool getBox(Entity_t* ent, Box& box, Box3D& box3D);
+    // 2d
     _NODISCARD bool getBox(Entity_t* ent, Box& box);
-    _NODISCARD bool getBox3D(Entity_t* ent, Box3D& box);
     _NODISCARD uint32_t inByteOrder(const size_t netLong);
     _NODISCARD std::string getKeyName(const uint32_t virtualKey);
     _NODISCARD std::string toLowerCase(const std::string& str);

@@ -59,7 +59,7 @@ void interfaces::init()
 	glowManager = *reinterpret_cast<CGlowManager**>(utilities::patternScan(CLIENT_DLL, GLOWMANAGER, 0x3));
 	weapon = *reinterpret_cast<IWeapon**>(utilities::patternScan(CLIENT_DLL, WEAPONDATA, 0x2));
 	moveHelper = **reinterpret_cast<IMoveHelper***>(utilities::patternScan(CLIENT_DLL, MOVEHELPER, 0x2));
-	resource = *reinterpret_cast<PlayerResource***>(utilities::patternScan(CLIENT_DLL, PLAYER_RESOURCE, 0x2));
+	resource = *reinterpret_cast<PlayerResource***>(utilities::patternScan(CLIENT_DLL, PLAYER_RESOURCE, 0x4));
 	dx9Device = **reinterpret_cast<IDirect3DDevice9***>(utilities::patternScan(SHARED_API, DX9_DEVICE, 0x1));
 
 	console.log(TypeLogs::LOG_INFO, XOR("interfaces success"));
