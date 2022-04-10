@@ -24,12 +24,12 @@ I can't compile
 <details>
 
  * BunnyHop
- * Chams (Normal, Xyz) (rebuild needed)
+ * Chams (Normal, Xyz)
  * ESP (2D, 2D Filled, 3D, 3D Filled)
  * Glow
  * Sound ESP (rebuild needed)
  * Fov (Changing your local FOV)
- * Third Person (no bypass for sv_cheats included yet)
+ * Third Person
  * Aimbot (Nearest, Head, Chest)
  * Fov Aimbot
  * Smooth Aimbot
@@ -47,8 +47,6 @@ I can't compile
  * Nigtmode (Chnages materials to be darker including chnage of the sky)
  * Esp Lines (They will only show on selected target by aimbot)
  * Plots (Represent current FPS and Velocity in stored records and then drawn using lines and difference between them, fully custom)
- * Arm Chams (Color, no arms) (rebuild needed)
- * Weapon Chams (Color, no weapon) (rebuild needed)
  </details>
 
 # Keybinds
@@ -98,7 +96,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.3.0 - Huge recode, cleaned up most of bloat header includes. Features are now not in namespace but class. Improved code quality almost everywhere. Fixed unloading the cheat not causing any errors. Plots are totally rewritten. Fixed couple of features, although chams are temporiarly not possible. I am thinking of clean solution for them. Added console from imgui demo which will show current loggings. Still a lot of code needs rewrite.
 * 1.3.1 - Added option "load on start", which will load selected config on the start.
 * 1.3.2 - The hitmarker is now finished. Nothing more in this version.
-* 1.3.3 - Fixed "aiming is aiming at you", aimbot, and many more. And added working chams, still small fixes are needed to them.
+* 1.3.3 - Fixed "Enemy is aiming at you", aimbot, and many more. And added working chams, still small fixes are needed to them.
 </details>
 
 # Dependencies
