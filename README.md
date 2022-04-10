@@ -24,26 +24,25 @@ I can't compile
 <details>
 
  * BunnyHop
- * Chams (Normal, Xyz)
+ * Chams (Fully possible to customize currently running 5 materials. Players, weapons, arms are rendered separately)
  * ESP (2D, 2D Filled, 3D, 3D Filled)
  * Glow
- * Sound ESP (rebuild needed)
+ * Sound ESP (rebuild needed - events are not always networked with the steps)
  * Fov (Changing your local FOV)
  * Third Person
- * Aimbot (Nearest, Head, Chest)
+ * Aimbot (Nearest, Head, Chest, delay in ms - no instant switch to new target in fov)
  * Fov Aimbot
  * Smooth Aimbot
  * Triggerbot (delay in ms)
- * Rcs (With one value representing both yaw and punch)
- * Crosshair (Static, Recoil, Engine)
+ * Rcs (Customizable to decide both angle values)
+ * Crosshair (Static, Recoil, Engine, Spread)
  * Backtrack (manipulation in ms)
  * Radar 2D (Representing on small overlay where enemies are, including their view)
  * Local Info (Some information about local player)
- * Esp Flags (Some information about enemies, their hp, armor etc...)
- * Esp Info (For now only name and C4 holder)
+ * Esp Flags (Some information about enemies, their hp, armor etc...) (rebuild needed - lack of flags, can get much more info)
  * Esp Skeleton (Skeleton drawn by lines, working with backtrack too)
- * Backtrack Chams (Static, Rainbow, Last Tick) (rebuild needed)
- * DLight (Uses engine to highlight the player)
+ * Backtrack Chams (Static, Rainbow, Last Tick)
+ * DLight (Uses engine to highlight the player) (rebuild needed - this should be more customizable)
  * Nigtmode (Chnages materials to be darker including chnage of the sky)
  * Esp Lines (They will only show on selected target by aimbot)
  * Plots (Represent current FPS and Velocity in stored records and then drawn using lines and difference between them, fully custom)
