@@ -17,7 +17,7 @@ Vector math::calcAngle(const Vector& source, const Vector& destination)
 	const auto delta = source - destination;
 
 	Vector angles(
-		RAD2DEG(std::atanf(delta.z / std::hypotf(delta.x, delta.y))),
+		RAD2DEG(std::atanf(delta.z / std::hypot(delta.x, delta.y))),
 		RAD2DEG(std::atanf(delta.y / delta.x)),
 		0.0f
 	);
