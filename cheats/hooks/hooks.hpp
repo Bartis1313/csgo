@@ -51,7 +51,7 @@ namespace hooks
 	struct drawModel
 	{
 		using fn = void(__thiscall*)(void*, void*, const DrawModelState_t&, const ModelRenderInfo_t&, Matrix3x4*);
-		static void __stdcall hooked(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
+		static void __stdcall hooked(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 		inline static fn original = nullptr;
 		static const int index = DRAWMODEL;
 	};

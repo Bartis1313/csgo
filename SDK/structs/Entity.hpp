@@ -164,7 +164,7 @@ public:
 	_NODISCARD Weapon_t* getActiveWeapon();
 	_NODISCARD bool isAlive() { return m_iHealth() > 0; }
 	_NODISCARD bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
-	_NODISCARD bool IsValid() { return (isAlive() && !isDormant()); }
+	_NODISCARD bool isMoving() { return m_vecVelocity().length2D() > 0.1f; }
 
 	_NODISCARD Vector getHitboxPos(const int id);
 	_NODISCARD Vector getBonePos(const int id);

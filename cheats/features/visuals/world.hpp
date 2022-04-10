@@ -1,5 +1,10 @@
 #pragma once
 
+#include <vector>
+
+#include "../../../SDK/math/Vector.hpp"
+#include "../../../SDK/Color.hpp"
+
 class Entity_t;
 class IConVar;
 class IMaterial;
@@ -27,6 +32,13 @@ private:
 	void drawMolotovTimer(Entity_t* ent);
 private:
 	IConVar* m_oldSky = nullptr;
+	struct Trail_t
+	{
+		Vector m_pos;
+		float m_expire;
+		Color m_col;
+	};
+	std::vector<Trail_t> m_trails;
 };
 
 inline World world;

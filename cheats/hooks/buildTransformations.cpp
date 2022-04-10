@@ -1,5 +1,3 @@
-#pragma once
-
 #include "hooks.hpp"
 #include "../../SDK/CStudioHdr.hpp"
 //#include "../../SDK/CGlobalVars.hpp"

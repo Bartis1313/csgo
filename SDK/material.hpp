@@ -57,12 +57,21 @@ public:
     VFUNC(const char*, getName, 0, (), (this));
     VFUNC(const char*, getTextureGroupName, 1, (), (this));
     VFUNC(IMaterialVar*, findVar, 11, (const char* name, bool* found = nullptr, bool complain = true), (this, name, found, complain));
-    VFUNC(void, alphaModulate, 27, (float alpha), (this, alpha));   
+    VFUNC(void, alphaModulate, 27, (float alpha), (this, alpha));
+    VFUNC(void, alphaModulate, 27, (const Color& color), (this, color.a()));
     VFUNC(void, colorModulate, 28, (float r, float g, float b), (this, r, g, b));
     VFUNC(void, colorModulate, 28, (const Color& color), (this, color.r(), color.g(), color.b()));
     VFUNC(void, setMaterialVarFlag, 29, (MaterialVarFlags_t flag, bool on), (this, flag, on));
     VFUNC(IMaterialVar**, getShaderParams, 41, (), (this));
     VFUNC(bool, isError, 42, (), (this));
+    VFUNC(void, addRef, 12, (), (this));
+
+    // goes for rgba
+    void modulateAllColor(const Color& color)
+    {
+        this->colorModulate(color);
+        this->alphaModulate(color);
+    }
 };
 
 
@@ -72,5 +81,7 @@ public:
     VFUNC(void, setValue, 4, (float val), (this, val));
     VFUNC(void, setValue, 5, (int val), (this, val));
     VFUNC(void, setValue, 6, (const char* val), (this, val));
-    VFUNC(void, setValues, 11, (Vector val), (this, val));
+    VFUNC(void, setValues, 11, (const Vector& val), (this, val.x, val.y, val.z));
+    VFUNC(void, setValues, 11, (const Color& val), (this, val.r(), val.g(), val.b()));
+    VFUNC(void, setValues, 11, (float x, float y, float z), (this, x, y, z));
 };

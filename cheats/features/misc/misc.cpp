@@ -42,8 +42,8 @@ void Misc::drawCrosshair()
 {
 	int cfgCross = config.get<int>(vars.iCrosshair);
 
-	const static auto crosshair = interfaces::cvar->findVar(XOR("cl_crosshair_recoil"));
-	crosshair->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
+	const static auto cl_crosshair_recoil = interfaces::cvar->findVar(XOR("cl_crosshair_recoil"));
+	cl_crosshair_recoil->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
 
 	if (!cfgCross)
 		return;
@@ -59,46 +59,79 @@ void Misc::drawCrosshair()
 
 	int x = globals::screenX;
 	int y = globals::screenY;
-	x /= 2;
-	y /= 2;
+	x /= 2.0f;
+	y /= 2.0f;
+
+	const auto weapon = game::localPlayer->getActiveWeapon();
+	if (!weapon)
+		return;
+
+	auto getPunchPos = [=]()
+	{
+		Vector angle;
+		interfaces::engine->getViewAngles(angle);
+		const static auto scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"))->getFloat();
+		angle += game::localPlayer->m_aimPunchAngle() * scale;
+
+		auto start = game::localPlayer->getEyePos();
+		auto end = start + math::angleVec(angle) * weapon->getWpnInfo()->m_range;
+
+		return end;
+	};
 
 	switch (cfgCross)
 	{
 	case E2T(CrossHairTypes::STATIC):
-		// -1 for y because elselike it will be not aligned
-		// imo the best is to always throw w,h as odd num
-		imRender.drawRectFilled(x - 5, y - 1, 11, 3, Colors::Black);
-		imRender.drawRectFilled(x - 1, y - 5, 3, 11, Colors::Black);
+	{
+		float moveCross = 8.0f;
 
-		imRender.drawLine(x - 4, y, x + 5, y, Colors::LightBlue);
-		imRender.drawLine(x, y + 4, x, y - 5, Colors::LightBlue);
+		imRender.drawLine(x - moveCross, y, x + moveCross, y, Colors::Black, 3.0f);
+		imRender.drawLine(x, y - moveCross, x, y + moveCross, Colors::Black, 3.0f);
+
+		moveCross -= 1.5f;
+
+		imRender.drawLine(x - moveCross, y, x + moveCross, y, Colors::LightBlue, 1.0f);
+		imRender.drawLine(x, y - moveCross, x, y + moveCross, Colors::LightBlue, 1.0f);
 		break;
+	}
 	case E2T(CrossHairTypes::RECOIL):
 	{
-		Vector vAngles;
-		interfaces::engine->getViewAngles(vAngles);
-		vAngles += game::localPlayer->m_aimPunchAngle() * 2.0f; // cvar
-
-		const auto weapon = game::localPlayer->getActiveWeapon();
-		if (!weapon)
-			break;
-
-		auto start = game::localPlayer->getEyePos();
-		auto end = start + math::angleVec(vAngles) * weapon->getWpnInfo()->m_range;
-
-		// easy crosshair
-		//int width = x / 90;
-		//int height = y / 90;
-		//width -= (width * (game::localPlayer->m_aimPunchAngle().y));
-		//height += (height * (game::localPlayer->m_aimPunchAngle().x));
-
-		if (Vector endScreen; imRender.worldToScreen(end, endScreen) && game::localPlayer->isAlive())
+		if (Vector2D endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
 		{
-			imRender.drawRectFilled(endScreen.x - 5, endScreen.y - 1, 11, 3, Colors::Black);
-			imRender.drawRectFilled(endScreen.x - 1, endScreen.y - 5, 3, 11, Colors::Black);
+			int x = endScreen.x;
+			int y = endScreen.y;
 
-			imRender.drawLine(endScreen.x - 4, endScreen.y, endScreen.x + 5, endScreen.y, Colors::LightBlue);
-			imRender.drawLine(endScreen.x, endScreen.y + 4, endScreen.x, endScreen.y - 5, Colors::LightBlue);
+			float moveCross = 8.0f;
+
+			imRender.drawLine(x - moveCross, y, x + moveCross, y, Colors::Black, 3.0f);
+			imRender.drawLine(x, y - moveCross, x, y + moveCross, Colors::Black, 3.0f);
+
+			moveCross -= 1.5f;
+
+			imRender.drawLine(x - moveCross, y, x + moveCross, y, Colors::LightBlue, 1.0f);
+			imRender.drawLine(x, y - moveCross, x, y + moveCross, Colors::LightBlue, 1.0f);
+		}
+		break;
+	}
+	case E2T(CrossHairTypes::SPREAD):
+	{
+		if (Vector2D endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
+		{
+			// this is game's logic how to do it
+			/*float spread = weapon->getSpread();
+			float inaccuracy = weapon->getInaccuracy();
+			float scaledSpread = ((inaccuracy + spread) * 320.0f / std::tan(DEG2RAD(globals::FOV) / 2.0f));
+			int radiusSpread = scaledSpread * y / 480.0f;
+
+			if (game::localPlayer->m_vecVelocity().length2D() > 0.0f)
+				radiusSpread = inaccuracy * 1000.0f;*/
+			float inaccuracy = weapon->getInaccuracy();
+			int radiusSpread = inaccuracy * 1000.0f;
+			int x = endScreen.x;
+			int y = endScreen.y;
+
+			imRender.drawCircle(x, y, radiusSpread, 32, Colors::Black);
+			imRender.drawCircleFilled(x, y, radiusSpread, 32, Colors::LightBlue.getColorEditAlpha(0.2f));
 		}
 		break;
 	}
@@ -141,10 +174,14 @@ void Misc::drawLocalInfo()
 	float accuracy = globals::shotsFired
 		? (static_cast<float>(globals::shotsHit) / static_cast<float>(globals::shotsFired)) * 100.0f
 		: 0.0f;
-	imRender.text(width, 115, ImFonts::tahoma, std::format(XOR("Accuracy [{} / {}] {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy), false, Colors::Yellow);
+	float fixedKills = game::localPlayer->getKills() ? game::localPlayer->getKills() : 1.0f;
+	float hs = globals::shotsHead
+		? (static_cast<float>(globals::shotsHead) / fixedKills) * 100.0f
+		: 0.0f;
+	imRender.text(width, 115, ImFonts::tahoma, std::format(XOR("Accuracy [{} / {}] {:.2f}% HS {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy, hs), false, Colors::Yellow);
 
 	width *= 1.25f;
-	imRender.text(width, 15, ImFonts::tahoma, aimbot.getBest() ? std::format(XOR("Aimbot working on: {}"), aimbot.getBest()->getName()) : "", false, Colors::LightBlue);
+	imRender.text(width, 15, ImFonts::tahoma, aimbot.getTargetted() ? std::format(XOR("Aimbot working on: {}"), aimbot.getTargetted()->getName()) : "", false, Colors::LightBlue);
 }
 
 #include "../../../utilities/console/console.hpp"
@@ -269,7 +306,6 @@ void Misc::drawVelocityPlot()
 	bool& sliderRef = config.getRef<bool>(vars.bVelocityCustom);
 	if (sliderRef)
 	{
-		// there, no need for hard logic, we will make max vel as 450
 		if (ImGui::Begin(XOR("Sliders for velocity plot"), &sliderRef, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			//ImGui::SliderFloat(XOR("Set max velocity"), &MAX_SPEEED_MOVE, 450.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // who will ever get this velocity? adjust if needed
@@ -312,9 +348,6 @@ void Misc::drawVelocityPlot()
 
 void Misc::playHitmarker(IGameEvent* event)
 {
-	if (!config.get<bool>(vars.bDrawHitmarker))
-		return;
-
 	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
 	if (!attacker)
 		return;
@@ -327,12 +360,23 @@ void Misc::playHitmarker(IGameEvent* event)
 	if (!ent) // should never happen
 		return;
 
+	globals::shotsHit++;
+
+	auto dmg_health = event->getInt(XOR("dmg_health"));
+	auto health = ent->m_iHealth() - dmg_health;
 	auto hitgroup = event->getInt(XOR("hitgroup"));
 
-	Hitmark_t hit = {
+	if (health < 0 && hitgroup == 1)
+		globals::shotsHead++;
+
+	if (!config.get<bool>(vars.bDrawHitmarker))
+		return;
+
+	Hitmark_t hit =
+	{
 		interfaces::globalVars->m_curtime + config.get<float>(vars.fHitmarkerTime),
-		event->getInt(XOR("dmg_health")),
-		ent->m_iHealth() - event->getInt(XOR("dmg_health")),
+		dmg_health,
+		ent->m_iHealth() - dmg_health,
 		hitgroup == 1 // head
 	};
 	m_hitmarkers.push_back(hit);

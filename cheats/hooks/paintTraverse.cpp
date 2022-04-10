@@ -78,11 +78,10 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 				world.drawZeusRange();
 				misc.drawNoScope();
 				misc.drawCrosshair();
-				aimbot.drawFov();
+				aimbot.draw();
 				world.drawMovementTrail();
 				nadePred.draw();
 				misc.drawHat();
-				aimbot.drawBestPoint();
 			});
 	}
 }

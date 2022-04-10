@@ -33,6 +33,7 @@ class IVEfx;
 class InputSystem;
 struct IDirect3DDevice9;
 class IEffects;
+class KeyValuesSys;
 #pragma endregion
 
 namespace interfaces
@@ -68,6 +69,7 @@ namespace interfaces
 	inline InputSystem* iSystem = nullptr;
 	inline IDirect3DDevice9* dx9Device = nullptr;
 	inline IEffects* effects = nullptr;
+	inline KeyValuesSys* keyValuesSys = nullptr;
 
 	void init();
 }

@@ -10,16 +10,17 @@ class IVStudioRender
 {
     PAD(592);
 private:
-    IMaterial* materialOverride;
+    IMaterial* m_material;
     PAD(12);
 private:
-    OverrideType_t ovverideType;
+    OverrideType_t m_type;
 public:
+    VFUNC(void, forcedMaterialOverride, 33, (IMaterial* mat, OverrideType_t type = Normal, int index = -1), (this, mat, type, index));
     bool isForced()
     {
-        return (!materialOverride)
-            ? ovverideType == OverrideType_t::DepthWrite || ovverideType == OverrideType_t::SsaoDepthWrite
-            : std::string(materialOverride->getName()).starts_with(XOR("dev/glow"))
+        return (!m_material)
+            ? m_type == DepthWrite || m_type == SsaoDepthWrite
+            : std::string(m_material->getName()).starts_with(XOR("dev/glow"))
             ;
     }
 };

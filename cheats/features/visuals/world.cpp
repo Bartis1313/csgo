@@ -11,6 +11,7 @@
 #include "../../../SDK/ConVar.hpp"
 #include "../../../SDK/IWeapon.hpp"
 #include "../../../SDK/structs/Entity.hpp"
+#include "../../../SDK/IEffects.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
 
 #include "../../../config/vars.hpp"
@@ -109,16 +110,6 @@ void World::drawBomb(Entity_t* ent)
 		Color{ static_cast<int>(r), static_cast<int>(g), 0, 200 });
 }
 
-
-static bool isNade(const int classid)
-{
-	if (classid == CBaseCSGrenadeProjectile
-		|| classid == CDecoyProjectile
-		|| classid == CMolotovProjectile)
-		return true;
-	return false;
-}
-
 void World::drawProjectiles(Entity_t* ent)
 {
 	if (!config.get<bool>(vars.bDrawProjectiles))
@@ -141,15 +132,8 @@ void World::drawProjectiles(Entity_t* ent)
 
 	auto projectileName = static_cast<std::string>(studio->m_name);
 
-	if (projectileName.find(XOR("thrown")) != std::string::npos
-		|| isNade(cl->m_classID))
+	if (projectileName.find(XOR("thrown")) != std::string::npos)
 	{
-		Vector nadeOrigin = ent->absOrigin();
-		Vector nadePos = {};
-
-		if (!imRender.worldToScreen(nadeOrigin, nadePos))
-			return;
-
 		std::string nadeName = "";
 		Color colorNade;
 
@@ -277,8 +261,6 @@ void World::modulateWorld(void* thisptr, float* r, float* g, float* b, bool isSh
 	if (material->isError())
 		return;
 
-	auto matName = material->getTextureGroupName();
-
 	/*for (const auto& [name, color] : materialNames)
 	{
 		if (auto check = matName.starts_with(name); check && !isShutdown)
@@ -289,22 +271,21 @@ void World::modulateWorld(void* thisptr, float* r, float* g, float* b, bool isSh
 
 	bool isGoodMat = false;
 
-	// using strstr will just be useless, don't do this. We know expected strings
-	// you can cast matName as string and use .compare or ==. Performance should be the same
+	std::string_view name = material->getTextureGroupName();
 
-	if (!strcmp(matName, XOR("World textures")))
+	if (name == XOR("World textures"))
 	{
 		editColor(config.get<Color>(vars.cWorldTexture));
 		isGoodMat = true;
 	}
 
-	if (!strcmp(matName, XOR("StaticProp textures")))
+	if (name == XOR("StaticProp textures"))
 	{
 		editColor(config.get<Color>(vars.cWorldProp));
 		isGoodMat = true;
 	}
 
-	if (!strcmp(matName, XOR("SkyBox textures")))
+	if (name == XOR("SkyBox textures"))
 	{
 		editColor(config.get<Color>(vars.cSkyBox));
 		isGoodMat = true;
@@ -391,50 +372,109 @@ void World::drawMovementTrail()
 	static Vector end;
 
 	// check this first, special case here
-	if (!game::localPlayer)
+	if (!game::isAvailable())
 		return;
+
+	int type = config.get<int>(vars.iRunMovementTrail);
 
 	if (!config.get<bool>(vars.bRunMovementTrail))
 	{
-		// prepare the point to be corrected
-		end = game::localPlayer->m_vecOrigin();
 		return;
 	}
-	Color color;
-	config.get<bool>(vars.bMovementRainbow)
-		? color = Color::rainbowColor(interfaces::globalVars->m_realtime, config.get<float>(vars.fMovementRainbowSpeed))
-		: color = config.get<Color>(vars.cMovementTrail);
-	const static auto modelIndex = interfaces::modelInfo->getModelIndex(XOR("sprites/purplelaser1.vmt"));
 
-	const Vector start = game::localPlayer->m_vecOrigin();
+	if (type != E2T(MovementTrail::BEAM))
+	{
+		// prepare the point to be corrected
+		end = game::localPlayer->m_vecOrigin();
+	}
 
-	BeamInfo_t info = {};
+	switch (config.get<int>(vars.iRunMovementTrail))
+	{
+	case E2T(MovementTrail::BEAM):
+	{
+		if (!game::localPlayer->isMoving()) // do not add beams on not moving
+			return;
 
-	info.m_type = TE_BEAMPOINTS;
-	info.m_modelName = XOR("sprites/purplelaser1.vmt");
-	info.m_modelIndex = modelIndex;
-	info.m_vecStart = start;
-	info.m_vecEnd = end;
-	info.m_haloIndex = -1;
-	info.m_haloScale = 0.0f;
-	info.m_life = config.get<float>(vars.fMovementLife);
-	info.m_width = 5.0f;
-	info.m_endWidth = 5.0f;
-	info.m_fadeLength = 0.0f;
-	info.m_amplitude = 2.0;
-	info.m_brightness = 255.0f;
-	info.m_red = color.rMultiplied();
-	info.m_green = color.gMultiplied();
-	info.m_blue = color.bMultiplied();
-	info.m_speed = config.get<float>(vars.fMovementBeamSpeed);
-	info.m_startFrame = 0.0f;
-	info.m_frameRate = 0.0f;
-	info.m_segments = 2;
-	info.m_renderable = true;
+		Color color;
+		config.get<bool>(vars.bMovementRainbow)
+			? color = Color::rainbowColor(interfaces::globalVars->m_realtime, config.get<float>(vars.fMovementRainbowSpeed))
+			: color = config.get<Color>(vars.cMovementTrail);
+		const static auto modelIndex = interfaces::modelInfo->getModelIndex(XOR("sprites/purplelaser1.vmt"));
 
-	if (auto myBeam = interfaces::beams->createBeamPoints(info); myBeam)
-		interfaces::beams->drawBeam(myBeam);
+		const Vector start = game::localPlayer->m_vecOrigin();
 
-	// change to pos after beam is drawn, since it's static it's possible
-	end = start;
+		BeamInfo_t info = {};
+
+		info.m_type = TE_BEAMPOINTS;
+		info.m_modelName = XOR("sprites/purplelaser1.vmt");
+		info.m_modelIndex = modelIndex;
+		info.m_vecStart = start;
+		info.m_vecEnd = end;
+		info.m_haloIndex = -1;
+		info.m_haloScale = 0.0f;
+		info.m_life = config.get<float>(vars.fMovementLife);
+		info.m_width = 5.0f;
+		info.m_endWidth = 5.0f;
+		info.m_fadeLength = 0.0f;
+		info.m_amplitude = 2.0;
+		info.m_brightness = 255.0f;
+		info.m_red = color.rMultiplied();
+		info.m_green = color.gMultiplied();
+		info.m_blue = color.bMultiplied();
+		info.m_speed = config.get<float>(vars.fMovementBeamSpeed);
+		info.m_startFrame = 0.0f;
+		info.m_frameRate = 0.0f;
+		info.m_segments = 2;
+		info.m_renderable = true;
+
+		if (auto myBeam = interfaces::beams->createBeamPoints(info); myBeam)
+			interfaces::beams->drawBeam(myBeam);
+
+		// change to pos after beam is drawn, since it's static it's possible
+		end = start;
+
+		break;
+	}
+	case E2T(MovementTrail::LINE):
+	{
+		Color color;
+		config.get<bool>(vars.bMovementRainbow)
+			? color = Color::rainbowColor(interfaces::globalVars->m_realtime, config.get<float>(vars.fMovementRainbowSpeed))
+			: color = config.get<Color>(vars.cMovementTrail);
+
+		float curtime = interfaces::globalVars->m_curtime;
+
+		if (game::localPlayer->isMoving())
+			m_trails.emplace_back(Trail_t{ game::localPlayer->m_vecOrigin(), curtime + config.get<float>(vars.fMovementLife), color });
+
+		Vector last = {};
+		if (!m_trails.empty())
+			last = m_trails.front().m_pos;
+
+		for (size_t i = 0; const auto & el : m_trails)
+		{
+			if (el.m_expire < curtime)
+			{
+				m_trails.erase(m_trails.begin() + i);
+				continue;
+			}
+
+			if (Vector2D start, end; !last.isZero() && imRender.worldToScreen(el.m_pos, start) && imRender.worldToScreen(last, end))
+				imRender.drawLine(start, end, el.m_col, 3.0f);
+
+			last = el.m_pos;
+		}
+
+		break;
+	}
+	case E2T(MovementTrail::SPLASH):
+	{
+		if (game::localPlayer->isMoving())
+			interfaces::effects->energySplash(game::localPlayer->m_vecOrigin(), {}, true);
+
+		break;
+	}
+	default:
+		break;
+	}
 }

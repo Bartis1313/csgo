@@ -37,11 +37,10 @@ void Events::FireGameEvent(IGameEvent* event)
 	}
 	else if (!strcmp(event->getName(), XOR("game_start")))
 	{
-		globals::shotsFired = 0, globals::shotsHit = 0;
+		globals::shotsFired = 0, globals::shotsHit = 0, globals::shotsHead = 0;
 	}
 	else if (!strcmp(event->getName(), XOR("player_hurt")))
 	{
-		globals::shotsHit++;
 		misc.playHitmarker(event);
 	}
 	else if (!strcmp(event->getName(), XOR("weapon_fire")))

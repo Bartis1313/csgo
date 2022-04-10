@@ -51,6 +51,8 @@ void interfaces::init()
 	efx = getInterface<IVEfx>(ENGINE_DLL, XOR("VEngineEffects001"));
 	iSystem = getInterface<InputSystem>(INPUTSYSTEM_DLL, XOR("InputSystemVersion001"));
 	effects = getInterface<IEffects>(CLIENT_DLL, XOR("IEffects001"));
+
+	keyValuesSys = reinterpret_cast<KeyValuesSys*(__cdecl*)()>(LF(GetProcAddress)(LF(GetModuleHandleA)(VSTD_DLL), XOR("KeyValuesSystem")))();
 	
 	globalVars = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(client))[0] + 0x1F);
 	clientMode = **reinterpret_cast<ClientMode***>((*reinterpret_cast<uintptr_t**>(client))[10] + 0x5);

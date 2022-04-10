@@ -68,7 +68,8 @@ static void renderAimbot()
 				ImGui::Combo(XOR("Aimbot selection"), &config.getRef<int>(vars.iAimbot), selections::aimbotHitboxes);
 				ImGui::SliderFloat(XOR("Aimbot smooth"), &config.getRef<float>(vars.fSmooth), 1.0f, 50.0f);
 				ImGui::Checkbox(XOR("Enabled RCS"), &config.getRef<bool>(vars.bRCS));
-				ImGui::SliderFloat(XOR("RCS percentage"), &config.getRef<float>(vars.fRCS), 0.0f, 100.0f);
+				ImGui::SliderFloat(XOR("RCS percentage axis"), &config.getRef<float>(vars.fRCSx), 0.0f, 100.0f);
+				ImGui::SliderFloat(XOR("RCS percentage yaw"), &config.getRef<float>(vars.fRCSy), 0.0f, 100.0f);
 				ImGui::Checkbox(XOR("Triggerbot enabled"), &config.getRef<bool>(vars.bTriggerbot));
 				ImGui::SliderFloat(XOR("Triggerbot ms"), &config.getRef<float>(vars.fTriggerDelay), 0.0f, 200.0f);
 				ImGui::Checkbox(XOR("Draw fov"), &config.getRef<bool>(vars.bDrawFov));
@@ -77,6 +78,8 @@ static void renderAimbot()
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Draws a circle representing your aimbot FOV"));
 				ImGui::Checkbox(XOR("Draw aimbot point"), &config.getRef<bool>(vars.bDrawBestPoint));
+				ImGui::Checkbox(XOR("Delay"), &config.getRef<bool>(vars.bAimbotDelay));
+				ImGui::SliderFloat(XOR("Delay ms"), &config.getRef<float>(vars.fAimbotDelay), 0.0f, 800.0f);
 			}
 			ImGui::EndGroupPanel();
 
@@ -126,17 +129,36 @@ static void renderVisuals()
 
 			ImGui::BeginGroupPanel(XOR("Chams"));
 			{
-				ImGui::Checkbox(XOR("Chams enabled"), &config.getRef<bool>(vars.bChams));
-				ImGui::Combo(XOR("Chams type"), &config.getRef<int>(vars.iChams), selections::chamsNames);
+				ImGui::Checkbox(XOR("Chams enabled Players"), &config.getRef<bool>(vars.bChamsPlayers));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Chams color"), &config.getRef<Color>(vars.cChams));
+				ImGui::Combo(XOR("Chams type Players"), &config.getRef<int>(vars.iChamsPlayers), selections::chamsNames);
+				ImGui::ColorPicker(XOR("Chams color Players"), &config.getRef<Color>(vars.cChamsPlayers));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Chams XYZ color"), &config.getRef<Color>(vars.cChamsXYZ));
-				ImGui::Checkbox(XOR("Backtrack chams"), &config.getRef<bool>(vars.bBacktrackChams));
+				ImGui::Checkbox(XOR("Chams XQZ"), &config.getRef<bool>(vars.bChamsXQZPlayers));
 				ImGui::SameLine();
-				ImGui::Combo(XOR("##"), &config.getRef<int>(vars.iBacktrackChams), selections::btChams);
+				ImGui::ColorPicker(XOR("Chams XQZ color"), &config.getRef<Color>(vars.cChamsXQZPlayers));
+				
+				ImGui::Checkbox(XOR("Chams enabled Weapons"), &config.getRef<bool>(vars.bChamsWeapons));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Backtrack chams col"), &config.getRef<Color>(vars.cBackTrackChams));
+				ImGui::Combo(XOR("Chams type Weapons"), &config.getRef<int>(vars.iChamsWeapons), selections::chamsNames);
+				ImGui::ColorPicker(XOR("Chams color Weapons"), &config.getRef<Color>(vars.cChamsWeapons));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("Disable weapon"), &config.getRef<bool>(vars.bChamsWeaponsDisable));
+
+				ImGui::Checkbox(XOR("Chams enabled Arms"), &config.getRef<bool>(vars.bChamsArms));
+				ImGui::SameLine();
+				ImGui::Combo(XOR("Chams type Arms"), &config.getRef<int>(vars.iChamsArms), selections::chamsNames);
+				ImGui::ColorPicker(XOR("Chams color Arms"), &config.getRef<Color>(vars.cChamsArms));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("Disable arms"), &config.getRef<bool>(vars.bChamsArmsDisable));
+				
+				ImGui::Checkbox(XOR("Chams enabled Backtrack"), &config.getRef<bool>(vars.bChamsBacktrack));
+				ImGui::SameLine();
+				ImGui::Combo(XOR("Chams type Backtrack"), &config.getRef<int>(vars.iChamsBacktrackMode), selections::chamsNames);
+				ImGui::ColorPicker(XOR("Backtrack chams col"), &config.getRef<Color>(vars.cChamsBacktrack));
+				ImGui::SameLine();
+				ImGui::Combo(XOR("Chams style Backtrack"), &config.getRef<int>(vars.iChamsBacktrack), selections::btChams);
+
 				ImGui::Checkbox(XOR("Enabled glow"), &config.getRef<bool>(vars.bGlow));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Glow color"), &config.getRef<Color>(vars.cGlow));
@@ -234,9 +256,8 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Sound ESP"), &config.getRef<bool>(vars.bSoundEsp));
 				ImGui::SliderFloat(XOR("FOV local"), &config.getRef<float>(vars.fFOV), -50.0f, 50.0f);
 				ImGui::Checkbox(XOR("Third Person"), &config.getRef<bool>(vars.bThirdp));
-				ImGui::Checkbox(XOR("Enable crosshair"), &config.getRef<bool>(vars.bCrosshair));
 				ImGui::SameLine();
-				ImGui::Combo(XOR("##"), &config.getRef<int>(vars.iCrosshair), selections::crossHairNames);
+				ImGui::Combo(XOR("Crosshair type"), &config.getRef<int>(vars.iCrosshair), selections::crossHairNames);
 				ImGui::Checkbox(XOR("Enemy aiming warn"), &config.getRef<bool>(vars.bAimingWarn));
 			}
 			ImGui::EndGroupPanel();
@@ -302,6 +323,7 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Movement trail"), &tref);
 				if (tref)
 				{
+					ImGui::Combo(XOR("Trail type"), &config.getRef<int>(vars.iRunMovementTrail), selections::trails);
 					bool& rref = config.getRef<bool>(vars.bMovementRainbow);
 					ImGui::Checkbox(XOR("Run rainbow"), &rref);
 					if (!rref)

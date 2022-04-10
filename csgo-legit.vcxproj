@@ -161,6 +161,7 @@
     </ClCompile>
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
     <ClCompile Include="cheats\hooks\setupbones.cpp" />
+    <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
     <ClCompile Include="cheats\features\visuals\chams.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -302,8 +303,10 @@
     <ClInclude Include="cheats\features\misc\misc.hpp" />
     <ClInclude Include="cheats\features\prediction\nadepred.hpp" />
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
-    <ClInclude Include="cheats\hooks\buildTransformations.hpp" />
+    <ClInclude Include="cheats\hooks\buildTransformations.cpp" />
     <ClInclude Include="SDK\CStudioHdr.hpp" />
+    <ClInclude Include="SDK\KeyValues.hpp" />
+    <ClInclude Include="SDK\KeyValuesSys.hpp" />
     <ClInclude Include="SEHcatch.hpp" />
     <ClInclude Include="cheats\features\visuals\chams.hpp" />
     <ClInclude Include="cheats\features\visuals\player.hpp" />

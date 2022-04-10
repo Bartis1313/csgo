@@ -24,23 +24,23 @@ namespace ImGui
 	void EndGroupPanel();
 	bool Combo(const char* label, int* item, const std::span<const char*>& arr, const float width = 90.0f);
 	bool ListBox(const char* label, int* item, const std::vector<std::string>& arr, const int heightItem = -1);
-	
-	// from demo, slight edit, usage same as normal console.log
-    struct ExampleAppLog
-    {
-        ImGuiTextBuffer     Buf;
-        ImGuiTextFilter     Filter;
-        ImVector<int>       LineOffsets; // Index to lines offset. We maintain this with AddLog() calls.
-        bool                AutoScroll;  // Keep scrolling if already at the bottom.
 
-        ExampleAppLog();
-        void Clear();
+	// from demo, slight edit, usage same as normal console.log
+	struct ExampleAppLog
+	{
+		ImGuiTextBuffer     Buf;
+		ImGuiTextFilter     Filter;
+		ImVector<int>       LineOffsets; // Index to lines offset. We maintain this with AddLog() calls.
+		bool                AutoScroll;  // Keep scrolling if already at the bottom.
+
+		ExampleAppLog();
+		void Clear();
 
 		// edited 
 		template<typename... Args_t>
 		void AddLog(const std::string& fmt, const Args_t&... args);
 		void Draw(const char* title, bool* p_open = NULL);
-    };
+	};
 }
 
 template<typename... Args_t>

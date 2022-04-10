@@ -27,19 +27,37 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fFovAimbot, 0.0f, "aimbot FOV");
 	CONFIG_ADD_VARIABLE(float, fSmooth, 1.0f, "smooth amount for aimbot");
 	CONFIG_ADD_VARIABLE(bool, bRCS, false, "recoil control system enabled");
-	CONFIG_ADD_VARIABLE(float, fRCS, 50.0f, "recoil control system percentage");
+	CONFIG_ADD_VARIABLE(float, fRCSx, 50.0f, "recoil control system percentage for axis");
+	CONFIG_ADD_VARIABLE(float, fRCSy, 50.0f, "recoil control system percentage for yaw");
 	CONFIG_ADD_VARIABLE(bool, bTriggerbot, false, "triggerbot enabled");
 	CONFIG_ADD_VARIABLE(float, fTriggerDelay, 0.0f, "triggerbot amount of delay in ms");
 	CONFIG_ADD_VARIABLE(bool, bDrawFov, false, "draw fov representing aimbot range");
 	CONFIG_ADD_VARIABLE(Color, cDrawFov, Colors::LightBlue, "draw fov representing aimbot range color");
 	CONFIG_ADD_VARIABLE(bool, bDrawBestPoint, false, "draw best point of hitbox");
+	CONFIG_ADD_VARIABLE(bool, bAimbotDelay, false, "enable aimbot delay");
+	CONFIG_ADD_VARIABLE(float, fAimbotDelay, false, "aimbot delay time");
 
 	// VISUALS
-
 	CONFIG_ADD_VARIABLE(bool, bChams, false, "chams enabled");
-	CONFIG_ADD_VARIABLE(int, iChams, 0, "chams mode");
-	CONFIG_ADD_VARIABLE(Color, cChams, Color(255, 0, 255, 255), "chams color");
-	CONFIG_ADD_VARIABLE(Color, cChamsXYZ, Color(0, 100, 255, 255), "chamsXYZ color");
+	CONFIG_ADD_VARIABLE(bool, bChamsPlayers, false, "chams enabled player");
+	CONFIG_ADD_VARIABLE(int, iChamsPlayers, 0, "chams mode Players");
+	CONFIG_ADD_VARIABLE(Color, cChamsPlayers, Color(255, 0, 255, 255), "chams color player");
+	CONFIG_ADD_VARIABLE(bool, bChamsXQZPlayers, false, "chams XQZ enabled");
+	CONFIG_ADD_VARIABLE(Color, cChamsXQZPlayers, Color(0, 100, 255, 255), "chamsXQZ color player");
+	CONFIG_ADD_VARIABLE(bool, bChamsWeapons, false, "chams weapons enabled");
+	CONFIG_ADD_VARIABLE(bool, bChamsWeaponsDisable, false, "chams weapons enabled to insvisible");
+	CONFIG_ADD_VARIABLE(int, iChamsWeapons, 0, "chams mode Weapons");
+	CONFIG_ADD_VARIABLE(Color, cChamsWeapons, Color(255, 0, 255, 255), "chams color weapon");
+	CONFIG_ADD_VARIABLE(bool, bChamsArmsDisable, false, "chams arms enabled to insvisible");
+	CONFIG_ADD_VARIABLE(bool, bChamsArms, false, "chams arms enabled");
+	CONFIG_ADD_VARIABLE(Color, cChamsArms, Color(255, 0, 255, 255), "chams color arms");
+	CONFIG_ADD_VARIABLE(int, iChamsArms, 0, "chams mode Weapons");
+	CONFIG_ADD_VARIABLE(int, iChamsBacktrack, 0, "chams mode backtrack (not style)");
+	CONFIG_ADD_VARIABLE(bool, bChamsBacktrack, false, "chams arms enabled backtrack");
+	CONFIG_ADD_VARIABLE(Color, cChamsBacktrack, Color(255, 0, 255, 255), "chams color backtrack");
+	CONFIG_ADD_VARIABLE(int, iChamsBacktrackMode, 0, "chams mode backtrack");
+	CONFIG_ADD_VARIABLE(bool, bChamsbacktrackRainbow, false, "backtrack chams rainbow enabled");
+	CONFIG_ADD_VARIABLE(float, fChamsBacktrackRainbowSpeed, 0.5f, "backtrack chams rainbow speed");
 	CONFIG_ADD_VARIABLE(bool, bGlow, false, "glow enabled");
 	CONFIG_ADD_VARIABLE(Color, cGlow, Colors::Purple, "glow color");
 	CONFIG_ADD_VARIABLE(bool, bEsp, false, "ESP enabled");
@@ -57,13 +75,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cDlight, Color(20, 70, 150, 255), "Dlight color");
 	CONFIG_ADD_VARIABLE(bool, bShowInfo, false, "show info enabled");
 	CONFIG_ADD_VARIABLE(bool, bShowFlags, false, "show flags enabled");
-	CONFIG_ADD_VARIABLE(bool, bBacktrackChams, false, "enabled backtrack chams");
-	CONFIG_ADD_VARIABLE(int, iBacktrackChams, 0, "backtrack chams type");
 	CONFIG_ADD_VARIABLE(bool, bDLight, false, "DLight enabled");
 	CONFIG_ADD_VARIABLE(bool, bEspLasers, false, "Esp Lasers enabled");
-	CONFIG_ADD_VARIABLE(int, iHandChams, 0, "hand chams type");
-	CONFIG_ADD_VARIABLE(int, iWeaponChams, 0, "weapon chams type");
-	CONFIG_ADD_VARIABLE(Color, cBackTrackChams, Colors::LightBlue, "backtrack chams color");
 	CONFIG_ADD_VARIABLE(bool, bDrawDeadOnly, false, "draw esp only when dead");
 
 
@@ -109,7 +122,6 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bSoundEsp, false, "sound esp enabled");
 	CONFIG_ADD_VARIABLE(float, fFOV, 0, "fov for +/- view");
 	CONFIG_ADD_VARIABLE(bool, bThirdp, false, "third person enabled");
-	CONFIG_ADD_VARIABLE(bool, bCrosshair, false, "enable crosshair");
 	CONFIG_ADD_VARIABLE(int, iCrosshair, 0, "crosshair mode");
 	CONFIG_ADD_VARIABLE(bool, bBacktrack, false, "backtrack enabled");
 	CONFIG_ADD_VARIABLE(float, fBacktrackTick, 200.0f, "backtrack amount of ticks to manipulate");
@@ -130,6 +142,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fRadarLenght, 20.0f, "radar lenght of line");
 	CONFIG_ADD_VARIABLE(float, fRadarScale, 1.8f, "radar scaling");
 	CONFIG_ADD_VARIABLE(bool, bRadarRanges, true, "enable radar ranges");
+	CONFIG_ADD_VARIABLE(int, iRunMovementTrail, 0, "movement trail line type");
 	CONFIG_ADD_VARIABLE(bool, bRunMovementTrail, false, "enable movement trail line");
 	CONFIG_ADD_VARIABLE(Color, cMovementTrail, Colors::Coral, "movement trail color");
 	CONFIG_ADD_VARIABLE(bool, bMovementRainbow, false, "prefer rainbow color for trail");
@@ -161,7 +174,7 @@ struct Variables
 #pragma region enums
 enum class AimbotID : size_t
 {
-	NEAREST = 0,
+	NEAREST,
 	HEAD,
 	CHEST
 };
@@ -171,35 +184,39 @@ enum class CrossHairTypes : size_t
 	OFF,
 	STATIC,
 	RECOIL,
-	ENGINE
+	ENGINE,
+	SPREAD
 };
 
 enum class ChamsID : size_t
 {
-	STATIC = 1,
-	XYZ,
+	FLAT,
+	GENERIC,
+	GLOW,
+	METALIC,
+	PEARLSCENT
 };
 
 enum class BTChamsID : size_t
 {
-	STABLE = 1,
+	STABLE,
 	LAST_TICK,
 	RAINBOW,
 };
 
-enum class HandTypes : size_t
-{
-	COLOR = 0,
-	NO_HANDS,
-	NO_WEAPON,
-};
-
 enum class BoxTypes : size_t
 {
-	BOX2D = 0,
+	BOX2D,
 	FILLED2D,
 	BOX3D,
 	FILLED3D
+};
+
+enum class MovementTrail : size_t
+{
+	BEAM,
+	LINE,
+	SPLASH
 };
 
 #pragma endregion

@@ -134,7 +134,7 @@ void Backtrack::update()
 		record.m_head = entity->getBonePos(8);
 
 		// setup bones for us, will be needed for basically get good matrix, can draw backtrack'ed models etc...
-		entity->setupBones(record.m_matrix, MAX_BONES, BONE_USED_BY_HITBOX, interfaces::globalVars->m_curtime);
+		entity->setupBones(record.m_matrix, MAX_BONES, BONE_USED_MASK, interfaces::globalVars->m_curtime);
 
 		// fill them
 		m_records.at(i).push_front(record);

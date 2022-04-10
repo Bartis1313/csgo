@@ -26,25 +26,27 @@ namespace selections
 		"OFF",
 		"Static",
 		"Recoil",
-		"Engine"
+		"Engine",
+		"Spread"
 	};
 
 	inline std::array chamsNames =
 	{
-		"OFF",
-		"Static",
-		"Xyz"
+		"Flat",
+		"Generic",
+		"Glow",
+		"Metalic",
+		"Pearlescent"
 	};
 
 	inline std::array btChams =
 	{
-		"OFF",
 		"Stable",
 		"Last tick",
 		"Rainbow"
 	};
 
-	inline std::vector<std::string> styleNames = 
+	inline std::vector<std::string> styleNames =
 	{
 		"Cherry",
 		"Dark",
@@ -80,5 +82,12 @@ namespace selections
 		"vertigoblue_hdr",
 		"sky_dust",
 		"sky_hr_aztec"
+	};
+
+	inline std::array trails =
+	{
+		"Beam",
+		"Line",
+		"Splash"
 	};
 }

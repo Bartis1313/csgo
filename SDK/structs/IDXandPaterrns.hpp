@@ -53,3 +53,7 @@ enum VTableIndexes
 // disable jiggle bones without forcing convar
 #define BUILD_TRANSFORMATIONS	XOR("55 8B EC 83 E4 F0 81 EC ? ? ? ? 56 57 8B F9 8B 0D ? ? ? ? 89 7C 24 28 8B")
 #define CAM_THINK				XOR("85 C0 75 30 38 86")
+// chams
+#define KEY_VALUES_CONSTRUCT	XOR("55 8B EC 51 33 C0 C7 45")
+#define KEY_VALUES_FROM_STR		XOR("55 8B EC 81 EC ? ? ? ? 85 D2 53")
+#define KEY_VALUES_LOAD_BUF		XOR("55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89")

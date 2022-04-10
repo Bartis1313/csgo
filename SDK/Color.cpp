@@ -6,16 +6,18 @@ ImVec4 Color::getImguiColor(const Color& color)
 	return ImVec4{ color.r(), color.g(), color.b(), color.a() };
 }
 
-Color& Color::getColorEditAlpha(const float amount)
+Color Color::getColorEditAlpha(const float amount)
 {
-	m_color.at(3) = amount;
-	return *this;
+	Color clr = *this;
+	clr.at(3) = amount;
+	return clr;
 }
 
-Color& Color::getColorEditAlphaInt(const int amount)
+Color Color::getColorEditAlphaInt(const int amount)
 {
-	m_color.at(3) = amount / 255.0f;
-	return *this;
+	Color clr = *this;
+	clr.at(3) = amount / 255.0f;
+	return clr;
 }
 
 Color Color::fromHSB(float hue, float saturation, float brightness)

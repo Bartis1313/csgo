@@ -11,8 +11,12 @@ _NODISCARD constexpr float RAD2DEG(float radians) { return radians * (180.0f / s
 
 namespace math
 {
-	_NODISCARD Vector calcAngleRelative(const Vector& src, const Vector& dest, const Vector& viewAngle);
+	_NODISCARD Vector calcAngleRelative(const Vector& src, const Vector& dest, const Vector& viewAngles);
+	// classic
+	_NODISCARD Vector calcAngle(const Vector& src, const Vector& dest);
 	_NODISCARD float calcFov(const Vector& source, const Vector& destination, const Vector& viewAngles);
+	// based on distance, difference is that we dont have same fov everytime, since this is dynamic	
+	_NODISCARD float calcFovReal(const Vector& src, const Vector& dest, const Vector& viewAngles);
 	_NODISCARD Vector transformVector(const Vector& in, const Matrix3x4& matrix);
 	_NODISCARD Vector angleVec(const Vector& angle);
 	_NODISCARD float normalizeYaw(float yaw);

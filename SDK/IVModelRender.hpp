@@ -34,8 +34,8 @@ struct ModelRenderInfo_t
 
 struct DrawModelState_t
 {
-	Studiohdr_t* m_pStudioHdr;
-	void* m_pStudioHWData;
+	Studiohdr_t* m_studioHdr;
+	void* m_studioHWData;
 	void* m_pRenderable;
 	const Matrix3x4* m_pModelToWorld;
 	void* m_decals;

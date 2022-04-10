@@ -18,68 +18,16 @@
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../../utilities/math/math.hpp"
 
-Player_t* Aimbot::getBest() const
-{
-    return m_bestEnt;
-}
-
-void Aimbot::resetBests()
-{
-    m_bestEnt = nullptr;
-    m_bestHitpos = {};
-}
-
-void Aimbot::drawBestPoint()
-{
-    if (!config.get<bool>(vars.bDrawBestPoint))
-        return;
-
-    if (!game::isAvailable())
-        return;
-
-    if (!m_bestEnt)
-        return;
-
-    if (m_bestHitpos.isZero())
-        return;
-
-    if (Vector2D p; imRender.worldToScreen(m_bestHitpos, p))
-        imRender.drawCircleFilled(p.x, p.y, 5, 12, Colors::Cyan);
-}
-
-void Aimbot::drawFov()
-{
-    if (!config.get<bool>(vars.bDrawFov))
-        return;
-
-    if (!config.get<float>(vars.fFovAimbot))
-        return;
-
-    if (!game::isAvailable())
-        return;
-
-    const auto weapon = game::localPlayer->getActiveWeapon();
-
-    if (!weapon)
-        return;
-
-    if (weapon->isNonAimable())
-        return;
-
-    float radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
-
-    imRender.drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, config.get<Color>(vars.cDrawFov));
-}
-
 void Aimbot::run(CUserCmd* cmd)
 {
     if (!config.get<bool>(vars.bAimbot))
         return;
 
-    if (!game::localPlayer)
+    if (!game::isAvailable())
         return;
 
-    resetBests();
+    if (!game::localPlayer->isAlive())
+        return;
 
     auto weapon = game::localPlayer->getActiveWeapon();
 
@@ -87,93 +35,37 @@ void Aimbot::run(CUserCmd* cmd)
         return;
 
     if (weapon->isNonAimable())
+    {
+        resetFields(); // switching to knife when clicked
         return;
+    }
 
     if (weapon->isSniper() && !game::localPlayer->m_bIsScoped())
         return;
 
-    if (cmd->m_buttons & IN_ATTACK) // add key later
+    const auto myEye = game::localPlayer->getEyePos();
+    const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::localPlayer->getAimPunch() : Vector{};
+
+    if (!isClicked(cmd))
     {
-        float bestFov = config.get<float>(vars.fFovAimbot);
-        Vector bestPos = {};
-        const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::localPlayer->getAimPunch() : Vector{};
-        const auto myEye = game::localPlayer->getEyePos();
-
-        for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
-        {
-            auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
-
-            if (!ent)
-                continue;
-
-            if (ent == game::localPlayer)
-                continue;
-
-            if (!ent->isAlive() || !game::localPlayer->isAlive())
-                continue;
-
-            if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
-                continue;
-
-            if (ent->isDormant())
-                continue;
-
-            if (ent->m_bGunGameImmunity())
-                continue;
-            
-            // vector can be used to... to detect hotboxes, after gui is done you can easily make vector with boolens as multibox for them
-            // if you want bones which I dislike because it will be useless effort, some bone ids are not the same for every model
-            // https://cdn.discordapp.com/attachments/829304849027170305/916477147261051000/unknown.png
-            for (int pos = HITBOX_HEAD; pos < HITBOX_MAX; pos++)
-            {
-                Vector hitPos = {};
-                switch (config.get<int>(vars.iAimbot))
-                {
-                case E2T(AimbotID::NEAREST):
-                    hitPos = ent->getHitboxPos(pos);
-                    break;
-                case E2T(AimbotID::HEAD):
-                    hitPos = ent->getHitboxPos(HITBOX_HEAD);
-                    break;
-                case E2T(AimbotID::CHEST):
-                    hitPos = ent->getHitboxPos(HITBOX_LOWER_CHEST);
-                    break;
-                default:
-                    break;
-                }
-                auto angles = cmd->m_viewangles + punch;
-                angles.clamp();
-
-                if (!game::localPlayer->isPossibleToSee(hitPos))
-                    continue;
-
-                auto fov = math::calcFov(myEye, hitPos, angles);
-
-                if (fov < bestFov)
-                {
-                    bestFov = fov;
-                    bestPos = hitPos;
-                    m_bestEnt = ent;
-                    m_bestHitpos = hitPos;
-                }
-                if (config.get<int>(vars.iAimbot) != E2T(AimbotID::NEAREST))
-                    break;
-            }
-        }
-
-        if (!bestPos.isZero())
-        {
-            auto angle = math::calcAngleRelative(myEye, bestPos, cmd->m_viewangles + punch);
-            angle.clamp();
-
-            // remember to only smooth when the value is non zero/negative!
-            if (auto smoothing = config.get<float>(vars.fSmooth); smoothing)
-                angle /= smoothing;
-            cmd->m_viewangles += angle;
-
-            interfaces::engine->setViewAngles(cmd->m_viewangles);
-        }
+        resetFields();
+        return;
     }
+
+    if (!getBestTarget(cmd, weapon, myEye, punch))
+        return;
+
+    if (m_bestHitpos.isZero())
+        return;
+   
+    auto angle = math::calcAngleRelative(myEye, m_bestHitpos, cmd->m_viewangles + punch);
+    angle.clamp();
+
+    if (auto smoothing = config.get<float>(vars.fSmooth); smoothing)
+        angle /= smoothing;
+    cmd->m_viewangles += angle;
+
+    interfaces::engine->setViewAngles(cmd->m_viewangles);
 }
 
 void Aimbot::RCS(CUserCmd* cmd)
@@ -182,8 +74,8 @@ void Aimbot::RCS(CUserCmd* cmd)
     const static auto scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"))->getFloat();
     auto punch = game::localPlayer->m_aimPunchAngle() * scale;
 
-    punch.x *= config.get<float>(vars.fRCS) / 100.0f;
-    punch.y *= config.get<float>(vars.fRCS) / 100.0f;
+    punch.x *= config.get<float>(vars.fRCSx) / 100.0f;
+    punch.y *= config.get<float>(vars.fRCSy) / 100.0f;
 
     auto toMove = cmd->m_viewangles += (oldPunch - punch);
     toMove.clamp();
@@ -192,7 +84,6 @@ void Aimbot::RCS(CUserCmd* cmd)
 
     oldPunch = punch;
 }
-
 
 void Aimbot::runRCS(CUserCmd* cmd)
 {
@@ -216,3 +107,180 @@ void Aimbot::runRCS(CUserCmd* cmd)
     RCS(cmd);
 }
 
+//#include "../../../utilities/console/console.hpp"
+
+bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, const Vector& punch)
+{ 
+    /*bool isSame = m_temp == m_bestEnt;
+    console.print("{}\n", isSame);*/
+
+    static float delay = 0.0f;
+    // will not work for the special case:
+    // delay did not hit timer limit but we switched manually to new target -> should reset the timer. I couldn't detect it without false positives :(
+    // epic solution - stop shooting and start again
+    if (config.get<bool>(vars.bAimbotDelay))
+    {
+        /*if (m_bestEnt && m_bestEnt->isAlive())
+        {
+            m_temp = m_bestEnt;
+        }*/
+        if (m_bestEnt && !m_delay && !m_bestEnt->isAlive()) // if ent is found and dead, then set field to delay and wait curr time + cfgtime
+        {
+            m_delay = true;
+            delay = interfaces::globalVars->m_curtime + (config.get<float>(vars.fAimbotDelay) / 1000.0f);
+        }
+        if (m_delay) // if the delay is hit, check time, so when ent died
+        {
+            if (delay <= interfaces::globalVars->m_curtime)
+                m_delay = false;
+            else // need reset fields here and stop the method
+            {
+                m_bestHitpos = {};
+                m_bestEnt = nullptr;
+                return false;
+            }
+        }
+    }
+
+    m_bestEnt = nullptr;
+    m_bestHitpos = {};
+
+    auto hitboxes = getHitboxes();
+
+    float bestFov = config.get<float>(vars.fFovAimbot);
+
+    for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+    {
+        auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+
+        if (!ent)
+            continue;
+
+        if (ent == game::localPlayer)
+            continue;
+
+        if (!ent->isAlive() || !game::localPlayer->isAlive())
+            continue;
+
+        if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+            continue;
+
+        if (ent->isDormant())
+            continue;
+
+        if (ent->m_bGunGameImmunity())
+            continue;
+
+        for (const auto pos : hitboxes)
+        {
+            Vector hitPos = ent->getHitboxPos(pos);
+
+            auto angles = cmd->m_viewangles + punch;
+            angles.clamp();
+
+            if (!game::localPlayer->isPossibleToSee(hitPos))
+                continue;
+
+            auto fov = math::calcFov(eye, hitPos, angles);
+
+            if (fov < bestFov)
+            {
+                bestFov = fov;
+                m_bestEnt = ent;
+                m_bestHitpos = hitPos;
+            }
+        }
+    }
+    return m_bestEnt ? true : false;
+}
+
+Player_t* Aimbot::getTargetted()
+{
+    return m_bestEnt;
+}
+
+void Aimbot::resetFields()
+{
+    m_bestEnt = nullptr;
+    m_bestHitpos = {};
+    m_delay = false;
+}
+
+void Aimbot::drawBestPoint()
+{
+    if (!config.get<bool>(vars.bDrawBestPoint))
+        return;
+
+    if (!game::isAvailable())
+        return;
+
+    if (m_bestHitpos.isZero())
+        return;
+
+    if (Vector2D p; imRender.worldToScreen(m_bestHitpos, p))
+        imRender.drawCircleFilled(p.x, p.y, 5, 12, Colors::Cyan);
+}
+
+void Aimbot::drawFov()
+{
+    if (!config.get<bool>(vars.bDrawFov))
+        return;
+
+    if (!config.get<bool>(vars.bAimbot))
+        return;
+
+    if (!config.get<float>(vars.fFovAimbot))
+        return;
+
+    if (!game::isAvailable())
+        return;
+
+    const auto weapon = game::localPlayer->getActiveWeapon();
+
+    if (!weapon)
+        return;
+
+    if (weapon->isNonAimable())
+        return;
+
+    float radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
+
+    imRender.drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, config.get<Color>(vars.cDrawFov));
+}
+
+bool Aimbot::isClicked(CUserCmd* cmd)
+{
+    return cmd->m_buttons & IN_ATTACK /*|| some key press event*/;
+}
+
+std::vector<size_t> Aimbot::getHitboxes()
+{
+    std::vector<size_t> hitboxes = {};
+
+    switch (config.get<int>(vars.iAimbot))
+    {
+    case E2T(AimbotID::NEAREST):
+    {
+        for (size_t i = HITBOX_HEAD; i < HITBOX_MAX; i++)
+            hitboxes.push_back(i);
+
+        break;
+    }
+    case E2T(AimbotID::HEAD):
+        hitboxes = { HITBOX_HEAD };
+        break;
+    case E2T(AimbotID::CHEST):
+        hitboxes = { HITBOX_LOWER_CHEST };
+        break;
+    default:
+        break;
+    }
+
+    return hitboxes;
+}
+
+void Aimbot::draw()
+{
+    drawFov();
+    drawBestPoint();
+}

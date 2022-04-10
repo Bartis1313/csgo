@@ -233,7 +233,7 @@ void Visuals::drawSkeleton(Player_t* ent)
 
 		auto child = skeletPos(i);
 		auto parent = skeletPos(bone->m_parent);
-		auto chestbone = skeletPos(chest + 1);
+		auto chestbone = skeletPos(chest);
 		auto upper = skeletPos(chest + 1) - chestbone;
 		auto breast = chestbone + upper / 2.0f;
 
@@ -256,7 +256,7 @@ void Visuals::drawSkeleton(Player_t* ent)
 
 void Visuals::drawSnapLine(Player_t* ent, const Box& box)
 {
-	if (ent == aimbot.getBest())
+	if (ent == aimbot.getTargetted())
 	{
 		// lines on the bottom and center bottom box
 		imRender.drawLine(globals::screenX / 2, globals::screenY, box.x + box.w / 2, box.y + box.h, Colors::Purple);
@@ -413,22 +413,34 @@ void Visuals::enemyIsAimingAtYou(Player_t* ent)
 	idealAimAngle -= ent->m_aimPunchAngle() * scale;
 
 	Vector curEnemyAngle = ent->m_angEyeAngles();
-
 	curEnemyAngle.normalize();
 
-	float dy = math::normalizeYaw(curEnemyAngle.y - idealAimAngle.y),
-		dp = curEnemyAngle.x - idealAimAngle.x;
+	// check if we can even see the enemy, this might not work always
+	// assume we have a fov changer, and enemy does not. This then is not valid
+	auto isInScreenRange = [=]()
+	{
+		if (Vector2D s; imRender.worldToScreen(ent->absOrigin(), s))
+		{
+			bool xLimit = globals::screenX > s.x;
+			bool yLimit = globals::screenY > s.y;
 
-	float fovDist = std::sqrt(dy * dy + dp * dp);
+			return xLimit && yLimit;
+		}
+
+		return false;
+	};
+	// check trace
 	bool check = ent->isPossibleToSee(game::localPlayer->getEyePos());
 
-	// hardcoded, when enemies use 3rd cam or some fov changer, it won't be accurate
-	if (check && fovDist <= 60.0f)
+	// dynamic fov
+	float fov = math::calcFovReal(ent->getEyePos(), game::localPlayer->getBonePos(3), curEnemyAngle); // 3 is middle body
+
+	if (check && isInScreenRange())
 	{
 		imRender.text(globals::screenX / 2, 60, ImFonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
 	}
-	// in the moment when enemy aims through walls, don't check trace
-	if (fovDist <= 5.0f)
+	// this can be made with tracing
+	if (fov <= 5.0f)
 	{
 		imRender.text(globals::screenX / 2, 80, ImFonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
 	}

@@ -6,14 +6,15 @@
 
 #include "../features/visuals/chams.hpp"
 
-void __stdcall hooks::drawModel::hooked(void* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
+void __stdcall hooks::drawModel::hooked(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
 {
 	if(!interfaces::engine->isInGame() || interfaces::modelRender->isForcedMaterial())
-		return original(interfaces::modelRender, ctx, state, info, matrix);
+		return original(interfaces::modelRender, result, state, info, matrix);
 
 	//chams::run(ctx, state, info, matrix);
 	//chams::drawModel(ctx, state, info, matrix);
+	chams.run(result, state, info, matrix);
 	
-	original(interfaces::modelRender, ctx, state, info, matrix);
+	original(interfaces::modelRender, result, state, info, matrix);
 	interfaces::modelRender->overrideMaterial(nullptr);
 }

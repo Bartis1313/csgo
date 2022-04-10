@@ -9,15 +9,42 @@ Vector math::calcAngleRelative(const Vector& source, const Vector& destination, 
 		RAD2DEG(std::atan2(delta.y, delta.x)) - viewAngles.y,
 		0.0f
 	);
-	;
 	return angles.normalize();
 }
 
-float math::calcFov(const Vector& source, const Vector& destination, const Vector& viewAngle)
+Vector math::calcAngle(const Vector& source, const Vector& destination)
 {
-	const auto angle = calcAngleRelative(source, destination, viewAngle);
+	const auto delta = source - destination;
+
+	Vector angles(
+		RAD2DEG(std::atanf(delta.z / std::hypotf(delta.x, delta.y))),
+		RAD2DEG(std::atanf(delta.y / delta.x)),
+		0.0f
+	);
+
+	angles.z = 0.0f;
+	if (delta.x >= 0.0)
+		angles.y += 180.0f;
+
+	return angles;
+}
+
+float math::calcFov(const Vector& source, const Vector& destination, const Vector& viewAngles)
+{
+	const auto angle = calcAngleRelative(source, destination, viewAngles);
 	const auto fov = std::hypot(angle.x, angle.y);
 	return fov;
+}
+
+float math::calcFovReal(const Vector& source, const Vector& destination, const Vector& viewAngles)
+{
+	float dist = source.distTo(destination);
+	float realDist = dist / 10.0f;
+
+	auto start = angleVec(viewAngles) * realDist;
+	auto end = angleVec(calcAngle(source, destination)) * realDist;
+
+	return start.distTo(end);
 }
 
 Vector math::transformVector(const Vector& in, const Matrix3x4& matrix)
