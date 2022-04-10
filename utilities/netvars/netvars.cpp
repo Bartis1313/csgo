@@ -64,7 +64,7 @@ uintptr_t NetvarManager::getProp(RecvTable* recvTable, const char* propName, Rec
 				extraOffset += (recvProp->m_offset + temp);
 		}
 
-		if (strcmp(recvProp->m_varName, propName))
+		if (std::string_view name = recvProp->m_varName; name != propName)
 			continue;
 
 		if (prop)
@@ -83,7 +83,7 @@ RecvTable* NetvarManager::getTable(const char* tableName) const
 
 	for(const auto& [name, recv] : m_Tables)
 	{
-		if (!strcmp(name.c_str(), tableName))
+		if (name == tableName)
 			return recv;
 	}
 

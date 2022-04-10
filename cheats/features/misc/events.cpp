@@ -21,29 +21,29 @@ void Events::init() const
 	interfaces::eventManager->addListener(&events, XOR("round_start"));
 	interfaces::eventManager->addListener(&events, XOR("player_hurt"));
 	interfaces::eventManager->addListener(&events, XOR("weapon_fire"));
-	console.log(TypeLogs::LOG_INFO, XOR("events hooked"));
+	console.log(TypeLogs::LOG_INFO, XOR("events init"));
 }
 
 void Events::FireGameEvent(IGameEvent* event)
 {
-	if (!strcmp(event->getName(), XOR("player_footstep")))
+	if (std::string_view name = event->getName(); name == XOR("player_footstep"))
 	{
 		visuals.drawSound(event);
 	}
-	else if (!strcmp(event->getName(), XOR("player_death")))
+	else if (name == XOR("player_death"))
 	{
 		// testing
 		interfaces::cvar->consolePrintf("Died\n");
 	}
-	else if (!strcmp(event->getName(), XOR("game_start")))
+	else if (name == XOR("game_start"))
 	{
 		globals::shotsFired = 0, globals::shotsHit = 0, globals::shotsHead = 0;
 	}
-	else if (!strcmp(event->getName(), XOR("player_hurt")))
+	else if (name == XOR("player_hurt"))
 	{
 		misc.playHitmarker(event);
 	}
-	else if (!strcmp(event->getName(), XOR("weapon_fire")))
+	else if (name == XOR("weapon_fire"))
 	{
 		// here just check like that
 		auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));

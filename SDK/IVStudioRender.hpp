@@ -20,7 +20,7 @@ public:
     {
         return (!m_material)
             ? m_type == DepthWrite || m_type == SsaoDepthWrite
-            : std::string(m_material->getName()).starts_with(XOR("dev/glow"))
+            : std::string_view(m_material->getName()).starts_with(XOR("dev/glow"))
             ;
     }
 };

@@ -45,11 +45,11 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	static unsigned int panelScope = 0;
 	static unsigned int panelID = 0;
 
-	const auto panelName = interfaces::panel->getName(panel);
+	const std::string_view panelName = interfaces::panel->getName(panel);
 
 	if (!panelScope)
 	{
-		if(strstr(panelName, XOR("HudZoom")))
+		if (panelName.find(XOR("HudZoom")) != std::string::npos)
 			panelScope = panel;
 	}
 	else if (panelScope == panel)
@@ -62,7 +62,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 
 	if (!panelID)
 	{
-		if (strstr(panelName, XOR("MatSystemTopPanel")))
+		if (panelName.find(XOR("MatSystemTopPanel")) != std::string::npos)
 			panelID = panel;
 	}
 	else if (panelID == panel)
