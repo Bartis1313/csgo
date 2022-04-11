@@ -415,27 +415,13 @@ void Visuals::enemyIsAimingAtYou(Player_t* ent)
 	Vector curEnemyAngle = ent->m_angEyeAngles();
 	curEnemyAngle.normalize();
 
-	// check if we can even see the enemy, this might not work always
-	// assume we have a fov changer, and enemy does not. This then is not valid
-	auto isInScreenRange = [=]()
-	{
-		if (Vector2D s; imRender.worldToScreen(ent->absOrigin(), s))
-		{
-			bool xLimit = globals::screenX > s.x;
-			bool yLimit = globals::screenY > s.y;
-
-			return xLimit && yLimit;
-		}
-
-		return false;
-	};
 	// check trace
 	bool check = ent->isPossibleToSee(game::localPlayer->getEyePos());
 
 	// dynamic fov
 	float fov = math::calcFovReal(ent->getEyePos(), game::localPlayer->getBonePos(3), curEnemyAngle); // 3 is middle body
 
-	if (check && isInScreenRange())
+	if (check)
 	{
 		imRender.text(globals::screenX / 2, 60, ImFonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
 	}
