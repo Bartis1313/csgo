@@ -20,8 +20,8 @@ public:
 	NETVAR_BY_INDEX(int, getDeaths, m_iDeaths);
 	NETVAR_BY_INDEX(int, getPing, m_iPing);
 	NETVAR_BY_INDEX(int, getWins, m_iCompetitiveWins);
-	std::string getRank(int idx, bool useShortName = false)
-	{
+    std::string getRank(int idx, bool useShortName = false)
+    {
         static std::pair<std::string, std::string> ranks[] =
         {
             { "-", "-"},
@@ -45,10 +45,10 @@ public:
             {"The Global Elite", "GLOBAL"}
         };
 
-        auto str = useShortName ? ranks[m_getRank(idx)].first : ranks[m_getRank(idx)].second;
+        auto str = !useShortName ? ranks[m_getRank(idx)].first : ranks[m_getRank(idx)].second;
 
         return str;
-	}
+    }
 private: // 65 is supposed to be max players, correct if this is higher, who plays on such big servers though?
 	NETVAR(int[65], m_iKills, "DT_PlayerResource", "m_iKills");
 	NETVAR(int[65], m_iDeaths, "DT_PlayerResource", "m_iDeaths");
