@@ -96,6 +96,7 @@ I will try to implement it in a short time perioid, eventually people who commit
 * 1.3.1 - Added option "load on start", which will load selected config on the start.
 * 1.3.2 - The hitmarker is now finished. Nothing more in this version.
 * 1.3.3 - Fixed "Enemy is aiming at you", aimbot, and many more. And added working chams, still small fixes are needed to them.
+* 1.3.4 - Fixed stupid math calcAngle basing on src - dst logic, made it same as calcAngleRelative with how delta is achieved. Few rendering improvements such as rendering font. Use cached bones for calculating the pos. Added posibility to render icons from the game. Added lines to radar.
 </details>
 
 # Dependencies
@@ -109,3 +110,4 @@ I will try to implement it in a short time perioid, eventually people who commit
 * [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs18 leak which made reversing even easier.
 * [Pawel Gozdur](https://github.com/carlos-konewka) - helping me with math, especially plot logic.
 * [UC Wiki](https://www.unknowncheats.me/wiki/UnKnoWnCheaTs_Game_Hacking_Wiki) - for very helpful sources.
+* [rollraw/qo0](https://github.com/rollraw) - swapchain render + icon font.

@@ -315,3 +315,8 @@ float utilities::scaleDamageArmor(float dmg, const float armor)
 
 	return dmg;
 }
+
+_NODISCARD std::string utilities::u8toStr(const std::u8string& u8str)
+{
+	return std::string{ u8str.cbegin(), u8str.cend() };
+}

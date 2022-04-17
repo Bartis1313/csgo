@@ -1,5 +1,7 @@
 #pragma once
 
+#include <array>
+
 struct Box;
 class IGameEvent;
 class Player_t;
@@ -14,6 +16,7 @@ public:
 	void drawSound(IGameEvent* event);
 private:
 	void drawInfo(Player_t* ent, const Box& box);
+	void drawnName(Player_t* ent, const Box& box);
 	void drawPlayer(Player_t* ent);
 	void runDLight(Player_t* ent);
 	void drawHealth(Player_t* ent, const Box& box);
@@ -29,6 +32,9 @@ private:
 	void drawBox3D(const Box3D& box, const float thickness = 2.0f);
 	void drawBox3DFilled(const Box3D& box, const float thickness = 2.0f);
 	Color healthBased(Player_t* ent);
+	
+	std::array<int, 65> m_health;
+	std::array<int, 65> m_armor;
 };
 
 inline Visuals visuals;

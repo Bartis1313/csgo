@@ -578,15 +578,11 @@ void SurfaceRender::drawFromTexture(const int id, const int x, const int y, cons
 
 void SurfaceRender::drawProgressRing(const int x, const int y, float radius, const int points, float percent, const float thickness, const Color& color)
 {
-	// alfa means 0.0 - 1.0 range of how filled circle is
-	percent = std::clamp(percent, 0.0f, 100.0f);
-	float alfa = percent / 100.0f;
-
 	// basically telling how precision will be
 	float step = std::numbers::pi_v<float> *2.0f / points;
 
 	// limit angle, based on percentage passed
-	float maxAngle = std::numbers::pi_v<float> *2.0f * alfa;
+	float maxAngle = std::numbers::pi_v<float> *2.0f * percent;
 
 	for (float angle = 0.0f; angle < maxAngle; angle += step)
 	{
@@ -625,6 +621,7 @@ void SurfaceRender::drawProgressRing(const int x, const int y, float radius, con
 #include <filesystem>
 #include "../../dependencies/ImGui/imgui_freetype.h"
 #include "../../dependencies/ImGui/imgui_internal.h"
+#include "iconfont.hpp"
 
 void ImGuiRender::init(ImGuiIO& io)
 {
@@ -634,9 +631,17 @@ void ImGuiRender::init(ImGuiIO& io)
 		const std::filesystem::path path{ fontsPath };
 
 		ImFontConfig cfg;
+		cfg.OversampleH = 3; // this will still not help the "blurry" font on scaling 
 		ImFonts::tahoma = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 		ImFonts::espBar = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 10.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 		ImFonts::menuFont = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+
+		constexpr ImWchar ranges[] =
+		{
+			0xE000, 0xF8FF,
+			0,
+		};
+		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 30.0f, &cfg, ranges);
 
 		if (!ImGuiFreeType::BuildFontAtlas(io.Fonts))
 			throw std::runtime_error(XOR("ImGuiFreeType::BuildFontAtlas returned false"));
@@ -649,9 +654,17 @@ void ImGuiRender::init(ImGuiIO& io)
 		const std::filesystem::path path{ fontsPath };
 
 		ImFontConfig cfg;
+		cfg.OversampleH = 3; // this will still not help the "blurry" font on scaling 
 		ImFonts::tahoma = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 		ImFonts::espBar = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 10.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 		ImFonts::menuFont = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+
+		constexpr ImWchar ranges[] =
+		{
+			0xE000, 0xF8FF,
+			0,
+		};
+		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 30.0f, &cfg, ranges);
 
 		if (!ImGuiFreeType::BuildFontAtlas(io.Fonts))
 			throw std::runtime_error(XOR("ImGuiFreeType::BuildFontAtlas returned false"));
@@ -945,6 +958,18 @@ void ImGuiRender::text(const float x, const float y, ImFont* font, const std::ws
 	m_drawData.emplace_back(DrawType::TEXT, std::make_any<TextObject_t>(TextObject_t(font, { x, y }, U32(color), _text, dropShadow, centered)));
 }
 
+void ImGuiRender::text(const float x, const float y, const float fontSize, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
+{
+	std::string _text(text.length(), 0);
+	// because warning
+	std::transform(text.begin(), text.end(), _text.begin(), [](wchar_t wc)
+		{
+			return static_cast<char>(wc);
+		});
+
+	m_drawData.emplace_back(DrawType::TEXT_SIZE, std::make_any<TextObject_t>(TextObject_t(fontSize, font, { x, y }, U32(color), _text, dropShadow, centered)));
+}
+
 void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...)
 {
 	if (!fmt)
@@ -1031,10 +1056,7 @@ void ImGuiRender::drawArc(const float x, const float y, float radius, const int 
 
 void ImGuiRender::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
 {
-	percent = std::clamp(percent, 0.0f, 100.0f);
-	float alfa = percent / 100.0f;
-
-	float maxAngle = RAD2DEG(std::numbers::pi_v<float> *2.0f * alfa) + angleMin;
+	float maxAngle = RAD2DEG(std::numbers::pi_v<float> *2.0f * percent) + angleMin;
 
 	m_drawData.emplace_back(DrawType::ARC, std::make_any<ArcObject_t>(ArcObject_t({ x, y }, radius, DEG2RAD(angleMin), DEG2RAD(maxAngle), points, U32(color), flags, thickness)));
 }
@@ -1180,8 +1202,31 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 				const auto alpha = ImGui::ColorConvertU32ToFloat4(obj.m_color).z;
 				draw->AddText({ pos.x + 1.0f, pos.y + 1.0f }, U32(Colors::Black.getColorEditAlpha(alpha)), obj.m_text.c_str());
 			}
+
 			draw->AddText(pos, obj.m_color, obj.m_text.c_str());
 
+			ImGui::PopFont();
+
+			break;
+		}
+		case DrawType::TEXT_SIZE:
+		{
+			const auto& obj = std::any_cast<TextObject_t>(val);
+			ImVec2 pos = { obj.m_pos.x, obj.m_pos.y };
+
+			ImGui::PushFont(obj.m_font);
+
+			if (auto tsize = obj.m_font->CalcTextSizeA(obj.m_size, std::numeric_limits<float>::max(), 0.0f, obj.m_text.c_str()); obj.m_centred)
+				pos.x -= tsize.x / 2.0f;
+
+			if (obj.m_dropShadow)
+			{
+				const auto alpha = ImGui::ColorConvertU32ToFloat4(obj.m_color).z;
+				draw->AddText(obj.m_font, obj.m_size, { pos.x + 1.0f, pos.y + 1.0f }, U32(Colors::Black.getColorEditAlpha(alpha)), obj.m_text.c_str());
+			}
+			
+			draw->AddText(obj.m_font, obj.m_size, pos, obj.m_color, obj.m_text.c_str());
+			
 			ImGui::PopFont();
 
 			break;
@@ -1305,6 +1350,12 @@ void ImGuiRenderWindow::drawText(const float x, const float y, const float size,
 		m_drawing->AddText(font, size, { m_pos.x + pos.x + 1.0f, m_pos.y + pos.y + 1.0f }, U32(Colors::Black.getColorEditAlpha(alpha)), text.c_str());
 	}
 	m_drawing->AddText(font, size, pos, U32(color), text.c_str());
+}
+
+void ImGuiRenderWindow::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
+{
+	RUNTIME_CHECK_RENDER_WINDOW;
+	m_drawing->AddTriangleFilled(ImVec2{ m_pos.x + p1.x,m_pos.y + p1.y }, ImVec2{ m_pos.x + p2.x, m_pos.y + p2.y }, ImVec2{ m_pos.x + p3.x, m_pos.y + p3.y }, U32(color));
 }
 
 #undef RUNTIME_CHECK_RENDER_WINDOW

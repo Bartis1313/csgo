@@ -70,6 +70,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cWeaponText, Colors::White, "weapon text color");
 	CONFIG_ADD_VARIABLE(Color, cReloadbar, Colors::Turquoise, "weapon reload time bar color");
 	CONFIG_ADD_VARIABLE(bool, bDrawInfos, false, "draw infos enabled");
+	CONFIG_ADD_VARIABLE(bool, bDrawName, false, "draw name enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawSkeleton, false, "draw skeleton enabled");
 	CONFIG_ADD_VARIABLE(Color, cSkeleton, Colors::White, "skeleton color");
 	CONFIG_ADD_VARIABLE(Color, cDlight, Color(20, 70, 150, 255), "Dlight color");
@@ -78,6 +79,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bDLight, false, "DLight enabled");
 	CONFIG_ADD_VARIABLE(bool, bEspLasers, false, "Esp Lasers enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawDeadOnly, false, "draw esp only when dead");
+	CONFIG_ADD_VEC(bool, vFlags, 10, false, "Esp flags");
 
 
 	// WORLD
@@ -217,6 +219,16 @@ enum class MovementTrail : size_t
 	BEAM,
 	LINE,
 	SPLASH
+};
+
+enum EspFlags : size_t
+{
+	BOT,
+	MONEY,
+	WINS,
+	RANK,
+	ARMOR,
+	ZOOM
 };
 
 #pragma endregion

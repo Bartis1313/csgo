@@ -88,16 +88,16 @@ private:
 public:
 	// logs into console + draw + file
 	template<typename... Args_t>
-	void log(TypeLogs type, const std::string& fmt, const Args_t&... args);
+	void log(TypeLogs type, const std::string& fmt, Args_t&&... args);
 
 	// only puts it inside drawing
 	// There is no date, no automatic newline
 	template<typename... Args_t>
-	void print(const std::string& fmt, const Args_t&... args);
+	void print(const std::string& fmt, Args_t&&... args);
 };
 
 template<typename... Args_t>
-void Console::log(TypeLogs type, const std::string& fmt, const Args_t&... args)
+void Console::log(TypeLogs type, const std::string& fmt, Args_t&&... args)
 {
 	if (m_logName.empty())
 		assert("Did you call Console::init ?");
@@ -130,7 +130,7 @@ void Console::log(TypeLogs type, const std::string& fmt, const Args_t&... args)
 }
 
 template<typename... Args_t>
-void Console::print(const std::string& fmt, const Args_t&... args)
+void Console::print(const std::string& fmt, Args_t&&... args)
 {
 	// we don't need to take of anything because I set it already
 	m_log.AddLog(fmt, args...);

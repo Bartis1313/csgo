@@ -76,60 +76,65 @@ void Visuals::drawHealth(Player_t* ent, const Box& box)
 	if (!config.get<bool>(vars.bDrawHealth))
 		return;
 
-	auto health = ent->m_iHealth() > 100 ? 100 : ent->m_iHealth();
-	if (health)
+	auto& health = m_health.at(ent->getIndex());
+
+	if (auto realHealth = ent->m_iHealth(); health > realHealth)
+		health -= 2.0f * interfaces::globalVars->m_frametime;
+	else
+		health = realHealth;
+
+	auto offset = health * box.h / 100;
+	auto pad = box.h - offset;
+
+	Box newBox =
 	{
-		auto offset = health * box.h / 100;
-		auto pad = box.h - offset;
+		box.x - 6,
+		box.y - 1,
+		2,
+		box.h + 2,
+	};
 
-		Box newBox =
-		{
-			box.x - 6,
-			box.y - 1,
-			2,
-			box.h + 2,
-		};
+	// fill first
+	imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
+	imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, healthBased(ent));
+	imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
 
-		// fill first
-		imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
-		imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, healthBased(ent));
-		imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
-
-		// if the player has health below max, then draw HP info
-		if (health < 100)
-			imRender.text(newBox.x - 2, newBox.y + pad - 4, ImFonts::espBar, std::to_string(health), false, Colors::White);
-	}
+	// if the player has health below max, then draw HP info
+	if(health < 100)
+		imRender.text(newBox.x - 2, newBox.y + pad - 4, ImFonts::espBar, std::to_string(health), false, Colors::White);
 }
 
 void Visuals::drawArmor(Player_t* ent, const Box& box)
 {
-	if(!config.get<bool>(vars.bDrawArmor))
+	if (!config.get<bool>(vars.bDrawArmor))
 		return;
 
-	auto armor = ent->m_ArmorValue() > 100 ? 100 : ent->m_ArmorValue();
-	if (armor)
+	auto& armor = m_armor.at(ent->getIndex());
+
+	if (auto realArmor = ent->m_ArmorValue(); armor > realArmor)
+		armor -= 2.0f * interfaces::globalVars->m_frametime;
+	else
+		armor = realArmor;
+
+	auto offset = armor * box.h / 100;
+	auto pad = box.h - offset;
+
+	Box newBox =
 	{
-		auto offset = armor * box.h / 100;
-		auto pad = box.h - offset;
+		box.x + box.w + 4,
+		box.y - 1,
+		2,
+		box.h + 2,
+	};
 
-		Box newBox =
-		{
-			box.x + box.w + 4,
-			box.y - 1,
-			2,
-			box.h + 2,
-		};
+	Color armorCol = Color(0, static_cast<int>(armor * 1.4f), 255); // light to blue, something simple
 
-		Color armorCol = Color(0, static_cast<int>(armor * 1.4f), 250, 255); // light to blue, something simple
+	imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
+	imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, armorCol);
+	imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
 
-		imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
-		imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, armorCol);
-		imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
-
-
-		if (armor < 100)
-			imRender.text(newBox.x - 2, newBox.y + pad - 4, ImFonts::espBar, std::to_string(armor), false, Colors::White);
-	}
+	if (armor < 100 && armor != 0)
+		imRender.text(newBox.x - 2, newBox.y + pad - 4, ImFonts::espBar, std::to_string(armor), false, Colors::White);
 }
 
 void Visuals::drawWeapon(Player_t* ent, const Box& box)
@@ -182,13 +187,19 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 
 void Visuals::drawInfo(Player_t* ent, const Box& box)
 {
+	// FIX!
+}
+
+void Visuals::drawnName(Player_t* ent, const Box& box)
+{
 	if (!config.get<bool>(vars.bDrawInfos))
 		return;
 
-	imRender.text(box.x + (box.w / 2), box.y - 15, ImFonts::tahoma, ent->getName(), true, healthBased(ent));
+	float dist = ent->absOrigin().distTo(game::localPlayer->absOrigin());
+	// clamping is hardcoded, for csgo there are no huge distances. For other games that have long distances rendered, this will still run ok.
+	float fontSize = std::clamp(80.0f / (dist / 80.0f), 12.0f, 30.0f);
 
-	if (ent->isC4Owner())
-		imRender.text(box.x - 25 + box.w, box.y + 5 + box.h, ImFonts::tahoma, XOR("C4"), false, healthBased(ent));
+	imRender.text(box.x + box.w / 2.0f, box.y - fontSize - 2.0f, fontSize, ImFonts::menuFont, ent->getName(), true, healthBased(ent), false);
 }
 
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
@@ -275,10 +286,10 @@ void Visuals::drawLaser(Player_t* ent)
 	// end is where lines just ends, this 70 is hardcoded, but whatever here tbh
 	auto end = start + forward * 70.f;
 
-	if (Vector screenLocal, screenEnt; imRender.worldToScreen(start, screenLocal) && imRender.worldToScreen(end, screenEnt))
+	if (Vector2D startP, endLine; imRender.worldToScreen(start, startP) && imRender.worldToScreen(end, endLine))
 	{
-		imRender.drawCircleFilled(screenLocal.x, screenLocal.y, 3, 32, Colors::Red);
-		imRender.drawLine(screenLocal.x, screenLocal.y, screenEnt.x, screenEnt.y, Colors::Purple);
+		imRender.drawCircleFilled(startP.x, startP.y, 3, 32, Colors::Red);
+		imRender.drawLine(startP, endLine, Colors::Purple);
 	}
 }
 
@@ -332,6 +343,7 @@ void Visuals::drawPlayer(Player_t* ent)
 	drawWeapon(ent, box);
 	drawInfo(ent, box);
 	drawSnapLine(ent, box);
+	drawnName(ent, box);
 }
 
 // add this to events manager 
@@ -470,21 +482,21 @@ void Visuals::drawBox3DFilled(const Box3D& box, const float thickness)
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color, thickness);
 	}
 	// missing part at the bottom
-	imRender.drawLine(box.points.at(0), box.points.at(3), color);
+	imRender.drawLine(box.points.at(0), box.points.at(3), color, thickness);
 	// top parts
 	for (size_t i = 4; i < 7; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color, thickness);
 	}
 	// missing part at the top
-	imRender.drawLine(box.points.at(4), box.points.at(7), color);
+	imRender.drawLine(box.points.at(4), box.points.at(7), color, thickness);
 	// now all 4 box.points missing parts for 3d box
 	for (size_t i = 0; i < 4; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color, thickness);
 	}
 }
 
@@ -494,21 +506,21 @@ void Visuals::drawBox3D(const Box3D& box, const float thickness)
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color, thickness);
 	}
 	// missing part at the bottom
-	imRender.drawLine(box.points.at(0), box.points.at(3), color);
+	imRender.drawLine(box.points.at(0), box.points.at(3), color, thickness);
 	// top parts
 	for (size_t i = 4; i < 7; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color, thickness);
 	}
 	// missing part at the top
-	imRender.drawLine(box.points.at(4), box.points.at(7), color);
+	imRender.drawLine(box.points.at(4), box.points.at(7), color, thickness);
 	// now all 4 box.points missing parts for 3d box
 	for (size_t i = 0; i < 4; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color, thickness);
 	}
 }
 

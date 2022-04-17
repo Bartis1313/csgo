@@ -464,6 +464,7 @@
     <ClInclude Include="utilities\math\math.hpp" />
     <ClInclude Include="utilities\netvars\netvars.hpp" />
     <ClInclude Include="utilities\pad.hpp" />
+    <ClInclude Include="utilities\renderer\iconfont.hpp" />
     <ClInclude Include="utilities\renderer\renderer.hpp" />
     <ClInclude Include="utilities\csgo.hpp" />
     <ClInclude Include="utilities\simpleTimer.hpp" />

@@ -74,7 +74,7 @@ void ImGui::Hotkey(const char* label, int* key, const ImVec2& size)
 
     if (const auto id = GetID(label); GetActiveID() == id)
     {
-        Button(XOR("..."), size);
+        Button("...", size);
         GetCurrentContext()->ActiveIdAllowOverlap = true;
 
         if ((!IsItemHovered() && GetIO().MouseClicked[0]) || checkKey(key))
@@ -88,7 +88,7 @@ void ImGui::Hotkey(const char* label, int* key, const ImVec2& size)
 
 void ImGui::HelpMarker(const char* desc)
 {
-    ImGui::TextDisabled(XOR("(?)"));
+    ImGui::TextDisabled("(?)");
     if (ImGui::IsItemHovered())
     {
         ImGui::BeginTooltip();
@@ -103,14 +103,10 @@ void ImGui::HelpMarker(const char* desc)
 
 bool ImGui::ColorPicker(const char* label, Color* clr, const ImGuiColorEditFlags flags)
 {
-    if (float c[] = { clr->r(), clr->g(), clr->b(), clr->a() };
-        ImGui::ColorEdit4(label, c, flags))
+    if (std::array c = { clr->r(), clr->g(), clr->b(), clr->a() };
+        ImGui::ColorEdit4(label, c.data(), flags))
     {
-        *clr = Color(
-            c[0],
-            c[1],
-            c[2],
-            c[3]);
+        *clr = Color{ c };
         return true;
     }
     return false;
@@ -259,7 +255,36 @@ static bool vecGetter(void* data, int idx, const char** out)
 
 bool ImGui::ListBox(const char* label, int* item, const std::vector<std::string>& arr, const int heightItem)
 {
-    return ImGui::ListBox(label, item, vecGetter, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), heightItem);
+    return ImGui::ListBox(label, item, &vecGetter, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), heightItem);
+}
+
+void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options)
+{
+    bool check = names.size() != options.size() || !names.empty() || !options.empty();
+    assert(check && "given size of arrays args was not equal or one of them was empty");
+
+    size_t size = names.size(); // does not matter if you pass options size here
+
+    std::string previewName = "";
+    for (size_t i = 0; i < size; i++)
+    {
+        if (options.at(i)) // if it's active
+            previewName += names[i];
+
+        if (i < size - 1 && options.at(i)) // add ", " on every option but not last
+            previewName += ", ";
+    }
+
+    if (BeginCombo(label, previewName.c_str()))
+    {
+        for (size_t i = 0; i < size; i++)
+        {
+            if(Selectable(names[i], options.at(i), ImGuiSelectableFlags_DontClosePopups))
+                options.at(i) = !options.at(i);
+        }
+
+        EndCombo();
+    }
 }
 
 ImGui::ExampleAppLog::ExampleAppLog()

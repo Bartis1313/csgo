@@ -70,7 +70,7 @@ public:
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
 	[[deprecated("You should only read comments from there, better results are with ImGuiRender class")]]
 	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
-	// percent should be passed in 0-100 range, credits for helping Carlos1216
+	// percent should be passed in 0.0-1.0 range, credits for helping Carlos1216
 	void drawProgressRing(const int x, const int y, float radius, const int points, float percent, const float thickness, const Color& color);
 	// width only
 	_NODISCARD int getTextSize(const unsigned long font, const std::string& text);
@@ -93,6 +93,7 @@ namespace ImFonts
 	inline ImFont* tahoma;
 	inline ImFont* espBar;
 	inline ImFont* menuFont;
+	inline ImFont* icon;
 }
 
 enum class DrawType : size_t
@@ -113,6 +114,7 @@ enum class DrawType : size_t
 	POLYGON,
 	POLYGON_FILLED,
 	TEXT,
+	TEXT_SIZE,
 	ARC,
 };
 
@@ -233,15 +235,6 @@ struct QuadObject_t
 	float m_thickness;
 };
 
-struct TrapezObject_t
-{
-	ImVec2 m_p1;
-	ImVec2 m_p2;
-	ImVec2 m_p3;
-	ImVec2 m_p4;
-	ImU32 m_color;
-};
-
 struct PolygonObject_t
 {
 	// normal polyline/polygon
@@ -266,6 +259,10 @@ struct TextObject_t
 	TextObject_t(ImFont* font, const ImVec2& pos, ImU32 color, const std::string& text, bool dropShadow, bool centered)
 		: m_font{ font }, m_pos{ pos }, m_color{ color }, m_text{ text }, m_dropShadow{ dropShadow }, m_centred{ centered }
 	{}
+	// text with size
+	TextObject_t(float fontSize, ImFont* font, const ImVec2& pos, ImU32 color, const std::string& text, bool dropShadow, bool centered)
+		: m_size{ fontSize }, m_font{ font }, m_pos{ pos }, m_color{ color }, m_text{ text }, m_dropShadow{ dropShadow }, m_centred{ centered }
+	{}
 
 	ImVec2 m_pos;
 	ImFont* m_font;
@@ -273,6 +270,7 @@ struct TextObject_t
 	ImU32 m_color;
 	bool m_dropShadow;
 	bool m_centred;
+	float m_size = -1.0f;
 };
 
 struct ArcObject_t
@@ -325,6 +323,7 @@ public:
 	void drawPolyGon(const int count, ImVec2* verts, const Color& color);
 	void drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal);
 	void text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
+	void text(const float x, const float y, const float fontSize, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...);
 	// pass pos from world, you will often pass width.x == width.y
@@ -387,6 +386,7 @@ public:
 	void drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color);
 	void drawPolyLine(const int count, ImVec2* verts, const Color& color, ImDrawFlags flags = 0, float thickness = 1.0f);
 	void drawText(const float x, const float y, const float size, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
+	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
 
 	// remember it's a "cursor window pos"
 	ImVec2 getPos() const { return m_pos; }

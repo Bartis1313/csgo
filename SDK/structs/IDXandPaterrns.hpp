@@ -57,3 +57,4 @@ enum VTableIndexes
 #define KEY_VALUES_CONSTRUCT	XOR("55 8B EC 51 33 C0 C7 45")
 #define KEY_VALUES_FROM_STR		XOR("55 8B EC 81 EC ? ? ? ? 85 D2 53")
 #define KEY_VALUES_LOAD_BUF		XOR("55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89")
+#define CACHED_BONE				XOR("FF B7 ? ? ? ? 52")

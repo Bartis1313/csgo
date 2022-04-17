@@ -3,6 +3,7 @@
 #include "../../utilities/netvars/netvars.hpp"
 #include "../../utilities/vfunc.hpp"
 #include "../interfaces/interfaces.hpp"
+#include "../UtlVector.hpp"
 #include "../vars.hpp"
 #include "IDXandPaterrns.hpp"
 
@@ -56,6 +57,7 @@ public:
 	VFUNC(int, drawModel, 9, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
 	VFUNC(bool, isDormant, 9, (), (this + NETWORKABLE));
 
+	_NODISCARD UtlVector<Matrix3x4> m_CachedBoneData();
 	_NODISCARD Vector getAimPunch();
 	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
 	_NODISCARD AnimationLayer* getAnimOverlays();
@@ -99,6 +101,7 @@ public:
 	VFUNC(WeaponInfo*, getWpnInfo, WEAPONINFO, (), (this));
 
 	_NODISCARD std::string getWpnName();
+	_NODISCARD std::u8string getIcon();
 
 	_NODISCARD bool isEmpty() { return m_iClip1() <= 0; }
 	_NODISCARD bool isRifle();
@@ -173,6 +176,8 @@ public:
 	_NODISCARD int getKills();
 	_NODISCARD int getDeaths();
 	_NODISCARD int getPing();
+	_NODISCARD std::string getRank(bool useShortName = false);
+	_NODISCARD int getWins();
 	_NODISCARD bool isPossibleToSee(const Vector& pos);
 	// address as number
 	_NODISCARD uintptr_t getLiteralAddress();

@@ -158,7 +158,7 @@ void Misc::drawLocalInfo()
 	int width = globals::screenX * 0.6f;
 
 	imRender.text(width, 15, ImFonts::tahoma, std::format(XOR("Map: {}"), interfaces::engine->getLevelName()), false, Colors::Green);
-	imRender.text(width, 25, ImFonts::tahoma, std::format(XOR("Weapon {} [{} / {}]"), weapon->getWpnName(), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
+	imRender.text(width, 25, ImFonts::tahoma, std::format(XOR("Weapon {} [{} / {}]"), weapon->getWpnInfo()->m_WeaponName, weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
 	imRender.text(width, 35, ImFonts::tahoma, std::format(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100), false, Colors::Yellow);
 	imRender.text(width, 45, ImFonts::tahoma, std::format(XOR("Zoom level {}"), weapon->m_zoomLevel()), false, Colors::Yellow);
 	imRender.text(width, 55, ImFonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->absOrigin().y, game::localPlayer->absOrigin().z), false, Colors::Yellow);

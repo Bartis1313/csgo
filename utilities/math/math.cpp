@@ -14,19 +14,15 @@ Vector math::calcAngleRelative(const Vector& source, const Vector& destination, 
 
 Vector math::calcAngle(const Vector& source, const Vector& destination)
 {
-	const auto delta = source - destination;
+	const auto delta = destination - source;
 
 	Vector angles(
-		RAD2DEG(std::atanf(delta.z / std::hypot(delta.x, delta.y))),
-		RAD2DEG(std::atanf(delta.y / delta.x)),
+		RAD2DEG(std::atan2(-delta.z, std::hypot(delta.x, delta.y))),
+		RAD2DEG(std::atan2(delta.y, delta.x)),
 		0.0f
 	);
 
-	angles.z = 0.0f;
-	if (delta.x >= 0.0)
-		angles.y += 180.0f;
-
-	return angles;
+	return angles.normalize();
 }
 
 float math::calcFov(const Vector& source, const Vector& destination, const Vector& viewAngles)
@@ -96,7 +92,7 @@ Vector math::vectorToAngle(const Vector& vec)
 	}
 	else
 	{
-		angle.x = RAD2DEG(std::atan2(-vec.z, vec.length2D()));
+		angle.x = RAD2DEG(std::atan2(-vec.z, std::hypot(vec.x, vec.y)));
 		angle.y = RAD2DEG(std::atan2(vec.y, vec.x));
 
 		if (angle.y > 90.0f)

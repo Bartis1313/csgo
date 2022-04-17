@@ -77,69 +77,93 @@ Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 
 void Radar::run()
 {
-	if (bool& ref = config.getRef<bool>(vars.bRadar))
+	bool& ref = config.getRef<bool>(vars.bRadar);
+	if (!ref)
+		return;
+
+	if (!game::localPlayer)
+		return;
+
+	if (!interfaces::engine->isInGame())
+		return;
+
+	if (ImGui::Begin(XOR("Radar"), &ref, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar))
 	{
-		if (!game::localPlayer)
-			return;
+		imRenderWindow.addList();
 
-		if (!interfaces::engine->isInGame())
-			return;
+		const auto myEye = game::localPlayer->getEyePos();
+		Vector ang = {};
+		interfaces::engine->getViewAngles(ang);
 
-		if (ImGui::Begin("Radar", &ref))
+		auto rect = imRenderWindow.getRect();
+		float scaledFov = globals::FOV / 5.0f;
+		// assume calculation is only in straight line representing 2D, so max = 180 deg, and this is not correct in 100%, idk better solution
+		float fovAddon = rect.y / std::tan(DEG2RAD((180.f - (globals::FOV + scaledFov)) / 2.0f));
+
+		float middleX = rect.x / 2.0f;
+		float middleY = rect.y / 2.0f;
+
+		// triangles representing fov view
+		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX + (int)fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
+		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX - (int)fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
+
+		// fov lines
+		imRenderWindow.drawLine({ middleX + fovAddon / 2.0f, 0.0f }, { middleX, middleY }, Colors::White);
+		imRenderWindow.drawLine({ middleX - fovAddon / 2.0f, 0.0f }, { middleX, middleY }, Colors::White);
+
+		// normal cross lines
+		imRenderWindow.drawLine({ 0.0f, middleY }, { rect.x, middleY }, Colors::White);
+		imRenderWindow.drawLine({ middleX, 0.0f }, { middleX, rect.y }, Colors::White);
+
+		// draw small circle where are we
+		imRenderWindow.drawCircleFilled(middleX, middleY, 5.0f, 12, Colors::Green);
+
+		for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 		{
-			imRenderWindow.addList();
+			auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
 
-			const auto myEye = game::localPlayer->getEyePos();
-			Vector ang = {};
-			interfaces::engine->getViewAngles(ang);
+			if (!ent)
+				continue;
 
-			for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+			if (ent->isDormant())
+				continue;
+
+			if (ent == game::localPlayer)
+				continue;
+
+			if (!ent->isAlive() || !game::localPlayer->isAlive())
+				continue;
+
+			if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+				continue;
+
+			const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D{}, Vector2D{ imRenderWindow.getWidth(), imRenderWindow.getHeight() }, config.get<float>(vars.fRadarScale));
+
+			auto entYaw = ent->m_angEyeAngles().y;
+
+			if (entYaw < 0.0f)
+				entYaw = 360.0f + entYaw;
+
+			const auto rotated = 270.0f - entYaw + ang.y;
+
+			auto dotRad = config.get<float>(vars.fRadarLenght);
+
+			const auto finalX = dotRad * std::cos(DEG2RAD(rotated));
+			const auto finalY = dotRad * std::sin(DEG2RAD(rotated));
+
+			if (config.get<bool>(vars.bRadarRanges) ? true : !entRotatedPos.isZero())
 			{
-				auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+				auto dotThickness = config.get<float>(vars.fRadarThickness);
 
-				if (!ent)
-					continue;
+				auto colLine = config.get<Color>(vars.cRadarLine);
+				imRenderWindow.drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY,
+					game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colLine : colLine.getColorEditAlpha(0.5f));
+				auto colPlayer = config.get<Color>(vars.cRadarPlayer);
+				imRenderWindow.drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32,
+					game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colPlayer : colPlayer.getColorEditAlpha(0.5f));
 
-				if (ent->isDormant())
-					continue;
-
-				if (ent == game::localPlayer)
-					continue;
-
-				if (!ent->isAlive() || !game::localPlayer->isAlive())
-					continue;
-
-				if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
-					continue;
-
-				const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D{}, Vector2D{ imRenderWindow.getWidth(), imRenderWindow.getHeight() }, config.get<float>(vars.fRadarScale));
-
-				auto entYaw = ent->m_angEyeAngles().y;
-
-				if (entYaw < 0.0f)
-					entYaw = 360.0f + entYaw;
-
-				const auto rotated = 270.0f - entYaw + ang.y;
-
-				auto dotRad = config.get<float>(vars.fRadarLenght);
-
-				const auto finalX = dotRad * std::cos(DEG2RAD(rotated));
-				const auto finalY = dotRad * std::sin(DEG2RAD(rotated));
-
-				if (config.get<bool>(vars.bRadarRanges) ? true : !entRotatedPos.isZero())
-				{
-					auto dotThickness = config.get<float>(vars.fRadarThickness);
-
-					auto colLine = config.get<Color>(vars.cRadarLine);
-					imRenderWindow.drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY,
-						game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colLine : colLine.getColorEditAlpha(0.5f));
-					auto colPlayer = config.get<Color>(vars.cRadarPlayer);
-					imRenderWindow.drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32,
-						game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colPlayer : colPlayer.getColorEditAlpha(0.5f));
-
-				}
 			}
-			ImGui::End();
 		}
+		ImGui::End();
 	}
 }
