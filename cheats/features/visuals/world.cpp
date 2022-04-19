@@ -474,9 +474,7 @@ void World::drawMovementTrail()
 	int type = config.get<int>(vars.iRunMovementTrail);
 
 	if (!config.get<bool>(vars.bRunMovementTrail))
-	{
 		return;
-	}
 
 	if (type != E2T(MovementTrail::BEAM))
 	{
@@ -484,7 +482,7 @@ void World::drawMovementTrail()
 		end = game::localPlayer->m_vecOrigin();
 	}
 
-	switch (config.get<int>(vars.iRunMovementTrail))
+	switch (type)
 	{
 	case E2T(MovementTrail::BEAM):
 	{
