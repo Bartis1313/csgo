@@ -142,7 +142,7 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 		return itr != arrid.cend();
 	};
 
-	if (std::string_view projectileName = studio->m_name; projectileName.find(XOR("thrown")) != std::string::npos || goodID(id)
+	if (std::string_view projectileName = studio->m_name; (projectileName.find(XOR("thrown")) != std::string::npos || goodID(id))
 		&& config.get<bool>(vars.bDrawProjectiles))
 	{
 		std::pair<std::string, Color> nades;
