@@ -559,6 +559,8 @@ void World::drawMovementTrail()
 				imRender.drawLine(start, end, el.m_col, 3.0f);
 
 			last = el.m_pos;
+
+			i++;
 		}
 
 		break;
