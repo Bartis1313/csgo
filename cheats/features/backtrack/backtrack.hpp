@@ -29,7 +29,6 @@ private:
 		Vector m_origin = {};
 		Matrix3x4 m_matrix[BONE_USED_BY_HITBOX];
 	};
-public:
 	std::array<std::deque<StoredRecord>, 65> m_records;
 public:
 	_NODISCARD auto& getAllRecords() { return m_records; }
