@@ -1,6 +1,9 @@
 #pragma once
-#include "config.hpp"
+
 #include <Windows.h>
+
+#include "config.hpp"
+#include "enums.hpp"
 
 // type - template
 // name - name of var
@@ -69,7 +72,6 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bDrawWeapon, false, "draw weapon enabled");
 	CONFIG_ADD_VARIABLE(Color, cWeaponText, Colors::White, "weapon text color");
 	CONFIG_ADD_VARIABLE(Color, cReloadbar, Colors::Turquoise, "weapon reload time bar color");
-	CONFIG_ADD_VARIABLE(bool, bDrawInfos, false, "draw infos enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawName, false, "draw name enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawSkeleton, false, "draw skeleton enabled");
 	CONFIG_ADD_VARIABLE(Color, cSkeleton, Colors::White, "skeleton color");
@@ -79,7 +81,10 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bDLight, false, "DLight enabled");
 	CONFIG_ADD_VARIABLE(bool, bEspLasers, false, "Esp Lasers enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawDeadOnly, false, "draw esp only when dead");
-	CONFIG_ADD_VEC(bool, vFlags, 10, false, "Esp flags");
+	CONFIG_ADD_VEC(bool, vFlags, E2T(EspFlags::FLAGS_SIZE), false, "Esp flags");
+	CONFIG_ADD_VARIABLE(bool, bDrawDropped, false, "draw dropped weapons");
+	CONFIG_ADD_VARIABLE(Color, cDrawDropped, Colors::White, "draw dropped weapons color");
+	CONFIG_ADD_VEC(bool, vDroppedFlags, E2T(DroppedFlags::FLAGS_SIZE), false, "Esp flags");
 
 
 	// WORLD
@@ -109,6 +114,11 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cMolotovRangeText, Colors::White, "mololotov range color for text");
 	CONFIG_ADD_VARIABLE(bool, bDrawZeusRange, false, "draw zeus range enabled");
 	CONFIG_ADD_VARIABLE(Color, cZeusRange, Colors::Palevioletred, "zeus range color");
+	CONFIG_ADD_VARIABLE(bool, bDrawSmoke, false, "draw smoke enabled");
+	CONFIG_ADD_VARIABLE(Color, cDrawSmoke, Colors::White, "draw smoke color");
+	CONFIG_ADD_VARIABLE(bool, bEditMolotov, false, "enabled editing molotov color");
+	CONFIG_ADD_VARIABLE(Color, cEditMolotov, Colors::Purple, "color molotov edited");
+
 
 	// MASTER SWITCHES
 	
@@ -171,64 +181,4 @@ struct Variables
 	CONFIG_ADD_VARIABLE(int, iStyleMenu, 0, "style of the menu");
 
 } inline vars;
-#pragma endregion
-
-#pragma region enums
-enum class AimbotID : size_t
-{
-	NEAREST,
-	HEAD,
-	CHEST
-};
-
-enum class CrossHairTypes : size_t
-{
-	OFF,
-	STATIC,
-	RECOIL,
-	ENGINE,
-	SPREAD
-};
-
-enum class ChamsID : size_t
-{
-	FLAT,
-	GENERIC,
-	GLOW,
-	METALIC,
-	PEARLSCENT
-};
-
-enum class BTChamsID : size_t
-{
-	STABLE,
-	LAST_TICK,
-	RAINBOW,
-};
-
-enum class BoxTypes : size_t
-{
-	BOX2D,
-	FILLED2D,
-	BOX3D,
-	FILLED3D
-};
-
-enum class MovementTrail : size_t
-{
-	BEAM,
-	LINE,
-	SPLASH
-};
-
-enum EspFlags : size_t
-{
-	BOT,
-	MONEY,
-	WINS,
-	RANK,
-	ARMOR,
-	ZOOM
-};
-
 #pragma endregion

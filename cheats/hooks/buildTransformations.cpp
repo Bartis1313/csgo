@@ -1,5 +1,9 @@
 #include "hooks.hpp"
+
 #include "../../SDK/CStudioHdr.hpp"
+#include "../../SDK/CUtlVector.hpp"
+#include "../../SDK/math/matrix.hpp"
+
 //#include "../../SDK/CGlobalVars.hpp"
 //#include "../../SDK/structs/Entity.hpp"
 //#include "../../SDK/interfaces/interfaces.hpp"
@@ -17,7 +21,7 @@ void __fastcall hooks::buildTransformations::hooked(FAST_ARGS, CStudioHdr* hdr, 
     //    // and here u check flags |= 8, but there are better ways like on bottom
     //}
 
-    UtlVector<int> flags = hdr->m_boneFlags;
+    CUtlVector<int> flags = hdr->m_boneFlags;
 
     for (int i = 0; i < hdr->m_boneFlags.m_size; i++)
     {

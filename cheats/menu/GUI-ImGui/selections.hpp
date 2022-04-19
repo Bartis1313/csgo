@@ -90,4 +90,23 @@ namespace selections
 		"Line",
 		"Splash"
 	};
+
+	inline std::array flags =
+	{
+		"Bot",
+		"Money",
+		"Wins",
+		"Rank",
+		"Armor",
+		"Zoom",
+		"C4"
+	};
+
+	inline std::array droppedFlags =
+	{
+		"Box",
+		"Text",
+		"Icon",
+		"Ammo"
+	};
 }

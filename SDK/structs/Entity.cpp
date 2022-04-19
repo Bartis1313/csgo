@@ -77,10 +77,10 @@ bool Entity_t::isBreakable()
 	return false;
 }
 
-UtlVector<Matrix3x4> Entity_t::m_CachedBoneData()
+CUtlVector<Matrix3x4> Entity_t::m_CachedBoneData()
 {
 	const static auto offset = *reinterpret_cast<uintptr_t*>(utilities::patternScan(CLIENT_DLL, CACHED_BONE, 0x2)) + 0x4; // 0x2914
-	return *reinterpret_cast<UtlVector<Matrix3x4>*>(uintptr_t(this) + offset);
+	return *reinterpret_cast<CUtlVector<Matrix3x4>*>(uintptr_t(this) + offset);
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -392,7 +392,7 @@ Vector Player_t::getHitboxPos(const int id)
 			Vector min = math::transformVector(hitbox->m_bbmin, m_CachedBoneData().m_memory[hitbox->m_bone]);
 			Vector max = math::transformVector(hitbox->m_bbmax, m_CachedBoneData().m_memory[hitbox->m_bone]);
 
-			return Vector{ min + max } * 0.5f;
+			return Vector{ min + max } *0.5f;
 		}
 	}
 

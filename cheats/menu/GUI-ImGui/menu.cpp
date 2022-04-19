@@ -117,13 +117,14 @@ static void renderVisuals()
 				ImGui::ColorPicker(XOR("Box color, filled"), &config.getRef<Color>(vars.cBoxFill), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaPreviewHalf);
 				ImGui::Checkbox(XOR("Health"), &config.getRef<bool>(vars.bDrawHealth));
 				ImGui::Checkbox(XOR("Armor"), &config.getRef<bool>(vars.bDrawArmor));
-				ImGui::Checkbox(XOR("Infos"), &config.getRef<bool>(vars.bDrawInfos));
+				ImGui::Checkbox(XOR("Name"), &config.getRef<bool>(vars.bDrawName));
 				ImGui::Checkbox(XOR("Skeleton"), &config.getRef<bool>(vars.bDrawSkeleton));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Skeleton color"), &config.getRef<Color>(vars.cSkeleton));
 				ImGui::Checkbox(XOR("Dlight"), &config.getRef<bool>(vars.bDLight));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Dlight color"), &config.getRef<Color>(vars.cDlight));
+				ImGui::MultiCombo(XOR("Esp flags"), selections::flags, config.getRef<std::vector<bool>>(vars.vFlags));
 			}
 			ImGui::EndGroupPanel();
 
@@ -178,22 +179,22 @@ static void renderVisuals()
 				ImGui::ColorPicker(XOR("Color for text"), &config.getRef<Color>(vars.cWeaponText));
 				ImGui::SameLine();
 				ImGui::Text(XOR("Weapon text"));
+
 				ImGui::ColorPicker(XOR("Reload bar color"), &config.getRef<Color>(vars.cReloadbar));
 				ImGui::SameLine();
 				ImGui::Text(XOR("Reload bar"));
+
+				ImGui::Checkbox(XOR("Dropped C4"), &config.getRef<bool>(vars.bDrawDroppedC4));
+				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Dropped C4 color"), &config.getRef<Color>(vars.cDrawDroppedC4));
+
+				ImGui::Checkbox(XOR("Bomb info"), &config.getRef<bool>(vars.bDrawBomb));
 				ImGui::SameLine();
-				ImGui::Text(XOR("Dropped C4"));
-				ImGui::ColorPicker(XOR("C4 Info"), &config.getRef<Color>(vars.cDrawBomb));
+				ImGui::ColorPicker(XOR("C4 info"), &config.getRef<Color>(vars.cDrawBomb));
 				ImGui::SameLine();
-				ImGui::Text(XOR("C4 information"));
-				ImGui::ColorPicker(XOR("Draw molotov circle"), &config.getRef<Color>(vars.cMolotovRange));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Molotov circle"));
+				ImGui::Text(XOR("C4 info"));
 			}
 			ImGui::EndGroupPanel();
-
-			ImGui::SameLine();
 
 			ImGui::BeginGroupPanel(XOR("Nades"));
 			{
@@ -216,6 +217,27 @@ static void renderVisuals()
 				ImGui::ColorPicker(XOR("Decoy color"), &config.getRef<Color>(vars.cDecoy));
 				ImGui::SameLine();
 				ImGui::Text(XOR("Decoy"));
+				ImGui::Checkbox(XOR("Enabled dropped"), &config.getRef<bool>(vars.bDrawDropped));
+				ImGui::MultiCombo(XOR("Dropped flags"), selections::droppedFlags, config.getRef<std::vector<bool>>(vars.vDroppedFlags));
+				ImGui::ColorPicker(XOR("Dropped color"), &config.getRef<Color>(vars.cDrawDropped));
+				ImGui::SameLine();
+				ImGui::Text(XOR("Dropped color"));
+				ImGui::Checkbox(XOR("Edit molotov"), &config.getRef<bool>(vars.bEditMolotov));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Edited molotov"), &config.getRef<Color>(vars.cEditMolotov));
+
+				ImGui::Checkbox(XOR("Enabled molotov circle"), &config.getRef<bool>(vars.bDrawmolotovRange));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Draw molotov circle"), &config.getRef<Color>(vars.cMolotovRange));
+				ImGui::SameLine();
+				ImGui::Text(XOR("Molotov circle"));
+
+				ImGui::Checkbox(XOR("Enabled smoke circle"), &config.getRef<bool>(vars.bDrawSmoke));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Draw smoke circle"), &config.getRef<Color>(vars.cDrawSmoke));
+				ImGui::SameLine();
+				ImGui::Text(XOR("Smoke circle"));
+				
 			}
 			ImGui::EndGroupPanel();
 

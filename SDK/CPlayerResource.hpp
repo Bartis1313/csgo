@@ -16,10 +16,10 @@ _NODISCARD type name(const int index) { \
 class PlayerResource
 {
 public:
-	NETVAR_BY_INDEX(int, getKills, m_iKills);
-	NETVAR_BY_INDEX(int, getDeaths, m_iDeaths);
-	NETVAR_BY_INDEX(int, getPing, m_iPing);
-	NETVAR_BY_INDEX(int, getWins, m_iCompetitiveWins);
+    NETVAR_BY_INDEX(int, getKills, m_iKills);
+    NETVAR_BY_INDEX(int, getDeaths, m_iDeaths);
+    NETVAR_BY_INDEX(int, getPing, m_iPing);
+    NETVAR_BY_INDEX(int, getWins, m_iCompetitiveWins);
     std::string getRank(int idx, bool useShortName = false)
     {
         static std::pair<std::string, std::string> ranks[] =
@@ -44,16 +44,20 @@ public:
             {"Supreme Master First Class", "SUPREME"},
             {"The Global Elite", "GLOBAL"}
         };
+        static size_t size = sizeof(ranks) / sizeof(ranks[0]);
+        auto indexRank = m_getRank(idx);
+        if (indexRank > size || indexRank < 0) // make sure we never hit bad index
+            indexRank = 0;
 
-        auto str = !useShortName ? ranks[m_getRank(idx)].first : ranks[m_getRank(idx)].second;
+        auto str = !useShortName ? ranks[indexRank].first : ranks[indexRank].second;
 
         return str;
     }
 private: // 65 is supposed to be max players, correct if this is higher, who plays on such big servers though?
-	NETVAR(int[65], m_iKills, "DT_PlayerResource", "m_iKills");
-	NETVAR(int[65], m_iDeaths, "DT_PlayerResource", "m_iDeaths");
-	NETVAR(int[65], m_iPing, "DT_PlayerResource", "m_iPing");
-	NETVAR(int[65], m_iCompetitiveRanking, "DT_PlayerResource", "m_iCompetitiveRanking");
-	NETVAR(int[65], m_iCompetitiveWins, "DT_PlayerResource", "m_iCompetitiveWins");
-	NETVAR_BY_INDEX(int, m_getRank, m_iCompetitiveRanking);
+    NETVAR(int[65], m_iKills, "DT_PlayerResource", "m_iKills");
+    NETVAR(int[65], m_iDeaths, "DT_PlayerResource", "m_iDeaths");
+    NETVAR(int[65], m_iPing, "DT_PlayerResource", "m_iPing");
+    NETVAR(int[65], m_iCompetitiveRanking, "DT_PlayerResource", "m_iCompetitiveRanking");
+    NETVAR(int[65], m_iCompetitiveWins, "DT_PlayerResource", "m_iCompetitiveWins");
+    NETVAR_BY_INDEX(int, m_getRank, m_iCompetitiveRanking);
 };

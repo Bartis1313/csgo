@@ -25,7 +25,7 @@ namespace ImGui
 	bool Combo(const char* label, int* item, const std::span<const char*>& arr, const float width = 90.0f);
 	bool ListBox(const char* label, int* item, const std::vector<std::string>& arr, const int heightItem = -1);
 	// need return anything? maybe, but useless at all for my use
-	void MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options);
+	void MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options, const float width = 140.0f);
 
 	// from demo, slight edit, usage same as normal console.log
 	struct ExampleAppLog

@@ -55,6 +55,12 @@ void hooks::init()
 
 	const auto addrextraBonesProccessing = utilities::patternScan(CLIENT_DLL, EXTRA_BONES_PROCCESSING);
 	const auto extraBonesProccessingTarget = reinterpret_cast<void*>(addrextraBonesProccessing);
+
+	const auto buildTr = utilities::patternScan(CLIENT_DLL, BUILD_TRANSFORMATIONS);
+	const auto buildTrTarget = reinterpret_cast<void*>(buildTr);
+
+	const auto particlesSimulation = utilities::patternScan(CLIENT_DLL, PARTICLE_SIMULATE);
+	const auto particlesSimulationTarget = reinterpret_cast<void*>(particlesSimulation);
 #pragma endregion
 
 #pragma region DX9
@@ -85,7 +91,9 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(presentTagret, present);
 	HOOK_SAFE(lockCursorTarget, lockCursor);
 	HOOK_SAFE(extraBonesProccessingTarget, doExtraBonesProcessing);
+	HOOK_SAFE(buildTrTarget, buildTransformations);
 	HOOK_SAFE(sv_cheatsTarget, sv_cheats);
+	HOOK_SAFE(particlesSimulationTarget, particlesSimulations);
 
 #undef HOOK_SAFE
 

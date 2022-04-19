@@ -3,7 +3,7 @@
 #include "../../utilities/netvars/netvars.hpp"
 #include "../../utilities/vfunc.hpp"
 #include "../interfaces/interfaces.hpp"
-#include "../UtlVector.hpp"
+#include "../CUtlVector.hpp"
 #include "../vars.hpp"
 #include "IDXandPaterrns.hpp"
 
@@ -57,7 +57,7 @@ public:
 	VFUNC(int, drawModel, 9, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
 	VFUNC(bool, isDormant, 9, (), (this + NETWORKABLE));
 
-	_NODISCARD UtlVector<Matrix3x4> m_CachedBoneData();
+	_NODISCARD CUtlVector<Matrix3x4> m_CachedBoneData();
 	_NODISCARD Vector getAimPunch();
 	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
 	_NODISCARD AnimationLayer* getAnimOverlays();
@@ -95,6 +95,7 @@ public:
 	NETVAR(bool, m_bPinPulled, "DT_BaseCSGrenade", "m_bPinPulled");
 	NETVAR(float, m_fThrowTime, "DT_BaseCSGrenade", "m_fThrowTime");
 	NETVAR(float, m_flThrowStrength, "DT_BaseCSGrenade", "m_flThrowStrength");
+	NETVAR(int, m_nExplodeEffectTickBegin, "DT_BaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin");
 
 	VFUNC(float, getInaccuracy, INACCURACY, (), (this));
 	VFUNC(float, getSpread, SPREAD, (), (this));
@@ -128,7 +129,15 @@ public:
 	PTRNETVAR(int, m_fireYDelta, "DT_Inferno", "m_fireYDelta");
 	PTRNETVAR(int, m_fireZDelta, "DT_Inferno", "m_fireZDelta");
 	_NODISCARD Vector getInfernoPos(size_t indexFire);
+};
 
+////////////////////////////////////////////////////////////////////////////////////////////
+
+class Smoke_t : public Entity_t
+{
+public:
+	_NODISCARD static float expireTime() { return 19.0f; }
+	NETVAR(int, m_nSmokeEffectTickBegin, "DT_SmokeGrenadeProjectile", "m_nSmokeEffectTickBegin");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,6 +171,7 @@ public:
 	NETVAR(float, m_flHealthShotBoostExpirationTime, "DT_CSPlayer", "m_flHealthShotBoostExpirationTime");
 	NETVAR(unsigned long, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget");
 	NETVAR(int, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
+	NETVAR(int, m_iAccount, "DT_CSPlayer", "m_iAccount");
 
 	void setAbsOrigin(const Vector& origin);
 	_NODISCARD Weapon_t* getActiveWeapon();

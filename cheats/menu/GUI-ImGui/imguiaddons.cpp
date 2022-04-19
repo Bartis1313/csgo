@@ -258,23 +258,34 @@ bool ImGui::ListBox(const char* label, int* item, const std::vector<std::string>
     return ImGui::ListBox(label, item, &vecGetter, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), heightItem);
 }
 
-void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options)
+void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options, const float width)
 {
     bool check = names.size() != options.size() || !names.empty() || !options.empty();
     assert(check && "given size of arrays args was not equal or one of them was empty");
 
     size_t size = names.size(); // does not matter if you pass options size here
 
-    std::string previewName = "";
-    for (size_t i = 0; i < size; i++)
+    ImVector<const char*> actives = {};
+    for (size_t i = 0; const auto & el : options)
     {
-        if (options.at(i)) // if it's active
-            previewName += names[i];
+        if (el) // if active selected
+            actives.push_back(names[i]);
 
-        if (i < size - 1 && options.at(i)) // add ", " on every option but not last
-            previewName += ", ";
+        i++;
     }
 
+    std::string previewName = "";
+    for (size_t i = 0; const auto & el : actives)
+    {
+        previewName += el;
+
+        if (i < actives.size() - 1) // add ", " on every option but not last
+            previewName += ", ";
+
+        i++;
+    }
+
+    PushItemWidth(width);
     if (BeginCombo(label, previewName.c_str()))
     {
         for (size_t i = 0; i < size; i++)
@@ -285,6 +296,7 @@ void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, s
 
         EndCombo();
     }
+    PopItemWidth();
 }
 
 ImGui::ExampleAppLog::ExampleAppLog()

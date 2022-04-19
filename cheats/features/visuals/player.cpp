@@ -26,8 +26,13 @@
 
 void Visuals::run()
 {
+	if (!config.get<bool>(vars.bEsp))
+		return;
+
 	if (!game::isAvailable())
 		return;
+
+	bool drawDead = config.get<bool>(vars.bDrawDeadOnly);
 
 	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 	{
@@ -39,7 +44,7 @@ void Visuals::run()
 		if (game::localPlayer == entity)
 			continue;
 
-		if (entity->isDormant()) // TODO: put fading
+		if (entity->isDormant())
 			continue;
 
 		if (!entity->isAlive())
@@ -47,9 +52,6 @@ void Visuals::run()
 
 		if (entity->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 			continue;
-
-		if (!config.get<bool>(vars.bEsp))
-			return;
 
 		auto runFeatures = [=]()
 		{
@@ -59,7 +61,7 @@ void Visuals::run()
 			drawLaser(entity);
 		};
 
-		if (config.get<bool>(vars.bDrawDeadOnly))
+		if (drawDead)
 		{
 			if (!game::localPlayer->isAlive())
 				runFeatures();
@@ -83,25 +85,25 @@ void Visuals::drawHealth(Player_t* ent, const Box& box)
 	else
 		health = realHealth;
 
-	auto offset = health * box.h / 100;
+	auto offset = health * box.h / 100.0f;
 	auto pad = box.h - offset;
 
 	Box newBox =
 	{
-		box.x - 6,
-		box.y - 1,
-		2,
-		box.h + 2,
+		box.x - 5.0f,
+		box.y,
+		2.0f,
+		box.h,
 	};
 
 	// fill first
-	imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
-	imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, healthBased(ent));
-	imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
+	imRender.drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black);
+	imRender.drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, healthBased(ent));
 
 	// if the player has health below max, then draw HP info
-	if(health < 100)
-		imRender.text(newBox.x - 2, newBox.y + pad - 4, ImFonts::espBar, std::to_string(health), false, Colors::White);
+	/*if(health < 100)
+		imRender.text(newBox.x - 2.0f, newBox.y + pad - 4.0f,
+			ImFonts::franklinGothic, std::format(XOR("{}"), health), false, Colors::White);*/
 }
 
 void Visuals::drawArmor(Player_t* ent, const Box& box)
@@ -116,25 +118,25 @@ void Visuals::drawArmor(Player_t* ent, const Box& box)
 	else
 		armor = realArmor;
 
-	auto offset = armor * box.h / 100;
+	auto offset = armor * box.h / 100.0f;
 	auto pad = box.h - offset;
 
 	Box newBox =
 	{
-		box.x + box.w + 4,
-		box.y - 1,
-		2,
-		box.h + 2,
+		box.x + box.w + 3.0f,
+		box.y,
+		2.0f,
+		box.h,
 	};
 
 	Color armorCol = Color(0, static_cast<int>(armor * 1.4f), 255); // light to blue, something simple
 
-	imRender.drawRectFilled(newBox.x, newBox.y, newBox.w, newBox.h, Colors::Black);
-	imRender.drawRectFilled(newBox.x, newBox.y + pad - 1, 2, offset + 2, armorCol);
-	imRender.drawRect(newBox.x - 1, newBox.y - 1, 4, newBox.h, Colors::Black);
+	imRender.drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black);
+	imRender.drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, armorCol);
 
-	if (armor < 100 && armor != 0)
-		imRender.text(newBox.x - 2, newBox.y + pad - 4, ImFonts::espBar, std::to_string(armor), false, Colors::White);
+	/*if (armor < 100 && armor != 0)
+		imRender.text(newBox.x - 2.0f, newBox.y + pad - 4.0f,
+			ImFonts::franklinGothic, std::format(XOR("{}"), armor), false, Colors::White);*/
 }
 
 void Visuals::drawWeapon(Player_t* ent, const Box& box)
@@ -148,14 +150,15 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 
 	Color tex = config.get<Color>(vars.cWeaponText);
 
-	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::espBar, ent->getActiveWeapon()->getWpnName(), true, tex);
+	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
+	int currentAmmo = weapon->m_iClip1();
+
+	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic, std::format(XOR("{} {}/{}"),
+		ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo), true, tex);
 
 	// skip useless trash for calculations
 	if (weapon->isNonAimable())
 		return;
-
-	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
-	int currentAmmo = weapon->m_iClip1();
 
 	Box newBox =
 	{
@@ -178,28 +181,80 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 			barWidth = (animlayer.m_cycle * box.w) / 1.0f;
 	}
 
-	imRender.drawRectFilled(newBox.x - 1, newBox.y - 1, newBox.w, 4, Colors::Black);
-	imRender.drawRectFilled(newBox.x, newBox.y, barWidth, 2, config.get<Color>(vars.cReloadbar));
-	
-	if (maxAmmo != currentAmmo && !isReloading)
-		imRender.text(newBox.x + barWidth, newBox.y + 1, ImFonts::espBar, std::to_string(currentAmmo), false, tex);
+	imRender.drawRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, newBox.w, 4.0f, Colors::Black);
+	imRender.drawRectFilled(newBox.x, newBox.y, barWidth, 2.0f, config.get<Color>(vars.cReloadbar));
 }
 
 void Visuals::drawInfo(Player_t* ent, const Box& box)
 {
-	// FIX!
+	std::vector<std::pair<std::string, Color>> flags = {};
+	using cont = std::vector<bool>; // container
+
+	PlayerInfo_t info = {};
+	if (!interfaces::engine->getPlayerInfo(ent->getIndex(), &info))
+		return;
+
+	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::BOT)))
+		if(info.m_fakePlayer)
+			flags.emplace_back(std::make_pair(XOR("BOT"), Colors::Yellow));
+
+	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::MONEY)))
+		flags.emplace_back(std::make_pair(std::format(XOR("{}$"), ent->m_iAccount()), Colors::Green));
+
+	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::WINS)))
+		flags.emplace_back(std::make_pair(std::format(XOR("Wins {}"), ent->getWins()), Colors::Green));
+
+	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::RANK)))
+		flags.emplace_back(std::make_pair(std::format(XOR("Rank {}"), ent->getRank()), Colors::White));
+
+	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::ARMOR)))
+	{
+		std::string text = "";
+		if (ent->m_bHasHelmet() && ent->m_ArmorValue())
+			text = XOR("H KEV");
+		else if (!ent->m_bHasHelmet() && ent->m_ArmorValue())
+			text = XOR("KEV");
+
+		flags.emplace_back(std::make_pair(text, Colors::White));
+	}
+
+	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::ZOOM)))
+		if(ent->m_bIsScoped())
+			flags.emplace_back(std::make_pair(XOR("ZOOM"), Colors::White));
+
+	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::C4)))
+		if (ent->isC4Owner())
+			flags.emplace_back(std::make_pair(XOR("C4"), Colors::Orange));
+
+	float fontSize = getScaledFontSize(ent, 60.0f, 11.0f, 16.0f);
+
+	float padding = 0.0f;
+	float addon = config.get<bool>(vars.bDrawArmor) ? 6.0f : 0.0f;
+
+	for (size_t i = 0; const auto & [name, color] : flags)
+	{
+		imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana, name, false, color, false);
+		auto textSize = ImFonts::verdana->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, name.c_str());
+		padding += textSize.y;
+		i++;
+
+		if (i != flags.size() && padding + fontSize > box.h) // when too many flags for long distances
+		{
+			imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana,
+				std::format(XOR("{} more..."), flags.size() - i), false, Colors::White, false);
+			break;
+		}
+	}
 }
 
 void Visuals::drawnName(Player_t* ent, const Box& box)
 {
-	if (!config.get<bool>(vars.bDrawInfos))
+	if (!config.get<bool>(vars.bDrawName))
 		return;
 
-	float dist = ent->absOrigin().distTo(game::localPlayer->absOrigin());
-	// clamping is hardcoded, for csgo there are no huge distances. For other games that have long distances rendered, this will still run ok.
-	float fontSize = std::clamp(80.0f / (dist / 80.0f), 12.0f, 30.0f);
+	float fontSize = getScaledFontSize(ent);
 
-	imRender.text(box.x + box.w / 2.0f, box.y - fontSize - 2.0f, fontSize, ImFonts::menuFont, ent->getName(), true, healthBased(ent), false);
+	imRender.text(box.x + box.w / 2.0f, box.y - fontSize - 2.0f, fontSize, ImFonts::verdana, ent->getName(), true, healthBased(ent), false);
 }
 
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
@@ -444,14 +499,22 @@ void Visuals::enemyIsAimingAtYou(Player_t* ent)
 	}
 }
 
+float Visuals::getScaledFontSize(Entity_t* ent, const float division, const float min, const float max)
+{
+	float dist = ent->absOrigin().distTo(game::localPlayer->absOrigin());
+	// clamping is hardcoded, for csgo there are no huge distances. For other games that have long distances rendered, this will still run ok.
+	float fontSize = std::clamp(division / (dist / division), min, max);
+	return fontSize;
+}
+
 #pragma region drawing_boxes
 
 void Visuals::drawBox2D(const Box& box)
 {
 	Color cfgCol = config.get<Color>(vars.cBox);
 
-	imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Color(0, 0, 0, 200));
-	imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Color(0, 0, 0, 200));
+	imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Colors::Black);
+	imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Colors::Black);
 	imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol);
 }
 

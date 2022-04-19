@@ -159,7 +159,9 @@
     <ClCompile Include="cheats\features\prediction\prediction.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\hooks\buildTransformations.cpp" />
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
+    <ClCompile Include="cheats\hooks\particlesSimulation.cpp" />
     <ClCompile Include="cheats\hooks\setupbones.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
@@ -303,8 +305,11 @@
     <ClInclude Include="cheats\features\misc\misc.hpp" />
     <ClInclude Include="cheats\features\prediction\nadepred.hpp" />
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
-    <ClInclude Include="cheats\hooks\buildTransformations.cpp" />
+    <ClInclude Include="config\enums.hpp" />
+    <ClInclude Include="SDK\CParticelCollection.hpp" />
     <ClInclude Include="SDK\CStudioHdr.hpp" />
+    <ClInclude Include="SDK\CUtlReference.hpp" />
+    <ClInclude Include="SDK\CUtlString.hpp" />
     <ClInclude Include="SDK\KeyValues.hpp" />
     <ClInclude Include="SDK\KeyValuesSys.hpp" />
     <ClInclude Include="SEHcatch.hpp" />
@@ -458,7 +463,7 @@
     <ClInclude Include="SDK\ICvar.hpp" />
     <ClInclude Include="SDK\IVEffects.hpp" />
     <ClInclude Include="SDK\IViewRenderBeams.hpp" />
-    <ClInclude Include="SDK\UtlVector.hpp" />
+    <ClInclude Include="SDK\CUtlVector.hpp" />
     <ClInclude Include="SDK\structs\IDXandPaterrns.hpp" />
     <ClInclude Include="utilities\console\console.hpp" />
     <ClInclude Include="utilities\math\math.hpp" />

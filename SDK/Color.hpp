@@ -92,6 +92,7 @@ namespace Colors
 	inline Color Coral = Color(255, 127, 80, 255);
 	inline Color Cyan = Color(0, 255, 255, 255);
 	inline Color Blank = Color(0, 0, 0, 0);
+	inline Color Orange = Color(255, 125, 0, 255);
 }
 
 _NODISCARD ImU32 U32(const Color& color);

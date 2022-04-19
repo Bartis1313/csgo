@@ -24,6 +24,7 @@ struct DrawModelState_t;
 struct ModelRenderInfo_t;
 struct Matrix3x4;
 struct CStudioHdr;
+class CParticleCollection;
 
 #define FAST_ARGS void* thisptr, void* edx
 
@@ -199,5 +200,12 @@ namespace hooks
 		static bool __fastcall hooked(FAST_ARGS);
 		inline static fn original = nullptr;
 		static const int index = SV_CHEATS;
+	};
+
+	struct particlesSimulations
+	{
+		using fn = void(__thiscall*)(CParticleCollection*);
+		static void __fastcall hooked(CParticleCollection* thisPtr, void* edx);
+		inline static fn original = nullptr;
 	};
 }

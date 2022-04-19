@@ -22,14 +22,11 @@ public:
 	void drawMovementTrail();
 
 private:
-	void drawProjectiles(Entity_t* ent);
+	void drawProjectiles(Entity_t* ent, const int id);
 	void drawBomb(Entity_t* ent);
 	void drawBombDropped(Entity_t* ent);
-	// TODO:
-	//void drawSmoke(Entity_t* ent);
-	void drawMolotovPoints(Entity_t* ent);
-	void drawSmokeTimer(Entity_t* ent);
-	void drawMolotovTimer(Entity_t* ent);
+	void drawMolotov(Entity_t* ent);
+	void drawSmoke(Entity_t* ent);
 private:
 	IConVar* m_oldSky = nullptr;
 	struct Trail_t

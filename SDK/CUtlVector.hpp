@@ -1,7 +1,7 @@
 #pragma once
 
 template <typename T>
-class UtlVector
+class CUtlVector
 {
 public:
 	constexpr T& operator[](int i)

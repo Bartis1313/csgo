@@ -34,9 +34,8 @@ unsigned long SurfaceRender::__createFont(const char* fontName, const int size, 
 void SurfaceRender::init()
 {
 	fonts::tahoma = __createFont(XOR("Tahoma"), 14, 800, FONTFLAG_OUTLINE);
-	fonts::smalle = __createFont(XOR("Tahoma"), 9, 800, FONTFLAG_ANTIALIAS);
-	fonts::espBar = __createFont(XOR("Franklin Gothic"), 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
-	fonts::menuFont = __createFont(XOR("Verdana"), 12, 350, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+	fonts::franklinGothic = __createFont(XOR("Franklin Gothic"), 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+	fonts::verdana = __createFont(XOR("Verdana"), 12, 350, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 
 	console.log(TypeLogs::LOG_INFO, XOR("render init success"));
 }
@@ -632,9 +631,11 @@ void ImGuiRender::init(ImGuiIO& io)
 
 		ImFontConfig cfg;
 		cfg.OversampleH = 3; // this will still not help the "blurry" font on scaling 
+		cfg.OversampleV = 3;
+		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
 		ImFonts::tahoma = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::espBar = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 10.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::menuFont = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::franklinGothic = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 10.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::verdana = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 
 		constexpr ImWchar ranges[] =
 		{
@@ -655,9 +656,11 @@ void ImGuiRender::init(ImGuiIO& io)
 
 		ImFontConfig cfg;
 		cfg.OversampleH = 3; // this will still not help the "blurry" font on scaling 
+		cfg.OversampleV = 3;
+		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
 		ImFonts::tahoma = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::espBar = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 10.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::menuFont = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::franklinGothic = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 10.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::verdana = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 
 		constexpr ImWchar ranges[] =
 		{
@@ -997,12 +1000,7 @@ void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool c
 
 ImVec2 ImGuiRender::getTextSize(ImFont* font, const std::string& text)
 {
-	ImGui::PushFont(font);
-
 	auto ret = ImGui::CalcTextSize(text.c_str());
-
-	ImGui::PopFont();
-
 	return ret;
 }
 
@@ -1234,7 +1232,7 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 		case DrawType::ARC:
 		{
 			const auto& obj = std::any_cast<ArcObject_t>(val);
-			draw->PathArcTo(obj.m_centre, obj.m_radius, obj.m_aMax, obj.m_aMax, obj.m_segments);
+			draw->PathArcTo(obj.m_centre, obj.m_radius, obj.m_aMin, obj.m_aMax, obj.m_segments);
 			draw->PathStroke(obj.m_color, obj.m_flags, obj.m_thickness);
 			break;
 		}

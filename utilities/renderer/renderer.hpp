@@ -31,9 +31,8 @@ struct Box3D
 namespace fonts
 {
 	inline unsigned long tahoma;
-	inline unsigned long smalle;
-	inline unsigned long espBar;
-	inline unsigned long menuFont;
+	inline unsigned long franklinGothic;
+	inline unsigned long verdana;
 }
 
 // rendering with game's engine
@@ -91,8 +90,8 @@ inline SurfaceRender surfaceRender;
 namespace ImFonts
 {
 	inline ImFont* tahoma;
-	inline ImFont* espBar;
-	inline ImFont* menuFont;
+	inline ImFont* franklinGothic;
+	inline ImFont* verdana;
 	inline ImFont* icon;
 }
 
@@ -158,12 +157,12 @@ struct RectObject_t
 	ImVec2 m_min;
 	ImVec2 m_max;
 	ImU32 m_color1; // left up / normal color
-	ImU32 m_color2; // right ip
+	ImU32 m_color2; // right up
 	ImU32 m_color3; // left bottom
 	ImU32 m_color4; // right bottom
 	ImDrawFlags m_flags;
 	float m_thickness;
-	float m_rounding;
+	float m_rounding = 0.0f;
 	bool m_horizontal;
 };
 
@@ -398,7 +397,9 @@ private:
 	ImVec2 m_pos; // additional pos, it corrects the drawing pos, so we can pass literal destination to window, see comment below
 	ImVec2 m_rect; // width and height
 	ImDrawList* m_drawing;
-} inline imRenderWindow;
+};
+
+inline ImGuiRenderWindow imRenderWindow;
 
 /*
 * This is out destination window

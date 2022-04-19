@@ -41,23 +41,24 @@ void World::drawMisc()
 		if (!cl)
 			continue;
 
-		if (entity)
+		drawProjectiles(entity, cl->m_classID);
+
+		switch (cl->m_classID)
 		{
-			switch (cl->m_classID)
-			{
-			case CInferno:
-				drawMolotovPoints(entity);
-				break;
-			case CC4:
-				drawBombDropped(entity);
-				break;
-			case CPlantedC4:
-				drawBomb(entity);
-				break;
-			default:
-				drawProjectiles(entity);
-				break;
-			}
+		case CC4:
+			drawBombDropped(entity);
+			break;
+		case CInferno:
+			drawMolotov(entity);
+			break;
+		case CPlantedC4:
+			drawBomb(entity);
+			break;
+		case CSmokeGrenadeProjectile:
+			drawSmoke(entity);
+			break;
+		default:
+			break;
 		}
 	}
 }
@@ -110,78 +111,107 @@ void World::drawBomb(Entity_t* ent)
 		Color{ static_cast<int>(r), static_cast<int>(g), 0, 200 });
 }
 
-void World::drawProjectiles(Entity_t* ent)
+#include "player.hpp"
+
+void World::drawProjectiles(Entity_t* ent, const int id)
 {
-	if (!config.get<bool>(vars.bDrawProjectiles))
-		return;
-
-	auto cl = ent->clientClass();
-
-	if (!cl)
+	if (!game::isAvailable())
 		return;
 
 	auto model = ent->getModel();
-
 	if (!model)
 		return;
 
 	auto studio = interfaces::modelInfo->getStudioModel(model);
-
 	if (!studio)
 		return;
 
-	auto projectileName = static_cast<std::string>(studio->m_name);
+	auto wpn = reinterpret_cast<Weapon_t*>(ent);
+	if (!wpn) // should not ever happen
+		return;
 
-	if (projectileName.find(XOR("thrown")) != std::string::npos)
+	constexpr auto goodID = [=](const int idx) // needed because some nades are special
 	{
-		std::string nadeName = "";
-		Color colorNade;
+		constexpr std::array arrid =
+		{
+			CBaseCSGrenadeProjectile,
+			CDecoyProjectile,
+			CMolotovProjectile,
+		};
+		auto itr = std::find(arrid.cbegin(), arrid.cend(), idx);
+		return itr != arrid.cend();
+	};
+
+	if (std::string_view projectileName = studio->m_name; projectileName.find(XOR("thrown")) != std::string::npos || goodID(id)
+		&& config.get<bool>(vars.bDrawProjectiles))
+	{
+		std::pair<std::string, Color> nades;
 
 		if (projectileName.find(XOR("flashbang")) != std::string::npos)
-		{
-			nadeName = XOR("FLASHBANG");
-			colorNade = config.get<Color>(vars.cFlashBang);
-		}
-		else if (projectileName.find(XOR("ggrenade")) != std::string::npos)
-		{
-			nadeName = XOR("GRENADE");
-			colorNade = config.get<Color>(vars.cGranede);
-		}
-		else if (projectileName.find(XOR("molotov")) != std::string::npos)
-		{
-			nadeName = XOR("MOLOTOV");
-			colorNade = config.get<Color>(vars.cMolotov);
-		}
-		else if (projectileName.find(XOR("incendiary")) != std::string::npos)
-		{
-			nadeName = XOR("FIRE INC");
-			colorNade = config.get<Color>(vars.cIncediary);
-		}
-		else if (projectileName.find(XOR("smokegrenade")) != std::string::npos)
-		{
-			nadeName = XOR("SMOKE");
-			colorNade = config.get<Color>(vars.cSmoke);
-		}
-		else if (projectileName.find(XOR("decoy")) != std::string::npos)
-		{
-			nadeName = XOR("DECOY");
-			colorNade = config.get<Color>(vars.cDecoy);
-		}
-		else
-			return;
+			nades = { XOR("FLASHBANG"), config.get<Color>(vars.cFlashBang) };
+		if (projectileName.find(XOR("ggrenade")) != std::string::npos && wpn->m_nExplodeEffectTickBegin() < 1) // prevent too long time
+			nades = { XOR("GRENADE"), config.get<Color>(vars.cGranede) };
+		if (projectileName.find(XOR("molotov")) != std::string::npos)
+			nades = { XOR("MOLOTOV"), config.get<Color>(vars.cMolotov) };
+		if (projectileName.find(XOR("incendiary")) != std::string::npos)
+			nades = { XOR("FIRE INC"), config.get<Color>(vars.cIncediary) };
+		if (projectileName.find(XOR("smokegrenade")) != std::string::npos && !reinterpret_cast<Smoke_t*>(wpn)->m_nSmokeEffectTickBegin()) // prevent too long time
+			nades = { XOR("SMOKE"), config.get<Color>(vars.cSmoke) };
+		if (projectileName.find(XOR("decoy")) != std::string::npos) // this nade time is also too long, to prevent it you need to check tick time. There is no netvar for decoys
+			nades = { XOR("DECOY"), config.get<Color>(vars.cDecoy) };
 
 		if (Box box; utilities::getBox(ent, box))
-		{
-			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::tahoma, nadeName, false, colorNade);
-		}
+			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana, nades.first, true, nades.second);
 	}
-	else if (projectileName.find(XOR("dropped")) != std::string::npos)
+	else if (projectileName.find(XOR("dropped")) != std::string::npos && config.get<bool>(vars.bDrawDropped))
 	{
-		const auto drop = reinterpret_cast<Weapon_t*>(ent);
-
 		if (Box box; utilities::getBox(ent, box))
 		{
-			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::tahoma, drop->getWpnName(), false, config.get<Color>(vars.cDropped));
+			float fontSize = visuals.getScaledFontSize(ent, 60.0f, 11.0f, 16.0f);
+			using cont = std::vector<bool>; // container
+			float padding = 0.0f;
+
+			auto getTextSize = [=](const std::string& text, ImFont* font = ImFonts::verdana)
+			{
+				return font->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
+			};
+
+			if (config.get<cont>(vars.vDroppedFlags).at(E2T(DroppedFlags::BOX))) // startpoint - no pad
+			{
+				Color cfgCol = config.get<Color>(vars.cDrawDropped);
+
+				imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Colors::Black);
+				imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Colors::Black);
+				imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol);
+			}
+			if (config.get<cont>(vars.vDroppedFlags).at(E2T(DroppedFlags::AMMO)) && !wpn->isNonAimable()) // no pad font logic, we just draw extra box
+			{
+				constexpr float startPad = 3.0f;
+
+				imRender.drawRectFilled(box.x - 1.0f, box.y + box.h - 1.0f + startPad, box.w + 2.0f, 4.0f, Colors::Black);
+				imRender.drawRectFilled(box.x, box.y + box.h + startPad,
+					wpn->m_iClip1() * box.w / wpn->getWpnInfo()->m_maxClip1, 2.0f, config.get<Color>(vars.cDrawDropped));
+
+				padding += 4.0f;
+			}
+			if (config.get<cont>(vars.vDroppedFlags).at(E2T(DroppedFlags::TEXT)))
+			{
+				auto name = wpn->getWpnName();
+				imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::verdana,
+					name, true, config.get<Color>(vars.cDropped));
+
+				auto textSize = getTextSize(name);
+				padding += textSize.y;
+			}
+			if (config.get<cont>(vars.vDroppedFlags).at(E2T(DroppedFlags::ICON)))
+			{
+				auto name = utilities::u8toStr(wpn->getIcon());
+				imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::icon,
+					name, true, config.get<Color>(vars.cDropped));
+
+				auto textSize = getTextSize(name, ImFonts::icon);
+				padding += textSize.y;
+			}
 		}
 	}
 }
@@ -303,8 +333,7 @@ void World::modulateWorld(void* thisptr, float* r, float* g, float* b, bool isSh
 	//}
 }
 
-// TODO: add points, as drawing one circle is not accurate
-void World::drawMolotovPoints(Entity_t* ent)
+void World::drawMolotov(Entity_t* ent)
 {
 	if (!config.get<bool>(vars.bDrawmolotovRange))
 		return;
@@ -321,16 +350,19 @@ void World::drawMolotovPoints(Entity_t* ent)
 	//imRender.drawCircle3DFilled(molotov->absOrigin(), 0.5f * Vector(max - min).length2D(), 32, config.get<Color>(vars.cMolotovRange));
 
 	//imRender.text(screen.x, screen.y, ImFonts::tahoma, XOR("Molotov"), false, config.get<Color>(vars.cMolotovRangeText));
+	float time = molotov->spawnTime() + molotov->expireTime() - interfaces::globalVars->m_curtime;
+	float scale = time / molotov->expireTime();
 
 	const auto& origin = molotov->absOrigin();
 	constexpr int molotovRadius = 60; // 30 * 2
 
 	//std::vector<ImVec2> points = {};
+	Color col = config.get<Color>(vars.cMolotovRange);
 
 	for (int i = 0; i < molotov->m_fireCount(); i++)
 	{
 		auto pos = origin + molotov->getInfernoPos(i);
-		imRender.drawCircle3DFilled(pos, molotovRadius, 32, Colors::Coral, Colors::Coral);
+		imRender.drawCircle3DFilled(pos, molotovRadius, 32, col, col);
 
 		/*Vector2D posw;
 		if (!imRender.worldToScreen(pos, posw))
@@ -339,6 +371,70 @@ void World::drawMolotovPoints(Entity_t* ent)
 		imRender.text(posw.x, posw.y, ImFonts::tahoma, std::to_string(i), false, Colors::Cyan);*/
 		// points are not on edge, this will need some graph path logic, and will be done soon
 	}
+	static float size = ImFonts::tahoma->FontSize;
+	// timer
+	if (Vector2D s; imRender.worldToScreen(origin, s))
+	{
+		imRender.drawProgressRing(s.x, s.y, 25, 32, -90.0f, scale, 5.0f, Colors::LightBlue);
+		imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma, std::format(XOR("{:.2f}s"), time), true, Colors::White);
+	}
+}
+
+void drawArc3DSmoke(const Vector& pos, const float radius, const int points, const float percent, const Color& color, const ImDrawFlags flags, const float thickness,
+	ImFont* font, const std::string& text, const Color& colorText)
+{
+	float step = std::numbers::pi_v<float> *2.0f / points;
+
+	Vector2D _end = {};
+	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f * percent); angle += step)
+	{
+		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
+		Vector worldEnd = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
+
+		if (Vector2D start, end; imRender.worldToScreen(worldStart, start) && imRender.worldToScreen(worldEnd, end))
+		{
+			_end = end;
+			imRender.drawLine(start, end, color);
+		}
+	}
+
+	if (!_end.isZero())
+		imRender.text(_end.x + 3.0f, _end.y, font, text, true, colorText);
+}
+
+void World::drawSmoke(Entity_t* ent)
+{
+	if (!config.get<bool>(vars.bDrawSmoke))
+		return;
+
+	auto smoke = reinterpret_cast<Smoke_t*>(ent);
+	if (!smoke)
+		return;
+
+	if (!smoke->m_nSmokeEffectTickBegin()) // dont do anything when smoke is thrown
+		return;
+
+	auto timeToTicks = [=](const float time)
+	{
+		return interfaces::globalVars->m_intervalPerTick * time;
+	};
+
+	float time = timeToTicks(smoke->m_nSmokeEffectTickBegin()) + smoke->expireTime() - interfaces::globalVars->m_curtime;
+	float scale = time / smoke->expireTime();
+
+	const auto& origin = smoke->absOrigin();
+	constexpr int smokeRadius = 144;
+
+	//imRender.drawCircle3DFilled(origin, smokeRadius, 216, col, col, true, 2.0f);
+	// many points to make it smooth
+	drawArc3DSmoke(origin, smokeRadius, 512, scale, config.get<Color>(vars.cDrawSmoke), false, 2.0f, ImFonts::tahoma, std::format(XOR("{:.2f}s"), time), Colors::Orange);
+	
+	// timer
+	/*if (Vector2D s; imRender.worldToScreen(origin, s))
+	{
+		imRender.drawProgressRing(s.x, s.y, 25, 32, -90, scale, 5.0f, Colors::LightBlue);
+		imRender.text(s.x, s.y, ImFonts::tahoma, std::format(XOR("{:.2f}s"), time), false, Colors::White);
+	}*/
 }
 
 void World::drawZeusRange()

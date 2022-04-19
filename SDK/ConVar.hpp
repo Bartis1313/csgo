@@ -1,5 +1,5 @@
 #pragma once
-#include "UtlVector.hpp"
+#include "CUtlVector.hpp"
 #include "../utilities/pad.hpp"
 #include "../utilities/vfunc.hpp"
 
@@ -30,5 +30,5 @@ public:
 	float m_min;
 	int m_hasMax;
 	float m_max;
-	UtlVector<void(__cdecl*)()> m_callbacks;
+	CUtlVector<void(__cdecl*)()> m_callbacks;
 };

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "UtlVector.hpp"
+#include "CUtlVector.hpp"
+#include "IVModelInfo.hpp"
+
 #include "../utilities/pad.hpp"
 
-struct Studiohdr_t;
 struct Virtualmodel_t;
 
 struct CStudioHdr
@@ -12,11 +13,11 @@ struct CStudioHdr
 	Virtualmodel_t* m_vModel;
 	/*const virtualmodel_t* ResetVModel(const virtualmodel_t* pVModel) const;
 	const studiohdr_t* GroupStudioHdr(int group);*/
-	UtlVector<const Studiohdr_t*> m_studioHdrCache;
-	int m_frameUnlockCounter;
+	CUtlVector<const Studiohdr_t*> m_studioHdrCache;
+	int m_sizeframeUnlockCounter;
 	int* m_frameUnlockCounter;
 	/*CThreadFastMutex	m_FrameUnlockCounterMutex;*/
 	PAD(8);
-	UtlVector<int> m_boneFlags;
-	UtlVector<int> m_boneParent;
+	CUtlVector<int> m_boneFlags;
+	CUtlVector<int> m_boneParent;
 };
