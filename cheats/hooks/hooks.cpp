@@ -48,7 +48,7 @@ void hooks::init()
 	const auto matertialValidAddrTarget = reinterpret_cast<void*>(addrMaterial);
 
 	const auto addrIsusingDebugProps = utilities::patternScan(ENGINE_DLL, IS_USING_PROP_DEBUG);
-	const auto IsusingDebugPropsTarget = reinterpret_cast<void*>(addrIsusingDebugProps);
+	const auto isusingDebugPropsTarget = reinterpret_cast<void*>(addrIsusingDebugProps);
 
 	const auto addrgetColorModulation = utilities::patternScan(MATERIAL_DLL, GET_COLOR_MODULATION);
 	const auto getColorModulationTarget = reinterpret_cast<void*>(addrgetColorModulation);
@@ -71,6 +71,8 @@ void hooks::init()
 
 	hookHelper::initMinhook();
 
+#define STR_DEF(str) std::string(#str)
+
 #define HOOK_SAFE(target, hookStructName) \
 hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName));
 
@@ -81,11 +83,11 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(overrideViewTarget, overrideView);
 	HOOK_SAFE(doPostScreenEffectsTarget, doPostScreenEffects);
 	HOOK_SAFE(frameStageNotifyTarget, frameStageNotify);
-	HOOK_SAFE(clientValidAddrTarget, clientValidAddr);
-	HOOK_SAFE(engineValidAddrTarget, engineValidAddr);
-	HOOK_SAFE(studioValidAddrTarget, studioRenderValidAddr);
-	HOOK_SAFE(matertialValidAddrTarget, materialSystemValidAddr);
-	HOOK_SAFE(IsusingDebugPropsTarget, isUsingStaticPropDebugModes);
+	//HOOK_SAFE(clientValidAddrTarget, clientValidAddr);
+	//HOOK_SAFE(engineValidAddrTarget, engineValidAddr);
+	//HOOK_SAFE(studioValidAddrTarget, studioRenderValidAddr);
+	//HOOK_SAFE(matertialValidAddrTarget, materialSystemValidAddr);
+	HOOK_SAFE(isusingDebugPropsTarget, isUsingStaticPropDebugModes);
 	HOOK_SAFE(getColorModulationTarget, getColorModulation);
 	HOOK_SAFE(resetTarget, reset);
 	HOOK_SAFE(presentTagret, present);

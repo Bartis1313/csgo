@@ -14,7 +14,7 @@ class Backtrack final
 {
 public:
 	void run(CUserCmd* cmd);
-	void update();
+	void update(int frame);
 	void init();
 	_NODISCARD bool isValid(float simtime) const;
 private:

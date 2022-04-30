@@ -534,3 +534,18 @@ enum Hitboxes
 	HITBOX_MAX
 };
 #pragma endregion
+
+#pragma region hitgroups
+enum Hitgroups
+{
+	HITGROUP_GENERIC,
+	HITGROUP_HEAD,
+	HITGROUP_CHEST,
+	HITGROUP_STOMACH,
+	HITGROUP_LEFTARM,
+	HITGROUP_RIGHTARM,
+	HITGROUP_LEFTLEG,
+	HITGROUP_RIGHTLEG,
+	HITGROUP_GEAR // alerts NPC, but doesn't do damage or bleed (1/100th damage)
+};
+#pragma endregion

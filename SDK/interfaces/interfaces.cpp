@@ -24,35 +24,47 @@ static T* getInterface(const std::string& moduleName, const std::string& interfa
 	if (const auto ret = capture(interfaceName.c_str(), nullptr); ret != nullptr)
 		return reinterpret_cast<T*>(ret);
 	else
-		LF(MessageBoxA)(nullptr, std::format(XOR("Interface {} was nullptr"), interfaceName).c_str(), XOR("Bartis hack"), MB_OK | MB_ICONERROR);
+		throw std::runtime_error(std::format(XOR("Interface {} was nullptr"), interfaceName));
 
 	return nullptr;
 }
 
-void interfaces::init()
+// capture and log
+// var - var you want to init
+// type - type for template
+// _module - module name from the game, eg: engine.dll
+// _interface - interface' name
+#define CAPNLOG(var, type, _module, _interface) \
+	var = getInterface<type>(_module, XOR(_interface)); \
+	console.log(TypeLogs::LOG_INFO, std::format(XOR("found {} at addr: {:#0x}"), _interface, reinterpret_cast<uintptr_t>(var))); \
+	
+bool interfaces::init()
 {
-	engine = getInterface<IVEngineClient>(ENGINE_DLL, XOR("VEngineClient014"));
-	panel = getInterface<IPanel>(VGUI_DLL, XOR("VGUI_Panel009"));
-	surface = getInterface<ISurface>(VGUIMAT_DLL, XOR("VGUI_Surface031"));
-	client = getInterface<IBaseClientDLL>(CLIENT_DLL, XOR("VClient018"));
-	entList = getInterface<IClientEntityList>(CLIENT_DLL, XOR("VClientEntityList003"));
-	cvar = getInterface<ICvar>(VSTD_DLL, XOR("VEngineCvar007"));
-	trace = getInterface<IEngineTrace>(ENGINE_DLL, XOR("EngineTraceClient004"));
-	renderView = getInterface<IViewRender>(ENGINE_DLL, XOR("VEngineRenderView014"));
-	matSys = getInterface<IMaterialSystem>(MATERIAL_DLL, XOR("VMaterialSystem080"));
-	modelInfo = getInterface<IVModelInfo>(ENGINE_DLL, XOR("VModelInfoClient004"));
-	prediction = getInterface<IPrediction>(CLIENT_DLL, XOR("VClientPrediction001"));
-	gameMovement = getInterface<CGameMovement>(CLIENT_DLL, XOR("GameMovement001"));
-	debugOverlay = getInterface<IVDebugOverlay>(ENGINE_DLL, XOR("VDebugOverlay004"));
-	localize = getInterface<ILocalize>(LOCALIZE_DLL, XOR("Localize_001"));
-	modelRender = getInterface<IVModelRender>(ENGINE_DLL, XOR("VEngineModel016"));
-	studioRender = getInterface<IVStudioRender>(STUDIORENDER_DLL, XOR("VStudioRender026"));
-	eventManager = getInterface<IGameEventManager>(ENGINE_DLL, XOR("GAMEEVENTSMANAGER002"));
-	efx = getInterface<IVEfx>(ENGINE_DLL, XOR("VEngineEffects001"));
-	iSystem = getInterface<InputSystem>(INPUTSYSTEM_DLL, XOR("InputSystemVersion001"));
-	effects = getInterface<IEffects>(CLIENT_DLL, XOR("IEffects001"));
+	CAPNLOG(engine, IVEngineClient, ENGINE_DLL, "VEngineClient014");
+	CAPNLOG(panel, IPanel, VGUI_DLL, "VGUI_Panel009");
+	CAPNLOG(surface, ISurface, VGUIMAT_DLL, "VGUI_Surface031");
+	CAPNLOG(client, IBaseClientDLL, CLIENT_DLL, "VClient018");
+	CAPNLOG(entList, IClientEntityList, CLIENT_DLL, "VClientEntityList003");
+	CAPNLOG(cvar, ICvar, VSTD_DLL, "VEngineCvar007");
+	CAPNLOG(trace, IEngineTrace, ENGINE_DLL, "EngineTraceClient004");
+	CAPNLOG(renderView, IViewRender, ENGINE_DLL, "VEngineRenderView014");
+	CAPNLOG(matSys, IMaterialSystem, MATERIAL_DLL, "VMaterialSystem080");
+	CAPNLOG(modelInfo, IVModelInfo, ENGINE_DLL, "VModelInfoClient004");
+	CAPNLOG(prediction, IPrediction, CLIENT_DLL, "VClientPrediction001");
+	CAPNLOG(gameMovement, CGameMovement, CLIENT_DLL, "GameMovement001");
+	CAPNLOG(debugOverlay, IVDebugOverlay, ENGINE_DLL, "VDebugOverlay004");
+	CAPNLOG(localize, ILocalize, LOCALIZE_DLL, "Localize_001");
+	CAPNLOG(modelRender, IVModelRender, ENGINE_DLL, "VEngineModel016");
+	CAPNLOG(studioRender, IVStudioRender, STUDIORENDER_DLL, "VStudioRender026");
+	CAPNLOG(eventManager, IGameEventManager, ENGINE_DLL, "GAMEEVENTSMANAGER002");
+	CAPNLOG(efx, IVEfx, ENGINE_DLL, "VEngineEffects001");
+	CAPNLOG(iSystem, InputSystem, INPUTSYSTEM_DLL, "InputSystemVersion001");
+	CAPNLOG(effects, IEffects, CLIENT_DLL, "IEffects001");
+
+#undef CAPNLOG
 
 	keyValuesSys = reinterpret_cast<KeyValuesSys*(__cdecl*)()>(LF(GetProcAddress)(LF(GetModuleHandleA)(VSTD_DLL), XOR("KeyValuesSystem")))();
+	memAlloc = *reinterpret_cast<IMemAlloc**>(LF(GetProcAddress)(LF(GetModuleHandleA)(TIER_DLL), XOR("g_pMemAlloc")));
 	
 	globalVars = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(client))[0] + 0x1F);
 	clientMode = **reinterpret_cast<ClientMode***>((*reinterpret_cast<uintptr_t**>(client))[10] + 0x5);
@@ -64,5 +76,11 @@ void interfaces::init()
 	resource = *reinterpret_cast<PlayerResource***>(utilities::patternScan(CLIENT_DLL, PLAYER_RESOURCE, 0x4));
 	dx9Device = **reinterpret_cast<IDirect3DDevice9***>(utilities::patternScan(SHARED_API, DX9_DEVICE, 0x1));
 
+	using namespace gameFunctions;
+
+	tesla = reinterpret_cast<tfn>(utilities::patternScan(CLIENT_DLL, FX_TESLA));
+	dispatchEffect = reinterpret_cast<dfn>(utilities::patternScan(CLIENT_DLL, DISPATCH_EFFECT));
+
 	console.log(TypeLogs::LOG_INFO, XOR("interfaces success"));
+	return true;
 }

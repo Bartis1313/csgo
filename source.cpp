@@ -1,4 +1,5 @@
 #include "cheats/hooks/hooks.hpp"
+#include "cheats/features/misc/callbacks.hpp"
 #include "cheats/hooks/helpers/helper.hpp"
 #include "utilities/console/console.hpp"
 #include "SDK/interfaces/interfaces.hpp"
@@ -41,6 +42,8 @@ DWORD WINAPI init(PVOID instance)
         netvarMan.dump();
         //render.init();
         hooks::wndProcSys::init();
+        callbacks.init();
+        callbacks.run();
         hooks::init();
     }
     catch (const std::runtime_error& err)
@@ -66,6 +69,7 @@ VOID WINAPI _shutdown(PVOID instance)
     RemoveVectoredExceptionHandler(globals::instance);
     hooks::wndProcSys::shutdown();
     events.shutdown();
+    callbacks.shutdown();
     hooks::shutdown();
     menu.shutdown();
     console.log(TypeLogs::LOG_INFO, XOR("Hack shutdown"));

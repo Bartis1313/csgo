@@ -387,7 +387,7 @@ Vector Player_t::getHitboxPos(const int id)
 
 	if (auto modelStudio = interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
 	{
-		if (auto hitbox = modelStudio->getHitboxSet(this->m_nHitboxSet())->getHitbox(id); hitbox != nullptr)
+		if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(id); hitbox != nullptr)
 		{
 			Vector min = math::transformVector(hitbox->m_bbmin, m_CachedBoneData().m_memory[hitbox->m_bone]);
 			Vector max = math::transformVector(hitbox->m_bbmax, m_CachedBoneData().m_memory[hitbox->m_bone]);
@@ -402,6 +402,43 @@ Vector Player_t::getHitboxPos(const int id)
 Vector Player_t::getBonePos(const int id)
 {
 	return m_CachedBoneData().m_memory[id].origin();
+}
+
+Vector Player_t::getHitgroupPos(const int hitgroup)
+{
+	auto fixHitgroupIndex = [h = hitgroup]()
+	{
+		switch (h)
+		{
+		case HITGROUP_HEAD:
+			return HITBOX_HEAD;
+		case HITGROUP_CHEST:
+			return HITBOX_LOWER_CHEST;
+		case HITGROUP_STOMACH:
+			return HITBOX_BELLY;
+		case HITGROUP_LEFTARM:
+			return HITBOX_RIGHT_HAND;
+		case HITGROUP_RIGHTARM:
+			return HITBOX_LEFT_HAND;
+		case HITGROUP_LEFTLEG:
+			return HITBOX_RIGHT_CALF;
+		case HITGROUP_RIGHTLEG:
+			return HITBOX_LEFT_CALF;
+		default:
+			return HITBOX_PELVIS;
+		}
+	};
+
+	if (auto modelStudio = interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
+	{
+		if (auto hitbox = modelStudio->getHitboxSet(this->m_nHitboxSet())->getHitbox(fixHitgroupIndex()); hitbox != nullptr)
+		{
+			Vector min = math::transformVector(hitbox->m_bbmin, m_CachedBoneData().m_memory[hitbox->m_bone]);
+			Vector max = math::transformVector(hitbox->m_bbmax, m_CachedBoneData().m_memory[hitbox->m_bone]);
+			return Vector{ min + max } *0.5f;
+		}
+	}
+	return {};
 }
 
 bool Player_t::isC4Owner()

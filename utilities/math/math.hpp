@@ -11,6 +11,7 @@ _NODISCARD constexpr float RAD2DEG(float radians) { return radians * (180.0f / s
 
 namespace math
 {
+	constexpr float PI = std::numbers::pi_v<float>;
 	_NODISCARD Vector calcAngleRelative(const Vector& src, const Vector& dest, const Vector& viewAngles);
 	// classic
 	_NODISCARD Vector calcAngle(const Vector& src, const Vector& dest);
@@ -19,8 +20,11 @@ namespace math
 	_NODISCARD float calcFovReal(const Vector& src, const Vector& dest, const Vector& viewAngles);
 	_NODISCARD Vector transformVector(const Vector& in, const Matrix3x4& matrix);
 	_NODISCARD Vector angleVec(const Vector& angle);
+	_NODISCARD void angleVectors(const Vector& angle, Vector& forward, Vector& right, Vector& up);
 	_NODISCARD float normalizeYaw(float yaw);
 	_NODISCARD float normalizePitch(float pitch);
 	// direction vector based on euler dimension
 	_NODISCARD Vector vectorToAngle(const Vector& vec);
+	// broken for now :(
+	_NODISCARD float customSin(float time, float multiply = 1.0f);
 }

@@ -131,8 +131,11 @@ void Visuals::drawArmor(Player_t* ent, const Box& box)
 
 	Color armorCol = Color(0, static_cast<int>(armor * 1.4f), 255); // light to blue, something simple
 
-	imRender.drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black);
-	imRender.drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, armorCol);
+	if (armor != 0)
+	{
+		imRender.drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black);
+		imRender.drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, armorCol);
+	}
 
 	/*if (armor < 100 && armor != 0)
 		imRender.text(newBox.x - 2.0f, newBox.y + pad - 4.0f,
@@ -163,9 +166,9 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 	Box newBox =
 	{
 		box.x,
-		box.y + box.h + 3,
-		box.w + 2,
-		2
+		box.y + box.h + 3.0f,
+		box.w + 2.0f,
+		2.0f
 	};
 
 	int barWidth = currentAmmo * box.w / maxAmmo;
@@ -287,7 +290,7 @@ void Visuals::drawSkeleton(Player_t* ent)
 
 	for (int i = 0; i < studio->m_bonesCount; i++)
 	{
-		auto bone = studio->bone(i);
+		auto bone = studio->getBone(i);
 		if (!bone)
 			continue;
 
@@ -355,15 +358,14 @@ void Visuals::runDLight(Player_t* ent)
 	if (!config.get<bool>(vars.bDLight))
 		return;
 
-	auto DLight = interfaces::efx->clAllocDlight(ent->getIndex());
-	DLight->m_style = DLIGHT_NO_WORLD_ILLUMINATION;
-	DLight->m_color = { config.get<Color>(vars.cDlight) };
-	DLight->m_origin = ent->absOrigin();
-	DLight->m_radius = 80.0f;
-	DLight->m_die = interfaces::globalVars->m_curtime + 0.05f;
-	DLight->m_exponent = true;
-	DLight->m_decay = 30.0f;
-	DLight->m_key = ent->getIndex();
+	auto dLight = interfaces::efx->clAllocDLight(ent->getIndex());
+	dLight->m_color = config.get<Color>(vars.cDlight);
+	dLight->m_origin = ent->m_vecOrigin();
+	dLight->m_radius = config.get<float>(vars.fDlightRadius);
+	dLight->m_die = interfaces::globalVars->m_curtime + 0.1f;
+	dLight->m_exponent = static_cast<char>(config.get<float>(vars.fDlightExponent));
+	dLight->m_decay = config.get<float>(vars.fDlightDecay);
+	dLight->m_key = ent->getIndex();
 }
 
 void Visuals::drawPlayer(Player_t* ent)
@@ -420,37 +422,7 @@ void Visuals::drawSound(IGameEvent* event)
 	if (!entity->isAlive())
 		return;
 
-	if (entity->m_bGunGameImmunity())
-		return;
-
-	static auto modelIndex = interfaces::modelInfo->getModelIndex(XOR("sprites/physbeam.vmt"));
-
-	BeamInfo_t info = {};
-
-	info.m_type = TE_BEAMRINGPOINT;
-	info.m_flags = FBEAM_FADEOUT;
-	info.m_modelName = XOR("sprites/physbeam.vmt");
-	info.m_modelIndex = modelIndex;
-	info.m_haloIndex = -1;
-	info.m_haloScale = 3.0f;
-	info.m_life = 2.0f;
-	info.m_width = 4.0f;
-	info.m_fadeLength = 1.0f;
-	info.m_amplitude = 0.0f;
-	info.m_red = 70.f;
-	info.m_green = 130.f;
-	info.m_blue = 200.f;
-	info.m_brightness = 255.f;
-	info.m_speed = 0.0f;
-	info.m_startFrame = 0.0f;
-	info.m_frameRate = 60.0f;	
-	info.m_vecCenter = entity->absOrigin() + Vector(0.0f, 0.0f, 5.0f);
-	info.m_startRadius = 5.0f;
-	info.m_endRadius = 20.f;
-	info.m_renderable = true;
-
-	if (auto beamDraw = interfaces::beams->createRingPoint(info); beamDraw)
-		interfaces::beams->drawBeam(beamDraw);
+	return; // FIXME: add esp records in vector. Use simple logic of storing records in some struct
 }
 
 Color Visuals::healthBased(Player_t* ent)
@@ -488,7 +460,7 @@ void Visuals::enemyIsAimingAtYou(Player_t* ent)
 	// dynamic fov
 	float fov = math::calcFovReal(ent->getEyePos(), game::localPlayer->getBonePos(3), curEnemyAngle); // 3 is middle body
 
-	if (check)
+	if (check) // no, check it differently
 	{
 		imRender.text(globals::screenX / 2, 60, ImFonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
 	}

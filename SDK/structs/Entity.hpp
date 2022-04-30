@@ -181,6 +181,7 @@ public:
 
 	_NODISCARD Vector getHitboxPos(const int id);
 	_NODISCARD Vector getBonePos(const int id);
+	_NODISCARD Vector getHitgroupPos(const int hitgroup);
 	_NODISCARD bool isC4Owner();
 	_NODISCARD std::string getName();
 	_NODISCARD int getKills();

@@ -34,6 +34,9 @@ class InputSystem;
 struct IDirect3DDevice9;
 class IEffects;
 class KeyValuesSys;
+class IMemAlloc;
+class CTeslaInfo;
+class CEffectData;
 #pragma endregion
 
 namespace interfaces
@@ -70,6 +73,15 @@ namespace interfaces
 	inline IDirect3DDevice9* dx9Device = nullptr;
 	inline IEffects* effects = nullptr;
 	inline KeyValuesSys* keyValuesSys = nullptr;
+	inline IMemAlloc* memAlloc = nullptr;
 
-	void init();
+	bool init();
+}
+
+namespace gameFunctions
+{	
+	using tfn = void(__thiscall*)(CTeslaInfo&);
+	inline tfn tesla = nullptr;
+	using dfn = int(__fastcall*)(const char* name, const CEffectData&);
+	inline dfn dispatchEffect = nullptr;
 }

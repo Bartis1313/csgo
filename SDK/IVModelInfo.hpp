@@ -85,7 +85,8 @@ struct Studiohdr_t
 	{
 		return (i > m_hitboxSetsCount) ? nullptr : reinterpret_cast<Mstudiohitboxset_t*>((uint8_t*)this + m_hitboxSetIndex) + i;
 	}
-	Mstudiobone_t* bone(int i) const
+
+	Mstudiobone_t* getBone(int i) const
 	{
 		return (i > m_bonesCount) ? nullptr : reinterpret_cast<Mstudiobone_t*>((uint8_t*)this + m_boneIndex) + i;
 	}

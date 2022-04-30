@@ -5,6 +5,5 @@
 class IVDebugOverlay
 {
 public:
-	VFUNC(bool, screenPosition, 11, (const Vector& in, Vector& out), (this, std::cref(in), std::ref(out)));
 	VFUNC(bool, worldToScreen, 13, (const Vector& in, Vector& out), (this, std::cref(in), std::ref(out)));
 };

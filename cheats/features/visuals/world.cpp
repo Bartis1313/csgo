@@ -45,9 +45,6 @@ void World::drawMisc()
 
 		switch (cl->m_classID)
 		{
-		case CC4:
-			drawBombDropped(entity);
-			break;
 		case CInferno:
 			drawMolotov(entity);
 			break;
@@ -60,21 +57,6 @@ void World::drawMisc()
 		default:
 			break;
 		}
-	}
-}
-
-void World::drawBombDropped(Entity_t* ent)
-{
-	if (!config.get<bool>(vars.bDrawDroppedC4))
-		return;
-
-	auto ownerHandle = ent->m_hOwnerEntity();
-	auto ownerEntity = interfaces::entList->getClientFromHandle(ownerHandle);
-
-	if (!ownerEntity)
-	{
-		if (Vector screen; imRender.worldToScreen(ent->absOrigin(), screen))
-			imRender.text(screen.x, screen.y, ImFonts::tahoma, XOR("Dropped bomb"), false, config.get<Color>(vars.cDrawDroppedC4));
 	}
 }
 
@@ -142,30 +124,32 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 		return itr != arrid.cend();
 	};
 
-	if (std::string_view projectileName = studio->m_name; (projectileName.find(XOR("thrown")) != std::string::npos || goodID(id))
-		&& config.get<bool>(vars.bDrawProjectiles))
+	if (std::string_view projectileName = studio->m_name; (projectileName.find(XOR("thrown")) != std::string::npos || goodID(id)))
 	{
-		std::pair<std::string, Color> nades;
+		if (config.get<bool>(vars.bDrawProjectiles))
+		{
+			std::pair<std::string, Color> nades;
 
-		if (projectileName.find(XOR("flashbang")) != std::string::npos)
-			nades = { XOR("FLASHBANG"), config.get<Color>(vars.cFlashBang) };
-		if (projectileName.find(XOR("ggrenade")) != std::string::npos && wpn->m_nExplodeEffectTickBegin() < 1) // prevent too long time
-			nades = { XOR("GRENADE"), config.get<Color>(vars.cGranede) };
-		if (projectileName.find(XOR("molotov")) != std::string::npos)
-			nades = { XOR("MOLOTOV"), config.get<Color>(vars.cMolotov) };
-		if (projectileName.find(XOR("incendiary")) != std::string::npos)
-			nades = { XOR("FIRE INC"), config.get<Color>(vars.cIncediary) };
-		if (projectileName.find(XOR("smokegrenade")) != std::string::npos && !reinterpret_cast<Smoke_t*>(wpn)->m_nSmokeEffectTickBegin()) // prevent too long time
-			nades = { XOR("SMOKE"), config.get<Color>(vars.cSmoke) };
-		if (projectileName.find(XOR("decoy")) != std::string::npos) // this nade time is also too long, to prevent it you need to check tick time. There is no netvar for decoys
-			nades = { XOR("DECOY"), config.get<Color>(vars.cDecoy) };
+			if (projectileName.find(XOR("flashbang")) != std::string::npos)
+				nades = { XOR("FLASHBANG"), config.get<Color>(vars.cFlashBang) };
+			if (projectileName.find(XOR("ggrenade")) != std::string::npos && wpn->m_nExplodeEffectTickBegin() < 1) // prevent too long time
+				nades = { XOR("GRENADE"), config.get<Color>(vars.cGranede) };
+			if (projectileName.find(XOR("molotov")) != std::string::npos)
+				nades = { XOR("MOLOTOV"), config.get<Color>(vars.cMolotov) };
+			if (projectileName.find(XOR("incendiary")) != std::string::npos)
+				nades = { XOR("FIRE INC"), config.get<Color>(vars.cIncediary) };
+			if (projectileName.find(XOR("smokegrenade")) != std::string::npos && !reinterpret_cast<Smoke_t*>(wpn)->m_nSmokeEffectTickBegin()) // prevent too long time
+				nades = { XOR("SMOKE"), config.get<Color>(vars.cSmoke) };
+			if (projectileName.find(XOR("decoy")) != std::string::npos) // this nade time is also too long, to prevent it you need to check tick time. There is no netvar for decoys
+				nades = { XOR("DECOY"), config.get<Color>(vars.cDecoy) };
 
-		if (Box box; utilities::getBox(ent, box))
-			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana, nades.first, true, nades.second);
+			if (Box box; utilities::getBox(ent, box))
+				imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana, nades.first, true, nades.second);
+		}
 	}
-	else if (projectileName.find(XOR("dropped")) != std::string::npos && config.get<bool>(vars.bDrawDropped))
+	else if (projectileName.find(XOR("dropped")) != std::string::npos)
 	{
-		if (Box box; utilities::getBox(ent, box))
+		if (Box box; utilities::getBox(ent, box) && config.get<bool>(vars.bDrawDropped))
 		{
 			float fontSize = visuals.getScaledFontSize(ent, 60.0f, 11.0f, 16.0f);
 			using cont = std::vector<bool>; // container
@@ -411,8 +395,11 @@ void World::drawSmoke(Entity_t* ent)
 	if (!smoke)
 		return;
 
-	if (!smoke->m_nSmokeEffectTickBegin()) // dont do anything when smoke is thrown
+	if (!smoke->m_nSmokeEffectTickBegin())
+	{
+		drawCustomSmoke(ent->absOrigin(), 30.0f, math::customSin(interfaces::globalVars->m_curtime, 4.0f));
 		return;
+	}
 
 	auto timeToTicks = [=](const float time)
 	{
@@ -428,7 +415,8 @@ void World::drawSmoke(Entity_t* ent)
 	//imRender.drawCircle3DFilled(origin, smokeRadius, 216, col, col, true, 2.0f);
 	// many points to make it smooth
 	drawArc3DSmoke(origin, smokeRadius, 512, scale, config.get<Color>(vars.cDrawSmoke), false, 2.0f, ImFonts::tahoma, std::format(XOR("{:.2f}s"), time), Colors::Orange);
-	
+	drawCustomSmoke(origin, smokeRadius, math::customSin(interfaces::globalVars->m_curtime, 4.0f));
+
 	// timer
 	/*if (Vector2D s; imRender.worldToScreen(origin, s))
 	{
@@ -439,13 +427,13 @@ void World::drawSmoke(Entity_t* ent)
 
 void World::drawZeusRange()
 {
+	if (!game::isAvailable())
+		return;
+
+	const static auto sv_party_mode = interfaces::cvar->findVar(XOR("sv_party_mode"));
+	config.get<bool>(vars.bZeusPartyMode) ? sv_party_mode->setValue(true) : sv_party_mode->setValue(false);
+
 	if (!config.get<bool>(vars.bDrawZeusRange))
-		return;
-
-	if (!game::localPlayer)
-		return;
-
-	if (!interfaces::engine->isInGame())
 		return;
 
 	auto weapon = game::localPlayer->getActiveWeapon();
@@ -457,9 +445,10 @@ void World::drawZeusRange()
 		const static float range = weapon->getWpnInfo()->m_range;
 		const Vector abs = game::localPlayer->absOrigin() + Vector(0.0f, 0.0f, 30.0f); // small correction to get correct trace visually, will still throw false positives on stairs etc...
 
-		imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer, config.get<Color>(vars.cZeusRange), true, 2.5f);
-
-		//imRender.drawCircle3D(game::localPlayer->absOrigin(), weapon->getWpnInfo()->m_range, 32, config.get<Color>(vars.cZeusRange), true, 2.0f);
+		if (config.get<bool>(vars.bZeusUseTracing))
+			imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer, config.get<Color>(vars.cZeusRange), true, 2.5f);
+		else
+			imRender.drawCircle3D(abs, range, 32, config.get<Color>(vars.cZeusRange), true, 2.0f);
 	}
 }
 
@@ -493,7 +482,6 @@ void World::drawMovementTrail()
 		config.get<bool>(vars.bMovementRainbow)
 			? color = Color::rainbowColor(interfaces::globalVars->m_realtime, config.get<float>(vars.fMovementRainbowSpeed))
 			: color = config.get<Color>(vars.cMovementTrail);
-		const static auto modelIndex = interfaces::modelInfo->getModelIndex(XOR("sprites/purplelaser1.vmt"));
 
 		const Vector start = game::localPlayer->m_vecOrigin();
 
@@ -501,7 +489,7 @@ void World::drawMovementTrail()
 
 		info.m_type = TE_BEAMPOINTS;
 		info.m_modelName = XOR("sprites/purplelaser1.vmt");
-		info.m_modelIndex = modelIndex;
+		info.m_modelIndex = -1;
 		info.m_vecStart = start;
 		info.m_vecEnd = end;
 		info.m_haloIndex = -1;
@@ -521,8 +509,7 @@ void World::drawMovementTrail()
 		info.m_segments = 2;
 		info.m_renderable = true;
 
-		if (auto myBeam = interfaces::beams->createBeamPoints(info); myBeam)
-			interfaces::beams->drawBeam(myBeam);
+		auto myBeam = interfaces::beams->createBeamPoints(info);			
 
 		// change to pos after beam is drawn, since it's static it's possible
 		end = start;
@@ -573,4 +560,123 @@ void World::drawMovementTrail()
 	default:
 		break;
 	}
+}
+
+void World::clientSideImpacts()
+{
+	if (!config.get<bool>(vars.bDrawClientSideImpacts))
+		return;
+
+	if (!game::isAvailable())
+		return;
+
+	auto m_vecBulletVerifyListClient = *reinterpret_cast<CUtlVector<clientHitVerify_t>*>((uintptr_t)game::localPlayer + 0x11C50);
+	static int gameBulletCount = m_vecBulletVerifyListClient.m_size; // init current count
+
+	for (int i = m_vecBulletVerifyListClient.m_size; i > gameBulletCount; i--) // get current bullets, NOT all
+		m_hitsClientSide.emplace_back(hitStruct_t
+			{
+				m_vecBulletVerifyListClient[i - 1].m_pos,
+				interfaces::globalVars->m_curtime + config.get<float>(vars.fDrawClientSideImpacts)
+			});
+
+	if (m_vecBulletVerifyListClient.m_size != gameBulletCount)
+		gameBulletCount = m_vecBulletVerifyListClient.m_size;
+
+	for (size_t i = 0; const auto & el : m_hitsClientSide)
+	{
+		float diff = el.m_expire - interfaces::globalVars->m_curtime;
+
+		if (diff < 0.0f)
+		{
+			m_hitsClientSide.erase(m_hitsClientSide.begin() + i);
+			continue;
+		}	
+
+		imRender.drawBox3DFilled(el.m_pos, { 4.0f, 4.0f }, 4.0f,
+			config.get<Color>(vars.cDrawClientSideImpactsLine), config.get<Color>(vars.cDrawClientSideImpactsFill));
+
+		i++;
+	}
+}
+
+void World::localImpacts()
+{
+	if (!config.get<bool>(vars.bDrawLocalSideImpacts))
+		return;
+
+	for (size_t i = 0; const auto & el : m_hitsLocal)
+	{
+		float diff = el.m_expire - interfaces::globalVars->m_curtime;
+
+		if (diff < 0.0f)
+		{
+			m_hitsLocal.erase(m_hitsLocal.begin() + i);
+			continue;
+		}
+
+		Trace_t tr;
+		TraceFilter filter;
+		filter.m_skip = game::localPlayer;
+		interfaces::trace->traceRay({ el.m_start, el.m_end }, MASK_PLAYER, &filter, &tr);
+
+		imRender.drawBox3DFilled(tr.m_end, { 4.0f, 4.0f }, 4.0f, 
+			config.get<Color>(vars.cDrawLocalSideImpactsLine), config.get<Color>(vars.cDrawLocalSideImpactsFill));
+
+		i++;
+	}
+}
+
+void World::removeBloodSpray(int frame)
+{
+	if (frame != FRAME_RENDER_START)
+		return;
+
+	if (!game::localPlayer)
+		return;
+
+	constexpr std::array arr = // r_cleardecals 
+	{
+		"decals/flesh/blood1_subrect",
+		"decals/flesh/blood2_subrect",
+		"decals/flesh/blood3_subrect",
+		"decals/flesh/blood4_subrect",
+		"decals/flesh/blood5_subrect",
+		"decals/flesh/blood6_subrect",
+		"decals/flesh/blood8_subrect",
+		"decals/flesh/blood9_subrect",
+	};
+
+	for (const auto name : arr)
+	{
+		auto mat = interfaces::matSys->findMaterial(name, XOR(TEXTURE_GROUP_DECAL));
+		mat->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, config.get<bool>(vars.bRemoveBloodSpray));
+	}
+}
+
+// not really removal, more like a "helper"
+void World::removeSmoke(int frame)
+{
+	if (frame != FRAME_RENDER_START)
+		return;
+
+	if (!game::localPlayer)
+		return;
+
+	const static auto throughSmoke = utilities::patternScan(CLIENT_DLL, GOES_THROUGH_SMOKE);
+	const static auto smokeCount = *reinterpret_cast<uintptr_t*>(throughSmoke + 0x8);
+
+	if (config.get<bool>(vars.bEditEffects)) // remove effects from inside, this is why we nulling smoke count
+		*reinterpret_cast<size_t*>(smokeCount) = 0;
+}
+
+void World::drawCustomSmoke(const Vector& pos, float radius, float angl)
+{
+	//printf("%f\n", angl);
+
+	constexpr float step = std::numbers::pi_v<float> *2.0f / 32;
+	float angle = std::numbers::pi_v<float> *2.0f * angl;
+	Vector end = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
+
+	interfaces::effects->smoke(end, -1, 5.0f, 1.0f);
 }

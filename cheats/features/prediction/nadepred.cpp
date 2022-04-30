@@ -107,7 +107,7 @@ void GrenadePrediction::draw()
 
 	for (const auto& el : m_bounces)
 	{
-		imRender.drawBox3DFilled(el, { 5.0f, 5.0f }, 5.0f, Colors::Green, Colors::Green);
+		imRender.drawBox3DFilled(el, { 4.0f, 4.0f }, 4.0f, Colors::Green, Colors::Green);
 	}
 
 	imRender.drawCircle3D(m_path.back(), weapon->getNadeRadius(), 32, Colors::White);
@@ -175,10 +175,13 @@ void GrenadePrediction::simulate()
 		if (s & DETONATE)
 			break;
 
-		if ((s & BOUNCE) || logtimer >= logstep)
+		if (s & BOUNCE || logtimer >= logstep)
 			logtimer = 0;
 		else
 			++logtimer;
+
+		if (vecThrow.isZero())
+			break;
 	}
 
 	m_path.push_back(vecSrc);
@@ -329,11 +332,10 @@ void GrenadePrediction::resolveFlyCollisionCustom(Trace_t& tr, Vector& velocity,
 		if (speedAbsSqr < minSpeed)
 			absVelocity = {};
 
-		else
-		{
+		
 			velocity = absVelocity;
 			pushEntity(tr.m_end, absVelocity * ((1.0f - tr.m_fraction) * interval), tr);
-		}
+		
 	}
 	else
 	{

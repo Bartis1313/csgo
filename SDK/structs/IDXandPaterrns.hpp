@@ -25,6 +25,7 @@ enum VTableIndexes
 #define STUDIORENDER_DLL		XOR("studiorender.dll")
 #define INPUTSYSTEM_DLL			XOR("inputsystem.dll")
 #define SHARED_API				XOR("shaderapidx9.dll")
+#define TIER_DLL				XOR("tier0.dll")
 
 #define GLOWMANAGER				XOR("0F 11 05 ? ? ? ? 83 C8 01")
 #define BEAMS					XOR("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")
@@ -59,3 +60,56 @@ enum VTableIndexes
 #define KEY_VALUES_LOAD_BUF		XOR("55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89")
 #define CACHED_BONE				XOR("FF B7 ? ? ? ? 52")
 #define PARTICLE_SIMULATE		XOR("55 8B EC 83 E4 F8 83 EC 30 56 57 8B F9 0F 28 E1 8B 0D ? ? ? ? F3 0F 11 64 24 ? 89 7C 24 18 8B 81")
+/*
+ManhackSparks
+TeslaZap
+TeslaHitboxes
+CommandPointer
+GunshipImpact
+Smoke
+MuzzleFlash
+Error
+BoltImpact
+RPGShotDown
+GlassImpact
+EjectBrass_338Mag
+EjectBrass_762Nato
+EjectBrass_556
+EjectBrass_57
+EjectBrass_12Gauge
+EjectBrass_9mm
+CS_MuzzleFlash_X
+CS_MuzzleFlash
+KnifeSlash
+Impact
+CS_HolidayLight
+csblood
+waterripple
+gunshotsplash
+watersplashquiet
+watersplash
+TracerSound
+ParticleTracer
+Tracer
+ShotgunShellEject
+RifleShellEject
+ShellEject
+RagdollImpact
+HelicopterMegaBomb
+WaterSurfaceExplosion
+Explosion
+HunterDamage
+BloodImpact
+bloodspray
+WheelDust
+ShakeRopes
+ParticleEffectStop
+ParticleEffect
+*/
+#define HEAD_OF_EFFECTS			XOR("8B 35 ? ? ? ? 85 F6 0F 84 ? ? ? ? 0F 1F 00")
+#define GOES_THROUGH_SMOKE		XOR("55 8B EC 83 EC 08 8B 15 ? ? ? ? 0F 57 C0")
+#define DISPATCH_EFFECT			XOR("55 8B EC 83 E4 F8 83 EC 20 56 57 8B F9 C7 44 24")
+#define FX_TESLA				XOR("55 8B EC 81 EC ? ? ? ? 56 57 8B F9 8B 47 18")
+#define FLASHLIGHT_CREATE		XOR("55 8B EC F3 0F 10 45 ? B8")
+#define FLASHLIGHT_DESTROY		XOR("56 8B F1 E8 ? ? ? ? 8B 4E 28")
+#define FLASHLIGHT_UPDATE		XOR("E8 ? ? ? ? 8B 06 F3 0F 10 46")

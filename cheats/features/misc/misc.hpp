@@ -3,6 +3,8 @@
 #include <deque>
 #include <vector>
 
+#include "../../../SDK/math/Vector.hpp"
+
 class IGameEvent;
 
 class Misc final
@@ -18,6 +20,9 @@ public:
 	void playHitmarker(IGameEvent* event);
 	void drawNoScope();
 	void drawHat();
+	void drawBulletTracer(const Vector& start, const Vector& end);
+	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/255782-cs-flash-light.html + kept less asm and updated everything
+	void flashLight(int frame);
 private:
 	std::deque<float> velRecords;
 	constexpr static size_t RECORDS_SIZE_VEL = 300;
@@ -28,11 +33,11 @@ private:
 		int m_dmg;
 		int m_health;
 		bool m_head;
+		Vector m_pos;
 
 		bool isAvailable() const { return m_health >= 0; }
 	};
 	std::vector<Hitmark_t> m_hitmarkers;
-
 };
 
 inline Misc misc;

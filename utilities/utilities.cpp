@@ -113,7 +113,7 @@ bool utilities::getBox(Entity_t* ent, Box& box, Box3D& box3D)
 		top = std::min(top, screen.at(i).y);
 		right = std::max(right, screen.at(i).x);
 		bottom = std::max(bottom, screen.at(i).y);
-		
+
 		box3D.points.at(i) = screen.at(i);
 	}
 
@@ -123,7 +123,7 @@ bool utilities::getBox(Entity_t* ent, Box& box, Box3D& box3D)
 	box.h = bottom - top;
 
 	// get important points, eg: if you use 3d box, you want to render health by quads, not rects
-	
+
 	box3D.topleft = screen.at(7);
 	box3D.topright = screen.at(6);
 	box3D.bottomleft = screen.at(3);
@@ -316,7 +316,7 @@ float utilities::scaleDamageArmor(float dmg, const float armor)
 	return dmg;
 }
 
-_NODISCARD std::string utilities::u8toStr(const std::u8string& u8str)
+std::string utilities::u8toStr(const std::u8string& u8str)
 {
 	return std::string{ u8str.cbegin(), u8str.cend() };
 }

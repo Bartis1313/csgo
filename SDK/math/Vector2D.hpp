@@ -14,7 +14,39 @@ struct Vector2D
 
 	constexpr auto operator<=>(const Vector2D&) const = default;
 
-	[[nodiscard]] constexpr bool isZero() const
+	constexpr Vector2D& operator+=(const Vector2D& v)
+	{
+		x += v.x; y += v.y;
+		return *this;
+	}
+
+	constexpr Vector2D& operator-=(const Vector2D& v)
+	{
+		x -= v.x; y -= v.y;
+		return *this;
+	}
+
+	constexpr Vector2D operator+(const Vector2D& v) const
+	{
+		return Vector2D{ x + v.x, y + v.y };
+	}
+
+	constexpr Vector2D operator-(const Vector2D& v) const
+	{
+		return Vector2D{ x - v.x, y - v.y };
+	}
+
+	_NODISCARD float length() const
+	{
+		return std::sqrt(x * x + y * y);
+	}
+
+	_NODISCARD float distTo(const Vector2D& vOther) const
+	{
+		return (*this - vOther).length();
+	}
+
+	_NODISCARD constexpr bool isZero() const
 	{
 		return x == 0.0f && y == 0.0f;
 	}

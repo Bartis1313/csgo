@@ -28,7 +28,7 @@ struct Box3D;
 template<typename T>
 _NODISCARD constexpr auto E2T(T en) { return static_cast<std::underlying_type_t<T>>(en); }
 
-inline constexpr std::string operator"" _u8str(const char8_t* str, std::size_t s)
+inline constexpr std::string operator"" _u8str(const char8_t* str, size_t s)
 {
     return std::string{ str, str + s };
 }
@@ -60,3 +60,40 @@ namespace utilities
     _NODISCARD float scaleDamageArmor(float dmg, const float armor);
     _NODISCARD std::string u8toStr(const std::u8string& u8str);
 }
+
+#include <random>
+#include <type_traits>
+
+namespace __randomHelper // helper to know when given type is a real int, not like casted chars
+{
+    template<typename T>
+    inline bool constexpr is_character_v
+    {
+        std::is_same_v<T, char>     ||
+        std::is_same_v<T, wchar_t>  ||
+        std::is_same_v<T, char16_t> ||
+        std::is_same_v<T, char32_t> ||
+        std::is_same_v<T, char8_t>
+    };
+    template<typename T>
+    inline bool constexpr is_integral_v{ std::is_integral_v<T> && !is_character_v<T> };
+    template<typename T>
+    inline bool constexpr is_floating_v{ std::is_floating_point_v<T> };
+}
+
+class Random // sfinae rule simple template static class
+{
+public:
+    template<typename T>
+    static std::enable_if_t<__randomHelper::is_integral_v<T>, T> getRandom(T min, T max)
+    {
+        return std::uniform_int_distribution<T>{min, max}(rng);
+    }
+    template<typename T>
+    static std::enable_if_t<__randomHelper::is_floating_v<T>, T> getRandom(T min, T max)
+    {
+        return std::uniform_real_distribution<T>{min, max}(rng);
+    }
+private:
+    inline static std::mt19937 rng{ std::random_device{}() };
+};

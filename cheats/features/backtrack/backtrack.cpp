@@ -83,8 +83,11 @@ float Backtrack::extraTicks() const
 	return std::clamp(network->getLatency(FLOW_INCOMING) - network->getLatency(FLOW_OUTGOING), 0.0f, 0.2f);
 }
 
-void Backtrack::update()
+void Backtrack::update(int frame)
 {
+	if (frame != FRAME_RENDER_START)
+		return;
+
 	if (!game::localPlayer || !config.get<bool>(vars.bBacktrack) || !game::localPlayer->isAlive())
 	{
 		// basically reset all
@@ -131,10 +134,11 @@ void Backtrack::update()
 		// head will be used for calculations, from my testing it seemed to be better
 		record.m_origin = entity->absOrigin();
 		record.m_simtime = entity->m_flSimulationTime();
-		record.m_head = entity->getBonePos(8);
 
 		// setup bones for us, will be needed for basically get good matrix, can draw backtrack'ed models etc...
-		entity->setupBones(record.m_matrix, BONE_USED_BY_HITBOX, BONE_USED_MASK, interfaces::globalVars->m_curtime);
+		if (!entity->setupBones(record.m_matrix, BONE_USED_BY_HITBOX, BONE_USED_MASK, interfaces::globalVars->m_curtime))
+			continue;
+		record.m_head = record.m_matrix[8].origin();
 
 		// fill them
 		m_records.at(i).push_front(record);
@@ -235,6 +239,6 @@ void Backtrack::run(CUserCmd* cmd)
 	if (bestRecordIdx != -1)
 	{
 		const auto& record = m_records.at(bestPlayerIdx).at(bestRecordIdx);
-		cmd->m_tickcount = TIME_TO_TICKS(record.m_simtime);
+		cmd->m_tickcount = TIME_TO_TICKS(record.m_simtime + getLerp());
 	}
 }

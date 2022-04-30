@@ -22,7 +22,7 @@ private:
 	struct DColor
 	{
 		DColor() = default;
-		DColor(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t)
+		DColor(uint8_t _r, uint8_t _g, uint8_t _b)
 			: r{ _r }, g{ _g }, b{ _b }
 		{}
 		DColor(const Color& clr)
@@ -50,7 +50,7 @@ public:
 class IVEfx
 {
 public:
-	VFUNC(DLight_t*, clAllocDlight, 4, (int key), (this, key));
+	VFUNC(DLight_t*, clAllocDLight, 4, (int key), (this, key));
 	VFUNC(DLight_t*, clAllocElight, 5, (int key), (this, key));
-	VFUNC(DLight_t*, getElightbyKey, 8, (int key), (this, key));
+	VFUNC(DLight_t*, getElightByKey, 8, (int key), (this, key));
 };

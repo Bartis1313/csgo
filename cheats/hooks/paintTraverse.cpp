@@ -82,6 +82,8 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 				world.drawMovementTrail();
 				nadePred.draw();
 				misc.drawHat();
+				world.clientSideImpacts();
+				world.localImpacts();
 			});
 	}
 }

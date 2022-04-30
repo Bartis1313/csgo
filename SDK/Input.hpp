@@ -7,7 +7,7 @@
 class Input
 {
 public:
-    PAD(173);
+    PAD(169);
     bool m_cameraInThirdPerson;
     PAD(2);
     Vector m_cameraOffset;

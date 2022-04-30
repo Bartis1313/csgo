@@ -8,6 +8,7 @@
 #include "../../../SDK/CGlobalVars.hpp"
 #include "../../../SDK/IGameEvent.hpp"
 #include "../../../SDK/IWeapon.hpp"
+#include "../../../SDK/IViewRenderBeams.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
 
 #include "../../../config/vars.hpp"
@@ -284,6 +285,13 @@ void Misc::getVelocityData()
 		return;
 	}
 
+	float vel = game::localPlayer->m_vecVelocity().length2D();
+	if (std::isinf(vel))
+	{
+		console.log(TypeLogs::LOG_WARN, XOR("record for plot got skipped due to infinity"));
+		return;
+	}
+
 	velRecords.emplace_back(game::localPlayer->m_vecVelocity().length2D());
 
 	// width
@@ -302,6 +310,7 @@ void Misc::drawVelocityPlot()
 
 	static float MAX_SPEEED_MOVE = interfaces::cvar->findVar(XOR("sv_maxspeed"))->getFloat(); // should be accurate
 	static Color cLine = Colors::White;
+	static bool transparent = false;
 
 	bool& sliderRef = config.getRef<bool>(vars.bVelocityCustom);
 	if (sliderRef)
@@ -313,19 +322,33 @@ void Misc::drawVelocityPlot()
 			ImGui::ColorPicker(XOR("Color lines plot##vel"), &cLine);
 			ImGui::SameLine();
 			ImGui::Text(XOR("Color line"));
+			ImGui::Checkbox(XOR("Run transparent"), &transparent);
+			ImGui::SameLine();
+			ImGui::HelpMarker(XOR("Will add some flags!\nEg: no resize"));
 
 			ImGui::End();
 		}
 	}
 
-	if (ImGui::Begin(XOR("Plot Velocity"), &plotVelRef, ImGuiWindowFlags_NoCollapse))
+	int flags = transparent
+		? ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
+		: ImGuiWindowFlags_NoCollapse;
+
+	if (ImGui::Begin(XOR("Plot Velocity"), &plotVelRef, flags))
 	{
-		imRenderWindow.addList(); // correct pos, so we start from x = 0 y = 0
+		imRenderWindow.addList(); // correct pos, so we start from x = 0 y = 0	
 		float acceptance = imRenderWindow.getWidth() / static_cast<float>(RECORDS_SIZE_VEL / acceptanceVelocityCustom);
 		float prevX = 0.0f, prevY = 0.0f;
+		float prevVel = 0.0f;
 		float scaledavg = MAX_SPEEED_MOVE / imRenderWindow.getHeight(); // might run some better logic...
+		float scaledFontSize = imRenderWindow.getWidth() / 25.0f;
+		float width = imRenderWindow.getWidth();
+		float height = imRenderWindow.getHeight();
+
 		for (size_t i = 0; const auto & currentVel : velRecords)
 		{
+			float deltaVel = std::abs(currentVel - prevVel);
+
 			float currentX = i * acceptance; // no need for clamping
 
 			float currentY = imRenderWindow.getHeight() - (currentVel / scaledavg); // is there any better way for this?
@@ -334,11 +357,36 @@ void Misc::drawVelocityPlot()
 
 			// start drawing after there is any change, we could use polylines here
 			if (i > 0)
+			{
 				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, cLine);
+				if (deltaVel > 20) // would need proper edge detection
+					imRenderWindow.drawText(static_cast<int>(currentX) + 10, static_cast<int>(currentY) - 10, scaledFontSize, ImFonts::verdana,
+						std::format("{}", std::round(currentVel)), true, Colors::Pink, false);
+			}
 			prevX = currentX; prevY = currentY;
+			prevVel = currentVel;
 
 			i++;
 		}
+
+		auto text = [drawing = ImGui::GetBackgroundDrawList()]
+		(const float x, const float y, const float size, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
+		{
+			ImVec2 pos = { x, y };
+
+			if (auto tsize = ImGui::CalcTextSize(text.c_str()); centered)
+				pos.x -= tsize.x / 2.0f;
+
+			if (dropShadow)
+			{
+				const auto alpha = ImGui::ColorConvertU32ToFloat4(U32(color)).z;
+				drawing->AddText(font, size, { pos.x + 1.0f, pos.y + 1.0f }, U32(Colors::Black.getColorEditAlpha(alpha)), text.c_str());
+			}
+			drawing->AddText(font, size, pos, U32(color), text.c_str());
+		};
+
+		text(imRenderWindow.getPos().x + width / 2.0f, imRenderWindow.getPos().y + 20.0f + height, 30.0f, ImFonts::verdana,
+			std::format("{}", std::round(game::localPlayer->m_vecVelocity().length2D())), true, Colors::Pink, false);
 
 		ImGui::End();
 	}
@@ -377,7 +425,8 @@ void Misc::playHitmarker(IGameEvent* event)
 		interfaces::globalVars->m_curtime + config.get<float>(vars.fHitmarkerTime),
 		dmg_health,
 		ent->m_iHealth() - dmg_health,
-		hitgroup == 1 // head
+		hitgroup == 1, // head
+		ent->getHitgroupPos(hitgroup)
 	};
 	m_hitmarkers.push_back(hit);
 	if (config.get<bool>(vars.bPlayHitmarker))
@@ -395,12 +444,15 @@ void Misc::drawHitmarker()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	int x = globals::screenX;
-	int y = globals::screenY;
-	x /= 2.0f, y /= 2.0f;
+	int x, y;
+	bool mode3D = config.get<bool>(vars.bDrawHitmarker3D);
+	if (!mode3D)
+	{
+		x = globals::screenX / 2.0f;
+		y = globals::screenY / 2.0f;
+	}
 
 	float currentAlpha = 0.0f;
-	Color actualColor;
 	for (size_t i = 0; const auto & el : m_hitmarkers)
 	{
 		float diff = el.m_expire - interfaces::globalVars->m_curtime;
@@ -411,38 +463,54 @@ void Misc::drawHitmarker()
 			continue;
 		}
 
+		Vector2D s;
+		if (mode3D)
+		{
+			if (!imRender.worldToScreen(el.m_pos, s))
+				continue;
+
+			x = s.x;
+			y = s.y;
+		}
+
 		currentAlpha = diff / config.get<float>(vars.fHitmarkerTime);
+		float sizeFont = 16.0f;
+		Color actualColor = config.get<Color>(vars.cDrawHitmarkerNormal).getColorEditAlpha(currentAlpha);
+		float lineX = 10.0f;
+		float lineY = 5.0f;
 
 		if (el.isAvailable() && el.m_head)
-			actualColor = Colors::Pink.getColorEditAlpha(currentAlpha);
+		{
+			actualColor = config.get<Color>(vars.cDrawHitmarkerHead).getColorEditAlpha(currentAlpha);
+			sizeFont = 24.0f;
+			lineX = 14.0f;
+			lineY = 7.0f;
+		}
 		else if (!el.isAvailable())
-			actualColor = Colors::Green.getColorEditAlpha(currentAlpha);
-		else
-			actualColor = Colors::White.getColorEditAlpha(currentAlpha);
+		{
+			actualColor = config.get<Color>(vars.cDrawHitmarkerDead).getColorEditAlpha(currentAlpha);
+			sizeFont = 28.0f;
+			lineX = 18.0f;
+			lineY = 9.0f;
+		}
 
-		constexpr int moveMultiply = 25;
-		float correction = (1.0f - currentAlpha) * moveMultiply; // this maybe should have el.expire ratio to previus one
-		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
-		float Ycorrection = y - (correction * 4.0f); // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
+		float lineAddonX = lineX / (1.0f / (currentAlpha + 0.01f)); // prevent division by 0 and make ratio
+		float lineAddonY = lineY / (1.0f / (currentAlpha + 0.01f));
 
-		imRender.text(Xcorrection, Ycorrection, ImFonts::tahoma, std::format(XOR("{}"), el.m_dmg), false, actualColor);
-
-		i++;
-	}
-
-	constexpr float lineX = 10.0f;
-	constexpr float lineY = 5.0f;
-	float lineAddonX = lineX / (1.0f / (currentAlpha + 0.01f)); // prevent division by 0 and make ratio
-	float lineAddonY = lineY / (1.0f / (currentAlpha + 0.01f));
-
-	if (!m_hitmarkers.empty())
-	{
 		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor);
 		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor);
 		imRender.drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor);
 		imRender.drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor);
+
+		constexpr int moveMultiply = 25;
+		float correction = (1.0f - currentAlpha) * moveMultiply; // this maybe should have el.expire ratio to previous one
+		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
+		float Ycorrection = y - (correction * 4.0f); // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
+
+		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma, std::format(XOR("{}"), el.m_dmg), false, actualColor, false);
+
+		i++;
 	}
-	
 }
 
 void Misc::drawNoScope()
@@ -517,4 +585,103 @@ void Misc::drawHat()
 	{
 		imRender.drawCone(pos, config.get<float>(vars.fHatRadius), 86, config.get<float>(vars.fHatSize), config.get<Color>(vars.cHatTriangle), config.get<Color>(vars.cHatLine), true, 2.0f);
 	}
+}
+
+void Misc::drawBulletTracer(const Vector& start, const Vector& end)
+{
+	if (!config.get<bool>(vars.bDrawBulletTracer))
+		return;
+
+	Color color = config.get<Color>(vars.cDrawBulletTracer);
+
+	Trace_t tr;
+	TraceFilter filter;
+	filter.m_skip = game::localPlayer;
+	interfaces::trace->traceRay({ start, end }, MASK_PLAYER, &filter, &tr);
+
+	BeamInfo_t info = {};
+
+	info.m_type = TE_BEAMPOINTS;
+	info.m_flags = FBEAM_FADEIN | FBEAM_FADEOUT;
+	info.m_modelName = XOR("sprites/physbeam.vmt");
+	info.m_modelIndex = -1;
+	info.m_haloIndex = -1;
+	info.m_haloScale = 3.0f;
+	info.m_life = config.get<float>(vars.fDrawBulletTracer);
+	info.m_width = 2.0f;
+	info.m_endWidth = 2.0f;
+	info.m_fadeLength = 1.0f;
+	info.m_amplitude = 2.0f;
+	info.m_red = color.rMultiplied();
+	info.m_green = color.gMultiplied();
+	info.m_blue = color.bMultiplied();
+	info.m_brightness = color.aMultiplied();
+	info.m_speed = 0.2f;
+	info.m_startFrame = 0.0f;
+	info.m_frameRate = 60.0f;
+	info.m_vecStart = start;
+	info.m_vecEnd = tr.m_end;
+	info.m_segments = 2;
+	info.m_renderable = true;
+
+	interfaces::beams->createBeamPoints(info);
+}
+
+#include "../../../SDK/CFlashlightEffect.hpp"
+#include "../../../SDK/IMemAlloc.hpp"
+
+static CFlashlightEffect* createFlashlight(float fov, Entity_t* ent, const char* effectName = XOR("effects/flashlight001"), float farZ = 1000.0f, float linearAtten = 1000.0f)
+{
+	auto flashlightMemory = reinterpret_cast<CFlashlightEffect*>(interfaces::memAlloc->_alloc(sizeof(CFlashlightEffect)));
+	if (!flashlightMemory)
+		return nullptr;
+
+	//__userpurge, this works which I am surprised, but I don't want to give bad example
+	//using fn = CFlashlightEffect * (__thiscall*)(void*, void*, float, float, float, float, int, const char*, float, float);
+	const static auto create = utilities::patternScan(CLIENT_DLL, FLASHLIGHT_CREATE);
+
+	int idx = ent->getIndex(); // allow asm passing this arg
+	__asm
+	{
+		mov eax, fov // fov = (*(int (__stdcall **)(const char *, const char *, signed int, signed int))(*(_DWORD *)ptrfl + 0x16C))
+		mov ecx, flashlightMemory
+		push /*dword ptr[linearAtten]*/ linearAtten
+		push /*dword ptr[farZ]*/ farZ
+		push /*dword ptr[effectName]*/ effectName
+		push /*dword ptr[idx]*/ idx
+		call create
+		leave // for userpurge
+		ret // for userpurge
+	}
+
+	//create(flashlightMemory, nullptr, 0.0f, 0.0f, 0.0f, fov, ent->getIndex(), pszTextureName, farZ, linearAtten);
+
+	return flashlightMemory;
+}
+
+static void destroyFlashLight(CFlashlightEffect* flashlight)
+{
+	using fn = void(__thiscall*)(void*, void*);
+	const static auto destroy = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, FLASHLIGHT_DESTROY));
+	destroy(flashlight, nullptr); // second arg is not even used there
+}
+
+static void updateFlashlight(CFlashlightEffect* flashlight, const Vector& pos, const Vector& forward, const Vector& right, const Vector& up)
+{
+	using fn = void(__thiscall*)(void*, int, const Vector&, const Vector&, const Vector&, const Vector&, float, float, float, bool, const char*);
+	const static uintptr_t update = utilities::patternScan(CLIENT_DLL, FLASHLIGHT_UPDATE); // call
+	const static uintptr_t relativeAddress = *reinterpret_cast<uintptr_t*>(update + 0x1); // read the rel32
+	const static uintptr_t nextInstruction = update + 0x5; // mov eax, [esi]
+
+	const static auto fun = reinterpret_cast<fn>(relativeAddress + nextInstruction);
+	fun(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov, flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
+}
+
+void Misc::flashLight(int frame)
+{
+	if (frame != FRAME_RENDER_START)
+		return;
+
+	static CFlashlightEffect* flashlight = nullptr;
+	return;
 }

@@ -124,6 +124,9 @@ static void renderVisuals()
 				ImGui::Checkbox(XOR("Dlight"), &config.getRef<bool>(vars.bDLight));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Dlight color"), &config.getRef<Color>(vars.cDlight));
+				ImGui::SliderFloat(XOR("Dlight radius"), &config.getRef<float>(vars.fDlightRadius), 0.0f, 300.0f);
+				ImGui::SliderFloat(XOR("Dlight exponent"), &config.getRef<float>(vars.fDlightExponent), 0.0f, 12.0f);
+				ImGui::SliderFloat(XOR("Dlight decay"), &config.getRef<float>(vars.fDlightDecay), 0.0f, 100.0f);
 				ImGui::MultiCombo(XOR("Esp flags"), selections::flags, config.getRef<std::vector<bool>>(vars.vFlags));
 			}
 			ImGui::EndGroupPanel();
@@ -184,10 +187,6 @@ static void renderVisuals()
 				ImGui::SameLine();
 				ImGui::Text(XOR("Reload bar"));
 
-				ImGui::Checkbox(XOR("Dropped C4"), &config.getRef<bool>(vars.bDrawDroppedC4));
-				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Dropped C4 color"), &config.getRef<Color>(vars.cDrawDroppedC4));
-
 				ImGui::Checkbox(XOR("Bomb info"), &config.getRef<bool>(vars.bDrawBomb));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("C4 info"), &config.getRef<Color>(vars.cDrawBomb));
@@ -222,9 +221,14 @@ static void renderVisuals()
 				ImGui::ColorPicker(XOR("Dropped color"), &config.getRef<Color>(vars.cDrawDropped));
 				ImGui::SameLine();
 				ImGui::Text(XOR("Dropped color"));
-				ImGui::Checkbox(XOR("Edit molotov"), &config.getRef<bool>(vars.bEditMolotov));
-				ImGui::SameLine();
+				ImGui::Checkbox(XOR("Edit effects"), &config.getRef<bool>(vars.bEditEffects));
 				ImGui::ColorPicker(XOR("Edited molotov"), &config.getRef<Color>(vars.cEditMolotov));
+				ImGui::SameLine();
+				ImGui::Text(XOR("Molotov color"));
+				ImGui::ColorPicker(XOR("Edited blood"), &config.getRef<Color>(vars.cEditBlood));
+				ImGui::SameLine();
+				ImGui::Text(XOR("Blood color"));
+				ImGui::SliderFloat(XOR("Smoke alpha"), &config.getRef<float>(vars.fSmokeAlpha), 0.0f, 1.0f);
 
 				ImGui::Checkbox(XOR("Enabled molotov circle"), &config.getRef<bool>(vars.bDrawmolotovRange));
 				ImGui::SameLine();
@@ -258,6 +262,7 @@ static void renderMisc()
 				ImGui::Combo(XOR("Skybox"), &config.getRef<int>(vars.iSkyBox), selections::skyboxes, {});
 				bool& modulateRef = config.getRef<bool>(vars.bModulateColor);
 				ImGui::Checkbox(XOR("Modulate world"), &modulateRef);
+				ImGui::Checkbox(XOR("Remove sky"), &config.getRef<bool>(vars.bRemoveSky));
 				if (modulateRef)
 				{
 					ImGui::ColorPicker(XOR("Modulate world texture"), &config.getRef<Color>(vars.cWorldTexture));
@@ -269,12 +274,14 @@ static void renderMisc()
 					ImGui::ColorPicker(XOR("Modulate world sky"), &config.getRef<Color>(vars.cSkyBox));
 					ImGui::SameLine();
 					ImGui::Text(XOR("Modulate world sky"));
-					ImGui::Checkbox(XOR("Remove sky"), &config.getRef<bool>(vars.bRemoveSky));
 					//ImGui::SliderFloat(XOR("Shader value"), &config.getRef<float>(vars.fShaderParam), 0.0f, 100.0f);
 				}
 				ImGui::Checkbox(XOR("Zeus range"), &config.getRef<bool>(vars.bDrawZeusRange));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Zeus color"), &config.getRef<Color>(vars.cZeusRange));
+				ImGui::Checkbox(XOR("Zeus party"), &config.getRef<bool>(vars.bZeusPartyMode));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("Zeus tracing"), &config.getRef<bool>(vars.bZeusUseTracing));
 				ImGui::Checkbox(XOR("Sound ESP"), &config.getRef<bool>(vars.bSoundEsp));
 				ImGui::SliderFloat(XOR("FOV local"), &config.getRef<float>(vars.fFOV), -50.0f, 50.0f);
 				ImGui::Checkbox(XOR("Third Person"), &config.getRef<bool>(vars.bThirdp));
@@ -314,6 +321,17 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Bunnyhop"), &config.getRef<bool>(vars.bBunnyHop));
 				ImGui::Checkbox(XOR("Autostrafe"), &config.getRef<bool>(vars.bAutoStrafe));
 				ImGui::Checkbox(XOR("Hitmarker"), &config.getRef<bool>(vars.bDrawHitmarker));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("3D##Hitm"), &config.getRef<bool>(vars.bDrawHitmarker3D));
+				ImGui::ColorPicker(XOR("Hitmarker normal"), &config.getRef<Color>(vars.cDrawHitmarkerNormal));
+				ImGui::SameLine();
+				ImGui::Text(XOR("Hitmarker normal"));
+				ImGui::ColorPicker(XOR("Hitmarker hs"), &config.getRef<Color>(vars.cDrawHitmarkerHead));
+				ImGui::SameLine();
+				ImGui::Text(XOR("Hitmarker hs"));
+				ImGui::ColorPicker(XOR("Hitmarker dead"), &config.getRef<Color>(vars.cDrawHitmarkerDead));
+				ImGui::SameLine();
+				ImGui::Text(XOR("Hitmarker dead"));
 				ImGui::SliderFloat(XOR("Hitmarker time"), &config.getRef<float>(vars.fHitmarkerTime), 0.0f, 2.0f);
 				ImGui::Checkbox(XOR("Play hitmarker"), &config.getRef<bool>(vars.bPlayHitmarker));
 				ImGui::SameLine();
@@ -382,7 +400,23 @@ static void renderMisc()
 					ImGui::SliderFloat(XOR("Hat size"), &config.getRef<float>(vars.fHatSize), -100.0f, 100.0f);
 					ImGui::SliderFloat(XOR("Hat radius"), &config.getRef<float>(vars.fHatRadius), 1.0f, 100.0f);
 				}
-
+				ImGui::Checkbox(XOR("Remove blood spray"), &config.getRef<bool>(vars.bRemoveBloodSpray));
+				ImGui::Checkbox(XOR("Enable tracers"), &config.getRef<bool>(vars.bDrawBulletTracer));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Tracers color"), &config.getRef<Color>(vars.cDrawBulletTracer));
+				ImGui::SliderFloat(XOR("Tracers life"), &config.getRef<float>(vars.fDrawBulletTracer), 0.0f, 5.0f);
+				ImGui::Checkbox(XOR("Enable local bullets"), &config.getRef<bool>(vars.bDrawLocalSideImpacts));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Local bullets line color"), &config.getRef<Color>(vars.cDrawLocalSideImpactsLine));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Local bullets fill color"), &config.getRef<Color>(vars.cDrawLocalSideImpactsFill));
+				ImGui::SliderFloat(XOR("Local bullets time"), &config.getRef<float>(vars.fDrawLocalSideImpacts), 0.0f, 5.0f);
+				ImGui::Checkbox(XOR("Enable client bullets"), &config.getRef<bool>(vars.bDrawClientSideImpacts));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Client bullets line color"), &config.getRef<Color>(vars.cDrawClientSideImpactsLine));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Client bullets fill color"), &config.getRef<Color>(vars.cDrawClientSideImpactsFill));
+				ImGui::SliderFloat(XOR("Client bullets time"), &config.getRef<float>(vars.fDrawClientSideImpacts), 0.0f, 5.0f);
 			}
 			ImGui::EndGroupPanel();
 
@@ -467,6 +501,8 @@ static void runStyle(const int idx)
 	m[idx]();
 }
 
+#include "background.hpp"
+
 static void renderStyles()
 {
 	ImGui::Columns(1, nullptr, false);
@@ -481,6 +517,18 @@ static void renderStyles()
 				{
 					runStyle(styleRef);
 				}
+				ImGui::Checkbox(XOR("Background"), &config.getRef<bool>(vars.bBackround));
+				ImGui::SliderFloat(XOR("Background speed"), &config.getRef<float>(vars.fBackground), 1.0f, 8.0f);
+				ImGui::SliderFloat(XOR("Background max dist"), &config.getRef<float>(vars.fBackgroundDistance), 10.0f, 400.0f);
+				ImGui::SliderInt(XOR("Background amount of records"), &config.getRef<int>(vars.iBackgroundSize), 20, 400);
+				ImGui::Text(XOR("They are temp limited with dynamic size + saving!"));
+				ImGui::ColorPicker(XOR("Background color1"), &config.getRef<Color>(vars.cBackGround1));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Background color2"), &config.getRef<Color>(vars.cBackGround2));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Background color3"), &config.getRef<Color>(vars.cBackGround3));
+				if (ImGui::Button(XOR("Refresh background")))
+					background.init();
 			}
 			ImGui::EndGroupPanel();
 

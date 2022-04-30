@@ -75,22 +75,23 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bDrawName, false, "draw name enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawSkeleton, false, "draw skeleton enabled");
 	CONFIG_ADD_VARIABLE(Color, cSkeleton, Colors::White, "skeleton color");
+	CONFIG_ADD_VARIABLE(bool, bDLight, false, "DLight enabled");
 	CONFIG_ADD_VARIABLE(Color, cDlight, Color(20, 70, 150, 255), "Dlight color");
+	CONFIG_ADD_VARIABLE(float, fDlightRadius, 50.0f, "DLight radius");
+	CONFIG_ADD_VARIABLE(float, fDlightDecay, 30.0f, "DLight radius");
+	CONFIG_ADD_VARIABLE(float, fDlightExponent, 8.0f, "DLight exponent");
 	CONFIG_ADD_VARIABLE(bool, bShowInfo, false, "show info enabled");
 	CONFIG_ADD_VARIABLE(bool, bShowFlags, false, "show flags enabled");
-	CONFIG_ADD_VARIABLE(bool, bDLight, false, "DLight enabled");
 	CONFIG_ADD_VARIABLE(bool, bEspLasers, false, "Esp Lasers enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawDeadOnly, false, "draw esp only when dead");
 	CONFIG_ADD_VEC(bool, vFlags, E2T(EspFlags::FLAGS_SIZE), false, "Esp flags");
 	CONFIG_ADD_VARIABLE(bool, bDrawDropped, false, "draw dropped weapons");
 	CONFIG_ADD_VARIABLE(Color, cDrawDropped, Colors::White, "draw dropped weapons color");
-	CONFIG_ADD_VEC(bool, vDroppedFlags, E2T(DroppedFlags::FLAGS_SIZE), false, "Esp flags");
+	CONFIG_ADD_VEC(bool, vDroppedFlags, E2T(DroppedFlags::FLAGS_SIZE), false, "Esp dropped flags");
 
 
 	// WORLD
 
-	CONFIG_ADD_VARIABLE(bool, bDrawDroppedC4, false, "draw dropped c4 enabled");
-	CONFIG_ADD_VARIABLE(Color, cDrawDroppedC4, Colors::White, "draw dropped c4 color");
 	CONFIG_ADD_VARIABLE(bool, bDrawBomb, false, "draw c4");
 	CONFIG_ADD_VARIABLE(Color, cDrawBomb, Colors::White, "draw c4 color");
 	CONFIG_ADD_VARIABLE(bool, bDrawProjectiles, false, "draw projectiles enabled");
@@ -110,14 +111,29 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cSkyBox, Colors::White, "world skybox color");
 	CONFIG_ADD_VARIABLE(float, fShaderParam, 100.0f, "shader percent param");
 	CONFIG_ADD_VARIABLE(bool, bDrawmolotovRange, false, "draw mololotov range enabled");
-	CONFIG_ADD_VARIABLE(Color, cMolotovRange, Colors::Red, "mololotov range color");
+	CONFIG_ADD_VARIABLE(Color, cMolotovRange, Colors::Red.getColorEditAlpha(0.3f), "mololotov range color");
 	CONFIG_ADD_VARIABLE(Color, cMolotovRangeText, Colors::White, "mololotov range color for text");
 	CONFIG_ADD_VARIABLE(bool, bDrawZeusRange, false, "draw zeus range enabled");
+	CONFIG_ADD_VARIABLE(bool, bZeusPartyMode, false, "zeus party mode enabled");
+	CONFIG_ADD_VARIABLE(bool, bZeusUseTracing, false, "draw zeus with tracing the circle");
 	CONFIG_ADD_VARIABLE(Color, cZeusRange, Colors::Palevioletred, "zeus range color");
 	CONFIG_ADD_VARIABLE(bool, bDrawSmoke, false, "draw smoke enabled");
 	CONFIG_ADD_VARIABLE(Color, cDrawSmoke, Colors::White, "draw smoke color");
-	CONFIG_ADD_VARIABLE(bool, bEditMolotov, false, "enabled editing molotov color");
+	CONFIG_ADD_VARIABLE(bool, bEditEffects, false, "enabled editing game's effects (PARTICLES)");
 	CONFIG_ADD_VARIABLE(Color, cEditMolotov, Colors::Purple, "color molotov edited");
+	CONFIG_ADD_VARIABLE(Color, cEditBlood, Colors::Purple, "color blood edited");
+	CONFIG_ADD_VARIABLE(float, fSmokeAlpha, 0.05f, "edit alpha smoke externally only");
+	CONFIG_ADD_VARIABLE(bool, bDrawBulletTracer, false, "bullet tracer enabled");
+	CONFIG_ADD_VARIABLE(float, fDrawBulletTracer, 2.0f, "bullet tracer time");
+	CONFIG_ADD_VARIABLE(Color, cDrawBulletTracer, Colors::LightBlue, "bullet tracer color");
+	CONFIG_ADD_VARIABLE(bool, bDrawClientSideImpacts, false, "draw impacts from client side");
+	CONFIG_ADD_VARIABLE(float, fDrawClientSideImpacts, 3.0f, "draw impacts from client side time");
+	CONFIG_ADD_VARIABLE(Color, cDrawClientSideImpactsLine, Colors::Cyan, "draw impacts from client side color lines");
+	CONFIG_ADD_VARIABLE(Color, cDrawClientSideImpactsFill, Colors::Red, "draw impacts from client side color fill");
+	CONFIG_ADD_VARIABLE(bool, bDrawLocalSideImpacts, false, "draw impacts from local side");
+	CONFIG_ADD_VARIABLE(float, fDrawLocalSideImpacts, 3.0f, "draw impacts from local side time");
+	CONFIG_ADD_VARIABLE(Color, cDrawLocalSideImpactsLine, Colors::Cyan, "draw impacts from local side color lines");
+	CONFIG_ADD_VARIABLE(Color, cDrawLocalSideImpactsFill, Colors::Red, "draw impacts from local side color fill");
 
 
 	// MASTER SWITCHES
@@ -141,6 +157,10 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bAutoStrafe, false, "autostrafe enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker, false, "draw hitmarker enabled");
 	CONFIG_ADD_VARIABLE(bool, bPlayHitmarker, false, "play sound hitmarker enabled");
+	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker3D, false, "draw hitmarker enabled in 3D");
+	CONFIG_ADD_VARIABLE(Color, cDrawHitmarkerNormal, Colors::White, "draw hitmarker normal hit");
+	CONFIG_ADD_VARIABLE(Color, cDrawHitmarkerHead, Colors::Pink, "draw hitmarker head hit");
+	CONFIG_ADD_VARIABLE(Color, cDrawHitmarkerDead, Colors::Green, "draw hitmarker dead hit");
 	CONFIG_ADD_VARIABLE(float, fHitmarkerTime, 0.8f, "hitmarker time");
 	CONFIG_ADD_VARIABLE(bool, bNoScope, false, "no scope enabled");
 	CONFIG_ADD_VARIABLE(bool, bShowFpsPlot, false, "show fps plot");
@@ -175,10 +195,18 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fFPSCap, false, "FPS value for plot (in game)");
 	CONFIG_ADD_VARIABLE(bool, bFPSCustom, false, "helper window for fps");
 	CONFIG_ADD_VARIABLE(bool, bVelocityCustom, false , "helper window for velocity");
+	CONFIG_ADD_VARIABLE(bool, bRemoveBloodSpray, false , "remove blood spray");
 
 	// STYLING
 
 	CONFIG_ADD_VARIABLE(int, iStyleMenu, 0, "style of the menu");
+	CONFIG_ADD_VARIABLE(bool, bBackround, false, "run menu background");
+	CONFIG_ADD_VARIABLE(float, fBackground, 2.0f, "background speed");
+	CONFIG_ADD_VARIABLE(float, fBackgroundDistance, 200.0f, "background lines max distance");
+	CONFIG_ADD_VARIABLE(int, iBackgroundSize, 150, "background amount of records");
+	CONFIG_ADD_VARIABLE(Color, cBackGround1, Color(220, 10, 100, 255), "background color1");
+	CONFIG_ADD_VARIABLE(Color, cBackGround2, Color(65, 75, 105, 255), "background color2");
+	CONFIG_ADD_VARIABLE(Color, cBackGround3, Color(220, 240, 240, 255), "background color3");
 
 } inline vars;
 #pragma endregion

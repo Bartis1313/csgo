@@ -15,6 +15,7 @@ namespace selections
 
 	inline std::array espNames =
 	{
+		"OFF",
 		"2D BOX",
 		"2D FILLED",
 		"3D BOX",

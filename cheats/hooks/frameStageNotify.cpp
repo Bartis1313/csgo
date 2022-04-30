@@ -6,6 +6,7 @@
 
 #include "../features/backtrack/backtrack.hpp"
 #include "../features/visuals/world.hpp"
+#include "../features/misc/misc.hpp"
 #include "../globals.hpp"
 
 void __stdcall hooks::frameStageNotify::hooked(int frame)
@@ -16,10 +17,11 @@ void __stdcall hooks::frameStageNotify::hooked(int frame)
 		return true;
 	} ();
 
+	backtrack.update(frame);
 	world.skyboxLoad(frame, globals::isShutdown);
-	if (frame == FRAME_RENDER_START)
-		backtrack.update();
-	// check for frame enums ALWAYS, it will be huge performance drop
+	world.removeBloodSpray(frame);
+	world.removeSmoke(frame);
+	misc.flashLight(frame);
 
 	original(interfaces::client, frame);
 }

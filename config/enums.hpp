@@ -35,6 +35,7 @@ enum class BTChamsID : size_t
 
 enum class BoxTypes : size_t
 {
+	OFF,
 	BOX2D,
 	FILLED2D,
 	BOX3D,

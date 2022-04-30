@@ -8,6 +8,14 @@
 class Entity_t;
 class IConVar;
 class IMaterial;
+class CEffectData;
+
+struct hitStructLocal_t
+{
+	Vector m_start;
+	Vector m_end;
+	float m_expire;
+};
 
 class World final
 {
@@ -17,14 +25,17 @@ public:
 	void skyboxLoad(int stage, bool isShotdown);
 	void removeSky(bool isShotdown);
 	void modulateWorld(void* thisptr, float* r, float* g, float* b, bool isShutdown);
-
 	void drawZeusRange();
 	void drawMovementTrail();
-
+	void clientSideImpacts();
+	void localImpacts();
+	void pushLocalImpacts(const hitStructLocal_t& hit) { m_hitsLocal.push_back(hit); }
+	void removeBloodSpray(int frame);
+	void removeSmoke(int frame);
+	void drawCustomSmoke(const Vector& pos, float radius, float angl);
 private:
 	void drawProjectiles(Entity_t* ent, const int id);
 	void drawBomb(Entity_t* ent);
-	void drawBombDropped(Entity_t* ent);
 	void drawMolotov(Entity_t* ent);
 	void drawSmoke(Entity_t* ent);
 private:
@@ -36,6 +47,19 @@ private:
 		Color m_col;
 	};
 	std::vector<Trail_t> m_trails;
+	struct clientHitVerify_t
+	{
+		Vector m_pos;
+		float m_time;
+		float m_expire;
+	};
+	struct hitStruct_t
+	{
+		Vector m_pos;
+		float m_expire;
+	};
+	std::vector<hitStruct_t> m_hitsClientSide;
+	std::vector<hitStructLocal_t> m_hitsLocal;
 };
 
 inline World world;

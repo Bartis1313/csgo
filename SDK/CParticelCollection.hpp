@@ -6,7 +6,6 @@
 
 #include "../utilities/pad.hpp"
 
-
 #define PARTICLE_ATTRIBUTE_TINT_RGB 6
 #define PARTICLE_ATTRIBUTE_ALPHA	7
 
@@ -48,6 +47,11 @@ struct CParticleAttributeAddressTable
 		rgb[8] = color.b();
 
 		//*a = color.a();
+	}
+	void modulateAlpha(float alpha, int num)
+	{
+		auto a = floatAttribute(PARTICLE_ATTRIBUTE_ALPHA, num);
+		*a = alpha;
 	}
 };
 

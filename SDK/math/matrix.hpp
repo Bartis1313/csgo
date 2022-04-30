@@ -1,6 +1,5 @@
 #pragma once
 #include "Vector.hpp"
-#include <compare>
 
 struct Matrix3x4
 {
@@ -13,8 +12,6 @@ struct Matrix3x4
 		m_flMatVal[1][0] = m10;	m_flMatVal[1][1] = m11; m_flMatVal[1][2] = m12; m_flMatVal[1][3] = m13;
 		m_flMatVal[2][0] = m20;	m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
 	}
-
-	constexpr auto operator<=>(const Matrix3x4&) const = default;
 
 	_NODISCARD constexpr Vector origin() const
 	{
@@ -47,8 +44,6 @@ struct Matrix4x4
 		m_flMatVal[2][0] = m20;	m_flMatVal[2][1] = m21; m_flMatVal[2][2] = m22; m_flMatVal[2][3] = m23;
 		m_flMatVal[3][0] = m30;	m_flMatVal[3][1] = m31; m_flMatVal[3][2] = m32; m_flMatVal[3][3] = m33;
 	}
-
-	constexpr auto operator<=>(const Matrix4x4&) const = default;
 
 	constexpr float* operator[](int i)
 	{

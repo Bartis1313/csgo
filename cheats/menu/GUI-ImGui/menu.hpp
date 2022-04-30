@@ -3,6 +3,8 @@
 class ImGuiMenu final
 {
 public:
+	ImGuiMenu() = default;
+
 	void init();
 	void shutdown();
 	void example();

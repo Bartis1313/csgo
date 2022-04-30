@@ -60,6 +60,30 @@ Vector math::angleVec(const Vector& angle)
 	return Vector(cp * cy, cp * sy, -sp);
 }
 
+void math::angleVectors(const Vector& angle, Vector& forward, Vector& right, Vector& up)
+{
+	auto sy = std::sin(DEG2RAD(angle.y));
+	auto cy = std::cos(DEG2RAD(angle.y));
+
+	auto sp = std::sin(DEG2RAD(angle.x));
+	auto cp = std::cos(DEG2RAD(angle.x));
+
+	auto sr = std::sin(DEG2RAD(angle.z));
+	auto cr = std::cos(DEG2RAD(angle.z));
+
+	forward.x = cp * cy;
+	forward.y = cp * sy;
+	forward.z = -sp;
+
+	right.x = (-1.0f * sr * sp * cy + -1.0f * cr * -sy);
+	right.y = (-1.0f * sr * sp * sy + -1.0f * cr * cy);
+	right.z = -1.0f * sr * cp;
+
+	up.x = (cr * sp * cy + -sr * -sy);
+	up.y = (cr * sp * sy + -sr * cy);
+	up.z = cr * cp;
+}
+
 float math::normalizeYaw(float yaw)
 {
 	while (yaw > 180.0f)
@@ -104,4 +128,16 @@ Vector math::vectorToAngle(const Vector& vec)
 	}
 	angle.z = 0.0f;
 	return angle;
+}
+
+float math::customSin(float time, float multiply)
+{
+	constexpr float RAD_PI_2 = 2.0f * PI;
+	float a = time / RAD_PI_2;
+	float angle = time - std::floor(a) * RAD_PI_2;
+	if (angle >= RAD_PI_2)
+		angle = 0.0f;
+
+	float res = (0.5f * std::sin(angle) + 0.5f) * multiply;
+	return res;
 }
