@@ -85,12 +85,12 @@ class Random // sfinae rule simple template static class
 {
 public:
     template<typename T>
-    static std::enable_if_t<__randomHelper::is_integral_v<T>, T> getRandom(T min, T max)
+    _NODISCARD static std::enable_if_t<__randomHelper::is_integral_v<T>, T> getRandom(T min, T max)
     {
         return std::uniform_int_distribution<T>{min, max}(rng);
     }
     template<typename T>
-    static std::enable_if_t<__randomHelper::is_floating_v<T>, T> getRandom(T min, T max)
+    _NODISCARD static std::enable_if_t<__randomHelper::is_floating_v<T>, T> getRandom(T min, T max)
     {
         return std::uniform_real_distribution<T>{min, max}(rng);
     }
