@@ -1,10 +1,11 @@
 # Csgo
 Very short and commented source aimed for legit gameplay
 
-![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/160652885-0bd3180b-04db-4e19-ad2b-41e75faba57c.png)
+![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/166804234-76aa01ff-36a8-4688-ad6a-b3b517413eb1.png)
+Menu screens: [screens](https://imgur.com/a/FiTtSOT)
 
 # Information
-In development, not every feature may work perfectly. Features marked ``(rebuild needed)`` need recode or better version.
+The development soon ends, it was very cool time for me to dig into that game for my needs. Features marked ``(rebuild needed)`` need recode or better version.
 <br />
 Menu key is insert, panic key is delete, you can change it in config if it matters.
 <br />
@@ -39,10 +40,10 @@ I can't compile
  * Backtrack (manipulation in ms)
  * Radar 2D (Representing on small overlay where enemies are, including their view)
  * Local Info (Some information about local player)
- * Esp Flags (Some information about enemies, their hp, armor etc...) (rebuild needed - lack of flags, can get much more info)
+ * Esp Flags (Some information about enemies, their hp, armor etc...)
  * Esp Skeleton (Skeleton drawn by lines, working with backtrack too)
  * Backtrack Chams (Static, Rainbow, Last Tick)
- * DLight (Uses engine to highlight the player) (rebuild needed - this should be more customizable)
+ * DLight (Uses engine to highlight the player)e)
  * Nigtmode (Chnages materials to be darker including chnage of the sky)
  * Esp Lines (They will only show on selected target by aimbot)
  * Plots (Represent current FPS and Velocity in stored records and then drawn using lines and difference between them, fully custom)
@@ -52,12 +53,6 @@ I can't compile
  - INSERT (Close/open menu)
  - DELETE (Panic key - shutdowns whole hack thread)
  - HOME (Console key - shows the console window rendered with ImGui)
-
-# Issues or requests
-For now the cheat may have them many as during development my main goal is to learn how to write optimized and simple code
-
-About requests, when I personally think the feature provided is alright,
-I will try to implement it in a short time perioid, eventually people who commit prs will be contributors
 
 # Log
 <details>
