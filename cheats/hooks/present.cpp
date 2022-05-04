@@ -10,6 +10,7 @@
 
 #include "../features/visuals/radar.hpp"
 #include "../features/misc/misc.hpp"
+#include "../features/visuals/world.hpp"
 
 #include "../../utilities/renderer/renderer.hpp"
 #include "../../utilities/utilities.hpp"
@@ -67,6 +68,7 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		radar.run();
 		misc.drawFpsPlot();
 		misc.drawVelocityPlot();
+		world.drawBombOverlay();
 	}
 
 	// END DRAW

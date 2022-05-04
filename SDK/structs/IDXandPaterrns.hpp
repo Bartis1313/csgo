@@ -113,3 +113,6 @@ ParticleEffect
 #define FLASHLIGHT_CREATE		XOR("55 8B EC F3 0F 10 45 ? B8")
 #define FLASHLIGHT_DESTROY		XOR("56 8B F1 E8 ? ? ? ? 8B 4E 28")
 #define FLASHLIGHT_UPDATE		XOR("E8 ? ? ? ? 8B 06 F3 0F 10 46")
+#define CLIENT_STATE			XOR("A1 ? ? ? ? 8B 88 ? ? ? ? 85 C9 75 07")
+#define GAME_RULES				XOR("8B EC 8B 0D ? ? ? ? 85 C9 74 07")
+#define SEND_DATAGRAM			XOR("55 8B EC 83 E4 F0 B8 ? ? ? ? E8 ? ? ? ? 56 57 8B F9 89 7C 24 18")

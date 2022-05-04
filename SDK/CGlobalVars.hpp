@@ -14,7 +14,7 @@ public:
     float m_intervalPerTick;
     float m_interpolationAmount;
     int m_simTicksThisFrame;
-    int m_network_protocol;
+    int m_networkProtocol;
     void* m_saveData;
     bool m_client;
     bool m_remoteClient;

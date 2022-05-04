@@ -37,6 +37,8 @@ class KeyValuesSys;
 class IMemAlloc;
 class CTeslaInfo;
 class CEffectData;
+class IClientState;
+class Entity_t;
 #pragma endregion
 
 namespace interfaces
@@ -74,6 +76,9 @@ namespace interfaces
 	inline IEffects* effects = nullptr;
 	inline KeyValuesSys* keyValuesSys = nullptr;
 	inline IMemAlloc* memAlloc = nullptr;
+	inline IClientState* clientState = nullptr;
+	// remember to dereference!
+	inline Entity_t** gameRules = nullptr;
 
 	bool init();
 }

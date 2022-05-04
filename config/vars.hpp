@@ -93,7 +93,7 @@ struct Variables
 	// WORLD
 
 	CONFIG_ADD_VARIABLE(bool, bDrawBomb, false, "draw c4");
-	CONFIG_ADD_VARIABLE(Color, cDrawBomb, Colors::White, "draw c4 color");
+	CONFIG_ADD_VARIABLE(Color, cBombBackground, Colors::Black, "bomb background color");
 	CONFIG_ADD_VARIABLE(bool, bDrawProjectiles, false, "draw projectiles enabled");
 	CONFIG_ADD_VARIABLE(Color, cFlashBang, Color(130, 0, 200, 255), "flashbang color");
 	CONFIG_ADD_VARIABLE(Color, cGranede, Color(130, 180, 20, 255), "granede color");
@@ -153,11 +153,14 @@ struct Variables
 	CONFIG_ADD_VARIABLE(int, iCrosshair, 0, "crosshair mode");
 	CONFIG_ADD_VARIABLE(bool, bBacktrack, false, "backtrack enabled");
 	CONFIG_ADD_VARIABLE(float, fBacktrackTick, 200.0f, "backtrack amount of ticks to manipulate");
+	CONFIG_ADD_VARIABLE(bool, bFakeLatency, false, "fake latency enabled");
+	CONFIG_ADD_VARIABLE(float, fFakeLatency, 200.0f, "fake latency amount");
 	CONFIG_ADD_VARIABLE(bool, bBunnyHop, false, "bunnyhop enabled");
 	CONFIG_ADD_VARIABLE(bool, bAutoStrafe, false, "autostrafe enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker, false, "draw hitmarker enabled");
 	CONFIG_ADD_VARIABLE(bool, bPlayHitmarker, false, "play sound hitmarker enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker3D, false, "draw hitmarker enabled in 3D");
+	CONFIG_ADD_VARIABLE(bool, bDrawHitmarkerResize, false, "draw hitmarker with resizing lines");
 	CONFIG_ADD_VARIABLE(Color, cDrawHitmarkerNormal, Colors::White, "draw hitmarker normal hit");
 	CONFIG_ADD_VARIABLE(Color, cDrawHitmarkerHead, Colors::Pink, "draw hitmarker head hit");
 	CONFIG_ADD_VARIABLE(Color, cDrawHitmarkerDead, Colors::Green, "draw hitmarker dead hit");

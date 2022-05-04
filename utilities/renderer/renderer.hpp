@@ -91,6 +91,7 @@ namespace ImFonts
 {
 	inline ImFont* tahoma;
 	inline ImFont* franklinGothic;
+	inline ImFont* franklinGothic12;
 	inline ImFont* verdana;
 	inline ImFont* icon;
 }
@@ -386,6 +387,7 @@ public:
 	void drawPolyLine(const int count, ImVec2* verts, const Color& color, ImDrawFlags flags = 0, float thickness = 1.0f);
 	void drawText(const float x, const float y, const float size, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
+	void drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 
 	// remember it's a "cursor window pos"
 	ImVec2 getPos() const { return m_pos; }

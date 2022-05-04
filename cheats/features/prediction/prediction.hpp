@@ -10,6 +10,7 @@ class Prediction final
 {
 public:
 	void addToPrediction(CUserCmd* cmd, const std::function<void()>& fun);
+	void update();
 private:
 	void start(CUserCmd* cmd);
 	void end();

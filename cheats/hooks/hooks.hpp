@@ -25,6 +25,7 @@ struct ModelRenderInfo_t;
 struct Matrix3x4;
 struct CStudioHdr;
 class CParticleCollection;
+class INetChannel;
 
 #define FAST_ARGS void* thisptr, void* edx
 
@@ -206,6 +207,13 @@ namespace hooks
 	{
 		using fn = void(__thiscall*)(CParticleCollection*);
 		static void __fastcall hooked(CParticleCollection* thisPtr, void* edx);
+		inline static fn original = nullptr;
+	};
+
+	struct sendDatagram
+	{
+		using fn = int(__thiscall*)(INetChannel*, void*);
+		static int __fastcall hooked(INetChannel* netChannel , void* edx, void* datagram);
 		inline static fn original = nullptr;
 	};
 }

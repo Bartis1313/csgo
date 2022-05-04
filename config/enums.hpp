@@ -31,6 +31,7 @@ enum class BTChamsID : size_t
 	STABLE,
 	LAST_TICK,
 	RAINBOW,
+	COLOR_CHANGE
 };
 
 enum class BoxTypes : size_t

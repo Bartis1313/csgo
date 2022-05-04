@@ -40,7 +40,7 @@ DWORD WINAPI init(PVOID instance)
         interfaces::init();
         netvarMan.init();
         netvarMan.dump();
-        //render.init();
+        surfaceRender.init();
         hooks::wndProcSys::init();
         callbacks.init();
         callbacks.run();

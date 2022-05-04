@@ -249,7 +249,7 @@ void Chams::drawBackTrack(Player_t* ent)
 				continue;
 
 			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, config.get<Color>(vars.cChamsBacktrack), true, false);
-			CALL(m_result, m_state, m_info, record->at(i).m_matrix);
+			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
@@ -259,7 +259,7 @@ void Chams::drawBackTrack(Player_t* ent)
 		if (backtrack.isValid(record->front().m_simtime))
 		{
 			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, config.get<Color>(vars.cChamsBacktrack), true, false);
-			CALL(m_result, m_state, m_info, record->back().m_matrix);
+			CALL(m_result, m_state, m_info, record->back().m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
@@ -272,8 +272,26 @@ void Chams::drawBackTrack(Player_t* ent)
 				continue;
 
 			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false,
-				Color::rainbowColor(interfaces::globalVars->m_curtime, config.get<float>(vars.fChamsBacktrackRainbowSpeed)), true, false);
-			CALL(m_result, m_state, m_info, record->at(i).m_matrix);
+				Color::rainbowColor(interfaces::globalVars->m_curtime + (i / 3.0f), config.get<float>(vars.fChamsBacktrackRainbowSpeed)), true, false);
+			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
+			interfaces::studioRender->forcedMaterialOverride(nullptr);
+		}
+		break;
+	}
+	case E2T(BTChamsID::COLOR_CHANGE):
+	{
+		Color fromCfg = config.get<Color>(vars.cChamsBacktrack);
+		
+		for (size_t i = 0; i < record->size(); i++)
+		{
+			if (!backtrack.isValid(record->at(i).m_simtime))
+				continue;
+			
+			Color color(fromCfg.r() - (i * (1.0f / record->size())),
+				i * (fromCfg.g() / record->size()), fromCfg.b(), fromCfg.a());
+			
+			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, color, true, false);
+			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;

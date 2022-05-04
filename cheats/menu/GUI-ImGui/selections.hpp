@@ -44,7 +44,8 @@ namespace selections
 	{
 		"Stable",
 		"Last tick",
-		"Rainbow"
+		"Rainbow",
+		"Color change"
 	};
 
 	inline std::vector<std::string> styleNames =

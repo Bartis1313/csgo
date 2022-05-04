@@ -11,7 +11,7 @@
 #define FLOW_INCOMING	1
 #define MAX_FLOWS		2
 
-class INetChannelInfo
+class INetChannel
 {
 public:
 	VFUNC(char*, getAddress, 1, (), (this));
@@ -19,8 +19,13 @@ public:
 	VFUNC(bool, isLoopBack, 6, (), (this));
 	VFUNC(bool, isPlayBack, 8, (), (this));
 	VFUNC(float, getLatency, 9, (int flow), (this, flow));
-	PAD(44);
-	int chockedPackets;
+	PAD(24);
+	int m_outSequenceNr;
+	int m_inSequenceNr;
+	int m_outSequenceNrAck;
+	int m_outReliableState;
+	int m_inReliableState;
+	int m_chockedPackets;
 };
 
 struct PlayerInfo_t
@@ -61,6 +66,6 @@ public:
 	VFUNC(void, executeClientCMD, 114, (const char* cmd, char delay = 0), (this, cmd, delay));
 	VFUNC(Matrix4x4&, worldToScreenMatrix, 37, (), (this));
 	VFUNC(const char*, getLevelName, 53, (), (this));
-	VFUNC(INetChannelInfo*, getNameNetChannel, 78, (), (this));
+	VFUNC(INetChannel*, getNameNetChannel, 78, (), (this));
 	VFUNC(bool, isTakingScreenshot, 92, (), (this));
 };

@@ -92,7 +92,11 @@ static void renderAimbot()
 				}
 
 				ImGui::Checkbox(XOR("Enabled backtrack"), &config.getRef<bool>(vars.bBacktrack));
+				ImGui::SameLine();
 				ImGui::SliderFloat(XOR("Backtrack ms"), &config.getRef<float>(vars.fBacktrackTick), 0.0f, 200.0f);
+				ImGui::Checkbox(XOR("Enabled fake latency"), &config.getRef<bool>(vars.bFakeLatency));
+				ImGui::SameLine();
+				ImGui::SliderFloat(XOR("Fake latency ms"), &config.getRef<float>(vars.fFakeLatency), 0.0f, 200.0f);
 			}
 			ImGui::EndGroupPanel();
 
@@ -189,9 +193,7 @@ static void renderVisuals()
 
 				ImGui::Checkbox(XOR("Bomb info"), &config.getRef<bool>(vars.bDrawBomb));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("C4 info"), &config.getRef<Color>(vars.cDrawBomb));
-				ImGui::SameLine();
-				ImGui::Text(XOR("C4 info"));
+				ImGui::ColorPicker(XOR("C4 info"), &config.getRef<Color>(vars.cBombBackground));
 			}
 			ImGui::EndGroupPanel();
 
@@ -323,6 +325,8 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Hitmarker"), &config.getRef<bool>(vars.bDrawHitmarker));
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("3D##Hitm"), &config.getRef<bool>(vars.bDrawHitmarker3D));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("Resize##Hitm"), &config.getRef<bool>(vars.bDrawHitmarkerResize));
 				ImGui::ColorPicker(XOR("Hitmarker normal"), &config.getRef<Color>(vars.cDrawHitmarkerNormal));
 				ImGui::SameLine();
 				ImGui::Text(XOR("Hitmarker normal"));

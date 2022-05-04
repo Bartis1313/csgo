@@ -41,6 +41,9 @@ void World::drawMisc()
 		if (!cl)
 			continue;
 
+		if (cl->m_classID == CPlantedC4)
+			m_bombEnt = reinterpret_cast<Bomb_t*>(entity);
+
 		drawProjectiles(entity, cl->m_classID);
 
 		switch (cl->m_classID)
@@ -65,32 +68,85 @@ void World::drawBomb(Entity_t* ent)
 	if (!config.get<bool>(vars.bDrawBomb))
 		return;
 
-	const static auto tickbomb = interfaces::cvar->findVar(XOR("mp_c4timer"))->getFloat();
-	const auto bombent = reinterpret_cast<Bomb_t*>(ent);
-	const auto bombtime = bombent->m_flC4Blow() - interfaces::globalVars->m_curtime;
+	if (Box box; utilities::getBox(ent, box))
+		imRender.text(box.x, box.y, ImFonts::tahoma, XOR("Planted Bomb"), false, Colors::White);
+}
 
-	if (bombtime < 0.0f)
+// would need better readbality at some point and those offsets for texts are hardcoded
+void World::drawBombOverlay()
+{
+	if (!game::isAvailable())
+		m_bombEnt = nullptr;
+
+	if (!m_bombEnt)
 		return;
 
-	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/389530-bomb-damage-indicator.html
+	bool& ref = config.getRef<bool>(vars.bDrawBomb);
+	if (!ref)
+		return;
 
-	constexpr float sigma = (500.0f * 3.5f) / 3.0f;
+	const static auto mp_c4timer = interfaces::cvar->findVar(XOR("mp_c4timer"))->getFloat();
+	const auto bombent = reinterpret_cast<Bomb_t*>(m_bombEnt);
+	const auto bombtime = bombent->m_flC4Blow() - interfaces::globalVars->m_curtime;
+	const auto defusetime = m_bombEnt->m_flDefuseCountDown() - interfaces::globalVars->m_curtime;
+	auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientFromHandle(m_bombEnt->m_hBombDefuser()));
+	const auto defuseMaxTime = ent && ent->m_bHasDefuser() ? 5.0f : 10.0f; // check ent too
 
-	const float hypDist = (ent->getEyePos() - game::localPlayer->getEyePos()).length();
-	const float dmg = utilities::scaleDamageArmor((500.f * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
-
-	const bool isSafe = dmg < game::localPlayer->m_iHealth();
-
-	if (Box box; utilities::getBox(ent, box))
+	if (bombtime < 0.0f || bombent->m_bBombDefused())
 	{
-		imRender.text(box.x, box.y, ImFonts::tahoma, XOR("Planted Bomb"), false, config.get<Color>(vars.cDrawBomb));
+		m_bombEnt = nullptr;
+		return;
 	}
 
-	float r = (255.0f - bombtime / tickbomb * 255.0f);
-	float g = (bombtime / tickbomb * 255.0f);
+	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/389530-bomb-damage-indicator.html
+	constexpr float bombRadius = 500.0f; // there is no info for this, run some map scanner
+	constexpr float sigma = (500.0f * 3.5f) / 3.0f;
+	const float hypDist = (m_bombEnt->getEyePos() - game::localPlayer->getEyePos()).length();
+	const float dmg = utilities::scaleDamageArmor((bombRadius * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
+	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 
-	imRender.text(5, 800, ImFonts::tahoma, isSafe ? std::format(XOR("TIME {:.2f} DMG {:.2f} SAFE"), bombtime, dmg) : std::format(XOR("TIME {:.2f} DMG {:.2f} YOU DIE"), bombtime, dmg), false,
-		Color{ static_cast<int>(r), static_cast<int>(g), 0, 200 });
+	float scaled = m_bombEnt->m_hBombDefuser() > 0 ? (defusetime / defuseMaxTime) : (bombtime / mp_c4timer);
+
+	float fdef = defusetime / defuseMaxTime;
+	float fbomb = bombtime / mp_c4timer;
+	float forRed = m_bombEnt->m_hBombDefuser() > 0 ? fdef : fbomb;
+	float forGreen = m_bombEnt->m_hBombDefuser() > 0 ? fdef : fbomb;
+
+	float r = (255.0f - forRed * 255.0f);
+	float g = (forGreen * 255.0f);
+	Color color{ static_cast<int>(r), static_cast<int>(g), 0, 200 };
+
+	constexpr ImVec2 size = { 300, 150 };
+	ImGui::SetNextWindowSize(size);
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, U32(config.get<Color>(vars.cBombBackground)));
+	if (ImGui::Begin(XOR("Bomb c4"), &ref, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+	{
+		imRenderWindow.addList();
+
+		constexpr float width = size.x;
+		constexpr float height = size.y;
+		constexpr float radius = height / 3.0f;
+
+		constexpr float scaledX = (width * 0.95f) - radius;
+		constexpr float scaledY = height / 2.0f;
+
+		imRenderWindow.drawProgressRing(scaledX, scaledY, radius, 32, -90, scaled, 5.0f, color);
+		if(defusetime > bombtime)
+			imRenderWindow.drawText(scaledX, scaledY - (radius / 2.5f / 2.0f), radius / 2.5f, ImFonts::franklinGothic, XOR("Too late"), true, Colors::White, false);
+		else
+			imRenderWindow.drawText(scaledX, scaledY - (radius / 2.5f / 2.0f), radius / 2.5f, ImFonts::franklinGothic, std::format(XOR("{:.2f}"),
+				m_bombEnt->m_hBombDefuser() > 0 ? defusetime : bombtime), true, Colors::White, false);
+		imRenderWindow.drawText(2.0f, 0.0f, height / 2.0f, ImFonts::icon, u8"\uE031"_u8str, false, Colors::White, false);
+		if (!m_whoPlanted.empty())
+			imRenderWindow.drawText(2.0f, height / 2.0f + 2, 15, ImFonts::franklinGothic, std::format(XOR("Planted by {}s"), m_whoPlanted), false, Colors::White, false);
+		if(m_bombEnt->m_hBombDefuser() > 0)
+			imRenderWindow.drawText(2.0f, height / 2.0f + 18, 15, ImFonts::franklinGothic, std::format(XOR("Defusing {}"), ent->getName()), false, Colors::White, false);
+		imRenderWindow.drawText(width / 2.0f, 2.0f, 15, ImFonts::franklinGothic, std::format(XOR("Site {}"), m_bombEnt->getBombSiteName()), true, Colors::White, false);
+		imRenderWindow.drawText(width / 2.0f, 20.0f, 15, ImFonts::franklinGothic, std::format(XOR("Damage {:.2f}"), dmg), true, isSafe ? Colors::Green : Colors::Red, false);
+
+		ImGui::End();
+	}
+	ImGui::PopStyleColor();
 }
 
 #include "player.hpp"
@@ -147,7 +203,7 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 				imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana, nades.first, true, nades.second);
 		}
 	}
-	else if (projectileName.find(XOR("dropped")) != std::string::npos)
+	else if (projectileName.find(XOR("dropped")) != std::string::npos && id != CPlantedC4) // add more if needed
 	{
 		if (Box box; utilities::getBox(ent, box) && config.get<bool>(vars.bDrawDropped))
 		{
@@ -343,6 +399,8 @@ void World::drawMolotov(Entity_t* ent)
 	//std::vector<ImVec2> points = {};
 	Color col = config.get<Color>(vars.cMolotovRange);
 
+	//std::vector<Vector2D> points;
+
 	for (int i = 0; i < molotov->m_fireCount(); i++)
 	{
 		auto pos = origin + molotov->getInfernoPos(i);
@@ -352,7 +410,9 @@ void World::drawMolotov(Entity_t* ent)
 		if (!imRender.worldToScreen(pos, posw))
 			break;
 
-		imRender.text(posw.x, posw.y, ImFonts::tahoma, std::to_string(i), false, Colors::Cyan);*/
+		points.push_back(posw);*/
+
+		//imRender.text(posw.x, posw.y, ImFonts::tahoma, std::to_string(i), false, Colors::Cyan);*/
 		// points are not on edge, this will need some graph path logic, and will be done soon
 	}
 	static float size = ImFonts::tahoma->FontSize;
@@ -456,7 +516,6 @@ void World::drawMovementTrail()
 {
 	static Vector end;
 
-	// check this first, special case here
 	if (!game::isAvailable())
 		return;
 

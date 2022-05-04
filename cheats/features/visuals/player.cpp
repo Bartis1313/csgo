@@ -156,7 +156,7 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
 	int currentAmmo = weapon->m_iClip1();
 
-	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic, std::format(XOR("{} {}/{}"),
+	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, std::format(XOR("{} {}/{}"),
 		ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo), true, tex);
 
 	// skip useless trash for calculations
@@ -298,6 +298,9 @@ void Visuals::drawSkeleton(Player_t* ent)
 			continue;
 
 		if (!(bone->m_flags & BONE_USED_BY_HITBOX))
+			continue;
+
+		if (record && !backtrack.isValid(record->front().m_simtime)) // if backtrack
 			continue;
 
 		auto child = skeletPos(i);

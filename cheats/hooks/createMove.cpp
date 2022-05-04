@@ -56,7 +56,9 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	bunnyhop.run(cmd);
 	bunnyhop.strafe(cmd);
 	nadePred.createMove(cmd->m_buttons);
+	backtrack.updateSequences();
 
+	prediction.update();
 	prediction.addToPrediction(cmd, [=]()
 		{
 			backtrack.run(cmd);

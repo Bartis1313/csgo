@@ -75,6 +75,8 @@ bool interfaces::init()
 	moveHelper = **reinterpret_cast<IMoveHelper***>(utilities::patternScan(CLIENT_DLL, MOVEHELPER, 0x2));
 	resource = *reinterpret_cast<PlayerResource***>(utilities::patternScan(CLIENT_DLL, PLAYER_RESOURCE, 0x4));
 	dx9Device = **reinterpret_cast<IDirect3DDevice9***>(utilities::patternScan(SHARED_API, DX9_DEVICE, 0x1));
+	clientState = **reinterpret_cast<IClientState***>(utilities::patternScan(ENGINE_DLL, CLIENT_STATE, 0x1));
+	gameRules = *reinterpret_cast<Entity_t***>(utilities::patternScan(CLIENT_DLL, GAME_RULES, 0x4));
 
 	using namespace gameFunctions;
 

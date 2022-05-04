@@ -360,7 +360,7 @@ void Misc::drawVelocityPlot()
 			{
 				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, cLine);
 				if (deltaVel > 20) // would need proper edge detection
-					imRenderWindow.drawText(static_cast<int>(currentX) + 10, static_cast<int>(currentY) - 10, scaledFontSize, ImFonts::verdana,
+					imRenderWindow.drawText(static_cast<int>(currentX) + 10, static_cast<int>(currentY) - 10, scaledFontSize, ImFonts::franklinGothic,
 						std::format("{}", std::round(currentVel)), true, Colors::Pink, false);
 			}
 			prevX = currentX; prevY = currentY;
@@ -385,7 +385,7 @@ void Misc::drawVelocityPlot()
 			drawing->AddText(font, size, pos, U32(color), text.c_str());
 		};
 
-		text(imRenderWindow.getPos().x + width / 2.0f, imRenderWindow.getPos().y + 20.0f + height, 30.0f, ImFonts::verdana,
+		text(imRenderWindow.getPos().x + width / 2.0f, imRenderWindow.getPos().y + 20.0f + height, 30.0f, ImFonts::franklinGothic,
 			std::format("{}", std::round(game::localPlayer->m_vecVelocity().length2D())), true, Colors::Pink, false);
 
 		ImGui::End();
@@ -493,9 +493,13 @@ void Misc::drawHitmarker()
 			lineX = 18.0f;
 			lineY = 9.0f;
 		}
-
-		float lineAddonX = lineX / (1.0f / (currentAlpha + 0.01f)); // prevent division by 0 and make ratio
-		float lineAddonY = lineY / (1.0f / (currentAlpha + 0.01f));
+		float lineAddonX = lineX;
+		float lineAddonY = lineY;
+		if (config.get<bool>(vars.bDrawHitmarkerResize))
+		{
+			lineAddonX = lineX / (1.0f / (currentAlpha + 0.01f)); // prevent division by 0 and make ratio
+			lineAddonY = lineY / (1.0f / (currentAlpha + 0.01f));
+		}
 
 		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor);
 		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor);

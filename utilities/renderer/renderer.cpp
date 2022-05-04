@@ -629,12 +629,26 @@ void ImGuiRender::init(ImGuiIO& io)
 	{
 		const std::filesystem::path path{ fontsPath };
 
+		/*
+		ImGuiFreeTypeBuilderFlags_NoHinting     = 1 << 0,   // Disable hinting. This generally generates 'blurrier' bitmap glyphs when the glyph are rendered in any of the anti-aliased modes.
+		ImGuiFreeTypeBuilderFlags_NoAutoHint    = 1 << 1,   // Disable auto-hinter.
+		ImGuiFreeTypeBuilderFlags_ForceAutoHint = 1 << 2,   // Indicates that the auto-hinter is preferred over the font's native hinter.
+		ImGuiFreeTypeBuilderFlags_LightHinting  = 1 << 3,   // A lighter hinting algorithm for gray-level modes. Many generated glyphs are fuzzier but better resemble their original shape. This is achieved by snapping glyphs to the pixel grid only vertically (Y-axis), as is done by Microsoft's ClearType and Adobe's proprietary font renderer. This preserves inter-glyph spacing in horizontal text.
+		ImGuiFreeTypeBuilderFlags_MonoHinting   = 1 << 4,   // Strong hinting algorithm that should only be used for monochrome output.
+		ImGuiFreeTypeBuilderFlags_Bold          = 1 << 5,   // Styling: Should we artificially embolden the font?
+		ImGuiFreeTypeBuilderFlags_Oblique       = 1 << 6,   // Styling: Should we slant the font, emulating italic style?
+		ImGuiFreeTypeBuilderFlags_Monochrome    = 1 << 7,   // Disable anti-aliasing. Combine this with MonoHinting for best results!
+		ImGuiFreeTypeBuilderFlags_LoadColor     = 1 << 8,   // Enable FreeType color-layered glyphs
+		ImGuiFreeTypeBuilderFlags_Bitmap        = 1 << 9    // Enable FreeType bitmap glyphs	
+		*/
+
 		ImFontConfig cfg;
-		cfg.OversampleH = 3; // this will still not help the "blurry" font on scaling 
+		cfg.OversampleH = 3;
 		cfg.OversampleV = 3;
 		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
 		ImFonts::tahoma = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::franklinGothic = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 10.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::franklinGothic = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 		ImFonts::verdana = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 
 		constexpr ImWchar ranges[] =
@@ -642,7 +656,7 @@ void ImGuiRender::init(ImGuiIO& io)
 			0xE000, 0xF8FF,
 			0,
 		};
-		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 30.0f, &cfg, ranges);
+		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 80.0f, &cfg, ranges);
 
 		if (!ImGuiFreeType::BuildFontAtlas(io.Fonts))
 			throw std::runtime_error(XOR("ImGuiFreeType::BuildFontAtlas returned false"));
@@ -655,11 +669,12 @@ void ImGuiRender::init(ImGuiIO& io)
 		const std::filesystem::path path{ fontsPath };
 
 		ImFontConfig cfg;
-		cfg.OversampleH = 3; // this will still not help the "blurry" font on scaling 
+		cfg.OversampleH = 3;
 		cfg.OversampleV = 3;
 		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
 		ImFonts::tahoma = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::franklinGothic = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 10.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::franklinGothic = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 		ImFonts::verdana = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 
 		constexpr ImWchar ranges[] =
@@ -667,7 +682,7 @@ void ImGuiRender::init(ImGuiIO& io)
 			0xE000, 0xF8FF,
 			0,
 		};
-		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 30.0f, &cfg, ranges);
+		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 80.0f, &cfg, ranges);
 
 		if (!ImGuiFreeType::BuildFontAtlas(io.Fonts))
 			throw std::runtime_error(XOR("ImGuiFreeType::BuildFontAtlas returned false"));
@@ -1339,7 +1354,9 @@ void ImGuiRenderWindow::drawText(const float x, const float y, const float size,
 	RUNTIME_CHECK_RENDER_WINDOW;
 	ImVec2 pos = { m_pos.x + x, m_pos.y + y };
 
-	if (auto tsize = ImGui::CalcTextSize(text.c_str()); centered)
+	ImGui::PushFont(font);
+
+	if (auto tsize = font->CalcTextSizeA(size, std::numeric_limits<float>::max(), 0.0f, text.c_str()); centered)
 		pos.x -= tsize.x / 2.0f;
 
 	if (dropShadow)
@@ -1348,12 +1365,22 @@ void ImGuiRenderWindow::drawText(const float x, const float y, const float size,
 		m_drawing->AddText(font, size, { m_pos.x + pos.x + 1.0f, m_pos.y + pos.y + 1.0f }, U32(Colors::Black.getColorEditAlpha(alpha)), text.c_str());
 	}
 	m_drawing->AddText(font, size, pos, U32(color), text.c_str());
+
+	ImGui::PopFont();
 }
 
 void ImGuiRenderWindow::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
 {
 	RUNTIME_CHECK_RENDER_WINDOW;
 	m_drawing->AddTriangleFilled(ImVec2{ m_pos.x + p1.x,m_pos.y + p1.y }, ImVec2{ m_pos.x + p2.x, m_pos.y + p2.y }, ImVec2{ m_pos.x + p3.x, m_pos.y + p3.y }, U32(color));
+}
+
+void ImGuiRenderWindow::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
+{
+	float maxAngle = RAD2DEG(std::numbers::pi_v<float> *2.0f * percent) + angleMin;
+
+	m_drawing->PathArcTo(ImVec2{m_pos.x + x, m_pos.y + y }, radius, DEG2RAD(angleMin), DEG2RAD(maxAngle), points);
+	m_drawing->PathStroke(U32(color), flags, thickness);
 }
 
 #undef RUNTIME_CHECK_RENDER_WINDOW

@@ -6,6 +6,7 @@
 #include "../../../SDK/Color.hpp"
 
 class Entity_t;
+class Bomb_t;
 class IConVar;
 class IMaterial;
 class CEffectData;
@@ -33,11 +34,15 @@ public:
 	void removeBloodSpray(int frame);
 	void removeSmoke(int frame);
 	void drawCustomSmoke(const Vector& pos, float radius, float angl);
+	void drawBombOverlay();
+	Bomb_t* m_bombEnt;
+	std::string m_whoPlanted = "";
 private:
 	void drawProjectiles(Entity_t* ent, const int id);
 	void drawBomb(Entity_t* ent);
 	void drawMolotov(Entity_t* ent);
 	void drawSmoke(Entity_t* ent);
+	void resetBomb() { m_bombEnt = nullptr; };
 private:
 	IConVar* m_oldSky = nullptr;
 	struct Trail_t

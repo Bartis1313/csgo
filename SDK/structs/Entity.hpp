@@ -66,19 +66,6 @@ public:
 	_NODISCARD bool isBreakable();
 };
 
-////////////////////////////////////////////////////////////////////////////////////////////
-
-class Bomb_t : public Entity_t
-{
-public:
-	NETVAR(float, m_flDefuseCountDown, "DT_PlantedC4", "m_flDefuseCountDown");
-	NETVAR(int, m_hBombDefuser, "DT_PlantedC4", "m_hBombDefuser");
-	NETVAR(float, m_flC4Blow, "DT_PlantedC4", "m_flC4Blow");
-	NETVAR(bool, m_bBombDefused, "DT_PlantedC4", "m_bBombDefused");
-};
-
-////////////////////////////////////////////////////////////////////////////////////////////
-
 class Weapon_t : public Entity_t
 {
 public:
@@ -138,6 +125,19 @@ class Smoke_t : public Entity_t
 public:
 	_NODISCARD static float expireTime() { return 19.0f; }
 	NETVAR(int, m_nSmokeEffectTickBegin, "DT_SmokeGrenadeProjectile", "m_nSmokeEffectTickBegin");
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+class Bomb_t : public Entity_t
+{
+public:
+	NETVAR(float, m_flDefuseCountDown, "DT_PlantedC4", "m_flDefuseCountDown");
+	NETVAR(int, m_hBombDefuser, "DT_PlantedC4", "m_hBombDefuser");
+	NETVAR(float, m_flC4Blow, "DT_PlantedC4", "m_flC4Blow");
+	NETVAR(bool, m_bBombDefused, "DT_PlantedC4", "m_bBombDefused");
+	NETVAR(bool, m_nBombSite, "DT_PlantedC4", "m_nBombSite");
+	_NODISCARD char getBombSiteName() { return m_nBombSite() == 0 ? 'A' : 'B'; }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

@@ -66,26 +66,31 @@ bool Backtrack::isValid(float simtime) const
 	auto network = interfaces::engine->getNameNetChannel();
 	if (!network)
 		return false;
-	// from my experience making it with game::serverTime() works slightly better
+
+	if (auto time = static_cast<int>(game::serverTime() - cvarsRatios.maxUnlag); simtime < time)
+	{
+		//printf("simtime precheck, sim %f lag sim %f\n", simtime, game::serverTime() - cvarsRatios.maxUnlag);
+		return false;
+	}
+
 	auto delta = std::clamp(network->getLatency(FLOW_OUTGOING) + network->getLatency(FLOW_INCOMING) + getLerp(), 0.0f, cvarsRatios.maxUnlag) - (game::serverTime() - simtime);
-	// this is not used, that's why this is commented, feel free to use it and config it yourself
-	// auto limit = std::clamp(vars::iBacktrackTick, 0.0f, 2.0f);
-	// if limit is used return looks like: return std::abs(delta) <= limit;
 	return std::abs(delta) <= 0.2f;
 }
 
 float Backtrack::extraTicks() const
 {
-	auto network = interfaces::engine->getNameNetChannel();
-	if (!network)
+	if (!config.get<bool>(vars.bFakeLatency))
 		return 0.0f;
-	// extra ticks, due to latency you might store wrong ticks
-	return std::clamp(network->getLatency(FLOW_INCOMING) - network->getLatency(FLOW_OUTGOING), 0.0f, 0.2f);
+
+	return config.get<float>(vars.fFakeLatency) / 1000.0f;
 }
 
 void Backtrack::update(int frame)
 {
-	if (frame != FRAME_RENDER_START)
+	// get time from every frame
+	float correcttime = config.get<float>(vars.fBacktrackTick) / 1000.0f + extraTicks();
+
+	if (frame != FRAME_NET_UPDATE_END)
 		return;
 
 	if (!game::localPlayer || !config.get<bool>(vars.bBacktrack) || !game::localPlayer->isAlive())
@@ -124,48 +129,68 @@ void Backtrack::update(int frame)
 		{
 			// don't add bunch of useless records
 			m_records.at(i).clear();
+			//m_correct.at(i).reset();
 			continue;
 		}
+
+		// purpose: nothing
+		//bool correct = false;
+		//if (m_correct.at(i).m_correctSimtime != entity->m_flSimulationTime() && m_correct.at(i).m_correctSimtime < entity->m_flSimulationTime())
+		//{
+		//	correct = true;
+		//	if(!m_correct.at(i).m_correctSimtime)
+		//		m_correct.at(i).m_correctSimtime = entity->m_flSimulationTime();
+
+		//	//printf("correct %f game %f servertime %f\n", m_correct.at(i).m_correctSimtime, interfaces::globalVars->m_curtime, game::serverTime());
+
+		//	m_correct.at(i).m_origin = entity->absOrigin();
+		//}
+
+		//if (correct)
+		//{
+		//	//printf("size %i\n", entity->m_CachedBoneData().m_size);
+
+		//	m_correct.at(i).m_correctSimtime = entity->m_flSimulationTime();
+		//	m_correct.at(i).m_setup = entity->setupBones(m_correct.at(i).m_matrix.data(), entity->m_CachedBoneData().m_size, // don't abuse setupbones with huge sizes
+		//		BONE_USED_MASK, interfaces::globalVars->m_curtime);
+		//}
+
 		// if record at this index is filled and has exactly same simulation time, don't update it
 		if (m_records.at(i).size() && (m_records.at(i).front().m_simtime == entity->m_flSimulationTime()))
 			continue;
 
+		if (!isValid(entity->m_flSimulationTime() /*m_correct.at(i).m_correctSimtime*/))
+			continue;
+
 		StoredRecord record = {};
-		// head will be used for calculations, from my testing it seemed to be better
 		record.m_origin = entity->absOrigin();
 		record.m_simtime = entity->m_flSimulationTime();
-
-		// setup bones for us, will be needed for basically get good matrix, can draw backtrack'ed models etc...
-		if (!entity->setupBones(record.m_matrix, BONE_USED_BY_HITBOX, BONE_USED_MASK, interfaces::globalVars->m_curtime))
-			continue;
+		entity->setupBones(record.m_matrix.data(), entity->m_CachedBoneData().m_size,
+			BONE_USED_MASK, interfaces::globalVars->m_curtime);
 		record.m_head = record.m_matrix[8].origin();
+		//record.m_origin = m_correct.at(i).m_origin;
+		//record.m_simtime = m_correct.at(i).m_correctSimtime;
+		//std::copy(m_correct.at(i).m_matrix.begin(), m_correct.at(i).m_matrix.end(), record.m_matrix);
+		//record.m_head = record.m_matrix[8].origin();
 
 		// fill them
 		m_records.at(i).push_front(record);
 
 		// when records are FULL and bigger than ticks we set in backtrack, then pop them
-		while (m_records.at(i).size() > 3 && m_records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(config.get<float>(vars.fBacktrackTick) / 1000.0f + extraTicks())))
+		while (m_records.at(i).size() > 3 && m_records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(correcttime)))
 			m_records.at(i).pop_back();
-
-		// lambda check for valid time simulation
-		// check every record with simtime
-		const auto invalid = std::find_if(std::cbegin(m_records.at(i)), std::cend(m_records.at(i)), [this](const StoredRecord& rec)
+		
+		// if it's not valid then clean up everything on this record
+		if (auto invalid = std::find_if(std::cbegin(m_records.at(i)), std::cend(m_records.at(i)), [this](const StoredRecord& rec)
 			{
 				return !isValid(rec.m_simtime);
-			});
-
-		// if it's not valid then clean up everything on this record
-		if (invalid != std::cend(m_records.at(i)))
+			}); invalid != std::cend(m_records.at(i)))
 			m_records.at(i).erase(invalid, std::cend(m_records.at(i)));
 	}
 }
 
 void Backtrack::run(CUserCmd* cmd)
 {
-	// this is same in working like an aimbot, but in here we don't set any angles
-	// we set origin and that's it, and go through nodes of records
-	// Maybe: some backtrack aimbot
-
 	if (!config.get<bool>(vars.bBacktrack))
 		return;
 
@@ -193,6 +218,9 @@ void Backtrack::run(CUserCmd* cmd)
 		if (!ent)
 			continue;
 
+		if (ent == game::localPlayer)
+			continue;
+
 		if (!ent->isAlive())
 			continue;
 
@@ -202,9 +230,9 @@ void Backtrack::run(CUserCmd* cmd)
 		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 			continue;
 
-		const auto& pos = ent->getBonePos(8);
+		const auto& pos = ent->absOrigin();
 
-		const auto fov = math::calcFov(myEye, pos, cmd->m_viewangles + aimPunch);
+		const auto fov = math::calcFovReal(myEye, pos, cmd->m_viewangles + aimPunch);
 		if (fov < bestFov)
 		{
 			bestFov = fov;
@@ -213,11 +241,8 @@ void Backtrack::run(CUserCmd* cmd)
 		}
 	}
 
-	if (bestPlayer && bestPlayerIdx != -1)
+	if (bestPlayer)
 	{
-		if (m_records.at(bestPlayerIdx).size() <= 3)
-			return;
-
 		bestFov = 180.0f;
 
 		for (int i = 0; i < m_records.at(bestPlayerIdx).size(); i++)
@@ -226,7 +251,7 @@ void Backtrack::run(CUserCmd* cmd)
 			if (!isValid(record.m_simtime))
 				continue;
 
-			const auto fov = math::calcFov(myEye, record.m_head, cmd->m_viewangles + aimPunch);
+			const auto fov = math::calcFovReal(myEye, record.m_head, cmd->m_viewangles + aimPunch);
 
 			if (fov < bestFov)
 			{
@@ -236,9 +261,67 @@ void Backtrack::run(CUserCmd* cmd)
 		}
 	}
 
-	if (bestRecordIdx != -1)
+	if (bestRecordIdx)
 	{
 		const auto& record = m_records.at(bestPlayerIdx).at(bestRecordIdx);
-		cmd->m_tickcount = TIME_TO_TICKS(record.m_simtime + getLerp());
+		cmd->m_tickcount = TIME_TO_TICKS(record.m_simtime);
+	}
+}
+
+void Backtrack::addLatency(INetChannel* netChannel, float latency)
+{
+	for (auto& el : m_sequences)
+	{
+		if (game::serverTime() - el._m_curtime >= latency)
+		{
+			netChannel->m_inReliableState = el.m_inReliableState;
+			netChannel->m_inSequenceNr = el.m_sequenceNr;
+			break;
+		}
+	}
+}
+
+void Backtrack::updateSequences()
+{
+	if (!game::isAvailable())
+		return;
+
+	if (!config.get<bool>(vars.bFakeLatency))
+	{
+		clearSequences();
+		return;
+	}
+
+	auto network = interfaces::engine->getNameNetChannel();
+	if (!network)
+		return;
+
+	if (m_lastSequence == 0)
+		m_lastSequence = network->m_inSequenceNr;
+
+	if (network->m_inSequenceNr > m_lastSequence)
+	{
+		m_lastSequence = network->m_inSequenceNr;
+		m_sequences.emplace_front(
+			SequenceRecord
+			{
+					network->m_inReliableState,
+					network->m_outReliableState,
+					network->m_inSequenceNr,
+					game::serverTime()
+			}
+		);
+	}
+
+	if (m_sequences.size() > 2048)
+		m_sequences.pop_back();
+}
+
+void Backtrack::clearSequences()
+{
+	if (!m_sequences.empty())
+	{
+		m_lastSequence = 0;
+		m_sequences.clear();
 	}
 }

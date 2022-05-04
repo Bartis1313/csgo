@@ -27,7 +27,7 @@ void Prediction::start(CUserCmd* cmd)
 
 	// store not current, but valid ticks/times to the game
 	interfaces::globalVars->m_curtime = game::serverTime(cmd);
-	interfaces::globalVars->m_frametime = interfaces::globalVars->m_intervalPerTick;
+	interfaces::globalVars->m_frametime = game::localPlayer->m_fFlags() & FL_FROZEN ? 0.0f : interfaces::globalVars->m_intervalPerTick;
 
 	// use what SDK has given to us
 	interfaces::gameMovement->startTrackPredictionErrors(game::localPlayer);
@@ -62,4 +62,15 @@ void Prediction::addToPrediction(CUserCmd* cmd, const std::function<void()>& fun
 	start(cmd);
 	fun();
 	end();
+}
+
+#include "../../../SDK/IClientState.hpp"
+
+void Prediction::update()
+{
+	auto state = interfaces::clientState;
+	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/engine/cl_pred.cpp#L64
+	if (bool validframe = state->m_deltaTick > 0)
+		interfaces::prediction->update(state->m_deltaTick, validframe,
+			state->m_lastCommandAck, state->m_lastOutGoingCommand + state->m_chockedCommands);
 }

@@ -23,11 +23,15 @@ void Events::init() const
 	interfaces::eventManager->addListener(&events, XOR("player_hurt"));
 	interfaces::eventManager->addListener(&events, XOR("weapon_fire"));
 	interfaces::eventManager->addListener(&events, XOR("bullet_impact"));
+	interfaces::eventManager->addListener(&events, XOR("bomb_exploded"));
+	interfaces::eventManager->addListener(&events, XOR("bomb_planted"));
 	console.log(TypeLogs::LOG_INFO, XOR("events init"));
 }
 
 void Events::FireGameEvent(IGameEvent* event)
 {
+	// todo: run map std::map<string, std::function> so there is no if else if mess
+
 	if (std::string_view name = event->getName(); name == XOR("player_footstep"))
 	{
 		visuals.drawSound(event);
@@ -76,6 +80,17 @@ void Events::FireGameEvent(IGameEvent* event)
 		world.pushLocalImpacts({ src, dst, interfaces::globalVars->m_curtime + config.get<float>(vars.fDrawLocalSideImpacts) });
 		misc.drawBulletTracer(src, dst);
 	}
+	else if (name == XOR("bomb_exploded")) // workaround
+		world.m_bombEnt = nullptr;
+	else if (name == XOR("bomb_planted")) // the field of class is changed only when planted so everytime we get correct info
+	{
+		auto who = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+		if (!who)
+			return;
+
+		world.m_whoPlanted = who->getName();
+	}
+
 }
 
 void Events::shutdown() const

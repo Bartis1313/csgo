@@ -45,6 +45,8 @@ public:
 class IPrediction
 {
 public:
+	VFUNC(void, update, 3, (int startframe, bool validframe, int incomingAcknowledged, int outgoingCommand),
+		(this, startframe, validframe, incomingAcknowledged, outgoingCommand));
 	VFUNC(void, setLocalViewangles, 13, (Vector& angle), (this, std::ref(angle)));
 	VFUNC(bool, inPrediction, 14, (), (this));
 	VFUNC(void, setupMove, 20, (Player_t* localPlayer, CUserCmd* cmd, IMoveHelper* moveHelper, CMoveData* moveData), (this, localPlayer, cmd, moveHelper, moveData));

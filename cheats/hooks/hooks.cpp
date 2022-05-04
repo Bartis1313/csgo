@@ -34,7 +34,6 @@ void hooks::init()
 	const auto sv_cheatsTarget = vfunc::getVFunc(sv_cheatsAddr, sv_cheats::index);
 #pragma endregion
 
-#pragma region checks
 	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK);
 	const auto clientValidAddrTarget = reinterpret_cast<void*>(addrClient);
 
@@ -61,7 +60,9 @@ void hooks::init()
 
 	const auto particlesSimulation = utilities::patternScan(CLIENT_DLL, PARTICLE_SIMULATE);
 	const auto particlesSimulationTarget = reinterpret_cast<void*>(particlesSimulation);
-#pragma endregion
+
+	const auto sendDatagramAddr = utilities::patternScan(ENGINE_DLL, SEND_DATAGRAM);
+	const auto sendDatagramTarget = reinterpret_cast<void*>(sendDatagramAddr);
 
 #pragma region DX9
 	const auto resetTarget = vfunc::getVFunc(interfaces::dx9Device, reset::index);
@@ -96,6 +97,7 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(buildTrTarget, buildTransformations);
 	HOOK_SAFE(sv_cheatsTarget, sv_cheats);
 	HOOK_SAFE(particlesSimulationTarget, particlesSimulations);
+	HOOK_SAFE(sendDatagramTarget, sendDatagram);
 
 #undef HOOK_SAFE
 

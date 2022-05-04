@@ -81,6 +81,7 @@
       <InlineFunctionExpansion>Default</InlineFunctionExpansion>
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
     </ClCompile>
     <ProjectReference>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
@@ -162,6 +163,7 @@
     </ClCompile>
     <ClCompile Include="cheats\hooks\buildTransformations.cpp" />
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
+    <ClCompile Include="cheats\hooks\sendDatagram.cpp" />
     <ClCompile Include="cheats\hooks\particlesSimulation.cpp" />
     <ClCompile Include="cheats\hooks\setupbones.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
@@ -318,6 +320,7 @@
     <ClInclude Include="SDK\CTeslaInfo.hpp" />
     <ClInclude Include="SDK\CUtlReference.hpp" />
     <ClInclude Include="SDK\CUtlString.hpp" />
+    <ClInclude Include="SDK\IClientState.hpp" />
     <ClInclude Include="SDK\IMemAlloc.hpp" />
     <ClInclude Include="SDK\KeyValues.hpp" />
     <ClInclude Include="SDK\KeyValuesSys.hpp" />
