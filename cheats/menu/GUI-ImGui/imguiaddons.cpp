@@ -1,87 +1,56 @@
 #include "imguiaddons.hpp"
-#include <Windows.h>
-#include <array>
 
-constexpr std::array badKeys =
-{
-    VK_ESCAPE, VK_RETURN,
-    VK_INSERT, VK_PRINT,
-    0x5B, 0x5C
-};
+#include "../../../config/key.hpp"
 
 #include "../../../utilities/utilities.hpp"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "../../../dependencies/ImGui/imgui_internal.h"
 
-bool checkKey(int* key)
+void ImGui::Hotkey(const char* label, Key& key, bool useExtended, const ImVec2& size)
 {
+    ImGui::PushID(label);
+    ImGui::TextUnformatted(label);
 
-    for (const auto& el : badKeys)
+    ImGui::SameLine();
+
+    if (const auto id = ImGui::GetID(label); ImGui::GetActiveID() == id)
     {
-        if (ImGui::IsKeyPressed(el))
-            return true;
+        ImGui::Button("...", size);
+        ImGui::GetCurrentContext()->ActiveIdAllowOverlap = true;
+
+        if ((!ImGui::IsItemHovered() && ImGui::GetIO().MouseClicked[0]) || key.checkKey())
+            ImGui::ClearActiveID();
+
     }
-
-    // imgui has many key handlers, so mouse is not treated like keyboard
-    // 0=left, 1=right, 2=middle + extras (ImGuiMouseButton_COUNT == 5)
-    for (int i = 0; i < IM_ARRAYSIZE(ImGui::GetIO().MouseDown); i++)
+    else if (ImGui::Button(utilities::getKeyName(key.getKeyCode()).c_str(), size))
+        ImGui::SetActiveID(id, GetCurrentWindow());
+    else
     {
-        if (ImGui::IsMouseClicked(i))
+        if (useExtended)
         {
-            // need this switch because imgui has own bool arr
-            switch (i)
+            if (ImGui::BeginPopup("##pop", ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
             {
-            case 0:
-                *key = VK_LBUTTON;
-                break;
-            case 1:
-                *key = VK_RBUTTON;
-                break;
-            case 2:
-                *key = VK_MBUTTON;
-                break;
-            case 3:
-                *key = VK_XBUTTON1;
-                break;
-            case 4:
-                *key = VK_XBUTTON2;
-                break;
-            default:
-                break;
+                for (const auto [mode, name] : Key::getKeyPairs())
+                {
+                    bool selected = key.getKeyMode() == mode;
+                    if (ImGui::Selectable(name, &selected))
+                    {
+                        if (selected)
+                            key.setKeyMode(mode);
+                    }
+                }
+
+                ImGui::EndPopup();
             }
-            return true;
+            else if (IsItemHovered())
+            {
+                ImGui::SetTooltip("Key mode");
+
+                if (ImGui::GetIO().MouseClicked[1])
+                    ImGui::OpenPopup("##pop");
+            }
         }
     }
-
-    for (int i = 0; i < IM_ARRAYSIZE(ImGui::GetIO().KeysDown); i++)
-    {
-        if (ImGui::IsKeyPressed(i))
-        {
-            *key = i;
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void ImGui::Hotkey(const char* label, int* key, const ImVec2& size)
-{
-    PushID(label);
-    Text(label);
-
-    SameLine();
-
-    if (const auto id = GetID(label); GetActiveID() == id)
-    {
-        Button("...", size);
-        GetCurrentContext()->ActiveIdAllowOverlap = true;
-
-        if ((!IsItemHovered() && GetIO().MouseClicked[0]) || checkKey(key))
-            ClearActiveID();
-    }
-    else if (Button(utilities::getKeyName(*key).c_str(), size))
-        SetActiveID(id, GetCurrentWindow());
 
     PopID();
 }

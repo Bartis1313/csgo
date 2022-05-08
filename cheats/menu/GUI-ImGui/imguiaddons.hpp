@@ -9,12 +9,13 @@
 #include "../../../dependencies/ImGui/imgui.h"
 
 class Color;
+class Key;
 using ImGuiColorEditFlags = int;
 
 namespace ImGui
 {
 	// basic hotkey function, that behaves like button.
-	void Hotkey(const char* label, int* key, const ImVec2& size = { 0.0f, 0.0f });
+	void Hotkey(const char* label, Key& key, bool useExtended = true, const ImVec2& size = { 0.0f, 0.0f });
 	// from demo
 	void HelpMarker(const char* desc);
 	bool ColorPicker(const char* label, Color* clr, const ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);

@@ -122,6 +122,8 @@ void hooks::wndProcSys::init()
 }
 
 #include "../../SDK/InputSystem.hpp"
+#include "../../config/key.hpp"
+#include "../../utilities/inputSystem.hpp"
 
 void hooks::wndProcSys::shutdown()
 {
@@ -142,18 +144,21 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 		return true;
 	} ();
 
-	// here, don't call getasynckeystate, it's another call for something that is already given by arg
-	if (message == WM_KEYDOWN) // should run some key struct for this
-	{
-		if (LOWORD(wparam) == config.get<int>(vars.iKeyMenu))
-			menu.changeActive();
-		if (LOWORD(wparam) == config.get<int>(vars.iKeyConsoleLog))
-			console.changeActiveLog();
-	}
+	inputHandler.run(message, wparam);
+
+	auto& aimbotKey = config.getRef<Key>(vars.kAimbotKey);
+	aimbotKey.update();
+	auto& thirdpKey = config.getRef<Key>(vars.kThirdp);
+	thirdpKey.update();
+
+	if(inputHandler.isKeyPressed(config.get<Key>(vars.kMenu).getKeyCode()))
+		menu.changeActive();
+
+	if (inputHandler.isKeyPressed(config.get<Key>(vars.kConsoleLog).getKeyCode()))
+		console.changeActiveLog();
 
 	interfaces::iSystem->enableInput(!menu.isMenuActive());
 
-	// this needs to check it! this way we skip man flickering problems, maybe this is not like the best way
 	if (menu.isMenuActive() && ImGui_ImplWin32_WndProcHandler(hwnd, message, wparam, lparam))
 		return TRUE;
 #if _DEBUG

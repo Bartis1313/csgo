@@ -26,9 +26,9 @@ struct Box3D;
 
 // enum to type
 template<typename T>
-_NODISCARD constexpr auto E2T(T en) { return static_cast<std::underlying_type_t<T>>(en); }
+_NODISCARD inline constexpr auto E2T(T en) { return static_cast<std::underlying_type_t<T>>(en); }
 
-inline constexpr std::string operator"" _u8str(const char8_t* str, size_t s)
+_NODISCARD inline constexpr std::string operator"" _u8str(const char8_t* str, size_t s)
 {
     return std::string{ str, str + s };
 }
@@ -56,7 +56,8 @@ namespace utilities
         return toReturn;
     }
     _NODISCARD std::vector<std::string> splitStr(const std::string& str, char limit = ' ');
-    _NODISCARD uint32_t getKey(const uint32_t vKey);
+    [[deprecated("use key classes")]]
+    uint32_t getKey(const uint32_t vKey);
     _NODISCARD float scaleDamageArmor(float dmg, const float armor);
     _NODISCARD std::string u8toStr(const std::u8string& u8str);
 }

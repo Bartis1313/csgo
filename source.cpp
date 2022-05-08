@@ -55,13 +55,12 @@ DWORD WINAPI init(PVOID instance)
     initTimer.end();
     console.log(TypeLogs::LOG_INFO, XOR("main thread took {:.5f}s"), initTimer.getSec());
 
-
     return TRUE;
 }
 
 VOID WINAPI _shutdown(PVOID instance)
 {
-    while (!utilities::getKey(config.get<int>(vars.iKeyPanic)))
+    while (!config.get<Key>(vars.kPanic).isPressed())
         std::this_thread::sleep_for(100ms);
 
     globals::isShutdown = true;
@@ -91,7 +90,7 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
 
         if (auto initThread = LF(CreateThread)(nullptr, NULL, init, instance, NULL, nullptr))
             LF(CloseHandle)(initThread);
-
+    
         if (auto shutdownThread = LF(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_shutdown), instance, NULL, nullptr))
             LF(CloseHandle)(shutdownThread);
 

@@ -250,7 +250,15 @@ void Aimbot::drawFov()
 
 bool Aimbot::isClicked(CUserCmd* cmd)
 {
-    return cmd->m_buttons & IN_ATTACK /*|| some key press event*/;
+    if (config.get<bool>(vars.bAimbotUseKey))
+    {
+        if (config.get<Key>(vars.kAimbotKey).isEnabled())
+            return true;
+        else
+            return false;
+    }
+    else
+        return cmd->m_buttons & IN_ATTACK;
 }
 
 std::vector<size_t> Aimbot::getHitboxes()

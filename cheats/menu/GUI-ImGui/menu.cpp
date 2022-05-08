@@ -64,6 +64,10 @@ static void renderAimbot()
 			ImGui::BeginGroupPanel(XOR("Aimbot general"), { -1.0f, 0.0f });
 			{
 				ImGui::Checkbox(XOR("Enabled aimbot"), &config.getRef<bool>(vars.bAimbot));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("Use key##aimbot"), &config.getRef<bool>(vars.bAimbotUseKey));
+				ImGui::SameLine();
+				ImGui::Hotkey("", config.getRef<Key>(vars.kAimbotKey));
 				ImGui::SliderFloat(XOR("Aimbot FOV"), &config.getRef<float>(vars.fFovAimbot), 0.0f, 50.0f);
 				ImGui::Combo(XOR("Aimbot selection"), &config.getRef<int>(vars.iAimbot), selections::aimbotHitboxes);
 				ImGui::SliderFloat(XOR("Aimbot smooth"), &config.getRef<float>(vars.fSmooth), 1.0f, 50.0f);
@@ -288,6 +292,7 @@ static void renderMisc()
 				ImGui::SliderFloat(XOR("FOV local"), &config.getRef<float>(vars.fFOV), -50.0f, 50.0f);
 				ImGui::Checkbox(XOR("Third Person"), &config.getRef<bool>(vars.bThirdp));
 				ImGui::SameLine();
+				ImGui::Hotkey(XOR(""), config.getRef<Key>(vars.kThirdp));
 				ImGui::Combo(XOR("Crosshair type"), &config.getRef<int>(vars.iCrosshair), selections::crossHairNames);
 				ImGui::Checkbox(XOR("Enemy aiming warn"), &config.getRef<bool>(vars.bAimingWarn));
 			}
@@ -437,7 +442,7 @@ static void renderConfig()
 	static std::string text = XOR("Your new config name");
 	static int currentcfg = 0;
 
-	ImGui::Columns(1, nullptr, false);
+	ImGui::Columns(2, nullptr, false);
 	{
 		if (ImGui::BeginChild(XOR("cfg"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
 		{
@@ -482,13 +487,24 @@ static void renderConfig()
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("This config will load on the start\nThis button saves default config!"));
-				static int testkey = 0x4;
-				ImGui::Hotkey(XOR("Testing hotkey!"), &testkey);
 			}
 			ImGui::EndGroupPanel();
 
 			ImGui::EndChild();
 		}
+	}
+	ImGui::NextColumn();
+	if (ImGui::BeginChild(XOR("cfgkeys"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
+	{
+		ImGui::BeginGroupPanel(XOR("Config keys"));
+		{
+			ImGui::Hotkey(XOR("Menu key"), config.getRef<Key>(vars.kMenu), false);
+			ImGui::Hotkey(XOR("Console key"), config.getRef<Key>(vars.kConsoleLog), false);
+			ImGui::Hotkey(XOR("Panic key"), config.getRef<Key>(vars.kPanic), false);
+		}
+		ImGui::EndGroupPanel();
+
+		ImGui::EndChild();
 	}
 }
 
@@ -557,7 +573,7 @@ std::array tabs =
 
 void ImGuiMenu::draw()
 {
-	if (isMenuActive())
+	if (m_active)
 	{
 		if (ImGui::Begin(XOR("csgo legit"), &m_active, ImGuiWindowFlags_NoCollapse))
 		{

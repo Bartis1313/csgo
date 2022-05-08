@@ -1,13 +1,13 @@
 #include "config.hpp"
 
-#include "../dependencies/json.hpp"
-#include "../utilities/console/console.hpp"
-
 #include <shlobj.h>
 #include <stdexcept>
 #include <format>
 #include <fstream>
 #include <filesystem>
+
+#include "../dependencies/json.hpp"
+#include "../utilities/console/console.hpp"
 
 using json = nlohmann::json;
 
@@ -32,6 +32,10 @@ ConfigType::ConfigType(const Types var, const std::string& name)
 	{
 		m_isGoodType = true;
 		m_isVec = true;
+	}
+	else if (std::holds_alternative<Key>(m_type))
+	{
+		m_isGoodType = true;
 	}
 	else
 		m_isGoodType = false;
@@ -102,6 +106,18 @@ bool Config::save(const std::string& file, const bool forceSave)
 
 			for (bool el : vec)
 				arr.push_back(el);
+
+			entry[XOR("value")] = arr.dump();
+		}
+		else if (std::holds_alternative<Key>(var.getType()))
+		{
+			auto key = var.get<Key>();
+
+			json arr =
+			{
+				key.getKeyMode(),
+				key.getKeyCode()
+			};
 
 			entry[XOR("value")] = arr.dump();
 		}
@@ -193,6 +209,17 @@ bool Config::load(const std::string& file)
 			{
 				original.at(i) = parsed.at(i).get<bool>();
 			}
+		}
+		else if (std::holds_alternative<Key>(entry.getType()))
+		{
+			auto parsed = json::parse(var[XOR("value")].get<std::string>());
+
+			entry.set(
+				Key(
+					parsed.at(0).get<KeyMode>(),
+					parsed.at(1).get<int>()
+				)
+			);
 		}
 	}
 

@@ -167,6 +167,7 @@
     <ClCompile Include="cheats\hooks\particlesSimulation.cpp" />
     <ClCompile Include="cheats\hooks\setupbones.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
+    <ClCompile Include="config\key.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
     <ClCompile Include="cheats\features\visuals\chams.cpp">
@@ -281,6 +282,7 @@
     <ClCompile Include="utilities\console\console.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="utilities\inputSystem.cpp" />
     <ClCompile Include="utilities\math\math.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -312,6 +314,7 @@
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
     <ClInclude Include="config\enums.hpp" />
+    <ClInclude Include="config\key.hpp" />
     <ClInclude Include="SDK\CClientEffectRegistration.hpp" />
     <ClInclude Include="SDK\CEffectData.hpp" />
     <ClInclude Include="SDK\CFlashlightEffect.hpp" />
@@ -478,6 +481,7 @@
     <ClInclude Include="SDK\CUtlVector.hpp" />
     <ClInclude Include="SDK\structs\IDXandPaterrns.hpp" />
     <ClInclude Include="utilities\console\console.hpp" />
+    <ClInclude Include="utilities\inputSystem.hpp" />
     <ClInclude Include="utilities\math\math.hpp" />
     <ClInclude Include="utilities\netvars\netvars.hpp" />
     <ClInclude Include="utilities\pad.hpp" />

@@ -39,6 +39,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bDrawBestPoint, false, "draw best point of hitbox");
 	CONFIG_ADD_VARIABLE(bool, bAimbotDelay, false, "enable aimbot delay");
 	CONFIG_ADD_VARIABLE(float, fAimbotDelay, false, "aimbot delay time");
+	CONFIG_ADD_VARIABLE(bool, bAimbotUseKey, false, "Use aimbot on key");
+	CONFIG_ADD_VARIABLE(Key, kAimbotKey, Key(KeyMode::DOWN, VK_LBUTTON), "aimbot key");
 
 	// VISUALS
 	CONFIG_ADD_VARIABLE(bool, bChams, false, "chams enabled");
@@ -139,10 +141,10 @@ struct Variables
 	// MASTER SWITCHES
 	
 	CONFIG_ADD_VARIABLE(bool, bMenuOpenedx88, true, "x88 menu enabled");
-	CONFIG_ADD_VARIABLE(int, iKeyMenu, VK_INSERT, "key for imgui menu");
-	CONFIG_ADD_VARIABLE(int, iKeyPanic, VK_DELETE, "key for shutdown");
-	CONFIG_ADD_VARIABLE(int, iKeyConsoleLog, VK_HOME, "key for log console");
-	CONFIG_ADD_VARIABLE(std::string, sLoadName, XOR("default.cfg"), "config to load (you only care for this in default cfg)");
+	CONFIG_ADD_VARIABLE(std::string, sLoadName, "default.cfg", "config to load (you only care for this in default cfg)");
+	CONFIG_ADD_VARIABLE(Key, kMenu, Key(KeyMode::TOGGLE, VK_INSERT), "key for imgui menu");
+	CONFIG_ADD_VARIABLE(Key, kPanic, Key(KeyMode::DOWN, VK_DELETE), "key for shutdown");
+	CONFIG_ADD_VARIABLE(Key, kConsoleLog, Key(KeyMode::TOGGLE, VK_HOME), "key for log console");
 	
 
 	// MISC
@@ -150,6 +152,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bSoundEsp, false, "sound esp enabled");
 	CONFIG_ADD_VARIABLE(float, fFOV, 0, "fov for +/- view");
 	CONFIG_ADD_VARIABLE(bool, bThirdp, false, "third person enabled");
+	CONFIG_ADD_VARIABLE(Key, kThirdp, Key(KeyMode::TOGGLE, 0x56), "third person key");
 	CONFIG_ADD_VARIABLE(int, iCrosshair, 0, "crosshair mode");
 	CONFIG_ADD_VARIABLE(bool, bBacktrack, false, "backtrack enabled");
 	CONFIG_ADD_VARIABLE(float, fBacktrackTick, 200.0f, "backtrack amount of ticks to manipulate");

@@ -30,12 +30,7 @@ void Misc::thirdperson()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	constexpr int VK_VKEY = 0x56; // this is only for test now
-	static bool thirdp = false;
-	if (utilities::getKey(VK_VKEY) & 1)
-		thirdp = !thirdp;
-
-	interfaces::input->m_cameraInThirdPerson = thirdp;
+	interfaces::input->m_cameraInThirdPerson = config.get<Key>(vars.kThirdp).isEnabled();
 	interfaces::input->m_cameraOffset.z = 220.0f;
 }
 

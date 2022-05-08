@@ -1,11 +1,13 @@
 #pragma once
 
-#include "../utilities/utilities.hpp"
-#include "../SDK/Color.hpp"
 #include <filesystem>
 #include <variant>
 #include <vector>
 #include <iostream>
+
+#include "key.hpp"
+#include "../utilities/utilities.hpp"
+#include "../SDK/Color.hpp"
 
 class ConfigType
 {
@@ -13,7 +15,7 @@ public:
 	// add possible types to accept
 	using Types = std::variant<bool, int, float,
 		std::string, Color,
-		std::vector<bool>>;
+		std::vector<bool>, Key>;
 
 	ConfigType() = default;
 	/// <summary>
