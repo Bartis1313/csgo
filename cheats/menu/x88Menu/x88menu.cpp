@@ -137,17 +137,20 @@ void X88Menu::handleKeys()
 		return;
 
 	if (inputHandler.isKeyPressed(VK_DOWN))
-		index++;
+	{
+		if (index != x88types.getVars().size() - 1)
+			index++;
+		else
+			index = 0;
+	}
 
 	if (inputHandler.isKeyPressed(VK_UP))
-		index--;
-
-	// and now custom clamping
-	if (index < 0)
-		index = x88types.getVars().size() - 1;
-
-	if (index > x88types.getVars().size() - 1)
-		index = 0;
+	{
+		if (index != 0)
+			index--;
+		else
+			index = x88types.getVars().size() - 1;
+	}
 
 	auto current = x88types.getVars().at(index);
 	auto& value = current.first.second;
