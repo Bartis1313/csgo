@@ -151,10 +151,10 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 	auto& thirdpKey = config.getRef<Key>(vars.kThirdp);
 	thirdpKey.update();
 
-	if(inputHandler.isKeyPressed(config.get<Key>(vars.kMenu).getKeyCode()))
+	if(config.get<Key>(vars.kMenu).isPressed())
 		menu.changeActive();
 
-	if (inputHandler.isKeyPressed(config.get<Key>(vars.kConsoleLog).getKeyCode()))
+	if (config.get<Key>(vars.kConsoleLog).isPressed())
 		console.changeActiveLog();
 
 	interfaces::iSystem->enableInput(!menu.isMenuActive());
