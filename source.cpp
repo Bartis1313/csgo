@@ -12,6 +12,7 @@
 #include "cheats/menu/GUI-ImGui/menu.hpp"
 #include "utilities/console/console.hpp"
 #include "SEHcatch.hpp"
+#include "cheats/menu/x88Menu/x88menu.hpp"
 
 #include <thread>
 
@@ -41,6 +42,7 @@ DWORD WINAPI init(PVOID instance)
         netvarMan.init();
         netvarMan.dump();
         surfaceRender.init();
+        x88menu.init();
         hooks::wndProcSys::init();
         callbacks.init();
         callbacks.run();

@@ -124,6 +124,7 @@ void hooks::wndProcSys::init()
 #include "../../SDK/InputSystem.hpp"
 #include "../../config/key.hpp"
 #include "../../utilities/inputSystem.hpp"
+#include "../menu/x88Menu/x88menu.hpp"
 
 void hooks::wndProcSys::shutdown()
 {
@@ -145,6 +146,7 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 	} ();
 
 	inputHandler.run(message, wparam);
+	x88menu.handleKeys();
 
 	auto& aimbotKey = config.getRef<Key>(vars.kAimbotKey);
 	aimbotKey.update();

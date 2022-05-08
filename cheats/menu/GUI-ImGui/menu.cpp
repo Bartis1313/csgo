@@ -501,6 +501,7 @@ static void renderConfig()
 			ImGui::Hotkey(XOR("Menu key"), config.getRef<Key>(vars.kMenu), false);
 			ImGui::Hotkey(XOR("Console key"), config.getRef<Key>(vars.kConsoleLog), false);
 			ImGui::Hotkey(XOR("Panic key"), config.getRef<Key>(vars.kPanic), false);
+			ImGui::Checkbox(XOR("Enable x88 menu"), &config.getRef<bool>(vars.bMenuOpenedx88));
 		}
 		ImGui::EndGroupPanel();
 

@@ -167,6 +167,7 @@
     <ClCompile Include="cheats\hooks\particlesSimulation.cpp" />
     <ClCompile Include="cheats\hooks\setupbones.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
+    <ClCompile Include="cheats\menu\x88Menu\x88menu.cpp" />
     <ClCompile Include="config\key.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
@@ -313,6 +314,8 @@
     <ClInclude Include="cheats\features\prediction\nadepred.hpp" />
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
+    <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
+    <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />
     <ClInclude Include="config\enums.hpp" />
     <ClInclude Include="config\key.hpp" />
     <ClInclude Include="SDK\CClientEffectRegistration.hpp" />
