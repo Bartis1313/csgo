@@ -48,5 +48,3 @@ public:
 private:
 	std::vector<std::pair<X88Pair, Limits>> m_vars;
 };
-
-inline X88Types x88types;

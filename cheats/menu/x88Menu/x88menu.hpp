@@ -2,7 +2,8 @@
 
 #include <string>
 
-// simple
+#include "x88types.hpp"
+
 class X88Menu
 {
 public:
@@ -15,6 +16,7 @@ private:
 	size_t index = 0;
 	size_t m_longestNameSize;
 	bool m_inited = false;
+	X88Types x88types;
 };
 
 inline X88Menu x88menu;

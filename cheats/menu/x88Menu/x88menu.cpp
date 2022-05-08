@@ -2,7 +2,6 @@
 
 #include <format>
 
-#include "x88types.hpp"
 #include "../../game.hpp"
 #include "../../globals.hpp"
 #include "../../../SDK/structs/Entity.hpp"
