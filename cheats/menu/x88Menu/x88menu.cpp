@@ -98,7 +98,7 @@ void X88Menu::init()
 	x88types.push(XOR("ESP"), &config.getRef<bool>(vars.bEsp));
 	x88types.push(XOR("FOV"), &config.getRef<float>(vars.fFOV), { -50.0f, 50.0f} );
 	x88types.push(XOR("Aimbot"), &config.getRef<bool>(vars.bAimbot));
-	x88types.push(XOR("Aimbot Type"), &config.getRef<int>(vars.iAimbot), 3);
+	x88types.push(XOR("Aimbot Type"), &config.getRef<int>(vars.iAimbot), 2);
 	x88types.push(XOR("Backtrack"), &config.getRef<bool>(vars.bBacktrack));
 	x88types.push(XOR("Backtrack MS"), &config.getRef<float>(vars.fBacktrackTick), { 0.0f, 200.0f });
 	x88types.push(XOR("No Sky"), &config.getRef<bool>(vars.bRemoveSky));

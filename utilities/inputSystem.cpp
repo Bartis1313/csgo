@@ -1,7 +1,12 @@
 #include "inputSystem.hpp"
 
+#include "../cheats/globals.hpp"
+
 void KeysHandler::run(UINT message, WPARAM wparam)
 {
+	if (globals::isInHotkey)
+		return;
+
 	// init starting keys, undefined
 	int key = 0;
 	auto state = KeyState::OFF;

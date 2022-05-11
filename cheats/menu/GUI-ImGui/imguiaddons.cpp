@@ -5,6 +5,7 @@
 #include "../../../utilities/utilities.hpp"
 #define IMGUI_DEFINE_MATH_OPERATORS
 #include "../../../dependencies/ImGui/imgui_internal.h"
+#include "../../globals.hpp"
 
 void ImGui::Hotkey(const char* label, Key& key, bool useExtended, const ImVec2& size)
 {
@@ -19,11 +20,17 @@ void ImGui::Hotkey(const char* label, Key& key, bool useExtended, const ImVec2& 
         ImGui::GetCurrentContext()->ActiveIdAllowOverlap = true;
 
         if ((!ImGui::IsItemHovered() && ImGui::GetIO().MouseClicked[0]) || key.checkKey())
+        {
+            globals::isInHotkey = false;
             ImGui::ClearActiveID();
+        }
 
     }
     else if (ImGui::Button(utilities::getKeyName(key.getKeyCode()).c_str(), size))
+    {
+        globals::isInHotkey = true;
         ImGui::SetActiveID(id, GetCurrentWindow());
+    }
     else
     {
         if (useExtended)

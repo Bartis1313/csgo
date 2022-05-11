@@ -18,4 +18,5 @@ namespace globals
 	inline int mouseY = 0;
 	inline HWND csgoWHND = NULL;
 	inline bool isShutdown = false;
+	inline bool isInHotkey = false;
 }
