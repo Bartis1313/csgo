@@ -90,7 +90,7 @@ void Backtrack::update(int frame)
 	// get time from every frame
 	float correcttime = config.get<float>(vars.fBacktrackTick) / 1000.0f + extraTicks();
 
-	if (frame != FRAME_NET_UPDATE_END)
+	if (frame != FRAME_RENDER_START)
 		return;
 
 	if (!game::localPlayer || !config.get<bool>(vars.bBacktrack) || !game::localPlayer->isAlive())
@@ -101,7 +101,7 @@ void Backtrack::update(int frame)
 		return;
 	}
 
-	auto isGoodEnt = [](Player_t* ent)
+	constexpr auto isGoodEnt = [](Player_t* ent)
 	{
 		if (!ent)
 			return false;
@@ -165,8 +165,9 @@ void Backtrack::update(int frame)
 		StoredRecord record = {};
 		record.m_origin = entity->absOrigin();
 		record.m_simtime = entity->m_flSimulationTime();
-		entity->setupBones(record.m_matrix.data(), entity->m_CachedBoneData().m_size,
-			BONE_USED_MASK, interfaces::globalVars->m_curtime);
+		if (!entity->setupBones(record.m_matrix.data(), entity->m_CachedBoneData().m_size,
+			BONE_USED_MASK, interfaces::globalVars->m_curtime))
+			continue;
 		record.m_head = record.m_matrix[8].origin();
 		//record.m_origin = m_correct.at(i).m_origin;
 		//record.m_simtime = m_correct.at(i).m_correctSimtime;
@@ -179,7 +180,7 @@ void Backtrack::update(int frame)
 		// when records are FULL and bigger than ticks we set in backtrack, then pop them
 		while (m_records.at(i).size() > 3 && m_records.at(i).size() > static_cast<size_t>(TIME_TO_TICKS(correcttime)))
 			m_records.at(i).pop_back();
-		
+
 		// if it's not valid then clean up everything on this record
 		if (auto invalid = std::find_if(std::cbegin(m_records.at(i)), std::cend(m_records.at(i)), [this](const StoredRecord& rec)
 			{
@@ -261,7 +262,7 @@ void Backtrack::run(CUserCmd* cmd)
 		}
 	}
 
-	if (bestRecordIdx)
+	if (bestRecordIdx != -1)
 	{
 		const auto& record = m_records.at(bestPlayerIdx).at(bestRecordIdx);
 		cmd->m_tickcount = TIME_TO_TICKS(record.m_simtime);
