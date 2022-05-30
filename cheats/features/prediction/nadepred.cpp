@@ -639,7 +639,7 @@ void GrenadeWarning::run(Nade_t* entity)
 		timeToTicks(reinterpret_cast<Player_t*>(entity)->m_flSimulationTime() - entity->getSpawnTime())
 	);
 
-	// if we draw anything then erase current value
+	// if no path, then delete this owner from map
 	if (!m_datas.at(ownerHandle).draw(entity))
 		m_datas.erase(ownerHandle);
 }
