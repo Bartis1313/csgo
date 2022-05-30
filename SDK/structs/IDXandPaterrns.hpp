@@ -2,9 +2,6 @@
 
 #include "../../utilities/utilities.hpp"
 
-// 06:09 29.03.2022
-// Bartis: updated
-
 enum VTableIndexes
 {
 	ISPLAYER = 158,

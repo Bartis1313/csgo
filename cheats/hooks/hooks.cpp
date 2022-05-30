@@ -84,10 +84,10 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(overrideViewTarget, overrideView);
 	HOOK_SAFE(doPostScreenEffectsTarget, doPostScreenEffects);
 	HOOK_SAFE(frameStageNotifyTarget, frameStageNotify);
-	//HOOK_SAFE(clientValidAddrTarget, clientValidAddr);
-	//HOOK_SAFE(engineValidAddrTarget, engineValidAddr);
-	//HOOK_SAFE(studioValidAddrTarget, studioRenderValidAddr);
-	//HOOK_SAFE(matertialValidAddrTarget, materialSystemValidAddr);
+	HOOK_SAFE(clientValidAddrTarget, clientValidAddr);
+	HOOK_SAFE(engineValidAddrTarget, engineValidAddr);
+	HOOK_SAFE(studioValidAddrTarget, studioRenderValidAddr);
+	HOOK_SAFE(matertialValidAddrTarget, materialSystemValidAddr);
 	HOOK_SAFE(isusingDebugPropsTarget, isUsingStaticPropDebugModes);
 	HOOK_SAFE(getColorModulationTarget, getColorModulation);
 	HOOK_SAFE(resetTarget, reset);
