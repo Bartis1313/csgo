@@ -156,7 +156,7 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
 	int currentAmmo = weapon->m_iClip1();
 
-	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, std::format(XOR("{} {}/{}"),
+	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, FORMAT(XOR("{} {}/{}"),
 		ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo), true, tex);
 
 	// skip useless trash for calculations
@@ -202,13 +202,13 @@ void Visuals::drawInfo(Player_t* ent, const Box& box)
 			flags.emplace_back(std::make_pair(XOR("BOT"), Colors::Yellow));
 
 	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::MONEY)))
-		flags.emplace_back(std::make_pair(std::format(XOR("{}$"), ent->m_iAccount()), Colors::Green));
+		flags.emplace_back(std::make_pair(FORMAT(XOR("{}$"), ent->m_iAccount()), Colors::Green));
 
 	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::WINS)))
-		flags.emplace_back(std::make_pair(std::format(XOR("Wins {}"), ent->getWins()), Colors::Green));
+		flags.emplace_back(std::make_pair(FORMAT(XOR("Wins {}"), ent->getWins()), Colors::Green));
 
 	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::RANK)))
-		flags.emplace_back(std::make_pair(std::format(XOR("Rank {}"), ent->getRank()), Colors::White));
+		flags.emplace_back(std::make_pair(FORMAT(XOR("Rank {}"), ent->getRank()), Colors::White));
 
 	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::ARMOR)))
 	{
@@ -244,7 +244,7 @@ void Visuals::drawInfo(Player_t* ent, const Box& box)
 		if (i != flags.size() && padding + fontSize > box.h) // when too many flags for long distances
 		{
 			imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana,
-				std::format(XOR("{} more..."), flags.size() - i), false, Colors::White, false);
+				FORMAT(XOR("{} more..."), flags.size() - i), false, Colors::White, false);
 			break;
 		}
 	}

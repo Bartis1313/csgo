@@ -136,10 +136,10 @@ bool Config::save(const std::string& file, const bool forceSave)
 	}
 	catch (const std::ofstream::failure& err)
 	{
-		console.log(TypeLogs::LOG_ERR, std::format(XOR("Saving {} file has failed: {}"), file, err.what()));
+		console.log(TypeLogs::LOG_ERR, FORMAT(XOR("Saving {} file has failed: {}"), file, err.what()));
 	}
 
-	console.log(TypeLogs::LOG_INFO, std::format(XOR("Saving {} file success"), file));
+	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("Saving {} file success"), file));
 	return true;
 }
 
@@ -159,7 +159,7 @@ bool Config::load(const std::string& file)
 	}
 	catch (const std::ifstream::failure& err)
 	{
-		console.log(TypeLogs::LOG_ERR, std::format(XOR("Loading {} file has failed: {}"), file, err.what()));
+		console.log(TypeLogs::LOG_ERR, FORMAT(XOR("Loading {} file has failed: {}"), file, err.what()));
 	}
 
 	for (const auto& var : config)
@@ -223,7 +223,7 @@ bool Config::load(const std::string& file)
 		}
 	}
 
-	console.log(TypeLogs::LOG_INFO, std::format(XOR("Loading {} file success"), file));
+	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("Loading {} file success"), file));
 	return true;
 }
 
@@ -272,7 +272,7 @@ bool Config::init()
 	// TODO: detect any changes, replace them with new file. Only idea for now is to compare file size (kb)
 	if (auto path = m_documentsPath / m_folder / getDefaultConfigName(); !std::filesystem::exists(path))
 	{
-		console.log(TypeLogs::LOG_INFO, std::format(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
+		console.log(TypeLogs::LOG_INFO, FORMAT(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
 
 		if (!save(getDefaultConfigName(), true))
 			return false;
@@ -344,5 +344,5 @@ void Config::deleteCfg(const std::string& file)
 	}
 
 	if (auto toDel = getPathForSave(path.string()); std::filesystem::remove(toDel))
-		console.log(TypeLogs::LOG_INFO, std::format(XOR("Removed config {}"), toDel.filename().string()));
+		console.log(TypeLogs::LOG_INFO, FORMAT(XOR("Removed config {}"), toDel.filename().string()));
 }

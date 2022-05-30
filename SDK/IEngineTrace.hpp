@@ -90,7 +90,7 @@ public:
 	TraceFilter(void* entity) :
 		m_skip{ entity }
 	{}
-	TraceFilter(void* entity, Collision_Group_t group) :
+	TraceFilter(void* entity, CollisionGroup_t group) :
 		m_skip{ entity }, m_collisionGroup{ group }
 	{}
 	virtual bool shouldHitEntity(Player_t* ent, int) const
@@ -102,7 +102,7 @@ public:
 		return m_collisionGroup;
 	}
 	void* m_skip;
-	Collision_Group_t m_collisionGroup = COLLISION_GROUP_NONE;
+	CollisionGroup_t m_collisionGroup = COLLISION_GROUP_NONE;
 };
 
 

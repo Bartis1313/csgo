@@ -153,19 +153,19 @@ void Misc::drawLocalInfo()
 
 	int width = globals::screenX * 0.6f;
 
-	imRender.text(width, 15, ImFonts::tahoma, std::format(XOR("Map: {}"), interfaces::engine->getLevelName()), false, Colors::Green);
-	imRender.text(width, 25, ImFonts::tahoma, std::format(XOR("Weapon {} [{} / {}]"), weapon->getWpnInfo()->m_WeaponName, weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
-	imRender.text(width, 35, ImFonts::tahoma, std::format(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100), false, Colors::Yellow);
-	imRender.text(width, 45, ImFonts::tahoma, std::format(XOR("Zoom level {}"), weapon->m_zoomLevel()), false, Colors::Yellow);
-	imRender.text(width, 55, ImFonts::tahoma, std::format(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->absOrigin().y, game::localPlayer->absOrigin().z), false, Colors::Yellow);
-	imRender.text(width, 65, ImFonts::tahoma, std::format(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().length2D()), false, Colors::Yellow);
+	imRender.text(width, 15, ImFonts::tahoma, FORMAT(XOR("Map: {}"), interfaces::engine->getLevelName()), false, Colors::Green);
+	imRender.text(width, 25, ImFonts::tahoma, FORMAT(XOR("Weapon {} [{} / {}]"), weapon->getWpnInfo()->m_WeaponName, weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount()), false, Colors::Yellow);
+	imRender.text(width, 35, ImFonts::tahoma, FORMAT(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100), false, Colors::Yellow);
+	imRender.text(width, 45, ImFonts::tahoma, FORMAT(XOR("Zoom level {}"), weapon->m_zoomLevel()), false, Colors::Yellow);
+	imRender.text(width, 55, ImFonts::tahoma, FORMAT(XOR("POS: x {:.2f} y {:.2f} z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->absOrigin().y, game::localPlayer->absOrigin().z), false, Colors::Yellow);
+	imRender.text(width, 65, ImFonts::tahoma, FORMAT(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().length2D()), false, Colors::Yellow);
 
-	imRender.text(width, 75, ImFonts::tahoma, std::format(XOR("Kills {}"), game::localPlayer->getKills()), false, Colors::Yellow);
-	imRender.text(width, 85, ImFonts::tahoma, std::format(XOR("Deaths {}"), game::localPlayer->getDeaths()), false, Colors::Yellow);
+	imRender.text(width, 75, ImFonts::tahoma, FORMAT(XOR("Kills {}"), game::localPlayer->getKills()), false, Colors::Yellow);
+	imRender.text(width, 85, ImFonts::tahoma, FORMAT(XOR("Deaths {}"), game::localPlayer->getDeaths()), false, Colors::Yellow);
 	// escape divide by zero exceptions by using this trick
 	float kd = game::localPlayer->getKills() / (game::localPlayer->getDeaths() ? game::localPlayer->getDeaths() : 1.0f);
-	imRender.text(width, 95, ImFonts::tahoma, std::format(XOR("KD {:.2f}"), kd), false, Colors::Yellow);
-	imRender.text(width, 105, ImFonts::tahoma, std::format(XOR("Ping {}"), game::localPlayer->getPing()), false, Colors::Yellow);
+	imRender.text(width, 95, ImFonts::tahoma, FORMAT(XOR("KD {:.2f}"), kd), false, Colors::Yellow);
+	imRender.text(width, 105, ImFonts::tahoma, FORMAT(XOR("Ping {}"), game::localPlayer->getPing()), false, Colors::Yellow);
 
 	float accuracy = globals::shotsFired
 		? (static_cast<float>(globals::shotsHit) / static_cast<float>(globals::shotsFired)) * 100.0f
@@ -174,10 +174,10 @@ void Misc::drawLocalInfo()
 	float hs = globals::shotsHead
 		? (static_cast<float>(globals::shotsHead) / fixedKills) * 100.0f
 		: 0.0f;
-	imRender.text(width, 115, ImFonts::tahoma, std::format(XOR("Accuracy [{} / {}] {:.2f}% HS {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy, hs), false, Colors::Yellow);
+	imRender.text(width, 115, ImFonts::tahoma, FORMAT(XOR("Accuracy [{} / {}] {:.2f}% HS {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy, hs), false, Colors::Yellow);
 
 	width *= 1.25f;
-	imRender.text(width, 15, ImFonts::tahoma, aimbot.getTargetted() ? std::format(XOR("Aimbot working on: {}"), aimbot.getTargetted()->getName()) : "", false, Colors::LightBlue);
+	imRender.text(width, 15, ImFonts::tahoma, aimbot.getTargetted() ? FORMAT(XOR("Aimbot working on: {}"), aimbot.getTargetted()->getName()) : "", false, Colors::LightBlue);
 }
 
 #include "../../../utilities/console/console.hpp"
@@ -506,7 +506,7 @@ void Misc::drawHitmarker()
 		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
 		float Ycorrection = y - (correction * 4.0f); // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
 
-		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma, std::format(XOR("{}"), el.m_dmg), false, actualColor, false);
+		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma, FORMAT(XOR("{}"), el.m_dmg), false, actualColor, false);
 
 		i++;
 	}

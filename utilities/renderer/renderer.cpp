@@ -554,7 +554,7 @@ void SurfaceRender::initNewTexture(int& id, Color* RGBA, const int w, const int 
 	if (id)
 		interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
-		throw std::runtime_error(std::format(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
+		throw std::runtime_error(FORMAT(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
 }
 void SurfaceRender::initNewTexture(int& id, unsigned char* RGBA, const int w, const int h)
 {
@@ -562,7 +562,7 @@ void SurfaceRender::initNewTexture(int& id, unsigned char* RGBA, const int w, co
 	if (id)
 		interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
-		throw std::runtime_error(std::format(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
+		throw std::runtime_error(FORMAT(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
 }
 
 void SurfaceRender::drawFromTexture(const int id, const int x, const int y, const int w, const int h, const Color& color)

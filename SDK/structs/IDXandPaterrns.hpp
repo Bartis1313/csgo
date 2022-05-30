@@ -116,3 +116,4 @@ ParticleEffect
 #define CLIENT_STATE			XOR("A1 ? ? ? ? 8B 88 ? ? ? ? 85 C9 75 07")
 #define GAME_RULES				XOR("8B EC 8B 0D ? ? ? ? 85 C9 74 07")
 #define SEND_DATAGRAM			XOR("55 8B EC 83 E4 F0 B8 ? ? ? ? E8 ? ? ? ? 56 57 8B F9 89 7C 24 18")
+#define CTRACE_FILTER_SIMPLE	XOR("55 8B EC 83 E4 F0 83 EC 7C 56 52")

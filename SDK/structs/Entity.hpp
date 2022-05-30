@@ -71,7 +71,7 @@ class Weapon_t : public Entity_t
 public:
 	NETVAR(float, m_flNextPrimaryAttack, "DT_BaseCombatWeapon", "m_flNextPrimaryAttack");
 	NETVAR(float, m_flNextSecondaryAttack, "DT_BaseCombatWeapon", "m_flNextSecondaryAttack");
-	NETVAR(short, m_iItemDefinitionIndex, "DT_BaseCombatWeapon", "m_iItemDefinitionIndex");
+	NETVAR(short, m_iItemDefinitionIndex, "DT_BaseAttributableItem", "m_iItemDefinitionIndex");
 	NETVAR(int, m_iClip1, "DT_BaseCombatWeapon", "m_iClip1");
 	NETVAR(int, m_iClip2, "DT_BaseCombatWeapon", "m_iClip2");
 	NETVAR(int, m_iPrimaryReserveAmmoCount, "DT_BaseCombatWeapon", "m_iPrimaryReserveAmmoCount");
@@ -116,6 +116,18 @@ public:
 	PTRNETVAR(int, m_fireYDelta, "DT_Inferno", "m_fireYDelta");
 	PTRNETVAR(int, m_fireZDelta, "DT_Inferno", "m_fireZDelta");
 	_NODISCARD Vector getInfernoPos(size_t indexFire);
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+class Nade_t : public Entity_t
+{
+public:
+	float& getSpawnTime();
+	NETVAR(int, m_hThrower, "DT_BaseCSGrenadeProjectile", "m_hThrower");
+	NETVAR(int, m_nExplodeEffectTickBegin, "DT_BaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin");
+	NETVAR(Vector, m_vecVelocity, "DT_BaseCSGrenadeProjectile", "m_vecVelocity");
+	NETVAR(Vector, m_vecOrigin, "DT_BaseCSGrenadeProjectile", "m_vecOrigin");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

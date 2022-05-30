@@ -15,6 +15,10 @@
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../../utilities/math/math.hpp"
 
+#include "../../../SDK/ClientClass.hpp"
+#include "../../../SDK/IVModelInfo.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
+
 #define DETONATE 1
 #define BOUNCE 2
 
@@ -25,6 +29,16 @@ enum ACT
 	ACT_LOB,
 	ACT_DROP,
 };
+
+uint32_t GrenadePrediction::timeToTicks(float time)
+{
+	return static_cast<uint32_t>(0.5f + time / interfaces::globalVars->m_intervalPerTick);
+}
+
+float GrenadePrediction::ticksToTime(float time)
+{
+	return interfaces::globalVars->m_intervalPerTick * time;
+}
 
 void GrenadePrediction::createMove(int buttons)
 {
@@ -92,22 +106,21 @@ void GrenadePrediction::draw()
 	if (!m_indexWpn)
 		return;
 
-	if (m_path.size() < 2)
+	if (!m_path.size() > 1)
 		return;
 
-	std::vector<ImVec2> pollys = {}; // debug needs to change settings or smth, makes this vector gone
+	Vector prev = m_path.front();
 	for (const auto& el : m_path)
 	{
-		if (Vector2D screen; imRender.worldToScreen(el, screen))
-			pollys.emplace_back(ImVec2{ screen.x, screen.y });
-	}
+		if (Vector2D start, end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
+			imRender.drawLine(start, end, Colors::LightBlue, 2.0f);
 
-	if (!pollys.empty())
-		imRender.drawPolyLine(pollys.size(), pollys.data(), Colors::LightBlue, false, 2.0f);
+		prev = el;
+	}
 
 	for (const auto& el : m_bounces)
 	{
-		imRender.drawBox3DFilled(el, { 4.0f, 4.0f }, 4.0f, Colors::Green, Colors::Green);
+		imRender.drawBox3DFilled(el, { 2.0f, 2.0f }, 2.0f, Colors::Green, Colors::Green);
 	}
 
 	imRender.drawCircle3D(m_path.back(), weapon->getNadeRadius(), 32, Colors::White);
@@ -200,12 +213,15 @@ size_t GrenadePrediction::step(Vector& src, Vector& vecThrow, int tick, float in
 	if (checkDetonate(vecThrow, tr, tick, interval))
 		result |= DETONATE;
 
-	if (tr.didHit())
+	if (tr.m_fraction != 1.0f)
 	{
 		result |= BOUNCE;
 		resolveFlyCollisionCustom(tr, vecThrow, move, interval);
 		m_bounces.push_back(tr.m_end);
 	}
+
+	if (auto size = m_bounces.size() - 1; !m_bounces.empty() && size > 20)
+		m_bounces.erase(m_bounces.begin() + size);
 
 	src = tr.m_end;
 	return result;
@@ -215,26 +231,20 @@ bool GrenadePrediction::checkDetonate(const Vector& vecThrow, const Trace_t& tr,
 {
 	auto check = [=](float amount = 0.2f)
 	{
-		return !(tick % static_cast<int>(amount / interval));
+		return !(tick % timeToTicks(amount));
 	};
 
-	const float time = interval * tick;
+	const float time = ticksToTime(tick);
 
 	switch (m_indexWpn)
 	{
 	case WEAPON_SMOKEGRENADE:
 	{
-		if (vecThrow.length2D() <= 0.1f)
-			return check();
-
-		return false;
+		return vecThrow.length2D() <= 0.1f && check();
 	}
 	case WEAPON_DECOY:
 	{
-		if (vecThrow.length2D() <= 0.2f)
-			return check();
-
-		return false;
+		return vecThrow.length2D() <= 0.2f && check();
 	}
 	case WEAPON_MOLOTOV:
 	case WEAPON_FIREBOMB:
@@ -245,7 +255,7 @@ bool GrenadePrediction::checkDetonate(const Vector& vecThrow, const Trace_t& tr,
 		if (tr.didHit() && tr.m_plane.m_normal.z >= std::cos(DEG2RAD(weapon_molotov_maxdetonateslope)))
 			return true;
 
-		return time >= molotov_throw_detonate_time && check();
+		return time >= molotov_throw_detonate_time && check(0.1f);
 	}
 	case WEAPON_FLASHBANG:
 	case WEAPON_HEGRENADE:
@@ -260,9 +270,17 @@ bool GrenadePrediction::checkDetonate(const Vector& vecThrow, const Trace_t& tr,
 // should add more traces, as in some cases the prediction can fail badly
 void GrenadePrediction::traceHull(Vector& src, Vector& end, Trace_t& tr)
 {
-	TraceFilter filter{ game::localPlayer };
-	Ray_t ray{ src, end, { -2.0f, -2.0f, -2.0f }, { 2.0f, 2.0f, 2.0f } };
-	interfaces::trace->traceRay(ray, MASK_SOLID, &filter, &tr);
+	const static auto traceFilterSimple = utilities::patternScan(CLIENT_DLL, CTRACE_FILTER_SIMPLE, 0x3D);
+
+	uintptr_t filter[] =
+	{
+		*reinterpret_cast<uintptr_t*>(traceFilterSimple),
+		reinterpret_cast<uintptr_t>(game::localPlayer),
+		0,
+		0
+	};
+
+	interfaces::trace->traceRay({ src, end, { -2.0f, -2.0f, -2.0f }, { 2.0f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), &tr);
 }
 
 void GrenadePrediction::addGravityMove(Vector& move, Vector& vel, float frametime)
@@ -317,30 +335,21 @@ void GrenadePrediction::resolveFlyCollisionCustom(Trace_t& tr, Vector& velocity,
 	physicsClipVelocity(velocity, tr.m_plane.m_normal, absVelocity, 2.0f);
 	absVelocity *= totalElascity;
 
+	constexpr float minSpeed = 20.0f * 20.0f;
+	float speedAbsSqr = absVelocity.lengthSqrt();
+
+	if (speedAbsSqr < minSpeed)
+		absVelocity = {};
+
 	if (tr.m_plane.m_normal.z > 0.7f)
 	{
-		constexpr float minSpeed = 20.0f * 20.0f;
-		float speedAbsSqr = absVelocity.lengthSqrt();
-
-		if (speedAbsSqr > 96000.0f)
-		{
-			float len = absVelocity.normalized().dot(tr.m_plane.m_normal);
-			if (len > 0.5f)
-				absVelocity *= 1.f - len + 0.5f;
-		}
-
-		if (speedAbsSqr < minSpeed)
-			absVelocity = {};
-
-		
-			velocity = absVelocity;
-			pushEntity(tr.m_end, absVelocity * ((1.0f - tr.m_fraction) * interval), tr);
-		
+		velocity = absVelocity;
+		absVelocity *= ((1.0f - tr.m_fraction) * interval);
+		pushEntity(tr.m_end, absVelocity * ((1.0f - tr.m_fraction) * interval), tr);
 	}
 	else
 	{
 		velocity = absVelocity;
-		pushEntity(tr.m_end, absVelocity * ((1.0f - tr.m_fraction) * interval), tr);
 	}
 }
 
@@ -356,4 +365,281 @@ void GrenadePrediction::physicsClipVelocity(const Vector& in, const Vector& norm
 		if (out[i] > -STOP_EPSILON && out[i] < STOP_EPSILON)
 			out[i] = 0.f;
 	}
+}
+
+bool GrenadeWarning::NadeTrace_t::step(float interval)
+{
+	if (m_detonated)
+		return true;
+
+	Vector move;
+	addGravityMove(move, m_velocity, interval);
+	Trace_t tr;
+	pushEntity(move, tr);
+
+	if (tr.didHit())
+		resolveFlyCollisionCustom(tr, interval);
+
+	m_pos = tr.m_end;
+
+	return false;
+}
+
+void GrenadeWarning::NadeTrace_t::traceHull(const Vector& src, const Vector& end, Entity_t* entity, Trace_t* tr)
+{
+	const static auto traceFilterSimple = utilities::patternScan(CLIENT_DLL, CTRACE_FILTER_SIMPLE, 0x3D);
+
+	uintptr_t filter[] =
+	{
+		*reinterpret_cast<uintptr_t*>(traceFilterSimple),
+		reinterpret_cast<uintptr_t>(entity),
+		0,
+		0
+	};
+
+	interfaces::trace->traceRay({ src, end, { -2.0f, -2.0f, -2.0f }, { 2.f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), tr);
+}
+
+void GrenadeWarning::NadeTrace_t::pushEntity(const Vector& src, Trace_t& tr)
+{
+	traceHull(m_pos, m_pos + src, m_nadeOwner, &tr);
+}
+
+void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float interval)
+{
+	/*float surfaceElasticity = 1.0;*/
+	if (auto e = tr.m_entity; e) // if it's any entity
+	{
+		if (auto e = tr.m_entity; e->isPlayer()) // if player don't stop but make it bouned a lot slower
+		{
+			/*surfaceElasticity = 0.3f;*/
+			m_velocity *= 0.3f;
+			return;
+		}
+
+		if (e->isBreakable()) // for example glass or window
+		{
+			if (!e->isAlive()) // any better solution?
+			{
+				m_velocity *= 0.4f;
+				return;
+			}
+		}
+		// here some checks are needed, I honestly don't know how to make it pixel perfect in this case
+	}
+
+	constexpr float surfaceElasticity = 1.0f;
+	constexpr float nadeElascity = 0.45f;
+	float totalElascity = surfaceElasticity * nadeElascity;
+	totalElascity = std::clamp(totalElascity, 0.0f, 0.9f);
+
+	Vector absVelocity;
+	physicsClipVelocity(m_velocity, tr.m_plane.m_normal, absVelocity, 2.0f);
+	absVelocity *= totalElascity;
+
+	constexpr float minSpeed = 20.0f * 20.0f;
+	float speedAbsSqr = absVelocity.lengthSqrt();
+
+	if (speedAbsSqr < minSpeed)
+		absVelocity = {};
+
+	if (tr.m_plane.m_normal.z > 0.7f)
+	{
+		m_velocity = absVelocity;
+		absVelocity *= ((1.0f - tr.m_fraction) * interval);
+		pushEntity(absVelocity * ((1.0f - tr.m_fraction) * interval), tr);
+	}
+	else
+		m_velocity = absVelocity;
+
+	// or velocity
+	if (m_bouncesCheck > 20)
+		return destroyTrace();
+
+	++m_bouncesCheck;
+}
+
+void GrenadeWarning::NadeTrace_t::handleDestroy()
+{
+	if (m_index == WEAPON_DECOY)
+		if (m_velocity.length2D() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
+		{
+			//printf("did destroy\n");
+			destroyTrace();
+		}
+
+	if (ticksToTime(m_tick) > m_nadeDetonateTime)
+		destroyTrace();
+
+	m_nextTick = m_tick + timeToTicks(0.2f);
+}
+
+void GrenadeWarning::NadeTrace_t::handleDetonates()
+{
+	switch (m_index)
+	{
+	case WEAPON_SMOKEGRENADE:
+	{
+		m_nadeDetonateTime = 3.0f;
+		break;
+	}
+	case WEAPON_DECOY:
+	{
+		m_nadeDetonateTime = 5.0f;
+		break;
+	}
+	case WEAPON_FLASHBANG:
+	case WEAPON_HEGRENADE:
+	{
+		m_nadeDetonateTime = 1.5f;
+		break;
+	}
+	case WEAPON_MOLOTOV:
+	case WEAPON_INCGRENADE:
+	{
+		const static auto molotov_throw_detonate_time = interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"));
+		m_nadeDetonateTime = molotov_throw_detonate_time->getFloat();
+		break;
+	}
+	default:
+		m_nadeDetonateTime = 0.0f;
+		break;
+	}
+}
+
+void GrenadeWarning::NadeTrace_t::simulate(const Vector& pos, const Vector& velocity, float nadeThrowTime, int ticks)
+{
+	m_pos = pos;
+	m_velocity = velocity;
+
+	handleDetonates();
+
+	float interval = interfaces::globalVars->m_intervalPerTick;
+	for (; m_tick < timeToTicks(500.0f); m_tick++) // 500 = 500 * 2 about 1000+
+	{
+		if (m_nextTick <= m_tick)
+			handleDestroy();
+
+		if (m_tick < ticks)
+			continue;
+
+		if (step(interval))
+			break;
+
+		push();
+	}
+
+	m_nadeEndTime = nadeThrowTime + ticksToTime(m_tick);
+}
+
+void GrenadeWarning::NadeTrace_t::destroyTrace()
+{
+	m_detonated = true;
+}
+
+void GrenadeWarning::NadeTrace_t::push()
+{
+	m_path.emplace_back(m_pos);
+}
+
+WeaponIndex GrenadeWarning::getIndexByClass(int idx)
+{
+	switch (idx)
+	{
+	case CBaseCSGrenadeProjectile:
+		return WEAPON_HEGRENADE;
+	case CSmokeGrenadeProjectile:
+		return WEAPON_SMOKEGRENADE;
+	case CMolotovProjectile:
+		return WEAPON_MOLOTOV;
+	case CDecoyProjectile:
+		return WEAPON_DECOY;
+	default:
+		break;
+	}
+
+	return WEAPON_NONE;
+}
+
+bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity)
+{
+	if (m_path.empty())
+		return false;
+
+	Vector prev = m_path.front();
+	Vector2D start; // need access outside
+	for (const auto& el : m_path)
+	{
+		if (Vector2D end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
+			imRender.drawLine(start, end, Colors::LightBlue, 2.0f);
+
+		prev = el;
+	}
+
+	/*float scale = ((m_nadeEndTime - interfaces::globalVars->m_curtime) / ticksToTime(m_tick));
+
+	imRender.drawProgressRing(start.x, start.y, 20, 32, -90, scale, 4.0f, Colors::Green);*/
+
+	return true;
+}
+
+void GrenadeWarning::run(Nade_t* entity)
+{
+	if (!m_datas.empty())
+		m_datas.clear();
+
+	if (!config.get<bool>(vars.bNadeTracer))
+		return;
+
+	const auto cl = entity->clientClass();
+	if (!cl)
+		return;
+
+	int id = cl->m_classID;
+
+	constexpr std::array allowedIDS =
+	{
+		CBaseCSGrenadeProjectile,
+		CSmokeGrenadeProjectile,
+		CMolotovProjectile,
+		CDecoyProjectile
+	};
+
+	// if not found
+	if (auto itr = std::find(allowedIDS.cbegin(), allowedIDS.cend(), id); itr == allowedIDS.cend())
+		return;
+
+	auto ownerHandle = entity->getIndex();
+
+	// keep it for sure correct, would also place decoy netvar of start but there is none
+	if (entity->m_nExplodeEffectTickBegin() ||
+		(id == CSmokeGrenadeProjectile && reinterpret_cast<Smoke_t*>(entity)->m_nSmokeEffectTickBegin()))
+	{
+		m_datas.erase(ownerHandle);
+		return;
+	}
+
+	auto idx = getIndexByClass(id);
+	if (idx == WEAPON_NONE)
+		return;
+
+	m_datas.emplace(std::make_pair(
+		ownerHandle,
+		NadeTrace_t
+		{
+			reinterpret_cast<Player_t*>(interfaces::entList->getClientFromHandle(entity->m_hThrower())),
+			idx
+		}));
+
+	// simulates, in this place because there is no much math related stuff needed for angles etc
+	m_datas.at(ownerHandle).simulate(
+		entity->m_vecOrigin(),
+		reinterpret_cast<Player_t*>(entity)->m_vecVelocity(),
+		entity->getSpawnTime(),
+		timeToTicks(reinterpret_cast<Player_t*>(entity)->m_flSimulationTime() - entity->getSpawnTime())
+	);
+
+	// if we draw anything then erase current value
+	if (!m_datas.at(ownerHandle).draw(entity))
+		m_datas.erase(ownerHandle);
 }

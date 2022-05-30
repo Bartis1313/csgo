@@ -19,6 +19,7 @@
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../../utilities/math/math.hpp"
 #include "../../globals.hpp"
+#include "../prediction/nadepred.hpp"
 
 void World::drawMisc()
 {
@@ -45,6 +46,8 @@ void World::drawMisc()
 			m_bombEnt = reinterpret_cast<Bomb_t*>(entity);
 
 		drawProjectiles(entity, cl->m_classID);
+
+		nadeWarning.run(reinterpret_cast<Nade_t*>(entity));
 
 		switch (cl->m_classID)
 		{
@@ -134,15 +137,15 @@ void World::drawBombOverlay()
 		if(defusetime > bombtime)
 			imRenderWindow.drawText(scaledX, scaledY - (radius / 2.5f / 2.0f), radius / 2.5f, ImFonts::franklinGothic, XOR("Too late"), true, Colors::White, false);
 		else
-			imRenderWindow.drawText(scaledX, scaledY - (radius / 2.5f / 2.0f), radius / 2.5f, ImFonts::franklinGothic, std::format(XOR("{:.2f}"),
+			imRenderWindow.drawText(scaledX, scaledY - (radius / 2.5f / 2.0f), radius / 2.5f, ImFonts::franklinGothic, FORMAT(XOR("{:.2f}"),
 				m_bombEnt->m_hBombDefuser() > 0 ? defusetime : bombtime), true, Colors::White, false);
 		imRenderWindow.drawText(2.0f, 0.0f, height / 2.0f, ImFonts::icon, u8"\uE031"_u8str, false, Colors::White, false);
 		if (!m_whoPlanted.empty())
-			imRenderWindow.drawText(2.0f, height / 2.0f + 2, 15, ImFonts::franklinGothic, std::format(XOR("Planted by {}s"), m_whoPlanted), false, Colors::White, false);
+			imRenderWindow.drawText(2.0f, height / 2.0f + 2, 15, ImFonts::franklinGothic, FORMAT(XOR("Planted by {}s"), m_whoPlanted), false, Colors::White, false);
 		if(m_bombEnt->m_hBombDefuser() > 0)
-			imRenderWindow.drawText(2.0f, height / 2.0f + 18, 15, ImFonts::franklinGothic, std::format(XOR("Defusing {}"), ent->getName()), false, Colors::White, false);
-		imRenderWindow.drawText(width / 2.0f, 2.0f, 15, ImFonts::franklinGothic, std::format(XOR("Site {}"), m_bombEnt->getBombSiteName()), true, Colors::White, false);
-		imRenderWindow.drawText(width / 2.0f, 20.0f, 15, ImFonts::franklinGothic, std::format(XOR("Damage {:.2f}"), dmg), true, isSafe ? Colors::Green : Colors::Red, false);
+			imRenderWindow.drawText(2.0f, height / 2.0f + 18, 15, ImFonts::franklinGothic, FORMAT(XOR("Defusing {}"), ent->getName()), false, Colors::White, false);
+		imRenderWindow.drawText(width / 2.0f, 2.0f, 15, ImFonts::franklinGothic, FORMAT(XOR("Site {}"), m_bombEnt->getBombSiteName()), true, Colors::White, false);
+		imRenderWindow.drawText(width / 2.0f, 20.0f, 15, ImFonts::franklinGothic, FORMAT(XOR("Damage {:.2f}"), dmg), true, isSafe ? Colors::Green : Colors::Red, false);
 
 		ImGui::End();
 	}
@@ -420,7 +423,7 @@ void World::drawMolotov(Entity_t* ent)
 	if (Vector2D s; imRender.worldToScreen(origin, s))
 	{
 		imRender.drawProgressRing(s.x, s.y, 25, 32, -90.0f, scale, 5.0f, Colors::LightBlue);
-		imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma, std::format(XOR("{:.2f}s"), time), true, Colors::White);
+		imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma, FORMAT(XOR("{:.2f}s"), time), true, Colors::White);
 	}
 }
 
@@ -474,7 +477,7 @@ void World::drawSmoke(Entity_t* ent)
 
 	//imRender.drawCircle3DFilled(origin, smokeRadius, 216, col, col, true, 2.0f);
 	// many points to make it smooth
-	drawArc3DSmoke(origin, smokeRadius, 512, scale, config.get<Color>(vars.cDrawSmoke), false, 2.0f, ImFonts::tahoma, std::format(XOR("{:.2f}s"), time), Colors::Orange);
+	drawArc3DSmoke(origin, smokeRadius, 512, scale, config.get<Color>(vars.cDrawSmoke), false, 2.0f, ImFonts::tahoma, FORMAT(XOR("{:.2f}s"), time), Colors::Orange);
 	drawCustomSmoke(origin, smokeRadius, math::customSin(interfaces::globalVars->m_curtime, 4.0f));
 
 	// timer

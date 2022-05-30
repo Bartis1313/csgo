@@ -19,7 +19,8 @@ void __stdcall hooks::frameStageNotify::hooked(int frame)
 
 	backtrack.update(frame);
 	world.skyboxLoad(frame, globals::isShutdown);
-	world.removeBloodSpray(frame);
+	// add bind to csgo yourself. This is useless
+	//world.removeBloodSpray(frame);
 	world.removeSmoke(frame);
 	misc.flashLight(frame);
 

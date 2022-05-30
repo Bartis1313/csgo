@@ -34,7 +34,7 @@ void X88Menu::draw()
 	else
 	{
 		surfaceRender.text(x, y, font,
-			std::format(XOR("Hello {} :) Local Player {:#0x}"), game::localPlayer->getName(), game::localPlayer->getLiteralAddress()),
+			FORMAT(XOR("Hello {} :) Local Player {:#0x}"), game::localPlayer->getName(), game::localPlayer->getLiteralAddress()),
 			false, Colors::Yellow);
 		y += 15;
 	}
@@ -61,27 +61,27 @@ void X88Menu::draw()
 
 			auto vecSize = surfaceRender.getTextSizeXY(font, name);
 
-			surfaceRender.text(x, y, font, std::format(XOR("{}"), name), false, color);
+			surfaceRender.text(x, y, font, FORMAT(XOR("{}"), name), false, color);
 			surfaceRender.text(x + addSpaces(name) + vecSize.x, y, font,
-				std::format(XOR("{}"), val), false, active);
+				FORMAT(XOR("{}"), val), false, active);
 			y += vecSize.y;
 		}
 		else if(std::holds_alternative<int*>(value))
 		{
 			auto vecSize = surfaceRender.getTextSizeXY(font, name);
 
-			surfaceRender.text(x, y, font, std::format(XOR("{}"), name), false, color);
+			surfaceRender.text(x, y, font, FORMAT(XOR("{}"), name), false, color);
 			surfaceRender.text(x + addSpaces(name) + vecSize.x, y, font,
-				std::format(XOR("{}"), *std::get<int*>(value)), false, color);
+				FORMAT(XOR("{}"), *std::get<int*>(value)), false, color);
 			y += vecSize.y;
 		}
 		else if (std::holds_alternative<float*>(value))
 		{
 			auto vecSize = surfaceRender.getTextSizeXY(font, name);
 
-			surfaceRender.text(x, y, font, std::format(XOR("{}"), name), false, color);
+			surfaceRender.text(x, y, font, FORMAT(XOR("{}"), name), false, color);
 			surfaceRender.text(x + addSpaces(name) + vecSize.x, y, font,
-				std::format(XOR("{:.2f}"), *std::get<float*>(value)), false, color);
+				FORMAT(XOR("{:.2f}"), *std::get<float*>(value)), false, color);
 			y += vecSize.y;
 		}
 

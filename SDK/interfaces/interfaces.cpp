@@ -24,7 +24,7 @@ static T* getInterface(const std::string& moduleName, const std::string& interfa
 	if (const auto ret = capture(interfaceName.c_str(), nullptr); ret != nullptr)
 		return reinterpret_cast<T*>(ret);
 	else
-		throw std::runtime_error(std::format(XOR("Interface {} was nullptr"), interfaceName));
+		throw std::runtime_error(FORMAT(XOR("Interface {} was nullptr"), interfaceName));
 
 	return nullptr;
 }
@@ -36,7 +36,7 @@ static T* getInterface(const std::string& moduleName, const std::string& interfa
 // _interface - interface' name
 #define CAPNLOG(var, type, _module, _interface) \
 	var = getInterface<type>(_module, XOR(_interface)); \
-	console.log(TypeLogs::LOG_INFO, std::format(XOR("found {} at addr: {:#0x}"), _interface, reinterpret_cast<uintptr_t>(var))); \
+	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: {:#0x}"), _interface, reinterpret_cast<uintptr_t>(var))); \
 	
 bool interfaces::init()
 {

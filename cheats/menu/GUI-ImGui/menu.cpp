@@ -368,6 +368,7 @@ static void renderMisc()
 					ImGui::SameLine();
 					ImGui::Checkbox(XOR("Show always"), &config.getRef<bool>(vars.bNadePredAlways));
 				}
+				ImGui::Checkbox(XOR("Nade trails"), &config.getRef<bool>(vars.bNadeTracer));
 				bool& tref = config.getRef<bool>(vars.bRunMovementTrail);
 				ImGui::Checkbox(XOR("Movement trail"), &tref);
 				if (tref)
@@ -409,7 +410,7 @@ static void renderMisc()
 					ImGui::SliderFloat(XOR("Hat size"), &config.getRef<float>(vars.fHatSize), -100.0f, 100.0f);
 					ImGui::SliderFloat(XOR("Hat radius"), &config.getRef<float>(vars.fHatRadius), 1.0f, 100.0f);
 				}
-				ImGui::Checkbox(XOR("Remove blood spray"), &config.getRef<bool>(vars.bRemoveBloodSpray));
+				//ImGui::Checkbox(XOR("Remove blood spray"), &config.getRef<bool>(vars.bRemoveBloodSpray));
 				ImGui::Checkbox(XOR("Enable tracers"), &config.getRef<bool>(vars.bDrawBulletTracer));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Tracers color"), &config.getRef<Color>(vars.cDrawBulletTracer));

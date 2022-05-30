@@ -82,7 +82,7 @@ LONG WINAPI SEHcatch::memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 				const auto flag = pExceptionInfo->ExceptionRecord->ExceptionFlags;
 				const auto params = pExceptionInfo->ExceptionRecord->NumberParameters;
 
-				ss << std::format(XOR("Exception (fatal) {} at address {} ({}), flags - {}, params - {}"), crashName, addr, name, flag, params);
+				ss << FORMAT(XOR("Exception (fatal) {} at address {} ({}), flags - {}, params - {}"), crashName, addr, name, flag, params);
 				// x86
 				console.log(TypeLogs::LOG_ERR, XOR("EAX - 0x{:X}"), pExceptionInfo->ContextRecord->Eax);
 				console.log(TypeLogs::LOG_ERR, XOR("EBP - 0x{:X}"), pExceptionInfo->ContextRecord->Ebp);

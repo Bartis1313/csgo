@@ -5,7 +5,6 @@
 #include <map>
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <format>
 #include <cassert>
 #include <locale>
@@ -88,7 +87,7 @@ private:
 public:
 	// logs into console + draw + file
 	template<typename... Args_t>
-	void log(TypeLogs type, const std::string& fmt, Args_t&&... args);
+	void log(TypeLogs type, const std::string_view fmt, Args_t&&... args);
 
 	// only puts it inside drawing
 	// There is no date, no automatic newline
@@ -97,7 +96,7 @@ public:
 };
 
 template<typename... Args_t>
-void Console::log(TypeLogs type, const std::string& fmt, Args_t&&... args)
+void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 {
 	if (m_logName.empty())
 		assert("Did you call Console::init ?");
@@ -106,26 +105,27 @@ void Console::log(TypeLogs type, const std::string& fmt, Args_t&&... args)
 		return;
 
 	std::ofstream log{ config.getPathForSave(m_logName), std::ofstream::out | std::ofstream::app };
-	std::stringstream ss;
 
 #ifdef _DEBUG
 	setColor(colorsForConsole[type]);
 	std::cout << consoleStrings[type];
 	reset();
 #endif
-	ss << "[" << utilities::getTime() << "] ";
+	std::string buffer;
+
+	buffer += FORMAT(XOR("[ {} ]"), utilities::getTime());
 
 	if constexpr (sizeof...(args) > 0)
-		ss << std::vformat(std::locale(), fmt, std::make_format_args(args...));
+		buffer += std::vformat(std::locale(), fmt, std::make_format_args(args...));
 	else
-		ss << fmt;
+		buffer += fmt;
 
-	ss << '\n';
+	buffer += '\n';
 #ifdef _DEBUG
-	std::cout << ss.str();
+	std::cout << buffer;
 #endif
-	log << consoleStrings[type] << ss.str();
-	m_log.AddLog(ss.str());
+	log << consoleStrings[type] << buffer;
+	m_log.AddLog(buffer);
 	log.close();
 }
 

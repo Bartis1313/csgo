@@ -483,7 +483,7 @@ enum ObserverTypes
 #pragma endregion
 
 #pragma region collisions
-enum Collision_Group_t
+enum CollisionGroup_t : size_t
 {
 	COLLISION_GROUP_NONE = 0,
 	COLLISION_GROUP_DEBRIS,			// Collides with nothing but world and static stuff

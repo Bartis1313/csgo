@@ -201,7 +201,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fFPSCap, false, "FPS value for plot (in game)");
 	CONFIG_ADD_VARIABLE(bool, bFPSCustom, false, "helper window for fps");
 	CONFIG_ADD_VARIABLE(bool, bVelocityCustom, false , "helper window for velocity");
-	CONFIG_ADD_VARIABLE(bool, bRemoveBloodSpray, false , "remove blood spray");
+	CONFIG_ADD_VARIABLE(bool, bRemoveBloodSpray, false , "[DEPRECATED] remove blood spray");
+	CONFIG_ADD_VARIABLE(bool, bNadeTracer, false , "run nade tracer");
 
 	// STYLING
 

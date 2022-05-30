@@ -59,7 +59,7 @@ uintptr_t utilities::patternScan(const std::string& mod, const std::string& mask
 		}
 	}
 
-	LF(MessageBoxA)(nullptr, std::format(XOR("Pattern scanning failed! mod: {} mask: {}"), mod, mask).c_str(), XOR("Bartis hack"), MB_OK | MB_ICONWARNING);
+	LF(MessageBoxA)(nullptr, FORMAT(XOR("Pattern scanning failed! mod: {} mask: {}"), mod, mask).c_str(), XOR("Bartis hack"), MB_OK | MB_ICONWARNING);
 
 	return 0;
 }

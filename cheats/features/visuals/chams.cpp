@@ -50,7 +50,7 @@ Chams::Mat_t Chams::createFromBuf(const std::string& name, bool ignore, bool wir
 		return str ? XOR("1") : XOR("0");
 	};*/
 
-	const std::string buf = std::format(XOR(R"#("{0}"
+	const std::string buf = FORMAT(XOR(R"#("{0}"
 	{{
 		"$basetexture"		"{1}"
 		"$envmap"			"{2}"

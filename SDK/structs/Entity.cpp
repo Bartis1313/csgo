@@ -530,6 +530,15 @@ uintptr_t Player_t::getLiteralAddress()
 
 ////////////////////////////////////////////////////////////////
 
+float& Nade_t::getSpawnTime()
+{
+	const static auto addr = netvarMan.getNetvar(XOR("DT_BaseCSGrenadeProjectile"), XOR("m_vecExplodeEffectOrigin"));
+	//m_flSpawnTime - not networkable, still in this class
+	return *reinterpret_cast<std::add_pointer_t<float>>((uintptr_t)this + addr + 0xC);
+}
+
+////////////////////////////////////////////////////////////////
+
 Vector Inferno_t::getInfernoPos(size_t indexFire)
 {
 	return Vector{
