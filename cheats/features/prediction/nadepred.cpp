@@ -539,7 +539,7 @@ void GrenadeWarning::NadeTrace_t::destroyTrace()
 
 void GrenadeWarning::NadeTrace_t::push()
 {
-	m_path.emplace_back(m_pos);
+	m_path.push_back(m_pos);
 }
 
 WeaponIndex GrenadeWarning::getIndexByClass(int idx)
