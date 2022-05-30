@@ -35,7 +35,7 @@ _NODISCARD inline constexpr std::string operator"" _u8str(const char8_t* str, si
 
 // format string at runtime
 template<typename... Args_t>
-_NODISCARD std::string FORMAT(const std::string_view fmt, Args_t&&... args)
+_NODISCARD inline constexpr std::string FORMAT(const std::string_view fmt, Args_t&&... args)
 {
     return std::vformat(std::locale(), fmt, std::make_format_args(args...));
 }
