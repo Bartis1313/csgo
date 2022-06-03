@@ -106,7 +106,7 @@ void GrenadePrediction::draw()
 	if (!m_indexWpn)
 		return;
 
-	if (!m_path.size() > 1)
+	if (m_path.empty())
 		return;
 
 	Vector prev = m_path.front();

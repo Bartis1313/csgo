@@ -72,8 +72,6 @@ void hooks::init()
 
 	hookHelper::initMinhook();
 
-#define STR_DEF(str) std::string(#str)
-
 #define HOOK_SAFE(target, hookStructName) \
 hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName));
 
