@@ -113,7 +113,7 @@ void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 #endif
 	std::string buffer;
 
-	buffer += FORMAT(XOR("[ {} ]"), utilities::getTime());
+	buffer += FORMAT(XOR("[{}] "), utilities::getTime());
 
 	if constexpr (sizeof...(args) > 0)
 		buffer += std::vformat(std::locale(), fmt, std::make_format_args(args...));
