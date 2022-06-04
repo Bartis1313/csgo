@@ -67,6 +67,9 @@ namespace utilities
     uint32_t getKey(const uint32_t vKey);
     _NODISCARD float scaleDamageArmor(float dmg, const float armor);
     _NODISCARD std::string u8toStr(const std::u8string& u8str);
+    _NODISCARD uintptr_t* findHudElement(const std::string_view name);
+    // local
+    _NODISCARD bool isChatOpen();
 }
 
 #include <random>

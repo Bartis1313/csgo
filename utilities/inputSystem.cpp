@@ -1,10 +1,16 @@
 #include "inputSystem.hpp"
 
 #include "../cheats/globals.hpp"
+#include "utilities.hpp"
+#include "../SDK/IVEngineClient.hpp"
+#include "../SDK/interfaces/interfaces.hpp"
 
 void KeysHandler::run(UINT message, WPARAM wparam)
 {
 	if (globals::isInHotkey)
+		return;
+
+	if (utilities::isChatOpen() || interfaces::engine->isConsoleVisible())
 		return;
 
 	// init starting keys, undefined

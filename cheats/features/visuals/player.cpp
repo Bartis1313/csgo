@@ -101,9 +101,15 @@ void Visuals::drawHealth(Player_t* ent, const Box& box)
 	imRender.drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, healthBased(ent));
 
 	// if the player has health below max, then draw HP info
-	/*if(health < 100)
-		imRender.text(newBox.x - 2.0f, newBox.y + pad - 4.0f,
-			ImFonts::franklinGothic, std::format(XOR("{}"), health), false, Colors::White);*/
+	if (health < 100)
+	{
+		auto text = FORMAT(XOR("{}"), health);
+		float fontSize = getScaledFontSize(ent, 100.0f, 10.0f, 14.0f);
+		auto size = ImFonts::franklinGothic12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
+
+		imRender.text(newBox.x - 4.0f - size.x, newBox.y + pad - 4.0f,
+			fontSize, ImFonts::franklinGothic12, text, false, Colors::White);
+	}
 }
 
 void Visuals::drawArmor(Player_t* ent, const Box& box)
@@ -236,14 +242,14 @@ void Visuals::drawInfo(Player_t* ent, const Box& box)
 
 	for (size_t i = 0; const auto & [name, color] : flags)
 	{
-		imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana, name, false, color, false);
-		auto textSize = ImFonts::verdana->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, name.c_str());
+		imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana12, name, false, color, false);
+		auto textSize = ImFonts::verdana12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, name.c_str());
 		padding += textSize.y;
 		i++;
 
 		if (i != flags.size() && padding + fontSize > box.h) // when too many flags for long distances
 		{
-			imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana,
+			imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana12,
 				FORMAT(XOR("{} more..."), flags.size() - i), false, Colors::White, false);
 			break;
 		}
@@ -257,7 +263,7 @@ void Visuals::drawnName(Player_t* ent, const Box& box)
 
 	float fontSize = getScaledFontSize(ent);
 
-	imRender.text(box.x + box.w / 2.0f, box.y - fontSize - 2.0f, fontSize, ImFonts::verdana, ent->getName(), true, healthBased(ent), false);
+	imRender.text(box.x + box.w / 2.0f, box.y - fontSize - 2.0f, fontSize, ImFonts::verdana12, ent->getName(), true, healthBased(ent), false);
 }
 
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
@@ -465,12 +471,12 @@ void Visuals::enemyIsAimingAtYou(Player_t* ent)
 
 	if (check) // no, check it differently
 	{
-		imRender.text(globals::screenX / 2, 60, ImFonts::tahoma, XOR("Enemy can see you"), true, Colors::Green);
+		imRender.text(globals::screenX / 2, 60, ImFonts::tahoma14, XOR("Enemy can see you"), true, Colors::Green);
 	}
 	// this can be made with tracing
 	if (fov <= 5.0f)
 	{
-		imRender.text(globals::screenX / 2, 80, ImFonts::tahoma, XOR("Enemy is aiming you"), true, Colors::Red);
+		imRender.text(globals::screenX / 2, 80, ImFonts::tahoma14, XOR("Enemy is aiming you"), true, Colors::Red);
 	}
 }
 

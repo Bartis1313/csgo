@@ -646,10 +646,11 @@ void ImGuiRender::init(ImGuiIO& io)
 		cfg.OversampleH = 3;
 		cfg.OversampleV = 3;
 		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
-		ImFonts::tahoma = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 20.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::franklinGothic = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::verdana = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 
 		constexpr ImWchar ranges[] =
 		{
@@ -672,10 +673,11 @@ void ImGuiRender::init(ImGuiIO& io)
 		cfg.OversampleH = 3;
 		cfg.OversampleV = 3;
 		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
-		ImFonts::tahoma = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 20.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::franklinGothic = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::verdana = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
 
 		constexpr ImWchar ranges[] =
 		{

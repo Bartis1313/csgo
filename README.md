@@ -102,6 +102,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.3.8 - Key detection made properly. Using 2 classes to detect it, as first using messages coming from wndproc is running 24/7 and other only listens to given key from config. Why making own detection? ImGui has it, but then you will have to deal with flickering cursor problems if want to run it 24/7.
 * 1.3.9 - Reback x88 menu, this time with better types detection and code. It also has ability to change config variables by operating on arrow keys.
 * 1.4.0 - After some break, added the grenade warning, lacks of visuals and custom choices of colors etc... No more errors with std::format, small config issue fixed.
+* 1.4.1 - Nade prediction should output given dmg by nade, or inform if inferno is in range. Fonts contain pixel size at the end now. Input system will now only work when: we are not in key hotkey, when vgui console is off, when chat window is off.
 </details>
 
 # Dependencies

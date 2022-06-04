@@ -320,3 +320,20 @@ std::string utilities::u8toStr(const std::u8string& u8str)
 {
 	return std::string{ u8str.cbegin(), u8str.cend() };
 }
+
+uintptr_t* utilities::findHudElement(const std::string_view name)
+{
+	const static auto hudPtr = *reinterpret_cast<void**>(patternScan(CLIENT_DLL, CSGO_HUD, 0x1));
+	using fn = uintptr_t*(__thiscall*)(void* /*uintptr_t*/, const char*);
+
+	const auto static findh = reinterpret_cast<fn>(patternScan(CLIENT_DLL, FIND_ELEMENT));
+	return findh(hudPtr, name.data());
+}
+
+#include "../SDK/CHudChat.hpp"
+
+bool utilities::isChatOpen()
+{
+	const auto chat = reinterpret_cast<CHudChat*>(findHudElement(XOR("CCSGO_HudChat")));
+	return chat->m_isOpen;
+}

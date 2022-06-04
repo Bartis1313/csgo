@@ -68,4 +68,5 @@ public:
 	VFUNC(const char*, getLevelName, 53, (), (this));
 	VFUNC(INetChannel*, getNameNetChannel, 78, (), (this));
 	VFUNC(bool, isTakingScreenshot, 92, (), (this));
+	VFUNC(bool, isConsoleVisible, 11, (), (this));
 };

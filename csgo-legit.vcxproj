@@ -321,6 +321,7 @@
     <ClInclude Include="SDK\CClientEffectRegistration.hpp" />
     <ClInclude Include="SDK\CEffectData.hpp" />
     <ClInclude Include="SDK\CFlashlightEffect.hpp" />
+    <ClInclude Include="SDK\CHudChat.hpp" />
     <ClInclude Include="SDK\CParticelCollection.hpp" />
     <ClInclude Include="SDK\CStudioHdr.hpp" />
     <ClInclude Include="SDK\CTeslaInfo.hpp" />

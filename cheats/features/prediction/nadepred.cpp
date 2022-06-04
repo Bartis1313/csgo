@@ -88,6 +88,25 @@ void GrenadePrediction::viewSetup()
 		m_indexWpn = 0;
 }
 
+struct DmgNadeInfo_t
+{
+public:
+	constexpr DmgNadeInfo_t(const Vector2D& pos, const std::string& dmgtext, const Color& color)
+		: m_pos{ pos }, m_textDmg{ dmgtext }, m_color{ color }
+	{}
+
+	Vector2D m_pos;
+	std::string m_textDmg;
+	Color m_color;
+};
+
+static Color colorBased(int health)
+{
+	int g = health * 2.55f;
+	int r = 255 - g;
+	return Color{ r, g, 0, 255 };
+}
+
 void GrenadePrediction::draw()
 {
 	if (!config.get<bool>(vars.bNadePred))
@@ -109,6 +128,58 @@ void GrenadePrediction::draw()
 	if (m_path.empty())
 		return;
 
+	std::vector<DmgNadeInfo_t> nadesDmg = {};
+
+	// valve values
+	constexpr float a = 105.0f;
+	constexpr float b = 25.0f;
+	constexpr float c = 140.0f;
+
+	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+	{
+		auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+		if (!ent)
+			continue;
+
+		if (ent->isDormant())
+			continue;
+
+		if (!ent->isAlive())
+			continue;
+
+		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+			continue;
+
+		float deltaDist = (ent->absOrigin() - m_path.back()).length();
+		
+		if (int idx = weapon->m_iItemDefinitionIndex(); idx == WEAPON_HEGRENADE)
+		{
+			if (deltaDist > 350.0f) // nade always same
+				continue;
+
+			float d = ((deltaDist - b) / c);
+			float dmg = a * std::exp(-d * d);
+			float resultDmg = utilities::scaleDamageArmor(dmg, ent->m_ArmorValue());
+			if (resultDmg < 0.1f)
+				continue;
+
+			float dmgDealt = ent->m_iHealth() - resultDmg;
+			if (Vector2D pos; imRender.worldToScreen(ent->absOrigin(), pos))
+			{
+				std::string text = dmgDealt < 0.0f ? XOR("DIE") : FORMAT(XOR("{:.2f}"), -resultDmg);
+				nadesDmg.emplace_back(pos, text, colorBased(dmgDealt));
+			}
+		}
+		else if (idx == WEAPON_MOLOTOV || idx == WEAPON_INCGRENADE)
+		{
+			if (deltaDist > 180.0f) // 180 is not always accurate perfectly
+				continue;
+
+			if (Vector2D pos; imRender.worldToScreen(ent->absOrigin(), pos))
+				nadesDmg.emplace_back(pos, XOR("In range"), Colors::LightBlue);
+		}
+	}
+
 	Vector prev = m_path.front();
 	for (const auto& el : m_path)
 	{
@@ -123,7 +194,12 @@ void GrenadePrediction::draw()
 		imRender.drawBox3DFilled(el, { 2.0f, 2.0f }, 2.0f, Colors::Green, Colors::Green);
 	}
 
-	imRender.drawCircle3D(m_path.back(), weapon->getNadeRadius(), 32, Colors::White);
+	for (const auto& [pos, text, color] : nadesDmg)
+	{
+		imRender.text(pos.x, pos.y, ImFonts::tahoma20, text, true, color, false);
+	}
+
+	//imRender.drawCircle3D(m_path.back(), weapon->getNadeRadius(), 32, Colors::White);
 }
 
 // not using magic value given by valve, so we never are based on buttons

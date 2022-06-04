@@ -89,10 +89,11 @@ inline SurfaceRender surfaceRender;
 
 namespace ImFonts
 {
-	inline ImFont* tahoma;
-	inline ImFont* franklinGothic;
+	inline ImFont* tahoma14;
+	inline ImFont* tahoma20;
+	inline ImFont* franklinGothic30;
 	inline ImFont* franklinGothic12;
-	inline ImFont* verdana;
+	inline ImFont* verdana12;
 	inline ImFont* icon;
 }
 
