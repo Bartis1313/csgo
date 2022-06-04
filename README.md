@@ -5,48 +5,52 @@ Very short and commented source aimed for legit gameplay
 Menu screens: [screens](https://imgur.com/a/FiTtSOT)
 
 # Information
-The development soon ends, it was very cool time for me to dig into that game for my needs. Features marked ``(rebuild needed)`` need recode or better version.
+Features marked ``(rebuild needed)`` need recode or better version.
 <br />
 Menu key is insert, panic key is delete, you can change it in config if it matters.
 <br />
+This is a trianing software. No further actions taken by people are heeded.
+<br />
 **BEFORE anything, make sure you have it installed**: [c++ redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170) [directX](https://www.microsoft.com/en-us/download/details.aspx?id=35)
-
-# FAQ
-Crashing on inject
-- You either have some missing files, or cheat was not updated. Open the issue giving enough information to help you.
-
-How to compile
-- Just open VS, don't change anything, you can try change enhanced instruction set (valid for your CPU).
-
-I can't compile
-- Install runtimes for it.
 
 # Features: 
 <details>
 
- * BunnyHop
- * Chams (Fully possible to customize currently running 5 materials. Players, weapons, arms are rendered separately)
- * ESP (2D, 2D Filled, 3D, 3D Filled)
- * Glow
- * Sound ESP (rebuild needed - events are not always networked with the steps)
- * Fov (Changing your local FOV)
- * Third Person
- * Aimbot (Nearest, Head, Chest, delay in ms - no instant switch to new target in fov)
- * Fov Aimbot
- * Smooth Aimbot
- * Triggerbot (delay in ms)
- * Rcs (Customizable to decide both angle values)
- * Crosshair (Static, Recoil, Engine, Spread)
- * Backtrack (manipulation in ms)
- * Radar 2D (Representing on small overlay where enemies are, including their view)
- * Local Info (Some information about local player)
- * Esp Flags (Some information about enemies, their hp, armor etc...)
- * Esp Skeleton (Skeleton drawn by lines, working with backtrack too)
- * Backtrack Chams (Static, Rainbow, Last Tick)
- * DLight (Uses engine to highlight the player)e)
- * Nigtmode (Chnages materials to be darker including chnage of the sky)
- * Esp Lines (They will only show on selected target by aimbot)
- * Plots (Represent current FPS and Velocity in stored records and then drawn using lines and difference between them, fully custom)
+ * Aimbot - aims at enemy using calculated angle, possible to delay in ms and select aimpoints.
+ * RCS - control the recoil spray.
+ * Triggerbot - delay in ms.
+ * Backtrack - manipulate ticks.
+ * Fake latency - manipulate sequences in ms.
+ * Bunnyhop
+ * Autostrafe
+ * Callbacks - not really used, good example how to use them.
+ * Events - listen game events, needed for some features for info.
+ * Thirdperson - 3rd person on key.
+ * Crosshairs - custom crosshairs, 5 types.
+ * Local info - ammo, pos etc...
+ * Fps plot - collect fps and represent it in graphical resizable plot.
+ * Velocity plot - collect local player speed and represent it in graphical resizable plot.
+ * Hitmarker - ability to draw hitmarkers 2D/3D with dmg output.
+ * No scope - removes scope black overlay.
+ * Bullet tracer - draw bullets directions by line beams.
+ * Flashlight - just example, not used.
+ * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic.
+ * Engine prediction - useful to never skip tick and get correct server time.
+ * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records.
+ * Glow - highlight ents (rebuild needed - more ents, not only player).
+ * Sound Esp - (rebuild needed - implement this).
+ * Esp - name, flags, boxes, health, armor, ammo, skeleton.
+ * DLight - highlights player by dlight
+ * Enemy aiming at you warn
+ * 2D radar - overlay showing where enemy is
+ * Custom skybox - listed from game
+ * Remove sky - removes props
+ * Edit world colors - props/walls/sky
+ * Movement trails - collect line frame by frame and draw from container
+ * Bullet impacts - where the bullet has hit
+ * Custom smoke/molotov - color/remove/timer
+ * Draw dropped weapons - box/icon/name/ammo
+ * Bomb overlay with info
  </details>
 
 # Keybinds
