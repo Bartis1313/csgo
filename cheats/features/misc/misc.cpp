@@ -217,21 +217,17 @@ void Misc::drawFpsPlot()
 	while (records.size() > static_cast<size_t>(RECORDS_SIZE / acceptanceCustom))
 		records.pop_front();
 
-	static float MAX_FPS = interfaces::engine->isInGame() ? 350.0f : 120.0f; // fps are limied in menu, then in game use whatever u want
-	static Color cLine = Colors::White;
+	static float MAX_FPS = interfaces::engine->isInGame() ? 350.0f : 120.0f;
 
 	bool& sliderRef = config.getRef<bool>(vars.bFPSCustom);
-	// i should fix this
 	if (sliderRef)
 	{
 		if (ImGui::Begin(XOR("Sliders for plot"), &sliderRef, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			if (interfaces::engine->isInGame()) // not enaled in menu
 				ImGui::SliderFloat(XOR("Set max FPS"), &MAX_FPS, 100.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // hardcoded ranges, we should maybe run some avg fps getter
-			ImGui::SliderFloat(XOR("Acceptance multiply"), &acceptanceCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
-			ImGui::ColorPicker(XOR("Color lines plot"), &cLine);
-			ImGui::SameLine();
-			ImGui::Text(XOR("Color line"));
+			ImGui::SliderFloat(XOR("Acceptance multiply fps"), &acceptanceCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
+			ImGui::ColorPicker(XOR("Color lines plot fps"), &config.getRef<CfgColor>(vars.cFps));
 
 			ImGui::End();
 		}
@@ -253,7 +249,7 @@ void Misc::drawFpsPlot()
 
 			// start drawing after there is any change, we could use polylines here
 			if (i > 0)
-				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, cLine);
+				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, config.get<CfgColor>(vars.cFps).getColor());
 			prevX = currentX; prevY = currentY;
 
 			i++;
@@ -304,7 +300,6 @@ void Misc::drawVelocityPlot()
 		return;
 
 	static float MAX_SPEEED_MOVE = interfaces::cvar->findVar(XOR("sv_maxspeed"))->getFloat(); // should be accurate
-	static Color cLine = Colors::White;
 	static bool transparent = false;
 
 	bool& sliderRef = config.getRef<bool>(vars.bVelocityCustom);
@@ -313,10 +308,8 @@ void Misc::drawVelocityPlot()
 		if (ImGui::Begin(XOR("Sliders for velocity plot"), &sliderRef, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			//ImGui::SliderFloat(XOR("Set max velocity"), &MAX_SPEEED_MOVE, 450.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // who will ever get this velocity? adjust if needed
-			ImGui::SliderFloat(XOR("Acceptance multiply##vel"), &acceptanceVelocityCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
-			ImGui::ColorPicker(XOR("Color lines plot##vel"), &cLine);
-			ImGui::SameLine();
-			ImGui::Text(XOR("Color line"));
+			ImGui::SliderFloat(XOR("Acceptance multiply vel"), &acceptanceVelocityCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
+			ImGui::ColorPicker(XOR("Color lines plot vel"), &config.getRef<CfgColor>(vars.cVelocityPlot));
 			ImGui::Checkbox(XOR("Run transparent"), &transparent);
 			ImGui::SameLine();
 			ImGui::HelpMarker(XOR("Will add some flags!\nEg: no resize"));
@@ -353,7 +346,7 @@ void Misc::drawVelocityPlot()
 			// start drawing after there is any change, we could use polylines here
 			if (i > 0)
 			{
-				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, cLine);
+				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, config.get<CfgColor>(vars.cVelocityPlot).getColor());
 				if (deltaVel > 20) // would need proper edge detection
 					imRenderWindow.drawText(static_cast<int>(currentX) + 10, static_cast<int>(currentY) - 10, scaledFontSize, ImFonts::franklinGothic30,
 						std::format("{}", std::round(currentVel)), true, Colors::Pink, false);
@@ -470,24 +463,25 @@ void Misc::drawHitmarker()
 
 		currentAlpha = diff / config.get<float>(vars.fHitmarkerTime);
 		float sizeFont = 16.0f;
-		Color actualColor = config.get<Color>(vars.cDrawHitmarkerNormal).getColorEditAlpha(currentAlpha);
+		CfgColor actualColor = config.get<CfgColor>(vars.cDrawHitmarkerNormal).getColor().getColorEditAlpha(currentAlpha);
 		float lineX = 10.0f;
 		float lineY = 5.0f;
 
 		if (el.isAvailable() && el.m_head)
 		{
-			actualColor = config.get<Color>(vars.cDrawHitmarkerHead).getColorEditAlpha(currentAlpha);
+			actualColor = config.get<CfgColor>(vars.cDrawHitmarkerHead).getColor().getColorEditAlpha(currentAlpha);
 			sizeFont = 24.0f;
 			lineX = 14.0f;
 			lineY = 7.0f;
 		}
 		else if (!el.isAvailable())
 		{
-			actualColor = config.get<Color>(vars.cDrawHitmarkerDead).getColorEditAlpha(currentAlpha);
+			actualColor = config.get<CfgColor>(vars.cDrawHitmarkerDead).getColor().getColorEditAlpha(currentAlpha);
 			sizeFont = 28.0f;
 			lineX = 18.0f;
 			lineY = 9.0f;
 		}
+
 		float lineAddonX = lineX;
 		float lineAddonY = lineY;
 		if (config.get<bool>(vars.bDrawHitmarkerResize))
@@ -496,17 +490,17 @@ void Misc::drawHitmarker()
 			lineAddonY = lineY / (1.0f / (currentAlpha + 0.01f));
 		}
 
-		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor);
-		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor);
-		imRender.drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor);
-		imRender.drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor);
+		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor.getColor());
+		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor.getColor());
+		imRender.drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor.getColor());
+		imRender.drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor.getColor());
 
 		constexpr int moveMultiply = 25;
 		float correction = (1.0f - currentAlpha) * moveMultiply; // this maybe should have el.expire ratio to previous one
 		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
 		float Ycorrection = y - (correction * 4.0f); // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
 
-		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma14, FORMAT(XOR("{}"), el.m_dmg), false, actualColor, false);
+		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma14, FORMAT(XOR("{}"), el.m_dmg), false, actualColor.getColor(), false);
 
 		i++;
 	}
@@ -582,7 +576,8 @@ void Misc::drawHat()
 	}
 	else
 	{
-		imRender.drawCone(pos, config.get<float>(vars.fHatRadius), 86, config.get<float>(vars.fHatSize), config.get<Color>(vars.cHatTriangle), config.get<Color>(vars.cHatLine), true, 2.0f);
+		imRender.drawCone(pos, config.get<float>(vars.fHatRadius), 86, config.get<float>(vars.fHatSize),
+			config.get<CfgColor>(vars.cHatTriangle).getColor(), config.get<CfgColor>(vars.cHatLine).getColor(), true, 2.0f);
 	}
 }
 
@@ -591,7 +586,7 @@ void Misc::drawBulletTracer(const Vector& start, const Vector& end)
 	if (!config.get<bool>(vars.bDrawBulletTracer))
 		return;
 
-	Color color = config.get<Color>(vars.cDrawBulletTracer);
+	CfgColor color = config.get<CfgColor>(vars.cDrawBulletTracer);
 
 	Trace_t tr;
 	TraceFilter filter;
@@ -611,10 +606,10 @@ void Misc::drawBulletTracer(const Vector& start, const Vector& end)
 	info.m_endWidth = 2.0f;
 	info.m_fadeLength = 1.0f;
 	info.m_amplitude = 2.0f;
-	info.m_red = color.rMultiplied();
-	info.m_green = color.gMultiplied();
-	info.m_blue = color.bMultiplied();
-	info.m_brightness = color.aMultiplied();
+	info.m_red = color.getColor().rMultiplied();
+	info.m_green = color.getColor().gMultiplied();
+	info.m_blue = color.getColor().bMultiplied();
+	info.m_brightness = color.getColor().aMultiplied();
 	info.m_speed = 0.2f;
 	info.m_startFrame = 0.0f;
 	info.m_frameRate = 60.0f;

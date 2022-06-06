@@ -121,7 +121,7 @@ void World::drawBombOverlay()
 
 	constexpr ImVec2 size = { 300, 150 };
 	ImGui::SetNextWindowSize(size);
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, U32(config.get<Color>(vars.cBombBackground)));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, U32(config.get<CfgColor>(vars.cBombBackground).getColor()));
 	if (ImGui::Begin(XOR("Bomb c4"), &ref, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
 		imRenderWindow.addList();
@@ -187,23 +187,23 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 	{
 		if (config.get<bool>(vars.bDrawProjectiles))
 		{
-			std::pair<std::string, Color> nades;
+			std::pair<std::string, CfgColor> nades;
 
 			if (projectileName.find(XOR("flashbang")) != std::string::npos)
-				nades = { XOR("FLASHBANG"), config.get<Color>(vars.cFlashBang) };
+				nades = { XOR("FLASHBANG"), config.get<CfgColor>(vars.cFlashBang) };
 			if (projectileName.find(XOR("ggrenade")) != std::string::npos && wpn->m_nExplodeEffectTickBegin() < 1) // prevent too long time
-				nades = { XOR("GRENADE"), config.get<Color>(vars.cGranede) };
+				nades = { XOR("GRENADE"), config.get<CfgColor>(vars.cGranede) };
 			if (projectileName.find(XOR("molotov")) != std::string::npos)
-				nades = { XOR("MOLOTOV"), config.get<Color>(vars.cMolotov) };
+				nades = { XOR("MOLOTOV"), config.get<CfgColor>(vars.cMolotov) };
 			if (projectileName.find(XOR("incendiary")) != std::string::npos)
-				nades = { XOR("FIRE INC"), config.get<Color>(vars.cIncediary) };
+				nades = { XOR("FIRE INC"), config.get<CfgColor>(vars.cIncediary) };
 			if (projectileName.find(XOR("smokegrenade")) != std::string::npos && !reinterpret_cast<Smoke_t*>(wpn)->m_nSmokeEffectTickBegin()) // prevent too long time
-				nades = { XOR("SMOKE"), config.get<Color>(vars.cSmoke) };
+				nades = { XOR("SMOKE"), config.get<CfgColor>(vars.cSmoke) };
 			if (projectileName.find(XOR("decoy")) != std::string::npos) // this nade time is also too long, to prevent it you need to check tick time. There is no netvar for decoys
-				nades = { XOR("DECOY"), config.get<Color>(vars.cDecoy) };
+				nades = { XOR("DECOY"), config.get<CfgColor>(vars.cDecoy) };
 
 			if (Box box; utilities::getBox(ent, box))
-				imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana12, nades.first, true, nades.second);
+				imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana12, nades.first, true, nades.second.getColor());
 		}
 	}
 	else if (projectileName.find(XOR("dropped")) != std::string::npos && id != CPlantedC4) // add more if needed
@@ -221,11 +221,11 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 
 			if (config.get<cont>(vars.vDroppedFlags).at(E2T(DroppedFlags::BOX))) // startpoint - no pad
 			{
-				Color cfgCol = config.get<Color>(vars.cDrawDropped);
+				CfgColor cfgCol = config.get<CfgColor>(vars.cDrawDropped);
 
 				imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Colors::Black);
 				imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Colors::Black);
-				imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol);
+				imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol.getColor());
 			}
 			if (config.get<cont>(vars.vDroppedFlags).at(E2T(DroppedFlags::AMMO)) && !wpn->isNonAimable()) // no pad font logic, we just draw extra box
 			{
@@ -233,7 +233,7 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 
 				imRender.drawRectFilled(box.x - 1.0f, box.y + box.h - 1.0f + startPad, box.w + 2.0f, 4.0f, Colors::Black);
 				imRender.drawRectFilled(box.x, box.y + box.h + startPad,
-					wpn->m_iClip1() * box.w / wpn->getWpnInfo()->m_maxClip1, 2.0f, config.get<Color>(vars.cDrawDropped));
+					wpn->m_iClip1() * box.w / wpn->getWpnInfo()->m_maxClip1, 2.0f, config.get<CfgColor>(vars.cDrawDropped).getColor());
 
 				padding += 4.0f;
 			}
@@ -241,7 +241,7 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 			{
 				auto name = wpn->getWpnName();
 				imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::verdana12,
-					name, true, config.get<Color>(vars.cDropped));
+					name, true, config.get<CfgColor>(vars.cDropped).getColor());
 
 				auto textSize = getTextSize(name);
 				padding += textSize.y;
@@ -250,7 +250,7 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 			{
 				auto name = utilities::u8toStr(wpn->getIcon());
 				imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::icon,
-					name, true, config.get<Color>(vars.cDropped));
+					name, true, config.get<CfgColor>(vars.cDropped).getColor());
 
 				auto textSize = getTextSize(name, ImFonts::icon);
 				padding += textSize.y;
@@ -317,11 +317,11 @@ void World::modulateWorld(void* thisptr, float* r, float* g, float* b, bool isSh
 		{ "SkyBox", config.get<Color>(vars.cSkyBox) },
 	};*/
 
-	auto editColor = [=](const Color& color)
+	auto editColor = [=](const CfgColor& color)
 	{
-		*r = color.r();
-		*g = color.g();
-		*b = color.b();
+		*r = color.getColor().r();
+		*g = color.getColor().g();
+		*b = color.getColor().b();
 	};
 
 	/*for (auto handle = interfaces::matSys->firstMaterial(); handle != interfaces::matSys->invalidMaterialFromHandle(); handle = interfaces::matSys->nextMaterial(handle))
@@ -348,19 +348,19 @@ void World::modulateWorld(void* thisptr, float* r, float* g, float* b, bool isSh
 
 	if (name == XOR("World textures"))
 	{
-		editColor(config.get<Color>(vars.cWorldTexture));
+		editColor(config.get<CfgColor>(vars.cWorldTexture));
 		isGoodMat = true;
 	}
 
 	if (name == XOR("StaticProp textures"))
 	{
-		editColor(config.get<Color>(vars.cWorldProp));
+		editColor(config.get<CfgColor>(vars.cWorldProp));
 		isGoodMat = true;
 	}
 
 	if (name == XOR("SkyBox textures"))
 	{
-		editColor(config.get<Color>(vars.cSkyBox));
+		editColor(config.get<CfgColor>(vars.cSkyBox));
 		isGoodMat = true;
 	}
 
@@ -400,14 +400,14 @@ void World::drawMolotov(Entity_t* ent)
 	constexpr int molotovRadius = 60; // 30 * 2
 
 	//std::vector<ImVec2> points = {};
-	Color col = config.get<Color>(vars.cMolotovRange);
+	CfgColor col = config.get<CfgColor>(vars.cMolotovRange);
 
 	//std::vector<Vector2D> points;
 
 	for (int i = 0; i < molotov->m_fireCount(); i++)
 	{
 		auto pos = origin + molotov->getInfernoPos(i);
-		imRender.drawCircle3DFilled(pos, molotovRadius, 32, col, col);
+		imRender.drawCircle3DFilled(pos, molotovRadius, 32, col.getColor(), col.getColor());
 
 		/*Vector2D posw;
 		if (!imRender.worldToScreen(pos, posw))
@@ -477,7 +477,7 @@ void World::drawSmoke(Entity_t* ent)
 
 	//imRender.drawCircle3DFilled(origin, smokeRadius, 216, col, col, true, 2.0f);
 	// many points to make it smooth
-	drawArc3DSmoke(origin, smokeRadius, 512, scale, config.get<Color>(vars.cDrawSmoke), false, 2.0f, ImFonts::tahoma14, FORMAT(XOR("{:.2f}s"), time), Colors::Orange);
+	drawArc3DSmoke(origin, smokeRadius, 512, scale, config.get<CfgColor>(vars.cDrawSmoke).getColor(), false, 2.0f, ImFonts::tahoma14, FORMAT(XOR("{:.2f}s"), time), Colors::Orange);
 	drawCustomSmoke(origin, smokeRadius, math::customSin(interfaces::globalVars->m_curtime, 4.0f));
 
 	// timer
@@ -508,10 +508,12 @@ void World::drawZeusRange()
 		const static float range = weapon->getWpnInfo()->m_range;
 		const Vector abs = game::localPlayer->absOrigin() + Vector(0.0f, 0.0f, 30.0f); // small correction to get correct trace visually, will still throw false positives on stairs etc...
 
+		CfgColor color = config.get<CfgColor>(vars.cZeusRange);
+
 		if (config.get<bool>(vars.bZeusUseTracing))
-			imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer, config.get<Color>(vars.cZeusRange), true, 2.5f);
+			imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer, color.getColor(), true, 2.5f);
 		else
-			imRender.drawCircle3D(abs, range, 32, config.get<Color>(vars.cZeusRange), true, 2.0f);
+			imRender.drawCircle3D(abs, range, 32, color.getColor(), true, 2.0f);
 	}
 }
 
@@ -533,17 +535,14 @@ void World::drawMovementTrail()
 		end = game::localPlayer->m_vecOrigin();
 	}
 
+	CfgColor color = config.get<CfgColor>(vars.cMovementTrail);
+
 	switch (type)
 	{
 	case E2T(MovementTrail::BEAM):
 	{
 		if (!game::localPlayer->isMoving()) // do not add beams on not moving
 			return;
-
-		Color color;
-		config.get<bool>(vars.bMovementRainbow)
-			? color = Color::rainbowColor(interfaces::globalVars->m_realtime, config.get<float>(vars.fMovementRainbowSpeed))
-			: color = config.get<Color>(vars.cMovementTrail);
 
 		const Vector start = game::localPlayer->m_vecOrigin();
 
@@ -562,9 +561,9 @@ void World::drawMovementTrail()
 		info.m_fadeLength = 0.0f;
 		info.m_amplitude = 2.0;
 		info.m_brightness = 255.0f;
-		info.m_red = color.rMultiplied();
-		info.m_green = color.gMultiplied();
-		info.m_blue = color.bMultiplied();
+		info.m_red = color.getColor().rMultiplied();
+		info.m_green = color.getColor().gMultiplied();
+		info.m_blue = color.getColor().bMultiplied();
 		info.m_speed = config.get<float>(vars.fMovementBeamSpeed);
 		info.m_startFrame = 0.0f;
 		info.m_frameRate = 0.0f;
@@ -580,15 +579,10 @@ void World::drawMovementTrail()
 	}
 	case E2T(MovementTrail::LINE):
 	{
-		Color color;
-		config.get<bool>(vars.bMovementRainbow)
-			? color = Color::rainbowColor(interfaces::globalVars->m_realtime, config.get<float>(vars.fMovementRainbowSpeed))
-			: color = config.get<Color>(vars.cMovementTrail);
-
 		float curtime = interfaces::globalVars->m_curtime;
 
 		if (game::localPlayer->isMoving())
-			m_trails.emplace_back(Trail_t{ game::localPlayer->m_vecOrigin(), curtime + config.get<float>(vars.fMovementLife), color });
+			m_trails.emplace_back(Trail_t{ game::localPlayer->m_vecOrigin(), curtime + config.get<float>(vars.fMovementLife), color.getColor() });
 
 		Vector last = {};
 		if (!m_trails.empty())
@@ -645,6 +639,9 @@ void World::clientSideImpacts()
 	if (m_vecBulletVerifyListClient.m_size != gameBulletCount)
 		gameBulletCount = m_vecBulletVerifyListClient.m_size;
 
+	CfgColor outline = config.get<CfgColor>(vars.cDrawClientSideImpactsLine);
+	CfgColor fill = config.get<CfgColor>(vars.cDrawClientSideImpactsFill);
+
 	for (size_t i = 0; const auto & el : m_hitsClientSide)
 	{
 		float diff = el.m_expire - interfaces::globalVars->m_curtime;
@@ -656,7 +653,7 @@ void World::clientSideImpacts()
 		}	
 
 		imRender.drawBox3DFilled(el.m_pos, { 4.0f, 4.0f }, 4.0f,
-			config.get<Color>(vars.cDrawClientSideImpactsLine), config.get<Color>(vars.cDrawClientSideImpactsFill));
+			outline.getColor(), fill.getColor());
 
 		i++;
 	}
@@ -666,6 +663,9 @@ void World::localImpacts()
 {
 	if (!config.get<bool>(vars.bDrawLocalSideImpacts))
 		return;
+
+	CfgColor outline = config.get<CfgColor>(vars.cDrawLocalSideImpactsLine);
+	CfgColor fill = config.get<CfgColor>(vars.cDrawLocalSideImpactsFill);
 
 	for (size_t i = 0; const auto & el : m_hitsLocal)
 	{
@@ -683,7 +683,7 @@ void World::localImpacts()
 		interfaces::trace->traceRay({ el.m_start, el.m_end }, MASK_PLAYER, &filter, &tr);
 
 		imRender.drawBox3DFilled(tr.m_end, { 4.0f, 4.0f }, 4.0f, 
-			config.get<Color>(vars.cDrawLocalSideImpactsLine), config.get<Color>(vars.cDrawLocalSideImpactsFill));
+			outline.getColor(), fill.getColor());
 
 		i++;
 	}

@@ -67,7 +67,7 @@ static void renderAimbot()
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("Use key##aimbot"), &config.getRef<bool>(vars.bAimbotUseKey));
 				ImGui::SameLine();
-				ImGui::Hotkey("", config.getRef<Key>(vars.kAimbotKey));
+				ImGui::Hotkey("", &config.getRef<Key>(vars.kAimbotKey));
 				ImGui::SliderFloat(XOR("Aimbot FOV"), &config.getRef<float>(vars.fFovAimbot), 0.0f, 50.0f);
 				ImGui::Combo(XOR("Aimbot selection"), &config.getRef<int>(vars.iAimbot), selections::aimbotHitboxes);
 				ImGui::SliderFloat(XOR("Aimbot smooth"), &config.getRef<float>(vars.fSmooth), 1.0f, 50.0f);
@@ -78,7 +78,7 @@ static void renderAimbot()
 				ImGui::SliderFloat(XOR("Triggerbot ms"), &config.getRef<float>(vars.fTriggerDelay), 0.0f, 200.0f);
 				ImGui::Checkbox(XOR("Draw fov"), &config.getRef<bool>(vars.bDrawFov));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Fov circle color"), &config.getRef<Color>(vars.cDrawFov));
+				ImGui::ColorPicker(XOR("Fov circle color"), &config.getRef<CfgColor>(vars.cDrawFov));
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Draws a circle representing your aimbot FOV"));
 				ImGui::Checkbox(XOR("Draw aimbot point"), &config.getRef<bool>(vars.bDrawBestPoint));
@@ -120,18 +120,18 @@ static void renderVisuals()
 				ImGui::Checkbox(XOR("Enabled"), &config.getRef<bool>(vars.bEsp));
 				ImGui::Combo(XOR("Boxes mode"), &config.getRef<int>(vars.iEsp), selections::espNames);
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Box color"), &config.getRef<Color>(vars.cBox));
+				ImGui::ColorPicker(XOR("Box color"), &config.getRef<CfgColor>(vars.cBox));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Box color, filled"), &config.getRef<Color>(vars.cBoxFill), ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel | ImGuiColorEditFlags_AlphaPreviewHalf);
+				ImGui::ColorPicker(XOR("Box color, filled"), &config.getRef<CfgColor>(vars.cBoxFill));
 				ImGui::Checkbox(XOR("Health"), &config.getRef<bool>(vars.bDrawHealth));
 				ImGui::Checkbox(XOR("Armor"), &config.getRef<bool>(vars.bDrawArmor));
 				ImGui::Checkbox(XOR("Name"), &config.getRef<bool>(vars.bDrawName));
 				ImGui::Checkbox(XOR("Skeleton"), &config.getRef<bool>(vars.bDrawSkeleton));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Skeleton color"), &config.getRef<Color>(vars.cSkeleton));
+				ImGui::ColorPicker(XOR("Skeleton color"), &config.getRef<CfgColor>(vars.cSkeleton));
 				ImGui::Checkbox(XOR("Dlight"), &config.getRef<bool>(vars.bDLight));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Dlight color"), &config.getRef<Color>(vars.cDlight));
+				ImGui::ColorPicker(XOR("Dlight color"), &config.getRef<CfgColor>(vars.cDlight));
 				ImGui::SliderFloat(XOR("Dlight radius"), &config.getRef<float>(vars.fDlightRadius), 0.0f, 300.0f);
 				ImGui::SliderFloat(XOR("Dlight exponent"), &config.getRef<float>(vars.fDlightExponent), 0.0f, 12.0f);
 				ImGui::SliderFloat(XOR("Dlight decay"), &config.getRef<float>(vars.fDlightDecay), 0.0f, 100.0f);
@@ -144,36 +144,36 @@ static void renderVisuals()
 				ImGui::Checkbox(XOR("Chams enabled Players"), &config.getRef<bool>(vars.bChamsPlayers));
 				ImGui::SameLine();
 				ImGui::Combo(XOR("Chams type Players"), &config.getRef<int>(vars.iChamsPlayers), selections::chamsNames);
-				ImGui::ColorPicker(XOR("Chams color Players"), &config.getRef<Color>(vars.cChamsPlayers));
+				ImGui::ColorPicker(XOR("Chams color Players"), &config.getRef<CfgColor>(vars.cChamsPlayers));
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("Chams XQZ"), &config.getRef<bool>(vars.bChamsXQZPlayers));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Chams XQZ color"), &config.getRef<Color>(vars.cChamsXQZPlayers));
+				ImGui::ColorPicker(XOR("Chams XQZ color"), &config.getRef<CfgColor>(vars.cChamsXQZPlayers));
 				
 				ImGui::Checkbox(XOR("Chams enabled Weapons"), &config.getRef<bool>(vars.bChamsWeapons));
 				ImGui::SameLine();
 				ImGui::Combo(XOR("Chams type Weapons"), &config.getRef<int>(vars.iChamsWeapons), selections::chamsNames);
-				ImGui::ColorPicker(XOR("Chams color Weapons"), &config.getRef<Color>(vars.cChamsWeapons));
+				ImGui::ColorPicker(XOR("Chams color Weapons"), &config.getRef<CfgColor>(vars.cChamsWeapons));
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("Disable weapon"), &config.getRef<bool>(vars.bChamsWeaponsDisable));
 
 				ImGui::Checkbox(XOR("Chams enabled Arms"), &config.getRef<bool>(vars.bChamsArms));
 				ImGui::SameLine();
 				ImGui::Combo(XOR("Chams type Arms"), &config.getRef<int>(vars.iChamsArms), selections::chamsNames);
-				ImGui::ColorPicker(XOR("Chams color Arms"), &config.getRef<Color>(vars.cChamsArms));
+				ImGui::ColorPicker(XOR("Chams color Arms"), &config.getRef<CfgColor>(vars.cChamsArms));
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("Disable arms"), &config.getRef<bool>(vars.bChamsArmsDisable));
 				
 				ImGui::Checkbox(XOR("Chams enabled Backtrack"), &config.getRef<bool>(vars.bChamsBacktrack));
 				ImGui::SameLine();
 				ImGui::Combo(XOR("Chams type Backtrack"), &config.getRef<int>(vars.iChamsBacktrackMode), selections::chamsNames);
-				ImGui::ColorPicker(XOR("Backtrack chams col"), &config.getRef<Color>(vars.cChamsBacktrack));
+				ImGui::ColorPicker(XOR("Backtrack chams col"), &config.getRef<CfgColor>(vars.cChamsBacktrack));
 				ImGui::SameLine();
 				ImGui::Combo(XOR("Chams style Backtrack"), &config.getRef<int>(vars.iChamsBacktrack), selections::btChams);
 
 				ImGui::Checkbox(XOR("Enabled glow"), &config.getRef<bool>(vars.bGlow));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Glow color"), &config.getRef<Color>(vars.cGlow));
+				ImGui::ColorPicker(XOR("Glow color"), &config.getRef<CfgColor>(vars.cGlow));
 			}
 			ImGui::EndGroupPanel();
 
@@ -187,66 +187,53 @@ static void renderVisuals()
 			ImGui::BeginGroupPanel(XOR("Weapons"));
 			{
 				ImGui::Checkbox(XOR("Enabled##weapons"), &config.getRef<bool>(vars.bDrawWeapon));
-				ImGui::ColorPicker(XOR("Color for text"), &config.getRef<Color>(vars.cWeaponText));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Weapon text"));
+				ImGui::ColorPicker(XOR("Color for text"), &config.getRef<CfgColor>(vars.cWeaponText));
 
-				ImGui::ColorPicker(XOR("Reload bar color"), &config.getRef<Color>(vars.cReloadbar));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Reload bar"));
+
+				ImGui::ColorPicker(XOR("Reload bar color"), &config.getRef<CfgColor>(vars.cReloadbar));
+
 
 				ImGui::Checkbox(XOR("Bomb info"), &config.getRef<bool>(vars.bDrawBomb));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("C4 info"), &config.getRef<Color>(vars.cBombBackground));
+				ImGui::ColorPicker(XOR("C4 info"), &config.getRef<CfgColor>(vars.cBombBackground));
 			}
 			ImGui::EndGroupPanel();
 
 			ImGui::BeginGroupPanel(XOR("Nades"));
 			{
 				ImGui::Checkbox(XOR("Enabled##nades"), &config.getRef<bool>(vars.bDrawProjectiles));
-				ImGui::ColorPicker(XOR("Flashbang color"), &config.getRef<Color>(vars.cFlashBang));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Flashbang"));
-				ImGui::ColorPicker(XOR("Granede color"), &config.getRef<Color>(vars.cGranede));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Granede"));
-				ImGui::ColorPicker(XOR("Molotov color"), &config.getRef<Color>(vars.cMolotov));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Molotov"));
-				ImGui::ColorPicker(XOR("Incediary color"), &config.getRef<Color>(vars.cIncediary));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Incediary"));
-				ImGui::ColorPicker(XOR("Smoke color"), &config.getRef<Color>(vars.cSmoke));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Smoke"));
-				ImGui::ColorPicker(XOR("Decoy color"), &config.getRef<Color>(vars.cDecoy));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Decoy"));
+				ImGui::ColorPicker(XOR("Flashbang color"), &config.getRef<CfgColor>(vars.cFlashBang));
+
+				ImGui::ColorPicker(XOR("Granede color"), &config.getRef<CfgColor>(vars.cGranede));
+
+				ImGui::ColorPicker(XOR("Molotov color"), &config.getRef<CfgColor>(vars.cMolotov));
+
+				ImGui::ColorPicker(XOR("Incediary color"), &config.getRef<CfgColor>(vars.cIncediary));
+
+				ImGui::ColorPicker(XOR("Smoke color"), &config.getRef<CfgColor>(vars.cSmoke));
+
+				ImGui::ColorPicker(XOR("Decoy color"), &config.getRef<CfgColor>(vars.cDecoy));
+
 				ImGui::Checkbox(XOR("Enabled dropped"), &config.getRef<bool>(vars.bDrawDropped));
 				ImGui::MultiCombo(XOR("Dropped flags"), selections::droppedFlags, config.getRef<std::vector<bool>>(vars.vDroppedFlags));
-				ImGui::ColorPicker(XOR("Dropped color"), &config.getRef<Color>(vars.cDrawDropped));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Dropped color"));
+				ImGui::ColorPicker(XOR("Dropped color"), &config.getRef<CfgColor>(vars.cDrawDropped));
+
 				ImGui::Checkbox(XOR("Edit effects"), &config.getRef<bool>(vars.bEditEffects));
-				ImGui::ColorPicker(XOR("Edited molotov"), &config.getRef<Color>(vars.cEditMolotov));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Molotov color"));
-				ImGui::ColorPicker(XOR("Edited blood"), &config.getRef<Color>(vars.cEditBlood));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Blood color"));
+				ImGui::ColorPicker(XOR("Edited molotov"), &config.getRef<CfgColor>(vars.cEditMolotov));
+
+				ImGui::ColorPicker(XOR("Edited blood"), &config.getRef<CfgColor>(vars.cEditBlood));
+
 				ImGui::SliderFloat(XOR("Smoke alpha"), &config.getRef<float>(vars.fSmokeAlpha), 0.0f, 1.0f);
 
 				ImGui::Checkbox(XOR("Enabled molotov circle"), &config.getRef<bool>(vars.bDrawmolotovRange));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Draw molotov circle"), &config.getRef<Color>(vars.cMolotovRange));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Molotov circle"));
+				ImGui::ColorPicker(XOR("Draw molotov circle"), &config.getRef<CfgColor>(vars.cMolotovRange));
+
 
 				ImGui::Checkbox(XOR("Enabled smoke circle"), &config.getRef<bool>(vars.bDrawSmoke));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Draw smoke circle"), &config.getRef<Color>(vars.cDrawSmoke));
+				ImGui::ColorPicker(XOR("Draw smoke circle"), &config.getRef<CfgColor>(vars.cDrawSmoke));
 				ImGui::SameLine();
-				ImGui::Text(XOR("Smoke circle"));
 				
 			}
 			ImGui::EndGroupPanel();
@@ -271,20 +258,17 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Remove sky"), &config.getRef<bool>(vars.bRemoveSky));
 				if (modulateRef)
 				{
-					ImGui::ColorPicker(XOR("Modulate world texture"), &config.getRef<Color>(vars.cWorldTexture));
-					ImGui::SameLine();
-					ImGui::Text(XOR("Modulate world texture"));
-					ImGui::ColorPicker(XOR("Modulate world prop"), &config.getRef<Color>(vars.cWorldProp));
-					ImGui::SameLine();
-					ImGui::Text(XOR("Modulate world prop"));
-					ImGui::ColorPicker(XOR("Modulate world sky"), &config.getRef<Color>(vars.cSkyBox));
-					ImGui::SameLine();
-					ImGui::Text(XOR("Modulate world sky"));
+					ImGui::ColorPicker(XOR("Modulate world texture"), &config.getRef<CfgColor>(vars.cWorldTexture));
+
+					ImGui::ColorPicker(XOR("Modulate world prop"), &config.getRef<CfgColor>(vars.cWorldProp));
+
+					ImGui::ColorPicker(XOR("Modulate world sky"), &config.getRef<CfgColor>(vars.cSkyBox));
+		
 					//ImGui::SliderFloat(XOR("Shader value"), &config.getRef<float>(vars.fShaderParam), 0.0f, 100.0f);
 				}
 				ImGui::Checkbox(XOR("Zeus range"), &config.getRef<bool>(vars.bDrawZeusRange));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Zeus color"), &config.getRef<Color>(vars.cZeusRange));
+				ImGui::ColorPicker(XOR("Zeus color"), &config.getRef<CfgColor>(vars.cZeusRange));
 				ImGui::Checkbox(XOR("Zeus party"), &config.getRef<bool>(vars.bZeusPartyMode));
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("Zeus tracing"), &config.getRef<bool>(vars.bZeusUseTracing));
@@ -292,7 +276,7 @@ static void renderMisc()
 				ImGui::SliderFloat(XOR("FOV local"), &config.getRef<float>(vars.fFOV), -50.0f, 50.0f);
 				ImGui::Checkbox(XOR("Third Person"), &config.getRef<bool>(vars.bThirdp));
 				ImGui::SameLine();
-				ImGui::Hotkey(XOR(""), config.getRef<Key>(vars.kThirdp));
+				ImGui::Hotkey(XOR(""), &config.getRef<Key>(vars.kThirdp));
 				ImGui::Combo(XOR("Crosshair type"), &config.getRef<int>(vars.iCrosshair), selections::crossHairNames);
 				ImGui::Checkbox(XOR("Enemy aiming warn"), &config.getRef<bool>(vars.bAimingWarn));
 			}
@@ -301,12 +285,8 @@ static void renderMisc()
 			ImGui::BeginGroupPanel(XOR("Radar"));
 			{
 				ImGui::Checkbox(XOR("2D Radar enabled"), &config.getRef<bool>(vars.bRadar));
-				ImGui::ColorPicker(XOR("Angle view line"), &config.getRef<Color>(vars.cRadarLine));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Angle line"));
-				ImGui::ColorPicker(XOR("Players color"), &config.getRef<Color>(vars.cRadarPlayer));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Players"));
+				ImGui::ColorPicker(XOR("Angle view line"), &config.getRef<CfgColor>(vars.cRadarLine));
+				ImGui::ColorPicker(XOR("Players color"), &config.getRef<CfgColor>(vars.cRadarPlayer));
 				ImGui::SliderFloat(XOR("Thickness"), &config.getRef<float>(vars.fRadarThickness), 0.0f, 20.0f);
 				ImGui::SliderFloat(XOR("Length"), &config.getRef<float>(vars.fRadarLenght), 0.0f, 40.0f);
 				ImGui::SliderFloat(XOR("Scale"), &config.getRef<float>(vars.fRadarScale), 0.0f, 10.0f);
@@ -332,15 +312,11 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("3D##Hitm"), &config.getRef<bool>(vars.bDrawHitmarker3D));
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("Resize##Hitm"), &config.getRef<bool>(vars.bDrawHitmarkerResize));
-				ImGui::ColorPicker(XOR("Hitmarker normal"), &config.getRef<Color>(vars.cDrawHitmarkerNormal));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Hitmarker normal"));
-				ImGui::ColorPicker(XOR("Hitmarker hs"), &config.getRef<Color>(vars.cDrawHitmarkerHead));
+				ImGui::ColorPicker(XOR("Hitmarker normal"), &config.getRef<CfgColor>(vars.cDrawHitmarkerNormal));
+				ImGui::ColorPicker(XOR("Hitmarker hs"), &config.getRef<CfgColor>(vars.cDrawHitmarkerHead));
 				ImGui::SameLine();
 				ImGui::Text(XOR("Hitmarker hs"));
-				ImGui::ColorPicker(XOR("Hitmarker dead"), &config.getRef<Color>(vars.cDrawHitmarkerDead));
-				ImGui::SameLine();
-				ImGui::Text(XOR("Hitmarker dead"));
+				ImGui::ColorPicker(XOR("Hitmarker dead"), &config.getRef<CfgColor>(vars.cDrawHitmarkerDead));
 				ImGui::SliderFloat(XOR("Hitmarker time"), &config.getRef<float>(vars.fHitmarkerTime), 0.0f, 2.0f);
 				ImGui::Checkbox(XOR("Play hitmarker"), &config.getRef<bool>(vars.bPlayHitmarker));
 				ImGui::SameLine();
@@ -374,17 +350,8 @@ static void renderMisc()
 				if (tref)
 				{
 					ImGui::Combo(XOR("Trail type"), &config.getRef<int>(vars.iRunMovementTrail), selections::trails);
-					bool& rref = config.getRef<bool>(vars.bMovementRainbow);
-					ImGui::Checkbox(XOR("Run rainbow"), &rref);
-					if (!rref)
-					{
-						ImGui::SameLine();
-						ImGui::ColorPicker(XOR("Movement trail color"), &config.getRef<Color>(vars.cMovementTrail));
-					}
-					else
-					{
-						ImGui::SliderFloat(XOR("Rainbow speed"), &config.getRef<float>(vars.fMovementRainbowSpeed), 0.2f, 10.0f);
-					}
+					ImGui::SameLine();
+					ImGui::ColorPicker(XOR("Movement trail color"), &config.getRef<CfgColor>(vars.cMovementTrail));
 					ImGui::SliderFloat(XOR("Trail speed"), &config.getRef<float>(vars.fMovementBeamSpeed), 1.0f, 10.0f);
 					ImGui::SliderFloat(XOR("Trail life"), &config.getRef<float>(vars.fMovementLife), 1.0f, 10.0f);
 				}
@@ -396,12 +363,8 @@ static void renderMisc()
 					ImGui::Checkbox(XOR("Rainbow hat"), &hatRainbowRef);
 					if (!hatRainbowRef)
 					{
-						ImGui::ColorPicker(XOR("Hat triangle color"), &config.getRef<Color>(vars.cHatTriangle));
-						ImGui::SameLine();
-						ImGui::Text(XOR("Hat triangle color"));
-						ImGui::ColorPicker(XOR("Hat lines color"), &config.getRef<Color>(vars.cHatLine));
-						ImGui::SameLine();
-						ImGui::Text(XOR("Hat lines color"));
+						ImGui::ColorPicker(XOR("Hat triangle color"), &config.getRef<CfgColor>(vars.cHatTriangle));
+						ImGui::ColorPicker(XOR("Hat lines color"), &config.getRef<CfgColor>(vars.cHatLine));
 					}
 					else
 					{
@@ -413,19 +376,19 @@ static void renderMisc()
 				//ImGui::Checkbox(XOR("Remove blood spray"), &config.getRef<bool>(vars.bRemoveBloodSpray));
 				ImGui::Checkbox(XOR("Enable tracers"), &config.getRef<bool>(vars.bDrawBulletTracer));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Tracers color"), &config.getRef<Color>(vars.cDrawBulletTracer));
+				ImGui::ColorPicker(XOR("Tracers color"), &config.getRef<CfgColor>(vars.cDrawBulletTracer));
 				ImGui::SliderFloat(XOR("Tracers life"), &config.getRef<float>(vars.fDrawBulletTracer), 0.0f, 5.0f);
 				ImGui::Checkbox(XOR("Enable local bullets"), &config.getRef<bool>(vars.bDrawLocalSideImpacts));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Local bullets line color"), &config.getRef<Color>(vars.cDrawLocalSideImpactsLine));
+				ImGui::ColorPicker(XOR("Local bullets line color"), &config.getRef<CfgColor>(vars.cDrawLocalSideImpactsLine));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Local bullets fill color"), &config.getRef<Color>(vars.cDrawLocalSideImpactsFill));
+				ImGui::ColorPicker(XOR("Local bullets fill color"), &config.getRef<CfgColor>(vars.cDrawLocalSideImpactsFill));
 				ImGui::SliderFloat(XOR("Local bullets time"), &config.getRef<float>(vars.fDrawLocalSideImpacts), 0.0f, 5.0f);
 				ImGui::Checkbox(XOR("Enable client bullets"), &config.getRef<bool>(vars.bDrawClientSideImpacts));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Client bullets line color"), &config.getRef<Color>(vars.cDrawClientSideImpactsLine));
+				ImGui::ColorPicker(XOR("Client bullets line color"), &config.getRef<CfgColor>(vars.cDrawClientSideImpactsLine));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Client bullets fill color"), &config.getRef<Color>(vars.cDrawClientSideImpactsFill));
+				ImGui::ColorPicker(XOR("Client bullets fill color"), &config.getRef<CfgColor>(vars.cDrawClientSideImpactsFill));
 				ImGui::SliderFloat(XOR("Client bullets time"), &config.getRef<float>(vars.fDrawClientSideImpacts), 0.0f, 5.0f);
 			}
 			ImGui::EndGroupPanel();
@@ -499,9 +462,9 @@ static void renderConfig()
 	{
 		ImGui::BeginGroupPanel(XOR("Config keys"));
 		{
-			ImGui::Hotkey(XOR("Menu key"), config.getRef<Key>(vars.kMenu), false);
-			ImGui::Hotkey(XOR("Console key"), config.getRef<Key>(vars.kConsoleLog), false);
-			ImGui::Hotkey(XOR("Panic key"), config.getRef<Key>(vars.kPanic), false);
+			ImGui::Hotkey(XOR("Menu key"), &config.getRef<Key>(vars.kMenu), false);
+			ImGui::Hotkey(XOR("Console key"), &config.getRef<Key>(vars.kConsoleLog), false);
+			ImGui::Hotkey(XOR("Panic key"), &config.getRef<Key>(vars.kPanic), false);
 			ImGui::Checkbox(XOR("Enable x88 menu"), &config.getRef<bool>(vars.bMenuOpenedx88));
 		}
 		ImGui::EndGroupPanel();
@@ -544,11 +507,11 @@ static void renderStyles()
 				ImGui::SliderFloat(XOR("Background max dist"), &config.getRef<float>(vars.fBackgroundDistance), 10.0f, 400.0f);
 				ImGui::SliderInt(XOR("Background amount of records"), &config.getRef<int>(vars.iBackgroundSize), 20, 400);
 				ImGui::Text(XOR("They are temp limited with dynamic size + saving!"));
-				ImGui::ColorPicker(XOR("Background color1"), &config.getRef<Color>(vars.cBackGround1));
+				ImGui::ColorPicker(XOR("Background color1"), &config.getRef<CfgColor>(vars.cBackGround1));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Background color2"), &config.getRef<Color>(vars.cBackGround2));
+				ImGui::ColorPicker(XOR("Background color2"), &config.getRef<CfgColor>(vars.cBackGround2));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Background color3"), &config.getRef<Color>(vars.cBackGround3));
+				ImGui::ColorPicker(XOR("Background color3"), &config.getRef<CfgColor>(vars.cBackGround3));
 				if (ImGui::Button(XOR("Refresh background")))
 					background.init();
 			}

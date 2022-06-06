@@ -123,7 +123,7 @@ public:
 class Nade_t : public Entity_t
 {
 public:
-	float& getSpawnTime();
+	NETVAR_ADDR(float, m_flSpawnTime, "DT_BaseCSGrenadeProjectile", "m_vecExplodeEffectOrigin", 0xC);
 	NETVAR(int, m_hThrower, "DT_BaseCSGrenadeProjectile", "m_hThrower");
 	NETVAR(int, m_nExplodeEffectTickBegin, "DT_BaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin");
 	NETVAR(Vector, m_vecVelocity, "DT_BaseCSGrenadeProjectile", "m_vecVelocity");

@@ -104,8 +104,8 @@ void Radar::run()
 		float middleY = rect.y / 2.0f;
 
 		// triangles representing fov view
-		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX + (int)fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
-		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX - (int)fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
+		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX + fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
+		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX - fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
 
 		// fov lines
 		imRenderWindow.drawLine({ middleX + fovAddon / 2.0f, 0.0f }, { middleX, middleY }, Colors::White);
@@ -155,12 +155,12 @@ void Radar::run()
 			{
 				auto dotThickness = config.get<float>(vars.fRadarThickness);
 
-				auto colLine = config.get<Color>(vars.cRadarLine);
+				CfgColor colLine = config.get<CfgColor>(vars.cRadarLine);
 				imRenderWindow.drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY,
-					game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colLine : colLine.getColorEditAlpha(0.5f));
-				auto colPlayer = config.get<Color>(vars.cRadarPlayer);
+					game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colLine.getColor() : colLine.getColor().getColorEditAlpha(0.5f));
+				CfgColor colPlayer = config.get<CfgColor>(vars.cRadarPlayer);
 				imRenderWindow.drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32,
-					game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colPlayer : colPlayer.getColorEditAlpha(0.5f));
+					game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colPlayer.getColor() : colPlayer.getColor().getColorEditAlpha(0.5f));
 
 			}
 		}

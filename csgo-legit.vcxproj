@@ -168,6 +168,7 @@
     <ClCompile Include="cheats\hooks\setupbones.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
     <ClCompile Include="cheats\menu\x88Menu\x88menu.cpp" />
+    <ClCompile Include="config\cfgcolor.cpp" />
     <ClCompile Include="config\key.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
@@ -316,6 +317,7 @@
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />
+    <ClInclude Include="config\cfgcolor.hpp" />
     <ClInclude Include="config\enums.hpp" />
     <ClInclude Include="config\key.hpp" />
     <ClInclude Include="SDK\CClientEffectRegistration.hpp" />

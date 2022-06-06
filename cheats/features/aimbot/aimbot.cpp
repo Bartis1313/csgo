@@ -70,14 +70,14 @@ void Aimbot::run(CUserCmd* cmd)
 
 void Aimbot::RCS(CUserCmd* cmd)
 {
-    static Vector oldPunch = {};
     const static auto scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"))->getFloat();
-    auto punch = game::localPlayer->m_aimPunchAngle() * scale;
+    static Vector oldPunch = game::localPlayer->m_aimPunchAngle() * scale;
+    Vector punch = game::localPlayer->m_aimPunchAngle() * scale;
 
     punch.x *= config.get<float>(vars.fRCSx) / 100.0f;
     punch.y *= config.get<float>(vars.fRCSy) / 100.0f;
 
-    auto toMove = cmd->m_viewangles += (oldPunch - punch);
+    Vector toMove = cmd->m_viewangles += (oldPunch - punch);
     toMove.clamp();
 
     interfaces::engine->setViewAngles(toMove);
@@ -245,7 +245,7 @@ void Aimbot::drawFov()
 
     float radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
 
-    imRender.drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, config.get<Color>(vars.cDrawFov));
+    imRender.drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, config.get<CfgColor>(vars.cDrawFov).getColor());
 }
 
 bool Aimbot::isClicked(CUserCmd* cmd)

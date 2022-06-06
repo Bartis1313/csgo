@@ -160,10 +160,10 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 
 		if (config.get<bool>(vars.bChamsXQZPlayers))
 		{
-			overrideChams(config.get<int>(vars.iChamsPlayers), true, false, config.get<Color>(vars.cChamsXQZPlayers));
+			overrideChams(config.get<int>(vars.iChamsPlayers), true, false, config.get<CfgColor>(vars.cChamsXQZPlayers).getColor());
 		}
 
-		overrideChams(config.get<int>(vars.iChamsPlayers), false, false, config.get<Color>(vars.cChamsPlayers), true, false);
+		overrideChams(config.get<int>(vars.iChamsPlayers), false, false, config.get<CfgColor>(vars.cChamsPlayers).getColor(), true, false);
 		return;
 
 	}
@@ -187,7 +187,7 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 				return;
 			}
 
-			overrideChams(config.get<int>(vars.iChamsArms), false, false, config.get<Color>(vars.cChamsArms), true, false);
+			overrideChams(config.get<int>(vars.iChamsArms), false, false, config.get<CfgColor>(vars.cChamsArms).getColor(), true, false);
 			return;
 		}
 		else if (name.find(XOR("fists")) == std::string::npos &&
@@ -209,7 +209,7 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 				return;
 			}
 
-			overrideChams(config.get<int>(vars.iChamsWeapons), false, false, config.get<Color>(vars.cChamsWeapons), true, false);
+			overrideChams(config.get<int>(vars.iChamsWeapons), false, false, config.get<CfgColor>(vars.cChamsWeapons).getColor(), true, false);
 			return;
 		}
 	}
@@ -248,7 +248,7 @@ void Chams::drawBackTrack(Player_t* ent)
 			if (!backtrack.isValid(record->at(i).m_simtime))
 				continue;
 
-			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, config.get<Color>(vars.cChamsBacktrack), true, false);
+			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, config.get<CfgColor>(vars.cChamsBacktrack).getColor(), true, false);
 			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
@@ -258,7 +258,7 @@ void Chams::drawBackTrack(Player_t* ent)
 	{
 		if (backtrack.isValid(record->front().m_simtime))
 		{
-			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, config.get<Color>(vars.cChamsBacktrack), true, false);
+			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, config.get<CfgColor>(vars.cChamsBacktrack).getColor(), true, false);
 			CALL(m_result, m_state, m_info, record->back().m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
@@ -280,15 +280,15 @@ void Chams::drawBackTrack(Player_t* ent)
 	}
 	case E2T(BTChamsID::COLOR_CHANGE):
 	{
-		Color fromCfg = config.get<Color>(vars.cChamsBacktrack);
+		CfgColor fromCfg = config.get<CfgColor>(vars.cChamsBacktrack);
 		
 		for (size_t i = 0; i < record->size(); i++)
 		{
 			if (!backtrack.isValid(record->at(i).m_simtime))
 				continue;
 			
-			Color color(fromCfg.r() - (i * (1.0f / record->size())),
-				i * (fromCfg.g() / record->size()), fromCfg.b(), fromCfg.a());
+			Color color(fromCfg.getColor().r() - (i * (1.0f / record->size())),
+				i * (fromCfg.getColor().g() / record->size()), fromCfg.getColor().b(), fromCfg.getColor().a());
 			
 			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, color, true, false);
 			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());

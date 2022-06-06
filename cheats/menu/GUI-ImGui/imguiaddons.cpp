@@ -7,7 +7,7 @@
 #include "../../../dependencies/ImGui/imgui_internal.h"
 #include "../../globals.hpp"
 
-void ImGui::Hotkey(const char* label, Key& key, bool useExtended, const ImVec2& size)
+void ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& size)
 {
     ImGui::PushID(label);
     ImGui::TextUnformatted(label);
@@ -19,14 +19,14 @@ void ImGui::Hotkey(const char* label, Key& key, bool useExtended, const ImVec2& 
         ImGui::Button("...", size);
         ImGui::GetCurrentContext()->ActiveIdAllowOverlap = true;
 
-        if ((!ImGui::IsItemHovered() && ImGui::GetIO().MouseClicked[0]) || key.checkKey())
+        if ((!ImGui::IsItemHovered() && ImGui::GetIO().MouseClicked[0]) || key->checkKey())
         {
             globals::isInHotkey = false;
             ImGui::ClearActiveID();
         }
 
     }
-    else if (ImGui::Button(utilities::getKeyName(key.getKeyCode()).c_str(), size))
+    else if (ImGui::Button(utilities::getKeyName(key->getKeyCode()).c_str(), size))
     {
         globals::isInHotkey = true;
         ImGui::SetActiveID(id, GetCurrentWindow());
@@ -39,11 +39,11 @@ void ImGui::Hotkey(const char* label, Key& key, bool useExtended, const ImVec2& 
             {
                 for (const auto [mode, name] : Key::getKeyPairs())
                 {
-                    bool selected = key.getKeyMode() == mode;
+                    bool selected = key->getKeyMode() == mode;
                     if (ImGui::Selectable(name, &selected))
                     {
                         if (selected)
-                            key.setKeyMode(mode);
+                            key->setKeyMode(mode);
                     }
                 }
 
@@ -75,17 +75,86 @@ void ImGui::HelpMarker(const char* desc)
     }
 }
 
-#include "../../../SDK/Color.hpp"
+#include "../../../config/cfgcolor.hpp"
 
-bool ImGui::ColorPicker(const char* label, Color* clr, const ImGuiColorEditFlags flags)
+bool ImGui::ColorPicker(const char* label, CfgColor* clr)
 {
-    if (std::array c = { clr->r(), clr->g(), clr->b(), clr->a() };
-        ImGui::ColorEdit4(label, c.data(), flags))
+    constexpr auto pickerFlags = ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaBar;
+    constexpr auto pickerButtonFlags = ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_AlphaPreview;
+    constexpr auto paletteButoonFlags = ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip;
+
+    bool toReturn = false;
+
+    static std::array<Color, 32> palette = {};
+    static auto bOnce = [=]()
     {
-        *clr = Color{ c };
+        for (size_t i = 0; auto & el : palette)
+        {
+            ImGui::ColorConvertHSVtoRGB(i / static_cast<float>(palette.size()), 1.0f, 1.0f,
+                el.at(0), el.at(1), el.at(2));
+            el.at(3) = 1.0f;
+
+            i++;
+        }
         return true;
+    } ();
+
+    ImGui::PushID(label);
+    bool openPopup = ImGui::ColorButton("##colbut", ImVec4{ clr->getColor().r(), clr->getColor().g(), clr->getColor().b(), clr->getColor().a() }, pickerButtonFlags);
+
+    // calc spacing dynamically by CalcWordWrapPositionA?
+    ImGui::SameLine(0.0f, 5.0f);
+    ImGui::TextUnformatted(label);
+
+    if (openPopup)
+        ImGui::OpenPopup("##colpop");
+
+    if (ImGui::BeginPopup("##colpop"))
+    {
+        std::array col{ clr->getColor().r(), clr->getColor().g(), clr->getColor().b(), clr->getColor().a() };
+        toReturn = ImGui::ColorPicker4("##colpicker", col.data(), pickerFlags);
+        *clr = CfgColor{ col, clr->getRainbow(), clr->getSpeed() };
+
+        ImGui::SameLine();
+
+        constexpr int seperateLimit = 7;
+        constexpr auto paletteButtonSize = ImVec2{ 20.0f, 20.0f };
+
+        if (ImGui::BeginChild("##colorsaddon", { seperateLimit * paletteButtonSize.x, 0.0f }))
+        {
+            for (size_t i = 0; const auto & el : palette)
+            {
+                ImGui::PushID(i);
+                if ((i % seperateLimit) != 0)
+                    ImGui::SameLine(0.0f, ImGui::GetStyle().ItemSpacing.y);
+
+                if (ImGui::ColorButton("##palette", ImVec4{ el.r(), el.g(), el.b(), el.a() }, paletteButoonFlags, paletteButtonSize))
+                {
+                    *clr = CfgColor{ Color{ el, clr->getColor().a() }, clr->getRainbow(), clr->getSpeed() };
+                    toReturn = true;
+                }
+                ImGui::PopID();
+
+                i++;
+            }
+
+            ImGui::Checkbox("Rainbow mode", &clr->getRainbowRef());
+            if (clr->getRainbow())
+            {
+                ImGui::PushItemWidth(seperateLimit * paletteButtonSize.x);
+                ImGui::SliderFloat("##ranbowspeed", &clr->getSpeedRef(), 0.0f, 15.0f, "Speed %.1f", ImGuiSliderFlags_Logarithmic);
+                ImGui::PopItemWidth();
+            }
+
+            ImGui::EndChild();
+        }
+
+        ImGui::EndPopup();
+
     }
-    return false;
+    ImGui::PopID();
+
+    return toReturn;
 }
 
 static ImVector<ImRect> s_GroupPanelLabelStack;

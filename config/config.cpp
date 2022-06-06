@@ -23,7 +23,7 @@ ConfigType::ConfigType(const Types var, const std::string& name)
 		m_isGoodType = true;
 	else if (std::holds_alternative<std::string>(m_type))
 		m_isGoodType = true;
-	else if (std::holds_alternative<Color>(m_type))
+	else if (std::holds_alternative<CfgColor>(m_type))
 	{
 		m_isGoodType = true;
 		m_isColor = true;
@@ -84,16 +84,18 @@ bool Config::save(const std::string& file, const bool forceSave)
 		{
 			entry[XOR("value")] = var.getRef<std::string>();
 		}
-		else if (std::holds_alternative<Color>(var.getType()))
+		else if (std::holds_alternative<CfgColor>(var.getType()))
 		{
-			auto col = var.get<Color>();
+			auto col = var.get<CfgColor>();
 
 			json arr =
 			{
-				col.r(),
-				col.g(),
-				col.b(),
-				col.a()
+				col.getColor().r(),
+				col.getColor().g(),
+				col.getColor().b(),
+				col.getColor().a(),
+				col.getRainbow(),
+				col.getSpeed()
 			};
 
 			entry[XOR("value")] = arr.dump();
@@ -187,16 +189,20 @@ bool Config::load(const std::string& file)
 		{
 			entry.set(var[XOR("value")].get<std::string>());
 		}
-		else if (std::holds_alternative<Color>(entry.getType()))
+		else if (std::holds_alternative<CfgColor>(entry.getType()))
 		{
 			auto parsed = json::parse(var[XOR("value")].get<std::string>());
 
 			entry.set(
-				Color(
+				CfgColor(
+					Color(
 					parsed.at(0).get<float>(),
 					parsed.at(1).get<float>(),
 					parsed.at(2).get<float>(),
 					parsed.at(3).get<float>()
+					),
+					parsed.at(4).get<bool>(),
+					parsed.at(5).get<float>()
 				)
 			);
 		}

@@ -6,15 +6,15 @@
 #include <iostream>
 
 #include "key.hpp"
+#include "cfgcolor.hpp"
 #include "../utilities/utilities.hpp"
-#include "../SDK/Color.hpp"
 
 class ConfigType
 {
 public:
 	// add possible types to accept
 	using Types = std::variant<bool, int, float,
-		std::string, Color,
+		std::string, CfgColor,
 		std::vector<bool>, Key>;
 
 	ConfigType() = default;

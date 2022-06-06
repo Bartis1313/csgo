@@ -27,6 +27,10 @@ public:
 	{
 		setColor(colArr[0], colArr[1], colArr[2], colArr[3]);
 	}
+	constexpr Color(const Color& col, float alpha)
+	{
+		setColor(col.r(), col.g(), col.b(), alpha);
+	}
 
 	constexpr void setColor(float r, float g, float b, float a = 1.0f) { m_color.at(0) = r; m_color.at(1) = g; m_color.at(2) = b; m_color.at(3) = a; }
 	constexpr void setAlpha(float a) { m_color.at(3) = a; }

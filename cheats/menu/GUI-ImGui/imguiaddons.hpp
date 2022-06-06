@@ -8,17 +8,18 @@
 
 #include "../../../dependencies/ImGui/imgui.h"
 
-class Color;
+class CfgColor;
 class Key;
 using ImGuiColorEditFlags = int;
 
 namespace ImGui
 {
 	// basic hotkey function, that behaves like button.
-	void Hotkey(const char* label, Key& key, bool useExtended = true, const ImVec2& size = { 0.0f, 0.0f });
+	void Hotkey(const char* label, Key* key, bool useExtended = true, const ImVec2& size = { 0.0f, 0.0f });
 	// from demo
 	void HelpMarker(const char* desc);
-	bool ColorPicker(const char* label, Color* clr, const ImGuiColorEditFlags flags = ImGuiColorEditFlags_NoInputs | ImGuiColorEditFlags_NoLabel);
+	// heavily based on code from demo, look "palette" in imgui demo file
+	bool ColorPicker(const char* label, CfgColor* clr);
 
 	// from widgets, https://github.com/ocornut/imgui/issues/1496#issuecomment-569892444
 	void BeginGroupPanel(const char* name, const ImVec2& size = { 0.0f, 0.0f });

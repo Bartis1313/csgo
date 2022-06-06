@@ -27,9 +27,9 @@ void Background::init()
 	m_maxDistLines = config.get<float>(vars.fBackgroundDistance);
 	m_colorArr =
 	{
-		config.get<Color>(vars.cBackGround1),
-		config.get<Color>(vars.cBackGround2),
-		config.get<Color>(vars.cBackGround3)
+		config.get<CfgColor>(vars.cBackGround1).getColor(),
+		config.get<CfgColor>(vars.cBackGround2).getColor(),
+		config.get<CfgColor>(vars.cBackGround3).getColor()
 	};
 
 	pushRandomPoints();

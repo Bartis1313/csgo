@@ -6,6 +6,7 @@
 #include "../../globals.hpp"
 #include "../../../SDK/structs/Entity.hpp"
 #include "../../../SDK/IVEngineClient.hpp"
+#include "../../../SDK/IClientEntityList.hpp"
 #include "../../../config/vars.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
 
@@ -24,8 +25,12 @@ void X88Menu::draw()
 	int x = globals::screenX * 0.2f;
 	int y = 20;
 
+	Player_t* local = nullptr; // game::localPlayer might skip frames and point to invalid
+	if(interfaces::engine->isInGame())
+		local = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
+
 	// start
-	if (!game::isAvailable())
+	if (!local)
 	{
 		surfaceRender.text(x, y, font, XOR("Hello undefined :)"), false, Colors::Yellow);
 		// going to hardcode the padding for this
@@ -34,7 +39,7 @@ void X88Menu::draw()
 	else
 	{
 		surfaceRender.text(x, y, font,
-			FORMAT(XOR("Hello {} :) Local Player {:#0x}"), game::localPlayer->getName(), game::localPlayer->getLiteralAddress()),
+			FORMAT(XOR("Hello {} :) Local Player {:#0x}"), local->getName(), local->getLiteralAddress()),
 			false, Colors::Yellow);
 		y += 15;
 	}

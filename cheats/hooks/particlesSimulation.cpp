@@ -46,8 +46,8 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 		root = root->m_parent;
 
 	std::string_view name = root->m_def.m_obj->m_name.m_buffer;
-	Color colorMolly = config.get<Color>(vars.cEditMolotov);
-	Color colorBlood = config.get<Color>(vars.cEditBlood);
+	CfgColor colorMolly = config.get<CfgColor>(vars.cEditMolotov);
+	CfgColor colorBlood = config.get<CfgColor>(vars.cEditBlood);
 	float smokeAlpha = config.get<float>(vars.fSmokeAlpha);
 
 	if (auto itr = std::find(smokenames.cbegin(), smokenames.cend(), name); itr != smokenames.cend())
@@ -62,7 +62,7 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	{
 		for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
 		{
-			thisPtr->m_particleAttributes.modulateColor(colorBlood, i);
+			thisPtr->m_particleAttributes.modulateColor(colorBlood.getColor(), i);
 		}
 	}
 
@@ -70,7 +70,7 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	{
 		for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
 		{
-			thisPtr->m_particleAttributes.modulateColor(colorMolly, i);
+			thisPtr->m_particleAttributes.modulateColor(colorMolly.getColor(), i);
 		}
 	}
 }

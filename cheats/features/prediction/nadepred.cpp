@@ -711,8 +711,8 @@ void GrenadeWarning::run(Nade_t* entity)
 	m_datas.at(ownerHandle).simulate(
 		entity->m_vecOrigin(),
 		reinterpret_cast<Player_t*>(entity)->m_vecVelocity(),
-		entity->getSpawnTime(),
-		timeToTicks(reinterpret_cast<Player_t*>(entity)->m_flSimulationTime() - entity->getSpawnTime())
+		entity->m_flSpawnTime(),
+		timeToTicks(reinterpret_cast<Player_t*>(entity)->m_flSimulationTime() - entity->m_flSpawnTime())
 	);
 
 	// if no path, then delete this owner from map

@@ -157,13 +157,13 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 	if (!weapon)
 		return;
 
-	Color tex = config.get<Color>(vars.cWeaponText);
+	CfgColor tex = config.get<CfgColor>(vars.cWeaponText);
 
 	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
 	int currentAmmo = weapon->m_iClip1();
 
 	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, FORMAT(XOR("{} {}/{}"),
-		ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo), true, tex);
+		ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo), true, tex.getColor());
 
 	// skip useless trash for calculations
 	if (weapon->isNonAimable())
@@ -191,7 +191,7 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 	}
 
 	imRender.drawRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, newBox.w, 4.0f, Colors::Black);
-	imRender.drawRectFilled(newBox.x, newBox.y, barWidth, 2.0f, config.get<Color>(vars.cReloadbar));
+	imRender.drawRectFilled(newBox.x, newBox.y, barWidth, 2.0f, config.get<CfgColor>(vars.cReloadbar).getColor());
 }
 
 void Visuals::drawInfo(Player_t* ent, const Box& box)
@@ -328,7 +328,7 @@ void Visuals::drawSkeleton(Player_t* ent)
 			continue;
 
 		if (Vector2D start, end; imRender.worldToScreen(parent, start) && imRender.worldToScreen(child, end))
-			imRender.drawLine(start, end, config.get<Color>(vars.cSkeleton));
+			imRender.drawLine(start, end, config.get<CfgColor>(vars.cSkeleton).getColor());
 	}
 }
 
@@ -368,7 +368,7 @@ void Visuals::runDLight(Player_t* ent)
 		return;
 
 	auto dLight = interfaces::efx->clAllocDLight(ent->getIndex());
-	dLight->m_color = config.get<Color>(vars.cDlight);
+	dLight->m_color = config.get<CfgColor>(vars.cDlight).getColor();
 	dLight->m_origin = ent->m_vecOrigin();
 	dLight->m_radius = config.get<float>(vars.fDlightRadius);
 	dLight->m_die = interfaces::globalVars->m_curtime + 0.1f;
@@ -492,79 +492,79 @@ float Visuals::getScaledFontSize(Entity_t* ent, const float division, const floa
 
 void Visuals::drawBox2D(const Box& box)
 {
-	Color cfgCol = config.get<Color>(vars.cBox);
+	CfgColor cfgCol = config.get<CfgColor>(vars.cBox);
 
 	imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Colors::Black);
 	imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Colors::Black);
-	imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol);
+	imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol.getColor());
 }
 
 void Visuals::drawBox2DFilled(const Box& box)
 {
-	Color fill = config.get<Color>(vars.cBoxFill);
+	CfgColor fill = config.get<CfgColor>(vars.cBoxFill);
 
-	imRender.drawRectFilled(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, fill);
+	imRender.drawRectFilled(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, fill.getColor());
 	drawBox2D(box);
 }
 
 void Visuals::drawBox3DFilled(const Box3D& box, const float thickness)
 {
-	Color color = config.get<Color>(vars.cBox);
-	Color fill = config.get<Color>(vars.cBoxFill);
+	CfgColor color = config.get<CfgColor>(vars.cBox);
+	CfgColor fill = config.get<CfgColor>(vars.cBoxFill);
 
-	imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), fill);
+	imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), fill.getColor());
 	// top
-	imRender.drawQuadFilled(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), fill);
+	imRender.drawQuadFilled(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), fill.getColor());
 	// front
-	imRender.drawQuadFilled(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), fill);
+	imRender.drawQuadFilled(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), fill.getColor());
 	// back
-	imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), fill);
+	imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), fill.getColor());
 	// right
-	imRender.drawQuadFilled(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), fill);
+	imRender.drawQuadFilled(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), fill.getColor());
 	// left
-	imRender.drawQuadFilled(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), fill);
+	imRender.drawQuadFilled(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), fill.getColor());
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color, thickness);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
 	}
 	// missing part at the bottom
-	imRender.drawLine(box.points.at(0), box.points.at(3), color, thickness);
+	imRender.drawLine(box.points.at(0), box.points.at(3), color.getColor(), thickness);
 	// top parts
 	for (size_t i = 4; i < 7; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color, thickness);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
 	}
 	// missing part at the top
-	imRender.drawLine(box.points.at(4), box.points.at(7), color, thickness);
+	imRender.drawLine(box.points.at(4), box.points.at(7), color.getColor(), thickness);
 	// now all 4 box.points missing parts for 3d box
 	for (size_t i = 0; i < 4; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color, thickness);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color.getColor(), thickness);
 	}
 }
 
 void Visuals::drawBox3D(const Box3D& box, const float thickness)
 {
-	Color color = config.get<Color>(vars.cBox);
+	CfgColor color = config.get<CfgColor>(vars.cBox);
 
 	for (size_t i = 0; i < 3; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color, thickness);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
 	}
 	// missing part at the bottom
-	imRender.drawLine(box.points.at(0), box.points.at(3), color, thickness);
+	imRender.drawLine(box.points.at(0), box.points.at(3), color.getColor(), thickness);
 	// top parts
 	for (size_t i = 4; i < 7; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color, thickness);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
 	}
 	// missing part at the top
-	imRender.drawLine(box.points.at(4), box.points.at(7), color, thickness);
+	imRender.drawLine(box.points.at(4), box.points.at(7), color.getColor(), thickness);
 	// now all 4 box.points missing parts for 3d box
 	for (size_t i = 0; i < 4; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color, thickness);
+		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color.getColor(), thickness);
 	}
 }
 

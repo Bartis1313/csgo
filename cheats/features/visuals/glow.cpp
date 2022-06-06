@@ -44,7 +44,7 @@ void Glow::run()
 		{
 			if (ent->m_iTeamNum() != game::localPlayer->m_iTeamNum())
 			{
-				glow.set(config.get<Color>(vars.cGlow));
+				glow.set(config.get<CfgColor>(vars.cGlow).getColor());
 				glow.m_fullBloom = false;
 			}
 			break;

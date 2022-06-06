@@ -103,6 +103,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.3.9 - Reback x88 menu, this time with better types detection and code. It also has ability to change config variables by operating on arrow keys.
 * 1.4.0 - After some break, added the grenade warning, lacks of visuals and custom choices of colors etc... No more errors with std::format, small config issue fixed.
 * 1.4.1 - Nade prediction should output given dmg by nade, or inform if inferno is in range. Fonts contain pixel size at the end now. Input system will now only work when: we are not in key hotkey, when vgui console is off, when chat window is off.
+* 1.4.2 - Rainbow colors can be an option from picker, remade color picker + logic in config for color.
 </details>
 
 # Dependencies
