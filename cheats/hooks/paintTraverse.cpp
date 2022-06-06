@@ -44,7 +44,16 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 		return;
 
 	const std::string_view panelName = interfaces::panel->getName(panel);
-	if (panelName == XOR("HudZoom"))
+
+	static unsigned int panelScope = 0;
+	static unsigned int panelID = 0;
+
+	if (!panelScope)
+	{
+		if (panelName == XOR("HudZoom"))
+			panelScope = panel;
+	}
+	else if (panelScope == panel)
 	{
 		if (interfaces::engine->isInGame() && config.get<bool>(vars.bNoScope))
 			return;
@@ -52,7 +61,12 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 
 	original(interfaces::panel, panel, forceRepaint, allowForce);
 
-	if (panelName == XOR("FocusOverlayPanel"))
+	if (!panelID)
+	{
+		if (panelName == XOR("FocusOverlayPanel"))
+			panelID = panel;
+	}
+	else if (panelID == panel)
 	{
 		imRender.addToRender([]()
 			{

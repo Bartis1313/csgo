@@ -123,6 +123,11 @@ static void renderVisuals()
 				ImGui::ColorPicker(XOR("Box color"), &config.getRef<CfgColor>(vars.cBox));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Box color, filled"), &config.getRef<CfgColor>(vars.cBoxFill));
+				if (config.get<int>(vars.iEsp) == E2T(BoxTypes::FILLED2D))
+				{
+					ImGui::Checkbox(XOR("Multi color rect fill"), &config.getRef<bool>(vars.bBoxMultiColor));
+					ImGui::SliderFloat(XOR("Rect fill multigradient speed"), &config.getRef<float>(vars.fBoxMultiColor), 0.0f, 15.0f);
+				}
 				ImGui::Checkbox(XOR("Health"), &config.getRef<bool>(vars.bDrawHealth));
 				ImGui::Checkbox(XOR("Armor"), &config.getRef<bool>(vars.bDrawArmor));
 				ImGui::Checkbox(XOR("Name"), &config.getRef<bool>(vars.bDrawName));

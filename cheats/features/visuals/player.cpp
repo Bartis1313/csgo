@@ -503,7 +503,18 @@ void Visuals::drawBox2DFilled(const Box& box)
 {
 	CfgColor fill = config.get<CfgColor>(vars.cBoxFill);
 
-	imRender.drawRectFilled(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, fill.getColor());
+	if(!config.get<bool>(vars.bBoxMultiColor))
+		imRender.drawRectFilled(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, fill.getColor());
+	else
+	{
+		float speed = config.get<float>(vars.fBoxMultiColor);
+
+		imRender.drawRectMultiColor(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f,
+			Color::rainbowColor(interfaces::globalVars->m_curtime, speed).getColorEditAlpha(fill.getColor().a()),
+			Color::rainbowColor(interfaces::globalVars->m_curtime + 30.0f, speed).getColorEditAlpha(fill.getColor().a()),
+			Color::rainbowColor(interfaces::globalVars->m_curtime + 60.0f, speed).getColorEditAlpha(fill.getColor().a()),
+			Color::rainbowColor(interfaces::globalVars->m_curtime + 90.0f, speed).getColorEditAlpha(fill.getColor().a()));
+	}
 	drawBox2D(box);
 }
 

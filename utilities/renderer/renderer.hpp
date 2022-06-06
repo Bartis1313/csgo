@@ -104,6 +104,7 @@ enum class DrawType : size_t
 	RECT,
 	RECT_FILLED,
 	RECT_GRADIENT,
+	RECT_MULTICOLOR,
 	CIRCLE,
 	CIRCLE_FILLED,
 	CIRCLE_3D,
@@ -160,8 +161,8 @@ struct RectObject_t
 	ImVec2 m_max;
 	ImU32 m_color1; // left up / normal color
 	ImU32 m_color2; // right up
-	ImU32 m_color3; // left bottom
-	ImU32 m_color4; // right bottom
+	ImU32 m_color3; // right bottom
+	ImU32 m_color4; // left bottom
 	ImDrawFlags m_flags;
 	float m_thickness;
 	float m_rounding = 0.0f;
@@ -310,6 +311,8 @@ public:
 	void drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags = 0);
 	void drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
 	void drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0);
+	void drawRectMultiColor(const float x, const float y, const float w, const float h,
+		const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft);
 	void drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness = 1.0f);
 	void drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color);
 	void drawCircle3D(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);

@@ -726,6 +726,13 @@ void ImGuiRender::drawRoundedRectFilled(const float x, const float y, const floa
 	m_drawData.emplace_back(DrawType::RECT_FILLED, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h }, U32(color), rounding, flags)));
 }
 
+void ImGuiRender::drawRectMultiColor(const float x, const float y, const float w, const float h,
+	const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft)
+{
+	m_drawData.emplace_back(DrawType::RECT_MULTICOLOR, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h },
+		U32(colUprLeft), U32(colUprRight), U32(colBotRight), U32(colBotLeft))));
+}
+
 void ImGuiRender::drawBox3D(const Vector& pos, const Vector2D& width, const float height, const Color& color, const float thickness)
 {
 	// dividing to get a centre to world position
@@ -1130,7 +1137,7 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 			draw->AddRectFilled(obj.m_min, obj.m_max, obj.m_color1, obj.m_rounding, obj.m_flags);
 			break;
 		}
-		case DrawType::RECT_GRADIENT: // FIXME: add possibility to draw multicolor gradient
+		case DrawType::RECT_GRADIENT:
 		{
 			const auto& obj = std::any_cast<RectObject_t>(val);
 
@@ -1139,6 +1146,13 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 			else
 				draw->AddRectFilledMultiColor(obj.m_min, obj.m_max, obj.m_color1, obj.m_color1, obj.m_color2, obj.m_color2);
 
+			break;
+		}
+		case DrawType::RECT_MULTICOLOR:
+		{
+			const auto& obj = std::any_cast<RectObject_t>(val);		
+			draw->AddRectFilledMultiColor(obj.m_min, obj.m_max, obj.m_color1, obj.m_color2, obj.m_color3, obj.m_color4);
+			
 			break;
 		}
 		case DrawType::CIRCLE:
