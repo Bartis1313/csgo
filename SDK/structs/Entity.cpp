@@ -77,6 +77,21 @@ bool Entity_t::isBreakable()
 	return false;
 }
 
+bool Entity_t::setupBonesShort(Matrix3x4* _out, int maxBones, int mask, float time)
+{
+	__asm
+	{
+		mov edi, this
+		mov eax, [edi + 0x4]
+		lea ecx, [edi + 0x4]
+		push time
+		push mask
+		push maxBones
+		push _out
+		call dword ptr[eax + 0x34]
+	}
+}
+
 CUtlVector<Matrix3x4> Entity_t::m_CachedBoneData()
 {
 	const static auto offset = *reinterpret_cast<uintptr_t*>(utilities::patternScan(CLIENT_DLL, CACHED_BONE, 0x2)) + 0x4; // 0x2914

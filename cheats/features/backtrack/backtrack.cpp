@@ -165,7 +165,7 @@ void Backtrack::update(int frame)
 		StoredRecord record = {};
 		record.m_origin = entity->absOrigin();
 		record.m_simtime = entity->m_flSimulationTime();
-		if (!entity->setupBones(record.m_matrix.data(), entity->m_CachedBoneData().m_size,
+		if (!entity->setupBonesShort(record.m_matrix.data(), entity->m_CachedBoneData().m_size,
 			BONE_USED_MASK, interfaces::globalVars->m_curtime))
 			continue;
 		record.m_head = record.m_matrix[8].origin();

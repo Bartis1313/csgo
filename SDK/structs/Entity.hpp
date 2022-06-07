@@ -53,6 +53,7 @@ public:
 	VFUNC(bool, isPlayer, ISPLAYER, (), (this));
 	VFUNC(bool, isWeapon, ISWEAPON, (), (this));
 	VFUNC(bool, setupBones, 13, (Matrix3x4* out, int maxBones, int mask, float time), (this + RENDERABLE, out, maxBones, mask, time));
+	bool setupBonesShort(Matrix3x4* out, int maxBones, int mask, float time);
 	VFUNC(Model_t*, getModel, 8, (), (this + RENDERABLE));
 	VFUNC(int, drawModel, 9, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
 	VFUNC(bool, isDormant, 9, (), (this + NETWORKABLE));
