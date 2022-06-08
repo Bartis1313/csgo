@@ -15,82 +15,83 @@
 #include "../../../utilities/console/console.hpp"
 #include "../../../config/vars.hpp"
 
-void Events::init() const
+void Events::add(const std::string_view eventName, const std::function<void(IGameEvent*)>& fun)
 {
-	interfaces::eventManager->addListener(&events, XOR("player_footstep"));
-	interfaces::eventManager->addListener(&events, XOR("player_death"));
-	interfaces::eventManager->addListener(&events, XOR("round_start"));
-	interfaces::eventManager->addListener(&events, XOR("player_hurt"));
-	interfaces::eventManager->addListener(&events, XOR("weapon_fire"));
-	interfaces::eventManager->addListener(&events, XOR("bullet_impact"));
-	interfaces::eventManager->addListener(&events, XOR("bomb_exploded"));
-	interfaces::eventManager->addListener(&events, XOR("bomb_planted"));
+	interfaces::eventManager->addListener(&events, eventName.data());
+	std::function<void(IGameEvent*)> m;
+	m_events.emplace_back(StructEvent_t{ &events, eventName, fun });
+}
+
+void Events::init()
+{
+	add(XOR("player_death"), [](IGameEvent*)
+		{
+			
+		});
+	add(XOR("round_start"), [](IGameEvent*)
+		{
+			globals::shotsFired = 0, globals::shotsHit = 0, globals::shotsHead = 0;
+		});
+	add(XOR("player_hurt"), [](IGameEvent* e)
+		{
+			misc.playHitmarker(e);
+		});
+	add(XOR("weapon_fire"), [](IGameEvent* e)
+		{
+			auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(e->getInt(XOR("userid"))));
+			if (!attacker)
+				return;
+
+			if (attacker == game::localPlayer)
+				globals::shotsFired++;
+		}
+	);
+	add(XOR("bullet_impact"), [](IGameEvent* e)
+		{
+			auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(e->getInt(XOR("userid"))));
+			if (!attacker)
+				return;
+
+			if (attacker != game::localPlayer)
+				return;
+
+			auto local = reinterpret_cast<Player_t*>(attacker);
+
+			float x = e->getFloat(XOR("x"));
+			float y = e->getFloat(XOR("y"));
+			float z = e->getFloat(XOR("z"));
+
+			Vector src = local->getEyePos();
+			Vector dst = { x, y, z };
+
+			world.pushLocalImpacts({ src, dst, interfaces::globalVars->m_curtime + config.get<float>(vars.fDrawLocalSideImpacts) });
+			misc.drawBulletTracer(src, dst);
+		});
+	add(XOR("bomb_exploded"), [](IGameEvent*)
+		{
+			world.m_bombEnt = nullptr;
+		});
+	add(XOR("bomb_planted"), [](IGameEvent* e)
+		{
+			auto who = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(e->getInt(XOR("userid")))));
+			if (!who)
+				return;
+
+			world.m_whoPlanted = who->getName();
+		});
+
 	console.log(TypeLogs::LOG_INFO, XOR("events init"));
 }
 
 void Events::FireGameEvent(IGameEvent* event)
 {
-	// todo: run map std::map<string, std::function> so there is no if else if mess
-
-	if (std::string_view name = event->getName(); name == XOR("player_footstep"))
+	if (auto it = std::find_if(m_events.cbegin(), m_events.cend(), [name = event->getName()](const StructEvent_t& el)
 	{
-		visuals.drawSound(event);
-	}
-	else if (name == XOR("player_death"))
+		return el.m_name == name;
+	}); it != m_events.cend())
 	{
-		// testing
-		interfaces::cvar->consolePrintf("Died\n");
+		it->m_fun(event);
 	}
-	else if (name == XOR("game_start"))
-	{
-		globals::shotsFired = 0, globals::shotsHit = 0, globals::shotsHead = 0;
-	}
-	else if (name == XOR("player_hurt"))
-	{
-		misc.playHitmarker(event);
-	}
-	else if (name == XOR("weapon_fire"))
-	{
-		// here just check like that
-		auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
-		if (!attacker)
-			return;
-
-		if (attacker == game::localPlayer)
-			globals::shotsFired++;
-	}
-	else if (name == XOR("bullet_impact"))
-	{
-		auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
-		if (!attacker)
-			return;
-
-		if (attacker != game::localPlayer)
-			return;
-
-		auto local = reinterpret_cast<Player_t*>(attacker);
-
-		float x = event->getFloat(XOR("x"));
-		float y = event->getFloat(XOR("y"));
-		float z = event->getFloat(XOR("z"));
-
-		Vector src = local->getEyePos();
-		Vector dst = { x, y, z };
-
-		world.pushLocalImpacts({ src, dst, interfaces::globalVars->m_curtime + config.get<float>(vars.fDrawLocalSideImpacts) });
-		misc.drawBulletTracer(src, dst);
-	}
-	else if (name == XOR("bomb_exploded")) // workaround
-		world.m_bombEnt = nullptr;
-	else if (name == XOR("bomb_planted")) // the field of class is changed only when planted so everytime we get correct info
-	{
-		auto who = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
-		if (!who)
-			return;
-
-		world.m_whoPlanted = who->getName();
-	}
-
 }
 
 void Events::shutdown() const
