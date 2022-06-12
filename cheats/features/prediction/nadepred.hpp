@@ -56,7 +56,7 @@ private:
 		{}
 
 		void simulate(const Vector& pos, const Vector& velocity, float nadeThrowTime, int ticks);
-		bool draw(Entity_t* entity);
+		bool draw(Entity_t* entity, WeaponIndex idx);
 	private:
 		void destroyTrace();
 		void push();

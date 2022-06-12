@@ -346,10 +346,23 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Nade pred"), &naderef);
 				if (naderef)
 				{
-					ImGui::SameLine();
 					ImGui::Checkbox(XOR("Show always"), &config.getRef<bool>(vars.bNadePredAlways));
+					ImGui::SameLine();
+					ImGui::ColorPicker(XOR("Nade pred color"), &config.getRef<CfgColor>(vars.cNadePredColor));
+					ImGui::ColorPicker(XOR("Nade pred color box fill"), &config.getRef<CfgColor>(vars.cNadeBoxColorFill));
+					ImGui::SameLine();
+					ImGui::ColorPicker(XOR("Nade pred color box outline"), &config.getRef<CfgColor>(vars.cNadeBoxColorOutline));
 				}
-				ImGui::Checkbox(XOR("Nade trails"), &config.getRef<bool>(vars.bNadeTracer));
+				bool& trailref = config.getRef<bool>(vars.bNadeTracer);
+				ImGui::Checkbox(XOR("Nade trails"), &trailref);
+				if (trailref)
+				{
+					ImGui::ColorPicker(XOR("Nade trail color"), &config.getRef<CfgColor>(vars.cNadeTracer));
+					ImGui::SliderFloat(XOR("Nade trail max dist"), &config.getRef<float>(vars.fNadeTracerMaxDist), 1.0f, 100.0f);
+					ImGui::Checkbox(XOR("Nade trail warn"), &config.getRef<bool>(vars.bNadeTracerWarn));
+					ImGui::SameLine();
+					ImGui::HelpMarker(XOR("Draws scaled circles behind you where nade is"));
+				}
 				bool& tref = config.getRef<bool>(vars.bRunMovementTrail);
 				ImGui::Checkbox(XOR("Movement trail"), &tref);
 				if (tref)

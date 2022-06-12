@@ -141,13 +141,13 @@ struct Variables
 
 
 	// MASTER SWITCHES
-	
+
 	CONFIG_ADD_VARIABLE(bool, bMenuOpenedx88, true, "x88 menu enabled");
 	CONFIG_ADD_VARIABLE(std::string, sLoadName, "default.cfg", "config to load (you only care for this in default cfg)");
 	CONFIG_ADD_VARIABLE(Key, kMenu, Key(KeyMode::TOGGLE, VK_INSERT), "key for imgui menu");
 	CONFIG_ADD_VARIABLE(Key, kPanic, Key(KeyMode::DOWN, VK_DELETE), "key for shutdown");
 	CONFIG_ADD_VARIABLE(Key, kConsoleLog, Key(KeyMode::TOGGLE, VK_HOME), "key for log console");
-	
+
 
 	// MISC
 
@@ -192,6 +192,9 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fMovementLife, 4.0f, "life of beam movement");
 	CONFIG_ADD_VARIABLE(bool, bNadePred, false, "nade prediction trace");
 	CONFIG_ADD_VARIABLE(bool, bNadePredAlways, false, "nade prediction will show line even if not throwing nade");
+	CONFIG_ADD_VARIABLE(Color, cNadePredColor, Colors::LightBlue, "nade prediction line color");
+	CONFIG_ADD_VARIABLE(Color, cNadeBoxColorFill, Colors::Green, "nade prediction cube fill color");
+	CONFIG_ADD_VARIABLE(Color, cNadeBoxColorOutline, Colors::Green, "nade prediction cube outline color");
 	CONFIG_ADD_VARIABLE(bool, bHat, false, "draw a cone on local player's head");
 	CONFIG_ADD_VARIABLE(bool, bHatRainbow, false, "is hat a rainbow");
 	CONFIG_ADD_VARIABLE(float, fHatSpeed, 3.0f, "rainbow hat speed");
@@ -204,9 +207,12 @@ struct Variables
 	CONFIG_ADD_VARIABLE(CfgColor, cFps, Colors::White, "color fps line");
 	CONFIG_ADD_VARIABLE(float, fFPSCap, false, "FPS value for plot (in game)");
 	CONFIG_ADD_VARIABLE(bool, bFPSCustom, false, "helper window for fps");
-	CONFIG_ADD_VARIABLE(bool, bVelocityCustom, false , "helper window for velocity");
-	CONFIG_ADD_VARIABLE(bool, bRemoveBloodSpray, false , "[DEPRECATED] remove blood spray");
-	CONFIG_ADD_VARIABLE(bool, bNadeTracer, false , "run nade tracer");
+	CONFIG_ADD_VARIABLE(bool, bVelocityCustom, false, "helper window for velocity");
+	CONFIG_ADD_VARIABLE(bool, bRemoveBloodSpray, false, "[DEPRECATED] remove blood spray");
+	CONFIG_ADD_VARIABLE(bool, bNadeTracer, false, "run nade tracer");
+	CONFIG_ADD_VARIABLE(Color, cNadeTracer, Colors::LightBlue, "nade tracer color");
+	CONFIG_ADD_VARIABLE(float, fNadeTracerMaxDist, 30.0f, "max meters for nade tracer");
+	CONFIG_ADD_VARIABLE(bool, bNadeTracerWarn, false, "run nade tracer warning");
 
 	// STYLING
 

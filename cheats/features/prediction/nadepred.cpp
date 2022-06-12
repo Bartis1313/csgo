@@ -180,18 +180,17 @@ void GrenadePrediction::draw()
 		}
 	}
 
-	Vector prev = m_path.front();
-	for (const auto& el : m_path)
+	for (Vector prev = m_path.front(); const auto& el : m_path)
 	{
 		if (Vector2D start, end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
-			imRender.drawLine(start, end, Colors::LightBlue, 2.0f);
+			imRender.drawLine(start, end, config.get<CfgColor>(vars.cNadePredColor).getColor(), 2.0f);
 
 		prev = el;
 	}
 
 	for (const auto& el : m_bounces)
 	{
-		imRender.drawBox3DFilled(el, { 2.0f, 2.0f }, 2.0f, Colors::Green, Colors::Green);
+		imRender.drawBox3DFilled(el, { 2.0f, 2.0f }, 2.0f, config.get<CfgColor>(vars.cNadeBoxColorOutline).getColor(), config.get<CfgColor>(vars.cNadeBoxColorFill).getColor());
 	}
 
 	for (const auto& [pos, text, color] : nadesDmg)
@@ -637,24 +636,76 @@ WeaponIndex GrenadeWarning::getIndexByClass(int idx)
 	return WEAPON_NONE;
 }
 
-bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity)
+bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 {
 	if (m_path.empty())
 		return false;
 
-	Vector prev = m_path.front();
 	Vector2D start; // need access outside
-	for (const auto& el : m_path)
+	if (float dist = m_path.back().distToMeters(game::localPlayer->absOrigin()); dist > config.get<float>(vars.fNadeTracerMaxDist))
+		return false;
+
+	for (Vector prev = m_path.front(); const auto& el : m_path)
 	{
 		if (Vector2D end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
-			imRender.drawLine(start, end, Colors::LightBlue, 2.0f);
+			imRender.drawLine(start, end, config.get<CfgColor>(vars.cNadeTracer).getColor(), 2.0f);
 
 		prev = el;
 	}
 
-	/*float scale = ((m_nadeEndTime - interfaces::globalVars->m_curtime) / ticksToTime(m_tick));
+	// from visuals, but not gonna use current ent pos for better look
+	auto scaledFont = [=](const float division = 80.0f, const float min = 12.0f, const float max = 30.0f)
+	{
+		float dist = m_path.back().distTo(game::localPlayer->absOrigin());
+		float fontSize = std::clamp(division / (dist / division), min, max);
+		return fontSize;
+	};
 
-	imRender.drawProgressRing(start.x, start.y, 20, 32, -90, scale, 4.0f, Colors::Green);*/
+	float scale = ((m_nadeEndTime - interfaces::globalVars->m_curtime) / ticksToTime(m_tick));
+	float rad = scaledFont();
+	
+	imRender.drawCircleFilled(start.x, start.y, rad, 32, Colors::Black);
+	imRender.drawProgressRing(start.x, start.y, rad, 32, -90, scale, 3.0f, Colors::Green);
+
+	auto name = utilities::u8toStr(reinterpret_cast<Weapon_t*>(entity)->getIcon(idx));
+	auto size = ImFonts::icon->CalcTextSizeA(rad + 5.0f, std::numeric_limits<float>::max(), 0.0f, name.c_str());
+	imRender.text(start.x, start.y - (size.y / 2.0f), rad + 5.0f, ImFonts::icon, name, true, Colors::White, false);
+
+	auto rotatePoint2D = [](const Vector2D& source, const Vector2D& dest, float rotateAngle)
+	{
+		const auto delta = dest - source;
+
+		Vector2D pointRotation
+		{
+			delta.x * std::sin(rotateAngle) - delta.y * std::cos(rotateAngle),
+			delta.x * std::cos(rotateAngle) + delta.y * std::sin(rotateAngle)
+		};
+
+		return source + pointRotation;
+	};
+
+	Vector2D uselessVec;
+	if (config.get<bool>(vars.bNadeTracerWarn) && !imRender.worldToScreen(m_pos, uselessVec))
+	{
+		const auto centre = Vector2D{ globals::screenX / 2.0f, globals::screenY / 2.0f };
+
+		Vector localViewAngle;
+		interfaces::engine->getViewAngles(localViewAngle);
+		const auto& localPos = game::localPlayer->absOrigin();
+		const auto angleToNade = math::calcAngleRelative(localPos, m_pos, localViewAngle);
+
+		auto screenPosition = centre;
+		screenPosition.x -= std::clamp(localPos.distTo(m_pos), 120.0f, centre.y - 12.0f); // 12.0f - min size possible here so wanna clip it
+
+		const auto pos = rotatePoint2D(centre, screenPosition, DEG2RAD(angleToNade.y));
+
+		imRender.drawCircleFilled(pos.x, pos.y, rad, 32, Colors::Black);
+		imRender.drawProgressRing(pos.x, pos.y, rad, 32, -90.0f, scale, 3.0f, Colors::Green);
+
+		auto name = utilities::u8toStr(reinterpret_cast<Weapon_t*>(entity)->getIcon(idx));
+		auto size = ImFonts::icon->CalcTextSizeA(rad + 5.0f, std::numeric_limits<float>::max(), 0.0f, name.c_str()); 
+		imRender.text(pos.x, pos.y - (size.y / 2.0f), rad + 5.0f, ImFonts::icon, name, true, Colors::White, false);
+	}
 
 	return true;
 }
@@ -716,6 +767,6 @@ void GrenadeWarning::run(Nade_t* entity)
 	);
 
 	// if no path, then delete this owner from map
-	if (!m_datas.at(ownerHandle).draw(entity))
+	if (!m_datas.at(ownerHandle).draw(entity, idx))
 		m_datas.erase(ownerHandle);
 }

@@ -90,7 +90,7 @@ public:
 	VFUNC(WeaponInfo*, getWpnInfo, WEAPONINFO, (), (this));
 
 	_NODISCARD std::string getWpnName();
-	_NODISCARD std::u8string getIcon();
+	_NODISCARD std::u8string getIcon(int correctIndex = -1);
 
 	_NODISCARD bool isEmpty() { return m_iClip1() <= 0; }
 	_NODISCARD bool isRifle();

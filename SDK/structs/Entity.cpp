@@ -190,11 +190,11 @@ std::string Weapon_t::getWpnName()
 	}
 }
 
-std::u8string Weapon_t::getIcon()
+std::u8string Weapon_t::getIcon(int correctIndex)
 {
 	// 0xE000 - start = WEAPON_NONE
 
-	switch (this->m_iItemDefinitionIndex())
+	switch (auto idx = correctIndex != -1 ? correctIndex : this->m_iItemDefinitionIndex(); idx)
 	{
 	case WEAPON_DEAGLE:					return u8"\uE001";
 	case WEAPON_ELITE:					return u8"\uE002";
