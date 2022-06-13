@@ -38,7 +38,7 @@ This is a trianing software. No further actions taken by people are heeded.
  * Engine prediction - useful to never skip tick and get correct server time.
  * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records.
  * Glow - highlight ents (rebuild needed - more ents, not only player).
- * Sound Esp - (rebuild needed - implement this).
+ * Sound Esp
  * Esp - name, flags, boxes, health, armor, ammo, skeleton.
  * DLight - highlights player by dlight
  * Enemy aiming at you warn
