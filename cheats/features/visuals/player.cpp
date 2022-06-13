@@ -59,6 +59,7 @@ void Visuals::run()
 			drawSkeleton(entity);
 			runDLight(entity);
 			drawLaser(entity);
+			drawSound(entity);
 		};
 
 		if (drawDead)
@@ -412,26 +413,103 @@ void Visuals::drawPlayer(Player_t* ent)
 	drawnName(ent, box);
 }
 
-// add this to events manager 
-void Visuals::drawSound(IGameEvent* event)
+void Visuals::pushStep(const StepData_t& step)
+{
+	m_steps.at(step.m_player->getIndex()).push_back(step);
+}
+
+void Visuals::drawSound(Entity_t* entity)
 {
 	if (!config.get<bool>(vars.bSoundEsp))
 		return;
 
-	auto userid = interfaces::engine->getPlayerID(event->getInt(XOR("userid")));
+	int index = entity->getIndex();
 
-	auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(userid));
+	int x = globals::screenX / 2.0f;
+	int y = globals::screenY / 2.0f;
+	float maxDist = config.get<float>(vars.fStepMaxDist);
+	float maxDistLine = config.get<float>(vars.fStepMaxLineDist);
+	static StepData_t bestStep;
 
-	if (!entity)
-		return;
+	for (size_t i = 0; const auto & el : m_steps.at(index))
+	{
+		float diff = el.m_expire - interfaces::globalVars->m_curtime;
 
-	if (!entity->isPlayer())
-		return;
+		if (diff < 0.0f)
+		{
+			m_steps.at(index).erase(m_steps.at(index).begin() + i);
+			continue;
+		}
 
-	if (!entity->isAlive())
-		return;
+		Vector2D elPos;
+		if (!imRender.worldToScreen(el.m_pos, elPos))
+			continue;
 
-	return; // FIXME: add esp records in vector. Use simple logic of storing records in some struct
+		//float scale = diff / config.get<float>(vars.fStepTime); // ratio
+		float alpha = (maxDist - el.m_pos.distToMeters(game::localPlayer->absOrigin())) / maxDist; // alpha fading per distance
+		if (alpha < 0.1f)
+			continue;
+
+		if (constexpr float maxDiff = 1.0f; diff < maxDiff) // fading effect
+			alpha = (diff / maxDiff) * alpha;
+
+		// again same thing, I don't want to use ent origin but current pos
+		auto scaledFont = [=](const float division = 80.0f, const float min = 12.0f, const float max = 30.0f)
+		{
+			float dist = el.m_pos.distTo(game::localPlayer->absOrigin());
+			float fontSize = std::clamp(division / (dist / division), min, max);
+			return fontSize;
+		};
+
+		float rad = scaledFont(50.0f, 3.0f, 8.0f);
+		imRender.drawCircleFilled(elPos.x, elPos.y, rad, 32.0f,
+			config.get<CfgColor>(vars.cSoundEsp).getColor().getColorEditAlpha(alpha));
+
+		float distFromMiddle = std::round(std::sqrt((elPos.x - x) * (elPos.x - x) + (elPos.y - y) * (elPos.y - y)));
+
+		if (distFromMiddle < maxDistLine)
+		{
+			if (!bestStep.m_player || distFromMiddle < bestStep.m_maxPixels)
+			{
+				bestStep.m_player = el.m_player;
+				bestStep.m_pos = el.m_pos;
+				bestStep.m_timeToPrint = diff;
+				bestStep.m_maxPixels = distFromMiddle;
+				// better not
+				/*bestStep.m_fontSize = scaledFont(50.0f, 10.0f, 18.0f);*/
+			}
+		}
+
+		i++;
+	}
+
+	if (bestStep.m_player)
+	{
+		if (Vector2D pos; imRender.worldToScreen(bestStep.m_pos, pos))
+		{
+			std::string_view place = bestStep.m_player->m_szLastPlaceName();
+			if (place.empty())
+				place = XOR("Unknown");
+			std::string nameText = FORMAT(XOR("{} -> {} [{:.1f}m]"), bestStep.m_player->getName(),
+				place, game::localPlayer->absOrigin().distToMeters(bestStep.m_pos));
+			std::string timeText = FORMAT(XOR("Time left {:.1f}s"), bestStep.m_timeToPrint);
+
+			x = globals::screenX / 2.5f;
+
+			float textSize = std::max(
+				imRender.getTextSize(ImFonts::tahoma14, timeText).x,
+				imRender.getTextSize(ImFonts::tahoma14, nameText).x);
+
+			static float fontSize = ImFonts::tahoma14->FontSize + 2.0f;
+
+			imRender.text(x, y, ImFonts::tahoma14, timeText, false, Colors::White);
+			imRender.text(x, y - fontSize, ImFonts::tahoma14, nameText, false, Colors::White);
+			imRender.drawLine(x, y, x + textSize, y, config.get<CfgColor>(vars.cStepLine).getColor());
+			imRender.drawLine(x + textSize, y, pos.x, pos.y, config.get<CfgColor>(vars.cStepLine).getColor());
+		}
+
+		bestStep.m_player = nullptr;
+	}
 }
 
 Color Visuals::healthBased(Player_t* ent)

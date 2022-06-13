@@ -134,6 +134,18 @@ static void renderVisuals()
 				ImGui::Checkbox(XOR("Skeleton"), &config.getRef<bool>(vars.bDrawSkeleton));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Skeleton color"), &config.getRef<CfgColor>(vars.cSkeleton));
+				bool& soundref = config.getRef<bool>(vars.bSoundEsp);
+				ImGui::Checkbox(XOR("Sound ESP"), &soundref);
+				if (soundref)
+				{
+					ImGui::ColorPicker(XOR("Circles color"), &config.getRef<CfgColor>(vars.cSoundEsp));
+					ImGui::SliderFloat(XOR("Step time"), &config.getRef<float>(vars.fStepTime), 1.0f, 20.0f);
+					ImGui::SliderFloat(XOR("Step max distance"), &config.getRef<float>(vars.fStepMaxDist), 5.0f, 500.0f);
+					ImGui::SliderFloat(XOR("Lines info distance"), &config.getRef<float>(vars.fStepMaxLineDist), 2.0f, 200.0f);
+					ImGui::SameLine();
+					ImGui::HelpMarker(XOR("Max pixels to decide to draw info from centre of screen to the best point"));
+					ImGui::ColorPicker(XOR("Lines info color"), &config.getRef<CfgColor>(vars.cStepLine));
+				}
 				ImGui::Checkbox(XOR("Dlight"), &config.getRef<bool>(vars.bDLight));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Dlight color"), &config.getRef<CfgColor>(vars.cDlight));
@@ -277,7 +289,6 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Zeus party"), &config.getRef<bool>(vars.bZeusPartyMode));
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("Zeus tracing"), &config.getRef<bool>(vars.bZeusUseTracing));
-				ImGui::Checkbox(XOR("Sound ESP"), &config.getRef<bool>(vars.bSoundEsp));
 				ImGui::SliderFloat(XOR("FOV local"), &config.getRef<float>(vars.fFOV), -50.0f, 50.0f);
 				ImGui::Checkbox(XOR("Third Person"), &config.getRef<bool>(vars.bThirdp));
 				ImGui::SameLine();

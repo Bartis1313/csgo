@@ -43,6 +43,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Key, kAimbotKey, Key(KeyMode::DOWN, VK_LBUTTON), "aimbot key");
 
 	// VISUALS
+
 	CONFIG_ADD_VARIABLE(bool, bChams, false, "chams enabled");
 	CONFIG_ADD_VARIABLE(bool, bChamsPlayers, false, "chams enabled player");
 	CONFIG_ADD_VARIABLE(int, iChamsPlayers, 0, "chams mode Players");
@@ -92,6 +93,12 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bDrawDropped, false, "draw dropped weapons");
 	CONFIG_ADD_VARIABLE(CfgColor, cDrawDropped, Colors::White, "draw dropped weapons color");
 	CONFIG_ADD_VEC(bool, vDroppedFlags, E2T(DroppedFlags::FLAGS_SIZE), false, "Esp dropped flags");
+	CONFIG_ADD_VARIABLE(bool, bSoundEsp, false, "sound esp enabled");
+	CONFIG_ADD_VARIABLE(Color, cSoundEsp, Colors::LightBlue, "sound esp color");
+	CONFIG_ADD_VARIABLE(float, fStepTime, 10.0f, "max step time");
+	CONFIG_ADD_VARIABLE(float, fStepMaxDist, 50.0f, "max distance of steps");
+	CONFIG_ADD_VARIABLE(float, fStepMaxLineDist, 80.0f, "max distance of line draw with info");
+	CONFIG_ADD_VARIABLE(Color, cStepLine, Colors::White, "step line info color");
 
 
 	// WORLD
@@ -151,7 +158,6 @@ struct Variables
 
 	// MISC
 
-	CONFIG_ADD_VARIABLE(bool, bSoundEsp, false, "sound esp enabled");
 	CONFIG_ADD_VARIABLE(float, fFOV, 0, "fov for +/- view");
 	CONFIG_ADD_VARIABLE(bool, bThirdp, false, "third person enabled");
 	CONFIG_ADD_VARIABLE(Key, kThirdp, Key(KeyMode::TOGGLE, 0x56), "third person key");

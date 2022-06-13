@@ -105,6 +105,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.4.1 - Nade prediction should output given dmg by nade, or inform if inferno is in range. Fonts contain pixel size at the end now. Input system will now only work when: we are not in key hotkey, when vgui console is off, when chat window is off.
 * 1.4.2 - Rainbow colors can be an option from picker, remade color picker + logic in config for color.
 * 1.4.3 - Finish nade prediction at all, warning for tracers will be scaled with distance to the nade.
+* 1.4.4 - Sound esp is done. Credits to the guy who had the idea with this. Scaling included for sound circles.
 </details>
 
 # Dependencies

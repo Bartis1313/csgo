@@ -27,15 +27,18 @@ void Events::init()
 	add(XOR("player_death"), [](IGameEvent*)
 		{
 			
-		});
+		}
+	);
 	add(XOR("round_start"), [](IGameEvent*)
 		{
 			globals::shotsFired = 0, globals::shotsHit = 0, globals::shotsHead = 0;
-		});
+		}
+	);
 	add(XOR("player_hurt"), [](IGameEvent* e)
 		{
 			misc.playHitmarker(e);
-		});
+		}
+	);
 	add(XOR("weapon_fire"), [](IGameEvent* e)
 		{
 			auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(e->getInt(XOR("userid"))));
@@ -66,11 +69,13 @@ void Events::init()
 
 			world.pushLocalImpacts({ src, dst, interfaces::globalVars->m_curtime + config.get<float>(vars.fDrawLocalSideImpacts) });
 			misc.drawBulletTracer(src, dst);
-		});
+		}
+	);
 	add(XOR("bomb_exploded"), [](IGameEvent*)
 		{
 			world.m_bombEnt = nullptr;
-		});
+		}
+	);
 	add(XOR("bomb_planted"), [](IGameEvent* e)
 		{
 			auto who = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(e->getInt(XOR("userid")))));
@@ -78,7 +83,23 @@ void Events::init()
 				return;
 
 			world.m_whoPlanted = who->getName();
-		});
+		}
+	);
+	add(XOR("player_footstep"), [](IGameEvent* e)
+		{
+			auto who = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(e->getInt(XOR("userid")))));
+			if (!who)
+				return;
+
+			if (!who->isPlayer())
+				return;
+
+			if (who->isDormant())
+				return;
+
+			visuals.pushStep(Visuals::StepData_t{ who, who->absOrigin(), interfaces::globalVars->m_curtime + config.get<float>(vars.fStepTime) });
+		}
+	);
 
 	console.log(TypeLogs::LOG_INFO, XOR("events init"));
 }

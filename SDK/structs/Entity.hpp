@@ -185,6 +185,7 @@ public:
 	NETVAR(unsigned long, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget");
 	NETVAR(int, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
 	NETVAR(int, m_iAccount, "DT_CSPlayer", "m_iAccount");
+	PTRNETVAR(const char, m_szLastPlaceName, "DT_BasePlayer", "m_szLastPlaceName");
 
 	void setAbsOrigin(const Vector& origin);
 	_NODISCARD Weapon_t* getActiveWeapon();
