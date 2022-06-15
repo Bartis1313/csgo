@@ -7,16 +7,16 @@ class Entity_t;
 
 struct BeamInfo_t
 {
-	int	m_type;
+	int m_type;
 	Entity_t* m_startEnt;
-	int	m_startAttachment;
+	int m_startAttachment;
 	Entity_t* m_endEnt;
-	int	m_EndAttachment;
+	int m_EndAttachment;
 	Vector m_vecStart;
 	Vector m_vecEnd;
-	int	m_modelIndex;
+	int m_modelIndex;
 	const char* m_modelName;
-	int	m_haloIndex;
+	int m_haloIndex;
 	const char* m_haloName;
 	float m_haloScale;
 	float m_life;
@@ -26,14 +26,14 @@ struct BeamInfo_t
 	float m_amplitude;
 	float m_brightness;
 	float m_speed;
-	int	m_startFrame;
+	int m_startFrame;
 	float m_frameRate;
 	float m_red;
 	float m_green;
 	float m_blue;
 	bool m_renderable;
-	int	m_segments;
-	int	m_flags;
+	int m_segments;
+	int m_flags;
 	Vector m_vecCenter;
 	float m_startRadius;
 	float m_endRadius;

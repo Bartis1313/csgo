@@ -32,7 +32,7 @@ private:
 		uint8_t r, g, b;
 	};
 public:
-	int	m_flags;
+	int m_flags;
 	Vector m_origin;
 	float m_radius;
 	DColor m_color;
@@ -40,8 +40,8 @@ public:
 	float m_die;
 	float m_decay;
 	float m_minlight;
-	int	m_key;
-	int	m_style;
+	int m_key;
+	int m_style;
 	Vector m_direction;
 	float m_innerAngle;
 	float m_outerAngle;

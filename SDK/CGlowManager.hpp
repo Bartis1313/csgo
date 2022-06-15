@@ -1,18 +1,18 @@
 #pragma once
+
 #include "Color.hpp"
-#include "math/Vector.hpp"
 #include "../utilities/pad.hpp"
 
 class CGlowObject_t
 {
 public:
-	void set(const Color& color)
+	void set(const Color& color, bool occluded = true, bool unocculuded = false, bool fullBloom = false, float amount = 1.0f)
 	{
-		rgb = Vector(color.r(), color.g(), color.b());
-		a = color.a();
-		m_occluded = true;
-		m_unoccluded = false;
-		m_bloomAmount = 1.0f;
+		m_color = color;
+		m_occluded = occluded;
+		m_unoccluded = unocculuded;
+		m_fullBloom = fullBloom;
+		m_bloomAmount = amount;
 	}
 	bool unused()
 	{
@@ -21,8 +21,7 @@ public:
 
 	int m_nextFree;
 	void* m_entity;
-	Vector rgb;
-	float a;
+	Color m_color;
 	PAD(8);
 	float m_bloomAmount;
 	PAD(4);

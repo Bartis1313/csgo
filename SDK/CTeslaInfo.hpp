@@ -8,7 +8,7 @@ class CTeslaInfo
 public:
 	Vector m_pos;
 	Vector m_angles;
-	int	m_entIndex;
+	int m_entIndex;
 	const char* m_spriteName;
 	float m_beamWidth;
 	int m_beams;
