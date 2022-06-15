@@ -415,6 +415,9 @@ void Visuals::drawPlayer(Player_t* ent)
 
 void Visuals::pushStep(const StepData_t& step)
 {
+	if (!config.get<bool>(vars.bSoundEsp))
+		return;
+
 	m_steps.at(step.m_player->getIndex()).push_back(step);
 }
 

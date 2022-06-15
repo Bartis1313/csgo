@@ -30,7 +30,7 @@ public:
 	void drawMovementTrail();
 	void clientSideImpacts();
 	void localImpacts();
-	void pushLocalImpacts(const hitStructLocal_t& hit) { m_hitsLocal.push_back(hit); }
+	void pushLocalImpacts(const hitStructLocal_t& hit);
 	void removeBloodSpray(int frame);
 	void removeSmoke(int frame);
 	void drawCustomSmoke(const Vector& pos, float radius, float angl);

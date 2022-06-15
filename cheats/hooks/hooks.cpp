@@ -67,6 +67,7 @@ void hooks::init()
 #pragma region DX9
 	const auto resetTarget = vfunc::getVFunc(interfaces::dx9Device, reset::index);
 	const auto presentTagret = vfunc::getVFunc(interfaces::dx9Device, present::index);
+	const auto drawIndexP = vfunc::getVFunc(interfaces::dx9Device, drawIndexedPrimitive::index);
 	//const auto endTarget = vfunc::getVFunc(interfaces::dx9Device, endScene::index);
 #pragma endregion
 
@@ -90,6 +91,7 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(getColorModulationTarget, getColorModulation);
 	HOOK_SAFE(resetTarget, reset);
 	HOOK_SAFE(presentTagret, present);
+	HOOK_SAFE(drawIndexP, drawIndexedPrimitive);
 	HOOK_SAFE(lockCursorTarget, lockCursor);
 	HOOK_SAFE(extraBonesProccessingTarget, doExtraBonesProcessing);
 	HOOK_SAFE(buildTrTarget, buildTransformations);

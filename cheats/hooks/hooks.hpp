@@ -15,7 +15,8 @@ enum hookIndexes
 	PRESENTDX = 17,
 	PROXY_MOVE = 22,
 	END_SCENE = 42,
-	SV_CHEATS = 13
+	SV_CHEATS = 13,
+	DRAW_IDX_PRIMITIVE = 82,
 };
 
 class IPanel;
@@ -139,6 +140,14 @@ namespace hooks
 		static long __stdcall hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region);
 		inline static fn original = nullptr;
 		static const int index = PRESENTDX;
+	};
+
+	struct drawIndexedPrimitive
+	{
+		using fn = long(__stdcall*)(IDirect3DDevice9*, D3DPRIMITIVETYPE, INT, UINT, UINT, UINT, UINT);
+		static long __stdcall hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex, UINT numVertices, UINT startIndex, UINT primCount);
+		inline static fn original = nullptr;
+		static const int index = DRAW_IDX_PRIMITIVE;
 	};
 
 	/*struct endScene

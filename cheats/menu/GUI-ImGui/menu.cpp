@@ -323,6 +323,12 @@ static void renderMisc()
 			{
 				ImGui::Checkbox(XOR("Bunnyhop"), &config.getRef<bool>(vars.bBunnyHop));
 				ImGui::Checkbox(XOR("Autostrafe"), &config.getRef<bool>(vars.bAutoStrafe));
+				bool& logRef = config.getRef<bool>(vars.bLogEnabled);
+				ImGui::Checkbox(XOR("Log events"), &logRef);
+				if (logRef)
+				{
+					ImGui::SliderFloat(XOR("Log time"), &config.getRef<float>(vars.fLogMaxTime), 1.0f, 8.0f);
+				}
 				ImGui::Checkbox(XOR("Hitmarker"), &config.getRef<bool>(vars.bDrawHitmarker));
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("3D##Hitm"), &config.getRef<bool>(vars.bDrawHitmarker3D));

@@ -742,3 +742,11 @@ void World::drawCustomSmoke(const Vector& pos, float radius, float angl)
 
 	interfaces::effects->smoke(end, -1, 5.0f, 1.0f);
 }
+
+void World::pushLocalImpacts(const hitStructLocal_t& hit)
+{
+	if (!config.get<bool>(vars.bDrawLocalSideImpacts))
+		return;
+
+	m_hitsLocal.push_back(hit);
+}

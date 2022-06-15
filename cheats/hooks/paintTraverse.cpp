@@ -15,6 +15,7 @@
 #include "../../config/vars.hpp"
 #include "../../utilities/renderer/renderer.hpp"
 #include "../menu/x88Menu/x88menu.hpp"
+#include "../features/misc/logger.hpp"
 
 #pragma region "Paint Helpers"
 // run current screensize
@@ -85,6 +86,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 				misc.drawHat();
 				world.clientSideImpacts();
 				world.localImpacts();
+				logger.draw();
 			});
 
 		x88menu.draw();

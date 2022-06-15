@@ -9,15 +9,16 @@
 #include "../visuals/player.hpp"
 #include "../misc/misc.hpp"
 #include "../visuals/world.hpp"
+#include "../misc/logger.hpp"
 
 #include "../../game.hpp"
 #include "../../globals.hpp"
 #include "../../../utilities/console/console.hpp"
 #include "../../../config/vars.hpp"
 
-void Events::add(const std::string_view eventName, const std::function<void(IGameEvent*)>& fun)
+void Events::add(const std::string& eventName, const std::function<void(IGameEvent*)>& fun)
 {
-	interfaces::eventManager->addListener(&events, eventName.data());
+	interfaces::eventManager->addListener(&events, eventName.c_str());
 	std::function<void(IGameEvent*)> m;
 	m_events.emplace_back(StructEvent_t{ &events, eventName, fun });
 }
@@ -26,7 +27,7 @@ void Events::init()
 {
 	add(XOR("player_death"), [](IGameEvent*)
 		{
-			
+			//logger.push(Logger::Log_t("died", Colors::White, interfaces::globalVars->m_curtime + 3.0f));
 		}
 	);
 	add(XOR("round_start"), [](IGameEvent*)
@@ -36,6 +37,7 @@ void Events::init()
 	);
 	add(XOR("player_hurt"), [](IGameEvent* e)
 		{
+			logger.add(Logger::Log_t(XOR("hurt event"), Colors::White, interfaces::globalVars->m_curtime + config.get<float>(vars.fLogMaxTime)));
 			misc.playHitmarker(e);
 		}
 	);

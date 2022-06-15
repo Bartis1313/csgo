@@ -99,6 +99,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fStepMaxDist, 50.0f, "max distance of steps");
 	CONFIG_ADD_VARIABLE(float, fStepMaxLineDist, 80.0f, "max distance of line draw with info");
 	CONFIG_ADD_VARIABLE(Color, cStepLine, Colors::White, "step line info color");
+	CONFIG_ADD_VARIABLE(bool, bLogEnabled, false, "enable log printing");
+	CONFIG_ADD_VARIABLE(float, fLogMaxTime, 4.0f, "time for how long the log should be visible");
 
 
 	// WORLD
