@@ -17,8 +17,6 @@ class Visuals final
 {
 public:
 	void run();
-	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/333825-bloodhound-inspired-legit-csgo-esp.html with some edits
-	void drawSound(Entity_t* ent);
 private:
 	void drawInfo(Player_t* ent, const Box& box);
 	void drawnName(Player_t* ent, const Box& box);
@@ -35,6 +33,9 @@ private:
 	void drawBox2DFilled(const Box& box);
 	void drawBox3D(const Box3D& box, const float thickness = 2.0f);
 	void drawBox3DFilled(const Box3D& box, const float thickness = 2.0f);
+	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/333825-bloodhound-inspired-legit-csgo-esp.html with some edits
+	void findBestSound(Entity_t* ent);
+	void drawSound();
 public:
 	Color healthBased(Player_t* ent);
 	// returns the size for any font based on distance and passed division
@@ -56,8 +57,7 @@ private:
 	std::array<int, 65> m_health;
 	std::array<int, 65> m_armor;
 	std::array<std::deque<StepData_t>, 65> m_steps;
-
-	
+	StepData_t m_bestStep;
 public:
 	void pushStep(const StepData_t& step);
 };

@@ -59,7 +59,7 @@ void Visuals::run()
 			drawSkeleton(entity);
 			runDLight(entity);
 			drawLaser(entity);
-			drawSound(entity);
+			findBestSound(entity);
 		};
 
 		if (drawDead)
@@ -72,6 +72,7 @@ void Visuals::run()
 
 		enemyIsAimingAtYou(entity);
 	}
+	drawSound();
 }
 
 void Visuals::drawHealth(Player_t* ent, const Box& box)
@@ -421,7 +422,7 @@ void Visuals::pushStep(const StepData_t& step)
 	m_steps.at(step.m_player->getIndex()).push_back(step);
 }
 
-void Visuals::drawSound(Entity_t* entity)
+void Visuals::findBestSound(Entity_t* entity)
 {
 	if (!config.get<bool>(vars.bSoundEsp))
 		return;
@@ -432,7 +433,6 @@ void Visuals::drawSound(Entity_t* entity)
 	int y = globals::screenY / 2.0f;
 	float maxDist = config.get<float>(vars.fStepMaxDist);
 	float maxDistLine = config.get<float>(vars.fStepMaxLineDist);
-	static StepData_t bestStep;
 
 	for (size_t i = 0; const auto & el : m_steps.at(index))
 	{
@@ -472,12 +472,12 @@ void Visuals::drawSound(Entity_t* entity)
 
 		if (distFromMiddle < maxDistLine)
 		{
-			if (!bestStep.m_player || distFromMiddle < bestStep.m_maxPixels)
+			if (!m_bestStep.m_player || distFromMiddle < m_bestStep.m_maxPixels)
 			{
-				bestStep.m_player = el.m_player;
-				bestStep.m_pos = el.m_pos;
-				bestStep.m_timeToPrint = diff;
-				bestStep.m_maxPixels = distFromMiddle;
+				m_bestStep.m_player = el.m_player;
+				m_bestStep.m_pos = el.m_pos;
+				m_bestStep.m_timeToPrint = diff;
+				m_bestStep.m_maxPixels = distFromMiddle;
 				// better not
 				/*bestStep.m_fontSize = scaledFont(50.0f, 10.0f, 18.0f);*/
 			}
@@ -485,17 +485,23 @@ void Visuals::drawSound(Entity_t* entity)
 
 		i++;
 	}
+}
 
-	if (bestStep.m_player)
+void Visuals::drawSound()
+{
+	int x = globals::screenX / 2.0f;
+	int y = globals::screenY / 2.0f;
+
+	if (m_bestStep.m_player)
 	{
-		if (Vector2D pos; imRender.worldToScreen(bestStep.m_pos, pos))
+		if (Vector2D pos; imRender.worldToScreen(m_bestStep.m_pos, pos))
 		{
-			std::string_view place = bestStep.m_player->m_szLastPlaceName();
+			std::string_view place = m_bestStep.m_player->m_szLastPlaceName();
 			if (place.empty())
 				place = XOR("Unknown");
-			std::string nameText = FORMAT(XOR("{} -> {} [{:.1f}m]"), bestStep.m_player->getName(),
-				place, game::localPlayer->absOrigin().distToMeters(bestStep.m_pos));
-			std::string timeText = FORMAT(XOR("Time left {:.1f}s"), bestStep.m_timeToPrint);
+			std::string nameText = FORMAT(XOR("{} -> {} [{:.1f}m]"), m_bestStep.m_player->getName(),
+				place, game::localPlayer->absOrigin().distToMeters(m_bestStep.m_pos));
+			std::string timeText = FORMAT(XOR("Time left {:.1f}s"), m_bestStep.m_timeToPrint);
 
 			x = globals::screenX / 2.5f;
 
@@ -511,7 +517,7 @@ void Visuals::drawSound(Entity_t* entity)
 			imRender.drawLine(x + textSize, y, pos.x, pos.y, config.get<CfgColor>(vars.cStepLine).getColor());
 		}
 
-		bestStep.m_player = nullptr;
+		m_bestStep.m_player = nullptr;
 	}
 }
 
