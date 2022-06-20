@@ -169,7 +169,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bFakeLatency, false, "fake latency enabled");
 	CONFIG_ADD_VARIABLE(float, fFakeLatency, 200.0f, "fake latency amount");
 	CONFIG_ADD_VARIABLE(bool, bBunnyHop, false, "bunnyhop enabled");
-	CONFIG_ADD_VARIABLE(bool, bAutoStrafe, false, "autostrafe enabled");
+	CONFIG_ADD_VARIABLE(int, iBunnyHopChance, 0, "bunnyhop chance");
+	CONFIG_ADD_VARIABLE(int, iAutoStrafe, 0, "autostrafe mode");
 	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker, false, "draw hitmarker enabled");
 	CONFIG_ADD_VARIABLE(bool, bPlayHitmarker, false, "play sound hitmarker enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker3D, false, "draw hitmarker enabled in 3D");

@@ -321,8 +321,13 @@ static void renderMisc()
 		{
 			ImGui::BeginGroupPanel(XOR("Misc other"));
 			{
-				ImGui::Checkbox(XOR("Bunnyhop"), &config.getRef<bool>(vars.bBunnyHop));
-				ImGui::Checkbox(XOR("Autostrafe"), &config.getRef<bool>(vars.bAutoStrafe));
+				bool& bunnyhopref = config.getRef<bool>(vars.bBunnyHop);
+				ImGui::Checkbox(XOR("Bunnyhop"), &bunnyhopref);
+				if (bunnyhopref)
+				{
+					ImGui::SliderInt(XOR("Bunnyhop hitchance"), &config.getRef<int>(vars.iBunnyHopChance), 0, 100, "%i%%");
+				}
+				ImGui::Combo(XOR("Autostrafe"), &config.getRef<int>(vars.iAutoStrafe), selections::straferModes);
 				bool& logRef = config.getRef<bool>(vars.bLogEnabled);
 				ImGui::Checkbox(XOR("Log events"), &logRef);
 				if (logRef)

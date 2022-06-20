@@ -111,4 +111,12 @@ namespace selections
 		"Icon",
 		"Ammo"
 	};
+
+	inline std::array straferModes =
+	{
+		"OFF",
+		"Sidespeed",
+		"Rotate",
+		"Directional"
+	};
 }

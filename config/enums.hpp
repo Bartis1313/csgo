@@ -71,4 +71,12 @@ enum class DroppedFlags : size_t
 	FLAGS_SIZE
 };
 
+enum class MovementStraferMode : size_t
+{
+	OFF,
+	SIDESPEED,
+	ROTATE,
+	DIRECTIONAL
+};
+
 #pragma endregion

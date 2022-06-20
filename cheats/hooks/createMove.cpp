@@ -10,7 +10,7 @@
 #include "../features/aimbot/aimbot.hpp"
 #include "../features/prediction/prediction.hpp"
 #include "../features/backtrack/backtrack.hpp"
-#include "../features/misc/bunnyhop.hpp"
+#include "../features/misc/movement.hpp"
 #include "../features/aimbot/triggerbot.hpp"
 #include "../features/visuals/world.hpp"
 #include "../features/misc/misc.hpp"
@@ -52,9 +52,11 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 
 	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
 
+	Vector oldAngle = cmd->m_viewangles;
+
 	game::serverTime(cmd);
-	bunnyhop.run(cmd);
-	bunnyhop.strafe(cmd);
+	movement.bunnyhop(cmd);
+	movement.strafe(cmd);
 	nadePred.createMove(cmd->m_buttons);
 	backtrack.updateSequences();
 
@@ -67,6 +69,8 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 			triggerbot.run(cmd);
 			misc.getVelocityData();
 		});
+
+	movement.fix(cmd, oldAngle);
 
 	// don't get untrusted
 	cmd->m_viewangles.normalize();

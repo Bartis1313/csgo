@@ -41,6 +41,7 @@ public:
 	NETVAR(Vector, m_ViewOffset, "DT_BasePlayer", "m_vecViewOffset[0]");
 	NETVAR(bool, m_bSpotted, "DT_BaseEntity", "m_bSpotted");
 	NETVAR(float, m_flSimulationTime, "DT_BasePlayer", "m_flSimulationTime");
+	NETVAR(float, m_flMaxspeed, "DT_BasePlayer", "m_flMaxspeed");
 	NETVAR_ADDR(int, m_nRenderMode, "DT_BasePlayer", "m_nRenderMode", 0x1);
 	NETVAR_ADDR(Matrix3x4, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
 

@@ -1083,6 +1083,34 @@ void ImGuiRender::drawProgressRing(const float x, const float y, const float rad
 	m_drawData.emplace_back(DrawType::ARC, std::make_any<ArcObject_t>(ArcObject_t({ x, y }, radius, DEG2RAD(angleMin), DEG2RAD(maxAngle), points, U32(color), flags, thickness)));
 }
 
+void ImGuiRender::drawSphere(const Vector& pos, float radius, float angleSphere, const Color& color)
+{
+	std::vector<ImVec2> verts = {};
+
+	float step = (1.0f / radius) + DEG2RAD(angleSphere);
+	for (float angle = 0.0f; angle < math::PI; angle += step)
+	{
+		verts.clear();
+		for (float angleBetween = 0.0f; angleBetween < math::PI * 2; angleBetween += step)
+		{
+			Vector worldStart =
+			{
+				radius * std::sin(angle) * std::cos(angleBetween) + pos.x,
+				radius * std::sin(angle) * std::sin(angleBetween) + pos.y,
+				radius * std::cos(angle) + pos.z
+			};
+
+			if (Vector2D screenStart; imRender.worldToScreen(worldStart, screenStart))
+				verts.push_back(ImVec2{ screenStart.x, screenStart.y });
+		}
+
+		if (verts.empty())
+			continue;
+
+		imRender.drawPolyLine(verts.size(), verts.data(), color);
+	}
+}
+
 void ImGuiRender::drawCone(const Vector& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags, const float thickness)
 {
 	Vector2D orignalW2S = {};

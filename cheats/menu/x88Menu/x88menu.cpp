@@ -109,7 +109,7 @@ void X88Menu::init()
 	x88types.push(XOR("No Sky"), &config.getRef<bool>(vars.bRemoveSky));
 	x88types.push(XOR("2D Radar"), &config.getRef<bool>(vars.bRadar));
 	x88types.push(XOR("Bunnyhop"), &config.getRef<bool>(vars.bBunnyHop));
-	x88types.push(XOR("Autostrafe"), &config.getRef<bool>(vars.bAutoStrafe));
+	x88types.push(XOR("Autostrafe"), &config.getRef<int>(vars.iAutoStrafe));
 	x88types.push(XOR("ThirdP"), &config.getRef<bool>(vars.bThirdp));
 	x88types.push(XOR("Draw Info"), &config.getRef<bool>(vars.bDrawMiscInfo));
 

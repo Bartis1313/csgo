@@ -351,6 +351,7 @@ public:
 
 	void drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 	void drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags = 0);
+	void drawSphere(const Vector& pos, float radius, float angleSphere, const Color& color);
 	_NODISCARD ImVec2 getTextSize(ImFont* font, const std::string& text);
 	_NODISCARD bool worldToScreen(const Vector& in, Vector& out);
 	_NODISCARD bool worldToScreen(const Vector& in, Vector2D& out);

@@ -67,7 +67,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
-      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
@@ -151,7 +151,7 @@
     <ClCompile Include="cheats\features\backtrack\backtrack.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\misc\bunnyhop.cpp">
+    <ClCompile Include="cheats\features\misc\movement.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\features\misc\callbacks.cpp" />
@@ -312,7 +312,7 @@
     <ClInclude Include="cheats\features\aimbot\aimbot.hpp" />
     <ClInclude Include="cheats\features\aimbot\triggerbot.hpp" />
     <ClInclude Include="cheats\features\backtrack\backtrack.hpp" />
-    <ClInclude Include="cheats\features\misc\bunnyhop.hpp" />
+    <ClInclude Include="cheats\features\misc\movement.hpp" />
     <ClInclude Include="cheats\features\misc\callbacks.hpp" />
     <ClInclude Include="cheats\features\misc\events.hpp" />
     <ClInclude Include="cheats\features\misc\logger.hpp" />
