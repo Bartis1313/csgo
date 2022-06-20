@@ -48,7 +48,7 @@ namespace selections
 		"Color change"
 	};
 
-	inline std::vector<std::string> styleNames =
+	inline std::array styleNames =
 	{
 		"Cherry",
 		"Dark",

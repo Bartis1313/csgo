@@ -289,18 +289,40 @@ bool ImGui::Combo(const char* label, int* item, const std::span<const char*>& ar
     return ret;
 }
 
-static bool vecGetter(void* data, int idx, const char** out)
+bool ImGui::Combo(const char* label, int* item, const std::span<const std::string>& arr, const float width)
 {
-    auto& v = *static_cast<std::vector<std::string>*>(data);
+    ImGui::PushItemWidth(width);
+    bool ret = ImGui::Combo(label, item, arr.data()->c_str(), arr.size());
+    ImGui::PopItemWidth();
+    return ret;
+}
+
+static bool arrGetterStr(void* data, int idx, const char** out)
+{
+    auto& v = *static_cast<std::span<std::string>*>(data);
 
     if (out)
-        *out = v.at(idx).c_str();
+        *out = v[idx].c_str();
     return true;
 }
 
-bool ImGui::ListBox(const char* label, int* item, const std::vector<std::string>& arr, const int heightItem)
+static bool arrGetter(void* data, int idx, const char** out)
 {
-    return ImGui::ListBox(label, item, &vecGetter, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), heightItem);
+    auto& v = *static_cast<std::span<const char*>*>(data);
+
+    if (out)
+        *out = v[idx];
+    return true;
+}
+
+bool ImGui::ListBox(const char* label, int* item, const std::span<const std::string>& arr, const int heightItem)
+{
+    return ImGui::ListBox(label, item, &arrGetterStr, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), heightItem);
+}
+
+bool ImGui::ListBox(const char* label, int* item, const std::span<const char*>& arr, const int heightItem)
+{
+    return ImGui::ListBox(label, item, &arrGetter, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), heightItem);
 }
 
 void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options, const float width)
