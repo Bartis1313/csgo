@@ -116,3 +116,6 @@ ParticleEffect
 #define CTRACE_FILTER_SIMPLE	XOR("55 8B EC 83 E4 F0 83 EC 7C 56 52")
 #define CSGO_HUD				XOR("B9 ? ? ? ? 68 ? ? ? ? E8 ? ? ? ? 89")
 #define FIND_ELEMENT			XOR("55 8B EC 53 8B 5D 08 56 57 8B F9 33 F6 39 77 28 7E 1E")
+// #STR: "ERROR: model verts have been compressed or you don't have , "Could not render eyeball for model '%s' (it has > 65536 ve, "$glint"
+// or find on call stack in x32dbg in studiorender.dll
+#define R_STUDIODRAWPOINTS		XOR("8B 7D FC 03 F8")
