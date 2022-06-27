@@ -150,6 +150,8 @@ void Visuals::drawArmor(Player_t* ent, const Box& box)
 			ImFonts::franklinGothic, std::format(XOR("{}"), armor), false, Colors::White);*/
 }
 
+#include "../../../SDK/ILocalize.hpp"
+
 void Visuals::drawWeapon(Player_t* ent, const Box& box)
 {
 	if (!config.get<bool>(vars.bDrawWeapon))
@@ -165,7 +167,8 @@ void Visuals::drawWeapon(Player_t* ent, const Box& box)
 	int currentAmmo = weapon->m_iClip1();
 
 	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, FORMAT(XOR("{} {}/{}"),
-		ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo), true, tex.getColor());
+		config.get<bool>(vars.bDrawWeaponTranslate) ? interfaces::localize->findAsUTF8(weapon->getWpnInfo()->m_WeaponName) : ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo),
+		true, tex.getColor());
 
 	// skip useless trash for calculations
 	if (weapon->isNonAimable())
@@ -400,8 +403,13 @@ void Visuals::drawPlayer(Player_t* ent)
 		drawBox3D(box3d);
 		break;
 	case E2T(BoxTypes::FILLED3D):
-		drawBox3DFilled(box3d);
+	{
+		if (!config.get<bool>(vars.bBoxMultiColor))
+			drawBox3DFilled(box3d);
+		else
+			drawBox3DFilledMultiColor(box3d);
 		break;
+	}
 	default:
 		break;
 	}
@@ -596,7 +604,7 @@ void Visuals::drawBox2DFilled(const Box& box)
 	{
 		float speed = config.get<float>(vars.fBoxMultiColor);
 
-		imRender.drawRectMultiColor(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f,
+		imRender.drawRectFilledMultiColor(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f,
 			Color::rainbowColor(interfaces::globalVars->m_curtime, speed).getColorEditAlpha(fill.getColor().a()),
 			Color::rainbowColor(interfaces::globalVars->m_curtime + 30.0f, speed).getColorEditAlpha(fill.getColor().a()),
 			Color::rainbowColor(interfaces::globalVars->m_curtime + 60.0f, speed).getColorEditAlpha(fill.getColor().a()),
@@ -621,6 +629,57 @@ void Visuals::drawBox3DFilled(const Box3D& box, const float thickness)
 	imRender.drawQuadFilled(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), fill.getColor());
 	// left
 	imRender.drawQuadFilled(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), fill.getColor());
+
+	for (size_t i = 0; i < 3; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
+	}
+	// missing part at the bottom
+	imRender.drawLine(box.points.at(0), box.points.at(3), color.getColor(), thickness);
+	// top parts
+	for (size_t i = 4; i < 7; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
+	}
+	// missing part at the top
+	imRender.drawLine(box.points.at(4), box.points.at(7), color.getColor(), thickness);
+	// now all 4 box.points missing parts for 3d box
+	for (size_t i = 0; i < 4; i++)
+	{
+		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color.getColor(), thickness);
+	}
+}
+
+void Visuals::drawBox3DFilledMultiColor(const Box3D& box, const float thickness)
+{
+	CfgColor color = config.get<CfgColor>(vars.cBox);
+	CfgColor fill = config.get<CfgColor>(vars.cBoxFill);
+
+	float speed = config.get<float>(vars.fBoxMultiColor);
+
+	std::array colors =
+	{
+		Color::rainbowColor(interfaces::globalVars->m_curtime, speed).getColorEditAlpha(fill.getColor().a()),
+		Color::rainbowColor(interfaces::globalVars->m_curtime + 30.0f, speed).getColorEditAlpha(fill.getColor().a()),
+		Color::rainbowColor(interfaces::globalVars->m_curtime + 60.0f, speed).getColorEditAlpha(fill.getColor().a()),
+		Color::rainbowColor(interfaces::globalVars->m_curtime + 90.0f, speed).getColorEditAlpha(fill.getColor().a())
+	};
+
+#define ADDC colors.at(0), colors.at(1), colors.at(2), colors.at(3)
+
+	imRender.drawQuadFilledMultiColor(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), ADDC);
+	// top
+	imRender.drawQuadFilledMultiColor(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), ADDC);
+	// front
+	imRender.drawQuadFilledMultiColor(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), ADDC);
+	// back
+	imRender.drawQuadFilledMultiColor(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), ADDC);
+	// right
+	imRender.drawQuadFilledMultiColor(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), ADDC);
+	// left
+	imRender.drawQuadFilledMultiColor(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), ADDC);
+
+#undef ADDC
 
 	for (size_t i = 0; i < 3; i++)
 	{

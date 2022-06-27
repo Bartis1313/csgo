@@ -15,7 +15,7 @@ struct clbStruct
 	clientEffectCallback m_callback = nullptr; // will be later inited
 };
 
-class Callbacks
+class Callbacks final
 {
 public:
 	// Example of using it shown in cpp

@@ -44,20 +44,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\barti\source\repos\csgo legit\dependencies\discord\include;$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\freetype\win32;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>.\build\debug\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <TargetName>Debug_$(ProjectName)</TargetName>
+    <SourcePath>C:\Users\barti\source\repos\csgo legit\dependencies\discord\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>.\build\Release\</OutDir>
     <LibraryPath>$(SolutionDir)dependencies\freetype\win32;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <IncludePath>C:\Users\barti\source\repos\csgo legit\dependencies\discord\include;$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
     <IntDir>$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
+    <SourcePath>C:\Users\barti\source\repos\csgo legit\dependencies\discord\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -151,6 +153,7 @@
     <ClCompile Include="cheats\features\backtrack\backtrack.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\features\misc\discord.cpp" />
     <ClCompile Include="cheats\features\misc\movement.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -174,6 +177,11 @@
     <ClCompile Include="cheats\menu\x88Menu\x88menu.cpp" />
     <ClCompile Include="config\cfgcolor.cpp" />
     <ClCompile Include="config\key.cpp" />
+    <ClCompile Include="dependencies\discord\src\connection_win.cpp" />
+    <ClCompile Include="dependencies\discord\src\discord_register_win.cpp" />
+    <ClCompile Include="dependencies\discord\src\discord_rpc.cpp" />
+    <ClCompile Include="dependencies\discord\src\rpc_connection.cpp" />
+    <ClCompile Include="dependencies\discord\src\serialization.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
     <ClCompile Include="cheats\features\visuals\chams.cpp">
@@ -298,6 +306,7 @@
     <ClCompile Include="utilities\renderer\renderer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="utilities\res.cpp" />
     <ClCompile Include="utilities\utilities.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -312,6 +321,7 @@
     <ClInclude Include="cheats\features\aimbot\aimbot.hpp" />
     <ClInclude Include="cheats\features\aimbot\triggerbot.hpp" />
     <ClInclude Include="cheats\features\backtrack\backtrack.hpp" />
+    <ClInclude Include="cheats\features\misc\discord.hpp" />
     <ClInclude Include="cheats\features\misc\movement.hpp" />
     <ClInclude Include="cheats\features\misc\callbacks.hpp" />
     <ClInclude Include="cheats\features\misc\events.hpp" />
@@ -325,6 +335,52 @@
     <ClInclude Include="config\cfgcolor.hpp" />
     <ClInclude Include="config\enums.hpp" />
     <ClInclude Include="config\key.hpp" />
+    <ClInclude Include="dependencies\discord\include\discord_register.h" />
+    <ClInclude Include="dependencies\discord\include\discord_rpc.h" />
+    <ClInclude Include="dependencies\discord\src\backoff.h" />
+    <ClInclude Include="dependencies\discord\src\connection.h" />
+    <ClInclude Include="dependencies\discord\src\msg_queue.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\allocators.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\cursorstreamwrapper.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\document.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\encodedstream.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\encodings.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\error\en.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\error\error.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\filereadstream.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\filewritestream.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\fwd.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\biginteger.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\clzll.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\diyfp.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\dtoa.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\ieee754.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\itoa.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\meta.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\pow10.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\regex.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\stack.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\strfunc.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\strtod.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\internal\swap.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\istreamwrapper.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\memorybuffer.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\memorystream.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\msinttypes\inttypes.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\msinttypes\stdint.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\ostreamwrapper.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\pointer.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\prettywriter.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\rapidjson.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\reader.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\schema.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\stream.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\stringbuffer.h" />
+    <ClInclude Include="dependencies\discord\src\rapidjson\writer.h" />
+    <ClInclude Include="dependencies\discord\src\rpc_connection.h" />
+    <ClInclude Include="dependencies\discord\src\serialization.h" />
+    <ClInclude Include="dependencies\stb_image.h" />
+    <ClInclude Include="resource.h" />
     <ClInclude Include="SDK\CClientEffectRegistration.hpp" />
     <ClInclude Include="SDK\CEffectData.hpp" />
     <ClInclude Include="SDK\CFlashlightEffect.hpp" />
@@ -499,6 +555,7 @@
     <ClInclude Include="utilities\renderer\iconfont.hpp" />
     <ClInclude Include="utilities\renderer\renderer.hpp" />
     <ClInclude Include="utilities\csgo.hpp" />
+    <ClInclude Include="utilities\res.hpp" />
     <ClInclude Include="utilities\simpleTimer.hpp" />
     <ClInclude Include="utilities\utilities.hpp" />
     <ClInclude Include="SDK\CGlowManager.hpp" />
@@ -542,7 +599,11 @@
     <Library Include="dependencies\freetype\Win32\freetype.lib" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="dependencies\discord\src\CMakeLists.txt" />
     <Text Include="dependencies\ImGui\LICENSE.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="csgo-legit.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

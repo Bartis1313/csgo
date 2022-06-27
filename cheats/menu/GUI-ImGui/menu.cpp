@@ -123,7 +123,7 @@ static void renderVisuals()
 				ImGui::ColorPicker(XOR("Box color"), &config.getRef<CfgColor>(vars.cBox));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Box color, filled"), &config.getRef<CfgColor>(vars.cBoxFill));
-				if (config.get<int>(vars.iEsp) == E2T(BoxTypes::FILLED2D))
+				if (auto type = config.get<int>(vars.iEsp); type == E2T(BoxTypes::FILLED2D) || type == E2T(BoxTypes::FILLED3D))
 				{
 					ImGui::Checkbox(XOR("Multi color rect fill"), &config.getRef<bool>(vars.bBoxMultiColor));
 					ImGui::SliderFloat(XOR("Rect fill multigradient speed"), &config.getRef<float>(vars.fBoxMultiColor), 0.0f, 15.0f);
@@ -204,12 +204,10 @@ static void renderVisuals()
 			ImGui::BeginGroupPanel(XOR("Weapons"));
 			{
 				ImGui::Checkbox(XOR("Enabled##weapons"), &config.getRef<bool>(vars.bDrawWeapon));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("Translate name"), &config.getRef<bool>(vars.bDrawWeaponTranslate));
 				ImGui::ColorPicker(XOR("Color for text"), &config.getRef<CfgColor>(vars.cWeaponText));
-
-
 				ImGui::ColorPicker(XOR("Reload bar color"), &config.getRef<CfgColor>(vars.cReloadbar));
-
-
 				ImGui::Checkbox(XOR("Bomb info"), &config.getRef<bool>(vars.bDrawBomb));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("C4 info"), &config.getRef<CfgColor>(vars.cBombBackground));
@@ -554,6 +552,7 @@ static void renderStyles()
 				ImGui::ColorPicker(XOR("Background color3"), &config.getRef<CfgColor>(vars.cBackGround3));
 				if (ImGui::Button(XOR("Refresh background")))
 					background.init();
+				ImGui::Checkbox(XOR("Discord RPC"), &config.getRef<bool>(vars.bDiscord));
 			}
 			ImGui::EndGroupPanel();
 

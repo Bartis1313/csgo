@@ -12,6 +12,7 @@
 #include <deque>
 
 class Color;
+class Resource;
 
 struct Box
 {
@@ -79,13 +80,12 @@ public:
 	_NODISCARD bool worldToScreen(const Vector& in, Vector2D& out);
 	void initNewTexture(int& id, Color* RGBA, const int w, const int h);
 	void initNewTexture(int& id, unsigned char* RGBA, const int w, const int h);
-	// color argument is very sometimes needed, because texture is mostly supposed to be all filled
-	void drawFromTexture(const int id, const int x, const int y, const int w, const int h, const Color& color);
+	void drawImage(const Resource& res, const int x, const int y, const int w, const int h, const Color& color = Colors::White);
 };
 
 inline SurfaceRender surfaceRender;
 
-#include "../../dependencies/ImGui/imgui.h"
+#include "../../dependencies/ImGui/imgui_impl_dx9.h"
 
 namespace ImFonts
 {
@@ -113,6 +113,7 @@ enum class DrawType : size_t
 	TRIANGLE_FILLED,
 	QUAD,
 	QUAD_FILLED,
+	QUAD_MULTICOLOR,
 	POLYGON,
 	POLYGON_FILLED,
 	TEXT,
@@ -227,12 +228,20 @@ struct QuadObject_t
 	QuadObject_t(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 color)
 		: m_p1{ p1 }, m_p2{ p2 }, m_p3{ p3 }, m_p4{ p4 }, m_color{ color }
 	{}
+	// multicolors
+	QuadObject_t(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, ImU32 color1, ImU32 color2, ImU32 color3, ImU32 color4)
+		: m_p1{ p1 }, m_p2{ p2 }, m_p3{ p3 }, m_p4{ p4 }, m_color1{ color1 }, m_color2{ color2 }, m_color3{ color3 }, m_color4{ color4 }
+	{}
 
 	ImVec2 m_p1;
 	ImVec2 m_p2;
 	ImVec2 m_p3;
 	ImVec2 m_p4;
 	ImU32 m_color;
+	ImU32 m_color1; // left up / normal color
+	ImU32 m_color2; // right up
+	ImU32 m_color3; // right bottom
+	ImU32 m_color4; // left bottom
 	ImDrawFlags m_flags;
 	float m_thickness;
 };
@@ -297,7 +306,6 @@ struct ArcObject_t
 	float m_percent;
 };
 
-
 // rendering supported by dear ImGui, few changes and new functions comparing to surface draw
 // thread safe idea - full credits to qo0' as I couldn't really rebuild manually w2s with any success removing this weird stutter
 class ImGuiRender
@@ -311,7 +319,7 @@ public:
 	void drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags = 0);
 	void drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
 	void drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0);
-	void drawRectMultiColor(const float x, const float y, const float w, const float h,
+	void drawRectFilledMultiColor(const float x, const float y, const float w, const float h,
 		const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft);
 	void drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness = 1.0f);
 	void drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color);
@@ -323,6 +331,8 @@ public:
 	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
 	void drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness = 1.0f);
 	void drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
+	void drawQuadFilledMultiColor(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4,
+		const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft);
 	void drawPolyLine(const int count, ImVec2* verts, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
 	void drawPolyGon(const int count, ImVec2* verts, const Color& color);
 	void drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal);
@@ -352,6 +362,8 @@ public:
 	void drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 	void drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 	void drawSphere(const Vector& pos, float radius, float angleSphere, const Color& color);
+	// no need for making it in mutex
+	void drawImage(ImDrawList* draw, const Resource& res, const float x, const float y, const float w, const float h, const Color& color = Colors::White, float rounding = 0.0f, ImDrawFlags flags = ImDrawCornerFlags_All);
 	_NODISCARD ImVec2 getTextSize(ImFont* font, const std::string& text);
 	_NODISCARD bool worldToScreen(const Vector& in, Vector& out);
 	_NODISCARD bool worldToScreen(const Vector& in, Vector2D& out);

@@ -4,6 +4,7 @@
 #include "../console/console.hpp"
 
 #include "../../SDK/interfaces/interfaces.hpp"
+#include "../../utilities/res.hpp"
 
 #define BUFFER_SIZE 256
 
@@ -565,13 +566,13 @@ void SurfaceRender::initNewTexture(int& id, unsigned char* RGBA, const int w, co
 		throw std::runtime_error(FORMAT(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
 }
 
-void SurfaceRender::drawFromTexture(const int id, const int x, const int y, const int w, const int h, const Color& color)
+void SurfaceRender::drawImage(const Resource& res, const int x, const int y, const int w, const int h, const Color& color)
 {
-	if (!interfaces::surface->isTextureValid(id))
+	if (!interfaces::surface->isTextureValid(res.getTextureID()))
 		return;
 
 	interfaces::surface->drawSetColor(color);
-	interfaces::surface->drawSetTexture(id);
+	interfaces::surface->drawSetTexture(res.getTextureID());
 	interfaces::surface->drawTexturedRect(x, y, x + w, y + h);
 }
 
@@ -646,11 +647,27 @@ void ImGuiRender::init(ImGuiIO& io)
 		cfg.OversampleH = 3;
 		cfg.OversampleV = 3;
 		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
-		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 20.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+
+		ImVector<ImWchar> range;
+		ImFontGlyphRangesBuilder textBuilder;
+		constexpr ImWchar textRanges[] = 
+		{
+			0x0020, 0x00FF, // Basic Latin
+			0x0100, 0x024F, // Latin Extended-A + Latin Extended-B
+			0x0600, 0x06FF, // Arabic
+			0x0E00, 0x0E7F, // Thai
+			0
+		};
+		textBuilder.AddRanges(textRanges);
+		textBuilder.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
+		textBuilder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+		textBuilder.BuildRanges(&range);
+
+		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, textRanges);
+		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 20.0f, &cfg, textRanges);
+		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, textRanges);
+		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, textRanges);
+		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, textRanges);
 
 		constexpr ImWchar ranges[] =
 		{
@@ -673,11 +690,27 @@ void ImGuiRender::init(ImGuiIO& io)
 		cfg.OversampleH = 3;
 		cfg.OversampleV = 3;
 		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
-		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 20.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
-		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, io.Fonts->GetGlyphRangesCyrillic());
+
+		ImVector<ImWchar> range;
+		ImFontGlyphRangesBuilder textBuilder;
+		constexpr ImWchar textRanges[] =
+		{
+			0x0020, 0x00FF, // Basic Latin
+			0x0100, 0x024F, // Latin Extended-A + Latin Extended-B
+			0x0600, 0x06FF, // Arabic
+			0x0E00, 0x0E7F, // Thai
+			0
+		};
+		textBuilder.AddRanges(textRanges);
+		textBuilder.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
+		textBuilder.AddRanges(io.Fonts->GetGlyphRangesDefault());
+		textBuilder.BuildRanges(&range);
+
+		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, textRanges);
+		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 20.0f, &cfg, textRanges);
+		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, textRanges);
+		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, textRanges);
+		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, textRanges);
 
 		constexpr ImWchar ranges[] =
 		{
@@ -726,7 +759,7 @@ void ImGuiRender::drawRoundedRectFilled(const float x, const float y, const floa
 	m_drawData.emplace_back(DrawType::RECT_FILLED, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h }, U32(color), rounding, flags)));
 }
 
-void ImGuiRender::drawRectMultiColor(const float x, const float y, const float w, const float h,
+void ImGuiRender::drawRectFilledMultiColor(const float x, const float y, const float w, const float h,
 	const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft)
 {
 	m_drawData.emplace_back(DrawType::RECT_MULTICOLOR, std::make_any<RectObject_t>(RectObject_t(ImVec2{ x, y }, ImVec2{ x + w, y + h },
@@ -953,6 +986,13 @@ void ImGuiRender::drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const V
 	m_drawData.emplace_back(DrawType::QUAD_FILLED, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color))));
 }
 
+void ImGuiRender::drawQuadFilledMultiColor(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4,
+	const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft)
+{
+	m_drawData.emplace_back(DrawType::QUAD_MULTICOLOR, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y },
+		U32(colUprLeft), U32(colUprRight), U32(colBotRight), U32(colBotLeft))));
+}
+
 void ImGuiRender::drawPolyLine(const int count, ImVec2* verts, const Color& color, const ImDrawFlags flags, const float thickness)
 {
 	m_drawData.emplace_back(DrawType::POLYGON, std::make_any<PolygonObject_t>(PolygonObject_t(count, verts, U32(color), flags, thickness)));
@@ -1111,6 +1151,11 @@ void ImGuiRender::drawSphere(const Vector& pos, float radius, float angleSphere,
 	}
 }
 
+void ImGuiRender::drawImage(ImDrawList* draw, const Resource& res, const float x, const float y, const float w, const float h, const Color& color, float rounding, ImDrawFlags flags)
+{
+	draw->AddImageRounded(res.getTexture(), ImVec2{ x, y }, ImVec2{ x + w, y + h }, { 0.0f, 0.0f }, { 1.0f, 1.0f }, U32(color), rounding, flags);
+}
+
 void ImGuiRender::drawCone(const Vector& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags, const float thickness)
 {
 	Vector2D orignalW2S = {};
@@ -1230,6 +1275,12 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 		{
 			const auto& obj = std::any_cast<QuadObject_t>(val);
 			draw->AddQuadFilled(obj.m_p1, obj.m_p2, obj.m_p3, obj.m_p4, obj.m_color);
+			break;
+		}
+		case DrawType::QUAD_MULTICOLOR:
+		{
+			const auto& obj = std::any_cast<QuadObject_t>(val);
+			draw->AddQuadFilledMultiColor(obj.m_p1, obj.m_p2, obj.m_p3, obj.m_p4, obj.m_color1, obj.m_color2, obj.m_color3, obj.m_color4);
 			break;
 		}
 		case DrawType::POLYGON:

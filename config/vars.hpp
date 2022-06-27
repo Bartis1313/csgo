@@ -75,6 +75,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bDrawHealth, false, "draw health enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawArmor, false, "draw armor enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawWeapon, false, "draw weapon enabled");
+	CONFIG_ADD_VARIABLE(bool, bDrawWeaponTranslate, false, "draw weapon in your lang translated by the game");
 	CONFIG_ADD_VARIABLE(CfgColor, cWeaponText, Colors::White, "weapon text color");
 	CONFIG_ADD_VARIABLE(CfgColor, cReloadbar, Colors::Turquoise, "weapon reload time bar color");
 	CONFIG_ADD_VARIABLE(bool, bDrawName, false, "draw name enabled");
@@ -222,6 +223,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cNadeTracer, Colors::LightBlue, "nade tracer color");
 	CONFIG_ADD_VARIABLE(float, fNadeTracerMaxDist, 30.0f, "max meters for nade tracer");
 	CONFIG_ADD_VARIABLE(bool, bNadeTracerWarn, false, "run nade tracer warning");
+	CONFIG_ADD_VARIABLE(bool, bDiscord, false, "run discord rpc");
 
 	// STYLING
 

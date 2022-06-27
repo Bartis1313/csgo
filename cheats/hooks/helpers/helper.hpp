@@ -11,7 +11,7 @@ namespace hookHelper
 		return reinterpret_cast<void**>(&arg);
 	}
 
-	inline void tryHook(void* target, void* detour, void* original, const std::string& name)
+	inline void tryHook(void* target, void* detour, void* original, const std::string_view name)
 	{
 		const MH_STATUS hk = MH_CreateHook(static_cast<LPVOID>(target), static_cast<LPVOID>(detour), static_cast<LPVOID*>(original));
 		if (hk != MH_OK)

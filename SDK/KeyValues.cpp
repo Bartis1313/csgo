@@ -7,9 +7,9 @@
 
 KeyValues::KeyValues(const char* name)
 {
-	using fn = void(__thiscall*)(void*, const char*);
+	using fn = void(__thiscall*)(void*, const char*, void*, int);
 	const static auto construct = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, KEY_VALUES_CONSTRUCT));
-	construct(this, name);
+	construct(this, name, nullptr, -1);
 }
 
 KeyValues* KeyValues::fromString(const char* name, const char* value)

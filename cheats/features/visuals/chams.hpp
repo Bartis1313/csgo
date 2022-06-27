@@ -35,8 +35,8 @@ private:
 		IMaterial* m_mat = nullptr;
 		bool m_glow = false;
 	};
-	Mat_t createFromBuf(const std::string& name, bool ignore, bool wireframe, const std::string& shader, const std::string& baseTexture = "",
-		const std::string& envMap = "", const std::string& proxies = "");
+	Mat_t createFromBuf(const std::string_view name, bool ignore, bool wireframe, const std::string_view shader, const std::string_view baseTexture = "",
+		const std::string_view envMap = "", const std::string_view proxies = "");
 
 	void drawBackTrack(Player_t* ent);
 	void CALL(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);

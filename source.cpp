@@ -13,6 +13,7 @@
 #include "utilities/console/console.hpp"
 #include "SEHcatch.hpp"
 #include "cheats/menu/x88Menu/x88menu.hpp"
+#include "cheats/features/misc/discord.hpp"
 
 #include <thread>
 
@@ -22,7 +23,7 @@
 
 using namespace std::literals;
 
-VOID WINAPI _shutdown(PVOID instance);
+VOID WINAPI _looper(PVOID instance);
 
 DWORD WINAPI init(PVOID instance)
 {
@@ -60,10 +61,14 @@ DWORD WINAPI init(PVOID instance)
     return TRUE;
 }
 
-VOID WINAPI _shutdown(PVOID instance)
+VOID WINAPI _looper(PVOID instance)
 {
+    dc.init();
     while (!config.get<Key>(vars.kPanic).isPressed())
-        std::this_thread::sleep_for(100ms);
+    {
+        std::this_thread::sleep_for(1s);
+        dc.run();
+    }
 
     globals::isShutdown = true;
 
@@ -75,8 +80,8 @@ VOID WINAPI _shutdown(PVOID instance)
     menu.shutdown();
     console.log(TypeLogs::LOG_INFO, XOR("Hack shutdown"));
     console.shutdown();
+    dc.shutdown();
 
-   // LF(MessageBoxA)(nullptr, XOR("Hack shutdown"), XOR("Confirmed hack shutdown"), MB_OK | MB_ICONERROR);
     LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
 }
 
@@ -92,8 +97,8 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
 
         if (auto initThread = LF(CreateThread)(nullptr, NULL, init, instance, NULL, nullptr))
             LF(CloseHandle)(initThread);
-    
-        if (auto shutdownThread = LF(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_shutdown), instance, NULL, nullptr))
+
+        if (auto shutdownThread = LF(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_looper), instance, NULL, nullptr))
             LF(CloseHandle)(shutdownThread);
 
         return TRUE;

@@ -16,6 +16,8 @@
 #include "../../utilities/renderer/renderer.hpp"
 #include "../menu/x88Menu/x88menu.hpp"
 #include "../features/misc/logger.hpp"
+#include "../../utilities/res.hpp"
+#include "../../resource.h"
 
 #pragma region "Paint Helpers"
 // run current screensize
@@ -61,6 +63,8 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	}
 
 	original(interfaces::panel, panel, forceRepaint, allowForce);
+
+	//static Resource res{ IDB_PNG1, "PNG" };
 
 	if (!panelID)
 	{

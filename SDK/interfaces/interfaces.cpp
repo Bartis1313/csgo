@@ -11,7 +11,7 @@
 #include "../../utilities/console/console.hpp"
 
 template <typename T>
-static T* getInterface(const std::string& moduleName, const std::string& interfaceName)
+static T* getInterface(const std::string_view moduleName, const std::string_view interfaceName)
 {
 	// using fun = void* (*)(const char*, int*);
 	using fun = void* __cdecl(const char*, int*);
@@ -19,9 +19,9 @@ static T* getInterface(const std::string& moduleName, const std::string& interfa
 		LF(GetProcAddress)(LF(GetModuleHandleA)(moduleName), XOR("CreateInterface"))
 		);*/
 	const auto capture = reinterpret_cast<std::add_pointer_t<fun>>(
-		LF(GetProcAddress)(LF(GetModuleHandleA)(moduleName.c_str()), XOR("CreateInterface"))
+		LF(GetProcAddress)(LF(GetModuleHandleA)(moduleName.data()), XOR("CreateInterface"))
 		);
-	if (const auto ret = capture(interfaceName.c_str(), nullptr); ret != nullptr)
+	if (const auto ret = capture(interfaceName.data(), nullptr); ret != nullptr)
 		return reinterpret_cast<T*>(ret);
 	else
 		throw std::runtime_error(FORMAT(XOR("Interface {} was nullptr"), interfaceName));
@@ -84,5 +84,6 @@ bool interfaces::init()
 	dispatchEffect = reinterpret_cast<dfn>(utilities::patternScan(CLIENT_DLL, DISPATCH_EFFECT));
 
 	console.log(TypeLogs::LOG_INFO, XOR("interfaces success"));
+	done = true;
 	return true;
 }

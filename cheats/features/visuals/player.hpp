@@ -33,6 +33,7 @@ private:
 	void drawBox2DFilled(const Box& box);
 	void drawBox3D(const Box3D& box, const float thickness = 2.0f);
 	void drawBox3DFilled(const Box3D& box, const float thickness = 2.0f);
+	void drawBox3DFilledMultiColor(const Box3D& box, const float thickness = 2.0f);
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/333825-bloodhound-inspired-legit-csgo-esp.html with some edits
 	void findBestSound(Entity_t* ent);
 	void drawSound();

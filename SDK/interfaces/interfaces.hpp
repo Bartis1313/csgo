@@ -81,6 +81,8 @@ namespace interfaces
 	inline Entity_t** gameRules = nullptr;
 
 	bool init();
+
+	inline bool done = false;
 }
 
 namespace gameFunctions

@@ -106,6 +106,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.4.2 - Rainbow colors can be an option from picker, remade color picker + logic in config for color.
 * 1.4.3 - Finish nade prediction at all, warning for tracers will be scaled with distance to the nade.
 * 1.4.4 - Sound esp is done. Credits to the guy who had the idea with this. Scaling included for sound circles.
+* 1.4.5 - Changes in code, mainly to render low levels things such as images by resources. Few slight changes into imgui: add ability to load up image by memory, ability to draw multicolors with poly. Discord rpc with updated information from client.
 </details>
 
 # Dependencies

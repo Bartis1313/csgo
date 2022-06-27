@@ -15,6 +15,8 @@
 #include "../../utilities/renderer/renderer.hpp"
 #include "../../utilities/utilities.hpp"
 #include "../../utilities/console/console.hpp"
+#include "../../utilities/res.hpp"
+#include "../../resource.h"
 
 static bool isValidWindow()
 {
@@ -54,6 +56,8 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 	device->GetVertexDeclaration(&ppdecl);
 	device->GetVertexShader(&ppshader);
 
+	static Resource res{ IDB_PNG1, "PNG" };
+
 	// BEGIN DRAW
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
@@ -63,6 +67,7 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		menu.draw();
 		console.drawLog();
 		const auto imdraw = ImGui::GetBackgroundDrawList();
+		//imRender.drawImage(imdraw, res, 300, 300, 200, 200);
 		imRender.renderPresent(imdraw);
 		background.draw(imdraw);
 		radar.run();

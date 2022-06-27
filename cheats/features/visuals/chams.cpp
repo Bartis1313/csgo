@@ -26,7 +26,7 @@ void Chams::init()
 {
 	static auto bOnce = [this]()
 	{
-		m_flat = interfaces::matSys->createMaterial(XOR("Flat"), KeyValues::fromString(XOR("UnlitGeneric")));
+		m_flat = interfaces::matSys->createMaterial(XOR("Flat"), KeyValues::fromString(XOR("UnlitGeneric")));;
 		m_generic = interfaces::matSys->createMaterial(XOR("Generic"), KeyValues::fromString(XOR("VertexLitGeneric")));
 		m_glow =
 		{
@@ -42,8 +42,8 @@ void Chams::init()
 	} ();
 }
 
-Chams::Mat_t Chams::createFromBuf(const std::string& name, bool ignore, bool wireframe, const std::string& shader, const std::string& baseTexture,
-	const std::string& envMap, const std::string& proxies)
+Chams::Mat_t Chams::createFromBuf(const std::string_view name, bool ignore, bool wireframe, const std::string_view shader, const std::string_view baseTexture,
+	const std::string_view envMap, const std::string_view proxies)
 {
 	/*auto retBoolStr = [](bool str) -> std::string
 	{
@@ -67,13 +67,13 @@ Chams::Mat_t Chams::createFromBuf(const std::string& name, bool ignore, bool wir
 			{5}
 		}}
 	}})#"
-	), shader, baseTexture, envMap, /*retBoolStr(ignore)*/ ignore, /*retBoolStr(wireframe)*/ wireframe, proxies);
+	), shader, baseTexture, envMap, ignore ? 1 : 0, wireframe ? 1 : 0, proxies);
 
-	auto key = new KeyValues{ buf.c_str() };
-	m_keyBuf.push_back(key);
-	key->loadFromBuffer(name.c_str(), buf.c_str());
+	auto key = new KeyValues{ buf.data() };
+	//m_keyBuf.push_back(key);
+	key->loadFromBuffer(name.data(), buf.c_str());
 
-	return Mat_t{ interfaces::matSys->createMaterial(name.c_str(), key) };
+	return Mat_t{ interfaces::matSys->createMaterial(name.data(), key) };
 }
 
 void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& color, bool force, bool call)
