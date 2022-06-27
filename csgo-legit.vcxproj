@@ -44,22 +44,22 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\barti\source\repos\csgo legit\dependencies\discord\include;$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)dependencies\discord\include;$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)dependencies\freetype\win32;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>.\build\debug\</OutDir>
     <IntDir>$(Configuration)\</IntDir>
     <TargetName>Debug_$(ProjectName)</TargetName>
-    <SourcePath>C:\Users\barti\source\repos\csgo legit\dependencies\discord\src;$(SourcePath)</SourcePath>
+    <SourcePath>$(SolutionDir)dependencies\discord\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>.\build\Release\</OutDir>
     <LibraryPath>$(SolutionDir)dependencies\freetype\win32;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Users\barti\source\repos\csgo legit\dependencies\discord\include;$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)dependencies\discord\include;$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
     <IntDir>$(Configuration)\</IntDir>
     <GenerateManifest>false</GenerateManifest>
     <LinkIncremental>false</LinkIncremental>
-    <SourcePath>C:\Users\barti\source\repos\csgo legit\dependencies\discord\src;$(SourcePath)</SourcePath>
+    <SourcePath>$(SolutionDir)dependencies\discord\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
