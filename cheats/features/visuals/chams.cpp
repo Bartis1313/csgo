@@ -16,17 +16,11 @@
 #include "../../../config/vars.hpp"
 #include "../../game.hpp"
 
-Chams::~Chams()
-{
-	for (const auto el : m_keyBuf)
-		delete el;
-}
-
 void Chams::init()
 {
 	static auto bOnce = [this]()
 	{
-		m_flat = interfaces::matSys->createMaterial(XOR("Flat"), KeyValues::fromString(XOR("UnlitGeneric")));;
+		m_flat = interfaces::matSys->createMaterial(XOR("Flat"), KeyValues::fromString(XOR("UnlitGeneric")));
 		m_generic = interfaces::matSys->createMaterial(XOR("Generic"), KeyValues::fromString(XOR("VertexLitGeneric")));
 		m_glow =
 		{
@@ -40,40 +34,6 @@ void Chams::init()
 
 		return true;
 	} ();
-}
-
-Chams::Mat_t Chams::createFromBuf(const std::string_view name, bool ignore, bool wireframe, const std::string_view shader, const std::string_view baseTexture,
-	const std::string_view envMap, const std::string_view proxies)
-{
-	/*auto retBoolStr = [](bool str) -> std::string
-	{
-		return str ? XOR("1") : XOR("0");
-	};*/
-
-	const std::string buf = FORMAT(XOR(R"#("{0}"
-	{{
-		"$basetexture"		"{1}"
-		"$envmap"			"{2}"
-		"$envmapfresnel"	"0"
-		"$model"			"1"
-		"$translucent"		"0"
-		"$ignorez"			"{3}"
-		"$selfillum"		"1"
-		"$halflambert"		"1"
-		"$wireframe"		"{4}"
-		"$nofog"			"1"
-		"proxies"
-		{{
-			{5}
-		}}
-	}})#"
-	), shader, baseTexture, envMap, ignore ? 1 : 0, wireframe ? 1 : 0, proxies);
-
-	auto key = new KeyValues{ buf.data() };
-	//m_keyBuf.push_back(key);
-	key->loadFromBuffer(name.data(), buf.c_str());
-
-	return Mat_t{ interfaces::matSys->createMaterial(name.data(), key) };
 }
 
 void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& color, bool force, bool call)
@@ -98,7 +58,7 @@ void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& 
 		mat = m_pearlescent;
 		break;
 	default:
-		break;
+		return;
 	}
 
 	if (!mat.getMat())

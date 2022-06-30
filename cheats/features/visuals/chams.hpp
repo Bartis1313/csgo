@@ -18,7 +18,6 @@ class Chams final
 {
 public:
 	void init();
-	~Chams();
 	void run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 private:
 	void overrideChams(int styles, bool ignore, bool wireframe, const Color& color, bool force = true, bool call = true);
@@ -35,8 +34,6 @@ private:
 		IMaterial* m_mat = nullptr;
 		bool m_glow = false;
 	};
-	Mat_t createFromBuf(const std::string_view name, bool ignore, bool wireframe, const std::string_view shader, const std::string_view baseTexture = "",
-		const std::string_view envMap = "", const std::string_view proxies = "");
 
 	void drawBackTrack(Player_t* ent);
 	void CALL(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
