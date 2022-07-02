@@ -129,15 +129,3 @@ Vector math::vectorToAngle(const Vector& vec)
 	angle.z = 0.0f;
 	return angle;
 }
-
-float math::customSin(float time, float multiply)
-{
-	constexpr float RAD_PI_2 = 2.0f * PI;
-	float a = time / RAD_PI_2;
-	float angle = time - std::floor(a) * RAD_PI_2;
-	if (angle >= RAD_PI_2)
-		angle = 0.0f;
-
-	float res = (0.5f * std::sin(angle) + 0.5f) * multiply;
-	return res;
-}

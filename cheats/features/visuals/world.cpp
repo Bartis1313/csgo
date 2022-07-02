@@ -460,7 +460,7 @@ void World::drawSmoke(Entity_t* ent)
 
 	if (!smoke->m_nSmokeEffectTickBegin())
 	{
-		drawCustomSmoke(ent->absOrigin(), 30.0f, math::customSin(interfaces::globalVars->m_curtime, 4.0f));
+		drawCustomSmoke(ent->absOrigin(), 30.0f);
 		return;
 	}
 
@@ -478,7 +478,7 @@ void World::drawSmoke(Entity_t* ent)
 	//imRender.drawCircle3DFilled(origin, smokeRadius, 216, col, col, true, 2.0f);
 	// many points to make it smooth
 	drawArc3DSmoke(origin, smokeRadius, 512, scale, config.get<CfgColor>(vars.cDrawSmoke).getColor(), false, 2.0f, ImFonts::tahoma14, FORMAT(XOR("{:.2f}s"), time), Colors::Orange);
-	drawCustomSmoke(origin, smokeRadius, math::customSin(interfaces::globalVars->m_curtime, 4.0f));
+	drawCustomSmoke(origin, smokeRadius);
 
 	// timer
 	/*if (Vector2D s; imRender.worldToScreen(origin, s))
@@ -732,13 +732,10 @@ void World::removeSmoke(int frame)
 		*reinterpret_cast<size_t*>(smokeCount) = 0;
 }
 
-void World::drawCustomSmoke(const Vector& pos, float radius, float angl)
+void World::drawCustomSmoke(const Vector& pos, float radius)
 {
-	//printf("%f\n", angl);
-
-	constexpr float step = std::numbers::pi_v<float> *2.0f / 32;
-	float angle = std::numbers::pi_v<float> *2.0f * angl;
-	Vector end = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
+	// clockwise for better effect
+	Vector end = { radius * std::sin(interfaces::globalVars->m_curtime) + pos.x, radius * std::cos(interfaces::globalVars->m_curtime) + pos.y, pos.z };
 
 	interfaces::effects->smoke(end, -1, 5.0f, 1.0f);
 }

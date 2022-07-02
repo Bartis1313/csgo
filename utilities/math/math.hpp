@@ -25,6 +25,4 @@ namespace math
 	_NODISCARD float normalizePitch(float pitch);
 	// direction vector based on euler dimension
 	_NODISCARD Vector vectorToAngle(const Vector& vec);
-	// broken for now :(
-	_NODISCARD float customSin(float time, float multiply = 1.0f);
 }

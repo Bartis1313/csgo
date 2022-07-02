@@ -33,7 +33,7 @@ public:
 	void pushLocalImpacts(const hitStructLocal_t& hit);
 	void removeBloodSpray(int frame);
 	void removeSmoke(int frame);
-	void drawCustomSmoke(const Vector& pos, float radius, float angl);
+	void drawCustomSmoke(const Vector& pos, float radius);
 	void drawBombOverlay();
 	Bomb_t* m_bombEnt;
 	std::string m_whoPlanted = "";
