@@ -322,7 +322,7 @@ bool GrenadePrediction::checkDetonate(const Vector& vecThrow, const Trace_t& tr,
 		return vecThrow.length2D() <= 0.2f && check();
 	}
 	case WEAPON_MOLOTOV:
-	case WEAPON_FIREBOMB:
+	case WEAPON_INCGRENADE:
 	{
 		const static float molotov_throw_detonate_time = interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"))->getFloat();
 		const static float weapon_molotov_maxdetonateslope = interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
@@ -478,6 +478,15 @@ void GrenadeWarning::NadeTrace_t::traceHull(const Vector& src, const Vector& end
 void GrenadeWarning::NadeTrace_t::pushEntity(const Vector& src, Trace_t& tr)
 {
 	traceHull(m_pos, m_pos + src, m_nadeOwner, &tr);
+
+	// lazy attempt... see nadepred check code
+	if (m_index == WEAPON_MOLOTOV || m_index == WEAPON_INCGRENADE)
+	{
+		const static float weapon_molotov_maxdetonateslope = interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
+
+		if (bool res = tr.didHit() && tr.m_plane.m_normal.z >= std::cos(DEG2RAD(weapon_molotov_maxdetonateslope)); res)
+			destroyTrace();
+	}
 }
 
 void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float interval)
@@ -617,16 +626,26 @@ void GrenadeWarning::NadeTrace_t::push()
 	m_path.push_back(m_pos);
 }
 
-WeaponIndex GrenadeWarning::getIndexByClass(int idx)
+WeaponIndex GrenadeWarning::getIndexByClass(int idx, Studiohdr_t* studio)
 {
-	switch (idx)
+	switch (std::string_view name = studio->m_name; idx)
 	{
 	case CBaseCSGrenadeProjectile:
-		return WEAPON_HEGRENADE;
+	{
+		if(name.find(XOR("ggrenade")) != std::string::npos)
+			return WEAPON_HEGRENADE;
+		else
+			return WEAPON_FLASHBANG;
+	}
 	case CSmokeGrenadeProjectile:
 		return WEAPON_SMOKEGRENADE;
 	case CMolotovProjectile:
-		return WEAPON_MOLOTOV;
+	{
+		if (name.find(XOR("molotov")) != std::string::npos)
+			return WEAPON_MOLOTOV;
+		else
+			return WEAPON_INCGRENADE;
+	}
 	case CDecoyProjectile:
 		return WEAPON_DECOY;
 	default:
@@ -737,7 +756,6 @@ void GrenadeWarning::run(Nade_t* entity)
 		return;
 
 	auto ownerHandle = entity->getIndex();
-
 	// keep it for sure correct, would also place decoy netvar of start but there is none
 	if (entity->m_nExplodeEffectTickBegin() ||
 		(id == CSmokeGrenadeProjectile && reinterpret_cast<Smoke_t*>(entity)->m_nSmokeEffectTickBegin()))
@@ -746,7 +764,15 @@ void GrenadeWarning::run(Nade_t* entity)
 		return;
 	}
 
-	auto idx = getIndexByClass(id);
+	auto model = entity->getModel();
+	if (!model)
+		return;
+
+	auto studio = interfaces::modelInfo->getStudioModel(model);
+	if (!studio)
+		return;
+
+	auto idx = getIndexByClass(id, studio);
 	if (idx == WEAPON_NONE)
 		return;
 

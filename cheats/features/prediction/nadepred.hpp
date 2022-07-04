@@ -10,6 +10,7 @@ class Entity_t;
 class Player_t;
 class Nade_t;
 enum WeaponIndex;
+struct Studiohdr_t;
 
 // a lot of code is in cstrike15 leak, as I tried to do this I run on few cases where it was not pixel perfect
 // fix is def needed, for breakables bounces
@@ -86,7 +87,10 @@ private:
 	};
 
 	std::unordered_map<int, NadeTrace_t> m_datas = {};
-	WeaponIndex getIndexByClass(int idx);
+public:
+	// studio is special case arg - because henade and flashbang have exactly same class id
+	// and people who think definition index is ok are wrong, player ents DON'T hold the nade anymore in that case
+	WeaponIndex getIndexByClass(int idx, Studiohdr_t* studio);
 };
 
 inline GrenadePrediction nadePred;

@@ -189,18 +189,43 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 		{
 			std::pair<std::string, CfgColor> nades;
 
-			if (projectileName.find(XOR("flashbang")) != std::string::npos)
+			switch (nadeWarning.getIndexByClass(id, studio))
+			{
+			case WEAPON_FLASHBANG:
+			{
 				nades = { XOR("FLASHBANG"), config.get<CfgColor>(vars.cFlashBang) };
-			if (projectileName.find(XOR("ggrenade")) != std::string::npos && wpn->m_nExplodeEffectTickBegin() < 1) // prevent too long time
-				nades = { XOR("GRENADE"), config.get<CfgColor>(vars.cGranede) };
-			if (projectileName.find(XOR("molotov")) != std::string::npos)
+				break;
+			}
+			case WEAPON_HEGRENADE:
+			{
+				if(wpn->m_nExplodeEffectTickBegin() < 1) // prevent too long time
+					nades = { XOR("GRENADE"), config.get<CfgColor>(vars.cGranede) };
+				break;
+			}
+			case WEAPON_MOLOTOV:
+			{
 				nades = { XOR("MOLOTOV"), config.get<CfgColor>(vars.cMolotov) };
-			if (projectileName.find(XOR("incendiary")) != std::string::npos)
+				break;
+			}
+			case WEAPON_INCGRENADE:
+			{
 				nades = { XOR("FIRE INC"), config.get<CfgColor>(vars.cIncediary) };
-			if (projectileName.find(XOR("smokegrenade")) != std::string::npos && !reinterpret_cast<Smoke_t*>(wpn)->m_nSmokeEffectTickBegin()) // prevent too long time
-				nades = { XOR("SMOKE"), config.get<CfgColor>(vars.cSmoke) };
-			if (projectileName.find(XOR("decoy")) != std::string::npos) // this nade time is also too long, to prevent it you need to check tick time. There is no netvar for decoys
-				nades = { XOR("DECOY"), config.get<CfgColor>(vars.cDecoy) };
+				break;
+			}
+			case WEAPON_SMOKEGRENADE:
+			{
+				if (!reinterpret_cast<Smoke_t*>(wpn)->m_nSmokeEffectTickBegin()) // prevent too long time
+					nades = { XOR("SMOKE"), config.get<CfgColor>(vars.cSmoke) };
+				break;
+			}
+			case WEAPON_DECOY:
+			{
+				nades = { XOR("DECOY"), config.get<CfgColor>(vars.cDecoy) }; // this nade time is also too long, check velocity if it's very low
+				break;
+			}
+			case WEAPON_NONE: // understand as NADE_NONE
+				return;
+			}
 
 			if (Box box; utilities::getBox(ent, box))
 				imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana12, nades.first, true, nades.second.getColor());
