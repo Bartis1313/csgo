@@ -3,6 +3,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <format>
 
 #include "../dependencies/lazy_importer.hpp"
 #include "../dependencies/xorstr.hpp"

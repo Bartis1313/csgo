@@ -18,14 +18,14 @@ void Prediction::start(CUserCmd* cmd)
 		return true;
 	} ();
 
-	// make it as a unique prediction, like md5 unique hash iirc or smth
+	// make it as a unique prediction, md5 random
 	*predicionRandomSeed = cmd->m_randomSeed & 0x7FFFFFFF;
 
 	// get current times to globals
 	curTime = interfaces::globalVars->m_curtime;
 	frameTime = interfaces::globalVars->m_frametime;
 
-	// store not current, but valid ticks/times to the game
+	// store not current, but valid times to the game
 	interfaces::globalVars->m_curtime = game::serverTime(cmd);
 	interfaces::globalVars->m_frametime = game::localPlayer->m_fFlags() & FL_FROZEN ? 0.0f : interfaces::globalVars->m_intervalPerTick;
 
@@ -46,7 +46,7 @@ void Prediction::end()
 	if (!game::localPlayer)
 		return;
 
-	// just resets here, so we have valid prediction every frame
+	// just resets here, so we have valid prediction every tick
 
 	interfaces::gameMovement->finishTrackPredictionErrors(game::localPlayer);
 	interfaces::moveHelper->setHost(nullptr);
@@ -68,7 +68,7 @@ void Prediction::addToPrediction(CUserCmd* cmd, const std::function<void()>& fun
 
 void Prediction::update()
 {
-	auto state = interfaces::clientState;
+	const static auto state = interfaces::clientState;
 	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/engine/cl_pred.cpp#L64
 	if (bool validframe = state->m_deltaTick > 0)
 		interfaces::prediction->update(state->m_deltaTick, validframe,
