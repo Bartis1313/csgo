@@ -60,6 +60,7 @@ bool interfaces::init()
 	CAPNLOG(efx, IVEfx, ENGINE_DLL, "VEngineEffects001");
 	CAPNLOG(iSystem, InputSystem, INPUTSYSTEM_DLL, "InputSystemVersion001");
 	CAPNLOG(effects, IEffects, CLIENT_DLL, "IEffects001");
+	CAPNLOG(fileSystem, IFileSystem, FILESYS_DLL, "VFileSystem017");
 
 #undef CAPNLOG
 

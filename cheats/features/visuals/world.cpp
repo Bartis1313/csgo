@@ -147,6 +147,7 @@ void World::drawBombOverlay()
 		imRenderWindow.drawText(width / 2.0f, 2.0f, 15, ImFonts::franklinGothic30, FORMAT(XOR("Site {}"), m_bombEnt->getBombSiteName()), true, Colors::White, false);
 		imRenderWindow.drawText(width / 2.0f, 20.0f, 15, ImFonts::franklinGothic30, FORMAT(XOR("Damage {:.2f}"), dmg), true, isSafe ? Colors::Green : Colors::Red, false);
 
+		imRenderWindow.end();
 		ImGui::End();
 	}
 	ImGui::PopStyleColor();
@@ -753,7 +754,7 @@ void World::removeSmoke(int frame)
 	const static auto throughSmoke = utilities::patternScan(CLIENT_DLL, GOES_THROUGH_SMOKE);
 	const static auto smokeCount = *reinterpret_cast<uintptr_t*>(throughSmoke + 0x8);
 
-	if (config.get<bool>(vars.bEditEffects)) // remove effects from inside, this is why we nulling smoke count
+	if (config.get<bool>(vars.bEditEffectsSmoke)) // remove effects from inside, this is why we nulling smoke count
 		*reinterpret_cast<size_t*>(smokeCount) = 0;
 }
 

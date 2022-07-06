@@ -39,14 +39,14 @@ struct CParticleAttributeAddressTable
 		*/
 
 		auto rgb = floatAttribute(PARTICLE_ATTRIBUTE_TINT_RGB, num);
-		//auto a = floatAttribute(PARTICLE_ATTRIBUTE_ALPHA, num);
+		auto a = floatAttribute(PARTICLE_ATTRIBUTE_ALPHA, num);
 
 
 		rgb[0] = color.r();
 		rgb[4] = color.g();
 		rgb[8] = color.b();
 
-		//*a = color.a();
+		*a = color.a();
 	}
 	void modulateAlpha(float alpha, int num)
 	{

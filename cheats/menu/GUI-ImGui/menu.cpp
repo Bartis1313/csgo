@@ -233,19 +233,24 @@ static void renderVisuals()
 				ImGui::MultiCombo(XOR("Dropped flags"), selections::droppedFlags, config.getRef<std::vector<bool>>(vars.vDroppedFlags));
 				ImGui::ColorPicker(XOR("Dropped color"), &config.getRef<CfgColor>(vars.cDrawDropped));
 
-				ImGui::Checkbox(XOR("Edit effects"), &config.getRef<bool>(vars.bEditEffects));
+				ImGui::Checkbox(XOR("##Edit molotov"), &config.getRef<bool>(vars.bEditEffectsMoly));
+				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Edited molotov"), &config.getRef<CfgColor>(vars.cEditMolotov));
 
+				ImGui::Checkbox(XOR("##Edit blood"), &config.getRef<bool>(vars.bEditEffectsBlood));
+				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Edited blood"), &config.getRef<CfgColor>(vars.cEditBlood));
 
-				ImGui::SliderFloat(XOR("Smoke alpha"), &config.getRef<float>(vars.fSmokeAlpha), 0.0f, 1.0f);
+				ImGui::Checkbox(XOR("##Edit smoke"), &config.getRef<bool>(vars.bEditEffectsSmoke));
+				ImGui::SameLine();
+				ImGui::ColorPicker(XOR("Edited smoke"), &config.getRef<CfgColor>(vars.cEditSmoke));
 
-				ImGui::Checkbox(XOR("Enabled molotov circle"), &config.getRef<bool>(vars.bDrawmolotovRange));
+				ImGui::Checkbox(XOR("##Enabled molotov circle"), &config.getRef<bool>(vars.bDrawmolotovRange));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Draw molotov circle"), &config.getRef<CfgColor>(vars.cMolotovRange));
 
 
-				ImGui::Checkbox(XOR("Enabled smoke circle"), &config.getRef<bool>(vars.bDrawSmoke));
+				ImGui::Checkbox(XOR("##Enabled smoke circle"), &config.getRef<bool>(vars.bDrawSmoke));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Draw smoke circle"), &config.getRef<CfgColor>(vars.cDrawSmoke));
 				ImGui::SameLine();
@@ -258,6 +263,8 @@ static void renderVisuals()
 	}
 	ImGui::Columns();
 }
+
+#include "../../features/visuals/radar.hpp"
 
 static void renderMisc()
 {
@@ -304,9 +311,16 @@ static void renderMisc()
 				ImGui::SliderFloat(XOR("Thickness"), &config.getRef<float>(vars.fRadarThickness), 0.0f, 20.0f);
 				ImGui::SliderFloat(XOR("Length"), &config.getRef<float>(vars.fRadarLenght), 0.0f, 40.0f);
 				ImGui::SliderFloat(XOR("Scale"), &config.getRef<float>(vars.fRadarScale), 0.0f, 10.0f);
+				ImGui::SliderFloat(XOR("Radar size"), &config.getRef<float>(vars.fRadarSize), 10.0f, 500.0f);
 				ImGui::Checkbox(XOR("Draw out of radar"), &config.getRef<bool>(vars.bRadarRanges));
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("If enemy is out of the radar\nThen icons will still appear but clamped"));
+				if (ImGui::Button(XOR("Refresh texture manually")))
+				{
+					radar.manuallyInitTexture();
+				}
+				ImGui::SameLine();
+				ImGui::HelpMarker(XOR("Will not for workshop maps\nYou can try forcing the engine to re-render by pressing escape few times"));
 			}
 			ImGui::EndGroupPanel();
 

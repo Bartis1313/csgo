@@ -32,6 +32,7 @@ void hooks::init()
 	const auto createMoveProxyTarget = vfunc::getVFunc(interfaces::client, proxyCreateMove::index);
 	const auto sv_cheatsAddr = interfaces::cvar->findVar(XOR("sv_cheats"));
 	const auto sv_cheatsTarget = vfunc::getVFunc(sv_cheatsAddr, sv_cheats::index);
+	const auto unkFileSystemtarget = vfunc::getVFunc(interfaces::fileSystem, unknownFileSystem::index);
 #pragma endregion
 
 	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK);
@@ -63,6 +64,9 @@ void hooks::init()
 
 	const auto sendDatagramAddr = utilities::patternScan(ENGINE_DLL, SEND_DATAGRAM);
 	const auto sendDatagramTarget = reinterpret_cast<void*>(sendDatagramAddr);
+
+	const auto unkownOverviewMapAddr = utilities::patternScan(CLIENT_DLL, UNK_OVBERVIEWMAP);
+	const auto unkownOverviewMapTarget = reinterpret_cast<void*>(unkownOverviewMapAddr);
 
 #pragma region DX9
 	const auto resetTarget = vfunc::getVFunc(interfaces::dx9Device, reset::index);
@@ -98,6 +102,8 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(sv_cheatsTarget, sv_cheats);
 	HOOK_SAFE(particlesSimulationTarget, particlesSimulations);
 	HOOK_SAFE(sendDatagramTarget, sendDatagram);
+	HOOK_SAFE(unkownOverviewMapTarget, unknownOverViewFun);
+	HOOK_SAFE(unkFileSystemtarget, unknownFileSystem);
 
 #undef HOOK_SAFE
 

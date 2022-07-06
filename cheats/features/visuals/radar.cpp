@@ -1,36 +1,42 @@
 #include "radar.hpp"
 
+#include <d3dx9.h>
+
 #include "../../../SDK/IVEngineClient.hpp"
 #include "../../../SDK/CGlobalVars.hpp"
 #include "../../../SDK/IClientEntityList.hpp"
 #include "../../../SDK/math/Vector.hpp"
-#include "../../../SDK/math/Vector2D.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
+#include "../../../SDK/MapStruct.hpp"
 
 #include "../../game.hpp"
 #include "../../../config/vars.hpp"
 #include "../../globals.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../../utilities/math/math.hpp"
+#include "../../../utilities/res.hpp"
+#include "../../../utilities/console/console.hpp"
 
 #include "../../../dependencies/ImGui/imgui.h"
 #include "../../../dependencies/ImGui/imgui_internal.h"
 
-Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale)
+void Radar::initRetAddr()
 {
-	auto dotThickness = config.get<float>(vars.fRadarThickness);
+	m_retAddr = reinterpret_cast<uintptr_t*>(utilities::patternScan(PANORAMA_DLL, UNK_FILESYS));
+}
 
-	float directionX, directionY;
-	float dotX, dotY;
+Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale, bool clipRanges)
+{
+	float dotThickness = config.get<float>(vars.fRadarThickness);
 
-	directionX = -(entPos.y - eye.y);
-	directionY = entPos.x - eye.x;
+	float directionX = entPos.x - eye.x;
+	float directionY = -(entPos.y - eye.y);
 
 	auto yawDeg = angles.y - 90.0f;
 	// calculate dots of radian and return correct view
 	const auto yawToRadian = DEG2RAD(yawDeg);
-	dotX = (directionY * std::cos(yawToRadian) - directionX * std::sin(yawToRadian)) / 20.0f;
-	dotY = (directionY * std::sin(yawToRadian) + directionX * std::cos(yawToRadian)) / 20.0f;
+	float dotX = (directionX * std::cos(yawToRadian) - directionY * std::sin(yawToRadian)) / 20.0f;
+	float dotY = (directionX * std::sin(yawToRadian) + directionY * std::cos(yawToRadian)) / 20.0f;
 	// return correct scale, it zooms in/out depends what value is thrown
 	dotX *= scale;
 	dotY *= scale;
@@ -39,22 +45,24 @@ Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 	dotY += size.y / 2.0f;
 
 	// do not draw out of range, added pos, even we pass 0, but for clarity
-	if (!config.get<bool>(vars.bRadarRanges))
+	if (clipRanges)
 	{
-		if (dotX < pos.x)
-			return {}; // this is zero vector
+		if(!config.get<bool>(vars.bRadarRanges))
+		{
+			if (dotX < pos.x)
+				return {}; // this is zero vector
 
-		if (dotX > pos.y + size.x - dotThickness)
-			return {};
+			if (dotX > pos.y + size.x - dotThickness)
+				return {};
 
-		if (dotY < pos.y)
-			return {};
+			if (dotY < pos.y)
+				return {};
 
-		if (dotY > pos.y + size.y - dotThickness)
-			return {};
-	}
-	else
-	{
+			if (dotY > pos.y + size.y - dotThickness)
+				return {};
+		}
+		else
+		{
 		if (dotX < pos.x)
 			dotX = pos.x;
 
@@ -66,6 +74,7 @@ Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 
 		if (dotY > pos.y + size.y - dotThickness)
 			dotY = pos.y + size.y - dotThickness;
+		}
 	}
 
 	// again correct for out center...
@@ -73,6 +82,100 @@ Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 	dotY += pos.y;
 
 	return { dotX, dotY };
+}
+
+void Radar::onInit(MapStruct* map)
+{
+	m_pos = map->m_origin;
+	m_scale = map->m_scale;
+
+	m_inited = true;
+}
+
+void Radar::manuallyInitPos()
+{
+	if (!game::isAvailable())
+		return;
+
+	const auto map = reinterpret_cast<MapStruct*>(utilities::findHudElement(XOR("CCSGO_MapOverview")));
+	m_pos = map->m_origin;
+	m_scale = map->m_scale;
+
+	m_inited = true;
+}
+
+bool Radar::manuallyInitTexture()
+{
+	if (!game::isAvailable())
+		return false;
+
+	std::string levelName = interfaces::engine->getLevelName();
+
+	// not really working for workshops
+	if (auto place = levelName.rfind('/'); place != std::string::npos)
+		levelName = levelName.substr(place + 1, levelName.size());
+
+	std::string path = FORMAT(XOR("csgo\\resource\\overviews\\{}_radar.dds"), levelName);
+
+	// prob not supported format
+	/*Resource res{ path };
+	if (res.getTexture())
+		m_mapTexture = res.getTexture();
+	else
+		return false;*/
+
+	if(auto hr = D3DXCreateTextureFromFileA(interfaces::dx9Device, path.c_str(), &m_mapTexture); hr == D3D_OK)
+		console.log(TypeLogs::LOG_INFO, "Created map texture from path: {}", path);
+	else
+	{
+		console.log(TypeLogs::LOG_ERR, "Creating map texture from path failed, code: {}", hr);
+		return false;
+	}
+
+	return true;
+}
+
+Radar::MapPos Radar::getMapPos() const
+{
+	return MapPos{ m_pos, m_scale * 1000.0f };
+}
+
+#define TO_IMV2(name, vec2) ImVec2 name{ vec2.x, vec2.y }
+#define __TO_IMV2(name, vec2) name = { vec2.x, vec2.y }
+
+void Radar::drawMap()
+{
+	if (!m_inited)
+		manuallyInitPos();
+
+	auto map = getMapPos();
+
+	// square
+	float size = map.m_scale;
+	std::array poses =
+	{
+		Vector{ m_pos.x, m_pos.y, 0.0f },
+		Vector{ m_pos.x + size, m_pos.y, 0.0f },
+		Vector{ m_pos.x + size, m_pos.y - size, 0.0f },
+		Vector{ m_pos.x, m_pos.y - size, 0.0f },
+	};
+
+	const auto myEye = game::localPlayer->getEyePos();
+	Vector ang = {};
+	interfaces::engine->getViewAngles(ang);
+	float scale = config.get<float>(vars.fRadarScale);
+
+	auto _p1 = entToRadar(myEye, ang, poses.at(0), m_drawPos, m_drawSize, scale, false);
+	auto _p2 = entToRadar(myEye, ang, poses.at(1), m_drawPos, m_drawSize, scale, false);
+	auto _p3 = entToRadar(myEye, ang, poses.at(2), m_drawPos, m_drawSize, scale, false);
+	auto _p4 = entToRadar(myEye, ang, poses.at(3), m_drawPos, m_drawSize, scale, false);
+
+	TO_IMV2(p1, _p1);
+	TO_IMV2(p2, _p2);
+	TO_IMV2(p3, _p3);
+	TO_IMV2(p4, _p4);
+
+	imRenderWindow.getDrawList()->AddImageQuad(m_mapTexture, p1, p2, p3, p4);
 }
 
 void Radar::run()
@@ -87,9 +190,14 @@ void Radar::run()
 	if (!interfaces::engine->isInGame())
 		return;
 
-	if (ImGui::Begin(XOR("Radar"), &ref, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar))
+	float size = config.get<float>(vars.fRadarSize);
+	ImGui::SetNextWindowSize({ size, size });
+	if (ImGui::Begin(XOR("Radar"), &ref, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
 		imRenderWindow.addList();
+
+		__TO_IMV2(m_drawSize, imRenderWindow.getRect());
+		__TO_IMV2(m_drawPos, imRenderWindow.getPos());
 
 		const auto myEye = game::localPlayer->getEyePos();
 		Vector ang = {};
@@ -98,10 +206,12 @@ void Radar::run()
 		auto rect = imRenderWindow.getRect();
 		float scaledFov = globals::FOV / 5.0f;
 		// assume calculation is only in straight line representing 2D, so max = 180 deg, and this is not correct in 100%, idk better solution
-		float fovAddon = rect.y / std::tan(DEG2RAD((180.f - (globals::FOV + scaledFov)) / 2.0f));
+		float fovAddon = rect.y / std::tan(DEG2RAD((180.0f - (globals::FOV + scaledFov)) / 2.0f));
 
 		float middleX = rect.x / 2.0f;
 		float middleY = rect.y / 2.0f;
+
+		drawMap();
 
 		// triangles representing fov view
 		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX + fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
@@ -137,7 +247,7 @@ void Radar::run()
 			if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
 				continue;
 
-			const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D{}, Vector2D{ imRenderWindow.getWidth(), imRenderWindow.getHeight() }, config.get<float>(vars.fRadarScale));
+			const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D{}, Vector2D{ imRenderWindow.getWidth(), imRenderWindow.getHeight() }, config.get<float>(vars.fRadarScale), true);
 
 			auto entYaw = ent->m_angEyeAngles().y;
 
@@ -164,6 +274,7 @@ void Radar::run()
 
 			}
 		}
+		imRenderWindow.end();
 		ImGui::End();
 	}
 }

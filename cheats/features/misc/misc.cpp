@@ -255,6 +255,7 @@ void Misc::drawFpsPlot()
 			i++;
 		}
 
+		imRenderWindow.end();
 		ImGui::End();
 	}
 	if (!plotRef)
@@ -376,6 +377,7 @@ void Misc::drawVelocityPlot()
 		text(imRenderWindow.getPos().x + width / 2.0f, imRenderWindow.getPos().y + 20.0f + height, 30.0f, ImFonts::franklinGothic30,
 			std::format("{}", std::round(game::localPlayer->m_vecVelocity().length2D())), true, Colors::Pink, false);
 
+		imRenderWindow.end();
 		ImGui::End();
 	}
 	if (!plotVelRef)

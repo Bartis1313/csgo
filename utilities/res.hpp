@@ -9,9 +9,9 @@ class Resource final
 {
 public:
 	Resource() = delete;
-	~Resource();
-	Resource(const std::string_view path);
+	Resource(const std::string& path);
 	Resource(int resID, const std::string_view type);
+	Resource(void* data, size_t size);
 	// imgui
 	bool operator()() const { return m_texture; };
 	// imgui
@@ -27,6 +27,10 @@ private:
 	int m_textureID = -1;
 	int m_width;
 	int m_height;
-
-	inline static std::vector<Resource> m_resBuf;
 };
+
+namespace resBufferCollect
+{
+	inline static std::vector<Resource> m_resBuf;
+	void destroyAll();
+}

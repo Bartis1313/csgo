@@ -382,6 +382,9 @@ void* ImGui_CreateTexture(const void* data, int width, int height)
     ImGui_ImplDX9_Data* bd = ImGui_ImplDX9_GetBackendData();
     unsigned char* pixels;
 
+    if (!bd || !bd->pd3dDevice || !data)
+        return NULL;
+
     // Convert RGBA32 to BGRA32 (because RGBA32 is not well supported by DX9 devices)
 #ifndef IMGUI_USE_BGRA_PACKED_COLOR
     ImU32* dst_start = (ImU32*)ImGui::MemAlloc((size_t)width * height * 4);

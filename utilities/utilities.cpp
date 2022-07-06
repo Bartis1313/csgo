@@ -15,9 +15,13 @@
 std::string utilities::getTime()
 {
 	const auto now = std::chrono::system_clock::now();
-	const auto time = std::chrono::system_clock::to_time_t(now);
+	auto time = std::chrono::system_clock::to_time_t(now);
 	std::stringstream ss;
-	ss << std::put_time(std::localtime(&time), XOR("%d:%m:%Y-%X"));
+
+	std::tm bt = {};
+	localtime_s(&bt, &time);
+
+	ss << std::put_time(&bt, XOR("%d:%m:%Y-%X")); 
 	return ss.str();
 }
 

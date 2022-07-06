@@ -1,5 +1,6 @@
 #pragma once
 
+#include <d3dx9.h>
 #include <Windows.h>
 #include <ShlObj.h>
 

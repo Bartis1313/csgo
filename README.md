@@ -42,7 +42,7 @@ This is a trianing software. No further actions taken by people are heeded.
  * Esp - name, flags, boxes, health, armor, ammo, skeleton.
  * DLight - highlights player by dlight
  * Enemy aiming at you warn
- * 2D radar - overlay showing where enemy is
+ * 2D radar - overlay showing where enemy is, with background of the map texture.
  * Custom skybox - listed from game
  * Remove sky - removes props
  * Edit world colors - props/walls/sky
@@ -107,6 +107,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.4.3 - Finish nade prediction at all, warning for tracers will be scaled with distance to the nade.
 * 1.4.4 - Sound esp is done. Credits to the guy who had the idea with this. Scaling included for sound circles.
 * 1.4.5 - Changes in code, mainly to render low levels things such as images by resources. Few slight changes into imgui: add ability to load up image by memory, ability to draw multicolors with poly. Discord rpc with updated information from client.
+* 1.4.6 - Texture rendered in the radar, I run on some weird problems there and unfortunately because of the dds file format it's impossible to use Resource class. Cleaned the project settings. Instead of ignoring the error of unsafe function, getting time is threadsafe now. Game color edits are now run per each instead of applying whole list.
 </details>
 
 # Dependencies

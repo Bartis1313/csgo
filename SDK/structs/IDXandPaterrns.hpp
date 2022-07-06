@@ -23,6 +23,8 @@ enum VTableIndexes
 #define INPUTSYSTEM_DLL			XOR("inputsystem.dll")
 #define SHARED_API				XOR("shaderapidx9.dll")
 #define TIER_DLL				XOR("tier0.dll")
+#define PANORAMA_DLL			XOR("panorama.dll")
+#define FILESYS_DLL				XOR("filesystem_stdio.dll")
 
 #define GLOWMANAGER				XOR("0F 11 05 ? ? ? ? 83 C8 01")
 #define BEAMS					XOR("B9 ? ? ? ? A1 ? ? ? ? FF 10 A1 ? ? ? ? B9")
@@ -117,3 +119,6 @@ ParticleEffect
 // #STR: "ERROR: model verts have been compressed or you don't have , "Could not render eyeball for model '%s' (it has > 65536 ve, "$glint"
 // or find on call stack in x32dbg in studiorender.dll
 #define R_STUDIODRAWPOINTS		XOR("8B 7D FC 03 F8")
+#define UNK_FILESYS				XOR("C7 43 ? ? ? ? ? 83 7C 24 ? ? 7C 25 8B 54 24 48")
+// #STR: "Error! CMapOverview::SetMap: couldn't load file %s.\n", "file://{images_overviews}/%s_radar_spectate.dds", "pos_x", "pos_y", "scale", "resource/overviews/%s.txt"
+#define UNK_OVBERVIEWMAP		XOR("55 8B EC 81 EC ? ? ? ? 53 8B 5D 08 8B D3")

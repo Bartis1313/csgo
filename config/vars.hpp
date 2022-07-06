@@ -133,10 +133,12 @@ struct Variables
 	CONFIG_ADD_VARIABLE(CfgColor, cZeusRange, CfgColor(Colors::Palevioletred, true, 4.0f), "zeus range color");
 	CONFIG_ADD_VARIABLE(bool, bDrawSmoke, false, "draw smoke enabled");
 	CONFIG_ADD_VARIABLE(CfgColor, cDrawSmoke, Colors::White, "draw smoke color");
-	CONFIG_ADD_VARIABLE(bool, bEditEffects, false, "enabled editing game's effects (PARTICLES)");
+	CONFIG_ADD_VARIABLE(bool, bEditEffectsBlood, false, "enabled editing game's effects (BLOOD)");
+	CONFIG_ADD_VARIABLE(bool, bEditEffectsMoly, false, "enabled editing game's effects (MOLOTOV)");
+	CONFIG_ADD_VARIABLE(bool, bEditEffectsSmoke, false, "enabled editing game's effects (SMOKE)");
 	CONFIG_ADD_VARIABLE(CfgColor, cEditMolotov, Colors::Purple, "color molotov edited");
 	CONFIG_ADD_VARIABLE(CfgColor, cEditBlood, Colors::Purple, "color blood edited");
-	CONFIG_ADD_VARIABLE(float, fSmokeAlpha, 0.05f, "edit alpha smoke externally only");
+	CONFIG_ADD_VARIABLE(CfgColor, cEditSmoke, Colors::Purple, "color smoke edited");
 	CONFIG_ADD_VARIABLE(bool, bDrawBulletTracer, false, "bullet tracer enabled");
 	CONFIG_ADD_VARIABLE(float, fDrawBulletTracer, 2.0f, "bullet tracer time");
 	CONFIG_ADD_VARIABLE(CfgColor, cDrawBulletTracer, Colors::LightBlue, "bullet tracer color");
@@ -193,6 +195,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fRadarLenght, 20.0f, "radar lenght of line");
 	CONFIG_ADD_VARIABLE(float, fRadarScale, 1.8f, "radar scaling");
 	CONFIG_ADD_VARIABLE(bool, bRadarRanges, true, "enable radar ranges");
+	CONFIG_ADD_VARIABLE(float, fRadarSize, 200.0f, "Radar size");
 	CONFIG_ADD_VARIABLE(int, iRunMovementTrail, 0, "movement trail line type");
 	CONFIG_ADD_VARIABLE(bool, bRunMovementTrail, false, "enable movement trail line");
 	CONFIG_ADD_VARIABLE(CfgColor, cMovementTrail, Colors::Coral, "movement trail color");

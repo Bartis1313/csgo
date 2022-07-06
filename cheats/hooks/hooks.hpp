@@ -17,6 +17,7 @@ enum hookIndexes
 	END_SCENE = 42,
 	SV_CHEATS = 13,
 	DRAW_IDX_PRIMITIVE = 82,
+	UNKOWN_FILESYS = 89,
 };
 
 class IPanel;
@@ -27,6 +28,7 @@ struct Matrix3x4;
 struct CStudioHdr;
 class CParticleCollection;
 class INetChannel;
+struct MapStruct;
 
 #define FAST_ARGS void* thisptr, void* edx
 
@@ -223,6 +225,21 @@ namespace hooks
 	{
 		using fn = int(__thiscall*)(INetChannel*, void*);
 		static int __fastcall hooked(INetChannel* netChannel , void* edx, void* datagram);
+		inline static fn original = nullptr;
+	};
+
+	struct unknownFileSystem
+	{
+		using fn = int(__stdcall*)(void*);
+		static int __stdcall hooked(void* image);
+		inline static fn original = nullptr;
+		static const int index = UNKOWN_FILESYS;
+	};
+
+	struct unknownOverViewFun
+	{
+		using fn = int(__thiscall*)(MapStruct*, int);
+		static int __fastcall hooked(MapStruct* map, void* edx, int unk);
 		inline static fn original = nullptr;
 	};
 }

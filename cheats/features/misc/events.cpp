@@ -10,6 +10,7 @@
 #include "../misc/misc.hpp"
 #include "../visuals/world.hpp"
 #include "../misc/logger.hpp"
+#include "../visuals/radar.hpp"
 
 #include "../../game.hpp"
 #include "../../globals.hpp"
@@ -33,6 +34,7 @@ void Events::init()
 	add(XOR("round_start"), [](IGameEvent*)
 		{
 			globals::shotsFired = 0, globals::shotsHit = 0, globals::shotsHead = 0;
+			radar.setInited(false);
 		}
 	);
 	add(XOR("player_hurt"), [](IGameEvent* e)

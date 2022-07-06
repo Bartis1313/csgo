@@ -39,6 +39,7 @@ class CTeslaInfo;
 class CEffectData;
 class IClientState;
 class Entity_t;
+class IFileSystem;
 #pragma endregion
 
 namespace interfaces
@@ -79,6 +80,7 @@ namespace interfaces
 	inline IClientState* clientState = nullptr;
 	// remember to dereference!
 	inline Entity_t** gameRules = nullptr;
+	inline IFileSystem* fileSystem = nullptr;
 
 	bool init();
 

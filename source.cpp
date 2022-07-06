@@ -14,6 +14,8 @@
 #include "SEHcatch.hpp"
 #include "cheats/menu/x88Menu/x88menu.hpp"
 #include "cheats/features/misc/discord.hpp"
+#include "utilities/res.hpp"
+#include "cheats/features/visuals/radar.hpp"
 
 #include <thread>
 
@@ -47,6 +49,7 @@ DWORD WINAPI init(PVOID instance)
         hooks::wndProcSys::init();
         callbacks.init();
         callbacks.run();
+        radar.initRetAddr();
         hooks::init();
     }
     catch (const std::runtime_error& err)
@@ -77,6 +80,7 @@ VOID WINAPI _looper(PVOID instance)
     events.shutdown();
     callbacks.shutdown();
     hooks::shutdown();
+    resBufferCollect::destroyAll();
     menu.shutdown();
     console.log(TypeLogs::LOG_INFO, XOR("Hack shutdown"));
     console.shutdown();

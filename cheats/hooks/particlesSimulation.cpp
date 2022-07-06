@@ -33,13 +33,9 @@ constexpr std::array bloodnames =
 	"blood_impact_light_headshot"
 };
 
-// do searches by multithread?
 void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr, void* edx)
 {
 	original(thisPtr);
-
-	if (!config.get<bool>(vars.bEditEffects))
-		return;
 
 	CParticleCollection* root = thisPtr;
 	while (root->m_parent)
@@ -48,29 +44,38 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	std::string_view name = root->m_def.m_obj->m_name.m_buffer;
 	CfgColor colorMolly = config.get<CfgColor>(vars.cEditMolotov);
 	CfgColor colorBlood = config.get<CfgColor>(vars.cEditBlood);
-	float smokeAlpha = config.get<float>(vars.fSmokeAlpha);
+	CfgColor colorSmoke = config.get<CfgColor>(vars.cEditSmoke);
 
-	if (auto itr = std::find(smokenames.cbegin(), smokenames.cend(), name); itr != smokenames.cend())
+	if (config.get<bool>(vars.bEditEffectsSmoke))
 	{
-		for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+		if (auto itr = std::find(smokenames.cbegin(), smokenames.cend(), name); itr != smokenames.cend())
 		{
-			thisPtr->m_particleAttributes.modulateAlpha(smokeAlpha, i);
+			for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+			{
+				thisPtr->m_particleAttributes.modulateColor(colorSmoke.getColor(), i);
+			}
 		}
 	}
 
-	if (auto itr = std::find(bloodnames.cbegin(), bloodnames.cend(), name); itr != bloodnames.cend())
+	if (config.get<bool>(vars.bEditEffectsBlood))
 	{
-		for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+		if (auto itr = std::find(bloodnames.cbegin(), bloodnames.cend(), name); itr != bloodnames.cend())
 		{
-			thisPtr->m_particleAttributes.modulateColor(colorBlood.getColor(), i);
+			for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+			{
+				thisPtr->m_particleAttributes.modulateColor(colorBlood.getColor(), i);
+			}
 		}
 	}
 
-	if (auto itr = std::find(mollyNames.cbegin(), mollyNames.cend(), name); itr != mollyNames.cend())
+	if (config.get<bool>(vars.bEditEffectsMoly))
 	{
-		for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+		if (auto itr = std::find(mollyNames.cbegin(), mollyNames.cend(), name); itr != mollyNames.cend())
 		{
-			thisPtr->m_particleAttributes.modulateColor(colorMolly.getColor(), i);
+			for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+			{
+				thisPtr->m_particleAttributes.modulateColor(colorMolly.getColor(), i);
+			}
 		}
 	}
 }
