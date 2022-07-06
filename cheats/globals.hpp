@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Windows.h>
+#include <vector>
 #include "../SDK/math/Vector.hpp"
 
 namespace globals
@@ -19,4 +20,7 @@ namespace globals
 	inline HWND csgoWHND = NULL;
 	inline bool isShutdown = false;
 	inline bool isInHotkey = false;
+	// referesh per 1s
+	inline std::vector<std::string> cfgfilenames;
+	inline std::vector<std::string> customSkyboxes;
 }

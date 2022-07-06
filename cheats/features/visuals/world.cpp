@@ -773,3 +773,14 @@ void World::pushLocalImpacts(const hitStructLocal_t& hit)
 
 	m_hitsLocal.push_back(hit);
 }
+
+bool World::checkCustomSkybox()
+{
+	//char buf[MAX_PATH];
+	//GetModuleFileNameA(NULL, buf, sizeof(buf));
+
+	//std::filesystem::
+
+
+	return true;
+}

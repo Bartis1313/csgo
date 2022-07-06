@@ -35,6 +35,7 @@ public:
 	void removeSmoke(int frame);
 	void drawCustomSmoke(const Vector& pos, float radius);
 	void drawBombOverlay();
+	bool checkCustomSkybox();
 	Bomb_t* m_bombEnt;
 	std::string m_whoPlanted = "";
 private:
