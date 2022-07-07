@@ -117,6 +117,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(CfgColor, cDecoy, Color(0, 30, 60, 255), "decoy color");
 	CONFIG_ADD_VARIABLE(CfgColor, cDropped, Colors::White, "dropped weapons color");
 	CONFIG_ADD_VARIABLE(int, iSkyBox, 0, "custom skybox index");
+	CONFIG_ADD_VARIABLE(int, iCustomSkyBox, 0, "custom skybox index (not from game)");
 	CONFIG_ADD_VARIABLE(bool, bRemoveSky, false, "removes the sky");
 	CONFIG_ADD_VARIABLE(bool, bFixProps, false, "fix props in world");
 	CONFIG_ADD_VARIABLE(bool, bModulateColor, false, "world edit enabled");

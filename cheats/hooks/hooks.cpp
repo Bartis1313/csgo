@@ -33,6 +33,8 @@ void hooks::init()
 	const auto sv_cheatsAddr = interfaces::cvar->findVar(XOR("sv_cheats"));
 	const auto sv_cheatsTarget = vfunc::getVFunc(sv_cheatsAddr, sv_cheats::index);
 	const auto unkFileSystemtarget = vfunc::getVFunc(interfaces::fileSystem, unknownFileSystem::index);
+	const auto getUnverifiedFileHashesTarget = vfunc::getVFunc(interfaces::fileSystem, getUnverifiedFileHashes::index);
+	const auto unkFileCheckTarget = vfunc::getVFunc(interfaces::fileSystem, unkFileCheck::index);
 #pragma endregion
 
 	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK);
@@ -104,6 +106,8 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(sendDatagramTarget, sendDatagram);
 	HOOK_SAFE(unkownOverviewMapTarget, unknownOverViewFun);
 	HOOK_SAFE(unkFileSystemtarget, unknownFileSystem);
+	HOOK_SAFE(getUnverifiedFileHashesTarget, getUnverifiedFileHashes);
+	HOOK_SAFE(unkFileCheckTarget, unkFileCheck);
 
 #undef HOOK_SAFE
 

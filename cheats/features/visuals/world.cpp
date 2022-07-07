@@ -303,8 +303,19 @@ void World::skyboxLoad(int stage, bool isShutdown)
 	if (stage != FRAME_RENDER_START)
 		return;
 
-	if (int index = config.get<int>(vars.iSkyBox); index != 0 && !isShutdown) // is not none and there is no shutdown
-		loadSkyBoxFunction(selections::skyboxes.at(index));
+	// bool to point true = custom
+	std::pair<int, bool> keySky;
+	if (auto custom = config.get<int>(vars.iCustomSkyBox); custom > 0)
+		keySky = { custom, true };
+	else
+		keySky = { config.get<int>(vars.iSkyBox), false };
+
+	if (keySky.first != 0 && !isShutdown) // is not none and there is no shutdown
+	{
+		keySky.second == true 
+			? loadSkyBoxFunction(m_allCustomSkyboxes.at(keySky.first).c_str())
+			: loadSkyBoxFunction(selections::skyboxes.at(keySky.first));
+	}
 	else
 	{
 		static bool bOnce = [this]()
@@ -776,11 +787,42 @@ void World::pushLocalImpacts(const hitStructLocal_t& hit)
 
 bool World::checkCustomSkybox()
 {
-	//char buf[MAX_PATH];
-	//GetModuleFileNameA(NULL, buf, sizeof(buf));
+	auto path = std::filesystem::current_path() / XOR("csgo") / XOR("materials") / XOR("skybox");
 
-	//std::filesystem::
+	if (!std::filesystem::is_directory(path))
+	{
+		// if no, remove it, in
+		std::filesystem::remove(path);
 
+		// after removal, create the folder, from there the path is possible to reach
+		if (!std::filesystem::create_directories(path))
+			return false;
+	}
+
+	m_pathCustomSkybox = path;
+
+	return true;
+}
+
+void World::reloadCustomSkyboxes()
+{
+	m_allCustomSkyboxes.clear();
+	m_allCustomSkyboxes.emplace_back(XOR("none"));
+	auto iterator = std::filesystem::directory_iterator(m_pathCustomSkybox);
+	for (const auto& entry : iterator)
+	{
+		if (std::string name = entry.path().filename().string();
+			(entry.path().extension() == XOR(".vmt") || entry.path().extension() == XOR(".vtf")) && !name.empty())
+		{
+			m_allCustomSkyboxes.push_back(name);
+		}
+	}
+}
+
+bool World::initSkyboxes()
+{
+	checkCustomSkybox();
+	reloadCustomSkyboxes();
 
 	return true;
 }

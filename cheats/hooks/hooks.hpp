@@ -18,6 +18,8 @@ enum hookIndexes
 	SV_CHEATS = 13,
 	DRAW_IDX_PRIMITIVE = 82,
 	UNKOWN_FILESYS = 89,
+	UNVERIFIED_FILE_HASHES= 101,
+	UNK_FILE_CHECK = 128,
 };
 
 class IPanel;
@@ -241,5 +243,21 @@ namespace hooks
 		using fn = int(__thiscall*)(MapStruct*, int);
 		static int __fastcall hooked(MapStruct* map, void* edx, int unk);
 		inline static fn original = nullptr;
+	};
+
+	struct getUnverifiedFileHashes
+	{
+		using fn = int(__thiscall*)(void*, int);
+		static int __fastcall hooked(FAST_ARGS, int maxFiles);
+		inline static fn original = nullptr;
+		static const int index = UNVERIFIED_FILE_HASHES;
+	};
+
+	struct unkFileCheck
+	{
+		using fn = int(__thiscall*)(void*);
+		static int __fastcall hooked(FAST_ARGS);
+		inline static fn original = nullptr;
+		static const int index = UNK_FILE_CHECK;
 	};
 }

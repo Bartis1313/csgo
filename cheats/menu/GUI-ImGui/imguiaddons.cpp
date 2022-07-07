@@ -281,22 +281,6 @@ void ImGui::EndGroupPanel()
     ImGui::EndGroup();
 }
 
-bool ImGui::Combo(const char* label, int* item, const std::span<const char*>& arr, const float width)
-{
-    ImGui::PushItemWidth(width);
-    bool ret = ImGui::Combo(label, item, arr.data(), arr.size());
-    ImGui::PopItemWidth();
-    return ret;
-}
-
-bool ImGui::Combo(const char* label, int* item, const std::span<const std::string>& arr, const float width)
-{
-    ImGui::PushItemWidth(width);
-    bool ret = ImGui::Combo(label, item, arr.data()->c_str(), arr.size());
-    ImGui::PopItemWidth();
-    return ret;
-}
-
 static bool arrGetterStr(void* data, int idx, const char** out)
 {
     auto& v = *static_cast<std::span<std::string>*>(data);
@@ -313,6 +297,22 @@ static bool arrGetter(void* data, int idx, const char** out)
     if (out)
         *out = v[idx];
     return true;
+}
+
+bool ImGui::Combo(const char* label, int* item, const std::span<const char*>& arr, const float width)
+{
+    ImGui::PushItemWidth(width);
+    bool ret = ImGui::Combo(label, item, arr.data(), arr.size());
+    ImGui::PopItemWidth();
+    return ret;
+}
+
+bool ImGui::Combo(const char* label, int* item, const std::span<const std::string>& arr, const float width)
+{
+    ImGui::PushItemWidth(width);
+    bool ret = ImGui::Combo(label, item, &arrGetterStr, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), width);
+    ImGui::PopItemWidth();
+    return ret;
 }
 
 bool ImGui::ListBox(const char* label, int* item, const std::span<const std::string>& arr, const int heightItem)

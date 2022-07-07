@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <filesystem>
 
 #include "../../../SDK/math/Vector.hpp"
 #include "../../../SDK/Color.hpp"
@@ -35,7 +37,9 @@ public:
 	void removeSmoke(int frame);
 	void drawCustomSmoke(const Vector& pos, float radius);
 	void drawBombOverlay();
-	bool checkCustomSkybox();
+	_NODISCARD constexpr std::vector<std::string> getAllCustomSkyBoxes() const { return  m_allCustomSkyboxes; }
+	void reloadCustomSkyboxes();
+	bool initSkyboxes();
 	Bomb_t* m_bombEnt;
 	std::string m_whoPlanted = "";
 private:
@@ -45,6 +49,7 @@ private:
 	void drawSmoke(Entity_t* ent);
 	void resetBomb() { m_bombEnt = nullptr; };
 private:
+	bool checkCustomSkybox();
 	IConVar* m_oldSky = nullptr;
 	struct Trail_t
 	{
@@ -66,6 +71,8 @@ private:
 	};
 	std::vector<hitStruct_t> m_hitsClientSide;
 	std::vector<hitStructLocal_t> m_hitsLocal;
+	std::filesystem::path m_pathCustomSkybox;
+	std::vector<std::string> m_allCustomSkyboxes;
 };
 
 inline World world;

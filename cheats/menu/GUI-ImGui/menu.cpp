@@ -7,6 +7,7 @@
 #include "../../../utilities/console/console.hpp"
 #include "../../../config/vars.hpp"
 #include "styles.hpp"
+#include "../../features/visuals/world.hpp"
 
 void runStyle(const int idx);
 
@@ -274,7 +275,15 @@ static void renderMisc()
 		{
 			ImGui::BeginGroupPanel(XOR("Misc"));
 			{
+				const auto customsky = world.getAllCustomSkyBoxes();
+
 				ImGui::Combo(XOR("Skybox"), &config.getRef<int>(vars.iSkyBox), selections::skyboxes, {});
+				ImGui::Combo(XOR("Skybox Custom"), &config.getRef<int>(vars.iCustomSkyBox), customsky, {});
+				ImGui::SameLine();
+				if (ImGui::Button(XOR("Reload Custom Skybox")))
+				{
+					world.reloadCustomSkyboxes();
+				}
 				bool& modulateRef = config.getRef<bool>(vars.bModulateColor);
 				ImGui::Checkbox(XOR("Modulate world"), &modulateRef);
 				ImGui::Checkbox(XOR("Remove sky"), &config.getRef<bool>(vars.bRemoveSky));

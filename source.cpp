@@ -16,6 +16,7 @@
 #include "cheats/features/misc/discord.hpp"
 #include "utilities/res.hpp"
 #include "cheats/features/visuals/radar.hpp"
+#include "cheats/features/visuals/world.hpp"
 
 #include <thread>
 
@@ -26,6 +27,8 @@
 using namespace std::literals;
 
 VOID WINAPI _looper(PVOID instance);
+
+static bool inited = false;
 
 DWORD WINAPI init(PVOID instance)
 {
@@ -41,6 +44,7 @@ DWORD WINAPI init(PVOID instance)
         config.init();
         if (auto name = config.get<std::string>(vars.sLoadName); name != config.getDefaultConfigName()) // custom load
             config.load(name);
+        world.initSkyboxes();
         interfaces::init();
         netvarMan.init();
         netvarMan.dump();
@@ -61,6 +65,8 @@ DWORD WINAPI init(PVOID instance)
     initTimer.end();
     console.log(TypeLogs::LOG_INFO, XOR("main thread took {:.5f}s"), initTimer.getSec());
 
+    inited = true;
+
     return TRUE;
 }
 
@@ -69,8 +75,11 @@ VOID WINAPI _looper(PVOID instance)
     dc.init();
     while (!config.get<Key>(vars.kPanic).isPressed())
     {
-        std::this_thread::sleep_for(1s);
-        dc.run();
+        if (inited)
+        {
+            dc.run();
+            std::this_thread::sleep_for(1s);
+        }
     }
 
     globals::isShutdown = true;

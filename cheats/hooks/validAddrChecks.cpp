@@ -31,6 +31,16 @@ void __fastcall hooks::doExtraBonesProcessing::hooked(FAST_ARGS, void* hdr, void
 	return;
 }
 
+int __fastcall hooks::getUnverifiedFileHashes::hooked(FAST_ARGS, int maxFiles)
+{
+	return 0;
+}
+
+int __fastcall hooks::unkFileCheck::hooked(FAST_ARGS)
+{
+	return 1; // 2 is kick
+}
+
 //#include "../../SDK/Input.hpp"
 //#include "../../SDK/interfaces/interfaces.hpp"
 #include "../../SDK/structs/IDXandPaterrns.hpp"
