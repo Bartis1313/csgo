@@ -11,22 +11,9 @@
 
 using json = nlohmann::json;
 
-template <typename... T, typename... P>
-static constexpr bool holdsAny(const std::variant<P...>& v)
-{
-	return (std::holds_alternative<T>(v) || ...);
-}
-
 ConfigType::ConfigType(const Types var, const std::string& name)
 	: m_type{ var }, m_name{ name }
-{
-	// copied from hpp, otherwise in any way alias couldn't work
-	bool check = holdsAny<bool, int, float,
-		std::string, CfgColor,
-		std::vector<bool>, Key>(m_type);
-
-	assert(check == false && "unknown variant type");
-}
+{}
 
 bool Config::save(const std::string& file, const bool forceSave)
 {
