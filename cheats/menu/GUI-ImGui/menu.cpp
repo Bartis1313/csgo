@@ -277,8 +277,8 @@ static void renderMisc()
 			{
 				const auto customsky = world.getAllCustomSkyBoxes();
 
-				ImGui::Combo(XOR("Skybox"), &config.getRef<int>(vars.iSkyBox), selections::skyboxes, {});
-				ImGui::Combo(XOR("Skybox Custom"), &config.getRef<int>(vars.iCustomSkyBox), customsky, {});
+				ImGui::Combo(XOR("Skybox"), &config.getRef<int>(vars.iSkyBox), selections::skyboxes);
+				ImGui::Combo(XOR("Skybox Custom"), &config.getRef<int>(vars.iCustomSkyBox), customsky);
 				ImGui::SameLine();
 				if (ImGui::Button(XOR("Reload Custom Skybox")))
 				{
@@ -467,6 +467,19 @@ static void renderConfig()
 	static std::string text = XOR("Your new config name");
 	static int currentcfg = 0;
 
+	static auto initIndexOnce = []()
+	{
+		for (size_t i = 0; const auto & el : config.getAllConfigFiles())
+		{
+			if (el == config.getCfgToLoad())
+				currentcfg = i;
+
+			i++;
+		}
+
+		return true;
+	} ();
+
 	ImGui::Columns(2, nullptr, false);
 	{
 		if (ImGui::BeginChild(XOR("cfg"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
@@ -502,13 +515,9 @@ static void renderConfig()
 				}
 				if (ImGui::Button(XOR("Load on start")))
 				{
-					config.getRef<std::string>(vars.sLoadName) = allcfg.at(currentcfg);
-
+					// this is only saving the load name, nothing more
+					config.saveCfgToLoad(allcfg.at(currentcfg));
 					console.log(TypeLogs::LOG_INFO, XOR("{} will be now loaded config on the start"), allcfg.at(currentcfg));
-
-					// yes this is confusing, but this is also simple, perfect solution is to get the line where this var is located and edit it
-					// this will be done soon
-					config.save(config.getDefaultConfigName(), true);
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("This config will load on the start\nThis button saves default config!"));

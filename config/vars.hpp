@@ -156,7 +156,6 @@ struct Variables
 	// MASTER SWITCHES
 
 	CONFIG_ADD_VARIABLE(bool, bMenuOpenedx88, true, "x88 menu enabled");
-	CONFIG_ADD_VARIABLE(std::string, sLoadName, "default.cfg", "config to load (you only care for this in default cfg)");
 	CONFIG_ADD_VARIABLE(Key, kMenu, Key(KeyMode::TOGGLE, VK_INSERT), "key for imgui menu");
 	CONFIG_ADD_VARIABLE(Key, kPanic, Key(KeyMode::DOWN, VK_DELETE), "key for shutdown");
 	CONFIG_ADD_VARIABLE(Key, kConsoleLog, Key(KeyMode::TOGGLE, VK_HOME), "key for log console");

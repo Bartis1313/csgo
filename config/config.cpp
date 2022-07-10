@@ -11,37 +11,21 @@
 
 using json = nlohmann::json;
 
+template <typename... T, typename... P>
+static constexpr bool holdsAny(const std::variant<P...>& v)
+{
+	return (std::holds_alternative<T>(v) || ...);
+}
+
 ConfigType::ConfigType(const Types var, const std::string& name)
 	: m_type{ var }, m_name{ name }
 {
-	// now check if the type is correct
-	if (std::holds_alternative<bool>(m_type))
-		m_isGoodType = true;
-	else if (std::holds_alternative<int>(m_type))
-		m_isGoodType = true;
-	else if (std::holds_alternative<float>(m_type))
-		m_isGoodType = true;
-	else if (std::holds_alternative<std::string>(m_type))
-		m_isGoodType = true;
-	else if (std::holds_alternative<CfgColor>(m_type))
-	{
-		m_isGoodType = true;
-		m_isColor = true;
-	}
-	else if (std::holds_alternative<std::vector<bool>>(m_type))
-	{
-		m_isGoodType = true;
-		m_isVec = true;
-	}
-	else if (std::holds_alternative<Key>(m_type))
-	{
-		m_isGoodType = true;
-	}
-	else
-		m_isGoodType = false;
+	// copied from hpp, otherwise in any way alias couldn't work
+	bool check = holdsAny<bool, int, float,
+		std::string, CfgColor,
+		std::vector<bool>, Key>(m_type);
 
-	if (!m_isGoodType)
-		throw std::runtime_error(XOR("unknown type, check the variant"));
+	assert(check == false && "unknown variant type");
 }
 
 bool Config::save(const std::string& file, const bool forceSave)
@@ -196,10 +180,10 @@ bool Config::load(const std::string& file)
 			entry.set(
 				CfgColor(
 					Color(
-					parsed.at(0).get<float>(),
-					parsed.at(1).get<float>(),
-					parsed.at(2).get<float>(),
-					parsed.at(3).get<float>()
+						parsed.at(0).get<float>(),
+						parsed.at(1).get<float>(),
+						parsed.at(2).get<float>(),
+						parsed.at(3).get<float>()
 					),
 					parsed.at(4).get<bool>(),
 					parsed.at(5).get<float>()
@@ -253,18 +237,27 @@ size_t Config::getIndexByName(const std::string& name)
 	return -1;
 }
 
-bool Config::init()
+bool Config::init(const std::string& defName, const std::string& defLoadFileName,
+	const std::filesystem::path& hackPath, const std::filesystem::path& loadPath)
 {
-	if (auto path = getHacksPath(); !path.empty())
-		m_documentsPath = path;
-	else
-	{
-		// throw err, it's something not OK to happen
-		throw std::runtime_error(XOR("documents path could not be reached"));
-	}
+	m_defaultConfig = defName;
+	m_defaultFileNameLoad = defLoadFileName;
+	m_path = hackPath;
+	m_loadPath = loadPath;
 
 	// check if the path to where save files is even a directory
-	if (auto path = m_documentsPath / m_folder; !std::filesystem::is_directory(path))
+	if (auto path = getHackPath(); !std::filesystem::is_directory(path))
+	{
+		// if no, remove it, in
+		std::filesystem::remove(path);
+
+		// after removal, create the folder, from there the path is possible to reach
+		if (!std::filesystem::create_directories(path))
+			return false;
+	}
+
+	// same thing in load
+	if (auto path = getLoadPath(); !std::filesystem::is_directory(path))
 	{
 		// if no, remove it, in
 		std::filesystem::remove(path);
@@ -276,15 +269,15 @@ bool Config::init()
 
 	// check if the default file already exists, if yes, don't save
 	// TODO: detect any changes, replace them with new file. Only idea for now is to compare file size (kb)
-	if (auto path = m_documentsPath / m_folder / getDefaultConfigName(); !std::filesystem::exists(path))
+	if (auto path = getPathForSave(getCfgToLoad()); !std::filesystem::exists(path))
 	{
 		console.log(TypeLogs::LOG_INFO, FORMAT(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
 
-		if (!save(getDefaultConfigName(), true))
+		if (!save(getCfgToLoad(), true))
 			return false;
 	}
 
-	if (!load(getDefaultConfigName()))
+	if (!load(getCfgToLoad()))
 	{
 		return false;
 	}
@@ -295,11 +288,38 @@ bool Config::init()
 	return true;
 }
 
+std::string Config::getCfgToLoad()
+{
+	// unsafe operation, nobody edits it manually anyway
+	std::ifstream read{ getPathForLoad(m_defaultFileNameLoad) };
+	if (!read) // if not created
+	{
+		std::ofstream write{ getPathForLoad(m_defaultFileNameLoad) };
+		write << getDefaultConfigName();
+		write.close();
+	}
+
+	std::string str{ std::istreambuf_iterator<char>{ read }, {} };
+	read.close();
+	return str;
+}
+
+bool Config::saveCfgToLoad(const std::string& name)
+{
+	std::ofstream write{ getPathForLoad(m_defaultFileNameLoad) };
+	if (!write)
+		return false;
+
+	write << name;
+	write.close();
+
+	return true;
+}
 
 void Config::reload()
 {
 	m_allFilesInFolder.clear();
-	auto iterator = std::filesystem::directory_iterator(m_documentsPath / m_folder);
+	auto iterator = std::filesystem::directory_iterator(getHackPath());
 	for (const auto& entry : iterator)
 	{
 		if (std::string name = entry.path().filename().string();
@@ -310,33 +330,45 @@ void Config::reload()
 	}
 }
 
-std::filesystem::path Config::getHacksPath() const
+std::filesystem::path Config::getDocumentsPath()
 {
 #ifdef _DEBUG
-// if possible to get the path, if so, return it
-	if (CHAR documents[MAX_PATH]; SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
-	{
-		std::filesystem::path toReturn;
-		toReturn.assign(documents);
-		toReturn.append(m_mainEntryFolder);
-		return toReturn;
-	}
+	// if possible to get the path, if so, return it
+	if (static CHAR documents[MAX_PATH]; SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
+		return std::filesystem::path{ documents };
 #else
-	if (CHAR documents[MAX_PATH]; SUCCEEDED(LF(SHGetFolderPathA).cached()(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
-	{
-		std::filesystem::path toReturn;
-		toReturn.assign(documents);
-		toReturn.append(m_mainEntryFolder);
-		return toReturn;
-	}
+	if (static CHAR documents[MAX_PATH]; SUCCEEDED(LF(SHGetFolderPathA).cached()(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
+		return std::filesystem::path{ documents };
 #endif
-	// if fail, return empty
 	return {};
+}
+
+std::filesystem::path Config::getHackPath() const
+{
+	assert(getDocumentsPath().empty() == false && "hacks path was empty");
+
+	std::filesystem::path toReturn;
+	toReturn.assign(getDocumentsPath() / m_path);
+	return toReturn;
+}
+
+std::filesystem::path Config::getLoadPath() const
+{
+	assert(getDocumentsPath().empty() == false && "load cfg path was empty");
+
+	std::filesystem::path toReturn;
+	toReturn.assign(getDocumentsPath() / m_loadPath);
+	return toReturn;
 }
 
 std::filesystem::path Config::getPathForSave(const std::string& file) const
 {
-	return std::filesystem::path{ m_documentsPath / m_folder / file };
+	return std::filesystem::path{ getHackPath() / file };
+}
+
+std::filesystem::path Config::getPathForLoad(const std::string& file) const
+{
+	return std::filesystem::path{ getLoadPath() / file };
 }
 
 void Config::deleteCfg(const std::string& file)

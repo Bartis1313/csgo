@@ -4,6 +4,7 @@
 #include <variant>
 #include <vector>
 #include <iostream>
+#include <string>
 
 #include "key.hpp"
 #include "cfgcolor.hpp"
@@ -29,21 +30,12 @@ public:
 	template<typename T>
 	_NODISCARD T& getRef() const
 	{
-		// only check on debug, who would fail for this?
-#ifdef _DEBUG
-		if (!std::holds_alternative<T>(m_type))
-			throw std::runtime_error(XOR("unknown type, check the variant and given template type"));
-#endif
 		return std::add_lvalue_reference_t<T>(std::get<T>(m_type));
 	}
 	// get the value, template is needed to operate easier, by VALUE
 	template<typename T>
 	_NODISCARD T get() const
 	{
-#ifdef _DEBUG
-		if (!std::holds_alternative<T>(m_type))
-			throw std::runtime_error(XOR("unknown type, check the variant and given template type"));
-#endif
 		return std::get<T>(m_type);
 	}
 
@@ -59,9 +51,6 @@ public:
 private:
 	Types m_type;
 	std::string m_name;
-	bool m_isGoodType = false;
-	bool m_isColor = false;
-	bool m_isVec = false;
 };
 
 class Config
@@ -70,16 +59,25 @@ public:
 	Config() = default;
 
 	bool save(const std::string& file, const bool forceSave = false);
+	std::string getCfgToLoad();
+	bool saveCfgToLoad(const std::string& name);
 	bool load(const std::string& file);
 	void deleteCfg(const std::string& file);
-	// will init the config for default cfg
-	bool init();
+	/// <summary>
+	/// init the config
+	/// </summary>
+	/// <param name="defName">Default name of the config</param>
+	/// <param name="defLoadFileName">Default name of the filename to gather load info</param>
+	/// <param name="hackPath">Default path of where config is saved</param>
+	/// <param name="loadPath">Default utility path for detection which cfg to load</param>
+	/// <returns>true if success</returns>
+	bool init(const std::string& defName, const std::string& defLoadFileName, const std::filesystem::path& hackPath, const std::filesystem::path& loadPath);
 	void reload();
 	// adds variable into the vector of variables, returns size due to getting "ID" from every varaible
-	template<typename T>
+	template <typename T>
 	_NODISCARD size_t addVar(const T& var, const std::string& name)
 	{
-		m_allVars.emplace_back(std::move(ConfigType{ var, name }));
+		m_allVars.emplace_back(ConfigType{ var, name });
 		return m_allVars.size() - 1;
 	}
 	// get selected by REFERENCE variable
@@ -95,26 +93,33 @@ public:
 		return m_allVars.at(idx).get<T>();
 	}
 	// get main folder
-	_NODISCARD std::filesystem::path getHacksPath() const;
+	_NODISCARD std::filesystem::path getHackPath() const;
+	// get main load folder
+	_NODISCARD std::filesystem::path getLoadPath() const;
 	// get DEFAULT name, returns the field m_defaultConfig which never change
 	_NODISCARD std::string getDefaultConfigName() const { return m_defaultConfig; }
 	// get correct path for savings
 	_NODISCARD std::filesystem::path getPathForSave(const std::string& file) const;
+	// get correct path for load names
+	_NODISCARD std::filesystem::path getPathForLoad(const std::string& file) const;
 	// get all files
 	_NODISCARD std::vector<std::string> getAllConfigFiles() const { return m_allFilesInFolder; }
+	// get documents path, static
+	_NODISCARD static std::filesystem::path getDocumentsPath();
 private:
 	// don't duplicate names
 	_NODISCARD size_t getIndexByName(const std::string& name);
 
 	std::filesystem::path getPathForConfig(const std::string& file);
-	std::filesystem::path m_documentsPath;
 
 	std::vector<ConfigType> m_allVars;
 	std::vector<std::string> m_allFilesInFolder;
-	// your desire to name it
-	const std::string m_defaultConfig = XOR("default.cfg");
-	const std::string m_folder = XOR("csgo");
-	const std::string m_mainEntryFolder = XOR("Bartis_internal");
+	std::string m_defaultConfig;
+	// filename where we read what to load
+	std::string m_defaultFileNameLoad;
+	
+	std::filesystem::path m_path;
+	std::filesystem::path m_loadPath;
 };
 
 inline Config config;

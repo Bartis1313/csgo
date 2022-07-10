@@ -301,17 +301,13 @@ static bool arrGetter(void* data, int idx, const char** out)
 
 bool ImGui::Combo(const char* label, int* item, const std::span<const char*>& arr, const float width)
 {
-    ImGui::PushItemWidth(width);
-    bool ret = ImGui::Combo(label, item, arr.data(), arr.size());
-    ImGui::PopItemWidth();
+    bool ret = ImGui::Combo(label, item, arr.data(), arr.size(), width);
     return ret;
 }
 
 bool ImGui::Combo(const char* label, int* item, const std::span<const std::string>& arr, const float width)
 {
-    ImGui::PushItemWidth(width);
     bool ret = ImGui::Combo(label, item, &arrGetterStr, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), width);
-    ImGui::PopItemWidth();
     return ret;
 }
 

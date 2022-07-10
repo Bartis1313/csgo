@@ -41,9 +41,10 @@ DWORD WINAPI init(PVOID instance)
     // warning: if you do wrong hierarchy - crash
     try
     {
-        config.init();
-        if (auto name = config.get<std::string>(vars.sLoadName); name != config.getDefaultConfigName()) // custom load
-            config.load(name);
+        config.init(
+            XOR("default.cfg"), XOR("load.LOAD"),
+            std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"),
+            std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo") / XOR("utility"));
         world.initSkyboxes();
         interfaces::init();
         netvarMan.init();
