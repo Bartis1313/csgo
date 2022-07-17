@@ -1,8 +1,7 @@
 # Csgo
 Very short and commented source aimed for legit gameplay
 
-![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/166804234-76aa01ff-36a8-4688-ad6a-b3b517413eb1.png)
-Menu screens: [screens](https://imgur.com/a/FiTtSOT)
+![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/179428634-adf44410-4002-4e5d-9ac5-b794dcb1c35f.png)
 
 # Information
 Features marked ``(rebuild needed)`` need recode or better version.
@@ -37,7 +36,7 @@ This is a trianing software. No further actions taken by people are heeded.
  * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic.
  * Engine prediction - useful to never skip tick and get correct server time.
  * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records.
- * Glow - highlight ents (rebuild needed - more ents, not only player).
+ * Glow - highlight player ents.
  * Sound Esp
  * Esp - name, flags, boxes, health, armor, ammo, skeleton.
  * DLight - highlights player by dlight
@@ -51,6 +50,9 @@ This is a trianing software. No further actions taken by people are heeded.
  * Custom smoke/molotov - color/remove/timer
  * Draw dropped weapons - box/icon/name/ammo
  * Bomb overlay with info
+ * Mirrorcam - show what is behind you on extra window (contains fixing setupbones occlusion problems)
+ * Freecam - view any place without moving your model (dormant ents won't render)
+ * Freelook - a copy of how it looks like in PUBG
  </details>
 
 # Keybinds

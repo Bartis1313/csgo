@@ -12,7 +12,7 @@ public:
     VFUNC(void, setRenderTarget, 6, (ITexture* texture), (this, texture));
     VFUNC(void, pushRenderTargetAndViewport, 119, (), (this));
     VFUNC(void, popRenderTargetAndViewport, 120, (), (this));
-    VFUNC(void, DrawScreenSpaceRectangle, 114,
+    VFUNC(void, drawScreenSpaceRectangle, 114,
         (IMaterial* material,
         int destX, int destY, int width, int height,
         float srcTextureX0, float srcTextureY0, float srcTextureX1, float srcTextureY1,

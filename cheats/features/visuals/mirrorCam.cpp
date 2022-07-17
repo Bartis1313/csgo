@@ -4,17 +4,13 @@
 
 #include "../../../dependencies/ImGui/imgui.h"
 
-#include "../../../SDK/ClientClass.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
 #include "../../../SDK/IMaterialSystem.hpp"
 #include "../../../SDK/ITexture.hpp"
 #include "../../../SDK/IMatRenderContext.hpp"
 #include "../../../SDK/CViewSetup.hpp"
-#include "../../../SDK/KeyValues.hpp"
 #include "../../../SDK/IVRenderView.hpp"
 #include "../../../SDK/CGlobalVars.hpp"
-#include "../../../SDK/IVEngineClient.hpp"
-#include "../../../SDK/IClientEntityList.hpp"
 
 #include "../../../utilities/utilities.hpp"
 #include "../../hooks/hooks.hpp"
@@ -25,9 +21,9 @@
 
 void MirrorCam::init()
 {
-	interfaces::matSys->forceBeginRenderTargetAllocation();
+	//interfaces::matSys->forceBeginRenderTargetAllocation();
 	m_texture = interfaces::matSys->createFullFrameRenderTarget(XOR("mirrorCam"));
-	interfaces::matSys->forceEndRenderTargetAllocation();
+	//interfaces::matSys->forceEndRenderTargetAllocation();
 
 	m_inited = true;
 
@@ -81,7 +77,11 @@ void MirrorCam::draw()
 
 void MirrorCam::renderCustomView(const CViewSetup& view)
 {
-	CViewSetup v = view;
+	// this might eat some FPS, if enabled
+	if (!config.get<bool>(vars.bMirrorCam))
+		return;
+
+	CViewSetup v = std::move(view);
 
 	v.m_angles.y = v.m_angles.y + 180.0f; // back
 	v.x = v.xOld = 0;
