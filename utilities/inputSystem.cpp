@@ -14,7 +14,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 		return;
 
 	// init starting keys, undefined
-	int key = 0;
+	m_vKey = 0;
 	auto state = KeyState::OFF;
 
 	switch (message)
@@ -24,7 +24,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	{
 		if (wparam < KEYS_SIZE)
 		{
-			key = wparam;
+			m_vKey = wparam;
 			state = KeyState::DOWN;
 		}
 	}
@@ -34,7 +34,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	{
 		if (wparam < KEYS_SIZE)
 		{
-			key = wparam;
+			m_vKey = wparam;
 			state = KeyState::UP;
 		}
 	}
@@ -43,7 +43,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	case WM_LBUTTONUP:
 	case WM_LBUTTONDBLCLK:
 	{
-		key = VK_LBUTTON;
+		m_vKey = VK_LBUTTON;
 		state = message == WM_LBUTTONUP ? KeyState::UP : KeyState::DOWN;
 	}
 	break;
@@ -51,7 +51,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	case WM_RBUTTONUP:
 	case WM_RBUTTONDBLCLK:
 	{
-		key = VK_RBUTTON;
+		m_vKey = VK_RBUTTON;
 		state = message == WM_RBUTTONUP ? KeyState::UP : KeyState::DOWN;
 	}
 	break;
@@ -59,7 +59,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	case WM_MBUTTONUP:
 	case WM_MBUTTONDBLCLK:
 	{
-		key = VK_MBUTTON;
+		m_vKey = VK_MBUTTON;
 		state = message == WM_MBUTTONUP ? KeyState::UP : KeyState::DOWN;
 	}
 	break;
@@ -67,7 +67,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	case WM_XBUTTONUP:
 	case WM_XBUTTONDBLCLK:
 	{
-		key = (GET_XBUTTON_WPARAM(wparam) == XBUTTON1 ? VK_XBUTTON1 : VK_XBUTTON2);
+		m_vKey = (GET_XBUTTON_WPARAM(wparam) == XBUTTON1 ? VK_XBUTTON1 : VK_XBUTTON2);
 		state = message == WM_XBUTTONUP ? KeyState::UP : KeyState::DOWN;
 	}
 	break;
@@ -76,10 +76,10 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	}
 
 	// save the key
-	if (state == KeyState::UP && m_keys.at(key) == KeyState::DOWN)
-		m_keys.at(key) = KeyState::PRESS;
+	if (state == KeyState::UP && m_keys.at(m_vKey) == KeyState::DOWN)
+		m_keys.at(m_vKey) = KeyState::PRESS;
 	else
-		m_keys.at(key) = state;
+		m_keys.at(m_vKey) = state;
 }
 
 bool KeysHandler::isKeyDown(UINT vKey) const

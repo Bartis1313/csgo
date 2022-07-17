@@ -47,7 +47,7 @@ bool interfaces::init()
 	CAPNLOG(entList, IClientEntityList, CLIENT_DLL, "VClientEntityList003");
 	CAPNLOG(cvar, ICvar, VSTD_DLL, "VEngineCvar007");
 	CAPNLOG(trace, IEngineTrace, ENGINE_DLL, "EngineTraceClient004");
-	CAPNLOG(renderView, IViewRender, ENGINE_DLL, "VEngineRenderView014");
+	CAPNLOG(renderView, IVRenderView, ENGINE_DLL, "VEngineRenderView014");
 	CAPNLOG(matSys, IMaterialSystem, MATERIAL_DLL, "VMaterialSystem080");
 	CAPNLOG(modelInfo, IVModelInfo, ENGINE_DLL, "VModelInfoClient004");
 	CAPNLOG(prediction, IPrediction, CLIENT_DLL, "VClientPrediction001");
@@ -77,7 +77,8 @@ bool interfaces::init()
 	resource = *reinterpret_cast<PlayerResource***>(utilities::patternScan(CLIENT_DLL, PLAYER_RESOURCE, 0x4));
 	dx9Device = **reinterpret_cast<IDirect3DDevice9***>(utilities::patternScan(SHARED_API, DX9_DEVICE, 0x1));
 	clientState = **reinterpret_cast<IClientState***>(utilities::patternScan(ENGINE_DLL, CLIENT_STATE, 0x1));
-	gameRules = *reinterpret_cast<Entity_t***>(utilities::patternScan(CLIENT_DLL, GAME_RULES, 0x4));
+	gameRules = *reinterpret_cast<CGameRules**>(utilities::patternScan(CLIENT_DLL, GAME_RULES, 0x2));
+	viewRender = **reinterpret_cast<IViewRender***>(utilities::patternScan(CLIENT_DLL, VIEW_RENDER, 0x2));
 
 	using namespace gameFunctions;
 

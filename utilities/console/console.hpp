@@ -8,6 +8,7 @@
 #include <format>
 #include <cassert>
 #include <locale>
+#include <mutex>
 
 #include "../../SDK/Color.hpp"
 #include "../../config/config.hpp"
@@ -83,7 +84,7 @@ private:
 	std::string m_logName;
 	ImGui::ExampleAppLog m_log;
 	bool m_activeLog = false;
-
+	std::mutex mutex;
 public:
 	// logs into console + draw + file
 	template<typename... Args_t>
@@ -98,6 +99,8 @@ public:
 template<typename... Args_t>
 void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 {
+	std::scoped_lock lock{ mutex };
+
 	if (m_logName.empty())
 		assert("Did you call Console::init ?");
 
@@ -132,6 +135,7 @@ void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 template<typename... Args_t>
 void Console::print(const std::string& fmt, Args_t&&... args)
 {
+	std::scoped_lock lock{ mutex };
 	// we don't need to take of anything because I set it already
 	m_log.AddLog(fmt, args...);
 }

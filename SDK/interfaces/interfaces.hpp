@@ -18,6 +18,7 @@ class IVModelInfo;
 class IVDebugOverlay;
 class IGameEventManager;
 class IViewRender;
+class IVRenderView;
 class CGlowManager;
 class CGameMovement;
 class IPrediction;
@@ -40,6 +41,7 @@ class CEffectData;
 class IClientState;
 class Entity_t;
 class IFileSystem;
+class CGameRules;
 #pragma endregion
 
 namespace interfaces
@@ -58,7 +60,8 @@ namespace interfaces
 	inline IVModelInfo* modelInfo = nullptr;
 	inline IVDebugOverlay* debugOverlay = nullptr;
 	inline IGameEventManager* eventManager = nullptr;
-	inline IViewRender* renderView = nullptr;
+	inline IVRenderView* renderView = nullptr;
+	inline IViewRender* viewRender = nullptr;
 	inline CGlowManager* glowManager = nullptr;
 	inline CGameMovement* gameMovement = nullptr;
 	inline IPrediction* prediction = nullptr;
@@ -78,8 +81,7 @@ namespace interfaces
 	inline KeyValuesSys* keyValuesSys = nullptr;
 	inline IMemAlloc* memAlloc = nullptr;
 	inline IClientState* clientState = nullptr;
-	// remember to dereference!
-	inline Entity_t** gameRules = nullptr;
+	inline CGameRules* gameRules = nullptr;
 	inline IFileSystem* fileSystem = nullptr;
 
 	bool init();

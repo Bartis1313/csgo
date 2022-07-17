@@ -227,6 +227,14 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fNadeTracerMaxDist, 30.0f, "max meters for nade tracer");
 	CONFIG_ADD_VARIABLE(bool, bNadeTracerWarn, false, "run nade tracer warning");
 	CONFIG_ADD_VARIABLE(bool, bDiscord, false, "run discord rpc");
+	CONFIG_ADD_VARIABLE(bool, bFreeLook, false, "freelook enable");
+	CONFIG_ADD_VARIABLE(Key, kFreeLook, Key(KeyMode::DOWN, VK_MENU), "freelook key");
+	CONFIG_ADD_VARIABLE(bool, bMirrorCam, false, "mirrorcam enable");
+	CONFIG_ADD_VARIABLE(bool, bMirrorCamOnKey, false, "mirrorcam enable only on key");
+	CONFIG_ADD_VARIABLE(Key, kMirrorCam, Key(KeyMode::TOGGLE, VK_F1), "mirrorcam key");
+	CONFIG_ADD_VARIABLE(bool, bFreeCam, false, "freecam enable");
+	CONFIG_ADD_VARIABLE(float, fFreeCam, 1.0f, "freecam speed");
+	CONFIG_ADD_VARIABLE(Key, kFreeCam, Key(KeyMode::TOGGLE, VK_F2), "freecam key");
 
 	// STYLING
 

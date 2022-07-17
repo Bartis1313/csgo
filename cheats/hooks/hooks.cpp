@@ -35,6 +35,8 @@ void hooks::init()
 	const auto unkFileSystemtarget = vfunc::getVFunc(interfaces::fileSystem, unknownFileSystem::index);
 	const auto getUnverifiedFileHashesTarget = vfunc::getVFunc(interfaces::fileSystem, getUnverifiedFileHashes::index);
 	const auto unkFileCheckTarget = vfunc::getVFunc(interfaces::fileSystem, unkFileCheck::index);
+	const auto renderViewTarget = vfunc::getVFunc(interfaces::viewRender, renderView::index);
+	const auto isHltvTarget = vfunc::getVFunc(interfaces::engine, isHltv::index);
 #pragma endregion
 
 	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK);
@@ -108,6 +110,8 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(unkFileSystemtarget, unknownFileSystem);
 	HOOK_SAFE(getUnverifiedFileHashesTarget, getUnverifiedFileHashes);
 	HOOK_SAFE(unkFileCheckTarget, unkFileCheck);
+	HOOK_SAFE(renderViewTarget, renderView);
+	HOOK_SAFE(isHltvTarget, isHltv);
 
 #undef HOOK_SAFE
 
@@ -162,6 +166,12 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 	aimbotKey.update();
 	auto& thirdpKey = config.getRef<Key>(vars.kThirdp);
 	thirdpKey.update();
+	auto& freeLookKey = config.getRef<Key>(vars.kFreeLook);
+	freeLookKey.update();
+	auto& freeCamKey = config.getRef<Key>(vars.kFreeCam);
+	freeCamKey.update();
+	auto& cameraKey = config.getRef<Key>(vars.kMirrorCam);
+	cameraKey.update();
 
 	if(config.get<Key>(vars.kMenu).isPressed())
 		menu.changeActive();

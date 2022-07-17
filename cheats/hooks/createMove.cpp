@@ -15,6 +15,8 @@
 #include "../features/visuals/world.hpp"
 #include "../features/misc/misc.hpp"
 #include "../features/prediction/nadepred.hpp"
+#include "../features/misc/freeLook.hpp"
+#include "../features/misc/freeCam.hpp"
 
 #include "../game.hpp"
 #include "../globals.hpp"
@@ -54,11 +56,19 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 
 	Vector oldAngle = cmd->m_viewangles;
 
+	// otherwise we moving
+	if (freeCam.isInCam())
+	{
+		cmd->m_forwardmove = 0;
+		cmd->m_sidemove = 0;
+	}
+
 	game::serverTime(cmd);
 	movement.bunnyhop(cmd);
 	movement.strafe(cmd);
 	nadePred.createMove(cmd->m_buttons);
 	backtrack.updateSequences();
+	freeLook.createMove(cmd);
 
 	prediction.update();
 	prediction.addToPrediction(cmd, [=]()

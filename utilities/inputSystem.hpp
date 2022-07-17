@@ -19,10 +19,12 @@ class KeysHandler
 public:
     KeysHandler() = default;
     void run(UINT message, WPARAM wparam);
-    bool isKeyDown(UINT vKey) const;
-    bool isKeyPressed(UINT vKey);
+    _NODISCARD bool isKeyDown(UINT vKey) const;
+    _NODISCARD bool isKeyPressed(UINT vKey);
+    _NODISCARD constexpr int getVKey() const { return m_vKey; }
 private:
     std::array<KeyState, KEYS_SIZE> m_keys;
+    int m_vKey = 0;
 };
 
 inline KeysHandler inputHandler;

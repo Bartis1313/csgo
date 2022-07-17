@@ -23,7 +23,11 @@ Resource::Resource(const std::string& path)
 
     stbi_set_flip_vertically_on_load_thread(false);
     m_buffer = stbi_load(path.c_str(), &m_width, &m_height, nullptr, 4);
-    // imgui
+    if (!m_buffer)
+    {
+        console.log(TypeLogs::LOG_ERR, XOR("Creating resource from path failed, reason: {}"), stbi_failure_reason());
+        return;
+    }
     m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
     surfaceRender.initNewTexture(m_textureID, m_buffer, m_width, m_height);
     stbi_image_free(m_buffer);
@@ -48,9 +52,12 @@ Resource::Resource(int resID, const std::string_view type)
 
     stbi_set_flip_vertically_on_load_thread(false);
     m_buffer = stbi_load_from_memory(hResPtr, size, &m_width, &m_height, nullptr, 4);
-    // imgui
+    if (!m_buffer)
+    {
+        console.log(TypeLogs::LOG_ERR, XOR("Creating resource from resources file failed, reason: {}"), stbi_failure_reason());
+        return;
+    }
     m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
-    // surface
     surfaceRender.initNewTexture(m_textureID, m_buffer, m_width, m_height);
     stbi_image_free(m_buffer);
     LF(FreeResource)(hResData);
@@ -64,6 +71,11 @@ Resource::Resource(void* data, size_t size)
 {
     stbi_set_flip_vertically_on_load_thread(false);
     m_buffer = stbi_load_from_memory(reinterpret_cast<unsigned char*>(data), size, &m_width, &m_height, nullptr, 4);
+    if (!m_buffer)
+    {
+        console.log(TypeLogs::LOG_ERR, XOR("Creating resource from memory failed, reason: {}"), stbi_failure_reason());
+        return;
+    }
     m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
     stbi_image_free(m_buffer);
 

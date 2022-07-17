@@ -164,7 +164,8 @@ void Misc::drawLocalInfo()
 	imRender.text(width, 85, ImFonts::tahoma14, FORMAT(XOR("Deaths {}"), game::localPlayer->getDeaths()), false, Colors::Yellow);
 	// escape divide by zero exceptions by using this trick
 	float kd = game::localPlayer->getKills() / (game::localPlayer->getDeaths() ? game::localPlayer->getDeaths() : 1.0f);
-	imRender.text(width, 95, ImFonts::tahoma14, FORMAT(XOR("KD {:.2f}"), kd), false, Colors::Yellow);
+	float kpm = game::localPlayer->getKills() / (game::serverTime() / 60.0f);
+	imRender.text(width, 95, ImFonts::tahoma14, FORMAT(XOR("KD {:.2f} KPM: {:.2f}"), kd, kpm), false, Colors::Yellow);
 	imRender.text(width, 105, ImFonts::tahoma14, FORMAT(XOR("Ping {}"), game::localPlayer->getPing()), false, Colors::Yellow);
 
 	float accuracy = globals::shotsFired

@@ -1,38 +1,42 @@
 #include "SEHcatch.hpp"
 
 #include <DbgHelp.h>
-#include <sstream>
 #include <map>
 
 #include "utilities/console/console.hpp"
 #include "utilities/utilities.hpp"
 
+// exception to string
+#define E2S(e) { e, #e }
+
 #pragma region crash_map
 const std::map<DWORD, const char*> crashNames
 {
-	{ EXCEPTION_ACCESS_VIOLATION, "EXCEPTION_ACCESS_VIOLATION" },
-	{ EXCEPTION_READ_FAULT, "EXCEPTION_READ_FAULT" },
-	{ EXCEPTION_DATATYPE_MISALIGNMENT, "EXCEPTION_DATATYPE_MISALIGNMENT" },
-	{ EXCEPTION_BREAKPOINT, "EXCEPTION_BREAKPOINT" },
-	{ EXCEPTION_SINGLE_STEP, "EXCEPTION_SINGLE_STEP" },
-	{ EXCEPTION_ARRAY_BOUNDS_EXCEEDED, "EXCEPTION_ARRAY_BOUNDS_EXCEEDED" },
-	{ EXCEPTION_FLT_DENORMAL_OPERAND, "EXCEPTION_FLT_DENORMAL_OPERAND" },
-	{ EXCEPTION_FLT_DIVIDE_BY_ZERO, "EXCEPTION_FLT_DIVIDE_BY_ZERO" },
-	{ EXCEPTION_FLT_INEXACT_RESULT, "EXCEPTION_FLT_INEXACT_RESULT" },
-	{ EXCEPTION_FLT_INVALID_OPERATION, "EXCEPTION_FLT_INVALID_OPERATION" },
-	{ EXCEPTION_FLT_OVERFLOW, "EXCEPTION_FLT_OVERFLOW" },
-	{ EXCEPTION_FLT_STACK_CHECK, "EXCEPTION_FLT_STACK_CHECK" },
-	{ EXCEPTION_FLT_UNDERFLOW, "EXCEPTION_FLT_UNDERFLOW" },
-	{ EXCEPTION_INT_DIVIDE_BY_ZERO, "EXCEPTION_INT_DIVIDE_BY_ZERO" },
-	{ EXCEPTION_INT_OVERFLOW, "EXCEPTION_INT_OVERFLOW" },
-	{ EXCEPTION_PRIV_INSTRUCTION, "EXCEPTION_PRIV_INSTRUCTION" },
-	{ EXCEPTION_NONCONTINUABLE_EXCEPTION, "EXCEPTION_NONCONTINUABLE_EXCEPTION" },
-	{ EXCEPTION_STACK_OVERFLOW, "EXCEPTION_STACK_OVERFLOW"},
-	{ EXCEPTION_INVALID_DISPOSITION, "EXCEPTION_INVALID_DISPOSITION" },
-	{ EXCEPTION_GUARD_PAGE, "EXCEPTION_GUARD_PAGE" },
-	{ EXCEPTION_INVALID_HANDLE, "EXCEPTION_INVALID_HANDLE" }
+	E2S(EXCEPTION_ACCESS_VIOLATION),
+	E2S(EXCEPTION_READ_FAULT),
+	E2S(EXCEPTION_DATATYPE_MISALIGNMENT),
+	E2S(EXCEPTION_BREAKPOINT),
+	E2S(EXCEPTION_SINGLE_STEP),
+	E2S(EXCEPTION_ARRAY_BOUNDS_EXCEEDED),
+	E2S(EXCEPTION_FLT_DENORMAL_OPERAND),
+	E2S(EXCEPTION_FLT_DIVIDE_BY_ZERO),
+	E2S(EXCEPTION_FLT_INEXACT_RESULT),
+	E2S(EXCEPTION_FLT_INVALID_OPERATION),
+	E2S(EXCEPTION_FLT_OVERFLOW),
+	E2S(EXCEPTION_FLT_STACK_CHECK),
+	E2S(EXCEPTION_FLT_UNDERFLOW),
+	E2S(EXCEPTION_INT_DIVIDE_BY_ZERO),
+	E2S(EXCEPTION_INT_OVERFLOW),
+	E2S(EXCEPTION_PRIV_INSTRUCTION),
+	E2S(EXCEPTION_NONCONTINUABLE_EXCEPTION),
+	E2S(EXCEPTION_STACK_OVERFLOW),
+	E2S(EXCEPTION_INVALID_DISPOSITION),
+	E2S(EXCEPTION_GUARD_PAGE),
+	E2S(EXCEPTION_INVALID_HANDLE)
 };
 #pragma endregion
+
+#undef E2S
 
 void SEHcatch::printStack()
 {
@@ -45,7 +49,7 @@ void SEHcatch::printStack()
 #endif
 
 	const auto frames = LF(CaptureStackBackTrace)(NULL, MAX_FRAMES, stack, nullptr);
-	const auto symbol = (SYMBOL_INFO*)malloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char));
+	const auto symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(CHAR), 1);
 	symbol->MaxNameLen = MAX_LENGTH;
 	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
@@ -71,18 +75,16 @@ LONG WINAPI SEHcatch::memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 		{
 			static bool bOnce = [=]()
 			{
-				const auto symbol = (SYMBOL_INFO*)malloc(sizeof(SYMBOL_INFO) + 256 * sizeof(char));
+				const auto symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(CHAR), 1);
 				symbol->MaxNameLen = MAX_LENGTH;
 				symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-
-				std::stringstream ss;
 
 				const auto addr = pExceptionInfo->ExceptionRecord->ExceptionAddress;
 				const auto name = symbol->Name;
 				const auto flag = pExceptionInfo->ExceptionRecord->ExceptionFlags;
 				const auto params = pExceptionInfo->ExceptionRecord->NumberParameters;
 
-				ss << FORMAT(XOR("Exception (fatal) {} at address {} ({}), flags - {}, params - {}"), crashName, addr, name, flag, params);
+				const auto info = FORMAT(XOR("Exception (fatal) {} at address {} ({}), flags - {}, params - {}"), crashName, addr, name, flag, params);
 				// x86
 				console.log(TypeLogs::LOG_ERR, XOR("EAX - 0x{:X}"), pExceptionInfo->ContextRecord->Eax);
 				console.log(TypeLogs::LOG_ERR, XOR("EBP - 0x{:X}"), pExceptionInfo->ContextRecord->Ebp);
@@ -94,9 +96,9 @@ LONG WINAPI SEHcatch::memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 				console.log(TypeLogs::LOG_ERR, XOR("ESI - 0x{:X}"), pExceptionInfo->ContextRecord->Esi);
 				console.log(TypeLogs::LOG_ERR, XOR("ESP - 0x{:X}"), pExceptionInfo->ContextRecord->Esp);
 
-				console.log(TypeLogs::LOG_ERR, ss.str());
+				console.log(TypeLogs::LOG_ERR, info);
 				printStack();
-				LF(MessageBoxA)(nullptr, ss.str().c_str(), XOR("Fatal error!"), MB_ICONERROR | MB_OK);
+				LF(MessageBoxA)(nullptr, info.c_str(), XOR("Fatal error!"), MB_ICONERROR | MB_OK);
 				free(symbol);
 				return true;
 			} ();

@@ -11,6 +11,8 @@
 #include "../features/visuals/radar.hpp"
 #include "../features/misc/misc.hpp"
 #include "../features/visuals/world.hpp"
+#include "../features/visuals/mirrorCam.hpp"
+#include "../features/misc/freeCam.hpp"
 
 #include "../../utilities/renderer/renderer.hpp"
 #include "../../utilities/utilities.hpp"
@@ -74,6 +76,8 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		misc.drawFpsPlot();
 		misc.drawVelocityPlot();
 		world.drawBombOverlay();
+		mCam.draw();
+		freeCam.drawInfo();
 	}
 
 	// END DRAW

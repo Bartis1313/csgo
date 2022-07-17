@@ -451,6 +451,18 @@ static void renderMisc()
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Client bullets fill color"), &config.getRef<CfgColor>(vars.cDrawClientSideImpactsFill));
 				ImGui::SliderFloat(XOR("Client bullets time"), &config.getRef<float>(vars.fDrawClientSideImpacts), 0.0f, 5.0f);
+				ImGui::Checkbox(XOR("Freelook"), &config.getRef<bool>(vars.bFreeLook));
+				ImGui::SameLine();
+				ImGui::Hotkey(XOR("##fl"), &config.getRef<Key>(vars.kFreeLook));
+				ImGui::Checkbox(XOR("FreeCam"), &config.getRef<bool>(vars.bFreeCam));
+				ImGui::SameLine();
+				ImGui::Hotkey("##fc", &config.getRef<Key>(vars.kFreeCam));
+				ImGui::SliderFloat(XOR("Speed##fc"), &config.getRef<float>(vars.fFreeCam), 1.0f, 20.0f);
+				ImGui::Checkbox(XOR("MirrorCam"), &config.getRef<bool>(vars.bMirrorCam));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("On key##mcam"), &config.getRef<bool>(vars.bMirrorCamOnKey));
+				ImGui::SameLine();
+				ImGui::Hotkey(XOR("##mcam"), &config.getRef<Key>(vars.kMirrorCam));
 			}
 			ImGui::EndGroupPanel();
 

@@ -13,8 +13,6 @@ public:
 	Resource(int resID, const std::string_view type);
 	Resource(void* data, size_t size);
 	// imgui
-	bool operator()() const { return m_texture; };
-	// imgui
 	IDirect3DTexture9* getTexture() const { return m_texture; }
 	// surface
 	constexpr int getTextureID() const { return m_textureID; }

@@ -10,7 +10,8 @@
 void ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& size)
 {
     ImGui::PushID(label);
-    ImGui::TextUnformatted(label);
+    if (std::strncmp(label, "##", 2))
+        ImGui::TextUnformatted(label, std::strstr(label, "##"));
 
     ImGui::SameLine();
 
@@ -59,7 +60,7 @@ void ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& 
         }
     }
 
-    PopID();
+    ImGui::PopID();
 }
 
 void ImGui::HelpMarker(const char* desc)

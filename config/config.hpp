@@ -59,7 +59,6 @@ public:
 	Config() = default;
 
 	bool save(const std::string& file, const bool forceSave = false);
-	std::string getCfgToLoad();
 	bool saveCfgToLoad(const std::string& name);
 	bool load(const std::string& file);
 	void deleteCfg(const std::string& file);
@@ -92,6 +91,8 @@ public:
 	{
 		return m_allVars.at(idx).get<T>();
 	}
+	// get load cfg name
+	_NODISCARD std::string getCfgToLoad() const;
 	// get main folder
 	_NODISCARD std::filesystem::path getHackPath() const;
 	// get main load folder

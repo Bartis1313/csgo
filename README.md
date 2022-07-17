@@ -109,6 +109,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.4.5 - Changes in code, mainly to render low levels things such as images by resources. Few slight changes into imgui: add ability to load up image by memory, ability to draw multicolors with poly. Discord rpc with updated information from client.
 * 1.4.6 - Texture rendered in the radar, I run on some weird problems there and unfortunately because of the dds file format it's impossible to use Resource class. Cleaned the project settings. Instead of ignoring the error of unsafe function, getting time is threadsafe now. Game color edits are now run per each instead of applying whole list.
 * 1.4.7 - Easy cfg load on start option, setting load cfg won't save current variables but only name to load.
+* 1.4.8 - Added mirrorcam (rendering by ImGui), freecam, freelook, fixed SEH catching allocation for symbols. Console logging is now locked, it's better to run them in mutex.
 </details>
 
 # Dependencies

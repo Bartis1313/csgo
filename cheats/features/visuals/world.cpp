@@ -789,11 +789,8 @@ bool World::checkCustomSkybox()
 {
 	auto path = std::filesystem::current_path() / XOR("csgo") / XOR("materials") / XOR("skybox");
 
-	if (!std::filesystem::is_directory(path))
+	if (!std::filesystem::exists(path))
 	{
-		// if no, remove it, in
-		std::filesystem::remove(path);
-
 		// after removal, create the folder, from there the path is possible to reach
 		if (!std::filesystem::create_directories(path))
 			return false;

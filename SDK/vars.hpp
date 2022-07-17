@@ -221,3 +221,9 @@
 #define FLOW_INCOMING	1
 #define MAX_FLOWS		2		// in & out
 #pragma endregion
+
+#pragma region create_render_flags
+#define CREATERENDERTARGETFLAGS_HDR				0x00000001
+#define CREATERENDERTARGETFLAGS_AUTOMIPMAP		0x00000002
+#define CREATERENDERTARGETFLAGS_UNFILTERABLE_OK 0x00000004
+#pragma endregion

@@ -275,7 +275,7 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 	return true;
 }
 
-std::string Config::getCfgToLoad()
+std::string Config::getCfgToLoad() const
 {
 	// unsafe operation, nobody edits it manually anyway
 	std::ifstream read{ getPathForLoad(m_defaultFileNameLoad) };

@@ -149,6 +149,8 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\features\misc\discord.cpp" />
+    <ClCompile Include="cheats\features\misc\freeCam.cpp" />
+    <ClCompile Include="cheats\features\misc\freeLook.cpp" />
     <ClCompile Include="cheats\features\misc\movement.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -162,9 +164,12 @@
     <ClCompile Include="cheats\features\prediction\prediction.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="cheats\features\visuals\mirrorCam.cpp" />
     <ClCompile Include="cheats\hooks\buildTransformations.cpp" />
     <ClCompile Include="cheats\hooks\drawIndexPrimitive.cpp" />
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
+    <ClCompile Include="cheats\hooks\isHltv.cpp" />
+    <ClCompile Include="cheats\hooks\renderView.cpp" />
     <ClCompile Include="cheats\hooks\sendDatagram.cpp" />
     <ClCompile Include="cheats\hooks\particlesSimulation.cpp" />
     <ClCompile Include="cheats\hooks\setupbones.cpp" />
@@ -319,6 +324,8 @@
     <ClInclude Include="cheats\features\aimbot\triggerbot.hpp" />
     <ClInclude Include="cheats\features\backtrack\backtrack.hpp" />
     <ClInclude Include="cheats\features\misc\discord.hpp" />
+    <ClInclude Include="cheats\features\misc\freeCam.hpp" />
+    <ClInclude Include="cheats\features\misc\freeLook.hpp" />
     <ClInclude Include="cheats\features\misc\movement.hpp" />
     <ClInclude Include="cheats\features\misc\callbacks.hpp" />
     <ClInclude Include="cheats\features\misc\events.hpp" />
@@ -326,6 +333,7 @@
     <ClInclude Include="cheats\features\misc\misc.hpp" />
     <ClInclude Include="cheats\features\prediction\nadepred.hpp" />
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
+    <ClInclude Include="cheats\features\visuals\mirrorCam.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />
@@ -381,14 +389,19 @@
     <ClInclude Include="SDK\CClientEffectRegistration.hpp" />
     <ClInclude Include="SDK\CEffectData.hpp" />
     <ClInclude Include="SDK\CFlashlightEffect.hpp" />
+    <ClInclude Include="SDK\CGameRules.hpp" />
     <ClInclude Include="SDK\CHudChat.hpp" />
     <ClInclude Include="SDK\CParticelCollection.hpp" />
     <ClInclude Include="SDK\CStudioHdr.hpp" />
     <ClInclude Include="SDK\CTeslaInfo.hpp" />
     <ClInclude Include="SDK\CUtlReference.hpp" />
     <ClInclude Include="SDK\CUtlString.hpp" />
+    <ClInclude Include="SDK\CViewSetup.hpp" />
     <ClInclude Include="SDK\IClientState.hpp" />
+    <ClInclude Include="SDK\IMatRenderContext.hpp" />
     <ClInclude Include="SDK\IMemAlloc.hpp" />
+    <ClInclude Include="SDK\ITexture.hpp" />
+    <ClInclude Include="SDK\IViewRender.hpp" />
     <ClInclude Include="SDK\KeyValues.hpp" />
     <ClInclude Include="SDK\KeyValuesSys.hpp" />
     <ClInclude Include="SDK\MapStruct.hpp" />

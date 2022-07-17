@@ -17,6 +17,7 @@
 #include "utilities/res.hpp"
 #include "cheats/features/visuals/radar.hpp"
 #include "cheats/features/visuals/world.hpp"
+#include "cheats/features/visuals/mirrorCam.hpp"
 
 #include <thread>
 
@@ -55,6 +56,7 @@ DWORD WINAPI init(PVOID instance)
         callbacks.init();
         callbacks.run();
         radar.initRetAddr();
+        mCam.init();
         hooks::init();
     }
     catch (const std::runtime_error& err)
