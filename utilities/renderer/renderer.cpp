@@ -125,10 +125,10 @@ void SurfaceRender::drawCircleFilled(const int x, const int y, const int radius,
 {
 	std::vector<Vertex_t> verts = {};
 
-	float step = std::numbers::pi_v<float> *2.0f / points;
-	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	float step = math::PI *2.0f / points;
+	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
-		verts.emplace_back(std::move(Vector2D{ x + (radius * std::cos(angle)), y + (radius * std::sin(angle)) }));
+		verts.emplace_back(Vector2D{ x + (radius * std::cos(angle)), y + (radius * std::sin(angle)) });
 	}
 
 	drawPolyGon(verts.size(), verts.data(), color);
@@ -136,8 +136,8 @@ void SurfaceRender::drawCircleFilled(const int x, const int y, const int radius,
 
 void SurfaceRender::drawCircle3D(const Vector& pos, const int radius, const int points, const Color& color)
 {
-	float step = std::numbers::pi_v<float> *2.0f / points;
-	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	float step = math::PI *2.0f / points;
+	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
 		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
 		Vector worldEnd = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
@@ -153,8 +153,8 @@ void SurfaceRender::drawFilledCircle3D(const Vector& pos, const int radius, cons
 	if (!worldToScreen(pos, orignalW2S))
 		return;
 
-	float step = std::numbers::pi_v<float> *2.0f / points;
-	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	float step = math::PI *2.0f / points;
+	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
 		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
 		Vector worldEnd = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
@@ -418,52 +418,21 @@ bool SurfaceRender::worldToScreen(const Vector& in, Vector2D& out)
 
 // cs engine lines are not anti aliased :(
 
-//#define CLASSIC_LINE
-//#define DEBUG_RENDER
-//#define TRIANGLE_METHOD
-#define POLYGON_METHOD
-	/*
-	* Quick explanation, nobody explains this
-	* Method drawline:
-	* easy and very effective, every engine shares draw line function somewhere
-	*
-	* Method polygon
-	* bit harder as not all engines shares such functions, so you must render it yourself with some lib / do it with dx/opgl
-	* also notice normal rectangle will awlays fail there!
-	*
-	* Filling:
-	* as polygon can be represented as two triangles there is no difference, just longer code
-	*
-	* In expereince from other games and from there, it's the best to call drawLine for box structure + drawQuadFilled for filling
-
-		   p4--------p5
-		  /|		/|
-		 / |	   / |
-		p7-|------p6 |
-		|  |      |  |
-		|  |	  |  |
-		|  |	  |	 |
-		|  p0-----|-p1
-		| /       | /
-		|/        |/
-		p3-------p2
-
-	*/
-
 void SurfaceRender::drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled)
 {
-	constexpr size_t SIZE = 8;
 	// transormed points to get pos.x/.y
-	std::array<Vector2D, SIZE> points = {};
+	std::array<Vector2D, 8> lines = {};
 
-	for (size_t i = 0; i < box.size(); i++)
+	for (size_t i = 0; auto& el : lines)
 	{
-		if (!worldToScreen(box.at(i), points.at(i)))
+		if (!worldToScreen(box.at(i), el))
 			return;
 
 #ifdef DEBUG_RENDER
 		textf(points.at(i).x, points.at(i).y, fonts::tahoma, false, Color(100, 20, 100, 255), "[%i] posX: %0.2f, posY: %0.2f", i, points.at(i).x, points.at(i).y);
 #endif // DEBUG_RENDER
+
+		i++;
 	}
 
 	// anything with low alpha
@@ -472,82 +441,20 @@ void SurfaceRender::drawBox3D(const std::array<Vector, 8>& box, const Color& col
 	// first fill then draw lines
 	if (filled)
 	{
-#ifdef TRIANGLE_METHOD
-		// bottom
-		drawTriangleFilled(points.at(0), points.at(1), points.at(2), fill);
-		drawTriangleFilled(points.at(2), points.at(0), points.at(3), fill);
-		// top
-		drawTriangleFilled(points.at(4), points.at(5), points.at(6), fill);
-		drawTriangleFilled(points.at(6), points.at(4), points.at(7), fill);
-
-		for (int i = 0; i < 3; i++)
-		{
-			drawTriangleFilled(points.at(i), points.at(i + 1), points.at(i + 4), fill);
-			drawTriangleFilled(points.at(i + 4), points.at(i + 5), points.at(i + 1), fill);
-		}
-		// manually render left 
-		drawTriangleFilled(points.at(3), points.at(4), points.at(7), fill);
-		drawTriangleFilled(points.at(0), points.at(3), points.at(4), fill);
-#endif // TRIANGLE_METHOD
-
-#ifdef POLYGON_METHOD			 
-		// bottom
-		drawQuadFilled(points.at(0), points.at(1), points.at(2), points.at(3), fill);
-		// top
-		drawQuadFilled(points.at(4), points.at(5), points.at(6), points.at(7), fill);
-		// front
-		drawQuadFilled(points.at(3), points.at(2), points.at(6), points.at(7), fill);
-		// back
-		drawQuadFilled(points.at(0), points.at(1), points.at(5), points.at(4), fill);
-		// right
-		drawQuadFilled(points.at(2), points.at(1), points.at(5), points.at(6), fill);
-		// left
-		drawQuadFilled(points.at(3), points.at(0), points.at(4), points.at(7), fill);
-#endif // POLYGON_METHOD
+		// auto points = math::grahamScan(box.points); -> overload this function, I dont use surface for this
+		// std::reverse(points.begin(), points.end()); -> don't use in surface.
+		// drawPolyGon(points.size(), points.data(), fill);
 	}
-#ifdef CLASSIC_LINE
-	// bottom parts
-	for (int i = 0; i < 3; i++)
+	for (size_t i = 1; i < 5; i++)
 	{
-		drawLine(points.at(i), points.at(i + 1), color);
+		// BOTTOM 0,1,2,3
+		drawLine(lines.at(i - 1), lines.at(i % 4), color);
+		// TOP 4,5,6,7
+		drawLine(lines.at(i + 3), lines.at(i % 4 + 4), color);
+		// MISSING TOP
+		drawLine(lines.at(i - 1), lines.at(i + 3), color);
 	}
-	// missing part at the bottom
-	drawLine(points.at(0), points.at(3), color);
-	// top parts
-	for (int i = 4; i < 7; i++)
-	{
-		drawLine(points.at(i), points.at(i + 1), color);
-	}
-	// missing part at the top
-	drawLine(points.at(4), points.at(7), color);
-
-	// now all 4 lines missing parts for 3d box
-	for (int i = 0; i < 4; i++)
-	{
-		drawLine(points.at(i), points.at(i + 4), color);
-	}
-#endif // CLASSIC_LINE
-
-#ifdef POLYGON_METHOD
-	// bottom
-	drawQuad(points.at(0), points.at(1), points.at(2), points.at(3), color);
-	// top
-	drawQuad(points.at(4), points.at(5), points.at(6), points.at(7), color);
-	// front
-	drawQuad(points.at(3), points.at(2), points.at(6), points.at(7), color);
-	// back
-	drawQuad(points.at(0), points.at(1), points.at(5), points.at(4), color);
-	// right
-	drawQuad(points.at(2), points.at(1), points.at(5), points.at(6), color);
-	// left
-	drawQuad(points.at(3), points.at(0), points.at(4), points.at(7), color);
-#endif // POLYGON_METHOD
 }
-
-#undef POLYGON_METHOD
-#undef CLASSIC_LINE
-#undef DEBUG_RENDER
-#undef TRIANGLE_METHOD
 
 void SurfaceRender::initNewTexture(int& id, Color* RGBA, const int w, const int h)
 {
@@ -579,14 +486,14 @@ void SurfaceRender::drawImage(const Resource& res, const int x, const int y, con
 void SurfaceRender::drawProgressRing(const int x, const int y, float radius, const int points, float percent, const float thickness, const Color& color)
 {
 	// basically telling how precision will be
-	float step = std::numbers::pi_v<float> *2.0f / points;
+	float step = math::PI *2.0f / points;
 
 	// limit angle, based on percentage passed
-	float maxAngle = std::numbers::pi_v<float> *2.0f * percent;
+	float maxAngle = math::PI *2.0f * percent;
 
 	for (float angle = 0.0f; angle < maxAngle; angle += step)
 	{
-		float ax = x + (radius * std::cos(angle)); // - (std::numbers::pi_v<float> / 2.0f)) - will make clock like turning order
+		float ax = x + (radius * std::cos(angle)); // - (math::PI / 2.0f)) - will make clock like turning order
 		float ay = y + (radius * std::sin(angle));
 
 		float bx = x + (radius + thickness) * std::cos(angle);
@@ -734,9 +641,9 @@ void ImGuiRender::drawLine(const float x, const float y, const float x2, const f
 	m_drawData.emplace_back(DrawType::LINE, std::make_any<LineObject_t>(LineObject_t(ImVec2{ x, y }, ImVec2{ x2, y2 }, U32(color), thickness)));
 }
 
-void ImGuiRender::drawLine(const Vector2D& start, const Vector2D& end, const Color& color, const float thickness)
+void ImGuiRender::drawLine(const ImVec2& start, const ImVec2& end, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(DrawType::LINE, std::make_any<LineObject_t>(LineObject_t(ImVec2{ start.x, start.y }, ImVec2{ end.x, end.y }, U32(color), thickness)));
+	m_drawData.emplace_back(DrawType::LINE, std::make_any<LineObject_t>(LineObject_t(start, end, U32(color), thickness)));
 }
 
 void ImGuiRender::drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags, const float thickness)
@@ -766,11 +673,35 @@ void ImGuiRender::drawRectFilledMultiColor(const float x, const float y, const f
 		U32(colUprLeft), U32(colUprRight), U32(colBotRight), U32(colBotLeft))));
 }
 
-void ImGuiRender::drawBox3D(const Vector& pos, const Vector2D& width, const float height, const Color& color, const float thickness)
+void ImGuiRender::drawTrianglePoly(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
+{
+	std::vector verts =
+	{
+		p1,
+		p2,
+		p3
+	};
+
+	imRender.drawPolyGon(verts, color);
+}
+
+static ImVec2 operator-(const ImVec2& v, float val)
+{
+	return ImVec2{ v.x - val, v.y - val };
+}
+
+static ImVec2 operator+(const ImVec2& v, float val)
+{
+	return ImVec2{ v.x + val, v.y + val };
+}
+
+void ImGuiRender::drawBox3D(const Vector& pos, const ImVec2& width, const float height, const Color& color, bool outlined, const float thickness)
 {
 	// dividing to get a centre to world position
 	float boxW = width.x / 2.0f;
 	float boxH = height;
+
+	outlined = false; // looks bad
 
 	float boxWidthSide = width.y / 2.0f;
 
@@ -786,41 +717,42 @@ void ImGuiRender::drawBox3D(const Vector& pos, const Vector2D& width, const floa
 		Vector{ pos.x + boxW, pos.y + boxWidthSide, pos.z },
 	};
 
-	// transormed points to get pos.x/.y
-	std::array<Vector2D, box.size()> lines = {};
-
-	for (size_t i = 0; i < box.size(); i++)
+	std::array<ImVec2, box.size()> lines = {};
+	
+	for (size_t i = 0; auto& el : lines)
 	{
-		if (!worldToScreen(box.at(i), lines.at(i)))
+		if (!worldToScreen(box.at(i), el))
 			return;
+
+		i++;
 	}
 
-	// bottom
-	for (size_t i = 0; i < 3; i++)
+	Color outlineCol = Colors::Black.getColorEditAlpha(color.a());
+
+	for (size_t i = 1; i < 5; i++)
 	{
-		drawLine(lines.at(i), lines.at(i + 1), color);
-	}
-	// missing part at the bottom
-	drawLine(lines.at(0), lines.at(3), color);
-	// top parts
-	for (size_t i = 4; i < 7; i++)
-	{
-		drawLine(lines.at(i), lines.at(i + 1), color);
-	}
-	// missing part at the top
-	drawLine(lines.at(4), lines.at(7), color);
-	// now all 4 lines missing parts for 3d box
-	for (size_t i = 0; i < 4; i++)
-	{
-		drawLine(lines.at(i), lines.at(i + 4), color);
+		// BOTTOM 0,1,2,3
+		imRender.drawLine(lines.at(i - 1), lines.at(i % 4), color, thickness);
+		if (outlined)
+			imRender.drawLine(lines.at(i - 1) + 1.0f - thickness, lines.at(i % 4) + 1.0f - thickness, outlineCol);
+		// TOP 4,5,6,7
+		imRender.drawLine(lines.at(i + 3), lines.at(i % 4 + 4), color, thickness);
+		if (outlined)
+			imRender.drawLine(lines.at(i + 3) + 1.0f - thickness, lines.at(i % 4 + 4) + 1.0f - thickness, outlineCol);
+		// MISSING TOP
+		imRender.drawLine(lines.at(i - 1), lines.at(i + 3), color, thickness);
+		if (outlined)
+			imRender.drawLine(lines.at(i - 1) + 1.0f - thickness, lines.at(i + 3) + 1.0f - thickness, outlineCol);
 	}
 }
 
-void ImGuiRender::drawBox3DFilled(const Vector& pos, const Vector2D& width, const float height, const Color& color, const Color& filling, const float thickness)
+void ImGuiRender::drawBox3DFilled(const Vector& pos, const ImVec2& width, const float height, const Color& color, const Color& filling, bool outlined, const float thickness)
 {
 	// dividing to get a centre to world position
 	float boxW = width.x / 2.0f;
 	float boxH = height;
+
+	outlined = false; // looks bad
 
 	float boxWidthSide = width.y / 2.0f;
 
@@ -837,45 +769,36 @@ void ImGuiRender::drawBox3DFilled(const Vector& pos, const Vector2D& width, cons
 	};
 
 	// transormed points to get pos.x/.y
-	std::array<Vector2D, box.size()> lines = {};
+	std::array<ImVec2, box.size()> lines = {};
 
-	for (size_t i = 0; i < box.size(); i++)
+	for (size_t i = 0; auto & el : lines)
 	{
-		if (!worldToScreen(box.at(i), lines.at(i)))
+		if (!worldToScreen(box.at(i), el))
 			return;
+
+		i++;
 	}
 
-	// yes ik, this is a mess to mix surface in here, quads in drawlist are weird with aa
-	// bottom
-	surfaceRender.drawQuadFilled(lines.at(0), lines.at(1), lines.at(2), lines.at(3), filling);
-	// top
-	surfaceRender.drawQuadFilled(lines.at(4), lines.at(5), lines.at(6), lines.at(7), filling);
-	// front
-	surfaceRender.drawQuadFilled(lines.at(3), lines.at(2), lines.at(6), lines.at(7), filling);
-	// back
-	surfaceRender.drawQuadFilled(lines.at(0), lines.at(1), lines.at(5), lines.at(4), filling);
-	// right
-	surfaceRender.drawQuadFilled(lines.at(2), lines.at(1), lines.at(5), lines.at(6), filling);
-	// left
-	surfaceRender.drawQuadFilled(lines.at(3), lines.at(0), lines.at(4), lines.at(7), filling);
+	auto points = math::grahamScan(lines);
+	std::reverse(points.begin(), points.end());
+	imRender.drawPolyGon(points, filling);
 
-	for (size_t i = 0; i < 3; i++)
+	Color outlineCol = Colors::Black.getColorEditAlpha(color.a());
+
+	for (size_t i = 1; i < 5; i++)
 	{
-		drawLine(lines.at(i), lines.at(i + 1), color);
-	}
-	// missing part at the bottom
-	drawLine(lines.at(0), lines.at(3), color);
-	// top parts
-	for (size_t i = 4; i < 7; i++)
-	{
-		drawLine(lines.at(i), lines.at(i + 1), color);
-	}
-	// missing part at the top
-	drawLine(lines.at(4), lines.at(7), color);
-	// now all 4 lines missing parts for 3d box
-	for (size_t i = 0; i < 4; i++)
-	{
-		drawLine(lines.at(i), lines.at(i + 4), color);
+		// BOTTOM 0,1,2,3
+		imRender.drawLine(lines.at(i - 1), lines.at(i % 4), color, thickness);
+		if (outlined)
+			imRender.drawLine(lines.at(i - 1) + 1.0f - thickness, lines.at(i % 4) + 1.0f - thickness, outlineCol);
+		// TOP 4,5,6,7
+		imRender.drawLine(lines.at(i + 3), lines.at(i % 4 + 4), color, thickness);
+		if (outlined)
+			imRender.drawLine(lines.at(i + 3) + 1.0f - thickness, lines.at(i % 4 + 4) + 1.0f - thickness, outlineCol);
+		// MISSING TOP
+		imRender.drawLine(lines.at(i - 1), lines.at(i + 3), color, thickness);
+		if (outlined)
+			imRender.drawLine(lines.at(i - 1) + 1.0f - thickness, lines.at(i + 3) + 1.0f - thickness, outlineCol);
 	}
 }
 
@@ -891,14 +814,14 @@ void ImGuiRender::drawCircleFilled(const float x, const float y, const float rad
 
 void ImGuiRender::drawCircle3D(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	float step = std::numbers::pi_v<float> *2.0f / points;
+	float step = math::PI *2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
-	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
 		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
-		if (Vector screenStart; worldToScreen(worldStart, screenStart))
-			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
+		if (ImVec2 screenStart; worldToScreen(worldStart, screenStart))
+			pointsVec.push_back(screenStart);
 	}
 
 	m_drawData.emplace_back(DrawType::CIRCLE_3D, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
@@ -909,10 +832,10 @@ void ImGuiRender::drawCircle3D(const Vector& pos, const float radius, const int 
 
 void ImGuiRender::drawCircle3DTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	float step = std::numbers::pi_v<float> *2.0f / points;
+	float step = math::PI *2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
-	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
 		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
 
@@ -922,8 +845,8 @@ void ImGuiRender::drawCircle3DTraced(const Vector& pos, const float radius, cons
 
 		interfaces::trace->traceRay({ pos, worldStart }, MASK_SHOT_BRUSHONLY, &filter, &trace);
 
-		if (Vector2D screenStart; worldToScreen(trace.m_end, screenStart))
-			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
+		if (ImVec2 screenStart; worldToScreen(trace.m_end, screenStart))
+			pointsVec.push_back(screenStart);
 	}
 
 	m_drawData.emplace_back(DrawType::CIRCLE_3D, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), flags, thickness)));
@@ -931,14 +854,14 @@ void ImGuiRender::drawCircle3DTraced(const Vector& pos, const float radius, cons
 
 void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
-	float step = std::numbers::pi_v<float> *2.0f / points;
+	float step = math::PI *2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
-	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
 		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
-		if (Vector2D screenStart; worldToScreen(worldStart, screenStart))
-			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
+		if (ImVec2 screenStart; worldToScreen(worldStart, screenStart))
+			pointsVec.push_back(screenStart);
 	}
 
 	m_drawData.emplace_back(DrawType::CIRCLE_3D_FILLED, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), U32(outline), flags, thickness)));
@@ -946,10 +869,10 @@ void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, cons
 
 void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
-	float step = std::numbers::pi_v<float> *2.0f / points;
+	float step = math::PI *2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
-	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
 		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
 
@@ -959,48 +882,53 @@ void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius
 
 		interfaces::trace->traceRay({ pos, worldStart }, MASK_SHOT_BRUSHONLY, &filter, &trace);
 
-		if (Vector screenStart; worldToScreen(trace.m_end, screenStart))
-			pointsVec.emplace_back(std::move(ImVec2{ screenStart.x, screenStart.y }));
+		if (ImVec2 screenStart; worldToScreen(trace.m_end, screenStart))
+			pointsVec.push_back(screenStart);
 	}
 
 	m_drawData.emplace_back(DrawType::CIRCLE_3D_FILLED, std::make_any<CircleObject_t>(CircleObject_t(pos, pointsVec, radius, points, U32(color), U32(outline), flags, thickness)));
 }
 
-void ImGuiRender::drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color, const float thickness)
+void ImGuiRender::drawTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(DrawType::TRIANGLE, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color), thickness)));
+	m_drawData.emplace_back(DrawType::TRIANGLE, std::make_any<TriangleObject_t>(TriangleObject_t(p1, p2, p3, U32(color), thickness)));
 }
 
-void ImGuiRender::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
+void ImGuiRender::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
 {
-	m_drawData.emplace_back(DrawType::TRIANGLE_FILLED, std::make_any<TriangleObject_t>(TriangleObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, U32(color))));
+	m_drawData.emplace_back(DrawType::TRIANGLE_FILLED, std::make_any<TriangleObject_t>(TriangleObject_t(p1, p2, p3, U32(color))));
 }
 
-void ImGuiRender::drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness)
+void ImGuiRender::drawQuad(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(DrawType::QUAD, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color), thickness)));
+	m_drawData.emplace_back(DrawType::QUAD, std::make_any<QuadObject_t>(QuadObject_t(p1, p2, p3, p4, U32(color), thickness)));
 }
 
-void ImGuiRender::drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
+void ImGuiRender::drawQuadFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color)
 {
-	m_drawData.emplace_back(DrawType::QUAD_FILLED, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y }, U32(color))));
+	m_drawData.emplace_back(DrawType::QUAD_FILLED, std::make_any<QuadObject_t>(QuadObject_t(p1, p2, p3, p4, U32(color))));
 }
 
-void ImGuiRender::drawQuadFilledMultiColor(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4,
+void ImGuiRender::drawQuadFilledMultiColor(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4,
 	const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft)
 {
-	m_drawData.emplace_back(DrawType::QUAD_MULTICOLOR, std::make_any<QuadObject_t>(QuadObject_t({ p1.x, p1.y }, { p2.x, p2.y }, { p3.x, p3.y }, { p4.x, p4.y },
+	m_drawData.emplace_back(DrawType::QUAD_MULTICOLOR, std::make_any<QuadObject_t>(QuadObject_t(p1, p2, p3, p4,
 		U32(colUprLeft), U32(colUprRight), U32(colBotRight), U32(colBotLeft))));
 }
 
-void ImGuiRender::drawPolyLine(const int count, ImVec2* verts, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImGuiRender::drawPolyLine(const std::vector<ImVec2>& verts, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	m_drawData.emplace_back(DrawType::POLYGON, std::make_any<PolygonObject_t>(PolygonObject_t(count, verts, U32(color), flags, thickness)));
+	m_drawData.emplace_back(DrawType::POLYGON, std::make_any<PolygonObject_t>(PolygonObject_t(verts, U32(color), flags, thickness)));
 }
 
-void ImGuiRender::drawPolyGon(const int count, ImVec2* verts, const Color& color)
+void ImGuiRender::drawPolyGon(const std::vector<ImVec2>& verts, const Color& color)
 {
-	m_drawData.emplace_back(DrawType::POLYGON_FILLED, std::make_any<PolygonObject_t>(PolygonObject_t(count, verts, U32(color))));
+	m_drawData.emplace_back(DrawType::POLYGON_FILLED, std::make_any<PolygonObject_t>(PolygonObject_t(verts, U32(color))));
+}
+
+void ImGuiRender::drawPolyGonMultiColor(const std::vector<ImVec2>& verts, const std::vector<ImU32>& colors)
+{
+	m_drawData.emplace_back(DrawType::POLYGON_MULTICOLOR, std::make_any<PolygonObject_t>(PolygonObject_t(verts, colors)));
 }
 
 void ImGuiRender::drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal)
@@ -1111,6 +1039,27 @@ bool ImGuiRender::worldToScreen(const Vector& in, Vector2D& out)
 	return true;
 }
 
+bool ImGuiRender::worldToScreen(const Vector& in, ImVec2& out)
+{
+	static auto addr = utilities::patternScan(CLIENT_DLL, VIEW_MATRIX_CLIENT);
+	auto viewMatrix = *reinterpret_cast<uintptr_t*>(addr + 0x3) + 0xB0;
+
+	const auto& screenMatrix = *reinterpret_cast<Matrix4x4*>(viewMatrix);
+
+	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
+
+	if (w < 0.001f)
+		return false;
+
+	ImVec2 viewport = ImGui::GetIO().DisplaySize;
+
+	float inversed = 1.0f / w;
+	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
+	out.y = (viewport.y / 2.0f) - (0.5f * ((screenMatrix[1][0] * in.x + screenMatrix[1][1] * in.y + screenMatrix[1][2] * in.z + screenMatrix[1][3]) * inversed) * viewport.y + 0.5f);
+
+	return true;
+}
+
 void ImGuiRender::drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags)
 {
 	m_drawData.emplace_back(DrawType::ARC, std::make_any<ArcObject_t>(ArcObject_t({ x, y }, radius, DEG2RAD(angleMin), DEG2RAD(angleMax), points, U32(color), flags, thickness)));
@@ -1118,7 +1067,7 @@ void ImGuiRender::drawArc(const float x, const float y, float radius, const int 
 
 void ImGuiRender::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
 {
-	float maxAngle = RAD2DEG(std::numbers::pi_v<float> *2.0f * percent) + angleMin;
+	float maxAngle = RAD2DEG(math::PI *2.0f * percent) + angleMin;
 
 	m_drawData.emplace_back(DrawType::ARC, std::make_any<ArcObject_t>(ArcObject_t({ x, y }, radius, DEG2RAD(angleMin), DEG2RAD(maxAngle), points, U32(color), flags, thickness)));
 }
@@ -1140,14 +1089,14 @@ void ImGuiRender::drawSphere(const Vector& pos, float radius, float angleSphere,
 				radius * std::cos(angle) + pos.z
 			};
 
-			if (Vector2D screenStart; imRender.worldToScreen(worldStart, screenStart))
-				verts.push_back(ImVec2{ screenStart.x, screenStart.y });
+			if (ImVec2 screenStart; imRender.worldToScreen(worldStart, screenStart))
+				verts.push_back(screenStart);
 		}
 
 		if (verts.empty())
 			continue;
 
-		imRender.drawPolyLine(verts.size(), verts.data(), color);
+		imRender.drawPolyLine(verts, color);
 	}
 }
 
@@ -1158,22 +1107,22 @@ void ImGuiRender::drawImage(ImDrawList* draw, const Resource& res, const float x
 
 void ImGuiRender::drawCone(const Vector& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags, const float thickness)
 {
-	Vector2D orignalW2S = {};
+	ImVec2 orignalW2S = {};
 	if (!worldToScreen(pos, orignalW2S))
 		return;
 
-	float step = std::numbers::pi_v<float> *2.0f / points;
+	float step = math::PI *2.0f / points;
 
-	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f); angle += step)
+	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
 		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
 		Vector worldEnd = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
 
-		if (Vector2D start, end; worldToScreen(worldStart, start) && worldToScreen(worldEnd, end))
+		if (ImVec2 start, end; worldToScreen(worldStart, start) && worldToScreen(worldEnd, end))
 		{
 			drawLine(start, end, colCircle);
 			// using surface because it does not add outlines
-			surfaceRender.drawTriangleFilled({ orignalW2S.x, orignalW2S.y + size /*- std::abs(size)*/ }, start, end, colCone);
+			drawTrianglePoly({ orignalW2S.x, orignalW2S.y + size /*- std::abs(size)*/ }, start, end, colCone);
 		}
 	}
 }
@@ -1286,13 +1235,19 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 		case DrawType::POLYGON:
 		{
 			const auto& obj = std::any_cast<PolygonObject_t>(val);
-			draw->AddPolyline(obj.m_verts, obj.m_count, obj.m_color, obj.m_flags, obj.m_thickness);
+			draw->AddPolyline(obj.m_verts.data(), obj.m_count, obj.m_color, obj.m_flags, obj.m_thickness);
 			break;
 		}
 		case DrawType::POLYGON_FILLED:
 		{
 			const auto& obj = std::any_cast<PolygonObject_t>(val);
-			draw->AddConvexPolyFilled(obj.m_verts, obj.m_count, obj.m_color);
+			draw->AddConvexPolyFilled(obj.m_verts.data(), obj.m_count, obj.m_color);
+			break;
+		}
+		case DrawType::POLYGON_MULTICOLOR:
+		{
+			const auto& obj = std::any_cast<PolygonObject_t>(val);
+			draw->AddConvexPolyFilledMultiColor(obj.m_verts.data(), obj.m_colors.data(), obj.m_count);
 			break;
 		}
 		case DrawType::TEXT:
@@ -1396,7 +1351,7 @@ void ImGuiRenderWindow::drawLine(const float x, const float y, const float x2, c
 	m_drawing->AddLine({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x2, m_pos.y + y2 }, U32(color), thickness);
 }
 
-void ImGuiRenderWindow::drawLine(const Vector2D& start, const Vector2D& end, const Color& color, const float thickness)
+void ImGuiRenderWindow::drawLine(const ImVec2& start, const ImVec2& end, const Color& color, const float thickness)
 {
 	RUNTIME_CHECK_RENDER_WINDOW;
 	m_drawing->AddLine({ m_pos.x + start.x, m_pos.y + start.y }, { m_pos.x + end.x, m_pos.y + end.y }, U32(color), thickness);
@@ -1464,15 +1419,15 @@ void ImGuiRenderWindow::drawText(const float x, const float y, const float size,
 	ImGui::PopFont();
 }
 
-void ImGuiRenderWindow::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
+void ImGuiRenderWindow::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
 {
 	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddTriangleFilled(ImVec2{ m_pos.x + p1.x,m_pos.y + p1.y }, ImVec2{ m_pos.x + p2.x, m_pos.y + p2.y }, ImVec2{ m_pos.x + p3.x, m_pos.y + p3.y }, U32(color));
+	m_drawing->AddTriangleFilled({ m_pos.x + p1.x,m_pos.y + p1.y }, { m_pos.x + p2.x, m_pos.y + p2.y }, { m_pos.x + p3.x, m_pos.y + p3.y }, U32(color));
 }
 
 void ImGuiRenderWindow::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
 {
-	float maxAngle = RAD2DEG(std::numbers::pi_v<float> *2.0f * percent) + angleMin;
+	float maxAngle = RAD2DEG(math::PI *2.0f * percent) + angleMin;
 
 	m_drawing->PathArcTo(ImVec2{m_pos.x + x, m_pos.y + y }, radius, DEG2RAD(angleMin), DEG2RAD(maxAngle), points);
 	m_drawing->PathStroke(U32(color), flags, thickness);

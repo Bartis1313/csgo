@@ -24,10 +24,10 @@ namespace ImGui
 	// from widgets, https://github.com/ocornut/imgui/issues/1496#issuecomment-569892444
 	void BeginGroupPanel(const char* name, const ImVec2& size = { 0.0f, 0.0f });
 	void EndGroupPanel();
-	bool Combo(const char* label, int* item, const std::span<const char*>& arr, const float width = -1.0f);
-	bool Combo(const char* label, int* item, const std::span<const std::string>& arr, const float width = -1.0f);
-	bool ListBox(const char* label, int* item, const std::span<const char*>& arr, const int heightItem = -1);
-	bool ListBox(const char* label, int* item, const std::span<const std::string>& arr, const int heightItem = -1);
+	bool Combo(const char* label, int* item, std::span<const char*> arr, const float width = -1.0f);
+	bool Combo(const char* label, int* item, std::span<const std::string> arr, const float width = -1.0f);
+	bool ListBox(const char* label, int* item, std::span<const char*> arr, const int heightItem = -1);
+	bool ListBox(const char* label, int* item, std::span<const std::string> arr, const int heightItem = -1);
 	// need return anything? maybe, but useless at all for my use
 	void MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options, const float width = 140.0f);
 

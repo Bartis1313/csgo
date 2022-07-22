@@ -96,6 +96,10 @@ public:
 	void print(const std::string& fmt, Args_t&&... args);
 };
 
+// sorry for using cout
+// https://youtu.be/TxhQQLGafZ4?t=78
+// :D
+
 template<typename... Args_t>
 void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 {

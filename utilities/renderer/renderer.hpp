@@ -21,12 +21,21 @@ struct Box
 
 struct Box3D
 {
+#ifdef SURFACE_DRAWING
 	std::array<Vector2D, 8> points;
 
 	Vector2D topleft;
 	Vector2D topright;
 	Vector2D bottomleft;
 	Vector2D bottomright;
+#else
+	std::array<ImVec2, 8> points;
+
+	ImVec2 topleft;
+	ImVec2 topright;
+	ImVec2 bottomleft;
+	ImVec2 bottomright;
+#endif
 };
 
 namespace fonts
@@ -116,6 +125,7 @@ enum class DrawType : size_t
 	QUAD_MULTICOLOR,
 	POLYGON,
 	POLYGON_FILLED,
+	POLYGON_MULTICOLOR,
 	TEXT,
 	TEXT_SIZE,
 	ARC,
@@ -249,16 +259,21 @@ struct QuadObject_t
 struct PolygonObject_t
 {
 	// normal polyline/polygon
-	PolygonObject_t(int count, ImVec2* verts, ImU32 color, ImDrawFlags flags, float thickness)
-		: m_count{ count }, m_verts{ verts }, m_color{ color }, m_flags{ flags }, m_thickness{ thickness }
+	PolygonObject_t(const std::vector<ImVec2>& verts, ImU32 color, ImDrawFlags flags, float thickness)
+		: m_count{ verts.size() }, m_verts{ verts }, m_color{ color }, m_flags{ flags }, m_thickness{ thickness }
 	{}
-	// filled polyline/polygon
-	PolygonObject_t(int count, ImVec2* verts, ImU32 color)
-		: m_count{ count }, m_verts{ verts }, m_color{ color }
+	// filled polygon
+	PolygonObject_t(const std::vector<ImVec2>& verts, ImU32 color)
+		: m_count{ verts.size() }, m_verts{ verts }, m_color{ color }
+	{}
+	// filled polygon multicolor
+	PolygonObject_t(const std::vector<ImVec2>& verts, const std::vector<ImU32>& colors)
+		: m_count{ verts.size() }, m_verts{ verts }, m_colors{ colors }
 	{}
 
-	int m_count;
-	ImVec2* m_verts;
+	size_t m_count;
+	std::vector<ImVec2> m_verts;
+	std::vector<ImU32> m_colors;
 	ImU32 m_color;
 	ImDrawFlags m_flags;
 	float m_thickness;
@@ -314,7 +329,7 @@ public:
 	void init(ImGuiIO& io);
 
 	void drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness = 1.0f);
-	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color, const float thickness = 1.0f);
+	void drawLine(const ImVec2& start, const ImVec2& end, const Color& color, const float thickness = 1.0f);
 	void drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
 	void drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags = 0);
 	void drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
@@ -327,14 +342,17 @@ public:
 	void drawCircle3DTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 	void drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 	void drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
-	void drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color, const float thickness = 1.0f);
-	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
-	void drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color, const float thickness = 1.0f);
-	void drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
-	void drawQuadFilledMultiColor(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4,
+	void drawTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color, const float thickness = 1.0f);
+	void drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color);
+	void drawTrianglePoly(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color);
+	void drawQuad(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color, const float thickness = 1.0f);
+	void drawQuadFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color);
+	void drawQuadFilledMultiColor(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4,
 		const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft);
-	void drawPolyLine(const int count, ImVec2* verts, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
-	void drawPolyGon(const int count, ImVec2* verts, const Color& color);
+	void drawPolyLine(const std::vector<ImVec2>& verts, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
+	void drawPolyGon(const std::vector<ImVec2>& verts, const Color& color);
+	// for performace and reduce looping pass by using U32()
+	void drawPolyGonMultiColor(const std::vector<ImVec2>& verts, const std::vector<ImU32>& colors);
 	void drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal);
 	void text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void text(const float x, const float y, const float fontSize, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
@@ -343,11 +361,11 @@ public:
 	// pass pos from world, you will often pass width.x == width.y
 	// width.x -> pass starting width at front
 	// width.y -> pass width of the box, between points at side
-	void drawBox3D(const Vector& pos, const Vector2D& width, const float height, const Color& color, const float thickness = 2.0f);
+	void drawBox3D(const Vector& pos, const ImVec2& width, const float height, const Color& color, bool outlined = false, const float thickness = 2.0f);
 	// pass pos from world, you will often pass width.x == width.y
 	// width.x -> pass starting width at front
 	// width.y -> pass width of the box, between points at side
-	void drawBox3DFilled(const Vector& pos, const Vector2D& width, const float height, const Color& color, const Color& filling = Colors::Grey, const float thickness = 2.0f);
+	void drawBox3DFilled(const Vector& pos, const ImVec2& width, const float height, const Color& color, const Color& filling = Colors::Grey, bool outlined = false, const float thickness = 2.0f);
 	void drawCone(const Vector& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 
 	/*
@@ -367,6 +385,7 @@ public:
 	_NODISCARD ImVec2 getTextSize(ImFont* font, const std::string& text);
 	_NODISCARD bool worldToScreen(const Vector& in, Vector& out);
 	_NODISCARD bool worldToScreen(const Vector& in, Vector2D& out);
+	_NODISCARD bool worldToScreen(const Vector& in, ImVec2& out);
 
 	// add to present
 	void renderPresent(ImDrawList* draw);
@@ -394,7 +413,7 @@ public:
 	void end();
 
 	void drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness = 1.0f);
-	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color, const float thickness = 1.0f);
+	void drawLine(const ImVec2& start, const ImVec2& end, const Color& color, const float thickness = 1.0f);
 	void drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
 	void drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags = 0);
 	void drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags = 0, const float thickness = 1.0f);
@@ -403,7 +422,7 @@ public:
 	void drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color);
 	void drawPolyLine(const int count, ImVec2* verts, const Color& color, ImDrawFlags flags = 0, float thickness = 1.0f);
 	void drawText(const float x, const float y, const float size, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
-	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
+	void drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color);
 	void drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 
 	// remember it's a "cursor window pos"

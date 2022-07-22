@@ -182,7 +182,7 @@ void GrenadePrediction::draw()
 
 	for (Vector prev = m_path.front(); const auto& el : m_path)
 	{
-		if (Vector2D start, end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
+		if (ImVec2 start, end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
 			imRender.drawLine(start, end, config.get<CfgColor>(vars.cNadePredColor).getColor(), 2.0f);
 
 		prev = el;
@@ -350,7 +350,7 @@ void GrenadePrediction::traceHull(Vector& src, Vector& end, Trace_t& tr)
 	uintptr_t filter[] =
 	{
 		*reinterpret_cast<uintptr_t*>(traceFilterSimple),
-		reinterpret_cast<uintptr_t>(game::localPlayer),
+		reinterpret_cast<uintptr_t>(game::localPlayer()),
 		0,
 		0
 	};
@@ -660,13 +660,13 @@ bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 	if (m_path.empty())
 		return false;
 
-	Vector2D start; // need access outside
+	ImVec2 start; // need access outside
 	if (float dist = m_path.back().distToMeters(game::localPlayer->absOrigin()); dist > config.get<float>(vars.fNadeTracerMaxDist))
 		return false;
 
 	for (Vector prev = m_path.front(); const auto& el : m_path)
 	{
-		if (Vector2D end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
+		if (ImVec2 end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
 			imRender.drawLine(start, end, config.get<CfgColor>(vars.cNadeTracer).getColor(), 2.0f);
 
 		prev = el;

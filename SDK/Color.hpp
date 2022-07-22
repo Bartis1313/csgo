@@ -43,8 +43,8 @@ public:
 
 	_NODISCARD static ImVec4 getImguiColor(const Color& color);
 	// edits alpha
-	_NODISCARD Color getColorEditAlpha(const float amount);
-	_NODISCARD Color getColorEditAlphaInt(const int amount);
+	_NODISCARD Color getColorEditAlpha(const float amount) const;
+	_NODISCARD Color getColorEditAlphaInt(const int amount) const;
 
 	_NODISCARD constexpr uint8_t rMultiplied() const { return static_cast<uint8_t>(m_color.at(0) * 255.0f); }
 	_NODISCARD constexpr uint8_t gMultiplied() const { return static_cast<uint8_t>(m_color.at(1) * 255.0f); }

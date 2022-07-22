@@ -9,7 +9,18 @@ enum VTableIndexes
 	INACCURACY = 483,
 	SPREAD = 453,
 	WEAPONINFO = 461,
-	PUNCH = 346
+	PUNCH = 346,
+	ABS_ORIGIN = 10,
+	ABS_ANGLE = 11,
+	CLIENT_CLASS = 2,
+	COLLIDEABLE = 3,
+	GET_INDEX = 10,
+	RENDER_BOUNDS = 17,
+	SETUP_BONES = 13,
+	GET_MODEL = 8,
+	DRAW_MODEL = 9,
+	IS_DORMANT = 9,
+	RENDERABLE_TO_WORLD = 32
 };
 
 #define ENGINE_DLL					XOR("engine.dll")
@@ -131,3 +142,6 @@ ParticleEffect
 #define SETUP_OCCLUSION				XOR("84 C0 0F 85 ? ? ? ? A1 ? ? ? ? 8B B7")
 // #STR: "Tried BeginRenderTargetAllocation after game startup. If I
 #define DISABLE_RENDER_TARGET_ALLOC XOR("80 B9 ? ? ? ? ? 74 0F")
+// #STR: "userid", "entindex", "weaponhud_selection"
+#define LOCAL_PLAYER				XOR("8B 0D ? ? ? ? 83 FF FF 74 07")
+#define PREDICTION_MOVE_DATA		XOR("A1 ? ? ? ? F3 0F 59 CD")

@@ -71,6 +71,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(CfgColor, cBox, Colors::Purple, "BOX color");
 	CONFIG_ADD_VARIABLE(CfgColor, cBoxFill, Color(0, 0, 0, 140), "BOX fill color");
 	CONFIG_ADD_VARIABLE(bool, bBoxMultiColor, false, "BOX multicolor FILL only");
+	CONFIG_ADD_VARIABLE(bool, bBoxOutlined, false, "BOX outlined lines");
 	CONFIG_ADD_VARIABLE(float, fBoxMultiColor, 1.0f, "BOX multicolor FILL color speed");
 	CONFIG_ADD_VARIABLE(bool, bDrawHealth, false, "draw health enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawArmor, false, "draw armor enabled");
@@ -235,6 +236,10 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bFreeCam, false, "freecam enable");
 	CONFIG_ADD_VARIABLE(float, fFreeCam, 1.0f, "freecam speed");
 	CONFIG_ADD_VARIABLE(Key, kFreeCam, Key(KeyMode::TOGGLE, VK_F2), "freecam key");
+	CONFIG_ADD_VARIABLE(bool, bFlashlight, false, "flashlight enable");
+	CONFIG_ADD_VARIABLE(Key, kFlashlight, Key(KeyMode::TOGGLE, 0x4C), "flashlight key"); // L key
+	CONFIG_ADD_VARIABLE(bool, bFlashlightBigMode, false, "flashlight big mode enabled");
+	CONFIG_ADD_VARIABLE(float, fFlashlightFov, 30.0f, "flashlight fov");
 
 	// STYLING
 

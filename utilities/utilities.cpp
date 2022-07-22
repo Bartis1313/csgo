@@ -83,6 +83,13 @@ bool utilities::getBox(Entity_t* ent, Box& box, Box3D& box3D)
 	const auto& min = col->OBBMins();
 	const auto& max = col->OBBMaxs();
 
+	const auto& matrixWorld = ent->renderableToWorldTransform();
+
+	float left = std::numeric_limits<float>::max();
+	float top = std::numeric_limits<float>::max();
+	float right = -std::numeric_limits<float>::max();
+	float bottom = -std::numeric_limits<float>::max();
+
 	std::array points =
 	{
 		Vector{ min.x, min.y, min.z },
@@ -95,30 +102,25 @@ bool utilities::getBox(Entity_t* ent, Box& box, Box3D& box3D)
 		Vector{ max.x, min.y, max.z }
 	};
 
-	// will never happen
-	/*if (!points.data())
-		return false;*/
-
-	const auto& tranFrame = ent->m_rgflCoordinateFrame();
-
-	float left = std::numeric_limits<float>::max();
-	float top = std::numeric_limits<float>::max();
-	float right = -std::numeric_limits<float>::max();
-	float bottom = -std::numeric_limits<float>::max();
-
+#ifdef SURFACE_DRAWING
 	std::array<Vector2D, 8> screen = {};
+#else
+	std::array<ImVec2, 8> screen = {};
+#endif
 
-	for (int i = 0; i < 8; i++)
+	for (size_t i = 0; auto& el : screen)
 	{
-		if (!imRender.worldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
+		if (!imRender.worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
 			return false;
 
-		left = std::min(left, screen.at(i).x);
-		top = std::min(top, screen.at(i).y);
-		right = std::max(right, screen.at(i).x);
-		bottom = std::max(bottom, screen.at(i).y);
+		left = std::min(left, el.x);
+		top = std::min(top, el.y);
+		right = std::max(right, el.x);
+		bottom = std::max(bottom, el.y);
 
-		box3D.points.at(i) = screen.at(i);
+		box3D.points.at(i) = el;
+
+		i++;
 	}
 
 	box.x = left;
@@ -158,28 +160,30 @@ bool utilities::getBox(Entity_t* ent, Box& box)
 		Vector{ max.x, min.y, max.z }
 	};
 
-	// will never happen
-	/*if (!points.data())
-		return false;*/
-
-	const auto& tranFrame = ent->m_rgflCoordinateFrame();
+	const auto& matrixWorld = ent->renderableToWorldTransform();
 
 	float left = std::numeric_limits<float>::max();
 	float top = std::numeric_limits<float>::max();
 	float right = -std::numeric_limits<float>::max();
 	float bottom = -std::numeric_limits<float>::max();
 
+#ifdef SURFACE_DRAWING
 	std::array<Vector2D, 8> screen = {};
+#else
+	std::array<ImVec2, 8> screen = {};
+#endif
 
-	for (int i = 0; i < 8; i++)
+	for (size_t i = 0; auto & el : screen)
 	{
-		if (!imRender.worldToScreen(math::transformVector(points.at(i), tranFrame), screen.at(i)))
+		if (!imRender.worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
 			return false;
 
-		left = std::min(left, screen.at(i).x);
-		top = std::min(top, screen.at(i).y);
-		right = std::max(right, screen.at(i).x);
-		bottom = std::max(bottom, screen.at(i).y);
+		left = std::min(left, el.x);
+		top = std::min(top, el.y);
+		right = std::max(right, el.x);
+		bottom = std::max(bottom, el.y);
+
+		i++;
 	}
 
 	box.x = left;

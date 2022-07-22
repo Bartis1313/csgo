@@ -4,14 +4,12 @@
 #include <vector>
 #include <utility>
 #include <format>
-
 #include "../dependencies/lazy_importer.hpp"
 #include "../dependencies/xorstr.hpp"
 
 class Entity_t;
 struct Box;
 struct Box3D;
-
 #define SECURE
 
 #if defined(_DEBUG) // debug mode

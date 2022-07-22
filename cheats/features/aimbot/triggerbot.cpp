@@ -57,7 +57,7 @@ void Triggerbot::run(CUserCmd* cmd)
 	Trace_t trace;
 	TraceFilter filter;
 
-	filter.m_skip = game::localPlayer;
+	filter.m_skip = game::localPlayer();
 	interfaces::trace->traceRay({ myEye, end }, MASK_PLAYER, &filter, &trace);
 
 	// so this way we skip time of trace

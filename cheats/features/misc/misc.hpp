@@ -6,6 +6,7 @@
 #include "../../../SDK/math/Vector.hpp"
 
 class IGameEvent;
+class CFlashlightEffect;
 
 class Misc final
 {
@@ -38,6 +39,7 @@ private:
 		bool isAvailable() const { return m_health >= 0; }
 	};
 	std::vector<Hitmark_t> m_hitmarkers;
+	CFlashlightEffect* m_flashLight = nullptr;
 };
 
 inline Misc misc;

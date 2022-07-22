@@ -41,7 +41,7 @@ void Visuals::run()
 		if (!entity)
 			continue;
 
-		if (game::localPlayer == entity)
+		if (entity == game::localPlayer)
 			continue;
 
 		if (entity->isDormant())
@@ -332,7 +332,7 @@ void Visuals::drawSkeleton(Player_t* ent)
 		if (std::abs(deltachild.z) < 5.0f && deltaparent.length() < 5.0f && deltachild.length() < 5.0f || i == chest)
 			continue;
 
-		if (Vector2D start, end; imRender.worldToScreen(parent, start) && imRender.worldToScreen(child, end))
+		if (ImVec2 start, end; imRender.worldToScreen(parent, start) && imRender.worldToScreen(child, end))
 			imRender.drawLine(start, end, config.get<CfgColor>(vars.cSkeleton).getColor());
 	}
 }
@@ -358,7 +358,7 @@ void Visuals::drawLaser(Player_t* ent)
 	// end is where lines just ends, this 70 is hardcoded, but whatever here tbh
 	auto end = start + forward * 70.f;
 
-	if (Vector2D startP, endLine; imRender.worldToScreen(start, startP) && imRender.worldToScreen(end, endLine))
+	if (ImVec2 startP, endLine; imRender.worldToScreen(start, startP) && imRender.worldToScreen(end, endLine))
 	{
 		imRender.drawCircleFilled(startP.x, startP.y, 3, 32, Colors::Red);
 		imRender.drawLine(startP, endLine, Colors::Purple);
@@ -588,9 +588,14 @@ float Visuals::getScaledFontSize(Entity_t* ent, const float division, const floa
 void Visuals::drawBox2D(const Box& box)
 {
 	CfgColor cfgCol = config.get<CfgColor>(vars.cBox);
+	Color outlineCol = Colors::Black.getColorEditAlpha(cfgCol.getColor().a());
+	bool outlined = config.get<bool>(vars.bBoxOutlined);
 
-	imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Colors::Black);
-	imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Colors::Black);
+	if (outlined)
+	{
+		imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, outlineCol);
+		imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, outlineCol);
+	}
 	imRender.drawRect(box.x, box.y, box.w, box.h, cfgCol.getColor());
 }
 
@@ -599,54 +604,57 @@ void Visuals::drawBox2DFilled(const Box& box)
 	CfgColor fill = config.get<CfgColor>(vars.cBoxFill);
 
 	if(!config.get<bool>(vars.bBoxMultiColor))
-		imRender.drawRectFilled(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, fill.getColor());
+		imRender.drawRectFilled(box.x, box.y, box.w, box.h, fill.getColor());
 	else
 	{
 		float speed = config.get<float>(vars.fBoxMultiColor);
+		float time = interfaces::globalVars->m_curtime;
 
-		imRender.drawRectFilledMultiColor(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f,
-			Color::rainbowColor(interfaces::globalVars->m_curtime, speed).getColorEditAlpha(fill.getColor().a()),
-			Color::rainbowColor(interfaces::globalVars->m_curtime + 30.0f, speed).getColorEditAlpha(fill.getColor().a()),
-			Color::rainbowColor(interfaces::globalVars->m_curtime + 60.0f, speed).getColorEditAlpha(fill.getColor().a()),
-			Color::rainbowColor(interfaces::globalVars->m_curtime + 90.0f, speed).getColorEditAlpha(fill.getColor().a()));
+		imRender.drawRectFilledMultiColor(box.x, box.y, box.w, box.h,
+			Color::rainbowColor(time, speed).getColorEditAlpha(fill.getColor().a()),
+			Color::rainbowColor(time + 1.0f, speed).getColorEditAlpha(fill.getColor().a()),
+			Color::rainbowColor(time + 2.0f, speed).getColorEditAlpha(fill.getColor().a()),
+			Color::rainbowColor(time + 3.0f, speed).getColorEditAlpha(fill.getColor().a()));
 	}
 	drawBox2D(box);
+}
+
+static ImVec2 operator-(const ImVec2& v, float val)
+{
+	return ImVec2{ v.x - val, v.y - val };
+}
+
+static ImVec2 operator+(const ImVec2& v, float val)
+{
+	return ImVec2{ v.x + val, v.y + val };
 }
 
 void Visuals::drawBox3DFilled(const Box3D& box, const float thickness)
 {
 	CfgColor color = config.get<CfgColor>(vars.cBox);
 	CfgColor fill = config.get<CfgColor>(vars.cBoxFill);
+	bool outlined = /*config.get<bool>(vars.bBoxOutlined)*/ false; // looks bad on 3d
 
-	imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), fill.getColor());
-	// top
-	imRender.drawQuadFilled(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), fill.getColor());
-	// front
-	imRender.drawQuadFilled(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), fill.getColor());
-	// back
-	imRender.drawQuadFilled(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), fill.getColor());
-	// right
-	imRender.drawQuadFilled(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), fill.getColor());
-	// left
-	imRender.drawQuadFilled(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), fill.getColor());
+	auto points = math::grahamScan(box.points);
+	std::reverse(points.begin(), points.end());
+	imRender.drawPolyGon(points, fill.getColor());
 
-	for (size_t i = 0; i < 3; i++)
+	Color outlineCol = Colors::Black.getColorEditAlpha(color.getColor().a());
+
+	for (size_t i = 1; i < 5; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
-	}
-	// missing part at the bottom
-	imRender.drawLine(box.points.at(0), box.points.at(3), color.getColor(), thickness);
-	// top parts
-	for (size_t i = 4; i < 7; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
-	}
-	// missing part at the top
-	imRender.drawLine(box.points.at(4), box.points.at(7), color.getColor(), thickness);
-	// now all 4 box.points missing parts for 3d box
-	for (size_t i = 0; i < 4; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color.getColor(), thickness);
+		// BOTTOM 0,1,2,3
+		imRender.drawLine(box.points.at(i - 1), box.points.at(i % 4), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i - 1) + 1.0f - thickness, box.points.at(i % 4) + 1.0f - thickness, outlineCol);
+		// TOP 4,5,6,7
+		imRender.drawLine(box.points.at(i + 3), box.points.at(i % 4 + 4), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i + 3) + 1.0f - thickness, box.points.at(i % 4 + 4) + 1.0f - thickness, outlineCol);
+		// MISSING TOP
+		imRender.drawLine(box.points.at(i - 1), box.points.at(i + 3), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i - 1) + 1.0f - thickness, box.points.at(i + 3) + 1.0f - thickness, outlineCol);
 	}
 }
 
@@ -654,74 +662,66 @@ void Visuals::drawBox3DFilledMultiColor(const Box3D& box, const float thickness)
 {
 	CfgColor color = config.get<CfgColor>(vars.cBox);
 	CfgColor fill = config.get<CfgColor>(vars.cBoxFill);
+	bool outlined = /*config.get<bool>(vars.bBoxOutlined)*/ false;
 
 	float speed = config.get<float>(vars.fBoxMultiColor);
+	float time = interfaces::globalVars->m_curtime;
 
-	std::array colors =
+	std::vector colors =
 	{
-		Color::rainbowColor(interfaces::globalVars->m_curtime, speed).getColorEditAlpha(fill.getColor().a()),
-		Color::rainbowColor(interfaces::globalVars->m_curtime + 30.0f, speed).getColorEditAlpha(fill.getColor().a()),
-		Color::rainbowColor(interfaces::globalVars->m_curtime + 60.0f, speed).getColorEditAlpha(fill.getColor().a()),
-		Color::rainbowColor(interfaces::globalVars->m_curtime + 90.0f, speed).getColorEditAlpha(fill.getColor().a())
+		U32(Color::rainbowColor(time, speed).getColorEditAlpha(fill.getColor().a())),
+		U32(Color::rainbowColor(time + 1.0f, speed).getColorEditAlpha(fill.getColor().a())),
+		U32(Color::rainbowColor(time + 2.0f, speed).getColorEditAlpha(fill.getColor().a())),
+		U32(Color::rainbowColor(time + 3.0f, speed).getColorEditAlpha(fill.getColor().a())),
+		U32(Color::rainbowColor(time + 4.0f, speed).getColorEditAlpha(fill.getColor().a())),
+		U32(Color::rainbowColor(time + 5.0f, speed).getColorEditAlpha(fill.getColor().a())),
 	};
 
-#define ADDC colors.at(0), colors.at(1), colors.at(2), colors.at(3)
+	auto points = math::grahamScan(box.points);
+	size_t delta = colors.size() - points.size();
+	std::reverse(points.begin(), points.end());
+	imRender.drawPolyGonMultiColor(points, colors); // any way to make it smooth trnasmition in vertex? I couldn't think of
 
-	imRender.drawQuadFilledMultiColor(box.points.at(0), box.points.at(1), box.points.at(2), box.points.at(3), ADDC);
-	// top
-	imRender.drawQuadFilledMultiColor(box.points.at(4), box.points.at(5), box.points.at(6), box.points.at(7), ADDC);
-	// front
-	imRender.drawQuadFilledMultiColor(box.points.at(3), box.points.at(2), box.points.at(6), box.points.at(7), ADDC);
-	// back
-	imRender.drawQuadFilledMultiColor(box.points.at(0), box.points.at(1), box.points.at(5), box.points.at(4), ADDC);
-	// right
-	imRender.drawQuadFilledMultiColor(box.points.at(2), box.points.at(1), box.points.at(5), box.points.at(6), ADDC);
-	// left
-	imRender.drawQuadFilledMultiColor(box.points.at(3), box.points.at(0), box.points.at(4), box.points.at(7), ADDC);
+	Color outlineCol = Colors::Black.getColorEditAlpha(color.getColor().a());
 
-#undef ADDC
-
-	for (size_t i = 0; i < 3; i++)
+	for (size_t i = 1; i < 5; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
-	}
-	// missing part at the bottom
-	imRender.drawLine(box.points.at(0), box.points.at(3), color.getColor(), thickness);
-	// top parts
-	for (size_t i = 4; i < 7; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
-	}
-	// missing part at the top
-	imRender.drawLine(box.points.at(4), box.points.at(7), color.getColor(), thickness);
-	// now all 4 box.points missing parts for 3d box
-	for (size_t i = 0; i < 4; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color.getColor(), thickness);
+		// BOTTOM 0,1,2,3
+		imRender.drawLine(box.points.at(i - 1), box.points.at(i % 4), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i - 1) + 1.0f - thickness, box.points.at(i % 4) + 1.0f - thickness, outlineCol);
+		// TOP 4,5,6,7
+		imRender.drawLine(box.points.at(i + 3), box.points.at(i % 4 + 4), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i + 3) + 1.0f - thickness, box.points.at(i % 4 + 4) + 1.0f - thickness, outlineCol);
+		// MISSING TOP
+		imRender.drawLine(box.points.at(i - 1), box.points.at(i + 3), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i - 1) + 1.0f - thickness, box.points.at(i + 3) + 1.0f - thickness, outlineCol);
 	}
 }
 
 void Visuals::drawBox3D(const Box3D& box, const float thickness)
 {
 	CfgColor color = config.get<CfgColor>(vars.cBox);
+	bool outlined = /*config.get<bool>(vars.bBoxOutlined)*/ false;
 
-	for (size_t i = 0; i < 3; i++)
+	Color outlineCol = Colors::Black.getColorEditAlpha(color.getColor().a());
+
+	for (size_t i = 1; i < 5; i++)
 	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
-	}
-	// missing part at the bottom
-	imRender.drawLine(box.points.at(0), box.points.at(3), color.getColor(), thickness);
-	// top parts
-	for (size_t i = 4; i < 7; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 1), color.getColor(), thickness);
-	}
-	// missing part at the top
-	imRender.drawLine(box.points.at(4), box.points.at(7), color.getColor(), thickness);
-	// now all 4 box.points missing parts for 3d box
-	for (size_t i = 0; i < 4; i++)
-	{
-		imRender.drawLine(box.points.at(i), box.points.at(i + 4), color.getColor(), thickness);
+		// BOTTOM 0,1,2,3
+		imRender.drawLine(box.points.at(i - 1), box.points.at(i % 4), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i - 1) + 1.0f - thickness, box.points.at(i % 4) + 1.0f - thickness, outlineCol);
+		// TOP 4,5,6,7
+		imRender.drawLine(box.points.at(i + 3), box.points.at(i % 4 + 4), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i + 3) + 1.0f - thickness, box.points.at(i % 4 + 4) + 1.0f - thickness, outlineCol);
+		// MISSING TOP
+		imRender.drawLine(box.points.at(i - 1), box.points.at(i + 3), color.getColor(), thickness);
+		if (outlined)
+			imRender.drawLine(box.points.at(i - 1) + 1.0f - thickness, box.points.at(i + 3) + 1.0f - thickness, outlineCol);
 	}
 }
 

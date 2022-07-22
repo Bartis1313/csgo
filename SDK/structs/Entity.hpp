@@ -43,21 +43,22 @@ public:
 	NETVAR(float, m_flSimulationTime, "DT_BasePlayer", "m_flSimulationTime");
 	NETVAR(float, m_flMaxspeed, "DT_BasePlayer", "m_flMaxspeed");
 	NETVAR_ADDR(int, m_nRenderMode, "DT_BasePlayer", "m_nRenderMode", 0x1);
-	NETVAR_ADDR(Matrix3x4, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
+	//NETVAR_ADDR(Matrix3x4, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
 
-	VFUNC(Vector&, absOrigin, 10, (), (this));
-	VFUNC(Vector&, absAngles, 11, (), (this));
-	VFUNC(ClientClass*, clientClass, 2, (), (this + NETWORKABLE));
-	VFUNC(ICollideable*, collideable, 3, (), (this));
-	VFUNC(int, getIndex, 10, (), (this + NETWORKABLE));
-	VFUNC(void, getRenderBounds, 17, (Vector& mins, Vector& maxs), (this + RENDERABLE, std::ref(mins), std::ref(maxs)));
+	VFUNC(Vector&, absOrigin, ABS_ORIGIN, (), (this));
+	VFUNC(Vector&, absAngles, ABS_ANGLE, (), (this));
+	VFUNC(ClientClass*, clientClass, CLIENT_CLASS, (), (this + NETWORKABLE));
+	VFUNC(ICollideable*, collideable, COLLIDEABLE, (), (this));
+	VFUNC(int, getIndex, GET_INDEX, (), (this + NETWORKABLE));
+	VFUNC(void, getRenderBounds, RENDER_BOUNDS, (Vector& mins, Vector& maxs), (this + RENDERABLE, std::ref(mins), std::ref(maxs)));
 	VFUNC(bool, isPlayer, ISPLAYER, (), (this));
 	VFUNC(bool, isWeapon, ISWEAPON, (), (this));
-	VFUNC(bool, setupBones, 13, (Matrix3x4* out, int maxBones, int mask, float time), (this + RENDERABLE, out, maxBones, mask, time));
+	VFUNC(bool, setupBones, SETUP_BONES, (Matrix3x4* out, int maxBones, int mask, float time), (this + RENDERABLE, out, maxBones, mask, time));
 	bool setupBonesShort(Matrix3x4* out, int maxBones, int mask, float time);
-	VFUNC(Model_t*, getModel, 8, (), (this + RENDERABLE));
-	VFUNC(int, drawModel, 9, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
-	VFUNC(bool, isDormant, 9, (), (this + NETWORKABLE));
+	VFUNC(Model_t*, getModel, GET_MODEL, (), (this + RENDERABLE));
+	VFUNC(int, drawModel, DRAW_MODEL, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
+	VFUNC(bool, isDormant, IS_DORMANT, (), (this + NETWORKABLE));
+	VFUNC(Matrix3x4&, renderableToWorldTransform, RENDERABLE_TO_WORLD, (), (this + RENDERABLE));
 
 	_NODISCARD CUtlVector<Matrix3x4> m_CachedBoneData();
 	_NODISCARD Vector getAimPunch();

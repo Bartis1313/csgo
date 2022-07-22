@@ -14,10 +14,10 @@ public:
 private:
 	void start(CUserCmd* cmd);
 	void end();
-	float curTime;
-	float frameTime;
-	uintptr_t* predicionRandomSeed = {};
-	CMoveData data = {};
+	float m_curTime;
+	float m_frameTime;
+	uintptr_t* m_predicionRandomSeed = {};
+	CMoveData* m_data = {};
 };
 
 inline Prediction prediction;

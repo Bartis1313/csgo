@@ -154,6 +154,7 @@ void World::drawBombOverlay()
 }
 
 #include "player.hpp"
+#include "../../../SDK/ILocalize.hpp"
 
 void World::drawProjectiles(Entity_t* ent, const int id)
 {
@@ -265,7 +266,9 @@ void World::drawProjectiles(Entity_t* ent, const int id)
 			}
 			if (config.get<cont>(vars.vDroppedFlags).at(E2T(DroppedFlags::TEXT)))
 			{
-				auto name = wpn->getWpnName();
+				auto name = config.get<bool>(vars.bDrawWeaponTranslate)
+					? interfaces::localize->findAsUTF8(wpn->getWpnInfo()->m_WeaponName)
+					: wpn->getWpnName();
 				imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::verdana12,
 					name, true, config.get<CfgColor>(vars.cDropped).getColor());
 
@@ -469,20 +472,20 @@ void drawArc3DSmoke(const Vector& pos, const float radius, const int points, con
 {
 	float step = std::numbers::pi_v<float> *2.0f / points;
 
-	Vector2D _end = {};
+	ImVec2 _end = {};
 	for (float angle = 0.0f; angle < (std::numbers::pi_v<float> *2.0f * percent); angle += step)
 	{
 		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
 		Vector worldEnd = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
 
-		if (Vector2D start, end; imRender.worldToScreen(worldStart, start) && imRender.worldToScreen(worldEnd, end))
+		if (ImVec2 start, end; imRender.worldToScreen(worldStart, start) && imRender.worldToScreen(worldEnd, end))
 		{
 			_end = end;
 			imRender.drawLine(start, end, color);
 		}
 	}
 
-	if (!_end.isZero())
+	if (_end.x != 0.0f && _end.y != 0.0f)
 		imRender.text(_end.x + 3.0f, _end.y, font, text, true, colorText);
 }
 
@@ -548,7 +551,7 @@ void World::drawZeusRange()
 		CfgColor color = config.get<CfgColor>(vars.cZeusRange);
 
 		if (config.get<bool>(vars.bZeusUseTracing))
-			imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer, color.getColor(), true, 2.5f);
+			imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer(), color.getColor(), true, 2.5f);
 		else
 			imRender.drawCircle3D(abs, range, 32, color.getColor(), true, 2.0f);
 	}
@@ -633,7 +636,7 @@ void World::drawMovementTrail()
 				continue;
 			}
 
-			if (Vector2D start, end; !last.isZero() && imRender.worldToScreen(el.m_pos, start) && imRender.worldToScreen(last, end))
+			if (ImVec2 start, end; !last.isZero() && imRender.worldToScreen(el.m_pos, start) && imRender.worldToScreen(last, end))
 				imRender.drawLine(start, end, el.m_col, 3.0f);
 
 			last = el.m_pos;
@@ -663,7 +666,7 @@ void World::clientSideImpacts()
 	if (!game::isAvailable())
 		return;
 
-	auto m_vecBulletVerifyListClient = *reinterpret_cast<CUtlVector<clientHitVerify_t>*>((uintptr_t)game::localPlayer + 0x11C50);
+	auto m_vecBulletVerifyListClient = *reinterpret_cast<CUtlVector<clientHitVerify_t>*>((uintptr_t)game::localPlayer() + 0x11C50);
 	static int gameBulletCount = m_vecBulletVerifyListClient.m_size; // init current count
 
 	for (int i = m_vecBulletVerifyListClient.m_size; i > gameBulletCount; i--) // get current bullets, NOT all
@@ -716,7 +719,7 @@ void World::localImpacts()
 
 		Trace_t tr;
 		TraceFilter filter;
-		filter.m_skip = game::localPlayer;
+		filter.m_skip = game::localPlayer();
 		interfaces::trace->traceRay({ el.m_start, el.m_end }, MASK_PLAYER, &filter, &tr);
 
 		imRender.drawBox3DFilled(tr.m_end, { 4.0f, 4.0f }, 4.0f, 

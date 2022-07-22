@@ -129,3 +129,82 @@ Vector math::vectorToAngle(const Vector& vec)
 	angle.z = 0.0f;
 	return angle;
 }
+
+#include "../../dependencies/ImGui/imgui_impl_dx9.h"
+#include <algorithm>
+
+static constexpr float orient(const ImVec2& a, const ImVec2& b, const ImVec2& c)
+{
+	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
+}
+
+std::vector<ImVec2> math::grahamScan(std::span<const ImVec2> points)
+{
+	// make a temp copy to allow use swap
+	std::vector<ImVec2> v{ points.begin(), points.end() };
+
+	// now at index 0 we have most left point
+	std::swap(v.at(0), *std::min_element(v.begin(), v.end(),
+		// is left? a lexicographically before b
+		[](const ImVec2& a, const ImVec2& b) constexpr
+		{
+			return (a.x < b.x || (a.x == b.x && a.y < b.y));
+		}
+	));
+
+	std::sort(v.begin() + 1, v.end(),
+		[v = v](const ImVec2& a, const ImVec2& b) constexpr
+		{
+			return orient(v.at(0), a, b) < 0.0f;
+		}
+	);
+
+	std::vector<ImVec2> hull;
+
+	// always push 3 to start hull
+	auto it = v.begin();
+	hull.push_back(*it++);
+	hull.push_back(*it++);
+	hull.push_back(*it++);
+
+	while (it != v.end()) 
+	{
+		// we make angle with convex?
+		while (orient(*(hull.rbegin() + 1), *(hull.rbegin()), *it) >= 0.0f)
+			hull.pop_back();
+
+		hull.push_back(*it++);
+	}
+
+	return hull;
+}
+
+std::vector<ImVec2> math::giftWrap(std::span<const ImVec2> points)
+{
+	// make a temp copy to allow use swap
+	std::vector<ImVec2> v{ points.begin(), points.end() };
+
+	// now at index 0 we have most left point
+	std::swap(v.at(0), *std::min_element(v.begin(), v.end(),
+		// is left? a lexicographically before b
+		[](const ImVec2& a, const ImVec2& b) constexpr
+		{
+			return (a.x < b.x || (a.x == b.x && a.y < b.y));
+		}
+	));
+	
+	std::vector<ImVec2> hull;
+
+	// first to last hull
+	do {
+		hull.push_back(v.at(0));
+		std::swap(v[0], *std::min_element(v.begin() + 1, v.end(),
+			[v = v](const ImVec2& a, const ImVec2& b) constexpr
+			{
+				return orient(v.at(0), a, b) < 0.0f;
+			}
+		));
+	} while (v.at(0).x != hull.at(0).x && v.at(0).y != hull.at(0).y); // when it is point[0]
+
+	return hull;
+}

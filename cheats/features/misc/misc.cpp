@@ -10,6 +10,7 @@
 #include "../../../SDK/IWeapon.hpp"
 #include "../../../SDK/IViewRenderBeams.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
+#include "../../../SDK/CFlashlightEffect.hpp"
 
 #include "../../../config/vars.hpp"
 #include "../../game.hpp"
@@ -539,7 +540,7 @@ void Misc::drawNoScope()
 // because this is special case... I had to copy this with few edits
 static void drawConeEditedRainbow(const Vector& pos, const float radius, const int points, const float size, const float speed, const int trianglesAlpha, const int linesAlpha, const float thickness = 2.0f)
 {
-	Vector2D orignalW2S = {};
+	ImVec2 orignalW2S = {};
 	if (!imRender.worldToScreen(pos, orignalW2S))
 		return;
 
@@ -549,10 +550,10 @@ static void drawConeEditedRainbow(const Vector& pos, const float radius, const i
 		Vector startWorld = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
 		Vector endWorld = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
 
-		if (Vector2D start, end; imRender.worldToScreen(startWorld, start) && imRender.worldToScreen(endWorld, end))
+		if (ImVec2 start, end; imRender.worldToScreen(startWorld, start) && imRender.worldToScreen(endWorld, end))
 		{
 			imRender.drawLine(start, end, Color::rainbowColor(interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(linesAlpha), thickness);
-			surfaceRender.drawTriangleFilled({ orignalW2S.x, orignalW2S.y + size }, start, end, Color::rainbowColor(interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(trianglesAlpha));
+			imRender.drawTrianglePoly({ orignalW2S.x, orignalW2S.y + size }, start, end, Color::rainbowColor(interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(trianglesAlpha));
 		}
 	}
 }
@@ -593,7 +594,7 @@ void Misc::drawBulletTracer(const Vector& start, const Vector& end)
 
 	Trace_t tr;
 	TraceFilter filter;
-	filter.m_skip = game::localPlayer;
+	filter.m_skip = game::localPlayer();
 	interfaces::trace->traceRay({ start, end }, MASK_PLAYER, &filter, &tr);
 
 	BeamInfo_t info = {};
@@ -642,13 +643,14 @@ static CFlashlightEffect* createFlashlight(float fov, Entity_t* ent, const char*
 	{
 		mov eax, fov // fov = (*(int (__stdcall **)(const char *, const char *, signed int, signed int))(*(_DWORD *)ptrfl + 0x16C))
 		mov ecx, flashlightMemory
-		push /*dword ptr[linearAtten]*/ linearAtten
-		push /*dword ptr[farZ]*/ farZ
-		push /*dword ptr[effectName]*/ effectName
-		push /*dword ptr[idx]*/ idx
+		push linearAtten
+		push farZ
+		push effectName
+		push idx
 		call create
-		leave // for userpurge
-		ret // for userpurge
+		// crash, tried to wrap __userpurge
+		//leave // for userpurge
+		//ret // for userpurge
 	}
 
 	//create(flashlightMemory, nullptr, 0.0f, 0.0f, 0.0f, fov, ent->getIndex(), pszTextureName, farZ, linearAtten);
@@ -676,9 +678,91 @@ static void updateFlashlight(CFlashlightEffect* flashlight, const Vector& pos, c
 
 void Misc::flashLight(int frame)
 {
+	if (m_flashLight && globals::isShutdown)
+	{
+		static auto bOnce = [=]()
+		{
+			destroyFlashLight(m_flashLight);
+			m_flashLight = nullptr;
+
+			return true;
+		} ();
+	}
+
+	if (globals::isShutdown)
+		return;
+
 	if (frame != FRAME_RENDER_START)
 		return;
 
-	static CFlashlightEffect* flashlight = nullptr;
-	return;
+	if (!game::isAvailable())
+		return;
+
+	if (!game::localPlayer->isAlive())
+		return;
+
+	if (!config.get<bool>(vars.bFlashlight))
+		return;
+
+	auto key = config.get<Key>(vars.kFlashlight);
+	switch (key.getKeyMode())
+	{
+	case KeyMode::DOWN:
+	{
+		static bool done = false;
+
+		if (key.isDown())
+		{
+			if (!done)
+			{
+				interfaces::surface->playSound(XOR("items\\flashlight1.wav"));
+				m_flashLight = createFlashlight(config.get<float>(vars.fFlashlightFov), game::localPlayer());
+				done = true;
+			}
+		}
+		else
+		{
+			if (done)
+			{
+				destroyFlashLight(m_flashLight);
+				m_flashLight = nullptr;
+				done = false;
+			}
+		}
+
+		break;
+	}
+	case KeyMode::TOGGLE:
+	{
+		if (key.isPressed())
+		{
+			interfaces::surface->playSound(XOR("items\\flashlight1.wav"));
+
+			if (m_flashLight)
+			{
+				destroyFlashLight(m_flashLight);
+				m_flashLight = nullptr;
+			}
+			else
+				m_flashLight = createFlashlight(config.get<float>(vars.fFlashlightFov), game::localPlayer());
+		}
+
+		break;
+	}
+	}
+
+	if (!m_flashLight)
+		return;
+
+	Vector forward, right, up;
+	Vector angle;
+	interfaces::engine->getViewAngles(angle);
+	math::angleVectors(angle, forward, right, up);
+
+	m_flashLight->m_isOn = true;
+	m_flashLight->m_castsShadows = true;
+	m_flashLight->m_bigMode = config.get<bool>(vars.bFlashlightBigMode);
+	m_flashLight->m_fov = config.get<float>(vars.fFlashlightFov);
+
+	updateFlashlight(m_flashLight, game::localPlayer->getEyePos(), forward, right, up);
 }

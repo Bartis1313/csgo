@@ -1,5 +1,7 @@
 #include "hooks.hpp"
 
+#include <d3dx9.h>
+
 #include "../features/visuals/radar.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 #include "../../utilities/res.hpp"

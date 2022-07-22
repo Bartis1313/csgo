@@ -52,8 +52,6 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	if (!verifiedCmd)
 		return;
 
-	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
-
 	Vector oldAngle = cmd->m_viewangles;
 
 	// otherwise we moving

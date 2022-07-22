@@ -14,31 +14,30 @@ void Prediction::start(CUserCmd* cmd)
 	// init once
 	static auto bOnce = [this]()
 	{
-		predicionRandomSeed = *reinterpret_cast<uintptr_t**>(utilities::patternScan(CLIENT_DLL, PREDICTIONRANDOMSEED) + 0x2);
+		m_predicionRandomSeed = *reinterpret_cast<uintptr_t**>(utilities::patternScan(CLIENT_DLL, PREDICTIONRANDOMSEED, 0x2));
+		m_data = **reinterpret_cast<CMoveData***>(utilities::patternScan(CLIENT_DLL, PREDICTION_MOVE_DATA, 0x1));
 		return true;
 	} ();
 
 	// make it as a unique prediction, md5 random
-	*predicionRandomSeed = cmd->m_randomSeed & 0x7FFFFFFF;
+	*m_predicionRandomSeed = cmd->m_randomSeed & 0x7FFFFFFF;
 
 	// get current times to globals
-	curTime = interfaces::globalVars->m_curtime;
-	frameTime = interfaces::globalVars->m_frametime;
+	m_curTime = interfaces::globalVars->m_curtime;
+	m_frameTime = interfaces::globalVars->m_frametime;
 
 	// store not current, but valid times to the game
 	interfaces::globalVars->m_curtime = game::serverTime(cmd);
 	interfaces::globalVars->m_frametime = game::localPlayer->m_fFlags() & FL_FROZEN ? 0.0f : interfaces::globalVars->m_intervalPerTick;
 
 	// use what SDK has given to us
-	interfaces::gameMovement->startTrackPredictionErrors(game::localPlayer);
+	interfaces::gameMovement->startTrackPredictionErrors(game::localPlayer());
 
-	// set temp data
-	memset(&data, 0, sizeof(data));
 	// again use what SDK has given to us
-	interfaces::moveHelper->setHost(game::localPlayer);
-	interfaces::prediction->setupMove(game::localPlayer, cmd, interfaces::moveHelper, &data);
-	interfaces::gameMovement->processMovement(game::localPlayer, &data);
-	interfaces::prediction->finishMove(game::localPlayer, cmd, &data);
+	interfaces::moveHelper->setHost(game::localPlayer());
+	interfaces::prediction->setupMove(game::localPlayer(), cmd, interfaces::moveHelper, m_data);
+	interfaces::gameMovement->processMovement(game::localPlayer(), m_data);
+	interfaces::prediction->finishMove(game::localPlayer(), cmd, m_data);
 }
 
 void Prediction::end()
@@ -48,13 +47,13 @@ void Prediction::end()
 
 	// just resets here, so we have valid prediction every tick
 
-	interfaces::gameMovement->finishTrackPredictionErrors(game::localPlayer);
+	interfaces::gameMovement->finishTrackPredictionErrors(game::localPlayer());
 	interfaces::moveHelper->setHost(nullptr);
 
-	*predicionRandomSeed = -1;
+	*m_predicionRandomSeed = -1;
 
-	interfaces::globalVars->m_curtime = curTime;
-	interfaces::globalVars->m_frametime = frameTime;
+	interfaces::globalVars->m_curtime = m_curTime;
+	interfaces::globalVars->m_frametime = m_frameTime;
 }
 
 void Prediction::addToPrediction(CUserCmd* cmd, const std::function<void()>& fun)

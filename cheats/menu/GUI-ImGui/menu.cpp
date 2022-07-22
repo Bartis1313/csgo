@@ -119,11 +119,12 @@ static void renderVisuals()
 			ImGui::BeginGroupPanel(XOR("Players"));
 			{
 				ImGui::Checkbox(XOR("Enabled"), &config.getRef<bool>(vars.bEsp));
-				ImGui::Combo(XOR("Boxes mode"), &config.getRef<int>(vars.iEsp), selections::espNames);
+				ImGui::Combo(XOR("Boxes mode"), &config.getRef<int>(vars.iEsp), selections::espNames, 40.0f);
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Box color"), &config.getRef<CfgColor>(vars.cBox));
+				ImGui::ColorPicker(XOR("color##box"), &config.getRef<CfgColor>(vars.cBox));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Box color, filled"), &config.getRef<CfgColor>(vars.cBoxFill));
+				ImGui::ColorPicker(XOR("filled##box"), &config.getRef<CfgColor>(vars.cBoxFill));
+				ImGui::Checkbox(XOR("Outlined"), &config.getRef<bool>(vars.bBoxOutlined));
 				if (auto type = config.get<int>(vars.iEsp); type == E2T(BoxTypes::FILLED2D) || type == E2T(BoxTypes::FILLED3D))
 				{
 					ImGui::Checkbox(XOR("Multi color rect fill"), &config.getRef<bool>(vars.bBoxMultiColor));
@@ -463,6 +464,12 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("On key##mcam"), &config.getRef<bool>(vars.bMirrorCamOnKey));
 				ImGui::SameLine();
 				ImGui::Hotkey(XOR("##mcam"), &config.getRef<Key>(vars.kMirrorCam));
+				ImGui::Checkbox(XOR("Flashlight"), &config.getRef<bool>(vars.bFlashlight));
+				ImGui::SameLine();
+				ImGui::Checkbox(XOR("Big mode"), &config.getRef<bool>(vars.bFlashlightBigMode));
+				ImGui::SameLine();
+				ImGui::Hotkey(XOR("key##flashl"), &config.getRef<Key>(vars.kFlashlight));
+				ImGui::SliderFloat(XOR("Flashlight FOV"), &config.getRef<float>(vars.fFlashlightFov), 1.0f, 100.0f);
 			}
 			ImGui::EndGroupPanel();
 
