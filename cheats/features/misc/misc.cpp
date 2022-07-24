@@ -184,6 +184,7 @@ void Misc::drawLocalInfo()
 
 #include "../../../utilities/console/console.hpp"
 #include "../../menu/GUI-ImGui/imguiaddons.hpp"
+#include <numeric>
 
 void Misc::drawFpsPlot()
 {
@@ -235,7 +236,7 @@ void Misc::drawFpsPlot()
 		}
 	}
 
-	if (ImGui::Begin(XOR("Plot FPS"), &plotRef, ImGuiWindowFlags_NoCollapse))
+	if (ImGui::Begin(FORMAT(XOR("Plot FPS AVG {:.2f}###Plot FPS"), std::reduce(records.begin(), records.end()) / records.size()).c_str(), &plotRef, ImGuiWindowFlags_NoCollapse))
 	{
 		imRenderWindow.addList(); // correct pos, so we start from x = 0 y = 0
 		float acceptance = imRenderWindow.getWidth() / static_cast<float>(RECORDS_SIZE / acceptanceCustom);
@@ -258,6 +259,7 @@ void Misc::drawFpsPlot()
 		}
 
 		imRenderWindow.end();
+
 		ImGui::End();
 	}
 	if (!plotRef)
@@ -325,7 +327,7 @@ void Misc::drawVelocityPlot()
 		? ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
 		: ImGuiWindowFlags_NoCollapse;
 
-	if (ImGui::Begin(XOR("Plot Velocity"), &plotVelRef, flags))
+	if (ImGui::Begin(FORMAT(XOR("Plot Velocity AVG {:.2f}###Plot Velocity"), std::reduce(velRecords.begin(), velRecords.end()) / velRecords.size()).c_str(), &plotVelRef, flags))
 	{
 		imRenderWindow.addList(); // correct pos, so we start from x = 0 y = 0	
 		float acceptance = imRenderWindow.getWidth() / static_cast<float>(RECORDS_SIZE_VEL / acceptanceVelocityCustom);

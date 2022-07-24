@@ -50,6 +50,7 @@ DWORD WINAPI init(PVOID instance)
         game::localPlayer.init();
         world.initSkyboxes();
         interfaces::init();
+        world.initEffects();
         netvarMan.init();
         netvarMan.dump();
         surfaceRender.init();

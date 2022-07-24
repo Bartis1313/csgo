@@ -12,6 +12,8 @@ class Bomb_t;
 class IConVar;
 class IMaterial;
 class CEffectData;
+class FogController_t;
+class EnvTonemapController_t;
 
 struct hitStructLocal_t
 {
@@ -40,14 +42,24 @@ public:
 	_NODISCARD constexpr std::vector<std::string> getAllCustomSkyBoxes() const { return  m_allCustomSkyboxes; }
 	void reloadCustomSkyboxes();
 	bool initSkyboxes();
-	Bomb_t* m_bombEnt;
-	std::string m_whoPlanted = "";
+	void runFog(FogController_t* ent);
+	void drawEffects();
+	void initEffects();
+	void runToneController(EnvTonemapController_t* ent);
+	constexpr void setBombEnt(Bomb_t* ent) { m_bombEnt = ent; }
+	constexpr void setWhoPlanted(const std::string& name) { m_whoPlanted = name; }
+	constexpr void setCheckStateSlider(bool state) { m_checkStateSlider = state; }
+	constexpr void setCheckStateButton(bool state) { m_checkStateButton = state; }
 private:
 	void drawProjectiles(Entity_t* ent, const int id);
 	void drawBomb(Entity_t* ent);
 	void drawMolotov(Entity_t* ent);
 	void drawSmoke(Entity_t* ent);
-	void resetBomb() { m_bombEnt = nullptr; };
+	void resetBomb() { m_bombEnt = nullptr; }
+	Bomb_t* m_bombEnt;
+	std::string m_whoPlanted = "";
+	bool m_checkStateSlider = false;
+	bool m_checkStateButton = false;
 private:
 	bool checkCustomSkybox();
 	IConVar* m_oldSky = nullptr;
@@ -73,6 +85,8 @@ private:
 	std::vector<hitStructLocal_t> m_hitsLocal;
 	std::filesystem::path m_pathCustomSkybox;
 	std::vector<std::string> m_allCustomSkyboxes;
+
+	std::vector<std::pair<IMaterial*, bool>> m_materials;
 };
 
 inline World world;

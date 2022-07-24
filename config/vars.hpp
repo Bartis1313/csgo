@@ -152,6 +152,15 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fDrawLocalSideImpacts, 3.0f, "draw impacts from local side time");
 	CONFIG_ADD_VARIABLE(CfgColor, cDrawLocalSideImpactsLine, Colors::Cyan, "draw impacts from local side color lines");
 	CONFIG_ADD_VARIABLE(CfgColor, cDrawLocalSideImpactsFill, Colors::Red, "draw impacts from local side color fill");
+	CONFIG_ADD_VARIABLE(bool, bFog, false, "fog enabled");
+	CONFIG_ADD_VARIABLE(float, fFogDistance, 500.0f, "fog distance");
+	CONFIG_ADD_VARIABLE(CfgColor, cFog, Colors::Purple, "fog color");
+	CONFIG_ADD_VARIABLE(int, iScreenEffect, 0, "screen effect index");
+	CONFIG_ADD_VARIABLE(float, fScreenEffectParam, 1.0f, "screen effect value");
+	CONFIG_ADD_VARIABLE(CfgColor, cScreenEffect, Colors::LightBlue, "screen color value");
+	CONFIG_ADD_VARIABLE(bool, bControlTone, false, "control tone enabled");
+	CONFIG_ADD_VARIABLE(float, fControlToneMin, 0.5f, "control tone min");
+	CONFIG_ADD_VARIABLE(float, fControlToneMax, 0.5f, "control tone max");
 
 
 	// MASTER SWITCHES

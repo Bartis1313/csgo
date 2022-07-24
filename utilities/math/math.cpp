@@ -140,6 +140,10 @@ static constexpr float orient(const ImVec2& a, const ImVec2& b, const ImVec2& c)
 
 std::vector<ImVec2> math::grahamScan(std::span<const ImVec2> points)
 {
+	// case when it's impossible
+	if (points.size() < 3)
+		return {};
+
 	// make a temp copy to allow use swap
 	std::vector<ImVec2> v{ points.begin(), points.end() };
 
@@ -181,6 +185,10 @@ std::vector<ImVec2> math::grahamScan(std::span<const ImVec2> points)
 
 std::vector<ImVec2> math::giftWrap(std::span<const ImVec2> points)
 {
+	// case when it's impossible
+	if (points.size() < 3)
+		return {};
+
 	// make a temp copy to allow use swap
 	std::vector<ImVec2> v{ points.begin(), points.end() };
 

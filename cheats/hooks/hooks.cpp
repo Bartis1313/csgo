@@ -37,6 +37,7 @@ void hooks::init()
 	const auto unkFileCheckTarget = vfunc::getVFunc(interfaces::fileSystem, unkFileCheck::index);
 	const auto renderViewTarget = vfunc::getVFunc(interfaces::viewRender, renderView::index);
 	const auto isHltvTarget = vfunc::getVFunc(interfaces::engine, isHltv::index);
+	const auto screen2DEffectTarget = vfunc::getVFunc(interfaces::viewRender, screen2DEffect::index);
 #pragma endregion
 
 	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK);
@@ -112,6 +113,8 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(unkFileCheckTarget, unkFileCheck);
 	HOOK_SAFE(renderViewTarget, renderView);
 	HOOK_SAFE(isHltvTarget, isHltv);
+	HOOK_SAFE(screen2DEffectTarget, screen2DEffect);
+
 
 #undef HOOK_SAFE
 

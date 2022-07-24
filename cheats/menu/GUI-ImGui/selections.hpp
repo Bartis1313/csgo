@@ -119,4 +119,19 @@ namespace selections
 		"Rotate",
 		"Directional"
 	};
+
+	inline std::array screenEffects =
+	{
+		"none",
+		"effects/healthboost",
+		"effects/parachute",
+		"effects/screentear",
+		"effects/dronecam",
+		"effects/nightvision",
+		"effects/dangerzone_screen",
+		"effects/underwater_overlay",
+		"dev/motion_blur",
+		"effects/survival_zone_projection_distancefield_inv",
+		"dev/screenhighlight_pulse",
+	};
 }

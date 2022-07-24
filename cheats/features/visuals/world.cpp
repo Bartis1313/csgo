@@ -60,6 +60,12 @@ void World::drawMisc()
 		case CSmokeGrenadeProjectile:
 			drawSmoke(entity);
 			break;
+		case CFogController:
+			runFog(reinterpret_cast<FogController_t*>(entity));
+			break;
+		case CEnvTonemapController:
+			runToneController(reinterpret_cast<EnvTonemapController_t*>(entity));
+			break;
 		default:
 			break;
 		}
@@ -442,14 +448,14 @@ void World::drawMolotov(Entity_t* ent)
 	//std::vector<ImVec2> points = {};
 	CfgColor col = config.get<CfgColor>(vars.cMolotovRange);
 
-	//std::vector<Vector2D> points;
+	//std::vector<ImVec2> points;
 
 	for (int i = 0; i < molotov->m_fireCount(); i++)
 	{
 		auto pos = origin + molotov->getInfernoPos(i);
 		imRender.drawCircle3DFilled(pos, molotovRadius, 32, col.getColor(), col.getColor());
 
-		/*Vector2D posw;
+		/*ImVec2 posw;
 		if (!imRender.worldToScreen(pos, posw))
 			break;
 
@@ -465,6 +471,9 @@ void World::drawMolotov(Entity_t* ent)
 		imRender.drawProgressRing(s.x, s.y, 25, 32, -90.0f, scale, 5.0f, Colors::LightBlue);
 		imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma14, FORMAT(XOR("{:.2f}s"), time), true, Colors::White);
 	}
+
+	/*auto g = math::giftWrap(points);
+	imRender.drawPolyGon(g, Colors::LightBlue);*/ // still too less points to make is "cool"
 }
 
 void drawArc3DSmoke(const Vector& pos, const float radius, const int points, const float percent, const Color& color, const ImDrawFlags flags, const float thickness,
@@ -794,7 +803,6 @@ bool World::checkCustomSkybox()
 
 	if (!std::filesystem::exists(path))
 	{
-		// after removal, create the folder, from there the path is possible to reach
 		if (!std::filesystem::create_directories(path))
 			return false;
 	}
@@ -825,4 +833,107 @@ bool World::initSkyboxes()
 	reloadCustomSkyboxes();
 
 	return true;
+}
+
+static constexpr uint32_t U32RGB(const SDKColor& clr)
+{
+	return (clr.r & 0x0FF) | ((clr.g & 0x0FF) << 8) | ((clr.b & 0x0FF) << 16);
+}
+
+void World::runFog(FogController_t* ent)
+{
+	if (!ent)
+		return;
+
+	if (!game::isAvailable())
+		return;
+
+	if (globals::isShutdown)
+	{
+		ent->m_fogenable() = false;
+		return;
+	}
+
+	if (bool opt = config.get<bool>(vars.bFog); opt)
+		ent->m_fogenable() = opt;
+	else
+	{
+		ent->m_fogenable() = opt;
+		return;
+	}
+
+	SDKColor col = config.get<CfgColor>(vars.cFog).getColor();
+
+	ent->m_fogstart() = 0.0f;
+	ent->m_fogend() = config.get<float>(vars.fFogDistance) * 10.0f;
+	ent->m_fogmaxdensity() = col.a / 100.0f;
+	ent->m_fogcolorPrimary() = U32RGB(col);
+	ent->m_fogcolorSecondary() = U32RGB(col);
+}
+
+#include "../../../SDK/IMatRenderContext.hpp"
+#include "../../menu/GUI-ImGui/selections.hpp"
+
+void World::initEffects()
+{
+	// warning is that we push "none" too, but below you can see it will never be the case
+	// toprevent just cfg + 1 (without pushing "none")
+	// for motion blur there is needed old code for this to make it "good"
+	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/viewpostprocess.cpp#L2996
+	for (const std::string_view el : selections::screenEffects)
+	{
+		bool mark = false;
+		if (el == "effects/nightvision") // this looks bad, dunno
+			mark = true;
+
+		m_materials.emplace_back(std::make_pair(interfaces::matSys->findMaterial(
+			el.data(), TEXTURE_GROUP_CLIENT_EFFECTS), mark));
+	}
+}
+
+void World::drawEffects()
+{
+	if (!game::isAvailable())
+		return;
+
+	int cfg = config.get<int>(vars.iScreenEffect);
+	if (cfg == 0)
+		return;
+
+	Color color = config.get<CfgColor>(vars.cScreenEffect).getColor();
+
+	auto material = m_materials.at(cfg).first;
+	material->colorModulate(color); // -> works for night vision
+	auto var = material->findVar(XOR("$c0_x"));
+	var->setValue(config.get<float>(vars.fScreenEffectParam));
+
+	if (m_materials.at(cfg).second) //nightvisioson
+		game::localPlayer->m_flNightVisionAlpha() = color.a();
+
+	// now there should be if for motion blur as it needs much more than just drawing this material
+
+	auto ctx = interfaces::matSys->getRenderContext();
+	ctx->drawScreenSpaceRectangle(material, 0, 0, globals::screenX, globals::screenY, 0, 0,
+		globals::screenX, globals::screenY, globals::screenX, globals::screenY);
+	ctx->release();
+}
+
+void World::runToneController(EnvTonemapController_t* ent)
+{
+	if (!game::isAvailable())
+		return;
+	
+	// this is needed to ONLY change when we changed anything
+	if (auto cfg = config.get<bool>(vars.bControlTone); cfg && (m_checkStateSlider || m_checkStateButton))
+	{
+		ent->m_bUseCustomAutoExposureMin() = cfg;
+		ent->m_bUseCustomAutoExposureMax() = cfg;
+		ent->m_flCustomAutoExposureMin() = config.get<float>(vars.fControlToneMin);
+		ent->m_flCustomAutoExposureMax() = config.get<float>(vars.fControlToneMax);
+	}
+	else if (globals::isShutdown || (!cfg && m_checkStateButton))
+	{
+		ent->m_bUseCustomAutoExposureMin() = cfg;
+		ent->m_bUseCustomAutoExposureMax() = cfg;
+	}
 }

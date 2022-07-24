@@ -77,7 +77,7 @@ void Events::init()
 	);
 	add(XOR("bomb_exploded"), [](IGameEvent*)
 		{
-			world.m_bombEnt = nullptr;
+			world.setBombEnt(nullptr);
 		}
 	);
 	add(XOR("bomb_planted"), [](IGameEvent* e)
@@ -86,7 +86,7 @@ void Events::init()
 			if (!who)
 				return;
 
-			world.m_whoPlanted = who->getName();
+			world.setWhoPlanted(who->getName());
 		}
 	);
 	add(XOR("player_footstep"), [](IGameEvent* e)

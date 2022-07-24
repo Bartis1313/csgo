@@ -21,6 +21,8 @@ public:
 		: x{ arr[0] }, y{ arr[1] }, z{ arr[2] }
 	{}
 
+	inline static constexpr float MAX_ARG = 32767.0f;
+
 	constexpr void clamp()
 	{
 		x = std::clamp(x, -89.0f, 89.0f);

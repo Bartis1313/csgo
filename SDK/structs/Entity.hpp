@@ -175,6 +175,7 @@ public:
 	NETVAR(int, m_hViewModel, "DT_BasePlayer", "m_hViewModel[0]");
 	NETVAR(float, m_flLowerBodyYawTarget, "DT_CSPlayer", "m_flLowerBodyYawTarget");
 	NETVAR(float, m_flFlashDuration, "DT_CSPlayer", "m_flFlashDuration");
+	NETVAR_ADDR(float, m_flNightVisionAlpha, "DT_CSPlayer", "m_flFlashDuration", -0x1C);
 	NETVAR(int, m_lifeState, "DT_CSPlayer", "m_lifeState");
 	NETVAR(int, m_fFlags, "DT_CSPlayer", "m_fFlags");
 	NETVAR(int, m_nHitboxSet, "DT_CSPlayer", "m_nHitboxSet");
@@ -208,6 +209,30 @@ public:
 	_NODISCARD bool isPossibleToSee(const Vector& pos);
 	// address as number
 	_NODISCARD uintptr_t getLiteralAddress();
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+class FogController_t : public Entity_t
+{
+public:
+	NETVAR(bool, m_fogenable, "DT_FogController", "m_fog.enable");
+	NETVAR(float, m_fogstart, "DT_FogController", "m_fog.start");
+	NETVAR(float, m_fogend, "DT_FogController", "m_fog.end");
+	NETVAR(float, m_fogmaxdensity, "DT_FogController", "m_fog.maxdensity");
+	NETVAR(int, m_fogcolorPrimary, "DT_FogController", "m_fog.colorPrimary");
+	NETVAR(int, m_fogcolorSecondary, "DT_FogController", "m_fog.colorSecondary");
+};
+
+////////////////////////////////////////////////////////////////////////////////////////////
+
+class EnvTonemapController_t : public Entity_t
+{
+public:
+	NETVAR(bool, m_bUseCustomAutoExposureMin, "DT_EnvTonemapController", "m_bUseCustomAutoExposureMin");
+	NETVAR(bool, m_bUseCustomAutoExposureMax, "DT_EnvTonemapController", "m_bUseCustomAutoExposureMax");
+	NETVAR(float, m_flCustomAutoExposureMin, "DT_EnvTonemapController", "m_flCustomAutoExposureMin");
+	NETVAR(float, m_flCustomAutoExposureMax, "DT_EnvTonemapController", "m_flCustomAutoExposureMax");
 };
 
 #undef RENDERABLE

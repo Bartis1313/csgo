@@ -22,6 +22,7 @@ enum hookIndexes
 	UNK_FILE_CHECK = 128,
 	RENDER_VIEW = 6,
 	IS_HLTV = 93,
+	SCREEN_2D_EFFECT = 39,
 };
 
 class IPanel;
@@ -277,5 +278,13 @@ namespace hooks
 		static bool __fastcall hooked(FAST_ARGS);
 		inline static fn original = nullptr;
 		static const int index = IS_HLTV;
+	};
+
+	struct screen2DEffect
+	{
+		using fn = void(__stdcall*)(CViewSetup*);
+		static void __stdcall hooked(CViewSetup* view);
+		inline static fn original = nullptr;
+		static const int index = SCREEN_2D_EFFECT;
 	};
 }

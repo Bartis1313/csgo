@@ -113,6 +113,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.4.7 - Easy cfg load on start option, setting load cfg won't save current variables but only name to load.
 * 1.4.8 - Added mirrorcam (rendering by ImGui), freecam, freelook, fixed SEH catching allocation for symbols. Console logging is now locked, it's better to run them in mutex.
 * 1.4.9 - Flashlight fixed and added it as a feature. Recoded rendering to take ImVec2 instead of vector2D when using imgui. Fixed/recoded drawing 3d boxes completely. Init localplayer once (and this method probably fixes crashes). Gather prediction move data from stack. Pass std::span as normal copy, not cref.
+* 1.5.0 - World screen effects added: fog, tone control, draw screen effects.
 </details>
 
 # Dependencies

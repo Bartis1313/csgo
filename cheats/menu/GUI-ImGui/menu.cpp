@@ -470,6 +470,20 @@ static void renderMisc()
 				ImGui::SameLine();
 				ImGui::Hotkey(XOR("key##flashl"), &config.getRef<Key>(vars.kFlashlight));
 				ImGui::SliderFloat(XOR("Flashlight FOV"), &config.getRef<float>(vars.fFlashlightFov), 1.0f, 100.0f);
+				ImGui::Checkbox(XOR("Fog enabled"), &config.getRef<bool>(vars.bFog));
+				ImGui::SliderFloat(XOR("Fog distance"), &config.getRef<float>(vars.fFogDistance), 1.0f, 1000.0f);
+				ImGui::ColorPicker(XOR("Fog color"), &config.getRef<CfgColor>(vars.cFog));
+				ImGui::Combo(XOR("Screen effect"), &config.getRef<int>(vars.iScreenEffect), selections::screenEffects);
+				ImGui::SliderFloat(XOR("Param##Screen effect"), &config.getRef<float>(vars.fScreenEffectParam), 0.0f, 1.0f);
+				ImGui::ColorPicker(XOR("Color##Screen effect"), &config.getRef<CfgColor>(vars.cScreenEffect));
+				bool changedbut = false;
+				changedbut |= ImGui::Checkbox(XOR("ControlTone enabled"), &config.getRef<bool>(vars.bControlTone));
+				world.setCheckStateButton(changedbut);
+				bool changed1 = false;
+				changed1|= ImGui::SliderFloat(XOR("Tone min"), &config.getRef<float>(vars.fControlToneMin), 0.0f, 1.0f);
+				bool changed2 = false;
+				changed2 |= ImGui::SliderFloat(XOR("Tone max"), &config.getRef<float>(vars.fControlToneMax), 0.0f, 1.0f);
+				world.setCheckStateSlider(changed1 || changed2);
 			}
 			ImGui::EndGroupPanel();
 
