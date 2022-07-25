@@ -161,6 +161,14 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bControlTone, false, "control tone enabled");
 	CONFIG_ADD_VARIABLE(float, fControlToneMin, 0.5f, "control tone min");
 	CONFIG_ADD_VARIABLE(float, fControlToneMax, 0.5f, "control tone max");
+	CONFIG_ADD_VARIABLE(bool, bWeather, false, "custom weather enabled");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainLenght, false, "weather rain lenght");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainSpeed, false, "weather rain speed");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainRadius, false, "weather rain radius");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainWidth, false, "weather rain width");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainSideVel, false, "weather rain side vel");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainAlpha, false, "weather rain alpha");
+	CONFIG_ADD_VARIABLE(float, fWeatherWindSpeed, false, "weather rain wind speed");
 
 
 	// MASTER SWITCHES

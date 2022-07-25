@@ -3,9 +3,12 @@
 
 class ClientClass
 {
+private:
+	using createfn = void* (__cdecl*)(int, int);
+	using createeventfn = void* (__cdecl*)();
 public:
-	void* m_createFn;
-	void* m_createEventFn;
+	createfn m_createFn;
+	createeventfn m_createEventFn;
 	char* m_networkName;
 	RecvTable* m_recvTable;
 	ClientClass* m_next;

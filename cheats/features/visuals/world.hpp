@@ -14,6 +14,7 @@ class IMaterial;
 class CEffectData;
 class FogController_t;
 class EnvTonemapController_t;
+class ClientClass;
 
 struct hitStructLocal_t
 {
@@ -50,17 +51,20 @@ public:
 	constexpr void setWhoPlanted(const std::string& name) { m_whoPlanted = name; }
 	constexpr void setCheckStateSlider(bool state) { m_checkStateSlider = state; }
 	constexpr void setCheckStateButton(bool state) { m_checkStateButton = state; }
+	void weather(int stage);
+	// manual helper for map change
+	constexpr void setWeatherState(bool state) { m_weather.m_created = state; }
+	void implMenu() const;
 private:
 	void drawProjectiles(Entity_t* ent, const int id);
 	void drawBomb(Entity_t* ent);
 	void drawMolotov(Entity_t* ent);
 	void drawSmoke(Entity_t* ent);
 	void resetBomb() { m_bombEnt = nullptr; }
-	Bomb_t* m_bombEnt;
+	Bomb_t* m_bombEnt = nullptr;
 	std::string m_whoPlanted = "";
 	bool m_checkStateSlider = false;
 	bool m_checkStateButton = false;
-private:
 	bool checkCustomSkybox();
 	IConVar* m_oldSky = nullptr;
 	struct Trail_t
@@ -87,6 +91,13 @@ private:
 	std::vector<std::string> m_allCustomSkyboxes;
 
 	std::vector<std::pair<IMaterial*, bool>> m_materials;
+
+	struct WeatherFields_t
+	{
+		Entity_t* m_ent = nullptr;
+		ClientClass* m_preciptation = nullptr;
+		bool m_created = false;
+	} m_weather;
 };
 
 inline World world;

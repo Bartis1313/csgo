@@ -50,7 +50,6 @@ DWORD WINAPI init(PVOID instance)
         game::localPlayer.init();
         world.initSkyboxes();
         interfaces::init();
-        world.initEffects();
         netvarMan.init();
         netvarMan.dump();
         surfaceRender.init();
@@ -61,6 +60,7 @@ DWORD WINAPI init(PVOID instance)
         radar.initRetAddr();
         mCam.init();
         hooks::init();
+        world.initEffects();
     }
     catch (const std::runtime_error& err)
     {

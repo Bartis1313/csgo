@@ -20,7 +20,12 @@ enum VTableIndexes
 	GET_MODEL = 8,
 	DRAW_MODEL = 9,
 	IS_DORMANT = 9,
-	RENDERABLE_TO_WORLD = 32
+	RENDERABLE_TO_WORLD = 32,
+	RELEASE = 1,
+	PRE_DATA_CHANGED = 4,
+	DATA_CHANGED = 5,
+	PRE_DATA_UPDATE = 6,
+	POST_DATA_UPDATE = 7,
 };
 
 #define ENGINE_DLL					XOR("engine.dll")
@@ -145,3 +150,5 @@ ParticleEffect
 // #STR: "userid", "entindex", "weaponhud_selection"
 #define LOCAL_PLAYER				XOR("8B 0D ? ? ? ? 83 FF FF 74 07")
 #define PREDICTION_MOVE_DATA		XOR("A1 ? ? ? ? F3 0F 59 CD")
+// #STR: "Client: Missing precache for particle system \"%s\"!\n" - this func is a mess to start working on rain manually
+#define DISPATCH_PARTICLE			XOR("55 8B EC 83 E4 F8 83 EC 6C 53 56 57 8B F9 8B DA 8D 4C 24 10 E8")

@@ -484,6 +484,8 @@ static void renderMisc()
 				bool changed2 = false;
 				changed2 |= ImGui::SliderFloat(XOR("Tone max"), &config.getRef<float>(vars.fControlToneMax), 0.0f, 1.0f);
 				world.setCheckStateSlider(changed1 || changed2);
+				ImGui::Checkbox(XOR("Weather"), &config.getRef<bool>(vars.bWeather));
+				world.implMenu();
 			}
 			ImGui::EndGroupPanel();
 

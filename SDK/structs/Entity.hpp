@@ -6,6 +6,7 @@
 #include "../CUtlVector.hpp"
 #include "../vars.hpp"
 #include "IDXandPaterrns.hpp"
+#include "../Enums.hpp"
 
 #include "../math/Vector.hpp"
 #include "../math/matrix.hpp"
@@ -44,6 +45,7 @@ public:
 	NETVAR(float, m_flMaxspeed, "DT_BasePlayer", "m_flMaxspeed");
 	NETVAR_ADDR(int, m_nRenderMode, "DT_BasePlayer", "m_nRenderMode", 0x1);
 	//NETVAR_ADDR(Matrix3x4, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
+	NETVAR(PrecipitationType_t, m_nPrecipType, "DT_Precipitation", "m_nPrecipType");
 
 	VFUNC(Vector&, absOrigin, ABS_ORIGIN, (), (this));
 	VFUNC(Vector&, absAngles, ABS_ANGLE, (), (this));
@@ -59,6 +61,11 @@ public:
 	VFUNC(int, drawModel, DRAW_MODEL, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
 	VFUNC(bool, isDormant, IS_DORMANT, (), (this + NETWORKABLE));
 	VFUNC(Matrix3x4&, renderableToWorldTransform, RENDERABLE_TO_WORLD, (), (this + RENDERABLE));
+	VFUNC(void, release, RELEASE, (), (this + NETWORKABLE));
+	VFUNC(void, onPreDataChanged, PRE_DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
+	VFUNC(void, onDataChanged, DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
+	VFUNC(void, preDataUpdate, PRE_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
+	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 
 	_NODISCARD CUtlVector<Matrix3x4> m_CachedBoneData();
 	_NODISCARD Vector getAimPunch();

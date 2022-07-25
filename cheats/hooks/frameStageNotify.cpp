@@ -17,6 +17,7 @@ void __stdcall hooks::frameStageNotify::hooked(int frame)
 		return true;
 	} ();
 
+	world.weather(frame);
 	backtrack.update(frame);
 	world.skyboxLoad(frame, globals::isShutdown);
 	// add bind to csgo yourself. This is useless

@@ -700,3 +700,48 @@ enum ClearFlags_t
 	VIEW_CLEAR_STENCIL = 0x20,
 };
 #pragma endregion
+
+#pragma region particles
+enum ParticleAttachment_t
+{
+	PATTACH_ABSORIGIN = 0,			// Create at absorigin, but don't follow
+	PATTACH_ABSORIGIN_FOLLOW,		// Create at absorigin, and update to follow the entity
+	PATTACH_CUSTOMORIGIN,			// Create at a custom origin, but don't follow
+	PATTACH_CUSTOMORIGIN_FOLLOW,	// Create at a custom origin, follow relative position to specified entity
+	PATTACH_POINT,					// Create on attachment point, but don't follow
+	PATTACH_POINT_FOLLOW,			// Create on attachment point, and update to follow the entity
+	PATTACH_EYES_FOLLOW,			// Create on eyes of the attached entity, and update to follow the entity
+	PATTACH_OVERHEAD_FOLLOW,		// Create at the top of the entity's bbox
+	PATTACH_WORLDORIGIN,			// Used for control points that don't attach to an entity
+	PATTACH_ROOTBONE_FOLLOW,		// Create at the root bone of the entity, and update to follow
+
+	MAX_PATTACH_TYPES,
+};
+#pragma endregion
+
+#pragma region data_update_type
+enum DataUpdateType_t
+{
+	DATA_UPDATE_CREATED = 0,	// indicates it was created +and+ entered the pvs
+//	DATA_UPDATE_ENTERED_PVS,
+	DATA_UPDATE_DATATABLE_CHANGED,
+//	DATA_UPDATE_LEFT_PVS,
+//	DATA_UPDATE_DESTROYED,		// FIXME: Could enable this, but it's a little worrying
+								// since it changes a bunch of existing code
+};
+#pragma endregion
+
+#pragma region preciptation
+enum PrecipitationType_t
+{
+	PRECIPITATION_TYPE_RAIN = 0,
+	PRECIPITATION_TYPE_SNOW,
+	PRECIPITATION_TYPE_ASH,
+	PRECIPITATION_TYPE_SNOWFALL,
+	PRECIPITATION_TYPE_PARTICLERAIN,
+	PRECIPITATION_TYPE_PARTICLEASH,
+	PRECIPITATION_TYPE_PARTICLERAINSTORM,
+	PRECIPITATION_TYPE_PARTICLESNOW,
+	NUM_PRECIPITATION_TYPES
+};
+#pragma endregion

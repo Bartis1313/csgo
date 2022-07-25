@@ -95,4 +95,6 @@ namespace gameFunctions
 	inline tfn tesla = nullptr;
 	using dfn = int(__fastcall*)(const char* name, const CEffectData&);
 	inline dfn dispatchEffect = nullptr;
+	// it's usercall
+	//using dfnp = void(__thiscall*)(const char* particleName, const Vector&, const Vector&, void*, int);
 }
