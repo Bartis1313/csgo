@@ -1038,40 +1038,33 @@ void World::implMenu() const
 		std::make_pair(cvarWindSpeed, cvarWindSpeed->getFloat()),
 	};
 
-	if (ImGui::SliderFloat(XOR("r_rainlength"), &config.getRef<float>(vars.fWeatherRainLenght), 0.0f, 1000.0f))
+	if (ImGui::SliderFloat(XOR("r_rainlength"), &config.getRef<float>(vars.fWeatherRainLenght), 0.0f, 1.0f))
 	{
-		const static auto cvar = interfaces::cvar->findVar(XOR("r_rainlength"));
-		cvar->setValue(config.get<float>(vars.fWeatherRainLenght));
+		cvarLenght->setValue(config.get<float>(vars.fWeatherRainLenght));
 	}
 	if (ImGui::SliderFloat(XOR("r_rainspeed"), &config.getRef<float>(vars.fWeatherRainSpeed), 0.0f, 1000.0f))
 	{
-		const static auto cvar = interfaces::cvar->findVar(XOR("r_rainspeed"));
-		cvar->setValue(config.get<float>(vars.fWeatherRainSpeed));
+		cvarRainSpeed->setValue(config.get<float>(vars.fWeatherRainSpeed));
 	}
-	if (ImGui::SliderFloat(XOR("r_rainradius"), &config.getRef<float>(vars.fWeatherRainRadius), 0.0f, 1000.0f))
+	if (ImGui::SliderFloat(XOR("r_rainradius"), &config.getRef<float>(vars.fWeatherRainRadius), 0.0f, 3000.0f))
 	{
-		const static auto cvar = interfaces::cvar->findVar(XOR("r_rainradius"));
-		cvar->setValue(config.get<float>(vars.fWeatherRainRadius));
+		cvarRadius->setValue(config.get<float>(vars.fWeatherRainRadius));
 	}
-	if (ImGui::SliderFloat(XOR("r_rainwidth"), &config.getRef<float>(vars.fWeatherRainWidth), 0.0f, 1000.0f))
+	if (ImGui::SliderFloat(XOR("r_rainwidth"), &config.getRef<float>(vars.fWeatherRainWidth), 0.0f, 5.0f))
 	{
-		const static auto cvar = interfaces::cvar->findVar(XOR("r_rainwidth"));
-		cvar->setValue(config.get<float>(vars.fWeatherRainWidth));
+		cvarWidth->setValue(config.get<float>(vars.fWeatherRainWidth));
 	}
 	if (ImGui::SliderFloat(XOR("r_RainSideVel"), &config.getRef<float>(vars.fWeatherRainSideVel), 0.0f, 1000.0f))
 	{
-		const static auto cvar = interfaces::cvar->findVar(XOR("r_RainSideVel"));
-		cvar->setValue(config.get<float>(vars.fWeatherRainSideVel));
+		cvarSidevel->setValue(config.get<float>(vars.fWeatherRainSideVel));
 	}
-	if (ImGui::SliderFloat(XOR("r_rainalpha"), &config.getRef<float>(vars.fWeatherRainAlpha), 0.0f, 1000.0f))
+	if (ImGui::SliderFloat(XOR("r_rainalpha"), &config.getRef<float>(vars.fWeatherRainAlpha), 0.0f, 1.0f))
 	{
-		const static auto cvar = interfaces::cvar->findVar(XOR("r_rainalpha"));
-		cvar->setValue(config.get<float>(vars.fWeatherRainAlpha));
+		cvarAlpha->setValue(config.get<float>(vars.fWeatherRainAlpha));
 	}
 	if (ImGui::SliderFloat(XOR("cl_windspeed"), &config.getRef<float>(vars.fWeatherWindSpeed), 0.0f, 1000.0f))
 	{
-		const static auto cvar = interfaces::cvar->findVar(XOR("cl_windspeed"));
-		cvar->setValue(config.get<float>(vars.fWeatherWindSpeed));
+		cvarWindSpeed->setValue(config.get<float>(vars.fWeatherWindSpeed));
 	}
 	if (ImGui::Button(XOR("Default rain cvars")))
 	{
