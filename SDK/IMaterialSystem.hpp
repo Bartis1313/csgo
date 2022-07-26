@@ -23,6 +23,8 @@ public:
 	VFUNC(short, invalidMaterialFromHandle, 88, (), (this));
 	VFUNC(IMaterial*, getMaterial, 89, (short handle), (this, handle));
 	VFUNC(int, getMaterialCount, 90, (), (this));
+	VFUNC(ITexture*, findTexture, 91, (const char* name, const char* group, bool complain = true, int additionalFlags = 0),
+		(this, name, group, complain, additionalFlags));
 	VFUNC(IMatRenderContext*, getRenderContext, 115, (), (this));
 	VFUNC(void, beginRenderTargetAllocation, 94, (), (this));
 	VFUNC(void, endRenderTargetAllocation, 95, (), (this));

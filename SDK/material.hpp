@@ -84,4 +84,5 @@ public:
     VFUNC(void, setValues, 11, (const Vector& val), (this, val.x, val.y, val.z));
     VFUNC(void, setValues, 11, (const Color& val), (this, val.r(), val.g(), val.b()));
     VFUNC(void, setValues, 11, (float x, float y, float z), (this, x, y, z));
+    VFUNC(void, setVectorComponent, 26, (float val, int component), (this, val, component));
 };

@@ -287,4 +287,11 @@ namespace hooks
 		inline static fn original = nullptr;
 		static const int index = SCREEN_2D_EFFECT;
 	};
+
+	struct isDepthOfField
+	{
+		using fn = bool(__stdcall*)();
+		static bool __stdcall hooked();
+		inline static fn original = nullptr;
+	};
 }

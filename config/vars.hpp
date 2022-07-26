@@ -162,14 +162,13 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fControlToneMin, 0.5f, "control tone min");
 	CONFIG_ADD_VARIABLE(float, fControlToneMax, 0.5f, "control tone max");
 	CONFIG_ADD_VARIABLE(bool, bWeather, false, "custom weather enabled");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainLenght, false, "weather rain lenght");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainSpeed, false, "weather rain speed");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainRadius, false, "weather rain radius");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainWidth, false, "weather rain width");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainSideVel, false, "weather rain side vel");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainAlpha, false, "weather rain alpha");
-	CONFIG_ADD_VARIABLE(float, fWeatherWindSpeed, false, "weather rain wind speed");
-
+	CONFIG_ADD_VARIABLE(float, fWeatherRainLenght, 0.0f, "weather rain lenght");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainSpeed, 0.0f, "weather rain speed");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainRadius, 0.0f, "weather rain radius");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainWidth, 0.0f, "weather rain width");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainSideVel, 0.0f, "weather rain side vel");
+	CONFIG_ADD_VARIABLE(float, fWeatherRainAlpha, 0.0f, "weather rain alpha");
+	CONFIG_ADD_VARIABLE(float, fWeatherWindSpeed, 0.0f, "weather rain wind speed");
 
 	// MASTER SWITCHES
 
@@ -184,6 +183,9 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fFOV, 0, "fov for +/- view");
 	CONFIG_ADD_VARIABLE(bool, bThirdp, false, "third person enabled");
 	CONFIG_ADD_VARIABLE(Key, kThirdp, Key(KeyMode::TOGGLE, 0x56), "third person key");
+	CONFIG_ADD_VARIABLE(float, fThirdpDistance, 200.0f, "third person distance");
+	CONFIG_ADD_VARIABLE(float, fThirdpX, 0.0f, "third personX");
+	CONFIG_ADD_VARIABLE(float, fThirdpY, 0.0f, "third personY");
 	CONFIG_ADD_VARIABLE(int, iCrosshair, 0, "crosshair mode");
 	CONFIG_ADD_VARIABLE(bool, bBacktrack, false, "backtrack enabled");
 	CONFIG_ADD_VARIABLE(float, fBacktrackTick, 200.0f, "backtrack amount of ticks to manipulate");
@@ -257,6 +259,17 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Key, kFlashlight, Key(KeyMode::TOGGLE, 0x4C), "flashlight key"); // L key
 	CONFIG_ADD_VARIABLE(bool, bFlashlightBigMode, false, "flashlight big mode enabled");
 	CONFIG_ADD_VARIABLE(float, fFlashlightFov, 30.0f, "flashlight fov");
+
+	// EFFECTS - TODO sort this
+
+	CONFIG_ADD_VARIABLE(bool, bMotionBlur, false, "motion blur enabled");
+	CONFIG_ADD_VARIABLE(bool, bMotionBlurForward, false, "motion blur enabled forward");
+	CONFIG_ADD_VARIABLE(float, fMotionBlurFallingIntensity, 1.0f, "motion blur FallingIntensity");
+	CONFIG_ADD_VARIABLE(float, fMotionBlurFallingMin, 10.0f, "motion blur FallingMin");
+	CONFIG_ADD_VARIABLE(float, fMotionBlurFallingMax, 20.0f, "motion blur FallingMax");
+	CONFIG_ADD_VARIABLE(float, fMotionBlurGlobalStrength, 1.0f, "motion blur GlobalStrength");
+	CONFIG_ADD_VARIABLE(float, fMotionBlurRotationIntensity, 0.15f, "motion blur RotationIntensity");
+	CONFIG_ADD_VARIABLE(float, fMotionBlurRollIntensity, 0.3f, "motion blur RollIntensity");
 
 	// STYLING
 

@@ -73,6 +73,9 @@ void hooks::init()
 	const auto unkownOverviewMapAddr = utilities::patternScan(CLIENT_DLL, UNK_OVBERVIEWMAP);
 	const auto unkownOverviewMapTarget = reinterpret_cast<void*>(unkownOverviewMapAddr);
 
+	const auto isDepthAddr = utilities::patternScan(CLIENT_DLL, IS_DEPTH);
+	const auto isDepthTarget = reinterpret_cast<void*>(isDepthAddr);
+
 #pragma region DX9
 	const auto resetTarget = vfunc::getVFunc(interfaces::dx9Device, reset::index);
 	const auto presentTagret = vfunc::getVFunc(interfaces::dx9Device, present::index);
@@ -114,6 +117,7 @@ hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookSt
 	HOOK_SAFE(renderViewTarget, renderView);
 	HOOK_SAFE(isHltvTarget, isHltv);
 	HOOK_SAFE(screen2DEffectTarget, screen2DEffect);
+	HOOK_SAFE(isDepthTarget, isDepthOfField);
 
 
 #undef HOOK_SAFE

@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include <filesystem>
+#include <array>
 
 #include "../../../SDK/math/Vector.hpp"
 #include "../../../SDK/Color.hpp"
@@ -15,6 +16,7 @@ class CEffectData;
 class FogController_t;
 class EnvTonemapController_t;
 class ClientClass;
+class CViewSetup;
 
 struct hitStructLocal_t
 {
@@ -55,6 +57,8 @@ public:
 	// manual helper for map change
 	constexpr void setWeatherState(bool state) { m_weather.m_created = state; }
 	void implMenu() const;
+	bool doImageSpaceMotionBlur(CViewSetup* view);
+	void renderMotionBlur();
 private:
 	void drawProjectiles(Entity_t* ent, const int id);
 	void drawBomb(Entity_t* ent);
@@ -98,6 +102,23 @@ private:
 		ClientClass* m_preciptation = nullptr;
 		bool m_created = false;
 	} m_weather;
+
+	struct MotionBlurHistory_t
+	{
+		MotionBlurHistory_t() :
+			m_lastTimeUpdate{ 0.0f }, m_previousPitch{ 0.0f }, m_previousYaw{ 0.0f },
+			m_previousPositon{ Vector{} }, m_noRotationalMotionBlurUntil{ 0.0f }
+		{}
+
+		float m_lastTimeUpdate;
+		float m_previousPitch;
+		float m_previousYaw;
+		Vector m_previousPositon;
+		float m_noRotationalMotionBlurUntil;
+	} m_motionHistory;
+
+	std::array<float, 4> m_motionBlurValues = { 0.0f, 0.0f, 0.0f, 0.0f };
+	std::array<float, 4> m_motionBlurViewportValues = { 0.0f, 0.0f, 0.0f, 0.0f };
 };
 
 inline World world;

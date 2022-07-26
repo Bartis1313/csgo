@@ -308,6 +308,9 @@ static void renderMisc()
 				ImGui::Checkbox(XOR("Third Person"), &config.getRef<bool>(vars.bThirdp));
 				ImGui::SameLine();
 				ImGui::Hotkey(XOR(""), &config.getRef<Key>(vars.kThirdp));
+				ImGui::SliderFloat(XOR("Distance##thirdp"), &config.getRef<float>(vars.fThirdpDistance), 1.0f, 500.0f);
+				ImGui::SliderFloat(XOR("Extra X##thirdp"), &config.getRef<float>(vars.fThirdpX), -180.0f, 180.0f);
+				ImGui::SliderFloat(XOR("Extra Y##thirdp"), &config.getRef<float>(vars.fThirdpY), -180.0f, 180.0f);
 				ImGui::Combo(XOR("Crosshair type"), &config.getRef<int>(vars.iCrosshair), selections::crossHairNames);
 				ImGui::Checkbox(XOR("Enemy aiming warn"), &config.getRef<bool>(vars.bAimingWarn));
 			}
@@ -486,6 +489,13 @@ static void renderMisc()
 				world.setCheckStateSlider(changed1 || changed2);
 				ImGui::Checkbox(XOR("Weather"), &config.getRef<bool>(vars.bWeather));
 				world.implMenu();
+				ImGui::Checkbox(XOR("Motion blur"), &config.getRef<bool>(vars.bMotionBlur));
+				ImGui::Checkbox(XOR("Forward##Motion Blur"), &config.getRef<bool>(vars.bMotionBlurForward));
+				ImGui::SliderFloat(XOR("Failling intensity##Motion Blur"), &config.getRef<float>(vars.fMotionBlurFallingIntensity), 0.0f, 5.0f);
+				ImGui::SliderFloat(XOR("Falling max##Motion Blur"), &config.getRef<float>(vars.fMotionBlurFallingMax), 0.0f, 30.0f);
+				//ImGui::SliderFloat(XOR("falling min##Motion Blur"), &config.getRef<float>(vars.fMotionBlurFallingMin), 0.0f, 30.0f);
+				ImGui::SliderFloat(XOR("Strength##Motion Blur"), &config.getRef<float>(vars.fMotionBlurGlobalStrength), 0.0f, 20.0f);
+				ImGui::SliderFloat(XOR("Roll intensity##Motion Blur"), &config.getRef<float>(vars.fMotionBlurRollIntensity), 0.0f, 1.0f);
 			}
 			ImGui::EndGroupPanel();
 

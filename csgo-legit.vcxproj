@@ -166,6 +166,7 @@
     <ClCompile Include="cheats\hooks\buildTransformations.cpp" />
     <ClCompile Include="cheats\hooks\drawIndexPrimitive.cpp" />
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
+    <ClCompile Include="cheats\hooks\isDepth.cpp" />
     <ClCompile Include="cheats\hooks\isHltv.cpp" />
     <ClCompile Include="cheats\hooks\renderView.cpp" />
     <ClCompile Include="cheats\hooks\screen2deffect.cpp" />
