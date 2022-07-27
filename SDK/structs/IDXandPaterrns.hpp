@@ -190,7 +190,7 @@ ParticleEffect
 // anything like Failed to convert image data to RGBA might help to path it
 #define UNK_FILESYS					XOR("C7 43 ? ? ? ? ? 83 7C 24 ? ? 7C 25 8B 54 24 48")
 // #STR: "Error! CMapOverview::SetMap: couldn't load file %s.\n", "file://{images_overviews}/%s_radar_spectate.dds", "pos_x", "pos_y", "scale", "resource/overviews/%s.txt"
-#define UNK_OVBERVIEWMAP			XOR("55 8B EC 81 EC ? ? ? ? 53 8B 5D 08 8B D3")
+#define UNK_OVERVIEWMAP				XOR("55 8B EC 81 EC ? ? ? ? 53 8B 5D 08 8B D3")
 #define VIEW_RENDER					XOR("8B 0D ? ? ? ? FF 75 0C 8B 45 08")
 // #STR: "Client_Animation", "C_BaseAnimating::SetupBones", "*** ERROR: Bone access not allowed (entity %i:%s)\n", "%d:%s", "SetupBones: invalid bone array size (%d - needs %d)\n", "Client_Animation_Threaded"
 #define ACCUMULATE_LAYERS			XOR("84 C0 75 0D F6 87")

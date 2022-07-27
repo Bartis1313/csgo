@@ -21,109 +21,51 @@
 
 void hooks::init()
 {
-#pragma region game
-	const auto paintTraverseTarget = vfunc::getVFunc(interfaces::panel, paintTraverse::index);
-	//const auto creteMoveTarget = vfunc::getVFunc(interfaces::clientMode, createMove::index);
-	const auto drawModelTarget = vfunc::getVFunc(interfaces::modelRender, drawModel::index);
-	const auto overrideViewTarget = vfunc::getVFunc(interfaces::clientMode, overrideView::index);
-	const auto doPostScreenEffectsTarget = vfunc::getVFunc(interfaces::clientMode, doPostScreenEffects::index);
-	const auto frameStageNotifyTarget = vfunc::getVFunc(interfaces::client, frameStageNotify::index);
-	const auto lockCursorTarget = vfunc::getVFunc(interfaces::surface, lockCursor::index);
-	const auto createMoveProxyTarget = vfunc::getVFunc(interfaces::client, proxyCreateMove::index);
-	const auto sv_cheatsAddr = interfaces::cvar->findVar(XOR("sv_cheats"));
-	const auto sv_cheatsTarget = vfunc::getVFunc(sv_cheatsAddr, sv_cheats::index);
-	const auto unkFileSystemtarget = vfunc::getVFunc(interfaces::fileSystem, unknownFileSystem::index);
-	const auto getUnverifiedFileHashesTarget = vfunc::getVFunc(interfaces::fileSystem, getUnverifiedFileHashes::index);
-	const auto unkFileCheckTarget = vfunc::getVFunc(interfaces::fileSystem, unkFileCheck::index);
-	const auto renderViewTarget = vfunc::getVFunc(interfaces::viewRender, renderView::index);
-	const auto isHltvTarget = vfunc::getVFunc(interfaces::engine, isHltv::index);
-	const auto screen2DEffectTarget = vfunc::getVFunc(interfaces::viewRender, screen2DEffect::index);
-#pragma endregion
+#define HOOK_SAFE_VFUNC(thisptr, hookStructName) \
+hookHelper::tryHook(vfunc::getVFunc(thisptr, hookStructName::index), &hookStructName::hooked, \
+	hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName))
 
-	const auto addrClient = utilities::patternScan(CLIENT_DLL, NEW_CHECK);
-	const auto clientValidAddrTarget = reinterpret_cast<void*>(addrClient);
-
-	const auto addrEngine = utilities::patternScan(ENGINE_DLL, NEW_CHECK);
-	const auto engineValidAddrTarget = reinterpret_cast<void*>(addrEngine);
-
-	const auto addrStudio = utilities::patternScan(STUDIORENDER_DLL, NEW_CHECK);
-	const auto studioValidAddrTarget = reinterpret_cast<void*>(addrStudio);
-
-	const auto addrMaterial = utilities::patternScan(MATERIAL_DLL, NEW_CHECK);
-	const auto matertialValidAddrTarget = reinterpret_cast<void*>(addrMaterial);
-
-	const auto addrIsusingDebugProps = utilities::patternScan(ENGINE_DLL, IS_USING_PROP_DEBUG);
-	const auto isusingDebugPropsTarget = reinterpret_cast<void*>(addrIsusingDebugProps);
-
-	const auto addrgetColorModulation = utilities::patternScan(MATERIAL_DLL, GET_COLOR_MODULATION);
-	const auto getColorModulationTarget = reinterpret_cast<void*>(addrgetColorModulation);
-
-	const auto addrextraBonesProccessing = utilities::patternScan(CLIENT_DLL, EXTRA_BONES_PROCCESSING);
-	const auto extraBonesProccessingTarget = reinterpret_cast<void*>(addrextraBonesProccessing);
-
-	const auto buildTr = utilities::patternScan(CLIENT_DLL, BUILD_TRANSFORMATIONS);
-	const auto buildTrTarget = reinterpret_cast<void*>(buildTr);
-
-	const auto particlesSimulation = utilities::patternScan(CLIENT_DLL, PARTICLE_SIMULATE);
-	const auto particlesSimulationTarget = reinterpret_cast<void*>(particlesSimulation);
-
-	const auto sendDatagramAddr = utilities::patternScan(ENGINE_DLL, SEND_DATAGRAM);
-	const auto sendDatagramTarget = reinterpret_cast<void*>(sendDatagramAddr);
-
-	const auto unkownOverviewMapAddr = utilities::patternScan(CLIENT_DLL, UNK_OVBERVIEWMAP);
-	const auto unkownOverviewMapTarget = reinterpret_cast<void*>(unkownOverviewMapAddr);
-
-	const auto isDepthAddr = utilities::patternScan(CLIENT_DLL, IS_DEPTH);
-	const auto isDepthTarget = reinterpret_cast<void*>(isDepthAddr);
-
-#pragma region DX9
-	const auto resetTarget = vfunc::getVFunc(interfaces::dx9Device, reset::index);
-	const auto presentTagret = vfunc::getVFunc(interfaces::dx9Device, present::index);
-	const auto drawIndexP = vfunc::getVFunc(interfaces::dx9Device, drawIndexedPrimitive::index);
-	//const auto endTarget = vfunc::getVFunc(interfaces::dx9Device, endScene::index);
-#pragma endregion
+#define HOOK_SAFE_SIG(mod, mask, hookStructName) \
+hookHelper::tryHook(reinterpret_cast<void*>(utilities::patternScan(mod, mask)), &hookStructName::hooked, \
+	hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName))
 
 	hookHelper::initMinhook();
 
-#define HOOK_SAFE(target, hookStructName) \
-hookHelper::tryHook(target, &hookStructName::hooked, hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName));
+	HOOK_SAFE_SIG(CLIENT_DLL, NEW_CHECK, clientValidAddr);
+	HOOK_SAFE_SIG(ENGINE_DLL, NEW_CHECK, engineValidAddr);
+	HOOK_SAFE_SIG(STUDIORENDER_DLL, NEW_CHECK, studioRenderValidAddr);
+	HOOK_SAFE_SIG(MATERIAL_DLL, NEW_CHECK, materialSystemValidAddr);
+	HOOK_SAFE_SIG(ENGINE_DLL, IS_USING_PROP_DEBUG, isUsingStaticPropDebugModes);
+	HOOK_SAFE_SIG(MATERIAL_DLL, GET_COLOR_MODULATION, getColorModulation);
+	HOOK_SAFE_SIG(CLIENT_DLL, EXTRA_BONES_PROCCESSING, doExtraBonesProcessing);
+	HOOK_SAFE_SIG(CLIENT_DLL, BUILD_TRANSFORMATIONS, buildTransformations);
+	HOOK_SAFE_SIG(CLIENT_DLL, PARTICLE_SIMULATE, particlesSimulations);
+	HOOK_SAFE_SIG(ENGINE_DLL, SEND_DATAGRAM, sendDatagram);
+	HOOK_SAFE_SIG(CLIENT_DLL, UNK_OVERVIEWMAP, unknownOverViewFun);
+	HOOK_SAFE_SIG(CLIENT_DLL, IS_DEPTH, isDepthOfField);
 
-	//HOOK_SAFE(creteMoveTarget, createMove);
-	HOOK_SAFE(createMoveProxyTarget, proxyCreateMove);
-	HOOK_SAFE(paintTraverseTarget, paintTraverse);
-	HOOK_SAFE(drawModelTarget, drawModel);
-	HOOK_SAFE(overrideViewTarget, overrideView);
-	HOOK_SAFE(doPostScreenEffectsTarget, doPostScreenEffects);
-	HOOK_SAFE(frameStageNotifyTarget, frameStageNotify);
-	HOOK_SAFE(clientValidAddrTarget, clientValidAddr);
-	HOOK_SAFE(engineValidAddrTarget, engineValidAddr);
-	HOOK_SAFE(studioValidAddrTarget, studioRenderValidAddr);
-	HOOK_SAFE(matertialValidAddrTarget, materialSystemValidAddr);
-	HOOK_SAFE(isusingDebugPropsTarget, isUsingStaticPropDebugModes);
-	HOOK_SAFE(getColorModulationTarget, getColorModulation);
-	HOOK_SAFE(resetTarget, reset);
-	HOOK_SAFE(presentTagret, present);
-	HOOK_SAFE(drawIndexP, drawIndexedPrimitive);
-	HOOK_SAFE(lockCursorTarget, lockCursor);
-	HOOK_SAFE(extraBonesProccessingTarget, doExtraBonesProcessing);
-	HOOK_SAFE(buildTrTarget, buildTransformations);
-	HOOK_SAFE(sv_cheatsTarget, sv_cheats);
-	HOOK_SAFE(particlesSimulationTarget, particlesSimulations);
-	HOOK_SAFE(sendDatagramTarget, sendDatagram);
-	HOOK_SAFE(unkownOverviewMapTarget, unknownOverViewFun);
-	HOOK_SAFE(unkFileSystemtarget, unknownFileSystem);
-	HOOK_SAFE(getUnverifiedFileHashesTarget, getUnverifiedFileHashes);
-	HOOK_SAFE(unkFileCheckTarget, unkFileCheck);
-	HOOK_SAFE(renderViewTarget, renderView);
-	HOOK_SAFE(isHltvTarget, isHltv);
-	HOOK_SAFE(screen2DEffectTarget, screen2DEffect);
-	HOOK_SAFE(isDepthTarget, isDepthOfField);
+	HOOK_SAFE_VFUNC(interfaces::dx9Device, reset);
+	HOOK_SAFE_VFUNC(interfaces::dx9Device, present);
+	HOOK_SAFE_VFUNC(interfaces::dx9Device, drawIndexedPrimitive);
+	HOOK_SAFE_VFUNC(interfaces::client, proxyCreateMove);
+	HOOK_SAFE_VFUNC(interfaces::client, frameStageNotify);
+	HOOK_SAFE_VFUNC(interfaces::panel, paintTraverse);
+	HOOK_SAFE_VFUNC(interfaces::modelRender, drawModel);
+	HOOK_SAFE_VFUNC(interfaces::clientMode, overrideView);
+	HOOK_SAFE_VFUNC(interfaces::clientMode, doPostScreenEffects);
+	HOOK_SAFE_VFUNC(interfaces::surface, lockCursor);
+	HOOK_SAFE_VFUNC(interfaces::cvar->findVar(XOR("sv_cheats")), sv_cheats);
+	HOOK_SAFE_VFUNC(interfaces::fileSystem, unknownFileSystem);
+	HOOK_SAFE_VFUNC(interfaces::fileSystem, unkFileCheck);
+	HOOK_SAFE_VFUNC(interfaces::fileSystem, getUnverifiedFileHashes);
+	HOOK_SAFE_VFUNC(interfaces::viewRender, renderView);
+	HOOK_SAFE_VFUNC(interfaces::engine, isHltv);
+	HOOK_SAFE_VFUNC(interfaces::viewRender, screen2DEffect);
 
-
-#undef HOOK_SAFE
+#undef HOOK_SAFE_VFUNC
+#undef HOOK_SAFE_SIG
 
 	events.init();
-
 	hookHelper::checkAllHooks();
 
 	console.log(TypeLogs::LOG_INFO, XOR("hooks success"));
