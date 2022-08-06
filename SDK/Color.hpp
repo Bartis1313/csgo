@@ -61,6 +61,8 @@ public:
 	//https://gist.github.com/mjackson/5311256
 	_NODISCARD static Color hslToRGB(float hue, float saturation, float lightness);
 	_NODISCARD static Color rainbowColor(const float gameTime, const float multiply = 0.5f); // http://basecase.org/env/on-rainbows
+	// health 0-100
+	_NODISCARD static Color healthBased(uint8_t health, uint8_t alpha = 255);
 private:
 	std::array<float, 4> m_color;
 };

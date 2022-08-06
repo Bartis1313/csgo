@@ -7,7 +7,7 @@
 
 #include "../../config/vars.hpp"
 #include "../game.hpp"
-#include "../features/backtrack/backtrack.hpp"
+#include "../features/sources/fakelatency/fakelatency.hpp"
 
 int __fastcall hooks::sendDatagram::hooked(INetChannel* netChannel, void* edx, void* datagram)
 {
@@ -20,7 +20,7 @@ int __fastcall hooks::sendDatagram::hooked(INetChannel* netChannel, void* edx, v
 	const static auto sv_maxunlag = interfaces::cvar->findVar(XOR("sv_maxunlag"));
 
 	float maxLatency = std::max(0.0f, std::clamp(config.get<float>(vars.fFakeLatency) / 1000.f, 0.f, sv_maxunlag->getFloat()) - netChannel->getLatency(FLOW_OUTGOING));
-	backtrack.addLatency(netChannel, maxLatency);
+	g_FakeLatency.addLatency(netChannel, maxLatency);
 
 	const auto ret = original(netChannel, datagram);
 

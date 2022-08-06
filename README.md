@@ -1,5 +1,5 @@
 # Csgo
-Very short and commented source aimed for legit gameplay
+Very short and commented source aimed for visual aspects of the game.
 
 ![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/179428634-adf44410-4002-4e5d-9ac5-b794dcb1c35f.png)
 
@@ -116,6 +116,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.5.0 - World screen effects added: fog, tone control, draw screen effects.
 * 1.5.1 - Add weather effect.
 * 1.5.2 - Added 1:1 motion blur from source leak. Controlling thirdperson should be quite better as now it traces the distance to any objects, just like game originally does. Added extra options to it as suggested in: [#41](https://github.com/Bartis1313/csgo/issues/41). Added comments for sigs, I can't shortly explain how to use RTTI info in 3 lines, so this is just very basic string ref info.
+* 1.5.3 - HUGE recode, cleanup in way that features are inited and run. Also general cleanup/fixes in features. Now every change will be much easier to make, without calling some run() method manually, it all gets called by static object vec, code itself explains it very well. Each class has one task to do, or very limited to more. 
 </details>
 
 # Dependencies

@@ -137,32 +137,72 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="cheats\features\aimbot\aimbot.cpp">
+    <ClCompile Include="cheats\features\base.cpp" />
+    <ClCompile Include="cheats\features\classes\CM.cpp" />
+    <ClCompile Include="cheats\features\classes\DPSE.cpp" />
+    <ClCompile Include="cheats\features\classes\DM.cpp" />
+    <ClCompile Include="cheats\features\classes\frameStage.cpp" />
+    <ClCompile Include="cheats\features\classes\OV.cpp" />
+    <ClCompile Include="cheats\features\classes\overViewMap.cpp" />
+    <ClCompile Include="cheats\features\classes\renderableToPresent.cpp" />
+    <ClCompile Include="cheats\features\classes\renderableToSurface.cpp" />
+    <ClCompile Include="cheats\features\classes\RV.cpp" />
+    <ClCompile Include="cheats\features\classes\screen2dEffects.cpp" />
+    <ClCompile Include="cheats\features\sources\aimbot\aimbot.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\aimbot\triggerbot.cpp">
+    <ClCompile Include="cheats\features\sources\aimbot\aimbotDraw.cpp" />
+    <ClCompile Include="cheats\features\sources\fakelatency\fakelatency.cpp" />
+    <ClCompile Include="cheats\features\sources\misc\flashlight\flashlight.cpp" />
+    <ClCompile Include="cheats\features\sources\misc\thirdperson\thirdperson.cpp" />
+    <ClCompile Include="cheats\features\sources\triggerbot\triggerbot.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\backtrack\backtrack.cpp">
+    <ClCompile Include="cheats\features\sources\backtrack\backtrack.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\misc\discord.cpp" />
-    <ClCompile Include="cheats\features\misc\freeCam.cpp" />
-    <ClCompile Include="cheats\features\misc\freeLook.cpp" />
-    <ClCompile Include="cheats\features\misc\movement.cpp">
+    <ClCompile Include="cheats\features\sources\discord\discord.cpp" />
+    <ClCompile Include="cheats\features\sources\misc\cameras\freeCam.cpp" />
+    <ClCompile Include="cheats\features\sources\misc\cameras\freeLook.cpp" />
+    <ClCompile Include="cheats\features\sources\misc\movement\movement.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\misc\callbacks.cpp" />
-    <ClCompile Include="cheats\features\misc\events.cpp" />
-    <ClCompile Include="cheats\features\misc\logger.cpp" />
-    <ClCompile Include="cheats\features\misc\misc.cpp">
+    <ClCompile Include="cheats\features\sources\callbacks\callbacks.cpp" />
+    <ClCompile Include="cheats\features\sources\events\events.cpp" />
+    <ClCompile Include="cheats\features\sources\logger\logger.cpp" />
+    <ClCompile Include="cheats\features\sources\prediction\prediction.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\prediction\nadepred.cpp" />
-    <ClCompile Include="cheats\features\prediction\prediction.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="cheats\features\visuals\mirrorCam.cpp" />
+    <ClCompile Include="cheats\features\sources\RCS\RCS.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\hitmarker\hitmark.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\mirrorcam\mirrorCam.cpp" />
+    <ClCompile Include="cheats\features\sources\particle\particle.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\misc\crosshair.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\misc\drawinfo.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\misc\hat.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\misc\motionblur.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\misc\noscope.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\misc\screenEffects.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\misc\trails.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\player\boxes.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\player\enemyWarn.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\player\sounds.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\plots\plots.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\tracer\tracer.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\bomb.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\fog.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\impacts.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\modulateColors.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\molotov.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\nadepred.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\nadewarn.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\projectiles.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\removeSky.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\skybox.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\smoke.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\tone.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\weather.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\zeus.cpp" />
     <ClCompile Include="cheats\hooks\buildTransformations.cpp" />
     <ClCompile Include="cheats\hooks\drawIndexPrimitive.cpp" />
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
@@ -172,7 +212,6 @@
     <ClCompile Include="cheats\hooks\screen2deffect.cpp" />
     <ClCompile Include="cheats\hooks\sendDatagram.cpp" />
     <ClCompile Include="cheats\hooks\particlesSimulation.cpp" />
-    <ClCompile Include="cheats\hooks\setupbones.cpp" />
     <ClCompile Include="cheats\hooks\unknownFIleSys.cpp" />
     <ClCompile Include="cheats\hooks\unknownOverviewMap.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
@@ -186,17 +225,17 @@
     <ClCompile Include="dependencies\discord\src\serialization.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
-    <ClCompile Include="cheats\features\visuals\chams.cpp">
+    <ClCompile Include="cheats\features\sources\visuals\chams\chams.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\visuals\player.cpp">
+    <ClCompile Include="cheats\features\sources\visuals\player\player.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\visuals\glow.cpp">
+    <ClCompile Include="cheats\features\sources\visuals\glow\glow.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\features\visuals\radar.cpp" />
-    <ClCompile Include="cheats\features\visuals\world.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\radar\radar.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\world.cpp" />
     <ClCompile Include="cheats\game.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -320,20 +359,63 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cheats\features\aimbot\aimbot.hpp" />
-    <ClInclude Include="cheats\features\aimbot\triggerbot.hpp" />
-    <ClInclude Include="cheats\features\backtrack\backtrack.hpp" />
-    <ClInclude Include="cheats\features\misc\discord.hpp" />
-    <ClInclude Include="cheats\features\misc\freeCam.hpp" />
-    <ClInclude Include="cheats\features\misc\freeLook.hpp" />
-    <ClInclude Include="cheats\features\misc\movement.hpp" />
-    <ClInclude Include="cheats\features\misc\callbacks.hpp" />
-    <ClInclude Include="cheats\features\misc\events.hpp" />
-    <ClInclude Include="cheats\features\misc\logger.hpp" />
-    <ClInclude Include="cheats\features\misc\misc.hpp" />
-    <ClInclude Include="cheats\features\prediction\nadepred.hpp" />
-    <ClInclude Include="cheats\features\prediction\prediction.hpp" />
-    <ClInclude Include="cheats\features\visuals\mirrorCam.hpp" />
+    <ClInclude Include="cheats\features\classes\createMove.hpp" />
+    <ClInclude Include="cheats\features\classes\doPostScreen.hpp" />
+    <ClInclude Include="cheats\features\classes\drawModel.hpp" />
+    <ClInclude Include="cheats\features\classes\frameStage.hpp" />
+    <ClInclude Include="cheats\features\classes\onlyInit.hpp" />
+    <ClInclude Include="cheats\features\classes\overrideView.hpp" />
+    <ClInclude Include="cheats\features\classes\overViewMap.hpp" />
+    <ClInclude Include="cheats\features\classes\renderableToPresent.hpp" />
+    <ClInclude Include="cheats\features\classes\renderableToSurface.hpp" />
+    <ClInclude Include="cheats\features\classes\renderView.hpp" />
+    <ClInclude Include="cheats\features\classes\screen2dEffects.hpp" />
+    <ClInclude Include="cheats\features\sources\aimbot\aimbot.hpp" />
+    <ClInclude Include="cheats\features\sources\aimbot\aimbotDraw.hpp" />
+    <ClInclude Include="cheats\features\sources\fakelatency\fakelatency.hpp" />
+    <ClInclude Include="cheats\features\sources\misc\flashlight\flashlight.hpp" />
+    <ClInclude Include="cheats\features\sources\misc\thirdperson\thirdperson.hpp" />
+    <ClInclude Include="cheats\features\sources\triggerbot\triggerbot.hpp" />
+    <ClInclude Include="cheats\features\sources\backtrack\backtrack.hpp" />
+    <ClInclude Include="cheats\features\base.hpp" />
+    <ClInclude Include="cheats\features\sources\discord\discord.hpp" />
+    <ClInclude Include="cheats\features\sources\misc\cameras\freeCam.hpp" />
+    <ClInclude Include="cheats\features\sources\misc\cameras\freeLook.hpp" />
+    <ClInclude Include="cheats\features\sources\misc\movement\movement.hpp" />
+    <ClInclude Include="cheats\features\sources\callbacks\callbacks.hpp" />
+    <ClInclude Include="cheats\features\sources\events\events.hpp" />
+    <ClInclude Include="cheats\features\sources\logger\logger.hpp" />
+    <ClInclude Include="cheats\features\sources\prediction\prediction.hpp" />
+    <ClInclude Include="cheats\features\sources\RCS\RCS.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\hitmarker\hitmark.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\mirrorcam\mirrorCam.hpp" />
+    <ClInclude Include="cheats\features\sources\particle\particle.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\misc\crosshair.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\misc\drawinfo.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\misc\hat.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\misc\motionblur.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\misc\noscope.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\misc\screenEffects.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\misc\trails.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\player\boxes.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\player\enemyWarn.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\player\sounds.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\plots\plots.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\tracer\tracer.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\bomb.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\fog.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\impacts.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\modulateColors.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\molotov.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\nadepred.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\nadewarn.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\projectiles.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\removeSky.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\skybox.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\smoke.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\tone.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\weather.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\zeus.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />
@@ -406,11 +488,11 @@
     <ClInclude Include="SDK\KeyValuesSys.hpp" />
     <ClInclude Include="SDK\MapStruct.hpp" />
     <ClInclude Include="SEHcatch.hpp" />
-    <ClInclude Include="cheats\features\visuals\chams.hpp" />
-    <ClInclude Include="cheats\features\visuals\player.hpp" />
-    <ClInclude Include="cheats\features\visuals\glow.hpp" />
-    <ClInclude Include="cheats\features\visuals\radar.hpp" />
-    <ClInclude Include="cheats\features\visuals\world.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\chams\chams.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\player\player.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\glow\glow.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\radar\radar.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\world.hpp" />
     <ClInclude Include="cheats\game.hpp" />
     <ClInclude Include="cheats\globals.hpp" />
     <ClInclude Include="cheats\hooks\hooks.hpp" />

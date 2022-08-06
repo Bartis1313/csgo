@@ -345,3 +345,10 @@ bool utilities::isChatOpen()
 	const auto chat = reinterpret_cast<CHudChat*>(findHudElement(XOR("CCSGO_HudChat")));
 	return chat->m_isOpen;
 }
+
+float utilities::getScaledFont(const Vector& source, const Vector& destination, const float division, const float min, const float max)
+{
+	float dist = source.distTo(destination);
+	float fontSize = std::clamp(division / (dist / division), min, max);
+	return fontSize;
+}

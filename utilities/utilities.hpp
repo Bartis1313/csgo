@@ -10,6 +10,7 @@
 class Entity_t;
 struct Box;
 struct Box3D;
+struct Vector;
 #define SECURE
 
 #if defined(_DEBUG) // debug mode
@@ -69,6 +70,7 @@ namespace utilities
     _NODISCARD uintptr_t* findHudElement(const std::string_view name);
     // local
     _NODISCARD bool isChatOpen();
+    _NODISCARD float getScaledFont(const Vector& source, const Vector& destination, const float division = 80.0f, const float min = 12.0f, const float max = 30.0f);
 }
 
 #include <random>

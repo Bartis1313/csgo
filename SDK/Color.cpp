@@ -102,3 +102,10 @@ Color Color::rainbowColor(const float gameTime, const float multiply)
 		std::cos(gameTime * multiply - 2.0f * std::numbers::pi_v<float> / 3.0f) * 0.5f + 0.5f,
 		std::cos(gameTime * multiply - 4.0f * std::numbers::pi_v<float> / 3.0f) * 0.5f + 0.5f);
 }
+
+Color Color::healthBased(uint8_t health, uint8_t alpha)
+{
+	int g = health * 2.55f;
+	int r = 255 - g;
+	return Color(r, g, 0, alpha);
+}

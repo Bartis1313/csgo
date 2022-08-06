@@ -8,11 +8,7 @@
 #include "../menu/GUI-ImGui/menu.hpp"
 #include "../menu/GUI-ImGui/background.hpp"
 
-#include "../features/visuals/radar.hpp"
-#include "../features/misc/misc.hpp"
-#include "../features/visuals/world.hpp"
-#include "../features/visuals/mirrorCam.hpp"
-#include "../features/misc/freeCam.hpp"
+#include "../features/classes/renderableToPresent.hpp"
 
 #include "../../utilities/renderer/renderer.hpp"
 #include "../../utilities/utilities.hpp"
@@ -72,12 +68,7 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		//imRender.drawImage(imdraw, res, 300, 300, 200, 200);
 		imRender.renderPresent(imdraw);
 		background.draw(imdraw);
-		radar.run();
-		misc.drawFpsPlot();
-		misc.drawVelocityPlot();
-		world.drawBombOverlay();
-		mCam.draw();
-		freeCam.drawInfo();
+		RenderablePresentType::runAll();
 	}
 
 	// END DRAW

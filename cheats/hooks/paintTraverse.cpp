@@ -4,18 +4,13 @@
 #include "../../SDK/IPanel.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 
-#include "../features/visuals/player.hpp"
-#include "../features/aimbot/aimbot.hpp"
-#include "../features/visuals/world.hpp"
-#include "../features/visuals/radar.hpp"
-#include "../features/misc/misc.hpp"
-#include "../features/prediction/nadepred.hpp"
+#include "../features/classes/renderableToSurface.hpp"
+
 
 #include "../globals.hpp"
 #include "../../config/vars.hpp"
 #include "../../utilities/renderer/renderer.hpp"
 #include "../menu/x88Menu/x88menu.hpp"
-#include "../features/misc/logger.hpp"
 #include "../../utilities/res.hpp"
 #include "../../resource.h"
 
@@ -75,22 +70,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	{
 		imRender.addToRender([]()
 			{
-				visuals.run();
-				world.drawMisc();
-				misc.drawLocalInfo();
-				//misc.drawFpsPlot();
-				//misc.drawVelocityPlot();
-				misc.drawHitmarker();
-				world.drawZeusRange();
-				misc.drawNoScope();
-				misc.drawCrosshair();
-				aimbot.draw();
-				world.drawMovementTrail();
-				nadePred.draw();
-				misc.drawHat();
-				world.clientSideImpacts();
-				world.localImpacts();
-				logger.draw();
+				RenderableSurfaceType::runAll();
 			});
 
 		x88menu.draw();

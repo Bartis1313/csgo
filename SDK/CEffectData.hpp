@@ -10,6 +10,7 @@ public:
 	Vector m_normal = {};
 	Vector m_angles = {};
 	int m_flags = 0;
+	int m_entityIdx = 0;
 	float m_scale = 1.0f;
 	float m_magnitude = 0.0f;
 	float m_radius = 0.0f;

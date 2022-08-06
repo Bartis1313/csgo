@@ -5,6 +5,7 @@
 #include <vector>
 #include <locale>
 #include <format>
+#include <functional>
 
 #include "../../../dependencies/ImGui/imgui.h"
 
@@ -30,6 +31,7 @@ namespace ImGui
 	bool ListBox(const char* label, int* item, std::span<const std::string> arr, const int heightItem = -1);
 	// need return anything? maybe, but useless at all for my use
 	void MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options, const float width = 140.0f);
+	bool PopupButton(const char* label, const std::function<void()>& fun);
 
 	// from demo, slight edit, usage same as normal console.log
 	struct ExampleAppLog

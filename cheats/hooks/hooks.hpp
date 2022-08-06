@@ -34,6 +34,7 @@ struct CStudioHdr;
 class CParticleCollection;
 class INetChannel;
 struct MapStruct;
+class IMaterialSystem;
 
 #define FAST_ARGS void* thisptr, void* edx
 

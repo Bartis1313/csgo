@@ -211,3 +211,18 @@ ParticleEffect
 // wrapper to allow in other hooks
 // #STR: "_rt_FullFrameFB", "RenderTargets", "_rt_FullFrameFB%d"
 #define DRAW_SPACE_RECTANGLE_CALL	XOR("55 8B EC 83 E4 ? 83 EC ? 53 56 57 8D 44 24 ? 89 4C")
+// #STR: "StartParticleEffect:  Failed to find precached particle sy
+#define START_PARTICLE_EFFECT		XOR("55 8B EC 83 EC 34 80 3D ? ? ? ? ? 53 56 57 8B DA 8B F1 0F 85")
+// #STR: "state", "ParticleSystem_Destroy"
+#define PARTICLE_SYSTEM_DESTROY		XOR("56 8B F1 F6 86 ? ? ? ? ? C7 06")
+// #STR: "Attempted to create unknown particle system type \"%s\"!\n, "error", "explosion_smokegrenade"
+// see what under this str gets called
+#define PARTICLE_CALL				XOR("55 8B EC 83 EC ? 53 56 8B F2 89 75")
+// found by following leak's code again use unknown particle as str ref
+#define IS_EFFECT_CACHED			XOR("55 8B EC 83 EC ? 53 56 57 8B 7D ? 8D 59 ? 85 FF")
+// #STR: "state", "ParticleSystem_SetControlPointPosition"
+#define SET_PARTICLE_POINT			XOR("55 8B EC 53 8B 5D ? 56 8B F1 F6 86")
+// explosion_smokegrenade, check inside: unknown particle
+#define PARTICLE_SYSTEM				XOR("55 8B EC 51 56 8B 35 ? ? ? ? 8B CE")
+// followed by leak's code
+#define FIND_STRING_INDEX			XOR("55 8B EC 83 EC ? 53 8B 5D ? 57 8B F9 89 7D ? 85 DB")

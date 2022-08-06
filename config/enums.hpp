@@ -79,4 +79,10 @@ enum class MovementStraferMode : size_t
 	DIRECTIONAL
 };
 
+enum class AimbotMethod : size_t
+{
+	CROSSHAIR,
+	DYNAMIC
+};
+
 #pragma endregion

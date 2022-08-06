@@ -11,10 +11,6 @@
 #include "../../dependencies/ImGui/imgui_impl_win32.h"
 #include "../../cheats/menu/GUI-ImGui/menu.hpp"
 
-#include "../features/misc/events.hpp"
-#include "../features/visuals/player.hpp"
-#include "../features/visuals/world.hpp"
-
 #include "../../config/vars.hpp"
 #include "../../utilities/renderer/renderer.hpp"
 #include "../../utilities/console/console.hpp"
@@ -59,13 +55,12 @@ hookHelper::tryHook(reinterpret_cast<void*>(utilities::patternScan(mod, mask)), 
 	HOOK_SAFE_VFUNC(interfaces::fileSystem, unkFileCheck);
 	HOOK_SAFE_VFUNC(interfaces::fileSystem, getUnverifiedFileHashes);
 	HOOK_SAFE_VFUNC(interfaces::viewRender, renderView);
-	HOOK_SAFE_VFUNC(interfaces::engine, isHltv);
 	HOOK_SAFE_VFUNC(interfaces::viewRender, screen2DEffect);
+	HOOK_SAFE_VFUNC(interfaces::engine, isHltv);
 
 #undef HOOK_SAFE_VFUNC
 #undef HOOK_SAFE_SIG
 
-	events.init();
 	hookHelper::checkAllHooks();
 
 	console.log(TypeLogs::LOG_INFO, XOR("hooks success"));

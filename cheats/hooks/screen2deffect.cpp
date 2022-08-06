@@ -1,10 +1,10 @@
 #include "hooks.hpp"
 
-#include "../features/visuals/world.hpp"
+#include "../features/classes/screen2dEffects.hpp"
 
 void __stdcall hooks::screen2DEffect::hooked(CViewSetup* view)
 {
-	world.drawEffects();
+	Screen2DEffectsType::runAll();
 
 	original(view);
 }

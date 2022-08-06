@@ -1,5 +1,4 @@
 #include "cheats/hooks/hooks.hpp"
-#include "cheats/features/misc/callbacks.hpp"
 #include "cheats/hooks/helpers/helper.hpp"
 #include "utilities/console/console.hpp"
 #include "SDK/interfaces/interfaces.hpp"
@@ -7,17 +6,15 @@
 #include "utilities/netvars/netvars.hpp"
 #include "config/vars.hpp"
 #include "cheats/globals.hpp"
-#include "cheats/features/misc/events.hpp"
+#include "cheats/features/sources/events/events.hpp"
 #include "utilities/simpleTimer.hpp"
 #include "cheats/menu/GUI-ImGui/menu.hpp"
 #include "utilities/console/console.hpp"
 #include "SEHcatch.hpp"
 #include "cheats/menu/x88Menu/x88menu.hpp"
-#include "cheats/features/misc/discord.hpp"
 #include "utilities/res.hpp"
-#include "cheats/features/visuals/radar.hpp"
-#include "cheats/features/visuals/world.hpp"
-#include "cheats/features/visuals/mirrorCam.hpp"
+#include "cheats/features/sources/discord/discord.hpp"
+#include "cheats/features/base.hpp"
 #include "cheats/game.hpp"
 
 #include <thread>
@@ -48,19 +45,15 @@ DWORD WINAPI init(PVOID instance)
             std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"),
             std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo") / XOR("utility"));
         game::localPlayer.init();
-        world.initSkyboxes();
         interfaces::init();
         netvarMan.init();
         netvarMan.dump();
         surfaceRender.init();
         x88menu.init();
         hooks::wndProcSys::init();
-        callbacks.init();
-        callbacks.run();
-        radar.initRetAddr();
-        mCam.init();
+        BaseHack::initAll();
+        g_Events.init();
         hooks::init();
-        world.initEffects();
     }
     catch (const std::runtime_error& err)
     {
@@ -78,7 +71,7 @@ DWORD WINAPI init(PVOID instance)
 
 VOID WINAPI _looper(PVOID instance)
 {
-    dc.init();
+    static DiscordPresence dc{};
     while (!config.get<Key>(vars.kPanic).isPressed())
     {
         if (inited)
@@ -92,8 +85,8 @@ VOID WINAPI _looper(PVOID instance)
 
     RemoveVectoredExceptionHandler(globals::instance);
     hooks::wndProcSys::shutdown();
-    events.shutdown();
-    callbacks.shutdown();
+    BaseHack::shutdownAll();
+    Events::shutdownAllEvents();
     hooks::shutdown();
     resBufferCollect::destroyAll();
     menu.shutdown();

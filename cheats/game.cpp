@@ -41,3 +41,13 @@ void LocalPlayer::init()
 {
 	m_local = *reinterpret_cast<Player_t***>(utilities::patternScan(CLIENT_DLL, LOCAL_PLAYER, 0x2));
 }
+
+uint32_t game::timeToTicks(float time)
+{
+	return static_cast<uint32_t>(0.5f + time / interfaces::globalVars->m_intervalPerTick);
+}
+
+float game::ticksToTime(uint32_t ticks)
+{
+	return interfaces::globalVars->m_intervalPerTick * static_cast<float>(ticks);
+}

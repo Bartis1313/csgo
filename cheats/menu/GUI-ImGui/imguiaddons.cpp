@@ -366,6 +366,28 @@ void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, s
     PopItemWidth();
 }
 
+bool ImGui::PopupButton(const char* label, const std::function<void()>& fun)
+{
+    ImGui::PushID(label);
+
+    if (ImGui::Button("Options"))
+        ImGui::OpenPopup("");
+
+    bool ret = false;
+    if (ImGui::BeginPopup(""))
+    {
+        fun();
+        ret = true;
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::PopID();
+
+    return ret;
+}
+
+
 ImGui::ExampleAppLog::ExampleAppLog()
 {
     AutoScroll = true;

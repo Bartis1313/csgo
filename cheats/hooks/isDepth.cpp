@@ -1,10 +1,10 @@
 #include "hooks.hpp"
 
-#include "../features/visuals/world.hpp"
+#include "../features/sources/visuals/misc/motionblur.hpp"
 
 bool __stdcall hooks::isDepthOfField::hooked()
 {
-	world.renderMotionBlur();
+	g_MotionBlur.render();
 
 	return false;
 }

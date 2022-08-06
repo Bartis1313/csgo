@@ -28,6 +28,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bAimbot, false, "aimbot enabled");
 	CONFIG_ADD_VARIABLE(int, iAimbot, 0, "aimbot mode");
 	CONFIG_ADD_VARIABLE(float, fFovAimbot, 0.0f, "aimbot FOV");
+	CONFIG_ADD_VARIABLE(int, iFovAimbot, 0, "aimbot FOV method");
 	CONFIG_ADD_VARIABLE(float, fSmooth, 1.0f, "smooth amount for aimbot");
 	CONFIG_ADD_VARIABLE(bool, bRCS, false, "recoil control system enabled");
 	CONFIG_ADD_VARIABLE(float, fRCSx, 50.0f, "recoil control system percentage for axis");
@@ -41,6 +42,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fAimbotDelay, false, "aimbot delay time");
 	CONFIG_ADD_VARIABLE(bool, bAimbotUseKey, false, "Use aimbot on key");
 	CONFIG_ADD_VARIABLE(Key, kAimbotKey, Key(KeyMode::DOWN, VK_LBUTTON), "aimbot key");
+	CONFIG_ADD_VARIABLE(bool, bAimBacktrack, false, "aimbot on backtrack");
 
 	// VISUALS
 
@@ -141,9 +143,19 @@ struct Variables
 	CONFIG_ADD_VARIABLE(CfgColor, cEditMolotov, Colors::Purple, "color molotov edited");
 	CONFIG_ADD_VARIABLE(CfgColor, cEditBlood, Colors::Purple, "color blood edited");
 	CONFIG_ADD_VARIABLE(CfgColor, cEditSmoke, Colors::Purple, "color smoke edited");
-	CONFIG_ADD_VARIABLE(bool, bDrawBulletTracer, false, "bullet tracer enabled");
-	CONFIG_ADD_VARIABLE(float, fDrawBulletTracer, 2.0f, "bullet tracer time");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawBulletTracer, Colors::LightBlue, "bullet tracer color");
+	CONFIG_ADD_VARIABLE(bool, bBulletTracer, false, "bullet tracer enabled");
+	CONFIG_ADD_VARIABLE(int, iBulletTracer, 0, "bullet tracer name idx");
+	/*CONFIG_ADD_VARIABLE(std::string, sBulletTracerType, "0", "bullet tracer type");*/
+	CONFIG_ADD_VARIABLE(std::string, sBulletTracer, "4|8", "bullet tracer flags");
+	CONFIG_ADD_VARIABLE(float, fBulletTracerLife, 2.0f, "bullet tracer time");
+	CONFIG_ADD_VARIABLE(CfgColor, cBulletTracer, Colors::LightBlue, "bullet tracer color");
+	CONFIG_ADD_VARIABLE(float, fBulletTracerWidth, 2.0f, "bullet tracer width");
+	CONFIG_ADD_VARIABLE(float, fBulletTracerFadeLength, 1.0f, "bullet tracer fade length");
+	CONFIG_ADD_VARIABLE(float, fBulletTracerAmplitude, 2.0f, "bullet tracer amplitude");
+	CONFIG_ADD_VARIABLE(float, fBulletTracerSpeed, 1.0f, "bullet tracer speed");
+	CONFIG_ADD_VARIABLE(float, fBulletTracerStartFrame, 0.0f, "bullet tracer start frame");
+	CONFIG_ADD_VARIABLE(float, fBulletTracerFrameRate, 60.0f, "bullet tracer framerate");
+	CONFIG_ADD_VARIABLE(int, fBulletTracerSegments, 2, "bullet tracer segments");
 	CONFIG_ADD_VARIABLE(bool, bDrawClientSideImpacts, false, "draw impacts from client side");
 	CONFIG_ADD_VARIABLE(float, fDrawClientSideImpacts, 3.0f, "draw impacts from client side time");
 	CONFIG_ADD_VARIABLE(CfgColor, cDrawClientSideImpactsLine, Colors::Cyan, "draw impacts from client side color lines");

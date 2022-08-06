@@ -33,4 +33,6 @@ namespace game
 	inline LocalPlayer localPlayer;
 	_NODISCARD bool isAvailable();
 	float serverTime(CUserCmd* cmd = nullptr);
+    _NODISCARD uint32_t timeToTicks(float time);
+    _NODISCARD float ticksToTime(uint32_t ticks);
 }

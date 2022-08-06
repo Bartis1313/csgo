@@ -7,7 +7,6 @@
 #include "../../../utilities/console/console.hpp"
 #include "../../../config/vars.hpp"
 #include "styles.hpp"
-#include "../../features/visuals/world.hpp"
 
 void runStyle(const int idx);
 
@@ -70,6 +69,7 @@ static void renderAimbot()
 				ImGui::SameLine();
 				ImGui::Hotkey("", &config.getRef<Key>(vars.kAimbotKey));
 				ImGui::SliderFloat(XOR("Aimbot FOV"), &config.getRef<float>(vars.fFovAimbot), 0.0f, 50.0f);
+				ImGui::Combo(XOR("Method##Aim"), &config.getRef<int>(vars.iFovAimbot), selections::aimbotMethods);
 				ImGui::Combo(XOR("Aimbot selection"), &config.getRef<int>(vars.iAimbot), selections::aimbotHitboxes);
 				ImGui::SliderFloat(XOR("Aimbot smooth"), &config.getRef<float>(vars.fSmooth), 1.0f, 50.0f);
 				ImGui::Checkbox(XOR("Enabled RCS"), &config.getRef<bool>(vars.bRCS));
@@ -85,6 +85,9 @@ static void renderAimbot()
 				ImGui::Checkbox(XOR("Draw aimbot point"), &config.getRef<bool>(vars.bDrawBestPoint));
 				ImGui::Checkbox(XOR("Delay"), &config.getRef<bool>(vars.bAimbotDelay));
 				ImGui::SliderFloat(XOR("Delay ms"), &config.getRef<float>(vars.fAimbotDelay), 0.0f, 800.0f);
+				ImGui::Checkbox(XOR("Aim at Backtrack"), &config.getRef<bool>(vars.bAimBacktrack));
+				ImGui::SameLine();
+				ImGui::HelpMarker(XOR("Will aim at middle of records!"));
 			}
 			ImGui::EndGroupPanel();
 
@@ -266,7 +269,11 @@ static void renderVisuals()
 	ImGui::Columns();
 }
 
-#include "../../features/visuals/radar.hpp"
+#include "../../features/sources/visuals/radar/radar.hpp"
+#include "../../features/sources/visuals/world/skybox.hpp"
+#include "../../features/sources/visuals/world/weather.hpp"
+#include "../../features/sources/visuals/world/tone.hpp"
+#include "../../../dependencies/ImGui/imgui_stdlib.h"
 
 static void renderMisc()
 {
@@ -276,14 +283,14 @@ static void renderMisc()
 		{
 			ImGui::BeginGroupPanel(XOR("Misc"));
 			{
-				const auto customsky = world.getAllCustomSkyBoxes();
+				const auto customsky = g_SkyboxEdit.getAllCustomSkyBoxes();
 
 				ImGui::Combo(XOR("Skybox"), &config.getRef<int>(vars.iSkyBox), selections::skyboxes);
 				ImGui::Combo(XOR("Skybox Custom"), &config.getRef<int>(vars.iCustomSkyBox), customsky);
 				ImGui::SameLine();
 				if (ImGui::Button(XOR("Reload Custom Skybox")))
 				{
-					world.reloadCustomSkyboxes();
+					g_SkyboxEdit.reloadCustomSkyboxes();
 				}
 				bool& modulateRef = config.getRef<bool>(vars.bModulateColor);
 				ImGui::Checkbox(XOR("Modulate world"), &modulateRef);
@@ -330,7 +337,7 @@ static void renderMisc()
 				ImGui::HelpMarker(XOR("If enemy is out of the radar\nThen icons will still appear but clamped"));
 				if (ImGui::Button(XOR("Refresh texture manually")))
 				{
-					radar.manuallyInitTexture();
+					g_Radar.manuallyInitTexture();
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Will not for workshop maps\nYou can try forcing the engine to re-render by pressing escape few times"));
@@ -439,10 +446,57 @@ static void renderMisc()
 					ImGui::SliderFloat(XOR("Hat radius"), &config.getRef<float>(vars.fHatRadius), 1.0f, 100.0f);
 				}
 				//ImGui::Checkbox(XOR("Remove blood spray"), &config.getRef<bool>(vars.bRemoveBloodSpray));
-				ImGui::Checkbox(XOR("Enable tracers"), &config.getRef<bool>(vars.bDrawBulletTracer));
+				ImGui::Checkbox(XOR("Enable tracers"), &config.getRef<bool>(vars.bBulletTracer));
 				ImGui::SameLine();
-				ImGui::ColorPicker(XOR("Tracers color"), &config.getRef<CfgColor>(vars.cDrawBulletTracer));
-				ImGui::SliderFloat(XOR("Tracers life"), &config.getRef<float>(vars.fDrawBulletTracer), 0.0f, 5.0f);
+				ImGui::PopupButton(XOR("##Bullet tracers"), []()
+					{
+						ImGui::Combo(XOR("Beam sprite"), &config.getRef<int>(vars.iBulletTracer), selections::beamNames);
+						/*ImGui::InputTextWithHint(XOR("Beam type"), XOR("Add without spaces! eg: 4|8"), &config.getRef<std::string>(vars.sBulletTracerType));*/
+						ImGui::SameLine();
+						ImGui::HelpMarker(XOR("Types list\n"
+							"TE_BEAMPOINTS 0\n"
+							"TE_SPRITE 1\n"
+							"TE_BEAMDISK 2\n"
+							"TE_BEAMCYLINDER 3\n"
+							"TE_BEAMFOLLOW 4\n"
+							"TE_BEAMRING 5\n"
+							"TE_BEAMSPLINE 6\n"
+							"TE_BEAMRINGPOINT 7\n"
+							"TE_BEAMLASER 8\n"
+							"TE_BEAMTESLA 9\n"
+						));
+						ImGui::InputTextWithHint(XOR("Beam flags"), XOR("Add without spaces! eg: 4|8"), &config.getRef<std::string>(vars.sBulletTracer));
+						ImGui::SameLine();
+						ImGui::HelpMarker(XOR("Flags list\n"
+							"FBEAM_STARTENTITY 1\n"
+							"FBEAM_ENDENTITY 2\n"
+							"FBEAM_FADEIN 4\n"
+							"FBEAM_FADEOUT 8\n"
+							"FBEAM_SINENOISE 16\n"
+							"FBEAM_SOLID 32\n"
+							"FBEAM_SHADEIN 64\n"
+							"FBEAM_SHADEOUT 128\n"
+							"FBEAM_ONLYNOISEONCE 256\n"
+							"FBEAM_NOTILE 512\n"
+							"FBEAM_USE_HITBOXES 1024\n"
+							"FBEAM_STARTVISIBLE 2048\n"
+							"FBEAM_ENDVISIBLE 4096\n"
+							"FBEAM_ISACTIVE 8192\n"
+							"FBEAM_FOREVER 16384\n"
+							"FBEAM_HALOBEAM 32768\n"
+							"FBEAM_REVERSED 65536\n"
+						));
+						ImGui::ColorPicker(XOR("Tracers color"), &config.getRef<CfgColor>(vars.cBulletTracer));
+						ImGui::SliderFloat(XOR("Tracers life"), &config.getRef<float>(vars.fBulletTracerLife), 0.0f, 10.0f);
+						ImGui::SliderFloat(XOR("Tracers width"), &config.getRef<float>(vars.fBulletTracerWidth), 0.0f, 20.0f);
+						ImGui::SliderFloat(XOR("Tracers fadeLenght"), &config.getRef<float>(vars.fBulletTracerFadeLength), 0.0f, 20.0f);
+						ImGui::SliderFloat(XOR("Tracers amplitude"), &config.getRef<float>(vars.fBulletTracerAmplitude), 0.0f, 20.0f);
+						ImGui::SliderFloat(XOR("Tracers speed"), &config.getRef<float>(vars.fBulletTracerSpeed), 0.0f, 200.0f);
+						ImGui::SliderFloat(XOR("Tracers startFrame"), &config.getRef<float>(vars.fBulletTracerStartFrame), 0.0f, 300.0f);
+						ImGui::SliderFloat(XOR("Tracers frameRate"), &config.getRef<float>(vars.fBulletTracerFrameRate), 0.0f, 200.0f);
+						ImGui::SliderInt(XOR("Tracers segmnets"), &config.getRef<int>(vars.fBulletTracerSegments), 0, 30);
+					}
+				);
 				ImGui::Checkbox(XOR("Enable local bullets"), &config.getRef<bool>(vars.bDrawLocalSideImpacts));
 				ImGui::SameLine();
 				ImGui::ColorPicker(XOR("Local bullets line color"), &config.getRef<CfgColor>(vars.cDrawLocalSideImpactsLine));
@@ -481,14 +535,14 @@ static void renderMisc()
 				ImGui::ColorPicker(XOR("Color##Screen effect"), &config.getRef<CfgColor>(vars.cScreenEffect));
 				bool changedbut = false;
 				changedbut |= ImGui::Checkbox(XOR("ControlTone enabled"), &config.getRef<bool>(vars.bControlTone));
-				world.setCheckStateButton(changedbut);
+				g_ToneController.setStateButton(changedbut);
 				bool changed1 = false;
 				changed1|= ImGui::SliderFloat(XOR("Tone min"), &config.getRef<float>(vars.fControlToneMin), 0.0f, 1.0f);
 				bool changed2 = false;
 				changed2 |= ImGui::SliderFloat(XOR("Tone max"), &config.getRef<float>(vars.fControlToneMax), 0.0f, 1.0f);
-				world.setCheckStateSlider(changed1 || changed2);
+				g_ToneController.setStateSlider(changed1 || changed2);
 				ImGui::Checkbox(XOR("Weather"), &config.getRef<bool>(vars.bWeather));
-				world.implMenu();
+				g_WeatherController.implMenu();
 				ImGui::Checkbox(XOR("Motion blur"), &config.getRef<bool>(vars.bMotionBlur));
 				ImGui::Checkbox(XOR("Forward##Motion Blur"), &config.getRef<bool>(vars.bMotionBlurForward));
 				ImGui::SliderFloat(XOR("Failling intensity##Motion Blur"), &config.getRef<float>(vars.fMotionBlurFallingIntensity), 0.0f, 5.0f);
@@ -504,8 +558,6 @@ static void renderMisc()
 	}
 	ImGui::Columns();
 }
-
-#include "../../../dependencies/ImGui/imgui_stdlib.h"
 
 static void renderConfig()
 {
