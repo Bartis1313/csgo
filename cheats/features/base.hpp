@@ -2,7 +2,7 @@
 
 #include <vector>
 
-// a base class for creating hacks, a constructor pushes the object into the vector and calls init on attach
+// a base class for creating hacks, you should push your object as "this" in your classes with defined methods
 // we should not care what is first as init or last, those things to init should not depend at all.
 class BaseHack
 {
