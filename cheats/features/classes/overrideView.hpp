@@ -9,7 +9,12 @@ class CViewSetup;
 class OverrideViewType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr OverrideViewType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run(CViewSetup* view) {};
 	static void runAll(CViewSetup* view);
 protected:

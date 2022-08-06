@@ -9,7 +9,12 @@ class CViewSetup;
 class RenderViewType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr RenderViewType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run(const CViewSetup& view) {};
 	static void runAll(const CViewSetup& view);
 protected:

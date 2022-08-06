@@ -12,11 +12,9 @@ class Weapon_t;
 class Aimbot : public CreateMoveInPredictionType
 {
 public:
-	Aimbot()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Aimbot() :
+		CreateMoveInPredictionType{}
+	{}
 
 	virtual void init();
 	virtual void run(CUserCmd* cmd);

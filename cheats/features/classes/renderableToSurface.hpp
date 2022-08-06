@@ -7,7 +7,12 @@
 class RenderableSurfaceType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr RenderableSurfaceType()
+		: BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void draw() {};
 	static void runAll();
 protected:

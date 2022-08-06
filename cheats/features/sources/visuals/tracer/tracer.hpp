@@ -8,10 +8,9 @@ class IGameEvent;
 class BulletTracer : public OnlyInitType
 {
 public:
-	BulletTracer()
-	{
-		m_hacks.push_back(this);
-	}
+	constexpr BulletTracer() :
+		OnlyInitType{}
+	{}
 
 	virtual void init();
 private:

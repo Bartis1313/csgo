@@ -11,11 +11,9 @@ class CUserCmd;
 class Plots : public RenderablePresentType
 {
 public:
-	Plots()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	Plots() :
+		RenderablePresentType{}
+	{}
 
 	virtual void init();
 	virtual void draw();
@@ -35,14 +33,12 @@ private:
 
 [[maybe_unused]] inline auto g_Plots = Plots{};
 
-class VelocityGather : CreateMoveInPredictionType
+class VelocityGather : public CreateMoveInPredictionType
 {
 public:
-	VelocityGather()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr VelocityGather() :
+		CreateMoveInPredictionType{}
+	{}
 
 	virtual void init();
 	virtual void run(CUserCmd* cmd);

@@ -10,11 +10,9 @@ class IConVar;
 class Movement : public CreateMovePrePredictionType
 {
 public:
-	Movement()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Movement() :
+		CreateMovePrePredictionType{}
+	{}
 
 	virtual void init();
 	virtual void run(CUserCmd* cmd);

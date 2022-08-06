@@ -11,10 +11,9 @@ class CUserCmd;
 class Prediction : public OnlyInitType
 {
 public:
-	Prediction()
-	{
-		m_hacks.push_back(this);
-	}
+	constexpr Prediction() :
+		OnlyInitType{}
+	{}
 
 	virtual void init();
 	void addToPrediction(CUserCmd* cmd, const std::function<void()>& fun);

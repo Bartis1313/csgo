@@ -13,10 +13,9 @@ class Player_t;
 class SoundDraw : public OnlyInitType
 {
 public:
-	SoundDraw()
-	{
-		m_hacks.push_back(this);
-	}
+	SoundDraw() :
+		OnlyInitType{}
+	{}
 
 	virtual void init();
 	void draw();

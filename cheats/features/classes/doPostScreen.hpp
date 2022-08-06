@@ -7,7 +7,12 @@
 class DoPostScreenType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr DoPostScreenType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run() {};
 	static void runAll();
 protected:

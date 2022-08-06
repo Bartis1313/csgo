@@ -8,10 +8,9 @@ class IConVar;
 class EnemyWarning : public OnlyInitType
 {
 public:
-	EnemyWarning()
-	{
-		m_hacks.push_back(this);
-	}
+	constexpr EnemyWarning() :
+		OnlyInitType{}
+	{}
 
 	virtual void init();
 	void draw(Player_t* ent);

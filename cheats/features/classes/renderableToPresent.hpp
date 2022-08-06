@@ -7,7 +7,12 @@
 class RenderablePresentType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr RenderablePresentType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void draw() {};
 	static void runAll();
 protected:

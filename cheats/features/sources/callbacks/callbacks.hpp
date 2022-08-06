@@ -10,10 +10,9 @@
 class Callbacks : public OnlyInitType
 {
 public:
-	Callbacks()
-	{
-		m_hacks.push_back(this);
-	}
+	constexpr Callbacks() :
+		OnlyInitType{}
+	{}
 
 	clientEffectCallback getCallbackByMemory(/*const */clientEffectCallback/*&*/ callb);
 	virtual void init();

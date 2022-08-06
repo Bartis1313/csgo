@@ -5,11 +5,9 @@
 class Thirdperson : public DoPostScreenType
 {
 public:
-	Thirdperson()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Thirdperson() :
+		DoPostScreenType{}
+	{}
 
 	virtual void init();
 	virtual void run();

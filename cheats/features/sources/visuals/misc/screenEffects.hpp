@@ -9,11 +9,9 @@ class IMaterial;
 class ScreenEffects : public Screen2DEffectsType
 {
 public:
-	ScreenEffects()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr ScreenEffects() :
+		Screen2DEffectsType{}
+	{}
 
 	virtual void init();
 	virtual void run();

@@ -7,11 +7,9 @@
 class Trails : RenderableSurfaceType
 {
 public:
-	Trails()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Trails() :
+		RenderableSurfaceType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

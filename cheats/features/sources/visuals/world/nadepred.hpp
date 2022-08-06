@@ -20,11 +20,9 @@ class GrenadePrediction;
 class GreandePredictionButton : public CreateMovePrePredictionType
 {
 public:
-	GreandePredictionButton()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr GreandePredictionButton() :
+		CreateMovePrePredictionType{}
+	{}
 
 	virtual void init();
 	virtual void run(CUserCmd* cmd);
@@ -44,11 +42,9 @@ private:
 class GrenadePrediction : public RenderableSurfaceType
 {
 public:
-	GrenadePrediction()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr GrenadePrediction() :
+		RenderableSurfaceType{}
+	{}
 
 	friend GreandePredictionButton;
 

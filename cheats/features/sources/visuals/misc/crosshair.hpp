@@ -7,11 +7,9 @@ class IConVar;
 class Crosshair : public RenderableSurfaceType
 {
 public:
-	Crosshair()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Crosshair() :
+		RenderableSurfaceType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

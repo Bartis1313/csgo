@@ -10,11 +10,9 @@ class INetChannel;
 class FakeLatency : public CreateMovePrePredictionType
 {
 public:
-	FakeLatency()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	FakeLatency() :
+		CreateMovePrePredictionType{}
+	{}
 
 	virtual void init();
 	virtual void run([[maybe_unused]] CUserCmd* cmd);

@@ -5,11 +5,9 @@
 class Info : public RenderablePresentType
 {
 public:
-	Info()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}	
+	constexpr Info() :
+		RenderablePresentType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

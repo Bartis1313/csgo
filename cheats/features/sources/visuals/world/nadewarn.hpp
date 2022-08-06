@@ -19,10 +19,9 @@ struct Studiohdr_t;
 class GrenadeWarning : public OnlyInitType
 {
 public:
-	GrenadeWarning()
-	{
-		m_hacks.push_back(this);
-	}
+	GrenadeWarning() :
+		OnlyInitType{}
+	{}
 
 	virtual void init();
 	void run(Nade_t* entity);
@@ -33,7 +32,7 @@ private:
 	{
 	public:
 		NadeTrace_t() = default;
-		NadeTrace_t(Player_t* owner, WeaponIndex index) :
+		constexpr NadeTrace_t(Player_t* owner, WeaponIndex index) :
 			m_nadeOwner{ owner }, m_index{ index }
 		{}
 

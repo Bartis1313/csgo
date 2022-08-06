@@ -10,10 +10,9 @@ struct Vector;
 class Particle : public OnlyInitType
 {
 public:
-	Particle()
-	{
-		m_hacks.push_back(this);
-	}
+	constexpr Particle() :
+		OnlyInitType{}
+	{}
 
 	virtual void init();
 	void dispatchParticle(const std::string& name, const Vector& pos);

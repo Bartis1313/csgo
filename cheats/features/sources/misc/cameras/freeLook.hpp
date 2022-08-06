@@ -13,11 +13,9 @@ class FreeLookViewer;
 class FreeLook : public CreateMovePrePredictionType
 {
 public:
-	FreeLook()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr FreeLook() :
+		CreateMovePrePredictionType{}
+	{}
 
 	virtual void init();
 	virtual void run(CUserCmd* cmd);
@@ -33,11 +31,9 @@ private:
 class FreeLookViewer : public OverrideViewType
 {
 public:
-	FreeLookViewer()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr FreeLookViewer() :
+		OverrideViewType{}
+	{}
 
 	virtual void init();
 	virtual void run(CViewSetup* view);

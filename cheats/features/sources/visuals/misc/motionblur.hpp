@@ -11,11 +11,9 @@ struct Vector;
 class MotionBlur : public OverrideViewType
 {
 public:
-	MotionBlur()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	MotionBlur() :
+		OverrideViewType{}
+	{}
 	
 	virtual void init();
 	virtual void run(CViewSetup* view);

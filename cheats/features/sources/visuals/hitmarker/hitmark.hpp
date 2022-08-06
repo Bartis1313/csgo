@@ -8,11 +8,9 @@ class IGameEvent;
 class Hitmarker : public RenderableSurfaceType
 {
 public:
-	Hitmarker()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Hitmarker() :
+		RenderableSurfaceType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

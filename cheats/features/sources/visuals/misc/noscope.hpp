@@ -8,11 +8,9 @@ class IMaterial;
 class NoScope : public RenderableSurfaceType
 {
 public:
-	NoScope()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr NoScope() :
+		RenderableSurfaceType{}
+	{}
 
 	virtual void init();
 	virtual void draw();
@@ -23,11 +21,9 @@ public:
 class NoScopeBlur : DoPostScreenType
 {
 public:
-	NoScopeBlur()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr NoScopeBlur() :
+		DoPostScreenType{}
+	{}
 
 	virtual void init();
 	virtual void run();

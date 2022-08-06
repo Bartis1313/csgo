@@ -5,11 +5,9 @@
 class Glow : public DoPostScreenType
 {
 public:
-	Glow()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Glow() :
+		DoPostScreenType{}
+	{}
 
 	virtual void init();
 	virtual void run();

@@ -9,6 +9,12 @@ class CUserCmd;
 class CreateMoveInPredictionType : public BaseHack
 {
 public:
+	constexpr CreateMoveInPredictionType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run(CUserCmd* cmd) {};
 	static void runAll(CUserCmd* cmd);
 protected:
@@ -18,6 +24,12 @@ protected:
 class CreateMovePrePredictionType : public BaseHack
 {
 public:
+	constexpr CreateMovePrePredictionType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run(CUserCmd* cmd) {};
 	static void runAll(CUserCmd* cmd);
 protected:
@@ -27,6 +39,12 @@ protected:
 class CreateMovePostPredictionType : public BaseHack
 {
 public:
+	constexpr CreateMovePostPredictionType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run(CUserCmd* cmd) {};
 	static void runAll(CUserCmd* cmd);
 protected:

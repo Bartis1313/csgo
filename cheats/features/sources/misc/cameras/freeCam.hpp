@@ -9,11 +9,9 @@ class CViewSetup;
 class Freecam : public OverrideViewType
 {
 public:
-	Freecam()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Freecam() :
+		OverrideViewType{}
+	{}
 
 	virtual void init();
 	// need to set angles to remove view effect
@@ -31,11 +29,9 @@ private:
 class FreecamDraw : public RenderablePresentType
 {
 public:
-	FreecamDraw()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr FreecamDraw() :
+		RenderablePresentType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

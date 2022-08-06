@@ -7,11 +7,9 @@ class IConVar;
 class RemoveSky : public DoPostScreenType
 {
 public:
-	RemoveSky()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr RemoveSky() :
+		DoPostScreenType{}
+	{}
 
 	virtual void init();
 	virtual void run();

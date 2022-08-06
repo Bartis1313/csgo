@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../classes/renderableToPresent.hpp"
+#include "../../classes/renderableToSurface.hpp"
 
 #include <vector>
 #include <string>
@@ -9,14 +9,13 @@
 
 struct ImFont;
 
-class Logger : public RenderablePresentType
+// TODO: run in present
+class Logger : public RenderableSurfaceType
 {
 public:
-	Logger()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Logger() :
+		RenderableSurfaceType{}
+	{}
 
 	struct Log_t
 	{
@@ -37,7 +36,7 @@ public:
 	virtual void draw();
 	virtual void init();
 private:
-	std::vector<Log_t> m_logs = {};
+	std::vector<Log_t> m_logs;
 };
 
 [[maybe_unused]] inline auto g_Logger = Logger{};

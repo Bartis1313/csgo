@@ -13,14 +13,12 @@ class RadarSizeHelper;
 struct IDirect3DTexture9;
 
 // texture - https://www.unknowncheats.me/forum/counterstrike-global-offensive/317765-getting-map-overview-information-textured-radar.html
-class Radar : RenderablePresentType
+class Radar : public RenderablePresentType
 {
 public:
-	Radar() 
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Radar() :
+		RenderablePresentType{}
+	{}
 
 	virtual void init();
 	virtual void draw();
@@ -57,11 +55,9 @@ private:
 class RadarSizeHelper : public OverViewMapType
 {
 public:
-	RadarSizeHelper()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr RadarSizeHelper() :
+		OverViewMapType{}
+	{}
 
 	virtual void init();
 	virtual void run(MapStruct* map);

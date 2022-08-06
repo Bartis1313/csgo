@@ -5,11 +5,9 @@
 class World : public RenderableSurfaceType
 {
 public:
-	World()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr World() :
+		RenderableSurfaceType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

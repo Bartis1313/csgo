@@ -13,11 +13,9 @@ class MirrorCamDraw;
 class MirrorCam : public RenderViewType
 {
 public:
-	MirrorCam()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr MirrorCam() :
+		RenderViewType{}
+	{}
 
 	virtual void init();
 	virtual void run(const CViewSetup& view);
@@ -37,11 +35,9 @@ private:
 class MirrorCamDraw : public RenderablePresentType
 {
 public:
-	MirrorCamDraw()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr MirrorCamDraw() :
+		RenderablePresentType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

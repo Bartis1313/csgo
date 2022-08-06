@@ -18,11 +18,9 @@ class Color;
 class PlayerVisuals : public RenderableSurfaceType
 {
 public:
-	PlayerVisuals()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr PlayerVisuals() :
+		RenderableSurfaceType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

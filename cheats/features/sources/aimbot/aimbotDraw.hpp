@@ -5,11 +5,9 @@
 class AimbotDraw : public RenderableSurfaceType
 {
 public:
-	AimbotDraw()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr AimbotDraw() :
+		RenderableSurfaceType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

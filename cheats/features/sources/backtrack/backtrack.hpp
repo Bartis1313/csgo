@@ -18,11 +18,9 @@ class BackTrackUpdater;
 class Backtrack : public CreateMoveInPredictionType
 {
 public:
-	Backtrack()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	Backtrack() :
+		CreateMoveInPredictionType{}
+	{}
 
 	virtual void run(CUserCmd* cmd);
 	virtual void init();
@@ -68,11 +66,9 @@ public:
 class BackTrackUpdater : public FrameStageType
 {
 public:
-	BackTrackUpdater()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr BackTrackUpdater() :
+		FrameStageType{}
+	{}
 
 	virtual void init();
 	virtual void run(int frame);

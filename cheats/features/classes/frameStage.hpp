@@ -7,7 +7,12 @@
 class FrameStageType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr FrameStageType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run(int frame) {};
 	static void runAll(int frame);
 protected:

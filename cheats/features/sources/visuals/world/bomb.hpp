@@ -9,11 +9,9 @@ class IGameEvent;
 class BombOverlay : public RenderablePresentType
 {
 public:
-	BombOverlay()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr BombOverlay() :
+		RenderablePresentType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

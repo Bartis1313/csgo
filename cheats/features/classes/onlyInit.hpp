@@ -6,5 +6,7 @@
 class OnlyInitType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr OnlyInitType() :
+		BaseHack{}
+	{}
 };

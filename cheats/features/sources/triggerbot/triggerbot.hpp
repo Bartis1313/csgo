@@ -5,11 +5,9 @@
 class Triggerbot : public CreateMoveInPredictionType
 {
 public:
-	Triggerbot()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Triggerbot() :
+		CreateMoveInPredictionType{}
+	{}
 
 	virtual void init();
 	virtual void run(CUserCmd* cmd);

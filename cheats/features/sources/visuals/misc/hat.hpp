@@ -7,11 +7,9 @@ struct Vector;
 class Hat : public RenderableSurfaceType
 {
 public:
-	Hat()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr Hat() :
+		RenderableSurfaceType{}
+	{}
 
 	virtual void init();
 	virtual void draw();

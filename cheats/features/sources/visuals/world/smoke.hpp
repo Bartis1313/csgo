@@ -12,10 +12,9 @@ using ImDrawFlags = int;
 class SmokeDraw : public OnlyInitType
 {
 public:
-	SmokeDraw()
-	{
-		m_hacks.push_back(this);
-	}
+	constexpr SmokeDraw() :
+		OnlyInitType{}
+	{}
 
 	virtual void init();
 	void draw(Smoke_t* ent);
@@ -30,11 +29,9 @@ private:
 class SmokeRemoval : public FrameStageType
 {
 public:
-	SmokeRemoval()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	constexpr SmokeRemoval() :
+		FrameStageType{}
+	{}
 
 	virtual void init();
 	virtual void run(int frame);

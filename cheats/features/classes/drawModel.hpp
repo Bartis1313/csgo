@@ -11,7 +11,12 @@ struct Matrix3x4;
 class DrawModelType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr DrawModelType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix) {};
 	static void runAll(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 protected:

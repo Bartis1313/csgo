@@ -19,11 +19,9 @@ struct Matrix3x4;
 class Chams : public DrawModelType
 {
 public:
-	Chams()
-	{
-		m_hacks.push_back(this);
-		m_hacksRun.push_back(this);
-	}
+	Chams() :
+		DrawModelType{}
+	{}
 
 	virtual void init();
 	virtual void run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);

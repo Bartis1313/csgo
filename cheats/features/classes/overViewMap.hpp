@@ -9,7 +9,12 @@ struct MapStruct;
 class OverViewMapType : public BaseHack
 {
 public:
-	virtual void init() {};
+	constexpr OverViewMapType() :
+		BaseHack{}
+	{
+		m_hacksRun.push_back(this);
+	}
+
 	virtual void run(MapStruct* map) {};
 	static void runAll(MapStruct* map);
 protected:
