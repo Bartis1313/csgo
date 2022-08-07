@@ -68,9 +68,11 @@ void BulletTracer::draw(IGameEvent* event)
 		return ret;
 	};
 
+	auto strWithoutSpaces = config.get<std::string>(vars.sBulletTracer);
+	strWithoutSpaces.erase(std::remove(strWithoutSpaces.begin(), strWithoutSpaces.end(), ' '), strWithoutSpaces.end());
 
 	info.m_type = /*convertToFlag(config.get<std::string>(vars.sBulletTracerType))*/ TE_BEAMPOINTS;
-	info.m_flags = convertToFlag(config.get<std::string>(vars.sBulletTracer));
+	info.m_flags = convertToFlag(strWithoutSpaces);
 	info.m_modelName = selections::beamNames.at(config.get<int>(vars.iBulletTracer));
 	info.m_modelIndex = -1;
 	info.m_haloIndex = -1;

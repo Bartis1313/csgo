@@ -21,13 +21,7 @@ void Callbacks::addCallBack(const clbStruct& callb)
 
 // custom1
 void example(const CEffectData& data)
-{
-    static bool bOnce = []()
-    {
-        console.print("{}\n", __FUNCTION__);
-        return true;
-    } ();
-
+{ 
     auto call = g_Callbacks.getCallbackByMemory(&example);
     call(data);
 }
@@ -35,18 +29,15 @@ void example(const CEffectData& data)
 // custom2 - fail
 void example2(const CEffectData& data)
 {
-    static bool bOnce = []()
-    {
-        console.print("{}\n", __FUNCTION__);
-        return true;
-    } ();
-
     auto call = g_Callbacks.getCallbackByMemory(&example2);
     call(data);
 }
 
 void Callbacks::init()
 {
+    this->addCallBack({ XOR("Impact"), &example, nullptr });
+    this->addCallBack({ XOR("Impact"), &example2, nullptr });
+
     m_head = **reinterpret_cast<CClientEffectRegistration***>(utilities::patternScan(CLIENT_DLL, HEAD_OF_EFFECTS, 0x2));
 
     for (auto head = m_head; head; head = head->m_next)
@@ -64,9 +55,6 @@ void Callbacks::init()
             }
         }
     }
-
-    g_Callbacks.addCallBack({ XOR("Impact"), &example, nullptr });
-    g_Callbacks.addCallBack({ XOR("Impact"), &example2, nullptr });
 }
 
 void Callbacks::shutdown()

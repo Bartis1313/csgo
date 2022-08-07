@@ -452,7 +452,7 @@ static void renderMisc()
 					{
 						ImGui::Combo(XOR("Beam sprite"), &config.getRef<int>(vars.iBulletTracer), selections::beamNames);
 						/*ImGui::InputTextWithHint(XOR("Beam type"), XOR("Add without spaces! eg: 4|8"), &config.getRef<std::string>(vars.sBulletTracerType));*/
-						ImGui::SameLine();
+						/*ImGui::SameLine();
 						ImGui::HelpMarker(XOR("Types list\n"
 							"TE_BEAMPOINTS 0\n"
 							"TE_SPRITE 1\n"
@@ -464,7 +464,7 @@ static void renderMisc()
 							"TE_BEAMRINGPOINT 7\n"
 							"TE_BEAMLASER 8\n"
 							"TE_BEAMTESLA 9\n"
-						));
+						));*/
 						ImGui::InputTextWithHint(XOR("Beam flags"), XOR("Add without spaces! eg: 4|8"), &config.getRef<std::string>(vars.sBulletTracer));
 						ImGui::SameLine();
 						ImGui::HelpMarker(XOR("Flags list\n"
@@ -594,11 +594,65 @@ static void renderConfig()
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Press enter to create new config"));
 				ImGui::ListBox(XOR("All configs"), &currentcfg, allcfg);
+
+				static bool dontAskMe = false;
+				static bool delayedClose = false; // not instant close for modal 
 				if (ImGui::Button(XOR("Delete")))
 				{
-					config.deleteCfg(allcfg.at(currentcfg));
-					config.reload();
+					if (dontAskMe && delayedClose)
+					{
+						config.deleteCfg(allcfg.at(currentcfg));
+						config.reload();
+					}
+					else
+						ImGui::OpenPopup(XOR("Delete?"));
 				}
+
+				if (ImGui::BeginPopupContextItem())
+				{
+					if (ImGui::Button(XOR("Reset asking")))
+					{
+						dontAskMe = false;
+						delayedClose = false;
+						ImGui::CloseCurrentPopup();
+					}
+
+					ImGui::EndPopup();
+				}
+
+				if (ImGui::BeginPopupModal(XOR("Delete?"), nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+				{
+					ImGui::TextUnformatted(FORMAT(XOR("Are you sure you want to delete {} file?"), allcfg.at(currentcfg)).c_str());
+					ImGui::Separator();
+					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.0f, 0.0f });
+					ImGui::Checkbox(XOR("Don't ask again"), &dontAskMe);
+					ImGui::PopStyleVar();
+
+					if (ImGui::Button(XOR("OK"), { 120.0f, 0.0f }))
+					{
+						config.deleteCfg(allcfg.at(currentcfg));
+						config.reload();
+						ImGui::CloseCurrentPopup();
+
+						if (dontAskMe)
+							delayedClose = true;
+						else
+							delayedClose = false;
+					}
+					ImGui::SameLine();
+					if (ImGui::Button(XOR("Cancel"), { 120.0f, 0.0f }))
+					{
+						ImGui::CloseCurrentPopup();
+
+						if (dontAskMe)
+							delayedClose = true;
+						else
+							delayedClose = false;
+					}
+
+					ImGui::EndPopup();
+				}
+			
 				ImGui::SameLine();
 				if (ImGui::Button(XOR("Save")))
 				{

@@ -254,11 +254,17 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 			return false;
 	}
 
-	// check if the default file already exists, if yes, don't save
-	// TODO: detect any changes, replace them with new file. Only idea for now is to compare file size (kb)
+	if (auto path = getPathForSave(m_defaultConfig); !std::filesystem::exists(path))
+	{
+		console.log(TypeLogs::LOG_INFO, FORMAT(XOR("Creating default file, because it doesn't exist: {}"), path.string()));
+
+		if (!save(m_defaultConfig, true))
+			return false;
+	}
+
 	if (auto path = getPathForSave(getCfgToLoad()); !std::filesystem::exists(path))
 	{
-		console.log(TypeLogs::LOG_INFO, FORMAT(XOR("Creating new file, because it doesn't exist: {}"), path.string()));
+		console.log(TypeLogs::LOG_INFO, FORMAT(XOR("Creating selected file for load, because it doesn't exist: {}"), path.string()));
 
 		if (!save(getCfgToLoad(), true))
 			return false;

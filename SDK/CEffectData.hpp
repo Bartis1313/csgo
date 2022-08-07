@@ -5,24 +5,23 @@
 class CEffectData
 {
 public:
-	Vector m_origin = {};
-	Vector m_start = {};
-	Vector m_normal = {};
-	Vector m_angles = {};
-	int m_flags = 0;
-	int m_entityIdx = 0;
-	float m_scale = 1.0f;
-	float m_magnitude = 0.0f;
-	float m_radius = 0.0f;
-	int m_attachmentIndex = 0;
-	short m_surfaceProp = 0;
+	Vector m_origin;
+	Vector m_start;
+	Vector m_normal;
+	Vector m_angles;
+	int m_flags;
+	int m_entityIdx;
+	float m_scale;
+	float m_magnitude;
+	float m_radius;
+	int m_attachmentIndex;
+	short m_surfaceProp;
 	// Some TF2 specific things
-	int m_material = 0;
-	int m_damageType = 0;
-	int m_hitBox = 0;
-	int m_otherEntIndex = 0;
-	unsigned char m_color = 0;
-	bool m_positionsAreRelativeToEntity = false;
+	int m_material;
+	int m_damageType;
+	int m_hitBox;
+	int m_otherEntIndex;
+	unsigned char m_color;
 	int getEffectNameIndex() { return m_iEffectName; }
 private:
 	int m_iEffectName;	// Entry in the EffectDispatch network string table. The is automatically handled by DispatchEffect().
