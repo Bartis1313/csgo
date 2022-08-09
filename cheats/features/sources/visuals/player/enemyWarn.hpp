@@ -2,6 +2,8 @@
 
 #include "../../../classes/onlyInit.hpp"
 
+#include <utility>
+
 class Player_t;
 class IConVar;
 
@@ -13,7 +15,8 @@ public:
 	{}
 
 	virtual void init();
-	void draw(Player_t* ent);
+ 	std::pair<bool, bool> check(Player_t* ent);
+	void draw(const std::pair<bool, bool>& checks);
 private:
 	IConVar* m_scale;
 };

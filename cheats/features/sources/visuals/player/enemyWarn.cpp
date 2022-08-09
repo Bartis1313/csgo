@@ -17,13 +17,13 @@ void EnemyWarning::init()
 	m_scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
 }
 
-void EnemyWarning::draw(Player_t* ent)
+std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
 {
 	if (!config.get<bool>(vars.bAimingWarn))
-		return;
+		return { false, false };
 
 	if (!game::isAvailable())
-		return;
+		return { false, false };
 
 	Vector posDelta = ent->getEyePos() - game::localPlayer->getEyePos();
 	Vector idealAimAngle = math::vectorToAngle(posDelta);
@@ -39,13 +39,16 @@ void EnemyWarning::draw(Player_t* ent)
 	// dynamic fov
 	float fov = math::calcFovReal(ent->getEyePos(), game::localPlayer->getBonePos(3), curEnemyAngle); // 3 is middle body
 
-	if (check) // no, check it differently
-	{
-		imRender.text(globals::screenX / 2, 60, ImFonts::tahoma14, XOR("Enemy can see you"), true, Colors::Green);
-	}
 	// this can be made with tracing
-	if (fov <= 5.0f)
-	{
+	bool checkFov = fov <= 5.0f;
+
+	return { check, checkFov };
+}
+
+void EnemyWarning::draw(const std::pair<bool, bool>& checks)
+{
+	if(checks.first) // trace
+		imRender.text(globals::screenX / 2, 60, ImFonts::tahoma14, XOR("Enemy can see you"), true, Colors::Green);
+	if(checks.second) // dynamic fov
 		imRender.text(globals::screenX / 2, 80, ImFonts::tahoma14, XOR("Enemy is aiming you"), true, Colors::Red);
-	}
 }

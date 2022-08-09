@@ -42,6 +42,8 @@ void PlayerVisuals::draw()
 
 	bool drawDead = config.get<bool>(vars.bDrawDeadOnly);
 
+	std::pair<bool, bool> warnChecks = { false, false };
+
 	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 	{
 		auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
@@ -78,9 +80,10 @@ void PlayerVisuals::draw()
 		else
 			runFeatures();
 
-		g_EnemyWarning.draw(entity);
+		warnChecks = g_EnemyWarning.check(entity);
 	}
 	g_SoundDraw.draw();
+	g_EnemyWarning.draw(warnChecks);
 }
 
 void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
