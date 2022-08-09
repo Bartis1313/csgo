@@ -36,7 +36,7 @@ static T* getInterface(const std::string_view moduleName, const std::string_view
 // _interface - interface' name
 #define CAPNLOG(var, type, _module, _interface) \
 	var = getInterface<type>(_module, XOR(_interface)); \
-	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: {:#0x}"), _interface, reinterpret_cast<uintptr_t>(var))); \
+	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), _interface, reinterpret_cast<uintptr_t>(var))); \
 	
 bool interfaces::init()
 {

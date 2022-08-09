@@ -93,19 +93,15 @@ void X88Menu::draw()
 
 void X88Menu::init()
 {
-	x88types.push(XOR("Triggerbot"), &config.getRef<bool>(vars.bTriggerbot));
-	x88types.push(XOR("Triggerbot MS"), &config.getRef<float>(vars.fTriggerDelay), { 0.0f, 200.0f });
-	x88types.push(XOR("Chams"), &config.getRef<int>(vars.iChamsPlayers), sizeof(ChamsID));
+	x88types.push(XOR("Chams"), &config.getRef<int>(vars.iChamsPlayers), 4);
 	x88types.push(XOR("ESP"), &config.getRef<bool>(vars.bEsp));
 	x88types.push(XOR("FOV"), &config.getRef<float>(vars.fFOV), { -50.0f, 50.0f} );
-	x88types.push(XOR("Aimbot"), &config.getRef<bool>(vars.bAimbot));
-	x88types.push(XOR("Aimbot Type"), &config.getRef<int>(vars.iAimbot), sizeof(AimbotID) - 2);
 	x88types.push(XOR("Backtrack"), &config.getRef<bool>(vars.bBacktrack));
 	x88types.push(XOR("Backtrack MS"), &config.getRef<float>(vars.fBacktrackTick), { 0.0f, 200.0f });
 	x88types.push(XOR("No Sky"), &config.getRef<bool>(vars.bRemoveSky));
 	x88types.push(XOR("2D Radar"), &config.getRef<bool>(vars.bRadar));
 	x88types.push(XOR("Bunnyhop"), &config.getRef<bool>(vars.bBunnyHop));
-	x88types.push(XOR("Autostrafe"), &config.getRef<int>(vars.iAutoStrafe), sizeof(MovementStraferMode) - 1);
+	x88types.push(XOR("Autostrafe"), &config.getRef<int>(vars.iAutoStrafe), 3);
 	x88types.push(XOR("ThirdP"), &config.getRef<bool>(vars.bThirdp));
 	x88types.push(XOR("Draw Info"), &config.getRef<bool>(vars.bDrawMiscInfo));
 

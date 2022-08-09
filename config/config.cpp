@@ -82,6 +82,35 @@ bool Config::save(const std::string& file, const bool forceSave)
 
 			entry[XOR("value")] = arr.dump();
 		}
+		else if (std::holds_alternative<std::vector<CfgWeapon>>(var.getType()))
+		{
+			auto vec = var.get<std::vector<CfgWeapon>>();
+
+			json arr;
+			for (const auto& el : vec)
+			{
+				json temp =
+				{
+					el.m_aimEnabled,
+					el.m_fov,
+					el.m_smooth,
+					el.m_methodAim,
+					el.m_aimSelection,
+					el.m_RcsEnabled,
+					el.m_aimDelayEnabled,
+					el.m_aimDelay,
+					el.m_aimbacktrack,
+					el.m_RcsX,
+					el.m_RcsY,
+					el.m_TriggerEnabled,
+					el.m_TriggerDelay
+				};
+
+				arr.push_back(temp);
+			}
+
+			entry[XOR("value")] = arr.dump();
+		}
 		else if (std::holds_alternative<Key>(var.getType()))
 		{
 			auto key = var.get<Key>();
@@ -185,6 +214,30 @@ bool Config::load(const std::string& file)
 			for (size_t i = 0; i < original.size(); i++)
 			{
 				original.at(i) = parsed.at(i).get<bool>();
+			}
+		}
+		else if (std::holds_alternative<std::vector<CfgWeapon>>(entry.getType()))
+		{
+			auto parsed = json::parse(var[XOR("value")].get<std::string>());
+			auto& original = entry.getRef<std::vector<CfgWeapon>>();
+
+			// this is terrible, should define own type
+			for (size_t i = 0; i < original.size(); i++)
+			{
+				auto el = parsed.at(i);
+				original.at(i).m_aimEnabled = el.at(0).get<bool>();
+				original.at(i).m_fov = el.at(1).get<float>();
+				original.at(i).m_smooth = el.at(2).get<float>();
+				original.at(i).m_methodAim = el.at(3).get<int>();
+				original.at(i).m_aimSelection = el.at(4).get<int>();
+				original.at(i).m_RcsEnabled = el.at(5).get<bool>();
+				original.at(i).m_aimDelayEnabled = el.at(6).get<bool>();
+				original.at(i).m_aimDelay = el.at(7).get<float>();
+				original.at(i).m_aimbacktrack = el.at(8).get<bool>();
+				original.at(i).m_RcsX = el.at(9).get<float>();
+				original.at(i).m_RcsY = el.at(10).get<float>();
+				original.at(i).m_TriggerEnabled = el.at(11).get<bool>();
+				original.at(i).m_TriggerDelay = el.at(12).get<float>();
 			}
 		}
 		else if (std::holds_alternative<Key>(entry.getType()))

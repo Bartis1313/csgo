@@ -34,7 +34,9 @@ void Info::draw()
 	auto text = []
 	(const std::string& text, const Color& color)
 	{
-		ImGui::TextColored(ImVec4{ color.r(), color.g(), color.b(), color.a() }, text.c_str());
+		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ color.r(), color.g(), color.b(), color.a() });
+		ImGui::TextUnformatted(text.c_str()); // because textcolored is formatted by va args
+		ImGui::PopStyleColor();
 	};
 
 	if (ImGui::Begin(XOR("##info"), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar

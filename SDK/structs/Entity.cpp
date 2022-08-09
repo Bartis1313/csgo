@@ -295,6 +295,14 @@ bool Weapon_t::isSmg()
 	if (!this->getWpnInfo())
 		return false;
 
+	return this->getWpnInfo()->m_type == WEAPONTYPE_SUBMACHINEGUN;
+}
+
+bool Weapon_t::isMachineGun()
+{
+	if (!this->getWpnInfo())
+		return false;
+
 	return this->getWpnInfo()->m_type == WEAPONTYPE_MACHINEGUN;
 }
 

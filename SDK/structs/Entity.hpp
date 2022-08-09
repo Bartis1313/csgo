@@ -104,6 +104,7 @@ public:
 	_NODISCARD bool isEmpty() { return m_iClip1() <= 0; }
 	_NODISCARD bool isRifle();
 	_NODISCARD bool isSmg();
+	_NODISCARD bool isMachineGun();
 	_NODISCARD bool isShotgun();
 	_NODISCARD bool isPistol();
 	_NODISCARD bool isSniper();

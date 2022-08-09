@@ -39,6 +39,7 @@ hookHelper::tryHook(reinterpret_cast<void*>(utilities::patternScan(mod, mask)), 
 	HOOK_SAFE_SIG(ENGINE_DLL, SEND_DATAGRAM, sendDatagram);
 	HOOK_SAFE_SIG(CLIENT_DLL, UNK_OVERVIEWMAP, unknownOverViewFun);
 	HOOK_SAFE_SIG(CLIENT_DLL, IS_DEPTH, isDepthOfField);
+	HOOK_SAFE_SIG(CLIENT_DLL, FX_BLOOD, fxBlood);
 
 	HOOK_SAFE_VFUNC(interfaces::dx9Device, reset);
 	HOOK_SAFE_VFUNC(interfaces::dx9Device, present);

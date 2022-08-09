@@ -22,7 +22,6 @@ public:
 
 	virtual void init();
 	virtual void draw();
-	void onInit(MapStruct* map);
 	_NODISCARD constexpr IDirect3DTexture9*& getTexture() { return m_mapTexture; }
 	_NODISCARD constexpr uintptr_t* getRetAddr() { return m_retAddr; }
 	constexpr void setInited(bool val) { m_inited = val; }

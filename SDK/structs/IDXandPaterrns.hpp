@@ -226,3 +226,5 @@ ParticleEffect
 #define PARTICLE_SYSTEM				XOR("55 8B EC 51 56 8B 35 ? ? ? ? 8B CE")
 // followed by leak's code
 #define FIND_STRING_INDEX			XOR("55 8B EC 83 EC ? 53 8B 5D ? 57 8B F9 89 7D ? 85 DB")
+// #STR: "Particle/Effect_Rendering", "FX_Blood"
+#define	FX_BLOOD					XOR("55 8B EC 83 EC 34 53 56 57 8B F9 F3 0F")

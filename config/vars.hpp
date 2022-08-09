@@ -25,24 +25,14 @@ struct Variables
 
 	// AIMBOT & TRIGGERBOT
 
-	CONFIG_ADD_VARIABLE(bool, bAimbot, false, "aimbot enabled");
-	CONFIG_ADD_VARIABLE(int, iAimbot, 0, "aimbot mode");
-	CONFIG_ADD_VARIABLE(float, fFovAimbot, 0.0f, "aimbot FOV");
-	CONFIG_ADD_VARIABLE(int, iFovAimbot, 0, "aimbot FOV method");
-	CONFIG_ADD_VARIABLE(float, fSmooth, 1.0f, "smooth amount for aimbot");
-	CONFIG_ADD_VARIABLE(bool, bRCS, false, "recoil control system enabled");
-	CONFIG_ADD_VARIABLE(float, fRCSx, 50.0f, "recoil control system percentage for axis");
-	CONFIG_ADD_VARIABLE(float, fRCSy, 50.0f, "recoil control system percentage for yaw");
-	CONFIG_ADD_VARIABLE(bool, bTriggerbot, false, "triggerbot enabled");
-	CONFIG_ADD_VARIABLE(float, fTriggerDelay, 0.0f, "triggerbot amount of delay in ms");
+	CONFIG_ADD_VEC(CfgWeapon, arrAimbot, E2T(WeaponList::LIST_SIZE) - 1, CfgWeapon(), "Aimbot settings");
+
+	
 	CONFIG_ADD_VARIABLE(bool, bDrawFov, false, "draw fov representing aimbot range");
 	CONFIG_ADD_VARIABLE(CfgColor, cDrawFov, Colors::LightBlue, "draw fov representing aimbot range color");
 	CONFIG_ADD_VARIABLE(bool, bDrawBestPoint, false, "draw best point of hitbox");
-	CONFIG_ADD_VARIABLE(bool, bAimbotDelay, false, "enable aimbot delay");
-	CONFIG_ADD_VARIABLE(float, fAimbotDelay, false, "aimbot delay time");
 	CONFIG_ADD_VARIABLE(bool, bAimbotUseKey, false, "Use aimbot on key");
 	CONFIG_ADD_VARIABLE(Key, kAimbotKey, Key(KeyMode::DOWN, VK_LBUTTON), "aimbot key");
-	CONFIG_ADD_VARIABLE(bool, bAimBacktrack, false, "aimbot on backtrack");
 
 	// VISUALS
 
@@ -84,6 +74,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bDrawName, false, "draw name enabled");
 	CONFIG_ADD_VARIABLE(bool, bDrawSkeleton, false, "draw skeleton enabled");
 	CONFIG_ADD_VARIABLE(CfgColor, cSkeleton, Colors::White, "skeleton color");
+	CONFIG_ADD_VARIABLE(bool, bSkeletonDebugPoints, false, "skeleton debug points enabled");
 	CONFIG_ADD_VARIABLE(bool, bDLight, false, "DLight enabled");
 	CONFIG_ADD_VARIABLE(CfgColor, cDlight, Color(20, 70, 150, 255), "Dlight color");
 	CONFIG_ADD_VARIABLE(float, fDlightRadius, 50.0f, "DLight radius");

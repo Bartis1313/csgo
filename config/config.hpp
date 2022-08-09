@@ -8,6 +8,7 @@
 
 #include "key.hpp"
 #include "cfgcolor.hpp"
+#include "cfgWeapon.hpp"
 #include "../utilities/utilities.hpp"
 
 class ConfigType
@@ -15,7 +16,7 @@ class ConfigType
 public:
 	// add possible types to accept
 	using Types = std::variant<bool, int, float,
-		std::string, CfgColor,
+		std::string, CfgColor, std::vector<CfgWeapon>,
 		std::vector<bool>, Key>;
 
 	ConfigType() = default;

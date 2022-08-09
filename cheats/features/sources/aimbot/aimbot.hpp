@@ -2,6 +2,7 @@
 
 #include "../../classes/createMove.hpp"
 #include "../../../../SDK/math/Vector.hpp"
+#include "../../../../config/cfgWeapon.hpp"
 
 #include <vector>
 
@@ -21,6 +22,7 @@ public:
 	Player_t* getTargetted() const;
 	Vector getCachedView() const;
 	Vector getBestHibox() const;
+	CfgWeapon getCachedConfig() const;
 private:
 	void resetFields();
 	bool isClicked(CUserCmd* cmd);
@@ -33,6 +35,7 @@ private:
 	float m_delayTime;
 	Vector m_view;
 	int m_bestId;
+	CfgWeapon m_config;
 };
 
 [[maybe_unused]] inline auto g_Aimbot = Aimbot{};

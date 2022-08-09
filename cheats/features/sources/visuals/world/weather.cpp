@@ -150,3 +150,13 @@ void WeatherController::implMenu()
 			convar->setValue(defVal);
 	}
 }
+
+void WeatherReset::init()
+{
+
+}
+
+void WeatherReset::run(MapStruct* map)
+{
+	g_WeatherController.m_weather.m_created = false;
+}

@@ -84,14 +84,6 @@ Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 	return { dotX, dotY };
 }
 
-void Radar::onInit(MapStruct* map)
-{
-	m_pos = map->m_origin;
-	m_scale = map->m_scale;
-
-	m_inited = true;
-}
-
 void Radar::manuallyInitPos()
 {
 	if (!game::isAvailable())
@@ -286,8 +278,12 @@ void RadarSizeHelper::init()
 
 void RadarSizeHelper::run(MapStruct* map)
 {
-	g_Radar.m_pos = map->m_origin;
-	g_Radar.m_scale = map->m_scale;
+	/*g_Radar.m_pos = map->m_origin;
+	g_Radar.m_scale = map->m_scale;*/
 
-	g_Radar.m_inited = true;
+	// something weird, the mapstruct for hook now has a 276 pad but it still responds with wrong values here
+	// although by CCSGO_MapOverview it has 256 still...
+	// so we trick it to load manually on new map
+
+	g_Radar.m_inited = false;
 }

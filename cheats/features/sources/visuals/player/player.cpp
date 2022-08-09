@@ -340,6 +340,12 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 		if (std::abs(deltachild.z) < 5.0f && deltaparent.length() < 5.0f && deltachild.length() < 5.0f || i == chest)
 			continue;
 
+		if (config.get<bool>(vars.bSkeletonDebugPoints))
+		{
+			if (ImVec2 s; imRender.worldToScreen(ent->getBonePos(i), s))
+				imRender.text(s.x, s.y, ImFonts::franklinGothic12, FORMAT(XOR("{}"), i), true, Colors::White, true);
+		}
+
 		if (ImVec2 start, end; imRender.worldToScreen(parent, start) && imRender.worldToScreen(child, end))
 			imRender.drawLine(start, end, config.get<CfgColor>(vars.cSkeleton).getColor());
 	}

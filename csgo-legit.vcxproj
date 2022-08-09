@@ -153,6 +153,7 @@
     </ClCompile>
     <ClCompile Include="cheats\features\sources\aimbot\aimbotDraw.cpp" />
     <ClCompile Include="cheats\features\sources\fakelatency\fakelatency.cpp" />
+    <ClCompile Include="cheats\features\sources\misc\counters\counters.cpp" />
     <ClCompile Include="cheats\features\sources\misc\flashlight\flashlight.cpp" />
     <ClCompile Include="cheats\features\sources\misc\thirdperson\thirdperson.cpp" />
     <ClCompile Include="cheats\features\sources\triggerbot\triggerbot.cpp">
@@ -205,6 +206,7 @@
     <ClCompile Include="cheats\features\sources\visuals\world\zeus.cpp" />
     <ClCompile Include="cheats\hooks\buildTransformations.cpp" />
     <ClCompile Include="cheats\hooks\drawIndexPrimitive.cpp" />
+    <ClCompile Include="cheats\hooks\fxBlood.cpp" />
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
     <ClCompile Include="cheats\hooks\isDepth.cpp" />
     <ClCompile Include="cheats\hooks\isHltv.cpp" />
@@ -217,6 +219,7 @@
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
     <ClCompile Include="cheats\menu\x88Menu\x88menu.cpp" />
     <ClCompile Include="config\cfgcolor.cpp" />
+    <ClCompile Include="config\cfgWeapon.cpp" />
     <ClCompile Include="config\key.cpp" />
     <ClCompile Include="dependencies\discord\src\connection_win.cpp" />
     <ClCompile Include="dependencies\discord\src\discord_register_win.cpp" />
@@ -373,6 +376,7 @@
     <ClInclude Include="cheats\features\sources\aimbot\aimbot.hpp" />
     <ClInclude Include="cheats\features\sources\aimbot\aimbotDraw.hpp" />
     <ClInclude Include="cheats\features\sources\fakelatency\fakelatency.hpp" />
+    <ClInclude Include="cheats\features\sources\misc\counters\counters.hpp" />
     <ClInclude Include="cheats\features\sources\misc\flashlight\flashlight.hpp" />
     <ClInclude Include="cheats\features\sources\misc\thirdperson\thirdperson.hpp" />
     <ClInclude Include="cheats\features\sources\triggerbot\triggerbot.hpp" />
@@ -420,6 +424,7 @@
     <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />
     <ClInclude Include="config\cfgcolor.hpp" />
+    <ClInclude Include="config\cfgWeapon.hpp" />
     <ClInclude Include="config\enums.hpp" />
     <ClInclude Include="config\key.hpp" />
     <ClInclude Include="dependencies\discord\include\discord_register.h" />

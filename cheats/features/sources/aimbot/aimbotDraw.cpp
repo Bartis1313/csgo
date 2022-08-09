@@ -26,13 +26,15 @@ void AimbotDraw::draw()
 
 void AimbotDraw::drawFov()
 {
+    auto cfg = g_Aimbot.getCachedConfig();
+
     if (!config.get<bool>(vars.bDrawFov))
         return;
 
-    if (!config.get<bool>(vars.bAimbot))
+    if (!cfg.m_aimEnabled)
         return;
 
-    if (!config.get<float>(vars.fFovAimbot))
+    if (!cfg.m_fov)
         return;
 
     if (!game::isAvailable())
@@ -48,11 +50,11 @@ void AimbotDraw::drawFov()
 
     float radius = 0.0f;
 
-    switch (config.get<int>(vars.iFovAimbot))
+    switch (cfg.m_methodAim)
     {
     case E2T(AimbotMethod::CROSSHAIR):
     {
-        radius = std::tan(DEG2RAD(config.get<float>(vars.fFovAimbot)) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
+        radius = std::tan(DEG2RAD(cfg.m_fov) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
 
         break;
     }
@@ -71,7 +73,7 @@ void AimbotDraw::drawFov()
         // turn for visualization
         auto forward = math::angleVec({ view.x, view.y + 90.f, 0.f });
         // dist in calcFovReal
-        forward *= config.get<float>(vars.fFovAimbot) * 10.0f;
+        forward *= cfg.m_fov * 10.0f;
         // final vector where we aim
         auto aimingView = destination + forward;
 

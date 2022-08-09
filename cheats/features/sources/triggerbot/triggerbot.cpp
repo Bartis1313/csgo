@@ -14,6 +14,8 @@
 #include "../../../game.hpp"
 #include "../../../utilities/math/math.hpp"
 
+#include "../aimbot/aimbot.hpp"
+
 void Triggerbot::init()
 {
 
@@ -21,7 +23,9 @@ void Triggerbot::init()
 
 void Triggerbot::run(CUserCmd* cmd)
 {
-	if (!config.get<bool>(vars.bTriggerbot))
+	auto cfg = g_Aimbot.getCachedConfig();
+
+	if (!cfg.m_TriggerEnabled)
 		return;
 
 	if (!game::isAvailable())
@@ -53,7 +57,7 @@ void Triggerbot::run(CUserCmd* cmd)
 	const auto current = interfaces::globalVars->m_realtime;
 
 	// because this time is in seconds, so delay must be /1000 (s->ms), when using chrono, you can cast to ms so it's more flexible
-	if ((current - m_delay) < static_cast<float>(config.get<float>(vars.fTriggerDelay) / 1000.0f))
+	if ((current - m_delay) < static_cast<float>(cfg.m_TriggerDelay / 1000.0f))
 		return;
 
 	Trace_t trace;

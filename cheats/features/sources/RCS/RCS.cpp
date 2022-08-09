@@ -11,6 +11,8 @@
 #include "../../../game.hpp"
 #include "../../../../config/vars.hpp"
 
+#include "../aimbot/aimbot.hpp"
+
 void RCS::init()
 {
     m_scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
@@ -18,7 +20,9 @@ void RCS::init()
 
 void RCS::run(CUserCmd* cmd)
 {
-    if (!config.get<bool>(vars.bRCS))
+    auto cfg = g_Aimbot.getCachedConfig();
+
+    if (!cfg.m_RcsEnabled)
         return;
 
     if (!game::isAvailable())
@@ -40,13 +44,15 @@ void RCS::run(CUserCmd* cmd)
 
 void RCS::prepare(CUserCmd* cmd)
 {
+    auto cfg = g_Aimbot.getCachedConfig();
+
     static Vector oldPunch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
     if (cmd->m_buttons & IN_ATTACK)
     {
         Vector punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
 
-        punch.x *= config.get<float>(vars.fRCSx) / 100.0f;
-        punch.y *= config.get<float>(vars.fRCSy) / 100.0f;
+        punch.x *= cfg.m_RcsX / 100.0f;
+        punch.y *= cfg.m_RcsY / 100.0f;
 
         Vector toMove = cmd->m_viewangles += (oldPunch - punch);
         toMove.clamp();
@@ -58,8 +64,8 @@ void RCS::prepare(CUserCmd* cmd)
     else
     {
         Vector punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
-        punch.x *= config.get<float>(vars.fRCSx) / 100.0f;
-        punch.y *= config.get<float>(vars.fRCSy) / 100.0f;
+        punch.x *= cfg.m_RcsX / 100.0f;
+        punch.y *= cfg.m_RcsY / 100.0f;
 
         oldPunch = punch;
     }

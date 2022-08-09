@@ -157,4 +157,18 @@ namespace selections
 		"sprites/radio.vmt",
 		"sprites/white.vmt",
 	};
+
+	inline std::array aimbotWeapons
+	{
+		"Riffle",
+		"Smg",
+		"Machine Gun",
+		"Pistol",
+		"Deagle",
+		"Revolver",
+		"Scout",
+		"Awp",
+		"Auto sniper",
+		"Shotgun"
+	};
 }

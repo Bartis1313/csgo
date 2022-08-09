@@ -28,18 +28,23 @@ void Aimbot::run(CUserCmd* cmd)
 {
     m_view = cmd->m_viewangles;
 
-    if (!config.get<bool>(vars.bAimbot))
+    auto weapon = game::localPlayer->getActiveWeapon();
+    if (!weapon)
+        return;
+    auto weaponCfg = CfgWeapon::getWeaponByIndex(weapon->m_iItemDefinitionIndex());
+    if (weaponCfg == WeaponList::WEAPON_UNKNOWN)
+        return;
+
+    auto indexCfg = E2T(weaponCfg);
+    m_config = config.get<std::vector<CfgWeapon>>(vars.arrAimbot).at(indexCfg);
+
+    if (!m_config.m_aimEnabled)
         return;
 
     if (!game::isAvailable())
         return;
 
     if (!game::localPlayer->isAlive())
-        return;
-
-    auto weapon = game::localPlayer->getActiveWeapon();
-
-    if (!weapon)
         return;
 
     if (weapon->isNonAimable())
@@ -67,7 +72,7 @@ void Aimbot::run(CUserCmd* cmd)
         return;
 
     Vector m_posToAim = m_bestHitpos;
-    if (config.get<bool>(vars.bAimBacktrack))
+    if (m_config.m_aimbacktrack)
     {
         int boneID = 8; // HEAD start
         if (auto modelStudio = interfaces::modelInfo->getStudioModel(m_bestEnt->getModel()); modelStudio != nullptr)
@@ -86,7 +91,7 @@ void Aimbot::run(CUserCmd* cmd)
 
     Vector delta = angle + cmd->m_viewangles - m_view;
 
-    if (auto smoothing = config.get<float>(vars.fSmooth); smoothing)
+    if (auto smoothing = m_config.m_smooth; smoothing)
         angle /= smoothing;
 
     cmd->m_viewangles += angle;
@@ -105,7 +110,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
     // will not work for the special case:
     // delay did not hit timer limit but we switched manually to new target -> should reset the timer. I couldn't detect it without false positives :(
     // epic solution - stop shooting and start again
-    if (config.get<bool>(vars.bAimbotDelay))
+    if (m_config.m_aimDelayEnabled)
     {
         /*if (m_bestEnt && m_bestEnt->isAlive())
         {
@@ -114,7 +119,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
         if (m_bestEnt && !m_delay && !m_bestEnt->isAlive()) // if ent is found and dead, then set field to delay and wait curr time + cfgtime
         {
             m_delay = true;
-            delay = interfaces::globalVars->m_curtime + (config.get<float>(vars.fAimbotDelay) / 1000.0f);
+            delay = interfaces::globalVars->m_curtime + (m_config.m_aimDelay / 1000.0f);
         }
         if (m_delay) // if the delay is hit, check time, so when ent died
         {
@@ -134,7 +139,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
 
     auto hitboxes = getHitboxes();
 
-    float bestFov = config.get<float>(vars.fFovAimbot);
+    float bestFov = m_config.m_fov;
 
     for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
     {
@@ -168,7 +173,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
             if (!game::localPlayer->isPossibleToSee(hitPos))
                 continue;
 
-            auto fov = config.get<int>(vars.iFovAimbot) == E2T(AimbotMethod::CROSSHAIR)
+            auto fov = m_config.m_methodAim == E2T(AimbotMethod::CROSSHAIR)
                 ? math::calcFov(eye, hitPos, angles)
                 : math::calcFovReal(eye, hitPos, angles);
 
@@ -199,6 +204,11 @@ Vector Aimbot::getBestHibox() const
     return m_bestHitpos;
 }
 
+CfgWeapon Aimbot::getCachedConfig() const
+{
+    return m_config;
+}
+
 void Aimbot::resetFields()
 {
     m_bestEnt = nullptr;
@@ -223,7 +233,7 @@ std::vector<size_t> Aimbot::getHitboxes()
 {
     std::vector<size_t> hitboxes = {};
 
-    switch (config.get<int>(vars.iAimbot))
+    switch (m_config.m_aimSelection)
     {
     case E2T(AimbotID::NEAREST):
     {

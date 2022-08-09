@@ -35,6 +35,7 @@ class CParticleCollection;
 class INetChannel;
 struct MapStruct;
 class IMaterialSystem;
+struct Vector;
 
 #define FAST_ARGS void* thisptr, void* edx
 
@@ -191,13 +192,6 @@ namespace hooks
 		inline static fn original = nullptr;
 	};
 
-	struct setupBones
-	{
-		using fn = bool(__thiscall*)(void*, Matrix3x4*, int, int, float);
-		static bool __fastcall hooked(FAST_ARGS, Matrix3x4*, int maxBones, int boneMask, float curtime);
-		inline static fn original = nullptr;
-	};
-
 	struct buildTransformations
 	{
 		using fn = void(__thiscall*)(void*, CStudioHdr*, void*, void*, const Matrix3x4&, int, void*);
@@ -293,6 +287,13 @@ namespace hooks
 	{
 		using fn = bool(__stdcall*)();
 		static bool __stdcall hooked();
+		inline static fn original = nullptr;
+	};
+
+	struct fxBlood
+	{
+		using fn = void(__thiscall*)(void*, Vector&, Vector&, float, float, float, float);
+		static void __fastcall hooked(FAST_ARGS, Vector& pos, Vector& dir, float r, float g, float b, float a);
 		inline static fn original = nullptr;
 	};
 }
