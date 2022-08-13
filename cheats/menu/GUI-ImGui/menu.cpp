@@ -82,6 +82,8 @@ static void renderAimbot()
 				ImGui::Checkbox(XOR("Aim at Backtrack"), &cfg.m_aimbacktrack);
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Will aim at middle of records!"));
+				ImGui::Checkbox(XOR("Smoke check##Aimbot"), &cfg.m_smokeCheck);
+				ImGui::SliderFloat(XOR("Flash limit##Aimbot"), &cfg.m_flashAlphaLimit, 0.0f, 255.0f);
 
 				ImGui::EndGroupPanel();
 			}
@@ -98,6 +100,8 @@ static void renderAimbot()
 		{
 			ImGui::Checkbox(XOR("Backtrack##enabled"), &config.getRef<bool>(vars.bBacktrack));
 			ImGui::SliderFloat(XOR("Backtrack ms"), &config.getRef<float>(vars.fBacktrackTick), 0.0f, 200.0f);
+			ImGui::Checkbox(XOR("Smoke check##Backtrack"), &config.getRef<bool>(vars.bBacktrackSmoke));
+			ImGui::SliderFloat(XOR("Flash limit##Backtrack"), &config.getRef<float>(vars.fBacktrackFlashStart), 0.0f, 255.0f);
 			ImGui::Checkbox(XOR("Latency##enabled"), &config.getRef<bool>(vars.bFakeLatency));
 			ImGui::SliderFloat(XOR("Fake latency ms"), &config.getRef<float>(vars.fFakeLatency), 0.0f, 200.0f);
 
@@ -199,6 +203,10 @@ static void renderVisuals()
 					}
 				);
 				ImGui::MultiCombo(XOR("Esp flags"), selections::flags, config.getRef<std::vector<bool>>(vars.vFlags));
+				ImGui::Checkbox(XOR("Visible only##Visuals"), &config.getRef<bool>(vars.bVisVisibleCheck));
+				ImGui::Checkbox(XOR("Dead only ##Visuals"), &config.getRef<bool>(vars.bDrawDeadOnly));
+				ImGui::Checkbox(XOR("Smoke check##Visuals"), &config.getRef<bool>(vars.bVisSmokeCheck));
+				ImGui::SliderFloat(XOR("Flash limit##Visuals"), &config.getRef<float>(vars.fVisFlashAlphaLimit), 0.0f, 255.0f);
 
 				ImGui::EndGroupPanel();
 			}

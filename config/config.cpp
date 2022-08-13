@@ -103,7 +103,9 @@ bool Config::save(const std::string& file, const bool forceSave)
 					el.m_RcsX,
 					el.m_RcsY,
 					el.m_TriggerEnabled,
-					el.m_TriggerDelay
+					el.m_TriggerDelay,
+					el.m_smokeCheck,
+					el.m_flashAlphaLimit
 				};
 
 				arr.push_back(temp);
@@ -238,6 +240,8 @@ bool Config::load(const std::string& file)
 				original.at(i).m_RcsY = el.at(10).get<float>();
 				original.at(i).m_TriggerEnabled = el.at(11).get<bool>();
 				original.at(i).m_TriggerDelay = el.at(12).get<float>();
+				original.at(i).m_smokeCheck = el.at(13).get<bool>();
+				original.at(i).m_flashAlphaLimit = el.at(14).get<float>();
 			}
 		}
 		else if (std::holds_alternative<Key>(entry.getType()))

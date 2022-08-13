@@ -38,6 +38,8 @@ public:
 		m_RcsY = 50.0f;
 		m_TriggerEnabled = false;
 		m_TriggerDelay = 0.0f;
+		m_smokeCheck = true;
+		m_flashAlphaLimit = 120.0f;
 	}
 
 	bool m_aimEnabled;
@@ -53,6 +55,8 @@ public:
 	float m_RcsY;
 	bool m_TriggerEnabled;
 	float m_TriggerDelay;
+	bool m_smokeCheck;
+	float m_flashAlphaLimit;
 
 	static WeaponList getWeaponByIndex(int weaponID);
 };

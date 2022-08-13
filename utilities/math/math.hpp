@@ -6,6 +6,7 @@
 #include <numbers>
 #include <span>
 #include <vector>
+#include <tuple>
 
 struct ImVec2;
 
@@ -25,11 +26,12 @@ namespace math
 	_NODISCARD float calcFovReal(const Vector& src, const Vector& dest, const Vector& viewAngles);
 	_NODISCARD Vector transformVector(const Vector& in, const Matrix3x4& matrix);
 	_NODISCARD Vector angleVec(const Vector& angle);
-	_NODISCARD void angleVectors(const Vector& angle, Vector& forward, Vector& right, Vector& up);
+	_NODISCARD std::tuple<Vector, Vector, Vector> angleVectors(const Vector& angle);
 	_NODISCARD float normalizeYaw(float yaw);
 	_NODISCARD float normalizePitch(float pitch);
 	// direction vector based on euler dimension
 	_NODISCARD Vector vectorToAngle(const Vector& vec);
 	_NODISCARD std::vector<ImVec2> grahamScan(std::span<const ImVec2> points);
 	_NODISCARD std::vector<ImVec2> giftWrap(std::span<const ImVec2> points);
+	_NODISCARD std::pair<Vector, Vector> transformAABB(const Matrix3x4& transform, const Vector& mins, const Vector& maxs);
 }

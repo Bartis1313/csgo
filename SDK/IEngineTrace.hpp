@@ -1,6 +1,7 @@
 #pragma once
 #include "math/Vector.hpp"
 #include "math/matrix.hpp"
+#include "math/AABB.hpp"
 #include "../utilities/pad.hpp"
 #include "../utilities/vfunc.hpp"
 #include "Enums.hpp"
@@ -105,10 +106,10 @@ public:
 	CollisionGroup_t m_collisionGroup = COLLISION_GROUP_NONE;
 };
 
-
 class IEngineTrace
 {
 public:
 	VFUNC(int, getPointContents, 0, (const Vector& absPosition, int contentsMask), (this, std::cref(absPosition), contentsMask, nullptr));
 	VFUNC(void, traceRay, 5, (const Ray_t& ray, unsigned int mask, TraceFilter* filter, Trace_t* trace), (this, std::cref(ray), mask, filter, trace));
+	VFUNC(bool, isFullyOccluded, 26, (int occlusionKey, const AABB_t& from, const AABB_t& to, const Vector& shadow), (this, occlusionKey, std::cref(from), std::cref(to), std::cref(shadow)));
 };

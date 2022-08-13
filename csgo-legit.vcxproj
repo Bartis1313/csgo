@@ -492,6 +492,7 @@
     <ClInclude Include="SDK\KeyValues.hpp" />
     <ClInclude Include="SDK\KeyValuesSys.hpp" />
     <ClInclude Include="SDK\MapStruct.hpp" />
+    <ClInclude Include="SDK\math\AABB.hpp" />
     <ClInclude Include="SEHcatch.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\chams\chams.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\player\player.hpp" />

@@ -60,7 +60,7 @@ Vector math::angleVec(const Vector& angle)
 	return Vector(cp * cy, cp * sy, -sp);
 }
 
-void math::angleVectors(const Vector& angle, Vector& forward, Vector& right, Vector& up)
+std::tuple<Vector, Vector, Vector> math::angleVectors(const Vector& angle)
 {
 	auto sy = std::sin(DEG2RAD(angle.y));
 	auto cy = std::cos(DEG2RAD(angle.y));
@@ -71,17 +71,22 @@ void math::angleVectors(const Vector& angle, Vector& forward, Vector& right, Vec
 	auto sr = std::sin(DEG2RAD(angle.z));
 	auto cr = std::cos(DEG2RAD(angle.z));
 
+	Vector forward;
 	forward.x = cp * cy;
 	forward.y = cp * sy;
 	forward.z = -sp;
 
+	Vector right;
 	right.x = (-1.0f * sr * sp * cy + -1.0f * cr * -sy);
 	right.y = (-1.0f * sr * sp * sy + -1.0f * cr * cy);
 	right.z = -1.0f * sr * cp;
 
+	Vector up;
 	up.x = (cr * sp * cy + -sr * -sy);
 	up.y = (cr * sp * sy + -sr * cy);
 	up.z = cr * cp;
+
+	return { forward, right, up };
 }
 
 float math::normalizeYaw(float yaw)
@@ -128,6 +133,26 @@ Vector math::vectorToAngle(const Vector& vec)
 	}
 	angle.z = 0.0f;
 	return angle;
+}
+
+std::pair<Vector, Vector> math::transformAABB(const Matrix3x4& transform, const Vector& mins, const Vector& maxs)
+{
+	Vector localCenter = mins + maxs;
+	localCenter *= 0.5f;
+
+	Vector localExtents = maxs - localCenter;
+
+	Vector worldCenter = transformVector(localCenter, transform);
+
+	Vector worldExtents;
+	worldExtents.x = localExtents.dot(transform[0]);
+	worldExtents.y = localExtents.dot(transform[1]);
+	worldExtents.z = localExtents.dot(transform[2]);
+
+	return {
+		worldCenter - worldExtents,
+		worldCenter + worldExtents
+	};
 }
 
 #include "../../dependencies/ImGui/imgui_impl_dx9.h"

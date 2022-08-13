@@ -536,19 +536,72 @@ int Player_t::getWins()
 	return -1;
 }
 
-bool Player_t::isPossibleToSee(const Vector& pos)
+bool Player_t::isPossibleToSee(Player_t* player, const Vector& pos)
 {
 	Trace_t tr;
 	TraceFilter filter;
 	filter.m_skip = this;
 	interfaces::trace->traceRay({ this->getEyePos(), pos }, MASK_PLAYER, &filter, &tr);
 
-	return tr.m_entity == this || tr.m_fraction > 0.97f;
+	return tr.m_entity == player || tr.m_fraction > 0.97f;
+}
+
+bool Player_t::isViewInSmoke(const Vector& pos)
+{
+	using fn = bool(__cdecl*)(Vector, Vector);
+	const static auto call = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, GOES_THROUGH_SMOKE));
+	return call(this->getEyePos(), pos);
 }
 
 uintptr_t Player_t::getLiteralAddress()
 {
 	return *reinterpret_cast<uintptr_t*>(this);
+}
+
+AABB_t Player_t::getOcclusionBounds()
+{
+	auto col = this->collideable();
+	const auto& mins = col->OBBMins();
+	const auto& maxs = col->OBBMaxs();
+
+	auto m_usSolidFlags = col->getSolidFlags();
+	auto m_nSolidType = col->getSolid();
+
+	auto isBoundsDefinedInEntitySpace = [=]()
+	{
+		return ((m_usSolidFlags & 0x40) == 0) &&
+			(m_nSolidType != 2) && (m_nSolidType != 0);
+	};
+
+	if (!isBoundsDefinedInEntitySpace() || col->getCollisionAngles().isZero())
+	{
+		const auto& pos = this->absOrigin();
+		return { pos + mins, pos + maxs };
+	}
+	else
+	{
+		Matrix3x4 mat = col->collisionToWorldTransform();
+		auto [boundsMin, boundsMax] = math::transformAABB(mat, mins, maxs);
+		return { boundsMin, boundsMax };
+	}
+}
+
+#include "../../SDK/ICvar.hpp"
+#include "../../SDK/ConVar.hpp"
+
+AABB_t Player_t::getCameraBounds()
+{
+	const static auto occlusion_test_camera_margins = interfaces::cvar->findVar(XOR("occlusion_test_camera_margins"));
+	const static auto occlusion_test_jump_margin = interfaces::cvar->findVar(XOR("occlusion_test_jump_margin"));
+
+	const auto& pos = this->m_vecOrigin();
+	float cameraMargins = occlusion_test_camera_margins->getFloat();
+	float jumpMargin = occlusion_test_jump_margin->getFloat();
+
+	return {
+		pos + Vector{ 0.0f, 0.0f, 46.0f } - Vector{ cameraMargins, cameraMargins, 0.0f },
+		pos + Vector{ 0.0f, 0.0f, 64.0f } + Vector{ cameraMargins, cameraMargins, jumpMargin }
+	};
 }
 
 ////////////////////////////////////////////////////////////////

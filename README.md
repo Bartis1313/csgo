@@ -119,6 +119,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.5.3 - HUGE recode, cleanup in way that features are inited and run. Also general cleanup/fixes in features. Now every change will be much easier to make, without calling some run() method manually, it all gets called by static object vec, code itself explains it very well. Each class has one task to do, or very limited to more.
 * 1.5.4 - Simplified constructors in base classes. IF possible they should be constexpr.
 * 1.5.5 - Config update for weapons selection in aimbot. Fixed crash with weather on new map. Cleaned up menu a bit.
+* 1.5.6 - Few checks added to aimbot, triggerbot, backtrack and player visuals.
 </details>
 
 # Dependencies

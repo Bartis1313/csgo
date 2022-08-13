@@ -53,11 +53,20 @@ void Triggerbot::run(CUserCmd* cmd)
 	// initialize delays, timer api is not needed since game shares this information
 	/*static auto delay = std::chrono::high_resolution_clock::now();
 	const auto current = std::chrono::high_resolution_clock::now();*/
-	m_delay = interfaces::globalVars->m_realtime;
+	static auto delay = interfaces::globalVars->m_realtime;
 	const auto current = interfaces::globalVars->m_realtime;
 
 	// because this time is in seconds, so delay must be /1000 (s->ms), when using chrono, you can cast to ms so it's more flexible
-	if ((current - m_delay) < static_cast<float>(cfg.m_TriggerDelay / 1000.0f))
+	if ((current - delay) < cfg.m_TriggerDelay / 1000.0f)
+		return;
+
+	if (game::localPlayer->m_flFlashDuration() > 0.0f)
+	{
+		if (game::localPlayer->m_flFlashBangTime() >= cfg.m_flashAlphaLimit)
+			return;
+	}
+
+	if (cfg.m_smokeCheck && game::localPlayer->isViewInSmoke(end))
 		return;
 
 	Trace_t trace;
@@ -67,7 +76,7 @@ void Triggerbot::run(CUserCmd* cmd)
 	interfaces::trace->traceRay({ myEye, end }, MASK_PLAYER, &filter, &trace);
 
 	// so this way we skip time of trace
-	m_delay = current;
+	delay = current;
 
 	if (trace.m_hitgroup == 0)
 		return;
@@ -102,5 +111,5 @@ void Triggerbot::run(CUserCmd* cmd)
 	}*/
 
 	cmd->m_buttons |= IN_ATTACK;
-	m_delay = 0.0f;
+	delay = 0.0f;
 }

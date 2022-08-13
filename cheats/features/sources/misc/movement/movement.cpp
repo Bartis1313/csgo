@@ -181,13 +181,11 @@ void Movement::strafe(CUserCmd* cmd)
 void MovementFix::run(CUserCmd* cmd, const Vector& oldAngle)
 {
 	const Vector angle = { 0.0f, oldAngle.y, 0.0f };
-	Vector forward, right, up;
-	math::angleVectors(angle, forward, right, up);
+	auto [forward, right, up] = math::angleVectors(angle);
 	forward.normalize(); right.normalize(); // because those are not yet normalized
 
 	const Vector angleNow = { 0.0f, cmd->m_viewangles.y, 0.0f };
-	Vector forwardNow, rightNow, upNow;
-	math::angleVectors(angleNow, forwardNow, rightNow, upNow);
+	auto [forwardNow, rightNow, upNow] = math::angleVectors(angleNow);
 
 	const Vector forwardOld = forward * cmd->m_forwardmove;
 	const Vector sideOld = right * cmd->m_sidemove;

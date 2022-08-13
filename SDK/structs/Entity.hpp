@@ -10,6 +10,7 @@
 
 #include "../math/Vector.hpp"
 #include "../math/matrix.hpp"
+#include "../math/AABB.hpp"
 
 class Weapon_t;
 class Player_t;
@@ -183,6 +184,7 @@ public:
 	NETVAR(int, m_hViewModel, "DT_BasePlayer", "m_hViewModel[0]");
 	NETVAR(float, m_flLowerBodyYawTarget, "DT_CSPlayer", "m_flLowerBodyYawTarget");
 	NETVAR(float, m_flFlashDuration, "DT_CSPlayer", "m_flFlashDuration");
+	NETVAR_ADDR(float, m_flFlashBangTime, "DT_CSPlayer", "m_flFlashDuration", -0x10);
 	NETVAR_ADDR(float, m_flNightVisionAlpha, "DT_CSPlayer", "m_flFlashDuration", -0x1C);
 	NETVAR(int, m_lifeState, "DT_CSPlayer", "m_lifeState");
 	NETVAR(int, m_fFlags, "DT_CSPlayer", "m_fFlags");
@@ -214,9 +216,15 @@ public:
 	_NODISCARD int getPing();
 	_NODISCARD std::string getRank(bool useShortName = false);
 	_NODISCARD int getWins();
-	_NODISCARD bool isPossibleToSee(const Vector& pos);
+	_NODISCARD bool isPossibleToSee(Player_t* player, const Vector& pos);
+	_NODISCARD bool isViewInSmoke(const Vector& pos);
 	// address as number
 	_NODISCARD uintptr_t getLiteralAddress();
+
+	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/shared/collisionproperty.cpp#L845
+	_NODISCARD AABB_t getOcclusionBounds();
+	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/server/gameinterface.cpp#L2772
+	_NODISCARD AABB_t getCameraBounds();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

@@ -141,6 +141,12 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
 
     float bestFov = m_config.m_fov;
 
+    if (game::localPlayer->m_flFlashDuration() > 0.0f)
+    {
+        if (game::localPlayer->m_flFlashBangTime() >= m_config.m_flashAlphaLimit)
+            return false;
+    }
+
     for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
     {
         auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
@@ -170,7 +176,10 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
             auto angles = cmd->m_viewangles + punch;
             angles.clamp();
 
-            if (!game::localPlayer->isPossibleToSee(hitPos))
+            if (!game::localPlayer->isPossibleToSee(ent, hitPos))
+                continue;
+
+            if (m_config.m_smokeCheck && game::localPlayer->isViewInSmoke(hitPos))
                 continue;
 
             auto fov = m_config.m_methodAim == E2T(AimbotMethod::CROSSHAIR)

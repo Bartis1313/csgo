@@ -59,10 +59,7 @@ void MotionBlur::run(CViewSetup* view)
 		while (currentYaw < -180.0f)
 			currentYaw += 360.0f;
 
-		Vector currentForwardVec;
-		Vector currentSideVec;
-		Vector uselessVec;
-		math::angleVectors(view->m_angles, currentForwardVec, currentSideVec, uselessVec);
+		auto [currentForwardVec, currentSideVec, uselessVec ] = math::angleVectors(view->m_angles);
 
 		Vector currentPosition = view->m_origin;
 		Vector positionChange = m_motionHistory.m_previousPositon - currentPosition;

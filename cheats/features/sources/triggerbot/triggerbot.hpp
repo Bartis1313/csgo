@@ -11,8 +11,6 @@ public:
 
 	virtual void init();
 	virtual void run(CUserCmd* cmd);
-private:
-	float m_delay;
 };
 
 [[maybe_unused]] inline auto g_Triggerbot = Triggerbot{};

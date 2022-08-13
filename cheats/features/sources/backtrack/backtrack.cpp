@@ -77,6 +77,7 @@ void Backtrack::run(CUserCmd* cmd)
 	Player_t* bestPlayer = nullptr;
 	int bestPlayerIdx = -1;
 	int bestRecordIdx = -1;
+	Vector bestPos = {};
 
 	const auto aimPunch = game::localPlayer->getAimPunch();
 	const auto myEye = game::localPlayer->getEyePos();
@@ -108,11 +109,21 @@ void Backtrack::run(CUserCmd* cmd)
 			bestFov = fov;
 			bestPlayer = ent;
 			bestPlayerIdx = i;
+			bestPos = pos;
 		}
 	}
 
 	if (bestPlayer)
 	{
+		if (game::localPlayer->m_flFlashDuration() > 0.0f)
+		{
+			if (game::localPlayer->m_flFlashBangTime() >= config.get<float>(vars.fBacktrackFlashStart))
+				return;
+		}
+
+		if (config.get<bool>(vars.bBacktrackSmoke) && game::localPlayer->isViewInSmoke(bestPos))
+			return;
+
 		bestFov = 180.0f;
 
 		for (int i = 0; i < m_records.at(bestPlayerIdx).size(); i++)

@@ -2,6 +2,7 @@
 
 #include "../../../../../SDK/ICvar.hpp"
 #include "../../../../../SDK/ConVar.hpp"
+#include "../../../../../SDK/IEngineTrace.hpp"
 #include "../../../../../SDK/interfaces/interfaces.hpp"
 #include "../../../../../SDK/structs/Entity.hpp"
 
@@ -26,23 +27,32 @@ std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
 		return { false, false };
 
 	Vector posDelta = ent->getEyePos() - game::localPlayer->getEyePos();
-	Vector idealAimAngle = math::vectorToAngle(posDelta);
+	/*Vector idealAimAngle = math::vectorToAngle(posDelta);
 
 	idealAimAngle -= ent->m_aimPunchAngle() * m_scale->getFloat();
 
 	Vector curEnemyAngle = ent->m_angEyeAngles();
-	curEnemyAngle.normalize();
+	curEnemyAngle.normalize();*/
 
-	// check trace
-	bool check = ent->isPossibleToSee(game::localPlayer->getEyePos());
+	Vector forward = math::angleVec(game::localPlayer->m_angEyeAngles());
+	// yeah that's hardcoded and not 100% accurate, I thought of something like in radar as "fov view", but we can't be sure if enemy uses fov changer
+	bool isBehind = posDelta.dot(forward) < 15.0f;
+
+	bool check = ent->isPossibleToSee(game::localPlayer(), game::localPlayer->getEyePos()) && !isBehind;
 
 	// dynamic fov
-	float fov = math::calcFovReal(ent->getEyePos(), game::localPlayer->getBonePos(3), curEnemyAngle); // 3 is middle body
+	// float fov = math::calcFovReal(ent->getEyePos(), game::localPlayer->getBonePos(3), curEnemyAngle); // 3 is middle body
 
-	// this can be made with tracing
-	bool checkFov = fov <= 5.0f;
+	Trace_t trace;
+	TraceFilter filter{ ent };
+	const auto eye = ent->getEyePos();
+	constexpr float range = 8192.0f; // because we need max range possible
+	const auto end = eye + (math::angleVec(ent->m_angEyeAngles()) * range);
+	interfaces::trace->traceRay({ eye, end }, MASK_PLAYER, &filter, &trace);
 
-	return { check, checkFov };
+	bool checkAim = trace.m_hitgroup != 0;
+
+	return { check, checkAim };
 }
 
 void EnemyWarning::draw(const std::pair<bool, bool>& checks)

@@ -139,10 +139,9 @@ void Flashlight::run(int frame)
 	if (!m_flashlight)
 		return;
 
-	Vector forward, right, up;
 	Vector angle;
 	interfaces::engine->getViewAngles(angle);
-	math::angleVectors(angle, forward, right, up);
+	auto [forward, right, up] = math::angleVectors(angle);
 
 	m_flashlight->m_isOn = true;
 	m_flashlight->m_castsShadows = true;

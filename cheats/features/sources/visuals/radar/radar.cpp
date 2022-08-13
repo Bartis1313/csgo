@@ -259,10 +259,10 @@ void Radar::draw()
 
 				CfgColor colLine = config.get<CfgColor>(vars.cRadarLine);
 				imRenderWindow.drawLine(entRotatedPos.x - 1, entRotatedPos.y - 1, entRotatedPos.x + finalX, entRotatedPos.y + finalY,
-					game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colLine.getColor() : colLine.getColor().getColorEditAlpha(0.5f));
+					game::localPlayer->isPossibleToSee(ent, ent->getBonePos(8)) ? colLine.getColor() : colLine.getColor().getColorEditAlpha(0.5f));
 				CfgColor colPlayer = config.get<CfgColor>(vars.cRadarPlayer);
 				imRenderWindow.drawCircleFilled(entRotatedPos.x, entRotatedPos.y, dotThickness, 32,
-					game::localPlayer->isPossibleToSee(ent->getBonePos(8)) ? colPlayer.getColor() : colPlayer.getColor().getColorEditAlpha(0.5f));
+					game::localPlayer->isPossibleToSee(ent, ent->getBonePos(8)) ? colPlayer.getColor() : colPlayer.getColor().getColorEditAlpha(0.5f));
 
 			}
 		}

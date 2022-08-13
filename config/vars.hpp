@@ -96,7 +96,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cStepLine, Colors::White, "step line info color");
 	CONFIG_ADD_VARIABLE(bool, bLogEnabled, false, "enable log printing");
 	CONFIG_ADD_VARIABLE(float, fLogMaxTime, 4.0f, "time for how long the log should be visible");
-
+	
 
 	// WORLD
 
@@ -192,6 +192,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(int, iCrosshair, 0, "crosshair mode");
 	CONFIG_ADD_VARIABLE(bool, bBacktrack, false, "backtrack enabled");
 	CONFIG_ADD_VARIABLE(float, fBacktrackTick, 200.0f, "backtrack amount of ticks to manipulate");
+	CONFIG_ADD_VARIABLE(bool, bBacktrackSmoke, true, "backtrack smoke check");
+	CONFIG_ADD_VARIABLE(float, fBacktrackFlashStart, 120.0f, "backtrack flash alpha");
 	CONFIG_ADD_VARIABLE(bool, bFakeLatency, false, "fake latency enabled");
 	CONFIG_ADD_VARIABLE(float, fFakeLatency, 200.0f, "fake latency amount");
 	CONFIG_ADD_VARIABLE(bool, bBunnyHop, false, "bunnyhop enabled");
@@ -284,6 +286,12 @@ struct Variables
 	CONFIG_ADD_VARIABLE(CfgColor, cBackGround1, Color(220, 10, 100, 255), "background color1");
 	CONFIG_ADD_VARIABLE(CfgColor, cBackGround2, Color(65, 75, 105, 255), "background color2");
 	CONFIG_ADD_VARIABLE(CfgColor, cBackGround3, Color(220, 240, 240, 255), "background color3");
+
+	// had to place them there, there is some really weird error with variant and adding vars
+
+	CONFIG_ADD_VARIABLE(bool, bVisSmokeCheck, false, "visuals smoke check");
+	CONFIG_ADD_VARIABLE(bool, bVisVisibleCheck, false, "visuals visible check");
+	CONFIG_ADD_VARIABLE(float, fVisFlashAlphaLimit, 120.0f, "visuals flash alpha limit");
 
 } inline vars;
 #pragma endregion

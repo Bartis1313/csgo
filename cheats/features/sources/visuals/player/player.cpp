@@ -44,6 +44,13 @@ void PlayerVisuals::draw()
 
 	std::pair<bool, bool> warnChecks = { false, false };
 
+	bool isFlashOk = true;
+	if (game::localPlayer->m_flFlashDuration() > 0.0f)
+	{
+		if (game::localPlayer->m_flFlashBangTime() >= config.get<float>(vars.fVisFlashAlphaLimit))
+			isFlashOk = false;
+	}
+
 	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 	{
 		auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
@@ -65,6 +72,17 @@ void PlayerVisuals::draw()
 
 		auto runFeatures = [=]()
 		{
+			if (config.get<bool>(vars.bVisVisibleCheck)
+				&& !game::localPlayer->isPossibleToSee(entity, entity->getHitboxPos(HITBOX_HEAD)))
+				return;
+
+			if (config.get<bool>(vars.bVisSmokeCheck)
+				&& game::localPlayer->isViewInSmoke(entity->getHitboxPos(HITBOX_BELLY)))
+				return;
+
+			if (!isFlashOk)
+				return;
+
 			drawPlayer(entity);
 			drawSkeleton(entity);
 			runDLight(entity);
