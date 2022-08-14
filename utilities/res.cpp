@@ -32,7 +32,7 @@ Resource::Resource(const std::string& path)
     surfaceRender.initNewTexture(m_textureID, m_buffer, m_width, m_height);
     stbi_image_free(m_buffer);
 
-    resBufferCollect::m_resBuf.push_back(*this);
+    m_resBuf.push_back(*this);
 
     console.log(TypeLogs::LOG_INFO, XOR("Image with path {} loaded!"), path);
 }
@@ -62,7 +62,7 @@ Resource::Resource(int resID, const std::string_view type)
     stbi_image_free(m_buffer);
     LF(FreeResource)(hResData);
 
-    resBufferCollect::m_resBuf.push_back(*this);
+    m_resBuf.push_back(*this);
 
     console.log(TypeLogs::LOG_INFO, XOR("Resource ID {}:{} image loaded!"), resID, type);
 }
@@ -79,12 +79,12 @@ Resource::Resource(void* data, size_t size)
     m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
     stbi_image_free(m_buffer);
 
-    resBufferCollect::m_resBuf.push_back(*this);
+    m_resBuf.push_back(*this);
 
     console.log(TypeLogs::LOG_INFO, XOR("Image from memory loaded!"));
 }
 
-void resBufferCollect::destroyAll()
+void Resource::destroyAll()
 {
     for (const auto& el : m_resBuf)
     {

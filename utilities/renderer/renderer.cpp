@@ -1262,7 +1262,7 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 
 			if (obj.m_dropShadow)
 			{
-				const auto alpha = ImGui::ColorConvertU32ToFloat4(obj.m_color).z;
+				const auto alpha = ImGui::ColorConvertU32ToFloat4(obj.m_color).w;
 				draw->AddText({ pos.x + 1.0f, pos.y + 1.0f }, U32(Colors::Black.getColorEditAlpha(alpha)), obj.m_text.c_str());
 			}
 
@@ -1284,7 +1284,7 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 
 			if (obj.m_dropShadow)
 			{
-				const auto alpha = ImGui::ColorConvertU32ToFloat4(obj.m_color).z;
+				const auto alpha = ImGui::ColorConvertU32ToFloat4(obj.m_color).w;
 				draw->AddText(obj.m_font, obj.m_size, { pos.x + 1.0f, pos.y + 1.0f }, U32(Colors::Black.getColorEditAlpha(alpha)), obj.m_text.c_str());
 			}
 			

@@ -207,6 +207,8 @@ static void renderVisuals()
 				ImGui::Checkbox(XOR("Dead only ##Visuals"), &config.getRef<bool>(vars.bDrawDeadOnly));
 				ImGui::Checkbox(XOR("Smoke check##Visuals"), &config.getRef<bool>(vars.bVisSmokeCheck));
 				ImGui::SliderFloat(XOR("Flash limit##Visuals"), &config.getRef<float>(vars.fVisFlashAlphaLimit), 0.0f, 255.0f);
+				ImGui::SliderFloat(XOR("Dormacy time##Visuals"), &config.getRef<float>(vars.fVisDormacyTime), 0.0f, 15.0f);
+				ImGui::SliderFloat(XOR("Dormacy time box##Visuals"), &config.getRef<float>(vars.fVisDormacyTimeLimit), 0.0f, 15.0f);
 
 				ImGui::EndGroupPanel();
 			}

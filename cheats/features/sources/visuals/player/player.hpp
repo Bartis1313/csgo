@@ -35,9 +35,27 @@ private:
 	void drawSkeleton(Player_t* ent);
 	void drawSnapLine(Player_t* ent, const Box& box);
 	void drawLaser(Player_t* ent);
+	void resetDormacy([[maybe_unused]] IGameEvent* event);
+	void updateDormacy(Player_t* ent);
 
 	std::array<int, 65> m_health;
 	std::array<int, 65> m_armor;
+
+	struct DormacyInfo_t
+	{
+		float m_alpha;
+		Vector m_lastPos;
+		float m_lastUpdate;
+		bool m_calledEvent;
+
+		bool isValid() const;
+	};
+
+	// for everything except boxes
+	std::array<DormacyInfo_t, 65> m_dormant;
+	std::array<float, 65> m_boxAlpha;
+
+	bool m_calledEvent; // for dormacy resets
 };
 
 [[maybe_unused]] inline auto g_PlayerVisuals = PlayerVisuals{};

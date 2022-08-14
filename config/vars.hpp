@@ -96,6 +96,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(Color, cStepLine, Colors::White, "step line info color");
 	CONFIG_ADD_VARIABLE(bool, bLogEnabled, false, "enable log printing");
 	CONFIG_ADD_VARIABLE(float, fLogMaxTime, 4.0f, "time for how long the log should be visible");
+	CONFIG_ADD_VARIABLE(float, fVisDormacyTime, 1.0f, "dormacy fade time");
+	CONFIG_ADD_VARIABLE(float, fVisDormacyTimeLimit, 15.0f, "dormacy fade time limit (for boxes)");
 	
 
 	// WORLD

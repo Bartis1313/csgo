@@ -87,8 +87,8 @@ VOID WINAPI _looper(PVOID instance)
     hooks::wndProcSys::shutdown();
     BaseHack::shutdownAll();
     Events::shutdownAllEvents();
+    Resource::destroyAll();
     hooks::shutdown();
-    resBufferCollect::destroyAll();
     menu.shutdown();
     console.log(TypeLogs::LOG_INFO, XOR("Hack shutdown"));
     console.shutdown();

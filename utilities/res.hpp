@@ -8,10 +8,10 @@ struct IDirect3DTexture9;
 class Resource final
 {
 public:
-	Resource() = delete;
 	Resource(const std::string& path);
 	Resource(int resID, const std::string_view type);
 	Resource(void* data, size_t size);
+	static void destroyAll();
 	// imgui
 	IDirect3DTexture9* getTexture() const { return m_texture; }
 	// surface
@@ -25,10 +25,6 @@ private:
 	int m_textureID = -1;
 	int m_width;
 	int m_height;
-};
 
-namespace resBufferCollect
-{
 	inline static std::vector<Resource> m_resBuf;
-	void destroyAll();
-}
+};
