@@ -17,7 +17,7 @@ void Thirdperson::init()
 	
 }
 
-void Thirdperson::run()
+void Thirdperson::run(CViewSetup* view)
 {
 	if (!config.get<bool>(vars.bThirdp))
 		return;
@@ -25,10 +25,6 @@ void Thirdperson::run()
 	if (!game::isAvailable())
 		return;
 
-	if (!game::localPlayer->isAlive())
-		return;
-
-	// TODO: reduce calls
 	if (bool state = config.get<Key>(vars.kThirdp).isEnabled(); state)
 	{
 		Vector angles;
@@ -41,7 +37,7 @@ void Thirdperson::run()
 
 		Vector camera =
 		{
-			std::cos(DEG2RAD(fixedX)) * config.get<float>(vars.fThirdpDistance),
+			std::cos(DEG2RAD(fixedY)) * config.get<float>(vars.fThirdpDistance),
 			std::sin(DEG2RAD(fixedY)) * config.get<float>(vars.fThirdpDistance),
 			std::sin(DEG2RAD(-fixedX)) * config.get<float>(vars.fThirdpDistance),
 		};

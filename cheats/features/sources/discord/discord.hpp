@@ -3,7 +3,7 @@
 class DiscordPresence final
 {
 public:
-	DiscordPresence();
+	void init();
 	void run();
 	void shutdown();
 };

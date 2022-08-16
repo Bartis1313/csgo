@@ -25,8 +25,6 @@
 
 using namespace std::literals;
 
-VOID WINAPI _looper(PVOID instance);
-
 static bool inited = false;
 
 DWORD WINAPI init(PVOID instance)
@@ -69,18 +67,10 @@ DWORD WINAPI init(PVOID instance)
     return TRUE;
 }
 
-VOID WINAPI _looper(PVOID instance)
-{
-    static DiscordPresence dc{};
-    while (!config.get<Key>(vars.kPanic).isPressed())
-    {
-        if (inited)
-        {
-            dc.run();
-            std::this_thread::sleep_for(1s);
-        }
-    }
+DiscordPresence dc;
 
+VOID WINAPI _shutdown(PVOID instance)
+{
     globals::isShutdown = true;
 
     RemoveVectoredExceptionHandler(globals::instance);
@@ -97,6 +87,21 @@ VOID WINAPI _looper(PVOID instance)
     LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
 }
 
+VOID WINAPI _looper(PVOID instance)
+{
+    dc.init();
+    while (!config.get<Key>(vars.kPanic).isPressed())
+    {
+        if (inited)
+        {
+            dc.run();
+            std::this_thread::sleep_for(1s);
+        }
+    }
+
+    _shutdown(instance);
+}
+
 BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID reserved)
 {
     if (reason == DLL_PROCESS_ATTACH)
@@ -110,10 +115,18 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
         if (auto initThread = LF(CreateThread)(nullptr, NULL, init, instance, NULL, nullptr))
             LF(CloseHandle)(initThread);
 
-        if (auto shutdownThread = LF(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_looper), instance, NULL, nullptr))
-            LF(CloseHandle)(shutdownThread);
+        if (auto looperThread = LF(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_looper), instance, NULL, nullptr))
+            LF(CloseHandle)(looperThread);
 
         return TRUE;
+    }
+    else if (reason == DLL_PROCESS_DETACH)
+    {
+        if (!globals::isShutdown) // then panic key forced shutdown
+        {
+            if (auto shutdownThread = LF(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_shutdown), instance, NULL, nullptr))
+                LF(CloseHandle)(shutdownThread);
+        }
     }
 
     return FALSE;

@@ -14,7 +14,7 @@
 
 #include "../../../game.hpp"
 
-DiscordPresence::DiscordPresence()
+void DiscordPresence::init()
 {
 	Discord_Initialize(XOR("990623614527213578"), NULL, 1, XOR("730")); // GetAppID -> 730
 }

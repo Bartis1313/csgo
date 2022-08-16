@@ -45,7 +45,7 @@ void Logger::draw()
 			el.m_color = el.m_color.getColorEditAlpha(scale * 3.0f); // some alpha up
 		}
 		
-		imRender.text(10.0f, el.m_y, ImFonts::tahoma14, el.m_text, false, el.m_color, false);
+		imRender.text(10.0f, el.m_y, el.m_font, el.m_text, false, el.m_color, false);
 
 		i++;
 	}

@@ -1,16 +1,18 @@
 #pragma once
 
-#include "../../../classes/doPostScreen.hpp"
+#include "../../../classes/overrideView.hpp"
 
-class Thirdperson : public DoPostScreenType
+class CViewSetup;
+
+class Thirdperson : public OverrideViewType
 {
 public:
 	constexpr Thirdperson() :
-		DoPostScreenType{}
+		OverrideViewType{}
 	{}
 
 	virtual void init();
-	virtual void run();
+	virtual void run([[maybe_unused]] CViewSetup* view);
 };
 
 [[maybe_unused]] inline auto g_Thirdperson = Thirdperson{};
