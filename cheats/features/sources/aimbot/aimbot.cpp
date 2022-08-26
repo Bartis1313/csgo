@@ -18,6 +18,7 @@
 #include "../../../game.hpp"
 #include "../../../utilities/math/math.hpp"
 #include "../backtrack/backtrack.hpp"
+#include "../cache/cache.hpp"
 
 void Aimbot::init()
 {
@@ -147,9 +148,9 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
             return false;
     }
 
-    for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+    for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
     {
-        auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+        auto ent = reinterpret_cast<Player_t*>(entity);
 
         if (!ent)
             continue;
@@ -160,7 +161,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
         if (!ent->isAlive() || !game::localPlayer->isAlive())
             continue;
 
-        if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+        if (!ent->isOtherTeam(game::localPlayer()))
             continue;
 
         if (ent->isDormant())

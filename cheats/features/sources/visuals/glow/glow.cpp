@@ -47,7 +47,7 @@ void Glow::run()
 		{
 		case CCSPlayer:
 		{
-			if (ent->m_iTeamNum() != game::localPlayer->m_iTeamNum())
+			if (!ent->isOtherTeam(game::localPlayer()))
 			{
 				glow.set(config.get<CfgColor>(vars.cGlow).getColor());
 				glow.m_fullBloom = false;

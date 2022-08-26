@@ -604,6 +604,22 @@ AABB_t Player_t::getCameraBounds()
 	};
 }
 
+bool Player_t::isOtherTeam(Player_t* player)
+{
+	const static auto mp_teammates_are_enemies = interfaces::cvar->findVar(XOR("mp_teammates_are_enemies"));
+	bool isDM = false;
+	if (mp_teammates_are_enemies && mp_teammates_are_enemies->getInt())
+		isDM = true;
+
+	if (isDM && this->m_iTeamNum() == player->m_iTeamNum())
+		return true;
+
+	if (this->m_iTeamNum() != player->m_iTeamNum())
+		return true;
+
+	return false;
+}
+
 ////////////////////////////////////////////////////////////////
 
 Vector Inferno_t::getInfernoPos(size_t indexFire)

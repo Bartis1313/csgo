@@ -14,6 +14,7 @@
 #include "../../../game.hpp"
 #include "../../../../config/vars.hpp"
 #include "../../../../utilities/math/math.hpp"
+#include "../cache/cache.hpp"
 
 void Backtrack::init()
 {
@@ -82,12 +83,9 @@ void Backtrack::run(CUserCmd* cmd)
 	const auto aimPunch = game::localPlayer->getAimPunch();
 	const auto myEye = game::localPlayer->getEyePos();
 
-	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
 	{
-		const auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
-
-		if (!ent)
-			continue;
+		auto ent = reinterpret_cast<Player_t*>(entity);
 
 		if (ent == game::localPlayer)
 			continue;
@@ -98,7 +96,7 @@ void Backtrack::run(CUserCmd* cmd)
 		if (ent->isDormant())
 			continue;
 
-		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+		if (!ent->isOtherTeam(game::localPlayer()))
 			continue;
 
 		const auto& pos = ent->absOrigin();
@@ -108,7 +106,7 @@ void Backtrack::run(CUserCmd* cmd)
 		{
 			bestFov = fov;
 			bestPlayer = ent;
-			bestPlayerIdx = i;
+			bestPlayerIdx = idx;
 			bestPos = pos;
 		}
 	}
@@ -174,9 +172,6 @@ void BackTrackUpdater::run(int frame)
 
 	constexpr auto isGoodEnt = [](Player_t* ent)
 	{
-		if (!ent)
-			return false;
-
 		if (ent == game::localPlayer)
 			return false;
 
@@ -186,17 +181,19 @@ void BackTrackUpdater::run(int frame)
 		if (!ent->isAlive())
 			return false;
 
-		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+		if (!ent->isOtherTeam(game::localPlayer()))
 			return false;
 
 		return true;
 	};
 
-	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
 	{
-		auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+		auto ent = reinterpret_cast<Player_t*>(entity);
 
-		if (!isGoodEnt(entity))
+		auto i = idx;
+
+		if (!isGoodEnt(ent))
 		{
 			// don't add bunch of useless records
 			records.at(i).clear();
@@ -204,16 +201,16 @@ void BackTrackUpdater::run(int frame)
 		}
 
 		// if record at this index is filled and has exactly same simulation time, don't update it
-		if (records.at(i).size() && (records.at(i).front().m_simtime == entity->m_flSimulationTime()))
+		if (records.at(i).size() && (records.at(i).front().m_simtime == ent->m_flSimulationTime()))
 			continue;
 
-		if (!g_Backtrack.isValid(entity->m_flSimulationTime() /*m_correct.at(i).m_correctSimtime*/))
+		if (!g_Backtrack.isValid(ent->m_flSimulationTime() /*m_correct.at(i).m_correctSimtime*/))
 			continue;
 
 		Backtrack::StoredRecord record = {};
-		record.m_origin = entity->absOrigin();
-		record.m_simtime = entity->m_flSimulationTime();
-		if (!entity->setupBonesShort(record.m_matrix.data(), entity->m_CachedBoneData().m_size,
+		record.m_origin = ent->absOrigin();
+		record.m_simtime = ent->m_flSimulationTime();
+		if (!ent->setupBonesShort(record.m_matrix.data(), ent->m_CachedBoneData().m_size,
 			BONE_USED_MASK, interfaces::globalVars->m_curtime))
 			continue;
 		record.m_head = record.m_matrix[8].origin();
@@ -225,11 +222,14 @@ void BackTrackUpdater::run(int frame)
 		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(game::timeToTicks(correcttime)))
 			records.at(i).pop_back();
 
-		// if it's not valid then clean up everything on this record
-		if (auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [this](const Backtrack::StoredRecord& rec)
+		auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [this](const Backtrack::StoredRecord& rec)
 			{
 				return !g_Backtrack.isValid(rec.m_simtime);
-			}); invalid != std::cend(records.at(i)))
+			});
+		// if it's not valid then clean up everything on this record
+		if (invalid != std::cend(records.at(i)))
 			records.at(i).erase(invalid, std::cend(records.at(i)));
+
+		i++;
 	}
 }

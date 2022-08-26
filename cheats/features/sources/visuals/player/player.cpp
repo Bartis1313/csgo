@@ -27,6 +27,7 @@
 #include "enemyWarn.hpp"
 #include "sounds.hpp"
 #include "../../events/events.hpp"
+#include "../../cache/cache.hpp"
 
 void PlayerVisuals::init()
 {
@@ -52,28 +53,25 @@ void PlayerVisuals::draw()
 			isFlashOk = false;
 	}
 
-	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
 	{
-		auto entity = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+		auto ent = reinterpret_cast<Player_t*>(entity);
 
-		if (!entity)
+		if (ent == game::localPlayer)
 			continue;
 
-		if (entity == game::localPlayer)
+		if (!ent->isAlive())
 			continue;
 
-		if (!entity->isAlive())
+		if (!ent->isOtherTeam(game::localPlayer()))
 			continue;
 
-		if (entity->m_iTeamNum() == game::localPlayer->m_iTeamNum())
-			continue;
-
-		updateDormacy(entity);
+		updateDormacy(ent);
 
 		if (m_calledEvent)
 			continue;
 
-		if (!m_dormant.at(i).isValid())
+		if (!m_dormant.at(idx).isValid())
 			continue;
 
 		// not going to render targets that are too far away
@@ -83,20 +81,20 @@ void PlayerVisuals::draw()
 		auto runFeatures = [=]()
 		{
 			if (config.get<bool>(vars.bVisVisibleCheck)
-				&& !game::localPlayer->isPossibleToSee(entity, entity->getHitboxPos(HITBOX_HEAD)))
+				&& !game::localPlayer->isPossibleToSee(ent, ent->getHitboxPos(HITBOX_HEAD)))
 				return;
 
 			if (config.get<bool>(vars.bVisSmokeCheck)
-				&& game::localPlayer->isViewInSmoke(entity->getHitboxPos(HITBOX_BELLY)))
+				&& game::localPlayer->isViewInSmoke(ent->getHitboxPos(HITBOX_BELLY)))
 				return;
 
 			if (!isFlashOk)
 				return;
 
-			drawPlayer(entity);
-			drawSkeleton(entity);
-			runDLight(entity);
-			drawLaser(entity);
+			drawPlayer(ent);
+			drawSkeleton(ent);
+			runDLight(ent);
+			drawLaser(ent);
 			g_SoundDraw.findBest(entity);
 		};
 
@@ -108,7 +106,7 @@ void PlayerVisuals::draw()
 		else
 			runFeatures();
 
-		warnChecks = g_EnemyWarning.check(entity);
+		warnChecks = g_EnemyWarning.check(ent);
 	}
 	g_SoundDraw.draw();
 	g_EnemyWarning.draw(warnChecks);
@@ -249,7 +247,7 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 
 	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::BOT)))
 		if(info.m_fakePlayer)
-			flags.emplace_back(std::make_pair(XOR("BOT"), Colors::Yellow));
+			flags.emplace_back(std::make_pair(XOR("BOT"), Colors::Yellow.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
 	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::MONEY)))
 		flags.emplace_back(std::make_pair(FORMAT(XOR("{}$"), ent->m_iAccount()), Colors::Green.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));

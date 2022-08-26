@@ -220,7 +220,7 @@ void Radar::draw()
 		// draw small circle where are we
 		imRenderWindow.drawCircleFilled(middleX, middleY, 5.0f, 12, Colors::Green);
 
-		for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+		for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++) // uisng cache might be not so much updated each frame, so I am using standard way
 		{
 			auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
 
@@ -236,7 +236,7 @@ void Radar::draw()
 			if (!ent->isAlive() || !game::localPlayer->isAlive())
 				continue;
 
-			if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+			if (!ent->isOtherTeam(game::localPlayer()))
 				continue;
 
 			const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vector2D{}, Vector2D{ imRenderWindow.getWidth(), imRenderWindow.getHeight() }, config.get<float>(vars.fRadarScale), true);

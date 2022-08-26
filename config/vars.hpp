@@ -166,6 +166,7 @@ struct Variables
 	CONFIG_ADD_VARIABLE(bool, bControlTone, false, "control tone enabled");
 	CONFIG_ADD_VARIABLE(float, fControlToneMin, 0.5f, "control tone min");
 	CONFIG_ADD_VARIABLE(float, fControlToneMax, 0.5f, "control tone max");
+	CONFIG_ADD_VARIABLE(float, fControlToneBloomScale, 0.0f, "control bloom scale");
 	CONFIG_ADD_VARIABLE(bool, bWeather, false, "custom weather enabled");
 	CONFIG_ADD_VARIABLE(float, fWeatherRainLenght, 0.0f, "weather rain lenght");
 	CONFIG_ADD_VARIABLE(float, fWeatherRainSpeed, 0.0f, "weather rain speed");
@@ -174,6 +175,8 @@ struct Variables
 	CONFIG_ADD_VARIABLE(float, fWeatherRainSideVel, 0.0f, "weather rain side vel");
 	CONFIG_ADD_VARIABLE(float, fWeatherRainAlpha, 0.0f, "weather rain alpha");
 	CONFIG_ADD_VARIABLE(float, fWeatherWindSpeed, 0.0f, "weather rain wind speed");
+	CONFIG_ADD_VARIABLE(bool, bAmbientLight, false, "ambient light enabled");
+	CONFIG_ADD_VARIABLE(Color, cAmbientLight, Colors::LightBlue, "ambient light color");
 
 	// MASTER SWITCHES
 

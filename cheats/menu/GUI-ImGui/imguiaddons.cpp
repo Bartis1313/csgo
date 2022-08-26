@@ -148,6 +148,9 @@ bool ImGui::ColorPicker(const char* label, CfgColor* clr)
                 ImGui::PushItemWidth(seperateLimit * paletteButtonSize.x);
                 ImGui::SliderFloat("##ranbowspeed", &clr->getSpeedRef(), 0.0f, 15.0f, "Speed %.1f", ImGuiSliderFlags_Logarithmic);
                 ImGui::PopItemWidth();
+
+                // apply return as updated color
+                toReturn = true;
             }
 
             ImGui::EndChild();

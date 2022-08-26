@@ -20,6 +20,8 @@
 #include "../../../../../SDK/IVModelInfo.hpp"
 #include "../../../../../SDK/IClientEntityList.hpp"
 
+#include "../../cache/cache.hpp"
+
 #define DETONATE 1
 #define BOUNCE 2
 
@@ -138,9 +140,9 @@ void GrenadePrediction::draw()
 	constexpr float b = 25.0f;
 	constexpr float c = 140.0f;
 
-	for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
+	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
 	{
-		auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+		auto ent = reinterpret_cast<Player_t*>(entity);
 		if (!ent)
 			continue;
 
@@ -150,7 +152,7 @@ void GrenadePrediction::draw()
 		if (!ent->isAlive())
 			continue;
 
-		if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum())
+		if (!ent->isOtherTeam(game::localPlayer()))
 			continue;
 
 		float deltaDist = (ent->absOrigin() - m_path.back()).length();

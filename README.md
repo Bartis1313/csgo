@@ -121,6 +121,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.5.5 - Config update for weapons selection in aimbot. Fixed crash with weather on new map. Cleaned up menu a bit.
 * 1.5.6 - Few checks added to aimbot, triggerbot, backtrack and player visuals.
 * 1.5.7 - Visual update for fading, players and dropped weapons. Cleanup in Resource class.
+* 1.5.8 - Cache for ents done, when drawing something ent based in present hook you should stick to normal classic loop, as commented in radar file.
 </details>
 
 # Dependencies

@@ -14,7 +14,7 @@
 
 void MotionBlur::init()
 {
-
+	m_motionBlurAddr = utilities::patternScan(CLIENT_DLL, BLUR_MATERIAL_ARR_1, 0x1);
 }
 
 // 1:1 from https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/viewpostprocess.cpp#L2996
@@ -209,6 +209,12 @@ void MotionBlur::render()
 	MotionBlurInternal->setVectorComponent(m_motionBlurValues[1], 1);
 	MotionBlurInternal->setVectorComponent(m_motionBlurValues[2], 2);
 	MotionBlurInternal->setVectorComponent(m_motionBlurValues[3], 3);
+	
+	// todo: find easiest way to trick the game we run motion blur, (easiest and best way - mempatch correct bytes)
+
+	// edit those fields from memory, todo
+	//float* motionBlurIntervalValues = *reinterpret_cast<float**>(m_motionBlurAddr);
+	//motionBlurIntervalValues = m_motionBlurValues.data();
 
 	static IMaterialVar* MotionBlurViewPortInternal = motion_blur->findVar(XOR("$MotionBlurViewportInternal"), nullptr, false);
 

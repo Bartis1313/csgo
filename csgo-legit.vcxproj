@@ -152,6 +152,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\features\sources\aimbot\aimbotDraw.cpp" />
+    <ClCompile Include="cheats\features\sources\cache\cache.cpp" />
     <ClCompile Include="cheats\features\sources\fakelatency\fakelatency.cpp" />
     <ClCompile Include="cheats\features\sources\misc\counters\counters.cpp" />
     <ClCompile Include="cheats\features\sources\misc\flashlight\flashlight.cpp" />
@@ -190,7 +191,9 @@
     <ClCompile Include="cheats\features\sources\visuals\player\sounds.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\plots\plots.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\tracer\tracer.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\ambient.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\world\bomb.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\world\dropped.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\world\fog.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\world\impacts.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\world\modulateColors.cpp" />
@@ -238,7 +241,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\features\sources\visuals\radar\radar.cpp" />
-    <ClCompile Include="cheats\features\sources\visuals\world\world.cpp" />
     <ClCompile Include="cheats\game.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -375,6 +377,7 @@
     <ClInclude Include="cheats\features\classes\screen2dEffects.hpp" />
     <ClInclude Include="cheats\features\sources\aimbot\aimbot.hpp" />
     <ClInclude Include="cheats\features\sources\aimbot\aimbotDraw.hpp" />
+    <ClInclude Include="cheats\features\sources\cache\cache.hpp" />
     <ClInclude Include="cheats\features\sources\fakelatency\fakelatency.hpp" />
     <ClInclude Include="cheats\features\sources\misc\counters\counters.hpp" />
     <ClInclude Include="cheats\features\sources\misc\flashlight\flashlight.hpp" />
@@ -406,7 +409,9 @@
     <ClInclude Include="cheats\features\sources\visuals\player\sounds.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\plots\plots.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\tracer\tracer.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\ambient.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\world\bomb.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\world\dropped.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\world\fog.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\world\impacts.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\world\modulateColors.hpp" />
@@ -498,7 +503,6 @@
     <ClInclude Include="cheats\features\sources\visuals\player\player.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\glow\glow.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\radar\radar.hpp" />
-    <ClInclude Include="cheats\features\sources\visuals\world\world.hpp" />
     <ClInclude Include="cheats\game.hpp" />
     <ClInclude Include="cheats\globals.hpp" />
     <ClInclude Include="cheats\hooks\hooks.hpp" />

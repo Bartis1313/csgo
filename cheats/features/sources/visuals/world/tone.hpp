@@ -1,11 +1,16 @@
 #pragma once
 
-class EnvTonemapController_t;
+#include "../../../classes/frameStage.hpp"
 
-class ToneController
+class ToneController : public FrameStageType
 {
 public:
-	void run(EnvTonemapController_t* ent);
+	constexpr ToneController() :
+		FrameStageType{}
+	{}
+
+	virtual void init();
+	virtual void run(int frame);
 	void setStateSlider(bool state) { m_checkStateSlider = state; }
 	void setStateButton(bool state) { m_checkStateButton = state; }
 private:

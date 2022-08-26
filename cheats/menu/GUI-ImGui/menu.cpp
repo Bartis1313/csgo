@@ -360,6 +360,7 @@ static void renderVisuals()
 #include "../../features/sources/visuals/radar/radar.hpp"
 #include "../../features/sources/visuals/world/skybox.hpp"
 #include "../../features/sources/visuals/world/weather.hpp"
+#include "../../features/sources/visuals/world/ambient.hpp"
 #include "../../features/sources/visuals/world/tone.hpp"
 #include "../../../dependencies/ImGui/imgui_stdlib.h"
 
@@ -596,7 +597,7 @@ static void renderMisc()
 							"TE_BEAMLASER 8\n"
 							"TE_BEAMTESLA 9\n"
 						));*/
-						ImGui::InputTextWithHint(XOR("Beam flags"), XOR("Add without spaces! eg: 4|8"), &config.getRef<std::string>(vars.sBulletTracer));
+						ImGui::InputTextWithHint(XOR("Beam flags"), XOR("eg: 4|8, spaces allowed"), &config.getRef<std::string>(vars.sBulletTracer));
 						ImGui::SameLine();
 						ImGui::HelpMarker(XOR("Flags list\n"
 							"FBEAM_STARTENTITY 1\n"
@@ -701,11 +702,11 @@ static void renderMisc()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Tone control pop"), []()
 					{
-						bool changed1 = false;
-						changed1 |= ImGui::SliderFloat(XOR("Tone min"), &config.getRef<float>(vars.fControlToneMin), 0.0f, 1.0f);
-						bool changed2 = false;
-						changed2 |= ImGui::SliderFloat(XOR("Tone max"), &config.getRef<float>(vars.fControlToneMax), 0.0f, 1.0f);
-						g_ToneController.setStateSlider(changed1 || changed2);
+						bool changed = false;
+						changed |= ImGui::SliderFloat(XOR("Tone min"), &config.getRef<float>(vars.fControlToneMin), 0.0f, 1.0f);
+						changed |= ImGui::SliderFloat(XOR("Tone max"), &config.getRef<float>(vars.fControlToneMax), 0.0f, 1.0f);
+						changed |= ImGui::SliderFloat(XOR("Tone bloom scale"), &config.getRef<float>(vars.fControlToneBloomScale), 0.0f, 16.0f);
+						g_ToneController.setStateSlider(changed);
 					}
 				);
 				ImGui::Checkbox(XOR("Weather"), &config.getRef<bool>(vars.bWeather));
@@ -727,6 +728,14 @@ static void renderMisc()
 						ImGui::SliderFloat(XOR("Roll intensity##Motion Blur"), &config.getRef<float>(vars.fMotionBlurRollIntensity), 0.0f, 1.0f);
 					}
 				);
+				bool changedbut2 = false;
+				changedbut2 |= ImGui::Checkbox(XOR("Ambient"), &config.getRef<bool>(vars.bAmbientLight));
+				g_AmbientLight.setButtonState(changedbut2);
+				ImGui::SameLine();
+				bool changed = false;
+				changed |= ImGui::ColorPicker(XOR("Color##ambient col"), &config.getRef<CfgColor>(vars.cAmbientLight));
+				g_AmbientLight.setPickerState(changed);
+				ImGui::SameLine();
 				
 				ImGui::EndGroupPanel();
 			}

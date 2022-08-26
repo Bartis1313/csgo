@@ -19,6 +19,7 @@
 #include "../../../../../utilities/renderer/renderer.hpp"
 
 #include "../../events/events.hpp"
+#include "../../cache/cache.hpp"
 
 void BombOverlay::init()
 {
@@ -122,4 +123,23 @@ void BombOverlay::handleWhoPlanted(IGameEvent* event)
 void BombOverlay::handleResetBomb(IGameEvent* event)
 {
 	m_bombEnt = nullptr;
+}
+
+void BombOverlayEntGrabber::init()
+{
+
+}
+
+void BombOverlayEntGrabber::run(int frame)
+{
+	if (frame != FRAME_RENDER_START)
+		return;
+
+	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::WORLD_ENTS))
+	{
+		if (classID != CPlantedC4)
+			continue;
+
+		g_BombOverlay.m_bombEnt = reinterpret_cast<Bomb_t*>(entity);
+	}
 }

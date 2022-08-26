@@ -1,26 +1,23 @@
 #pragma once
 
-#include "../../../classes/onlyInit.hpp"
+#include "../../../classes/renderableToSurface.hpp"
 #include "../../../classes/frameStage.hpp"
 
-class Smoke_t;
 struct Vector;
 class Color;
 struct ImFont;
 using ImDrawFlags = int;
 
-class SmokeDraw : public OnlyInitType
+class SmokeDraw : public RenderableSurfaceType
 {
 public:
 	constexpr SmokeDraw() :
-		OnlyInitType{}
+		RenderableSurfaceType{}
 	{}
 
 	virtual void init();
-	void draw(Smoke_t* ent);
+	virtual void draw();
 private:
-	void drawArc3DSmoke(const Vector& pos, const float radius, const int points, const float percent,
-		const Color& color, const ImDrawFlags flags, const float thickness, ImFont* font, const std::string& text, const Color& colorText);
 	void drawCustomSmokeEffect(const Vector& pos, float radius);
 };
 

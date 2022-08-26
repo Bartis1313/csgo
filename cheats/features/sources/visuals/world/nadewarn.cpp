@@ -153,7 +153,7 @@ void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float i
 
 void GrenadeWarning::NadeTrace_t::handleDestroy()
 {
-	if (m_index == WEAPON_DECOY)
+	if (m_index == WEAPON_DECOY || m_index == WEAPON_SMOKEGRENADE)
 		if (m_velocity.length2D() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
 		{
 			//printf("did destroy\n");
@@ -337,70 +337,58 @@ bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 	return true;
 }
 
-void GrenadeWarning::run(Nade_t* entity)
+#include "../../cache/cache.hpp"
+
+void GrenadeWarningPaint::init()
 {
-	if (!m_datas.empty())
-		m_datas.clear();
+
+}
+
+void GrenadeWarningPaint::draw()
+{
+	if (!g_GrenadeWarning.m_datas.empty())
+		g_GrenadeWarning.m_datas.clear();
 
 	if (!config.get<bool>(vars.bNadeTracer))
 		return;
 
-	const auto cl = entity->clientClass();
-	if (!cl)
-		return;
-
-	int id = cl->m_classID;
-
-	constexpr std::array allowedIDS =
+	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::GRENADE_PROJECTILES))
 	{
-		CBaseCSGrenadeProjectile,
-		CSmokeGrenadeProjectile,
-		CMolotovProjectile,
-		CDecoyProjectile
-	};
+		auto ent = reinterpret_cast<Nade_t*>(entity);
 
-	// if not found
-	if (auto itr = std::find(allowedIDS.cbegin(), allowedIDS.cend(), id); itr == allowedIDS.cend())
-		return;
+		if (ent->isDormant())
+			continue;
 
-	auto ownerHandle = entity->getIndex();
-	// keep it for sure correct, would also place decoy netvar of start but there is none
-	if (entity->m_nExplodeEffectTickBegin() ||
-		(id == CSmokeGrenadeProjectile && reinterpret_cast<Smoke_t*>(entity)->m_nSmokeEffectTickBegin()))
-	{
-		m_datas.erase(ownerHandle);
-		return;
+		auto model = ent->getModel();
+		if (!model)
+			return;
+
+		auto studio = interfaces::modelInfo->getStudioModel(model);
+		if (!studio)
+			return;
+
+		auto wpnIdx = g_GrenadeWarning.getIndexByClass(classID, studio);
+		if (wpnIdx == WEAPON_NONE)
+			return;
+
+		g_GrenadeWarning.m_datas.emplace(std::make_pair(
+			idx,
+			GrenadeWarning::NadeTrace_t
+			{
+				reinterpret_cast<Player_t*>(interfaces::entList->getClientFromHandle(ent->m_hThrower())),
+				wpnIdx
+			}));
+
+		// simulates, in this place because there is no much math related stuff needed for angles etc
+		g_GrenadeWarning.m_datas.at(idx).simulate(
+			ent->m_vecOrigin(),
+			reinterpret_cast<Player_t*>(ent)->m_vecVelocity(),
+			ent->m_flSpawnTime(),
+			game::timeToTicks(reinterpret_cast<Player_t*>(ent)->m_flSimulationTime() - ent->m_flSpawnTime())
+		);
+
+		// if no path, then delete this owner from map
+		if (!g_GrenadeWarning.m_datas.at(idx).draw(ent, wpnIdx))
+			g_GrenadeWarning.m_datas.erase(idx);
 	}
-
-	auto model = entity->getModel();
-	if (!model)
-		return;
-
-	auto studio = interfaces::modelInfo->getStudioModel(model);
-	if (!studio)
-		return;
-
-	auto idx = getIndexByClass(id, studio);
-	if (idx == WEAPON_NONE)
-		return;
-
-	m_datas.emplace(std::make_pair(
-		ownerHandle,
-		NadeTrace_t
-		{
-			reinterpret_cast<Player_t*>(interfaces::entList->getClientFromHandle(entity->m_hThrower())),
-			idx
-		}));
-
-	// simulates, in this place because there is no much math related stuff needed for angles etc
-	m_datas.at(ownerHandle).simulate(
-		entity->m_vecOrigin(),
-		reinterpret_cast<Player_t*>(entity)->m_vecVelocity(),
-		entity->m_flSpawnTime(),
-		game::timeToTicks(reinterpret_cast<Player_t*>(entity)->m_flSimulationTime() - entity->m_flSpawnTime())
-	);
-
-	// if no path, then delete this owner from map
-	if (!m_datas.at(ownerHandle).draw(entity, idx))
-		m_datas.erase(ownerHandle);
 }

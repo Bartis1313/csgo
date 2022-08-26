@@ -5,6 +5,8 @@
 #include "../../SDK/IClientEntityList.hpp"
 #include "../../SDK/IVEngineClient.hpp"
 
+#include "../game.hpp"
+
 static void* getStack(void** data)
 {
 	if (!data)
@@ -35,17 +37,17 @@ long __stdcall hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3D
 	if (!ent)
 		return res;
 
-	auto local = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
-	if (!local)
+	
+	if (!game::localPlayer)
 		return res;
 
-	if (ent == local)
+	if (ent == game::localPlayer)
 		return res;
 
 	if (!ent->isAlive())
 		return res;
 
-	if (local->m_iTeamNum() != ent->m_iTeamNum())
+	if (ent->isOtherTeam(game::localPlayer()))
 	{
 
 		// draw here

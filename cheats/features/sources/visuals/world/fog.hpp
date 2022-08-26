@@ -1,11 +1,18 @@
 #pragma once
 
+#include "../../../classes/frameStage.hpp"
+
 class FogController_t;
 
-class FogController
+class FogController : public FrameStageType
 {
 public:
-	void run(FogController_t* ent);
+	constexpr FogController() :
+		FrameStageType{}
+	{}
+
+	virtual void init();
+	virtual void run(int frame);
 };
 
 [[maybe_unused]] inline auto g_FogController = FogController{};

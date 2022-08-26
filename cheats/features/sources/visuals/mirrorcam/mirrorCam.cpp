@@ -21,9 +21,9 @@
 
 void MirrorCam::init()
 {
-	//interfaces::matSys->forceBeginRenderTargetAllocation();
+	interfaces::matSys->forceBeginRenderTargetAllocation();
 	m_texture = interfaces::matSys->createFullFrameRenderTarget(XOR("mirrorCam"));
-	//interfaces::matSys->forceEndRenderTargetAllocation();
+	interfaces::matSys->forceEndRenderTargetAllocation();
 
 	m_inited = true;
 

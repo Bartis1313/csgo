@@ -228,3 +228,6 @@ ParticleEffect
 #define FIND_STRING_INDEX			XOR("55 8B EC 83 EC ? 53 8B 5D ? 57 8B F9 89 7D ? 85 DB")
 // #STR: "Particle/Effect_Rendering", "FX_Blood"
 #define	FX_BLOOD					XOR("55 8B EC 83 EC 34 53 56 57 8B F9 F3 0F")
+// #STR: "$MotionBlurViewportInternal", "$MotionBlurInternal"
+// you can see there is an offset with pointer that is pushed below, "push 4" is helpful, this is the part of editing vector
+#define BLUR_MATERIAL_ARR_1			XOR("68 ? ? ? ? FF 50 34 8B 4E 08 5E 85 C9 74 0C")

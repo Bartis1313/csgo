@@ -46,7 +46,7 @@ private:
 	uintptr_t* m_retAddr;
 	IDirect3DTexture9* m_mapTexture;
 
-	friend RadarSizeHelper;;
+	friend RadarSizeHelper;
 };
 
 [[maybe_unused]] inline auto g_Radar = Radar{};

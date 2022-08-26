@@ -1,11 +1,16 @@
 #pragma once
 
-class Entity_t;
+#include "../../../classes/renderableToSurface.hpp"
 
-class Projectiles
+class Projectiles : public RenderableSurfaceType
 {
 public:
-	void run(Entity_t* ent, int classID);
+	constexpr Projectiles() :
+		RenderableSurfaceType{}
+	{}
+
+	virtual void init();
+	virtual void draw();
 };
 
 [[maybe_unused]] inline auto g_Projectiles = Projectiles{};

@@ -218,6 +218,7 @@ public:
 	_NODISCARD int getWins();
 	_NODISCARD bool isPossibleToSee(Player_t* player, const Vector& pos);
 	_NODISCARD bool isViewInSmoke(const Vector& pos);
+	_NODISCARD bool isOtherTeam(Player_t* player);
 	// address as number
 	_NODISCARD uintptr_t getLiteralAddress();
 
@@ -249,6 +250,14 @@ public:
 	NETVAR(bool, m_bUseCustomAutoExposureMax, "DT_EnvTonemapController", "m_bUseCustomAutoExposureMax");
 	NETVAR(float, m_flCustomAutoExposureMin, "DT_EnvTonemapController", "m_flCustomAutoExposureMin");
 	NETVAR(float, m_flCustomAutoExposureMax, "DT_EnvTonemapController", "m_flCustomAutoExposureMax");
+	NETVAR(bool, m_bUseCustomBloomScale, "DT_EnvTonemapController", "m_bUseCustomBloomScale");
+	NETVAR(float, m_flCustomBloomScale, "DT_EnvTonemapController", "m_flCustomBloomScale");
+};
+
+class EnvAmbientLight_t : public Entity_t
+{
+public:
+	NETVAR(Vector, m_vecColor, "DT_EnvAmbientLight", "m_vecColor");
 };
 
 #undef RENDERABLE

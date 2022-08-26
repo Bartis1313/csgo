@@ -2,10 +2,10 @@
 
 #include "../../../classes/renderableToSurface.hpp"
 
-class World : public RenderableSurfaceType
+class DroppedWeapons : public RenderableSurfaceType
 {
 public:
-	constexpr World() :
+	constexpr DroppedWeapons() :
 		RenderableSurfaceType{}
 	{}
 
@@ -13,4 +13,4 @@ public:
 	virtual void draw();
 };
 
-[[maybe_unused]] inline auto g_World = World{};
+[[maybe_unused]] inline auto g_DroppedWeapons = DroppedWeapons{};

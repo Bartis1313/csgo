@@ -85,7 +85,7 @@ void Triggerbot::run(CUserCmd* cmd)
 	if (!entity)
 		return;
 
-	if (game::localPlayer->m_iTeamNum() == entity->m_iTeamNum())
+	if (!entity->isOtherTeam(game::localPlayer()))
 		return;
 
 	if (!entity->isPlayer())

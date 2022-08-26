@@ -106,7 +106,7 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 	auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(info.m_entIndex));
 	drawBackTrack(ent);
 
-	if (ent && ent->isPlayer() && ent->isAlive() && ent->m_iTeamNum() != game::localPlayer->m_iTeamNum())
+	if (ent && ent->isPlayer() && ent->isAlive() && ent->isOtherTeam(game::localPlayer()))
 	{
 		if (!config.get<bool>(vars.bChamsPlayers))
 			return;
@@ -182,7 +182,7 @@ void Chams::drawBackTrack(Player_t* ent)
 	if (!ent->isAlive())
 		return;
 
-	if (ent->m_iTeamNum() == game::localPlayer->m_iTeamNum()) // backtrack works only for enemies here anyway
+	if (!ent->isOtherTeam(game::localPlayer())) // backtrack works only for enemies here anyway
 		return;
 
 	auto record = &g_Backtrack.getAllRecords().at(m_info.m_entIndex);

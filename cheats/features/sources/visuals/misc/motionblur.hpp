@@ -19,7 +19,7 @@ public:
 	virtual void run(CViewSetup* view);
 	// no point in making it virtual
 	void render();
-
+private:
 	struct MotionBlurHistory_t
 	{
 		MotionBlurHistory_t() :
@@ -36,6 +36,8 @@ public:
 
 	std::array<float, 4> m_motionBlurValues = { 0.0f, 0.0f, 0.0f, 0.0f };
 	std::array<float, 4> m_motionBlurViewportValues = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+	uintptr_t m_motionBlurAddr;
 };
 
 [[maybe_unused]] inline auto g_MotionBlur = MotionBlur{};

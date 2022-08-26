@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../../../classes/onlyInit.hpp"
+#include "../../../classes/renderableToSurface.hpp"
 
 #include <vector>
 #include <unordered_map>
@@ -13,6 +14,7 @@ class Player_t;
 class Nade_t;
 enum WeaponIndex;
 struct Studiohdr_t;
+class GrenadeWarningPaint;
 
 // code not fully made by me
 // Uses much less math than predicting the full throw due to existance of networkable values
@@ -24,7 +26,6 @@ public:
 	{}
 
 	virtual void init();
-	void run(Nade_t* entity);
 private:
 	inline static uintptr_t m_traceFilterSimpleAddr;
 
@@ -73,6 +74,21 @@ public:
 	// studio is special case arg - because henade and flashbang have exactly same class id
 	// and people who think definition index is ok are wrong, player ents DON'T hold the nade anymore in that case
 	WeaponIndex getIndexByClass(int idx, Studiohdr_t* studio);
+
+	friend GrenadeWarningPaint;
 };
 
 [[maybe_unused]] inline auto g_GrenadeWarning = GrenadeWarning{};
+
+class GrenadeWarningPaint : public RenderableSurfaceType
+{
+public:
+	constexpr GrenadeWarningPaint() :
+		RenderableSurfaceType{}
+	{}
+
+	virtual void init();
+	virtual void draw();
+};
+
+[[maybe_unused]] inline auto g_GrenadeWarningPaint = GrenadeWarningPaint{};
