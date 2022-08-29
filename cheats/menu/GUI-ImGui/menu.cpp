@@ -2,6 +2,7 @@
 #include "../../../dependencies/ImGui/imgui.h"
 #include "../../../dependencies/ImGui/imgui_impl_win32.h"
 #include "../../../dependencies/ImGui/imgui_impl_dx9.h"
+#include "../../../dependencies/ImGui/imgui_internal.h"
 #include "../../../utilities/utilities.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../../utilities/console/console.hpp"
@@ -54,6 +55,27 @@ void ImGuiMenu::example()
 #include "../../../config/vars.hpp"
 #include "selections.hpp"
 
+static ImVec2 availRegion()
+{
+	// we could manually count the difference between columns
+	ImVec2 avail = ImGui::GetContentRegionAvail();
+	return avail;
+}
+
+static ImVec2 getChildSize(size_t numOfChilds = 1) // num of childs in single column
+{
+	// x is always corresponding to avail region
+	float x = ImGui::GetContentRegionAvail().x;
+	return ImVec2{ x, ImGui::GetContentRegionAvail().y / numOfChilds };
+}
+
+static ImVec2 getChildSizeCustom(float y)
+{
+	// x is always corresponding to avail region
+	float x = ImGui::GetContentRegionAvail().x;
+	return ImVec2{ x, y };
+}
+
 static void renderAimbot()
 {
 	// using columns, it will be easier, imgui by default recommends begintable(), but in this case columns do stuff like padding each column for us.
@@ -63,9 +85,9 @@ static void renderAimbot()
 
 	ImGui::Columns(2, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("aim main"), {}, true), ImGuiWindowFlags_AlwaysAutoResize)
+		if (ImGui::BeginChild(XOR("aim main"), {}, true))
 		{
-			ImGui::BeginGroupPanel(XOR("Aimbot"));
+			ImGui::BeginGroupPanel(XOR("Aimbot"), availRegion());
 			{
 				ImGui::ListBox(XOR("Weapon selection"), &index, selections::aimbotWeapons);
 				ImGui::Checkbox(XOR("Enabled aimbot"), &cfg.m_aimEnabled);
@@ -96,7 +118,7 @@ static void renderAimbot()
 
 	if (ImGui::BeginChild(XOR("aim extra"), {}, true), ImGuiWindowFlags_AlwaysAutoResize)
 	{
-		ImGui::BeginGroupPanel(XOR("Backtracking & Latency"));
+		ImGui::BeginGroupPanel(XOR("Backtracking & Latency"), availRegion());
 		{
 			ImGui::Checkbox(XOR("Backtrack##enabled"), &config.getRef<bool>(vars.bBacktrack));
 			ImGui::SliderFloat(XOR("Backtrack ms"), &config.getRef<float>(vars.fBacktrackTick), 0.0f, 200.0f);
@@ -108,7 +130,7 @@ static void renderAimbot()
 			ImGui::EndGroupPanel();
 		}
 
-		ImGui::BeginGroupPanel(XOR("Triggrbot"), {});
+		ImGui::BeginGroupPanel(XOR("Triggerbot"), availRegion());
 		{
 			ImGui::Checkbox(XOR("Triggerbot enabled"), &cfg.m_TriggerEnabled);
 			ImGui::SliderFloat(XOR("Triggerbot ms"), &cfg.m_TriggerDelay, 0.0f, 200.0f);
@@ -116,7 +138,7 @@ static void renderAimbot()
 			ImGui::EndGroupPanel();
 		}
 
-		ImGui::BeginGroupPanel(XOR("RCS"));
+		ImGui::BeginGroupPanel(XOR("RCS"), availRegion());
 		{
 			ImGui::Checkbox(XOR("Enabled##RCS"), &cfg.m_RcsEnabled);
 			ImGui::SliderFloat(XOR("X%##Rcsx"), &cfg.m_RcsX, 0.0f, 100.0f);
@@ -125,7 +147,7 @@ static void renderAimbot()
 			ImGui::EndGroupPanel();
 		}
 
-		ImGui::BeginGroupPanel(XOR("Drawing"));
+		ImGui::BeginGroupPanel(XOR("Drawing"), availRegion());
 		{
 			ImGui::Checkbox(XOR("Draw fov"), &config.getRef<bool>(vars.bDrawFov));
 			ImGui::SameLine();
@@ -147,9 +169,9 @@ static void renderVisuals()
 {
 	ImGui::Columns(2, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("visuals"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::BeginChild(XOR("visuals"), {}, true))
 		{
-			ImGui::BeginGroupPanel(XOR("Players"));
+			ImGui::BeginGroupPanel(XOR("Players"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Enabled"), &config.getRef<bool>(vars.bEsp));
 				ImGui::SameLine();
@@ -213,7 +235,7 @@ static void renderVisuals()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Chams"));
+			ImGui::BeginGroupPanel(XOR("Chams"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Chams enabled Players"), &config.getRef<bool>(vars.bChamsPlayers));
 				ImGui::SameLine();
@@ -262,9 +284,9 @@ static void renderVisuals()
 	}
 	ImGui::NextColumn();
 	{
-		if (ImGui::BeginChild("wpns", {}, true, ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::BeginChild("wpns", {}, true))
 		{
-			ImGui::BeginGroupPanel(XOR("Weapons"));
+			ImGui::BeginGroupPanel(XOR("Weapons"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Enabled##weapons"), &config.getRef<bool>(vars.bDrawWeapon));
 				ImGui::SameLine();
@@ -279,7 +301,7 @@ static void renderVisuals()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Bomb"));
+			ImGui::BeginGroupPanel(XOR("Bomb"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Bomb info"), &config.getRef<bool>(vars.bDrawBomb));
 				ImGui::SameLine();
@@ -292,7 +314,7 @@ static void renderVisuals()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Nades"));
+			ImGui::BeginGroupPanel(XOR("Nades"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Enabled##nades"), &config.getRef<bool>(vars.bDrawProjectiles));
 				ImGui::SameLine();
@@ -310,7 +332,7 @@ static void renderVisuals()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Dropped"));
+			ImGui::BeginGroupPanel(XOR("Dropped"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Enabled##dropped"), &config.getRef<bool>(vars.bDrawDropped));
 				ImGui::SameLine();
@@ -324,7 +346,7 @@ static void renderVisuals()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Particles edit"));
+			ImGui::BeginGroupPanel(XOR("Particles edit"), availRegion());
 			{
 				ImGui::Checkbox(XOR("##Edit molotov"), &config.getRef<bool>(vars.bEditEffectsMoly));
 				ImGui::SameLine();
@@ -339,7 +361,7 @@ static void renderVisuals()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Molotov & Smoke circles"));
+			ImGui::BeginGroupPanel(XOR("Molotov & Smoke circles"), availRegion());
 			{
 				ImGui::Checkbox(XOR("##Enabled molotov circle"), &config.getRef<bool>(vars.bDrawmolotovRange));
 				ImGui::SameLine();
@@ -368,9 +390,9 @@ static void renderMisc()
 {
 	ImGui::Columns(2, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("Misc"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::BeginChild(XOR("Misc"), {}, true))
 		{
-			ImGui::BeginGroupPanel(XOR("Skybox"));
+			ImGui::BeginGroupPanel(XOR("Skybox"), availRegion());
 			{
 				const auto customsky = g_SkyboxEdit.getAllCustomSkyBoxes();
 
@@ -383,7 +405,7 @@ static void renderMisc()
 
 				ImGui::EndGroupPanel();
 			}
-			ImGui::BeginGroupPanel(XOR("World Modulation"));
+			ImGui::BeginGroupPanel(XOR("World Modulation"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Modulate world"), &config.getRef<bool>(vars.bModulateColor));
 				ImGui::Checkbox(XOR("Remove sky"), &config.getRef<bool>(vars.bRemoveSky));
@@ -403,7 +425,7 @@ static void renderMisc()
 			ImGui::SameLine();
 			ImGui::Checkbox(XOR("Zeus tracing"), &config.getRef<bool>(vars.bZeusUseTracing));*/
 
-			ImGui::BeginGroupPanel(XOR("View"));
+			ImGui::BeginGroupPanel(XOR("View"), availRegion());
 			{
 				ImGui::SliderFloat(XOR("FOV local"), &config.getRef<float>(vars.fFOV), -50.0f, 50.0f);
 				ImGui::Checkbox(XOR("Third Person"), &config.getRef<bool>(vars.bThirdp));
@@ -422,7 +444,7 @@ static void renderMisc()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Radar"));
+			ImGui::BeginGroupPanel(XOR("Radar"), availRegion());
 			{
 				ImGui::Checkbox(XOR("2D Radar enabled"), &config.getRef<bool>(vars.bRadar));
 				ImGui::SameLine();
@@ -453,9 +475,9 @@ static void renderMisc()
 	}
 	ImGui::NextColumn();
 	{
-		if (ImGui::BeginChild(XOR("Miscother"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::BeginChild(XOR("Miscother"), {}, true))
 		{
-			ImGui::BeginGroupPanel(XOR("Movement"));
+			ImGui::BeginGroupPanel(XOR("Movement"), availRegion());
 			{
 				bool& bunnyhopref = config.getRef<bool>(vars.bBunnyHop);
 				ImGui::Checkbox(XOR("Bunnyhop"), &bunnyhopref);
@@ -473,7 +495,7 @@ static void renderMisc()
 			{
 				ImGui::SliderFloat(XOR("Log time"), &config.getRef<float>(vars.fLogMaxTime), 1.0f, 8.0f);
 			}*/
-			ImGui::BeginGroupPanel(XOR("Hitmarker"));
+			ImGui::BeginGroupPanel(XOR("Hitmarker"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Hitmarker"), &config.getRef<bool>(vars.bDrawHitmarker));
 				ImGui::SameLine();
@@ -496,7 +518,7 @@ static void renderMisc()
 
 				ImGui::EndGroupPanel();
 			}
-			ImGui::BeginGroupPanel(XOR("Misc"));
+			ImGui::BeginGroupPanel(XOR("Misc"), availRegion());
 			{
 				ImGui::Checkbox(XOR("No scope"), &config.getRef<bool>(vars.bNoScope));
 				bool& fpsRef = config.getRef<bool>(vars.bShowFpsPlot);
@@ -536,7 +558,7 @@ static void renderMisc()
 
 				ImGui::EndGroupPanel();
 			}
-			ImGui::BeginGroupPanel(XOR("Nade prediction"));
+			ImGui::BeginGroupPanel(XOR("Nade prediction"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Nade pred"), &config.getRef<bool>(vars.bNadePred));
 				ImGui::SameLine();
@@ -563,7 +585,7 @@ static void renderMisc()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Bullets and trails"));
+			ImGui::BeginGroupPanel(XOR("Bullets and trails"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Movement trail"), &config.getRef<bool>(vars.bRunMovementTrail));
 				ImGui::SameLine();
@@ -651,7 +673,7 @@ static void renderMisc()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel(XOR("Misc other"));
+			ImGui::BeginGroupPanel(XOR("Misc other"), availRegion());
 			{
 				ImGui::Checkbox(XOR("Freelook"), &config.getRef<bool>(vars.bFreeLook));
 				ImGui::SameLine();
@@ -739,6 +761,7 @@ static void renderMisc()
 				
 				ImGui::EndGroupPanel();
 			}
+
 			ImGui::EndChild();
 		}
 	}
@@ -765,11 +788,11 @@ static void renderConfig()
 
 	ImGui::Columns(2, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("cfg"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::BeginChild(XOR("cfg"), {}, true))
 		{
 			const auto allcfg = config.getAllConfigFiles();
 
-			ImGui::BeginGroupPanel(XOR("Config"));
+			ImGui::BeginGroupPanel(XOR("Config"), availRegion());
 			{
 				if (ImGui::InputText(XOR("Config name"), &text, ImGuiInputTextFlags_EnterReturnsTrue))
 				{
@@ -857,7 +880,7 @@ static void renderConfig()
 					console.log(TypeLogs::LOG_INFO, XOR("{} will be now loaded config on the start"), allcfg.at(currentcfg));
 				}
 				ImGui::SameLine();
-				ImGui::HelpMarker(XOR("This config will load on the start\nThis button saves default config!"));
+				ImGui::HelpMarker(XOR("This config will load on the start"));
 			}
 			ImGui::EndGroupPanel();
 
@@ -865,9 +888,9 @@ static void renderConfig()
 		}
 	}
 	ImGui::NextColumn();
-	if (ImGui::BeginChild(XOR("cfgkeys"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
+	if (ImGui::BeginChild(XOR("cfgkeys"), {}, true))
 	{
-		ImGui::BeginGroupPanel(XOR("Config keys"));
+		ImGui::BeginGroupPanel(XOR("Config keys"), availRegion());
 		{
 			ImGui::Hotkey(XOR("Menu key"), &config.getRef<Key>(vars.kMenu), false);
 			ImGui::Hotkey(XOR("Console key"), &config.getRef<Key>(vars.kConsoleLog), false);
@@ -899,9 +922,9 @@ static void renderStyles()
 {
 	ImGui::Columns(1, nullptr, false);
 	{
-		if (ImGui::BeginChild(XOR("style"), {}, true, ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::BeginChild(XOR("style"), {}, true))
 		{
-			ImGui::BeginGroupPanel(XOR("Style"));
+			ImGui::BeginGroupPanel(XOR("Style"), availRegion());
 			{
 				int& styleRef = config.getRef<int>(vars.iStyleMenu);
 				ImGui::ListBox(XOR("Menu styles"), &styleRef, selections::styleNames);
@@ -942,41 +965,58 @@ std::array tabs =
 };
 #pragma endregion
 
-#include "../../../dependencies/ImGui/imgui_internal.h"
+void ImGuiMenu::renderAll()
+{
+	if (ImGui::Begin(XOR("csgo legit"), &m_active, ImGuiWindowFlags_NoCollapse))
+	{
+		ImGuiContext& g = *GImGui;
+		ImGuiWindow* window = g.CurrentWindow;
+		ImGuiStyle& style = ImGui::GetStyle();
+		ImVec2 backupPadding = style.FramePadding;
+		float width = ImGui::GetContentRegionAvail().x;
+
+		// remove tab underline
+		ImGui::PushStyleColor(ImGuiCol_TabActive, U32(Colors::Blank));
+		ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, U32(Colors::Blank));
+
+		if (ImGui::BeginTabBar(XOR("tabbar")))
+		{
+			style.FramePadding = { width / tabs.size(), backupPadding.y }; // still this is clamped by imgui in tabs
+			ImGui::PopStyleColor(2);
+			for (const auto& el : tabs)
+			{
+				if (ImGui::BeginTabItem(el.m_name))
+				{
+					style.FramePadding = backupPadding;
+					if (el.funcExist())
+						el.m_func();
+
+					ImGui::EndTabItem();
+				}
+			}
+			ImGui::EndTabBar();
+		}
+		ImGui::End();
+	}
+}
 
 void ImGuiMenu::draw()
 {
-	if (m_active)
-	{
-		if (ImGui::Begin(XOR("csgo legit"), &m_active, ImGuiWindowFlags_NoCollapse))
-		{
-			ImGuiStyle& style = ImGui::GetStyle();
-			ImVec2 backupPadding = style.FramePadding;
-			float width = ImGui::GetContentRegionAvail().x;
+	constexpr float ratio = 1.0f / 0.5f;
+	float step = ratio * ImGui::GetIO().DeltaTime;
 
-			// remove tab underline
-			ImGui::PushStyleColor(ImGuiCol_TabActive, U32(Colors::Blank));
-			ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, U32(Colors::Blank));
+	static float alpha = 0.0f;
+	
+	if (!m_active && alpha > 0.0f)
+		alpha = std::clamp(alpha - step, 0.0f, 1.0f);
 
-			if (ImGui::BeginTabBar(XOR("tabbar")))
-			{
-				style.FramePadding = { width / tabs.size(), backupPadding.y }; // still this is clamped by imgui in tabs
-				ImGui::PopStyleColor();
-				ImGui::PopStyleColor();
-				for (const auto& el : tabs)
-				{
-					if (ImGui::BeginTabItem(el.m_name))
-					{
-						style.FramePadding = backupPadding;
-						if (el.funcExist())
-							el.m_func();
+	if (m_active && alpha < 1.0f)
+		alpha = std::clamp(alpha + step, 0.0f, 1.0f);
 
-						ImGui::EndTabItem();
-					}
-				}
-				ImGui::EndTabBar();
-			}
-			ImGui::End();
-		}
-	}
+	if (!m_active && alpha == 0.0f)
+		return;
+
+	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);
+	renderAll();
+	ImGui::PopStyleVar();
 }

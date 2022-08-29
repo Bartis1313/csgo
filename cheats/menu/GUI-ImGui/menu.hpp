@@ -13,6 +13,7 @@ public:
 	constexpr void changeActive() { m_active = !m_active; }
 private:
 	bool m_active = true;
+	void renderAll();
 };
 
 inline ImGuiMenu menu;

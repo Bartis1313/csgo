@@ -164,11 +164,38 @@ bool ImGui::ColorPicker(const char* label, CfgColor* clr)
     return toReturn;
 }
 
-static ImVector<ImRect> s_GroupPanelLabelStack;
+#include <unordered_map>
+
+static std::unordered_map<ImGuiID, std::pair<ImVec2, ImVec2>> m_mapSizes = {};
+static const char* g_GroupPanelName = nullptr;
 
 void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
 {
+    g_GroupPanelName = name;
+
+    ImGui::PushID(name);
+
     ImGui::BeginGroup();
+
+    auto background = ImColor{ ImGui::GetStyleColorVec4(ImGuiCol_ChildBg) };
+    ImColor secondGradient =
+    {
+        background.Value.x - 0.1f,
+        background.Value.y - 0.1f,
+        background.Value.z - 0.1f,
+        background.Value.w * ImGui::GetStyle().Alpha,
+    };
+
+    auto id = ImGui::GetCurrentWindow()->GetID(g_GroupPanelName);
+    auto [min, max] = m_mapSizes[id];
+
+    ImGui::GetWindowDrawList()->AddRectFilledMultiColor(
+        min, max,
+        background,
+        background,
+        secondGradient,
+        secondGradient);
+
 
     auto cursorPos = ImGui::GetCursorScreenPos();
     auto itemSpacing = ImGui::GetStyle().ItemSpacing;
@@ -189,15 +216,12 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
     ImGui::SameLine(0.0f, 0.0f);
     ImGui::BeginGroup();
     ImGui::Dummy(ImVec2(frameHeight * 0.5f, 0.0f));
-    ImGui::SameLine(0.0f, 0.0f);
-    ImGui::TextUnformatted(name);
+    
     auto labelMin = ImGui::GetItemRectMin();
     auto labelMax = ImGui::GetItemRectMax();
     ImGui::SameLine(0.0f, 0.0f);
     ImGui::Dummy(ImVec2(0.0, frameHeight + itemSpacing.y));
     ImGui::BeginGroup();
-
-    //ImGui::GetWindowDrawList()->AddRect(labelMin, labelMax, IM_COL32(255, 0, 255, 255));
 
     ImGui::PopStyleVar(2);
 
@@ -212,9 +236,9 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
 
     auto itemWidth = ImGui::CalcItemWidth();
     ImGui::PushItemWidth(ImMax(0.0f, itemWidth - frameHeight));
-
-    s_GroupPanelLabelStack.push_back(ImRect(labelMin, labelMax));
 }
+
+#include "../../../utilities/renderer/renderer.hpp"
 
 void ImGui::EndGroupPanel()
 {
@@ -243,34 +267,42 @@ void ImGui::EndGroupPanel()
     auto itemMax = ImGui::GetItemRectMax();
     //ImGui::GetWindowDrawList()->AddRectFilled(itemMin, itemMax, IM_COL32(255, 0, 0, 64), 4.0f);
 
-    auto labelRect = s_GroupPanelLabelStack.back();
-    s_GroupPanelLabelStack.pop_back();
-
     ImVec2 halfFrame = ImVec2(frameHeight * 0.25f, frameHeight) * 0.5f;
     ImRect frameRect = ImRect(itemMin + halfFrame, itemMax - ImVec2(halfFrame.x, 0.0f));
-    labelRect.Min.x -= itemSpacing.x;
-    labelRect.Max.x += itemSpacing.x;
-    for (int i = 0; i < 4; ++i)
-    {
-        switch (i)
-        {
-            // left half-plane
-        case 0: ImGui::PushClipRect(ImVec2(-FLT_MAX, -FLT_MAX), ImVec2(labelRect.Min.x, FLT_MAX), true); break;
-            // right half-plane
-        case 1: ImGui::PushClipRect(ImVec2(labelRect.Max.x, -FLT_MAX), ImVec2(FLT_MAX, FLT_MAX), true); break;
-            // top
-        case 2: ImGui::PushClipRect(ImVec2(labelRect.Min.x, -FLT_MAX), ImVec2(labelRect.Max.x, labelRect.Min.y), true); break;
-            // bottom
-        case 3: ImGui::PushClipRect(ImVec2(labelRect.Min.x, labelRect.Max.y), ImVec2(labelRect.Max.x, FLT_MAX), true); break;
-        }
+ 
+    ImVec2 textSize = CalcTextSize(g_GroupPanelName);
+    auto draw = ImGui::GetWindowDrawList();
+    float width = frameRect.Max.x - frameRect.Min.x;
+    float addonoffset = width * 0.05f;
 
-        ImGui::GetWindowDrawList()->AddRect(
-            frameRect.Min, frameRect.Max,
-            ImColor(ImGui::GetStyleColorVec4(ImGuiCol_Border)),
-            halfFrame.x);
+    // for line outline
+    ImVec2 min = { frameRect.Min.x - 1.0f, frameRect.Min.y - 1.0f };
+    ImVec2 max = { frameRect.Max.x + 1.0f, frameRect.Max.y + 1.0f };
 
-        ImGui::PopClipRect();
-    }
+    constexpr float idealTextOffset = 5.0f;
+
+    // top left before text
+    draw->AddLine(min, { min.x + addonoffset, min.y }, ImColor{ 0.0f, 0.0f, 0.0f, ImGui::GetStyle().Alpha });
+    ImGui::PushFont(ImFonts::tahoma14);
+    // shadow
+    draw->AddText({ min.x + addonoffset + idealTextOffset + 1.0f, min.y - (textSize.y / 2.0f) + 1.0f }, ImColor{ 0.0f, 0.0f, 0.0f, ImGui::GetStyle().Alpha }, g_GroupPanelName);
+    // normal text
+    draw->AddText({ min.x + addonoffset + idealTextOffset, min.y - (textSize.y / 2.0f) }, ImGui::GetColorU32(ImGuiCol_Text), g_GroupPanelName);
+    ImGui::PopFont();
+    // top after text
+    draw->AddLine({ min.x + addonoffset + (idealTextOffset * 2.0f) + textSize.x, min.y }, { max.x, min.y }, ImColor{ 0.0f, 0.0f, 0.0f, ImGui::GetStyle().Alpha });
+    // left line
+    draw->AddLine(min, { min.x, max.y }, ImColor{ 0.0f, 0.0f, 0.0f, ImGui::GetStyle().Alpha });
+    // bottom line
+    draw->AddLine({ min.x, max.y }, max, ImColor{ 0.0f, 0.0f, 0.0f, ImGui::GetStyle().Alpha });
+    // right line
+    draw->AddLine({ max.x, min.y }, max, ImColor{ 0.0f, 0.0f, 0.0f, ImGui::GetStyle().Alpha });
+
+    auto id = ImGui::GetCurrentWindow()->GetID(g_GroupPanelName);
+
+    auto [itr, emplaced] = m_mapSizes.try_emplace(id, std::make_pair(frameRect.Min, frameRect.Max));
+    if (!emplaced)
+        itr->second = std::make_pair(frameRect.Min, frameRect.Max);
 
     ImGui::PopStyleVar(2);
 
@@ -286,6 +318,8 @@ void ImGui::EndGroupPanel()
     ImGui::Dummy(ImVec2(0.0f, 0.0f));
 
     ImGui::EndGroup();
+
+    ImGui::PopID();
 }
 
 static bool arrGetterStr(void* data, int idx, const char** out)
