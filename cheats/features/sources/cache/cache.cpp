@@ -1,5 +1,7 @@
 #include "cache.hpp"
 
+#include <ranges>
+
 #include "../../../../SDK/IVEngineClient.hpp"
 #include "../../../../SDK/IClientEntityList.hpp"
 #include "../../../../SDK/Enums.hpp"
@@ -16,8 +18,6 @@ void EntityCache::init()
 
 void EntityCache::run(int frame)
 {
-	std::scoped_lock lock{ m_mutex };
-
 	if (frame == FRAME_NET_UPDATE_START)
 		clear();
 	else if (frame == FRAME_NET_UPDATE_END)
@@ -27,7 +27,7 @@ void EntityCache::run(int frame)
 void EntityCache::fill()
 {
 	const int maxIdx = interfaces::entList->getHighestIndex();
-	for (int i = 1; i <= maxIdx; i++)
+	for (auto i : std::views::iota(1, maxIdx))
 	{
 		auto entity = reinterpret_cast<Entity_t*>(interfaces::entList->getClientEntity(i));
 		if (!entity)

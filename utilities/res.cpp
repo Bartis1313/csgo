@@ -3,12 +3,13 @@
 #include <Windows.h>
 #include <d3dx9.h>
 
+#include "tools/tools.hpp"
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "../dependencies/stb_image.h"
 #include "../dependencies/ImGui/imgui_impl_dx9.h"
 
 #include "../cheats/globals.hpp"
-#include "utilities.hpp"
 #include "../utilities/renderer/renderer.hpp"
 #include "../SDK/interfaces/interfaces.hpp"
 #include "../utilities/console/console.hpp"
@@ -39,16 +40,16 @@ Resource::Resource(const std::string& path)
 
 Resource::Resource(int resID, const std::string_view type)
 {
-    HRSRC hResInfo = LF(FindResourceA)(globals::instance, MAKEINTRESOURCEA(resID), type.data());
+    HRSRC hResInfo = LI_FN_CACHED(FindResourceA)(globals::instance, MAKEINTRESOURCEA(resID), type.data());
     if (!hResInfo)
         throw std::runtime_error(XOR("Recource could not be found"));
 
-    HGLOBAL hResData = LF(LoadResource)(globals::instance, hResInfo);
+    HGLOBAL hResData = LI_FN_CACHED(LoadResource)(globals::instance, hResInfo);
     if(!hResData)
         throw std::runtime_error(XOR("Recource data could not be found"));
 
-    unsigned char* hResPtr = reinterpret_cast<unsigned char*>(LF(LockResource)(hResData));
-    size_t size = LF(SizeofResource)(globals::instance, hResInfo);
+    unsigned char* hResPtr = reinterpret_cast<unsigned char*>(LI_FN_CACHED(LockResource)(hResData));
+    size_t size = LI_FN_CACHED(SizeofResource)(globals::instance, hResInfo);
 
     stbi_set_flip_vertically_on_load_thread(false);
     m_buffer = stbi_load_from_memory(hResPtr, size, &m_width, &m_height, nullptr, 4);
@@ -60,7 +61,7 @@ Resource::Resource(int resID, const std::string_view type)
     m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
     surfaceRender.initNewTexture(m_textureID, m_buffer, m_width, m_height);
     stbi_image_free(m_buffer);
-    LF(FreeResource)(hResData);
+    LI_FN_CACHED(FreeResource)(hResData);
 
     m_resBuf.push_back(*this);
 

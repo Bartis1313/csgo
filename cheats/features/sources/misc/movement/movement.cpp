@@ -1,14 +1,15 @@
 #include "movement.hpp"
 
-#include "../../../SDK/CUserCmd.hpp"
-#include "../../../SDK/ConVar.hpp"
-#include "../../../SDK/ICvar.hpp"
-#include "../../../SDK/math/Vector.hpp"
+#include "../../../../../SDK/CUserCmd.hpp"
+#include "../../../../../SDK/ConVar.hpp"
+#include "../../../../../SDK/ICvar.hpp"
+#include "../../../../../SDK/math/Vector.hpp"
 
-#include "../../../config/vars.hpp"
 #include "../../../../game.hpp"
-#include "../../../utilities/math/math.hpp"
-#include "../../../utilities/utilities.hpp"
+#include "../../../../../config/vars.hpp"
+#include "../../../../../utilities/math/math.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 
 enum movetypes
 {

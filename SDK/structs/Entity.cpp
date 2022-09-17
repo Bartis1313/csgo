@@ -14,6 +14,8 @@
 #include "../CPlayerResource.hpp"
 #include "../IEngineTrace.hpp"
 #include "../IWeapon.hpp"
+#include "../../gamememory/memory.hpp"
+#include "../../utilities/tools/tools.hpp"
 
 ////////////////////////////////////////////////////////////////////////
 
@@ -26,7 +28,7 @@ Vector Entity_t::getAimPunch()
 
 AnimationLayer* Entity_t::getAnimOverlays()
 {
-	const static auto offset = *reinterpret_cast<uintptr_t*>(utilities::patternScan(CLIENT_DLL, ANIMATION_LAYER, 0x2)); // 0x2990
+	auto offset = g_Memory.m_animOverlays();
 	return *reinterpret_cast<AnimationLayer**>(uintptr_t(this) + offset);
 }
 
@@ -36,9 +38,7 @@ size_t Entity_t::getSequenceActivity(size_t sequence)
 	if (!studio)
 		return 0;
 
-	using fn = int(__fastcall*)(void*, void*, int);
-	const static auto originalGSA = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, SEQUENCE_ACTIVITY));
-	return originalGSA(this, studio, sequence);
+	return g_Memory.m_sequenceActivity()(this, studio, sequence);
 }
 
 bool Entity_t::isBreakable()
@@ -49,10 +49,7 @@ bool Entity_t::isBreakable()
 	if (!this->getIndex())
 		return false;
 
-	using fn = bool(__thiscall*)(void*);
-	const static auto isBreakablefn = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, IS_BREAKBLE));
-
-	if (bool res = isBreakablefn(this); !res)
+	if (bool res = g_Memory.m_isBreakable()(this); !res)
 		return false;
 
 	auto cl = this->clientClass();
@@ -94,7 +91,7 @@ bool Entity_t::setupBonesShort(Matrix3x4* _out, int maxBones, int mask, float ti
 
 CUtlVector<Matrix3x4> Entity_t::m_CachedBoneData()
 {
-	const static auto offset = *reinterpret_cast<uintptr_t*>(utilities::patternScan(CLIENT_DLL, CACHED_BONE, 0x2)) + 0x4; // 0x2914
+	auto offset = g_Memory.m_cachedBones();
 	return *reinterpret_cast<CUtlVector<Matrix3x4>*>(uintptr_t(this) + offset);
 }
 
@@ -382,9 +379,7 @@ size_t Weapon_t::getNadeRadius()
 
 void Player_t::setAbsOrigin(const Vector& origin)
 {
-	using fn = void(__thiscall*)(void*, const Vector&);
-	const static auto setabs = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, SETABSORIGIN));
-	setabs(this, std::cref(origin));
+	g_Memory.m_setAbsOrigin()(this, std::cref(origin));
 }
 
 Weapon_t* Player_t::getActiveWeapon()
@@ -466,9 +461,7 @@ Vector Player_t::getHitgroupPos(const int hitgroup)
 
 bool Player_t::isC4Owner()
 {
-	using fn = bool(__thiscall*)(void*);
-	const static auto isc4 = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, HASC4));
-	return isc4(this);
+	return g_Memory.m_isC4Owner()(this);
 }
 
 std::string Player_t::getName()
@@ -548,9 +541,7 @@ bool Player_t::isPossibleToSee(Player_t* player, const Vector& pos)
 
 bool Player_t::isViewInSmoke(const Vector& pos)
 {
-	using fn = bool(__cdecl*)(Vector, Vector);
-	const static auto call = reinterpret_cast<fn>(utilities::patternScan(CLIENT_DLL, GOES_THROUGH_SMOKE));
-	return call(this->getEyePos(), pos);
+	return g_Memory.m_throughSmoke()(this->getEyePos(), pos);
 }
 
 uintptr_t Player_t::getLiteralAddress()

@@ -12,6 +12,8 @@
 #include "../../../../../utilities/utilities.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
 #include "../../../../../utilities/console/console.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 
 #include <numeric>
 

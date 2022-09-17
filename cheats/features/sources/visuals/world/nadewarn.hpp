@@ -27,7 +27,6 @@ public:
 
 	virtual void init();
 private:
-	inline static uintptr_t m_traceFilterSimpleAddr;
 
 	class NadeTrace_t
 	{

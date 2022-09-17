@@ -4,8 +4,7 @@
 #include "../SDK/CUserCmd.hpp"
 #include "../SDK/CGlobalVars.hpp"
 #include "../SDK/interfaces/interfaces.hpp"
-#include "../utilities/utilities.hpp"
-#include "../SDK/structs/IDXandPaterrns.hpp"
+#include "../gamememory/memory.hpp"
 
 bool game::isAvailable()
 {
@@ -39,7 +38,7 @@ float game::serverTime(CUserCmd* cmd)
 
 void LocalPlayer::init()
 {
-	m_local = *reinterpret_cast<Player_t***>(utilities::patternScan(CLIENT_DLL, LOCAL_PLAYER, 0x2));
+	m_local = g_Memory.m_localPlayer();
 }
 
 uint32_t game::timeToTicks(float time)

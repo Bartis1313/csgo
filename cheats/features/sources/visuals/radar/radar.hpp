@@ -23,7 +23,6 @@ public:
 	virtual void init();
 	virtual void draw();
 	_NODISCARD constexpr IDirect3DTexture9*& getTexture() { return m_mapTexture; }
-	_NODISCARD constexpr uintptr_t* getRetAddr() { return m_retAddr; }
 	constexpr void setInited(bool val) { m_inited = val; }
 	// will only work for vanilla maps
 	bool manuallyInitTexture();
@@ -43,7 +42,6 @@ private:
 	Vector2D m_drawSize;
 	Vector2D m_drawPos;
 	bool m_inited;
-	uintptr_t* m_retAddr;
 	IDirect3DTexture9* m_mapTexture;
 
 	friend RadarSizeHelper;

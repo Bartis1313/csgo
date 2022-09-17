@@ -5,6 +5,7 @@
 #include "../../SDK/ClientClass.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 #include "../../config/config.hpp"
+#include "../../utilities/utilities.hpp"
 
 #include <iomanip>
 
@@ -122,7 +123,10 @@ void NetvarManager::dump(RecvTable* recvTable)
 
 		std::string recvName = recvProp->m_varName;
 
-		if (recvName.find(XOR("m_")) == std::string::npos) // not starting with m_
+		if (recvName.find(XOR("baseclass")) != std::string::npos)
+			continue;
+
+		if (::isdigit(recvProp->m_varName[0]))
 			continue;
 
 		// offsets for set are hardcoded- simply no need for this

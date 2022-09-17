@@ -6,10 +6,9 @@ struct Vector2D
 	constexpr Vector2D()
 		: x{ 0.0f }, y{ 0.0f }
 	{}
-	// template due to making it working like pair
-	template<typename T = float>
-	constexpr Vector2D(const T t1, const T t2)
-		: x{ static_cast<float>(t1) }, y{ static_cast<float>(t2) } // casting due to making it always as a float no matter what
+
+	constexpr Vector2D(float x, float y)
+		: x{ x }, y{ y }
 	{}
 
 	constexpr auto operator<=>(const Vector2D&) const = default;
@@ -36,17 +35,17 @@ struct Vector2D
 		return Vector2D{ x - v.x, y - v.y };
 	}
 
-	_NODISCARD float length() const
+	[[nodiscard]] float length() const
 	{
 		return std::sqrt(x * x + y * y);
 	}
 
-	_NODISCARD float distTo(const Vector2D& vOther) const
+	[[nodiscard]] float distTo(const Vector2D& vOther) const
 	{
 		return (*this - vOther).length();
 	}
 
-	_NODISCARD constexpr bool isZero() const
+	[[nodiscard]] constexpr bool isZero() const
 	{
 		return x == 0.0f && y == 0.0f;
 	}

@@ -1,11 +1,14 @@
 #include "hooks.hpp"
 
 #include <d3dx9.h>
+#include <intrin.h>
 
 #include "../features/sources/visuals/radar/radar.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
 #include "../../utilities/res.hpp"
 #include "../../utilities/console/console.hpp"
+#include "../../utilities/tools/tools.hpp"
+#include "../../gamememory/memory.hpp"
 
 #define DDS_HEADER 542327876
 
@@ -17,7 +20,7 @@ int __stdcall hooks::unknownFileSystem::hooked(void* image)
 	//const static auto ret = utilities::patternScan(PANORAMA_DLL, UNK_FILESYS);
 
 	// dunno, this had to be inited before (retAddr)
-	if (image && _ReturnAddress() == g_Radar.getRetAddr() && *reinterpret_cast<uintptr_t*>(image) == DDS_HEADER)
+	if (image && _ReturnAddress() == g_Memory.m_returnAddrRadarImage() && *reinterpret_cast<uintptr_t*>(image) == DDS_HEADER)
 	{
 		size_t size = *reinterpret_cast<size_t*>(thisptr + 0x50);
 		// again broken

@@ -1,4 +1,5 @@
 #pragma once
+
 #include "../utilities/pad.hpp"
 #include "../utilities/vfunc.hpp"
 

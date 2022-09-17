@@ -13,6 +13,9 @@
 #include "../../SDK/Color.hpp"
 #include "../../config/config.hpp"
 #include "../../cheats/menu/GUI-ImGui/imguiaddons.hpp"
+#include "../tools/tools.hpp"
+#include "../tools/wrappers.hpp"
+#include "../utilities.hpp"
 
 enum class TypeLogs : size_t
 {

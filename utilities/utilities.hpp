@@ -2,75 +2,36 @@
 
 #include <string>
 #include <vector>
-#include <utility>
-#include <format>
-#include "../dependencies/lazy_importer.hpp"
-#include "../dependencies/xorstr.hpp"
 
 class Entity_t;
 struct Box;
-struct Box3D;
 struct Vector;
-#define SECURE
-
-#if defined(_DEBUG) // debug mode
-#define LF
-#define XOR(s) (s)
-#elif defined(SECURE) // secure mode will hit release only
-#define LF LI_FN
-#define XOR(s) xorstr_(s)
-#else // release mode
-#define LF LI_FN
-#define XOR(s) (s)
-#endif
-
-// enum to type
-template<typename T>
-_NODISCARD inline constexpr auto E2T(T en) { return static_cast<std::underlying_type_t<T>>(en); }
-
-_NODISCARD inline constexpr std::string operator"" _u8str(const char8_t* str, size_t s)
-{
-    return std::string{ str, str + s };
-}
-
-// format string at runtime
-template<typename... Args_t>
-_NODISCARD inline constexpr std::string FORMAT(const std::string_view fmt, Args_t&&... args)
-{
-    return std::vformat(std::locale(), fmt, std::make_format_args(args...));
-}
 
 namespace utilities
 {
-    _NODISCARD std::string getTime();
-    // old style: "A0 15 ?? FF A3"
-    _NODISCARD uintptr_t patternScan(const std::string& mod, const std::string& mask, const uintptr_t offsetToAdd = 0);
-    // https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bounding_ESP_Boxes
-    // 2d & 3d
-    _NODISCARD bool getBox(Entity_t* ent, Box& box, Box3D& box3D);
-    // 2d
-    _NODISCARD bool getBox(Entity_t* ent, Box& box);
-    _NODISCARD uint32_t inByteOrder(const size_t netLong);
-    _NODISCARD std::string getKeyName(const uint32_t virtualKey);
-    _NODISCARD std::string toLowerCase(const std::string& str);
-    _NODISCARD std::string toUpperCase(const std::string& str);
+    [[nodiscard]] std::string getTime();
+    [[nodiscard]] std::string getKeyName(const uint32_t virtualKey);
+    [[nodiscard]] std::string toLowerCase(const std::string& str);
+    [[nodiscard]] std::string toUpperCase(const std::string& str);
     // return filled array, this should run span<T>, but there were some problems with vector<bool> due to its special magic
     template<typename T, size_t howMany>
-    _NODISCARD std::vector<T> getFilledVec(T toFill) // cref not really needed here
+    [[nodiscard]] std::vector<T> getFilledVec(T toFill) // cref not really needed here
     {
         std::vector<T> toReturn(howMany);
         std::fill(toReturn.begin(), toReturn.begin() + howMany, toFill);
         return toReturn;
     }
-    _NODISCARD std::vector<std::string> splitStr(const std::string& str, char limit = ' ');
+    // deprecated, https://www.youtube.com/watch?v=V14xGZAyVKI
+    [[deprecated("use std::views::split")]]
+    std::vector<std::string> splitStr(const std::string& str, char limit = ' ');
     [[deprecated("use key classes")]]
     uint32_t getKey(const uint32_t vKey);
-    _NODISCARD float scaleDamageArmor(float dmg, const float armor);
-    _NODISCARD std::string u8toStr(const std::u8string& u8str);
-    _NODISCARD uintptr_t* findHudElement(const std::string_view name);
+    [[nodiscard]] float scaleDamageArmor(float dmg, const float armor);
+    [[nodiscard]] std::string u8toStr(const std::u8string& u8str);
+    [[nodiscard]] uintptr_t* findHudElement(const std::string_view name);
     // local
-    _NODISCARD bool isChatOpen();
-    _NODISCARD float getScaledFont(const Vector& source, const Vector& destination, const float division = 80.0f, const float min = 12.0f, const float max = 30.0f);
+    [[nodiscard]] bool isChatOpen();
+    [[nodiscard]] float getScaledFont(const Vector& source, const Vector& destination, const float division = 80.0f, const float min = 12.0f, const float max = 30.0f);
 }
 
 #include <random>
@@ -97,12 +58,12 @@ class Random // sfinae rule simple template static class
 {
 public:
     template<typename T>
-    _NODISCARD static std::enable_if_t<__randomHelper::is_integral_v<T>, T> getRandom(T min, T max)
+    [[nodiscard]] static std::enable_if_t<__randomHelper::is_integral_v<T>, T> getRandom(T min, T max)
     {
         return std::uniform_int_distribution<T>{min, max}(rng);
     }
     template<typename T>
-    _NODISCARD static std::enable_if_t<__randomHelper::is_floating_v<T>, T> getRandom(T min, T max)
+    [[nodiscard]] static std::enable_if_t<__randomHelper::is_floating_v<T>, T> getRandom(T min, T max)
     {
         return std::uniform_real_distribution<T>{min, max}(rng);
     }

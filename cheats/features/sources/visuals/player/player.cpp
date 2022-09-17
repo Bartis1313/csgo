@@ -431,8 +431,8 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 	if (!config.get<bool>(vars.bEsp))
 		return;
 
-	Box box; Box3D box3d;
-	if (!utilities::getBox(ent, box, box3d))
+	Box box;
+	if (!Box::getBox(ent, box))
 		return;
 
 	constexpr float maxDist = 100.0f; // start fade
@@ -464,14 +464,14 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 		g_BoxesDraw.drawBox2DFilled(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		break;
 	case E2T(BoxTypes::BOX3D):
-		g_BoxesDraw.drawBox3D(box3d, isDormant, m_boxAlpha.at(ent->getIndex()));
+		g_BoxesDraw.drawBox3D(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		break;
 	case E2T(BoxTypes::FILLED3D):
 	{
 		if (!config.get<bool>(vars.bBoxMultiColor))
-			g_BoxesDraw.drawBox3DFilled(box3d, isDormant, m_boxAlpha.at(ent->getIndex()));
+			g_BoxesDraw.drawBox3DFilled(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		else
-			g_BoxesDraw.drawBox3DFilledMultiColor(box3d, isDormant, m_boxAlpha.at(ent->getIndex()));
+			g_BoxesDraw.drawBox3DFilledMultiColor(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		break;
 	}
 	default:

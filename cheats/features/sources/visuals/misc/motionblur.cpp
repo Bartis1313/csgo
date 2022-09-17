@@ -11,10 +11,12 @@
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
 #include "../../../../../utilities/math/math.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../gamememory/memory.hpp"
 
 void MotionBlur::init()
 {
-	m_motionBlurAddr = utilities::patternScan(CLIENT_DLL, BLUR_MATERIAL_ARR_1, 0x1);
+	
 }
 
 // 1:1 from https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/viewpostprocess.cpp#L2996
@@ -231,7 +233,7 @@ void MotionBlur::render()
 	ctx->release();*/
 
 	// so we have to wrap it and call directly in isdepth hook to prevent problems like weapon being blurred
-	const static auto _call = utilities::patternScan(CLIENT_DLL, DRAW_SPACE_RECTANGLE_CALL);
+	const static auto _call = g_Memory.m_drawSpacedRectangle();
 	__asm
 	{
 		push globals::screenY

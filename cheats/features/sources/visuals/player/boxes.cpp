@@ -62,7 +62,7 @@ static ImVec2 operator+(const ImVec2& v, float val)
 	return ImVec2{ v.x + val, v.y + val };
 }
 
-void BoxesDraw::drawBox3DFilled(const Box3D& box, bool isDormant, float dormacyAlpha, float thickness)
+void BoxesDraw::drawBox3DFilled(const Box& box, bool isDormant, float dormacyAlpha, float thickness)
 {
 	Color fill = config.get<CfgColor>(vars.cBoxFill).getColor();
 	if (isDormant)
@@ -77,7 +77,7 @@ void BoxesDraw::drawBox3DFilled(const Box3D& box, bool isDormant, float dormacyA
 	drawBox3D(box, isDormant, dormacyAlpha, thickness);
 }
 
-void BoxesDraw::drawBox3DFilledMultiColor(const Box3D& box, bool isDormant, float dormacyAlpha, float thickness)
+void BoxesDraw::drawBox3DFilledMultiColor(const Box& box, bool isDormant, float dormacyAlpha, float thickness)
 {
 	Color fill = config.get<CfgColor>(vars.cBoxFill).getColor();
 	if (isDormant)
@@ -108,7 +108,7 @@ void BoxesDraw::drawBox3DFilledMultiColor(const Box3D& box, bool isDormant, floa
 	drawBox3D(box, isDormant, dormacyAlpha, thickness);
 }
 
-void BoxesDraw::drawBox3D(const Box3D& box, bool isDormant, float dormacyAlpha, float thickness)
+void BoxesDraw::drawBox3D(const Box& box, bool isDormant, float dormacyAlpha, float thickness)
 {
 	Color color = isDormant
 		? config.get<CfgColor>(vars.cBox).getColor().getColorEditAlpha(dormacyAlpha)

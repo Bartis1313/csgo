@@ -59,8 +59,6 @@ protected:
 	void simulate();
 	bool checkDetonate(const Vector& vecThrow, const Trace_t& tr, int tick, float interval);
 	void addGravityMove(Vector& move, Vector& vel, float frametime);
-
-	uintptr_t m_traceFilterSimpleAddr;
 private:
 	void traceHull(Vector& src, Vector& end, Trace_t& tr);
 	void pushEntity(Vector& src, const Vector& move, Trace_t& tr);

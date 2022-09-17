@@ -229,6 +229,7 @@
     <ClCompile Include="dependencies\discord\src\discord_rpc.cpp" />
     <ClCompile Include="dependencies\discord\src\rpc_connection.cpp" />
     <ClCompile Include="dependencies\discord\src\serialization.cpp" />
+    <ClCompile Include="gamememory\memory.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\chams\chams.cpp">
@@ -477,6 +478,7 @@
     <ClInclude Include="dependencies\discord\src\rpc_connection.h" />
     <ClInclude Include="dependencies\discord\src\serialization.h" />
     <ClInclude Include="dependencies\stb_image.h" />
+    <ClInclude Include="gamememory\memory.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="SDK\CClientEffectRegistration.hpp" />
     <ClInclude Include="SDK\CEffectData.hpp" />
@@ -660,6 +662,8 @@
     <ClInclude Include="utilities\csgo.hpp" />
     <ClInclude Include="utilities\res.hpp" />
     <ClInclude Include="utilities\simpleTimer.hpp" />
+    <ClInclude Include="utilities\tools\tools.hpp" />
+    <ClInclude Include="utilities\tools\wrappers.hpp" />
     <ClInclude Include="utilities\utilities.hpp" />
     <ClInclude Include="SDK\CGlowManager.hpp" />
     <ClInclude Include="SDK\ClientClass.hpp" />

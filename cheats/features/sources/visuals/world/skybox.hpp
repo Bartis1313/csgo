@@ -21,8 +21,6 @@ private:
 	void loadSkybox(const std::string& name);
 	void checkCustomSkybox();
 
-	uintptr_t m_loadSkyAddr;
-
 	std::filesystem::path m_pathCustomSkybox;
 	std::vector<std::string> m_allCustomSkyboxes;
 };

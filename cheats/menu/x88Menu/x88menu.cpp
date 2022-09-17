@@ -9,6 +9,7 @@
 #include "../../../SDK/IClientEntityList.hpp"
 #include "../../../config/vars.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
+#include "../../../utilities/tools/wrappers.hpp"
 
 void X88Menu::draw()
 {

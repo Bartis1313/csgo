@@ -16,13 +16,15 @@
 #include "../../../utilities/math/math.hpp"
 #include "../../../utilities/res.hpp"
 #include "../../../utilities/console/console.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 
 #include "../../../dependencies/ImGui/imgui.h"
 #include "../../../dependencies/ImGui/imgui_internal.h"
 
 void Radar::init()
 {
-	m_retAddr = reinterpret_cast<uintptr_t*>(utilities::patternScan(PANORAMA_DLL, UNK_FILESYS));
+	
 }
 
 Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale, bool clipRanges)

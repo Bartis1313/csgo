@@ -94,6 +94,10 @@ void Freecam::run(CViewSetup* view)
 	}
 }
 
+#include "../../../../../dependencies/ImGui/imgui.h"
+#include "../../../../..//utilities/tools/tools.hpp"
+#include "../../../../..//utilities/tools/wrappers.hpp"
+
 void FreecamDraw::init()
 {
 

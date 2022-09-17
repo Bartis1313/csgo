@@ -14,6 +14,8 @@
 #include "../../config/vars.hpp"
 #include "../../utilities/renderer/renderer.hpp"
 #include "../../utilities/console/console.hpp"
+#include "../../utilities/tools/tools.hpp"
+#include "../../gamememory/memory.hpp"
 
 void hooks::init()
 {
@@ -21,25 +23,25 @@ void hooks::init()
 hookHelper::tryHook(vfunc::getVFunc(thisptr, hookStructName::index), &hookStructName::hooked, \
 	hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName))
 
-#define HOOK_SAFE_SIG(mod, mask, hookStructName) \
-hookHelper::tryHook(reinterpret_cast<void*>(utilities::patternScan(mod, mask)), &hookStructName::hooked, \
+#define HOOK_SAFE_SIG(target, hookStructName) \
+hookHelper::tryHook(target, &hookStructName::hooked, \
 	hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName))
 
 	hookHelper::initMinhook();
 
-	HOOK_SAFE_SIG(CLIENT_DLL, NEW_CHECK, clientValidAddr);
-	HOOK_SAFE_SIG(ENGINE_DLL, NEW_CHECK, engineValidAddr);
-	HOOK_SAFE_SIG(STUDIORENDER_DLL, NEW_CHECK, studioRenderValidAddr);
-	HOOK_SAFE_SIG(MATERIAL_DLL, NEW_CHECK, materialSystemValidAddr);
-	HOOK_SAFE_SIG(ENGINE_DLL, IS_USING_PROP_DEBUG, isUsingStaticPropDebugModes);
-	HOOK_SAFE_SIG(MATERIAL_DLL, GET_COLOR_MODULATION, getColorModulation);
-	HOOK_SAFE_SIG(CLIENT_DLL, EXTRA_BONES_PROCCESSING, doExtraBonesProcessing);
-	HOOK_SAFE_SIG(CLIENT_DLL, BUILD_TRANSFORMATIONS, buildTransformations);
-	HOOK_SAFE_SIG(CLIENT_DLL, PARTICLE_SIMULATE, particlesSimulations);
-	HOOK_SAFE_SIG(ENGINE_DLL, SEND_DATAGRAM, sendDatagram);
-	HOOK_SAFE_SIG(CLIENT_DLL, UNK_OVERVIEWMAP, unknownOverViewFun);
-	HOOK_SAFE_SIG(CLIENT_DLL, IS_DEPTH, isDepthOfField);
-	HOOK_SAFE_SIG(CLIENT_DLL, FX_BLOOD, fxBlood);
+	HOOK_SAFE_SIG(g_Memory.m_clientValidAddr(), clientValidAddr);
+	HOOK_SAFE_SIG(g_Memory.m_enginevalidAddr(), engineValidAddr);
+	HOOK_SAFE_SIG(g_Memory.m_studioRenderValidAddr(), studioRenderValidAddr);
+	HOOK_SAFE_SIG(g_Memory.m_materialSysValidAddr(), materialSystemValidAddr);
+	HOOK_SAFE_SIG(g_Memory.m_isUsingPropDebug(), isUsingStaticPropDebugModes);
+	HOOK_SAFE_SIG(g_Memory.m_getColorModulation(), getColorModulation);
+	HOOK_SAFE_SIG(g_Memory.m_extraBonesProcessing(), doExtraBonesProcessing);
+	HOOK_SAFE_SIG(g_Memory.m_buildTransformations(), buildTransformations);
+	HOOK_SAFE_SIG(g_Memory.m_particleSimulate(), particlesSimulations);
+	HOOK_SAFE_SIG(g_Memory.m_sendDataGram(), sendDatagram);
+	HOOK_SAFE_SIG(g_Memory.m_unkOverviewMap(), unknownOverViewFun);
+	HOOK_SAFE_SIG(g_Memory.m_isDepth(), isDepthOfField);
+	HOOK_SAFE_SIG(g_Memory.m_fxBlood(), fxBlood);
 
 	HOOK_SAFE_VFUNC(interfaces::dx9Device, reset);
 	HOOK_SAFE_VFUNC(interfaces::dx9Device, present);
@@ -72,12 +74,8 @@ LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT message, WPARAM wparam, L
 
 void hooks::wndProcSys::init()
 {
-#ifdef _DEBUG
-	currentWindow = FindWindowA(XOR("Valve001"), NULL);
-#else
-	currentWindow = LF(FindWindowA).cached()(XOR("Valve001"), NULL);
-#endif
-	wndProcOriginal = reinterpret_cast<WNDPROC>(LF(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndproc)));
+	currentWindow = LI_FN_CACHED(FindWindowA)(XOR("Valve001"), NULL);
+	wndProcOriginal = reinterpret_cast<WNDPROC>(LI_FN(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndproc)));
 }
 
 #include "../../SDK/InputSystem.hpp"
@@ -87,7 +85,7 @@ void hooks::wndProcSys::init()
 
 void hooks::wndProcSys::shutdown()
 {
-	LF(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndProcOriginal));
+	LI_FN(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndProcOriginal));
 	interfaces::iSystem->enableInput(true);
 }
 
@@ -128,11 +126,8 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 
 	if (menu.isMenuActive() && ImGui_ImplWin32_WndProcHandler(hwnd, message, wparam, lparam))
 		return TRUE;
-#if _DEBUG
-	return CallWindowProcA(wndProcOriginal, hwnd, message, wparam, lparam);
-#else
-	return LF(CallWindowProcA).cached()(wndProcOriginal, hwnd, message, wparam, lparam);
-#endif
+
+	return LI_FN_CACHED(CallWindowProcA)(wndProcOriginal, hwnd, message, wparam, lparam);
 }
 #pragma endregion
 

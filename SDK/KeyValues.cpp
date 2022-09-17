@@ -1,13 +1,13 @@
 #include "KeyValues.hpp"
 
 #include "structs/IDXandPaterrns.hpp"
-#include "../utilities/utilities.hpp"
+#include "../gamememory/memory.hpp"
 #include "KeyValuesSys.hpp"
 #include "interfaces/interfaces.hpp"
 
 KeyValues* KeyValues::fromString(const char* name, const char* value)
 {
-	const static auto fromstring = utilities::patternScan(CLIENT_DLL, KEY_VALUES_FROM_STR);
+	const static auto fromstring = g_Memory.m_keyValuesFromString();
 	KeyValues* res;
 
 	__asm

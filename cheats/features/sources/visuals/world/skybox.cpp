@@ -8,13 +8,12 @@
 #include "../../../../game.hpp"
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../gamememory/memory.hpp"
 #include "../../../../menu/GUI-ImGui/selections.hpp"
 
 void SkyboxEdit::init()
 {
-	m_loadSkyAddr = utilities::patternScan(ENGINE_DLL, LOAD_SKY);
-
 	checkCustomSkybox();
 	reloadCustomSkyboxes();
 }
@@ -50,9 +49,7 @@ void SkyboxEdit::run(int frame)
 
 void SkyboxEdit::loadSkybox(const std::string& name)
 {
-	using fn = void(__fastcall*)(const char*);
-	static const auto forceSky = reinterpret_cast<fn>(m_loadSkyAddr);
-	forceSky(name.c_str());
+	g_Memory.m_loadSky()(name.c_str());
 }
 
 void SkyboxEdit::checkCustomSkybox()

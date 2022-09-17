@@ -3,30 +3,25 @@
 #include <Windows.h>
 #include <type_traits>
 #include <d3d9.h>
-#include <format>
 
 #include "../structs/IDXandPaterrns.hpp"
-#include "../../utilities/utilities.hpp"
-#include "../../utilities/utilities.hpp"
+#include "../../utilities/tools/tools.hpp"
+#include "../../utilities/tools/wrappers.hpp"
 #include "../../utilities/console/console.hpp"
+#include "../../utilities/vfunc.hpp"
+#include "../../gamememory/memory.hpp"
 
 template <typename T>
 static T* getInterface(const std::string_view moduleName, const std::string_view interfaceName)
 {
-	// using fun = void* (*)(const char*, int*);
-	using fun = void* __cdecl(const char*, int*);
-	/*const auto capture = reinterpret_cast<fun>(
-		LF(GetProcAddress)(LF(GetModuleHandleA)(moduleName), XOR("CreateInterface"))
-		);*/
-	const auto capture = reinterpret_cast<std::add_pointer_t<fun>>(
-		LF(GetProcAddress)(LF(GetModuleHandleA)(moduleName.data()), XOR("CreateInterface"))
-		);
+	using fun = void* (*)(const char*, int*);
+	fun capture;
+	LI_EXPORT(capture, reinterpret_cast<fun>, CreateInterface, g_Memory.getModule(moduleName));
+
 	if (const auto ret = capture(interfaceName.data(), nullptr); ret != nullptr)
 		return reinterpret_cast<T*>(ret);
-	else
-		throw std::runtime_error(FORMAT(XOR("Interface {} was nullptr"), interfaceName));
-
-	return nullptr;
+			
+	throw std::runtime_error(FORMAT(XOR("Interface {} was nullptr"), interfaceName));
 }
 
 // capture and log
@@ -36,7 +31,28 @@ static T* getInterface(const std::string_view moduleName, const std::string_view
 // _interface - interface' name
 #define CAPNLOG(var, type, _module, _interface) \
 	var = getInterface<type>(_module, XOR(_interface)); \
-	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), _interface, reinterpret_cast<uintptr_t>(var))); \
+	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), _interface, reinterpret_cast<uintptr_t>(var)));
+
+#define LOG(var) \
+	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var)));
+
+#define ADDNLOG(var, mem) \
+	var = mem; \
+	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var)));
+
+#define ENGINE_DLL					XOR("engine.dll")
+#define CLIENT_DLL					XOR("client.dll")
+#define VSTD_DLL					XOR("vstdlib.dll")
+#define VGUI_DLL					XOR("vgui2.dll")
+#define VGUIMAT_DLL					XOR("vguimatsurface.dll")
+#define MATERIAL_DLL				XOR("materialsystem.dll")
+#define LOCALIZE_DLL				XOR("localize.dll")
+#define STUDIORENDER_DLL			XOR("studiorender.dll")
+#define INPUTSYSTEM_DLL				XOR("inputsystem.dll")
+#define SHARED_API					XOR("shaderapidx9.dll")
+#define TIER_DLL					XOR("tier0.dll")
+#define PANORAMA_DLL				XOR("panorama.dll")
+#define FILESYS_DLL					XOR("filesystem_stdio.dll")
 	
 bool interfaces::init()
 {
@@ -64,28 +80,34 @@ bool interfaces::init()
 
 #undef CAPNLOG
 
-	keyValuesSys = reinterpret_cast<KeyValuesSys*(__cdecl*)()>(LF(GetProcAddress)(LF(GetModuleHandleA)(VSTD_DLL), XOR("KeyValuesSystem")))();
-	memAlloc = *reinterpret_cast<IMemAlloc**>(LF(GetProcAddress)(LF(GetModuleHandleA)(TIER_DLL), XOR("g_pMemAlloc")));
-	
+	LI_EXPORT_CDECL(keyValuesSys, reinterpret_cast<KeyValuesSys * (__cdecl*)()>, KeyValuesSystem, g_Memory.getModule(VSTD_DLL));
+	LOG(keyValuesSys);
+	LI_EXPORT(memAlloc, *reinterpret_cast<IMemAlloc**>, g_pMemAlloc, g_Memory.getModule(TIER_DLL));
+	LOG(memAlloc);
+
 	globalVars = **reinterpret_cast<CGlobalVarsBase***>((*reinterpret_cast<uintptr_t**>(client))[0] + 0x1F);
+	LOG(globalVars);
 	clientMode = **reinterpret_cast<ClientMode***>((*reinterpret_cast<uintptr_t**>(client))[10] + 0x5);
-	beams = *reinterpret_cast<IViewRenderBeams**>(utilities::patternScan(CLIENT_DLL, BEAMS, 0x1));
+	LOG(clientMode);
 	input = *reinterpret_cast<Input**>((*reinterpret_cast<uintptr_t**>(client))[16] + 0x1);
-	glowManager = *reinterpret_cast<CGlowManager**>(utilities::patternScan(CLIENT_DLL, GLOWMANAGER, 0x3));
-	weapon = *reinterpret_cast<IWeapon**>(utilities::patternScan(CLIENT_DLL, WEAPONDATA, 0x2));
-	moveHelper = **reinterpret_cast<IMoveHelper***>(utilities::patternScan(CLIENT_DLL, MOVEHELPER, 0x2));
-	resource = *reinterpret_cast<PlayerResource***>(utilities::patternScan(CLIENT_DLL, PLAYER_RESOURCE, 0x4));
-	dx9Device = **reinterpret_cast<IDirect3DDevice9***>(utilities::patternScan(SHARED_API, DX9_DEVICE, 0x1));
-	clientState = **reinterpret_cast<IClientState***>(utilities::patternScan(ENGINE_DLL, CLIENT_STATE, 0x1));
-	gameRules = *reinterpret_cast<CGameRules**>(utilities::patternScan(CLIENT_DLL, GAME_RULES, 0x2));
-	viewRender = **reinterpret_cast<IViewRender***>(utilities::patternScan(CLIENT_DLL, VIEW_RENDER, 0x2));
+	LOG(input);
 
-	using namespace gameFunctions;
+#undef LOG
 
-	tesla = reinterpret_cast<tfn>(utilities::patternScan(CLIENT_DLL, FX_TESLA));
-	dispatchEffect = reinterpret_cast<dfn>(utilities::patternScan(CLIENT_DLL, DISPATCH_EFFECT));
+	ADDNLOG(beams, g_Memory.m_beams());
+	ADDNLOG(glowManager, g_Memory.m_glowManager());
+	ADDNLOG(weapon, g_Memory.m_weaponInterface());
+	ADDNLOG(moveHelper, g_Memory.m_moveHelper());
+	ADDNLOG(resource, g_Memory.m_resourceInterface());
+	ADDNLOG(dx9Device, g_Memory.m_dx9Device());
+	ADDNLOG(clientState, g_Memory.m_clientState());
+	ADDNLOG(gameRules, g_Memory.m_gameRules());
+	ADDNLOG(viewRender, g_Memory.m_viewRender());
+
+#undef ADDNLOG
 
 	console.log(TypeLogs::LOG_INFO, XOR("interfaces success"));
+
 	done = true;
 	return true;
 }

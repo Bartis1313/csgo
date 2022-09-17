@@ -36,8 +36,6 @@ private:
 
 	std::array<float, 4> m_motionBlurValues = { 0.0f, 0.0f, 0.0f, 0.0f };
 	std::array<float, 4> m_motionBlurViewportValues = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-	uintptr_t m_motionBlurAddr;
 };
 
 [[maybe_unused]] inline auto g_MotionBlur = MotionBlur{};

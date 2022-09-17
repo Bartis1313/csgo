@@ -8,10 +8,12 @@
 #include "../../../../game.hpp"
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
 #include "../../../../../utilities/math/math.hpp"
 #include "../../cache/cache.hpp"
+#include "../../../../../gamememory/memory.hpp"
 
 void SmokeDraw::init()
 {
@@ -49,7 +51,7 @@ void SmokeDraw::draw()
 		if (ImVec2 s; imRender.worldToScreen(origin, s))
 		{
 			imRender.drawProgressRing(s.x, s.y, 25, 32, -90, scale, 5.0f, Colors::LightBlue);
-			imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma14, std::format(XOR("{:.2f}s"), time), true, Colors::White);
+			imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma14, FORMAT(XOR("{:.2f}s"), time), true, Colors::White);
 		}
 	}
 }
@@ -64,8 +66,7 @@ void SmokeDraw::drawCustomSmokeEffect(const Vector& pos, float radius)
 
 void SmokeRemoval::init()
 {
-	const auto throughSmoke = utilities::patternScan(CLIENT_DLL, GOES_THROUGH_SMOKE);
-	m_smokeCountAddr = *reinterpret_cast<uintptr_t*>(throughSmoke + 0x8);
+	
 }
 
 void SmokeRemoval::run(int frame)
@@ -77,5 +78,5 @@ void SmokeRemoval::run(int frame)
 		return;
 
 	if (config.get<bool>(vars.bEditEffectsSmoke)) // remove effects from inside, this is why we nulling smoke count
-		*reinterpret_cast<uintptr_t*>(m_smokeCountAddr) = 0;
+		*reinterpret_cast<uintptr_t*>(g_Memory.m_smokeCount()) = 0;
 }

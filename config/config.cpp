@@ -8,6 +8,8 @@
 
 #include "../dependencies/json.hpp"
 #include "../utilities/console/console.hpp"
+#include "../utilities/tools/tools.hpp"
+#include "../utilities/tools/wrappers.hpp"
 
 using json = nlohmann::json;
 
@@ -382,14 +384,9 @@ void Config::reload()
 
 std::filesystem::path Config::getDocumentsPath()
 {
-#ifdef _DEBUG
-	// if possible to get the path, if so, return it
-	if (static CHAR documents[MAX_PATH]; SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
+	if (static CHAR documents[MAX_PATH]; SUCCEEDED(LI_FN_CACHED(SHGetFolderPathA)(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
 		return std::filesystem::path{ documents };
-#else
-	if (static CHAR documents[MAX_PATH]; SUCCEEDED(LF(SHGetFolderPathA).cached()(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
-		return std::filesystem::path{ documents };
-#endif
+
 	return {};
 }
 

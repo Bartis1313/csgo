@@ -8,7 +8,7 @@
 #include "../../../../game.hpp"
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
 
 void NoScope::init()

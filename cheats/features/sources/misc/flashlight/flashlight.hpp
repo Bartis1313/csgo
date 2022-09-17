@@ -2,7 +2,7 @@
 
 #include "../../../classes/frameStage.hpp"
 
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 
 class Entity_t;
 class CFlashlightEffect;
@@ -17,16 +17,13 @@ public:
 
 	virtual void init();
 	virtual void run(int frame);
+	virtual void shutdown();
 private:
 	CFlashlightEffect* createFlashlight(float fov, Entity_t* ent, const char* effectName = XOR("effects/flashlight001"),
 		float farZ = 1000.0f, float linearAtten = 1000.0f);
 	void destroyFlashLight(CFlashlightEffect* flashlight);
 	void updateFlashlight(CFlashlightEffect* flashlight, const Vector& pos, const Vector& forward, const Vector& right, const Vector& up);
 
-	uintptr_t m_createAddr;
-	using destroyType = void(__thiscall*)(void*, void*);
-	destroyType m_destroyAddr;	
-	uintptr_t m_updateAddr;
 	CFlashlightEffect* m_flashlight = nullptr;
 };
 

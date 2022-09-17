@@ -1,7 +1,5 @@
 #include "console.hpp"
 
-#include <Windows.h>
-
 void Console::setColor(ColorsConsole color)
 {
 #ifdef _DEBUG
@@ -22,17 +20,12 @@ bool Console::init(const std::string& title, const std::string& logName)
 {
 	if (!logName.empty())
 		m_logName = logName;
+
 #ifdef _DEBUG
-	static bool bOnce = [=]()
-	{
-		AllocConsole();
+	AllocConsole();
+	freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
+	SetConsoleTitleA(title.c_str());
 
-		freopen_s(reinterpret_cast<FILE**>(stdout), "CONOUT$", "w", stdout);
-
-		SetConsoleTitleA(title.c_str());
-
-		return true;
-	} ();
 	return true;
 #endif
 	return false;

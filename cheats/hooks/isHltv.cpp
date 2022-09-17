@@ -1,9 +1,10 @@
 #include "hooks.hpp"
 
+#include <intrin.h>
+
 #include "../../SDK/CGlobalVars.hpp"
 #include "../../SDK/interfaces/interfaces.hpp"
-#include "../../utilities/utilities.hpp"
-#include "../../SDK/structs/IDXandPaterrns.hpp"
+#include "../../gamememory/memory.hpp"
 #include "../../config/vars.hpp"
 
 bool __fastcall hooks::isHltv::hooked(FAST_ARGS)
@@ -11,9 +12,9 @@ bool __fastcall hooks::isHltv::hooked(FAST_ARGS)
     uintptr_t ent;
     __asm mov ent, edi
 
-    const static auto occlusion = utilities::patternScan(CLIENT_DLL, SETUP_OCCLUSION);
-    const static auto velocity = utilities::patternScan(CLIENT_DLL, SETUP_VELOCITY);
-    const static auto accumulate = utilities::patternScan(CLIENT_DLL, ACCUMULATE_LAYERS);
+    const static auto occlusion = g_Memory.m_occlusion();
+    const static auto velocity = g_Memory.m_velocity();
+    const static auto accumulate = g_Memory.m_accumulate();
     const uintptr_t ret = reinterpret_cast<uintptr_t>(_ReturnAddress());
 
     if (ret == occlusion)

@@ -32,8 +32,6 @@ public:
 
 	virtual void init();
 	virtual void run(int frame);
-private:
-	uintptr_t m_smokeCountAddr;
 };
 
 [[maybe_unused]] inline auto g_SmokeRemoval = SmokeRemoval{};

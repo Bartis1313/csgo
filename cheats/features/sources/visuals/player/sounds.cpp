@@ -11,7 +11,8 @@
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 #include "../../events/events.hpp"
 
 void SoundDraw::init()

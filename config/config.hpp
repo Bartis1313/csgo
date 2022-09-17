@@ -9,7 +9,6 @@
 #include "key.hpp"
 #include "cfgcolor.hpp"
 #include "cfgWeapon.hpp"
-#include "../utilities/utilities.hpp"
 
 class ConfigType
 {

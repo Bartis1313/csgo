@@ -11,23 +11,9 @@
 #include "../features/classes/renderableToPresent.hpp"
 
 #include "../../utilities/renderer/renderer.hpp"
-#include "../../utilities/utilities.hpp"
 #include "../../utilities/console/console.hpp"
 #include "../../utilities/res.hpp"
 #include "../../resource.h"
-
-static bool isValidWindow()
-{
-	// sub window is better, for cs as they recently updated main window name
-#ifdef _DEBUG
-	if (auto window = FindWindowA("Valve001", NULL); GetForegroundWindow() != window)
-		return false;
-#else
-	if (auto window = LF(FindWindowA).cached()(XOR("Valve001"), NULL); LF(GetForegroundWindow).cached()() != window)
-		return false;
-#endif
-	return true;
-}
 
 long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {
@@ -45,9 +31,6 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 
 		return true;
 	} ();
-
-	if (!isValidWindow())
-		return original(device, srcRect, dstRect, window, region);
 
 	IDirect3DVertexDeclaration9* ppdecl;
 	IDirect3DVertexShader9* ppshader;

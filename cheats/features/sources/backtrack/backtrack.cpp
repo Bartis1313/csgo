@@ -14,6 +14,7 @@
 #include "../../../game.hpp"
 #include "../../../../config/vars.hpp"
 #include "../../../../utilities/math/math.hpp"
+#include "../../../../utilities/tools/tools.hpp"
 #include "../cache/cache.hpp"
 
 void Backtrack::init()

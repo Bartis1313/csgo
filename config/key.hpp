@@ -4,7 +4,7 @@
 #include <string>
 #include <utility>
 
-#include "../utilities/utilities.hpp"
+#include "../utilities/tools/wrappers.hpp"
 
 enum class KeyMode : size_t
 {

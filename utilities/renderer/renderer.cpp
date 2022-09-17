@@ -2,9 +2,74 @@
 
 #include "../math/math.hpp"
 #include "../console/console.hpp"
+#include "../tools/tools.hpp"
+
+#include "../../dependencies/ImGui/imgui_impl_dx9.h"
 
 #include "../../SDK/interfaces/interfaces.hpp"
+#include "../../SDK/ICollideable.hpp"
+#include "../../SDK/structs/Entity.hpp"
 #include "../../utilities/res.hpp"
+
+bool Box::getBox(Entity_t* ent, Box& box)
+{
+	// pretty much nothing to explain here, using engine and detect mins/maxs
+	const auto col = ent->collideable();
+	if (!col)
+		return false;
+
+	const auto& min = col->OBBMins();
+	const auto& max = col->OBBMaxs();
+
+	const auto& matrixWorld = ent->renderableToWorldTransform();
+
+	float left = std::numeric_limits<float>::max();
+	float top = std::numeric_limits<float>::max();
+	float right = -std::numeric_limits<float>::max();
+	float bottom = -std::numeric_limits<float>::max();
+
+	std::array points =
+	{
+		Vector{ min.x, min.y, min.z },
+		Vector{ min.x, max.y, min.z },
+		Vector{ max.x, max.y, min.z },
+		Vector{ max.x, min.y, min.z },
+		Vector{ min.x, min.y, max.z },
+		Vector{ min.x, max.y, max.z },
+		Vector{ max.x, max.y, max.z },
+		Vector{ max.x, min.y, max.z }
+	};
+
+	std::array<ImVec2, 8> screen = {};
+	for (size_t i = 0; auto & el : screen)
+	{
+		if (!imRender.worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
+			return false;
+
+		left = std::min(left, el.x);
+		top = std::min(top, el.y);
+		right = std::max(right, el.x);
+		bottom = std::max(bottom, el.y);
+
+		box.points.at(i) = el;
+
+		i++;
+	}
+
+	box.x = left;
+	box.y = top;
+	box.w = right - left;
+	box.h = bottom - top;
+
+	// get important points, eg: if you use 3d box, you want to render health by quads, not rects
+
+	box.topleft = screen.at(7);
+	box.topright = screen.at(6);
+	box.bottomleft = screen.at(3);
+	box.bottomright = screen.at(2);
+
+	return true;
+}
 
 #define BUFFER_SIZE 256
 
@@ -367,25 +432,22 @@ Vector2D SurfaceRender::getTextSizeXY(const unsigned long font, const std::strin
 	int width, height;
 	interfaces::surface->getTextSize(font, wtext.c_str(), width, height);
 
-	return { width, height };
+	return { (float)width, (float)height };
 }
 
-#include "../../SDK/structs/IDXandPaterrns.hpp"
+#include "../../gamememory/memory.hpp"
 #include "../../cheats/globals.hpp"
 
 bool SurfaceRender::worldToScreen(const Vector& in, Vector& out)
 {
-	static auto addr = utilities::patternScan(CLIENT_DLL, VIEW_MATRIX_CLIENT);
-	auto viewMatrix = *reinterpret_cast<uintptr_t*>(addr + 0x3) + 0xB0;
-
-	const auto& screenMatrix = *reinterpret_cast<Matrix4x4*>(viewMatrix);
+	auto screenMatrix = g_Memory.m_viewMatrixAddr();
 
 	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
 
 	if (w < 0.001f)
 		return false;
 
-	Vector2D viewport = { globals::screenX, globals::screenY };
+	Vector2D viewport = { (float)globals::screenX, (float)globals::screenY };
 
 	float inversed = 1.0f / w;
 	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
@@ -397,17 +459,14 @@ bool SurfaceRender::worldToScreen(const Vector& in, Vector& out)
 
 bool SurfaceRender::worldToScreen(const Vector& in, Vector2D& out)
 {
-	static auto addr = utilities::patternScan(CLIENT_DLL, VIEW_MATRIX_CLIENT);
-	auto viewMatrix = *reinterpret_cast<uintptr_t*>(addr + 0x3) + 0xB0;
-
-	const auto& screenMatrix = *reinterpret_cast<Matrix4x4*>(viewMatrix);
+	auto screenMatrix = g_Memory.m_viewMatrixAddr();
 
 	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
 
 	if (w < 0.001f)
 		return false;
 
-	Vector2D viewport = { globals::screenX, globals::screenY };
+	Vector2D viewport = { (float)globals::screenX, (float)globals::screenY };
 
 	float inversed = 1.0f / w;
 	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
@@ -532,64 +591,7 @@ void SurfaceRender::drawProgressRing(const int x, const int y, float radius, con
 
 void ImGuiRender::init(ImGuiIO& io)
 {
-#ifdef _DEBUG
-	if (CHAR fontsPath[MAX_PATH]; SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fontsPath)))
-	{
-		const std::filesystem::path path{ fontsPath };
-
-		/*
-		ImGuiFreeTypeBuilderFlags_NoHinting     = 1 << 0,   // Disable hinting. This generally generates 'blurrier' bitmap glyphs when the glyph are rendered in any of the anti-aliased modes.
-		ImGuiFreeTypeBuilderFlags_NoAutoHint    = 1 << 1,   // Disable auto-hinter.
-		ImGuiFreeTypeBuilderFlags_ForceAutoHint = 1 << 2,   // Indicates that the auto-hinter is preferred over the font's native hinter.
-		ImGuiFreeTypeBuilderFlags_LightHinting  = 1 << 3,   // A lighter hinting algorithm for gray-level modes. Many generated glyphs are fuzzier but better resemble their original shape. This is achieved by snapping glyphs to the pixel grid only vertically (Y-axis), as is done by Microsoft's ClearType and Adobe's proprietary font renderer. This preserves inter-glyph spacing in horizontal text.
-		ImGuiFreeTypeBuilderFlags_MonoHinting   = 1 << 4,   // Strong hinting algorithm that should only be used for monochrome output.
-		ImGuiFreeTypeBuilderFlags_Bold          = 1 << 5,   // Styling: Should we artificially embolden the font?
-		ImGuiFreeTypeBuilderFlags_Oblique       = 1 << 6,   // Styling: Should we slant the font, emulating italic style?
-		ImGuiFreeTypeBuilderFlags_Monochrome    = 1 << 7,   // Disable anti-aliasing. Combine this with MonoHinting for best results!
-		ImGuiFreeTypeBuilderFlags_LoadColor     = 1 << 8,   // Enable FreeType color-layered glyphs
-		ImGuiFreeTypeBuilderFlags_Bitmap        = 1 << 9    // Enable FreeType bitmap glyphs	
-		*/
-
-		ImFontConfig cfg;
-		cfg.OversampleH = 3;
-		cfg.OversampleV = 3;
-		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
-
-		ImVector<ImWchar> range;
-		ImFontGlyphRangesBuilder textBuilder;
-		constexpr ImWchar textRanges[] = 
-		{
-			0x0020, 0x00FF, // Basic Latin
-			0x0100, 0x024F, // Latin Extended-A + Latin Extended-B
-			0x0600, 0x06FF, // Arabic
-			0x0E00, 0x0E7F, // Thai
-			0
-		};
-		textBuilder.AddRanges(textRanges);
-		textBuilder.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
-		textBuilder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-		textBuilder.BuildRanges(&range);
-
-		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, textRanges);
-		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 20.0f, &cfg, textRanges);
-		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, textRanges);
-		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, textRanges);
-		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, textRanges);
-
-		constexpr ImWchar ranges[] =
-		{
-			0xE000, 0xF8FF,
-			0,
-		};
-		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 80.0f, &cfg, ranges);
-
-		if (!ImGuiFreeType::BuildFontAtlas(io.Fonts))
-			throw std::runtime_error(XOR("ImGuiFreeType::BuildFontAtlas returned false"));
-	}
-	else
-		throw std::runtime_error(XOR("could not reach windows path"));
-#else
-	if (CHAR fontsPath[MAX_PATH]; SUCCEEDED(LF(SHGetFolderPathA).cached()(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fontsPath)))
+	if (CHAR fontsPath[MAX_PATH]; SUCCEEDED(LI_FN_CACHED(SHGetFolderPathA)(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fontsPath)))
 	{
 		const std::filesystem::path path{ fontsPath };
 
@@ -631,7 +633,6 @@ void ImGuiRender::init(ImGuiIO& io)
 	}
 	else
 		throw std::runtime_error(XOR("could not reach windows path"));
-#endif
 
 	console.log(TypeLogs::LOG_INFO, XOR("init imgui fonts success"));
 }
@@ -998,10 +999,7 @@ ImVec2 ImGuiRender::getTextSize(ImFont* font, const std::string& text)
 
 bool ImGuiRender::worldToScreen(const Vector& in, Vector& out)
 {
-	static auto addr = utilities::patternScan(CLIENT_DLL, VIEW_MATRIX_CLIENT);
-	auto viewMatrix = *reinterpret_cast<uintptr_t*>(addr + 0x3) + 0xB0;
-
-	const auto& screenMatrix = *reinterpret_cast<Matrix4x4*>(viewMatrix);
+	auto screenMatrix = g_Memory.m_viewMatrixAddr();
 
 	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
 
@@ -1020,10 +1018,7 @@ bool ImGuiRender::worldToScreen(const Vector& in, Vector& out)
 
 bool ImGuiRender::worldToScreen(const Vector& in, Vector2D& out)
 {
-	static auto addr = utilities::patternScan(CLIENT_DLL, VIEW_MATRIX_CLIENT);
-	auto viewMatrix = *reinterpret_cast<uintptr_t*>(addr + 0x3) + 0xB0;
-
-	const auto& screenMatrix = *reinterpret_cast<Matrix4x4*>(viewMatrix);
+	auto screenMatrix = g_Memory.m_viewMatrixAddr();
 
 	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
 
@@ -1041,10 +1036,7 @@ bool ImGuiRender::worldToScreen(const Vector& in, Vector2D& out)
 
 bool ImGuiRender::worldToScreen(const Vector& in, ImVec2& out)
 {
-	static auto addr = utilities::patternScan(CLIENT_DLL, VIEW_MATRIX_CLIENT);
-	auto viewMatrix = *reinterpret_cast<uintptr_t*>(addr + 0x3) + 0xB0;
-
-	const auto& screenMatrix = *reinterpret_cast<Matrix4x4*>(viewMatrix);
+	auto screenMatrix = g_Memory.m_viewMatrixAddr();
 
 	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
 
@@ -1427,6 +1419,7 @@ void ImGuiRenderWindow::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, c
 
 void ImGuiRenderWindow::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
 {
+	RUNTIME_CHECK_RENDER_WINDOW;
 	float maxAngle = RAD2DEG(math::PI *2.0f * percent) + angleMin;
 
 	m_drawing->PathArcTo(ImVec2{m_pos.x + x, m_pos.y + y }, radius, DEG2RAD(angleMin), DEG2RAD(maxAngle), points);

@@ -14,6 +14,7 @@ public:
 protected:
 	virtual void init() {};
 	virtual void shutdown() {};
+private:
 	inline static std::vector<BaseHack*> m_hacks;
 };
 

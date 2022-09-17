@@ -15,6 +15,9 @@
 #include "../../../../globals.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../../utilities/math/math.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
+#include "../../../../../gamememory/memory.hpp"
 
 #include "../../../../../SDK/ClientClass.hpp"
 #include "../../../../../SDK/IVModelInfo.hpp"
@@ -109,7 +112,7 @@ static Color colorBased(int health)
 
 void GrenadePrediction::init()
 {
-	m_traceFilterSimpleAddr = utilities::patternScan(CLIENT_DLL, CTRACE_FILTER_SIMPLE, 0x3D);
+
 }
 
 void GrenadePrediction::draw()
@@ -352,7 +355,7 @@ void GrenadePrediction::traceHull(Vector& src, Vector& end, Trace_t& tr)
 {
 	uintptr_t filter[] =
 	{
-		*reinterpret_cast<uintptr_t*>(m_traceFilterSimpleAddr),
+		*reinterpret_cast<uintptr_t*>(g_Memory.m_traceFilterSimple()),
 		reinterpret_cast<uintptr_t>(game::localPlayer()),
 		0,
 		0

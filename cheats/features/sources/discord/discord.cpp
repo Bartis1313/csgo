@@ -13,6 +13,8 @@
 #include "../../../SDK/CGlobalVars.hpp"
 
 #include "../../../game.hpp"
+#include "../../../../utilities/tools/tools.hpp"
+#include "../../../../utilities/tools/wrappers.hpp"
 
 void DiscordPresence::init()
 {

@@ -13,7 +13,7 @@ struct Matrix3x4
 		m_matValues[2][0] = m20; m_matValues[2][1] = m21; m_matValues[2][2] = m22; m_matValues[2][3] = m23;
 	}
 
-	_NODISCARD constexpr Vector origin() const
+	[[nodiscard]] constexpr Vector origin() const
 	{
 		return Vector{ m_matValues[0][3], m_matValues[1][3], m_matValues[2][3] };
 	}

@@ -25,10 +25,10 @@ public:
 	CfgWeapon getCachedConfig() const;
 private:
 	void resetFields();
-	bool isClicked(CUserCmd* cmd);
-	bool getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, const Vector& punch);
+	[[nodiscard]] bool isClicked(CUserCmd* cmd);
+	[[nodiscard]] bool getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, const Vector& punch);
 
-	std::vector<size_t> getHitboxes();
+	[[nodiscard]]  std::vector<size_t> getHitboxes();
 	Player_t* m_bestEnt;
 	Vector m_bestHitpos;
 	bool m_delay;

@@ -1,5 +1,7 @@
 #include "tracer.hpp"
 
+#include <ranges>
+
 #include "../../../../../SDK/CGlobalVars.hpp"
 #include "../../../../../SDK/IGameEvent.hpp"
 #include "../../../../../SDK/IVEngineClient.hpp"
@@ -54,19 +56,20 @@ void BulletTracer::draw(IGameEvent* event)
 	filter.m_skip = game::localPlayer();
 	interfaces::trace->traceRay({ src, dst }, MASK_PLAYER, &filter, &tr);
 
-	BeamInfo_t info = {};
-
-	auto convertToFlag = [](const std::string& flag) // will not work with spaces!
+	auto convertToFlag = [](const std::string& flag)
 	{
-		const auto splitted = utilities::splitStr(flag, '|');
 		int ret = 0;
-		for (const auto& el : splitted)
+		for (const auto& el : std::views::split(flag, '|'))
 		{
-			int elNum = std::stoi(el);
-			ret |= elNum;
+			std::string v{ el.begin(), el.end() };
+			int num = std::stoi(v);
+			ret |= num;
 		}
+
 		return ret;
 	};
+
+	BeamInfo_t info = {};
 
 	auto strWithoutSpaces = config.get<std::string>(vars.sBulletTracer);
 	strWithoutSpaces.erase(std::remove(strWithoutSpaces.begin(), strWithoutSpaces.end(), ' '), strWithoutSpaces.end());

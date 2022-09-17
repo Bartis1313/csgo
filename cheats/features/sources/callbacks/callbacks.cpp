@@ -1,10 +1,12 @@
 #include "callbacks.hpp"
 
-#include "../../../SDK/structs/IDXandPaterrns.hpp"
-#include "../../../SDK/CEffectData.hpp"
+#include "../../../../SDK/structs/IDXandPaterrns.hpp"
+#include "../../../../SDK/CEffectData.hpp"
 
-#include "../../../utilities/utilities.hpp"
-#include "../../../utilities/console/console.hpp"
+#include "../../../../utilities/tools/tools.hpp"
+#include "../../../../utilities/tools/wrappers.hpp"
+#include "../../../../utilities/console/console.hpp"
+#include "../../../../gamememory/memory.hpp"
 
 void Callbacks::addCallBack(const clbStruct& callb)
 {
@@ -38,7 +40,7 @@ void Callbacks::init()
     this->addCallBack({ XOR("Impact"), &example, nullptr });
     this->addCallBack({ XOR("Impact"), &example2, nullptr });
 
-    m_head = **reinterpret_cast<CClientEffectRegistration***>(utilities::patternScan(CLIENT_DLL, HEAD_OF_EFFECTS, 0x2));
+    m_head = g_Memory.m_callbacksHead();
 
     for (auto head = m_head; head; head = head->m_next)
     {

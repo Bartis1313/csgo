@@ -1,5 +1,9 @@
 #include "hooks.hpp"
+
+#include <intrin.h>
+
 #include "../../config/vars.hpp"
+#include "../../gamememory/memory.hpp"
 
 char __fastcall hooks::clientValidAddr::hooked(FAST_ARGS, const char* lpModuleName)
 {
@@ -41,18 +45,10 @@ int __fastcall hooks::unkFileCheck::hooked(FAST_ARGS)
 	return 1; // 2 is kick
 }
 
-//#include "../../SDK/Input.hpp"
-//#include "../../SDK/interfaces/interfaces.hpp"
-#include "../../SDK/structs/IDXandPaterrns.hpp"
 
 bool __fastcall hooks::sv_cheats::hooked(FAST_ARGS)
 {
-	/*if (interfaces::input->m_cameraInThirdPerson)
-		return true;*/
-
-	static auto camThink = utilities::patternScan(CLIENT_DLL, CAM_THINK);
-
-	if (_ReturnAddress() == reinterpret_cast<void*>(camThink) && config.get<bool>(vars.bThirdp))
+	if (_ReturnAddress() == g_Memory.m_camThink.cast<void*>()() && config.get<bool>(vars.bThirdp))
 		return true;
 
 	return original(thisptr);

@@ -9,7 +9,8 @@
 #include "../../../../game.hpp"
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
 
 #include "../../cache/cache.hpp"
@@ -34,7 +35,7 @@ void DroppedWeapons::draw()
 		if (!wpn)
 			continue;
 
-		if (Box box; utilities::getBox(entity, box))
+		if (Box box; Box::getBox(entity, box))
 		{
 			float fontSize = utilities::getScaledFont(entity->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
 			using cont = std::vector<bool>;

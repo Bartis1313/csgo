@@ -8,6 +8,8 @@
 #include "../../../../../config/vars.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
 #include "../../../../../utilities/math/math.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 #include "../../cache/cache.hpp"
 
 void MolotovDraw::init()

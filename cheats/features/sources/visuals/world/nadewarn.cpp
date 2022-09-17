@@ -15,6 +15,7 @@
 #include "../../../../globals.hpp"
 #include "../../../utilities/renderer/renderer.hpp"
 #include "../../../utilities/math/math.hpp"
+#include "../../../../../gamememory/memory.hpp"
 
 #include "../../../../../SDK/ClientClass.hpp"
 #include "../../../../../SDK/IVModelInfo.hpp"
@@ -22,7 +23,7 @@
 
 void GrenadeWarning::init()
 {
-	m_traceFilterSimpleAddr = utilities::patternScan(CLIENT_DLL, CTRACE_FILTER_SIMPLE, 0x3D);
+	
 }
 
 bool GrenadeWarning::NadeTrace_t::step(float interval)
@@ -74,7 +75,7 @@ void GrenadeWarning::NadeTrace_t::traceHull(const Vector& src, const Vector& end
 {
 	uintptr_t filter[] =
 	{
-		*reinterpret_cast<uintptr_t*>(m_traceFilterSimpleAddr),
+		*reinterpret_cast<uintptr_t*>(g_Memory.m_traceFilterSimple()),
 		reinterpret_cast<uintptr_t>(entity),
 		0,
 		0

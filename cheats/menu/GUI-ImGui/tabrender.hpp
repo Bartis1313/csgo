@@ -12,7 +12,7 @@ struct TabRender
 		: m_name{ name }, m_func{ nullptr }
 	{}
 
-	_NODISCARD bool funcExist() const
+	[[nodiscard]] bool funcExist() const
 	{
 		return m_func != nullptr;
 	}

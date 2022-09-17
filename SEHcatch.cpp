@@ -1,16 +1,17 @@
 #include "SEHcatch.hpp"
 
 #include <DbgHelp.h>
-#include <map>
+#include <unordered_map>
 
 #include "utilities/console/console.hpp"
-#include "utilities/utilities.hpp"
+#include "utilities/tools/tools.hpp"
+#include "utilities/tools/wrappers.hpp"
 
 // exception to string
 #define E2S(e) { e, #e }
 
 #pragma region crash_map
-const std::map<DWORD, const char*> crashNames
+const std::unordered_map<DWORD, const char*> crashNames
 {
 	E2S(EXCEPTION_ACCESS_VIOLATION),
 	E2S(EXCEPTION_READ_FAULT),
@@ -41,25 +42,17 @@ const std::map<DWORD, const char*> crashNames
 void SEHcatch::printStack()
 {
 	void* stack[MAX_LENGTH];
-	const auto process = LF(GetCurrentProcess)();
-#ifndef _DEBUG
-	LF(SymInitialize).cached()(process, NULL, TRUE);
-#else
-	SymInitialize(process, NULL, TRUE);
-#endif
+	const auto process = LI_FN_CACHED(GetCurrentProcess)();
+	LI_FN_CACHED(SymInitialize)(process, NULL, TRUE);
 
-	const auto frames = LF(CaptureStackBackTrace)(NULL, MAX_FRAMES, stack, nullptr);
+	const auto frames = LI_FN_CACHED(CaptureStackBackTrace)(NULL, MAX_FRAMES, stack, nullptr);
 	const auto symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256 * sizeof(CHAR), 1);
 	symbol->MaxNameLen = MAX_LENGTH;
 	symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
 
 	for (int i = 3; i < frames; i++) // skip 3 records which are useless to print, you might call some other walkstack functions to get more info
 	{
-#ifndef _DEBUG
-		LF(SymFromAddr).cached()(process, reinterpret_cast<DWORD64>(stack[i]), NULL, symbol);
-#else
-		SymFromAddr(process, reinterpret_cast<DWORD64>(stack[i]), NULL, symbol);
-#endif
+		LI_FN_CACHED(SymFromAddr)(process, reinterpret_cast<DWORD64>(stack[i]), NULL, symbol);
 		console.log(TypeLogs::LOG_ERR, XOR("{}: {} - 0x{:X}"), frames - i - 1, symbol->Name, symbol->Address);
 	}
 	free(symbol);
@@ -98,7 +91,7 @@ LONG WINAPI SEHcatch::memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 
 				console.log(TypeLogs::LOG_ERR, info);
 				printStack();
-				LF(MessageBoxA)(nullptr, info.c_str(), XOR("Fatal error!"), MB_ICONERROR | MB_OK);
+				LI_FN(MessageBoxA)(nullptr, info.c_str(), XOR("Fatal error!"), MB_ICONERROR | MB_OK);
 				free(symbol);
 				return true;
 			} ();

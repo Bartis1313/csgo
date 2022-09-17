@@ -30,47 +30,47 @@ public:
 		z = std::clamp(z, -50.0f, 50.0f);
 	}
 
-	_NODISCARD bool isValid() const
+	[[nodiscard]] bool isValid() const
 	{
 		return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
 	}
 
-	_NODISCARD float length2D() const
+	[[nodiscard]] float length2D() const
 	{
 		return std::sqrt(x * x + y * y);
 	}
 
-	_NODISCARD constexpr float length2DSqrt() const
+	[[nodiscard]] constexpr float length2DSqrt() const
 	{
 		return (x * x + y * y);
 	}
 
-	_NODISCARD float length() const
+	[[nodiscard]] float length() const
 	{
 		return std::sqrt(x * x + y * y + z * z);
 	}
 
-	_NODISCARD float distToMeters(const Vector& vOther) const
+	[[nodiscard]] float distToMeters(const Vector& vOther) const
 	{
 		return distTo(vOther) * 0.0254f;
 	}
 
-	_NODISCARD constexpr float lengthSqrt() const
+	[[nodiscard]] constexpr float lengthSqrt() const
 	{
 		return (x * x + y * y + z * z);
 	}
 
-	_NODISCARD constexpr bool isZero() const
+	[[nodiscard]] constexpr bool isZero() const
 	{
 		return x == 0.0f && y == 0.0f && z == 0.0f;
 	}
 
-	_NODISCARD float distTo(const Vector& vOther) const
+	[[nodiscard]] float distTo(const Vector& vOther) const
 	{
 		return (*this - vOther).length();
 	}
 
-	_NODISCARD constexpr Vector2D toVec2D() const
+	[[nodiscard]] constexpr Vector2D toVec2D() const
 	{
 		return Vector2D{ x, y };
 	}
@@ -83,7 +83,7 @@ public:
 		return *this;
 	}
 
-	_NODISCARD Vector normalized() const
+	[[nodiscard]] Vector normalized() const
 	{
 		Vector vec = *this;
 		float len = vec.length();
@@ -96,7 +96,7 @@ public:
 		return vec;
 	}
 
-	_NODISCARD constexpr float dot(const Vector& v) const
+	[[nodiscard]] constexpr float dot(const Vector& v) const
 	{
 		return (x * v.x + y * v.y + z * v.z);
 	}

@@ -11,6 +11,7 @@
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 #include "../../events/events.hpp"
 
 void BulletImpactsClient::init()

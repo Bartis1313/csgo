@@ -60,7 +60,7 @@ public:
     int m_offset;
     int m_elementStride;
     int m_elements;
-    const char* m_pParentArrayPropName;
+    const char* m_parentArrayPropName;
 };
 
 class RecvTable

@@ -10,32 +10,32 @@
 #include <functional>
 #include <any>
 #include <deque>
+#include <array>
 
 class Color;
 class Resource;
+class Entity_t;
+struct ImVec2;
 
 struct Box
 {
-	float x, y, w, h;
-};
+	Box() = default;
+	constexpr Box(float x, float y, float w, float h) :
+		x{ x }, y{ y }, w{ w }, h{ h }
+	{}
+	constexpr Box(const std::array<ImVec2, 8>& arr) :
+		points{ arr }
+	{}
 
-struct Box3D
-{
-#ifdef SURFACE_DRAWING
-	std::array<Vector2D, 8> points;
-
-	Vector2D topleft;
-	Vector2D topright;
-	Vector2D bottomleft;
-	Vector2D bottomright;
-#else
 	std::array<ImVec2, 8> points;
+	float x, y, w, h;
 
 	ImVec2 topleft;
 	ImVec2 topright;
 	ImVec2 bottomleft;
 	ImVec2 bottomright;
-#endif
+
+	static bool getBox(Entity_t* ent, Box& box);
 };
 
 namespace fonts

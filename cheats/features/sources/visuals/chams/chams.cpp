@@ -12,7 +12,8 @@
 #include "../../../SDK/IVStudioRender.hpp"
 #include "../../../SDK/interfaces/interfaces.hpp"
 
-#include "../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 #include "../../../config/vars.hpp"
 #include "../../../../game.hpp"
 

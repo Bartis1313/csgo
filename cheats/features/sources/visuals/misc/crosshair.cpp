@@ -10,7 +10,7 @@
 #include "../../../../game.hpp"
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 #include "../../../../../utilities/math/math.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
 

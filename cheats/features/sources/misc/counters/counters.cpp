@@ -8,6 +8,7 @@
 #include "../../events/events.hpp"
 #include "../../../../game.hpp"
 #include "../../../../globals.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 
 void Counters::init()
 {

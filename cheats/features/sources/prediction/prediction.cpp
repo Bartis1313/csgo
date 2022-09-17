@@ -5,12 +5,12 @@
 #include "../../../SDK/CGlobalVars.hpp"
 
 #include "../../../game.hpp"
-#include "../../../../utilities/utilities.hpp"
+#include "../../../../gamememory/memory.hpp"
 
 void Prediction::init()
 {
-	m_predicionRandomSeed = *reinterpret_cast<uintptr_t**>(utilities::patternScan(CLIENT_DLL, PREDICTIONRANDOMSEED, 0x2));
-	m_data = **reinterpret_cast<CMoveData***>(utilities::patternScan(CLIENT_DLL, PREDICTION_MOVE_DATA, 0x1));
+	m_predicionRandomSeed = g_Memory.m_predictionSeed();
+	m_data = g_Memory.m_predictionData();
 }
 
 void Prediction::start(CUserCmd* cmd)

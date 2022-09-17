@@ -6,7 +6,7 @@
 
 #include "../../../../game.hpp"
 #include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
 
 #include "nadewarn.hpp"
@@ -83,7 +83,7 @@ void Projectiles::draw()
 			return;
 		}
 
-		if (Box box; utilities::getBox(entity, box))
+		if (Box box; Box::getBox(entity, box))
 			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana12, nades.first, true, nades.second.getColor());
 	}
 }

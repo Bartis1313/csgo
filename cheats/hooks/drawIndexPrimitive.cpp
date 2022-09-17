@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../../utilities/utilities.hpp"
+#include "../../gamememory/memory.hpp"
 #include "../../SDK/structs/Entity.hpp"
 #include "../../SDK/IClientEntityList.hpp"
 #include "../../SDK/IVEngineClient.hpp"
@@ -14,7 +14,7 @@ static void* getStack(void** data)
 
 	void** next = *reinterpret_cast<void***>(data);
 
-	const static auto retAddr = reinterpret_cast<void*>(utilities::patternScan(STUDIORENDER_DLL, R_STUDIODRAWPOINTS));
+	const static auto retAddr = g_Memory.m_renderDrawPoints();
 	if (data[1] == retAddr)
 		return next[4];
 

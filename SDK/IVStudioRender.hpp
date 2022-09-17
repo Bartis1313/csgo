@@ -3,7 +3,7 @@
 
 #include "material.hpp"
 
-#include "../utilities/utilities.hpp"
+#include "../utilities/tools/tools.hpp"
 #include "../utilities/pad.hpp"
 
 class IVStudioRender

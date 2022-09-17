@@ -5,7 +5,6 @@
 #include <vector>
 #include <unordered_map>
 #include <utility>
-#include <mutex>
 
 class Entity_t;
 
@@ -38,7 +37,6 @@ private:
 	// pointer to ent, index, classID
 	using typeCont = std::tuple<Entity_t*, size_t, size_t>;
 	std::unordered_map<EntCacheType, std::vector<typeCont>> m_entCache;
-	std::mutex m_mutex;
 };
 
 [[maybe_unused]] inline auto g_EntCache = EntityCache{};

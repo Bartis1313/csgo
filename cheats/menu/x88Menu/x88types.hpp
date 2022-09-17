@@ -6,6 +6,7 @@
 #include <string>
 #include <vector>
 #include <utility>
+#include <type_traits>
 
 // pair in pair
 class X88Types
@@ -30,17 +31,18 @@ private:
 	};
 public:
 	template<typename T>
-	void push(const std::string& name, const T& var)
+	constexpr void push(const std::string& name, const T& var)
 	{
 		m_vars.emplace_back(std::make_pair(X88Pair{ name, var }, Limits{}));
 	}
 	template<typename T>
-	void push(const std::string& name, const T& var, const std::pair<float, float>& limits)
+	constexpr void push(const std::string& name, const T& var, const std::pair<float, float>& limits)
 	{
 		m_vars.emplace_back(std::make_pair(X88Pair{ name, var }, Limits{ limits }));
+		return;
 	}
 	template<typename T>
-	void push(const std::string& name, const T& var, int limits)
+	constexpr void push(const std::string& name, const T& var, int limits)
 	{
 		m_vars.emplace_back(std::make_pair(X88Pair{ name, var }, Limits{ limits }));
 	}

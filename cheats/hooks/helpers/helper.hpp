@@ -1,6 +1,6 @@
 #pragma once
 #include "../../../dependencies/minhook/Minhook.h"
-#include "../../../utilities/utilities.hpp"
+#include "../../..//utilities/tools/tools.hpp"
 #include "../../../utilities/console/console.hpp"
 
 namespace hookHelper

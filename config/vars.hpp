@@ -3,6 +3,9 @@
 #include <Windows.h>
 
 #include "config.hpp"
+#include "../utilities/utilities.hpp"
+#include "../utilities/tools/tools.hpp"
+#include "../utilities/tools/wrappers.hpp"
 #include "enums.hpp"
 
 // type - template

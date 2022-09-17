@@ -45,7 +45,7 @@ void Background::pushRandomPoints()
 		m_particleArr.emplace_back(
 			ParticlePoint_t
 			{
-				Vector2D{ Random::getRandom<size_t>(0, globals::screenX), Random::getRandom<size_t>(0, globals::screenY) }, // pos
+				Vector2D{ static_cast<float>(Random::getRandom<size_t>(0, globals::screenX)), static_cast<float>(Random::getRandom<size_t>(0, globals::screenY)) }, // pos
 				Vector2D{ Random::getRandom<float>(-0.1f, 0.1f) * speed, Random::getRandom<float>(-0.1f, 0.1f) * speed }, // move
 				Color	{ m_colorArr.at(Random::getRandom<size_t>(0, m_colorArr.size() - 1)) } // color
 			});

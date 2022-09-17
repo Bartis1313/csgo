@@ -6,7 +6,7 @@
 #include "Enums.hpp"
 #include "vars.hpp"
 #include "../utilities/vfunc.hpp"
-#include "structs/IDXandPaterrns.hpp"
+#include "../gamememory/memory.hpp"
 
 class IMaterial;
 class KeyValues;
@@ -62,7 +62,7 @@ public:
 
 	bool& disableRenderTargetAllocationForever()
 	{
-		const static auto disableTargetAlloc = *reinterpret_cast<uintptr_t*>(utilities::patternScan(MATERIAL_DLL, DISABLE_RENDER_TARGET_ALLOC, 0x2));
+		const static auto disableTargetAlloc = g_Memory.m_disableTargetAlloc();
 		return *reinterpret_cast<bool*>(uintptr_t(this) + disableTargetAlloc);
 	}
 };

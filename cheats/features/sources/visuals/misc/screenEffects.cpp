@@ -9,6 +9,7 @@
 #include "../../../../game.hpp"
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 
 void ScreenEffects::init()
 {

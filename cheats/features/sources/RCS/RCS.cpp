@@ -10,6 +10,7 @@
 
 #include "../../../game.hpp"
 #include "../../../../config/vars.hpp"
+#include "../../../../utilities/tools/tools.hpp"
 
 #include "../aimbot/aimbot.hpp"
 

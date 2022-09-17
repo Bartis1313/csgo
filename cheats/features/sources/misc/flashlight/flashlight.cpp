@@ -13,15 +13,13 @@
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
 #include "../../../../../utilities/math/math.hpp"
+#include "../../../../../gamememory/memory.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 
 void Flashlight::init()
 {
-	m_createAddr = utilities::patternScan(CLIENT_DLL, FLASHLIGHT_CREATE);
-	m_destroyAddr = reinterpret_cast<destroyType>(utilities::patternScan(CLIENT_DLL, FLASHLIGHT_DESTROY));
-	const uintptr_t update = utilities::patternScan(CLIENT_DLL, FLASHLIGHT_UPDATE); // call
-	const uintptr_t relativeAddress = *reinterpret_cast<uintptr_t*>(update + 0x1); // read the rel32
-	const uintptr_t nextInstruction = update + 0x5;
-	m_updateAddr = relativeAddress + nextInstruction;
+
 }
 
 CFlashlightEffect* Flashlight::createFlashlight(float fov, Entity_t* ent, const char* effectName,
@@ -32,7 +30,7 @@ CFlashlightEffect* Flashlight::createFlashlight(float fov, Entity_t* ent, const 
 		return nullptr;
 
 	int idx = ent->getIndex(); // allow asm passing this arg
-	void* callAddr = reinterpret_cast<void*>(m_createAddr);
+	void* callAddr = g_Memory.m_flashlightCreate();
 	__asm
 	{
 		mov eax, fov
@@ -49,31 +47,16 @@ CFlashlightEffect* Flashlight::createFlashlight(float fov, Entity_t* ent, const 
 
 void Flashlight::destroyFlashLight(CFlashlightEffect* flashlight)
 {
-	using fn = void(__thiscall*)(void*, void*);
-	m_destroyAddr(flashlight, nullptr); // second arg is not even used there
+	g_Memory.m_flashlightDestroy()(flashlight, nullptr); // second arg is not even used there
 }
 
 void Flashlight::updateFlashlight(CFlashlightEffect* flashlight, const Vector& pos, const Vector& forward, const Vector& right, const Vector& up)
 {
-	using fn = void(__thiscall*)(void*, int, const Vector&, const Vector&, const Vector&, const Vector&, float, float, float, bool, const char*);
-
-	const static auto fun = reinterpret_cast<fn>(m_updateAddr);
-	fun(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov, flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
+	g_Memory.m_flashlightUpdate()(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov, flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
 }
 
 void Flashlight::run(int frame)
 {
-	if (m_flashlight && globals::isShutdown)
-	{
-		static auto bOnce = [=]()
-		{
-			destroyFlashLight(m_flashlight);
-			m_flashlight = nullptr;
-
-			return true;
-		} ();
-	}
-
 	if (globals::isShutdown)
 		return;
 
@@ -149,4 +132,13 @@ void Flashlight::run(int frame)
 	m_flashlight->m_fov = config.get<float>(vars.fFlashlightFov);
 
 	updateFlashlight(m_flashlight, game::localPlayer->getEyePos(), forward, right, up);
+}
+
+void Flashlight::shutdown()
+{
+	if (m_flashlight)
+	{		
+		destroyFlashLight(m_flashlight);
+		m_flashlight = nullptr;
+	}
 }

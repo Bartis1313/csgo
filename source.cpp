@@ -4,6 +4,7 @@
 #include "SDK/interfaces/interfaces.hpp"
 #include "utilities/renderer/renderer.hpp"
 #include "utilities/netvars/netvars.hpp"
+#include "utilities/tools/tools.hpp"
 #include "config/vars.hpp"
 #include "cheats/globals.hpp"
 #include "cheats/features/sources/events/events.hpp"
@@ -16,6 +17,7 @@
 #include "cheats/features/sources/discord/discord.hpp"
 #include "cheats/features/base.hpp"
 #include "cheats/game.hpp"
+#include "gamememory/memory.hpp"
 
 #include <thread>
 
@@ -42,6 +44,7 @@ DWORD WINAPI init(PVOID instance)
             XOR("default.cfg"), XOR("load.LOAD"),
             std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"),
             std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo") / XOR("utility"));
+        g_Memory.init();
         game::localPlayer.init();
         interfaces::init();
         netvarMan.init();
@@ -55,8 +58,8 @@ DWORD WINAPI init(PVOID instance)
     }
     catch (const std::runtime_error& err)
     {
-        LF(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
-        LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_FAILURE);
+        LI_FN(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
+        LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_FAILURE);
     }
 
     initTimer.end();
@@ -84,7 +87,7 @@ VOID WINAPI _shutdown(PVOID instance)
     console.shutdown();
     dc.shutdown();
 
-    LF(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
+    LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
 }
 
 VOID WINAPI _looper(PVOID instance)
@@ -108,15 +111,15 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
     {
         // here this sometimes throw null on mm
         if (instance)
-            LF(DisableThreadLibraryCalls)(instance);
+            LI_FN(DisableThreadLibraryCalls)(instance);
 
         globals::instance = instance;
 
-        if (auto initThread = LF(CreateThread)(nullptr, NULL, init, instance, NULL, nullptr))
-            LF(CloseHandle)(initThread);
+        if (auto initThread = LI_FN(CreateThread)(nullptr, NULL, init, instance, NULL, nullptr))
+            LI_FN(CloseHandle)(initThread);
 
-        if (auto looperThread = LF(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_looper), instance, NULL, nullptr))
-            LF(CloseHandle)(looperThread);
+        if (auto looperThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_looper), instance, NULL, nullptr))
+            LI_FN(CloseHandle)(looperThread);
 
         return TRUE;
     }
@@ -124,8 +127,8 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
     {
         if (!globals::isShutdown) // then panic key forced shutdown
         {
-            if (auto shutdownThread = LF(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_shutdown), instance, NULL, nullptr))
-                LF(CloseHandle)(shutdownThread);
+            if (auto shutdownThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(_shutdown), instance, NULL, nullptr))
+                LI_FN(CloseHandle)(shutdownThread);
         }
     }
 

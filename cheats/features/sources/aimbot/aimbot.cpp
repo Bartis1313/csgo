@@ -13,10 +13,11 @@
 #include "../../../../SDK/math/Vector.hpp"
 #include "../../../../SDK/interfaces/interfaces.hpp"
 
-#include "../../../config/vars.hpp"
+#include "../../../../config/vars.hpp"
 #include "../../../globals.hpp"
 #include "../../../game.hpp"
-#include "../../../utilities/math/math.hpp"
+#include "../../../../utilities/math/math.hpp"
+#include "../../../../utilities/tools/wrappers.hpp"
 #include "../backtrack/backtrack.hpp"
 #include "../cache/cache.hpp"
 

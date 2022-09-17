@@ -20,11 +20,6 @@ private:
 	void* getCallAddr(const std::string& name);
 	// caller is passed because it's a naked function
 	void* createParticle(void* caller, void* addr, Vector* pos);
-
-	uintptr_t m_isCachedAddr;
-	uintptr_t m_particleSystenAddr;
-	uintptr_t m_findStringIndexAddr;
-	uintptr_t m_callAddr;
 };
 
 [[maybe_unused]] inline auto g_Particle = Particle{};

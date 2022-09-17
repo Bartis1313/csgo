@@ -11,6 +11,7 @@
 #include "../../../../../config/vars.hpp"
 #include "../../../../../utilities/math/math.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
 
 
 void EnemyWarning::init()

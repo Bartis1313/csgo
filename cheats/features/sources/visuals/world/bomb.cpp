@@ -15,7 +15,8 @@
 #include "../../../../game.hpp"
 #include "../../../../globals.hpp"
 #include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
+#include "../../../../../utilities/tools/tools.hpp"
+#include "../../../../../utilities/tools/wrappers.hpp"
 #include "../../../../../utilities/renderer/renderer.hpp"
 
 #include "../../events/events.hpp"
