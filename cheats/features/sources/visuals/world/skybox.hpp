@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../classes/frameStage.hpp"
+#include <features/classes/frameStage.hpp>
 
 #include <string>
 #include <filesystem>

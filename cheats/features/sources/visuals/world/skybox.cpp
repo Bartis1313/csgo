@@ -1,16 +1,15 @@
 #include "skybox.hpp"
 
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../gamememory/memory.hpp"
-#include "../../../../menu/GUI-ImGui/selections.hpp"
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
+#include <memory/memory.hpp>
+#include <menu/GUI-ImGui/selections.hpp>
 
 void SkyboxEdit::init()
 {

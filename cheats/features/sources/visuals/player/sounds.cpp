@@ -1,19 +1,20 @@
 #include "sounds.hpp"
 
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IGameEvent.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-#include "../../../../../SDK/structs/Entity.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
 #include "../../events/events.hpp"
+
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IGameEvent.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/structs/Entity.hpp>
+
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
 
 void SoundDraw::init()
 {

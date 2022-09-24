@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../../classes/createMove.hpp"
-
-#include "../../../../../SDK/math/Vector.hpp"
+#include <features/classes/createMove.hpp>
+#include <SDK/math/Vector.hpp>
 
 class CUserCmd;
 class IConVar;

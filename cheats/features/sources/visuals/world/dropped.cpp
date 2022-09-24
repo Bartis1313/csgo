@@ -1,19 +1,19 @@
 #include "dropped.hpp"
 
-#include "../../../../../SDK/ILocalize.hpp"
-#include "../../../../../SDK/IWeapon.hpp"
-#include "../../../../../SDK/IVModelInfo.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-
 #include "../../cache/cache.hpp"
+
+#include <SDK/ILocalize.hpp>
+#include <SDK/IWeapon.hpp>
+#include <SDK/IVModelInfo.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/renderer/renderer.hpp>
 
 void DroppedWeapons::init()
 {
@@ -37,7 +37,7 @@ void DroppedWeapons::draw()
 
 		if (Box box; Box::getBox(entity, box))
 		{
-			float fontSize = utilities::getScaledFont(entity->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
+			float fontSize = game::getScaledFont(entity->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
 			using cont = std::vector<bool>;
 			float padding = 0.0f;
 

@@ -1,33 +1,33 @@
 #include "player.hpp"
 
-#include "../../../SDK/CGlobalVars.hpp"
-#include "../../../SDK/IClientEntityList.hpp"
-#include "../../../SDK/IVModelInfo.hpp"
-#include "../../../SDK/IVEngineClient.hpp"
-#include "../../../SDK/IVEffects.hpp"
-#include "../../../SDK/IGameEvent.hpp"
-#include "../../../SDK/IViewRenderBeams.hpp"
-#include "../../../SDK/animations.hpp"
-#include "../../../SDK/ICvar.hpp"
-#include "../../../SDK/ConVar.hpp"
-#include "../../../SDK/IWeapon.hpp"
-#include "../../../SDK/structs/Entity.hpp"
-#include "../../../SDK/Color.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../config/vars.hpp"
-#include "../../../../game.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../../utilities/math/math.hpp"
-#include "../../../../globals.hpp"
-
-#include "../../aimbot/aimbot.hpp"
-#include "../../backtrack/backtrack.hpp"
 #include "boxes.hpp"
 #include "enemyWarn.hpp"
 #include "sounds.hpp"
+#include "../../aimbot/aimbot.hpp"
+#include "../../backtrack/backtrack.hpp"
 #include "../../events/events.hpp"
 #include "../../cache/cache.hpp"
+
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/IVModelInfo.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/IVEffects.hpp>
+#include <SDK/IGameEvent.hpp>
+#include <SDK/IViewRenderBeams.hpp>
+#include <SDK/animations.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/IWeapon.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <SDK/Color.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+
+#include <config/vars.hpp>
+#include <game/game.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/math/math.hpp>
+#include <game/globals.hpp>
 
 void PlayerVisuals::init()
 {
@@ -143,7 +143,7 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 	if (health < 100)
 	{
 		auto text = FORMAT(XOR("{}"), health);
-		float fontSize = utilities::getScaledFont(ent->absOrigin(), game::localPlayer->absOrigin(), 100.0f, 10.0f, 14.0f);
+		float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer->absOrigin(), 100.0f, 10.0f, 14.0f);
 		auto size = ImFonts::franklinGothic12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
 
 		imRender.text(newBox.x - 4.0f - size.x, newBox.y + pad - 4.0f,
@@ -187,7 +187,7 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 			ImFonts::franklinGothic, std::format(XOR("{}"), armor), false, Colors::White);*/
 }
 
-#include "../../../SDK/ILocalize.hpp"
+#include <SDK/ILocalize.hpp>
 
 void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 {
@@ -277,7 +277,7 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 		if (ent->isC4Owner())
 			flags.emplace_back(std::make_pair(XOR("C4"), Colors::Orange.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
-	float fontSize = utilities::getScaledFont(ent->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
+	float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
 
 	float padding = 0.0f;
 	float addon = config.get<bool>(vars.bDrawArmor) ? 6.0f : 0.0f;
@@ -303,7 +303,7 @@ void PlayerVisuals::drawnName(Player_t* ent, const Box& box)
 	if (!config.get<bool>(vars.bDrawName))
 		return;
 
-	float fontSize = utilities::getScaledFont(ent->absOrigin(), game::localPlayer()->absOrigin());
+	float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer()->absOrigin());
 
 	imRender.text(box.x + box.w / 2.0f, box.y - fontSize - 2.0f, fontSize, ImFonts::verdana12, ent->getName(), true,
 		Color::healthBased(ent->m_iHealth()).getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha), false);

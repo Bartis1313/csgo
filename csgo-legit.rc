@@ -50,7 +50,7 @@ END
 // PNG
 //
 
-IDB_PNG1                PNG                     "dependencies\\images\\fatchad.png"
+IDB_PNG1                PNG                     "dependencies\\deps\\images\\fatchad.png"
 
 #endif    // Polish (Poland) resources
 /////////////////////////////////////////////////////////////////////////////

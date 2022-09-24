@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../../../classes/drawModel.hpp"
+#include <features/classes/drawModel.hpp>
+#include <SDK/IVModelRender.hpp>
 
 #include <string>
 #include <vector>
-
-#include "../../../SDK/IVModelRender.hpp"
 
 class Color;
 struct DrawModelState_t;

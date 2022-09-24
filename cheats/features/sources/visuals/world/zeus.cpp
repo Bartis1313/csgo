@@ -1,14 +1,14 @@
 #include "zeus.hpp"
 
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/IWeapon.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/IWeapon.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 
-#include "../../../../game.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
+#include <game/game.hpp>
+#include <config/vars.hpp>
+#include <utilities/utilities.hpp>
+#include <utilities/renderer/renderer.hpp>
 
 void ZeusDraw::init()
 {

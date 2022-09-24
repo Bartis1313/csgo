@@ -1,19 +1,19 @@
 #include "plots.hpp"
 
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 
-#include "../../../../game.hpp"
-#include "../../../../menu/GUI-ImGui/imguiaddons.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-#include "../../../../../utilities/console/console.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
+#include <game/game.hpp>
+#include <menu/GUI-ImGui/imguiaddons.hpp>
+#include <config/vars.hpp>
+#include <utilities/utilities.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/console/console.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
 
 #include <numeric>
 
@@ -183,10 +183,10 @@ void Plots::drawVelocity()
 
 			if (dropShadow)
 			{
-				const auto alpha = ImGui::ColorConvertU32ToFloat4(U32(color)).z;
-				drawing->AddText(font, size, { pos.x + 1.0f, pos.y + 1.0f }, U32(Colors::Black.getColorEditAlpha(alpha)), text.c_str());
+				const auto alpha = ImGui::ColorConvertU32ToFloat4(Color::U32(color)).z;
+				drawing->AddText(font, size, { pos.x + 1.0f, pos.y + 1.0f }, Color::U32(Colors::Black.getColorEditAlpha(alpha)), text.c_str());
 			}
-			drawing->AddText(font, size, pos, U32(color), text.c_str());
+			drawing->AddText(font, size, pos, Color::U32(color), text.c_str());
 		};
 
 		text(imRenderWindow.getPos().x + width / 2.0f, imRenderWindow.getPos().y + 20.0f + height, 30.0f, ImFonts::franklinGothic30,

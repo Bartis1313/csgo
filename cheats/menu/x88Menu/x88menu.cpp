@@ -1,15 +1,15 @@
 #include "x88menu.hpp"
 
-#include <format>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <config/vars.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/inputSystem.hpp>
 
-#include "../../game.hpp"
-#include "../../globals.hpp"
-#include "../../../SDK/structs/Entity.hpp"
-#include "../../../SDK/IVEngineClient.hpp"
-#include "../../../SDK/IClientEntityList.hpp"
-#include "../../../config/vars.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../../utilities/tools/wrappers.hpp"
+#include <format>
 
 void X88Menu::draw()
 {
@@ -123,8 +123,6 @@ size_t X88Menu::addSpaces(const std::string& text)
 	auto size = (m_longestNameSize + 5) - surfaceRender.getTextSizeXY(fonts::tahoma, text).x;
 	return size;
 }
-
-#include "../../../utilities/inputSystem.hpp"
 
 void X88Menu::handleKeys()
 {

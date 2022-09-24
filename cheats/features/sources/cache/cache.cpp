@@ -1,15 +1,14 @@
 #include "cache.hpp"
 
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/ClientClass.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <game/game.hpp>
+
 #include <ranges>
-
-#include "../../../../SDK/IVEngineClient.hpp"
-#include "../../../../SDK/IClientEntityList.hpp"
-#include "../../../../SDK/Enums.hpp"
-#include "../../../../SDK/ClientClass.hpp"
-#include "../../../../SDK/interfaces/interfaces.hpp"
-#include "../../../../SDK/structs/Entity.hpp"
-
-#include "../../../game.hpp"
 
 void EntityCache::init()
 {

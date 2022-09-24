@@ -1,12 +1,11 @@
 #pragma once
 
-#include "../../../classes/createMove.hpp"
-#include "../../../classes/onlyInit.hpp"
-#include "../../../classes/renderableToSurface.hpp"
+#include <features/classes/createMove.hpp>
+#include <features/classes/onlyInit.hpp>
+#include <features/classes/renderableToSurface.hpp>
+#include <SDK/math/Vector.hpp>
 
 #include <vector>
-
-#include "../../../SDK/math/Vector.hpp"
 
 struct Trace_t;
 class Entity_t;

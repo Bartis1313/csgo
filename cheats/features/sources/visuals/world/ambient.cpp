@@ -1,13 +1,12 @@
 #include "ambient.hpp"
 
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/Enums.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../globals.hpp"
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <utilities/tools/tools.hpp>
+#include <config/vars.hpp>
+#include <game/globals.hpp>
 
 void AmbientLight::init()
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../classes/overrideView.hpp"
+#include <features/classes/overrideView.hpp>
 
 class CViewSetup;
 

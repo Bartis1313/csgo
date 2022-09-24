@@ -1,15 +1,15 @@
 #include "screenEffects.hpp"
 
-#include "../../../../../SDK/IMaterialSystem.hpp"
-#include "../../../../../SDK/IMatRenderContext.hpp"
-#include "../../../../../SDK/vars.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
+#include <SDK/IMaterialSystem.hpp>
+#include <SDK/IMatRenderContext.hpp>
+#include <SDK/vars.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 
-#include "../../../../menu/GUI-ImGui/selections.hpp"
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
+#include <menu/GUI-ImGui/selections.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
 
 void ScreenEffects::init()
 {

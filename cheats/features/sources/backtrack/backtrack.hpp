@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../../classes/frameStage.hpp"
-#include "../../classes/createMove.hpp"
-
-#include "../../../SDK/vars.hpp"
-#include "../../../SDK/math/Vector.hpp"
-#include "../../../SDK/math/matrix.hpp"
+#include <features/classes/frameStage.hpp>
+#include <features/classes/createMove.hpp>
+#include <SDK/vars.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/math/matrix.hpp>
 
 #include <deque>
 #include <array>

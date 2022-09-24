@@ -1,29 +1,35 @@
 #include "aimbot.hpp"
 
-#include "../../../../SDK/IVEngineClient.hpp"
-#include "../../../../SDK/CUserCmd.hpp"
-#include "../../../../SDK/CGlobalVars.hpp"
-#include "../../../../SDK/IClientEntityList.hpp"
-#include "../../../../SDK/vars.hpp"
-#include "../../../../SDK/Enums.hpp"
-#include "../../../../SDK/ICvar.hpp"
-#include "../../../../SDK/ConVar.hpp"
-#include "../../../../SDK/IVModelInfo.hpp"
-#include "../../../../SDK/structs/Entity.hpp"
-#include "../../../../SDK/math/Vector.hpp"
-#include "../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../config/vars.hpp"
-#include "../../../globals.hpp"
-#include "../../../game.hpp"
-#include "../../../../utilities/math/math.hpp"
-#include "../../../../utilities/tools/wrappers.hpp"
-#include "../backtrack/backtrack.hpp"
 #include "../cache/cache.hpp"
+#include "../backtrack/backtrack.hpp"
+
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/CUserCmd.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/vars.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/IVModelInfo.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
+#include <game/globals.hpp>
+#include <game/game.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/tools/wrappers.hpp>
 
 void Aimbot::init()
 {
     
+}
+
+bool AimbotTarget_t::isBlackListed() const
+{
+    // wip
+    return true;
 }
 
 void Aimbot::run(CUserCmd* cmd)
@@ -33,6 +39,7 @@ void Aimbot::run(CUserCmd* cmd)
     auto weapon = game::localPlayer->getActiveWeapon();
     if (!weapon)
         return;
+
     auto weaponCfg = CfgWeapon::getWeaponByIndex(weapon->m_iItemDefinitionIndex());
     if (weaponCfg == WeaponList::WEAPON_UNKNOWN)
         return;
@@ -70,25 +77,37 @@ void Aimbot::run(CUserCmd* cmd)
     if (!getBestTarget(cmd, weapon, myEye, punch))
         return;
 
-    if (m_bestHitpos.isZero())
+    if (m_targets.front().m_pos.isZero())
         return;
+    
+    // everything sorted by fov. Blacklists go on top + they ofc are sorted
+    // we always want front() as current target
+    std::sort(m_targets.begin(), m_targets.end(), 
+        [this](const AimbotTarget_t& lhs, const AimbotTarget_t& rhs) // std::tie won't work in that case
+        {
+            if (lhs.isBlackListed() ^ rhs.isBlackListed())
+                return lhs.isBlackListed();
 
-    Vector m_posToAim = m_bestHitpos;
+            return lhs.m_fov < rhs.m_fov;
+        });
+
+    auto [player, guid, fov, index, bestpos] = m_targets.front();
+
     if (m_config.m_aimbacktrack)
     {
         int boneID = 8; // HEAD start
-        if (auto modelStudio = interfaces::modelInfo->getStudioModel(m_bestEnt->getModel()); modelStudio != nullptr)
+        if (auto modelStudio = interfaces::modelInfo->getStudioModel(player->getModel()); modelStudio != nullptr)
         {
-            if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(m_bestId); hitbox != nullptr)
+            if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(index); hitbox != nullptr)
             {
                 boneID = hitbox->m_bone;
             }
         }
-        auto record = g_Backtrack.getAllRecords().at(m_bestEnt->getIndex());
-        m_posToAim = record.at(record.size() / 2).m_matrix[boneID].origin(); // middle, u can play with this as u want to
+        auto record = g_Backtrack.getAllRecords().at(player->getIndex());
+        bestpos = record.at(record.size() / 2).m_matrix[boneID].origin(); // middle, u can play with this as u want to
     }
    
-    auto angle = math::calcAngleRelative(myEye, m_posToAim, cmd->m_viewangles + punch);
+    auto angle = math::calcAngleRelative(myEye, bestpos, cmd->m_viewangles + punch);
     angle.clamp();
 
     Vector delta = angle + cmd->m_viewangles - m_view;
@@ -118,7 +137,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
         {
             m_temp = m_bestEnt;
         }*/
-        if (m_bestEnt && !m_delay && !m_bestEnt->isAlive()) // if ent is found and dead, then set field to delay and wait curr time + cfgtime
+        if (m_targets.size() && !m_delay && !m_targets.front().m_player->isAlive()) // if ent is found and dead, then set field to delay and wait curr time + cfgtime
         {
             m_delay = true;
             delay = interfaces::globalVars->m_curtime + (m_config.m_aimDelay / 1000.0f);
@@ -129,19 +148,15 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
                 m_delay = false;
             else // need reset fields here and stop the method
             {
-                m_bestHitpos = {};
-                m_bestEnt = nullptr;
+                m_targets.clear();
                 return false;
             }
         }
     }
 
-    m_bestEnt = nullptr;
-    m_bestHitpos = {};
+    m_targets.clear();
 
     auto hitboxes = getHitboxes();
-
-    float bestFov = m_config.m_fov;
 
     if (game::localPlayer->m_flFlashDuration() > 0.0f)
     {
@@ -188,16 +203,17 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
                 ? math::calcFov(eye, hitPos, angles)
                 : math::calcFovReal(eye, hitPos, angles);
 
-            if (fov < bestFov)
+            if (fov <= m_config.m_fov)
             {
-                bestFov = fov;
-                m_bestId = pos;
-                m_bestEnt = ent;
-                m_bestHitpos = hitPos;
+                PlayerInfo_t info;
+                interfaces::engine->getPlayerInfo(idx, &info);
+
+                m_targets.emplace_back(AimbotTarget_t{ ent, info.m_steamID64, fov, idx, hitPos });
             }
         }
     }
-    return m_bestEnt ? true : false;
+
+    return m_targets.size();
 }
 
 Player_t* Aimbot::getTargetted() const
@@ -222,8 +238,7 @@ CfgWeapon Aimbot::getCachedConfig() const
 
 void Aimbot::resetFields()
 {
-    m_bestEnt = nullptr;
-    m_bestHitpos = {};
+    m_targets.clear();
     m_delay = false;
 }
 
@@ -242,7 +257,7 @@ bool Aimbot::isClicked(CUserCmd* cmd)
 
 std::vector<size_t> Aimbot::getHitboxes()
 {
-    std::vector<size_t> hitboxes = {};
+    std::vector<size_t> hitboxes;
 
     switch (m_config.m_aimSelection)
     {

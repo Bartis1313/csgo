@@ -1,8 +1,8 @@
 #include "modulateColors.hpp"
 
-#include "../../../../../SDK/IMaterialSystem.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
+#include <SDK/IMaterialSystem.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
 
 #include <unordered_map>
 

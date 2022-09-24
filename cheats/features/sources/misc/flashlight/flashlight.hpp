@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../../classes/frameStage.hpp"
-
-#include "../../../../../utilities/tools/tools.hpp"
+#include <features/classes/frameStage.hpp>
+#include <utilities/tools/tools.hpp>
 
 class Entity_t;
 class CFlashlightEffect;

@@ -1,15 +1,16 @@
 #include "movement.hpp"
 
-#include "../../../../../SDK/CUserCmd.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/math/math.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
+#include <SDK/CUserCmd.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <config/vars.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/rand.hpp>
 
 enum movetypes
 {
@@ -105,7 +106,7 @@ void Movement::strafe(CUserCmd* cmd)
 	{
 		auto rotateStrafe = [=](float rotation, const float forward)
 		{
-			rotation *= DEG2RAD(1.0f);
+			rotation *= math::DEG2RAD(1.0f);
 
 			cmd->m_forwardmove = std::cos(rotation) * forward;
 			cmd->m_sidemove = std::sin(rotation) * forward;
@@ -114,7 +115,7 @@ void Movement::strafe(CUserCmd* cmd)
 		if (inAir)
 		{
 			// https://www.quakeworld.nu/wiki/QW_physics_air
-			const float idealAngle = std::clamp(RAD2DEG(std::asin(30.0f / speed) * 0.5f), 0.0f, 45.0f);
+			const float idealAngle = std::clamp(math::RAD2DEG(std::asin(30.0f / speed) * 0.5f), 0.0f, 45.0f);
 			const float side = cmd->m_commandNumber % 2 ? 1.0f : -1.0f; // or use static -/+
 			rotateStrafe((idealAngle - 90.0f) * side, m_sideSpeed->getFloat());
 		}
@@ -142,7 +143,7 @@ void Movement::strafe(CUserCmd* cmd)
 
 			if (deltaAir != 0.0f)
 			{
-				const float yaw = DEG2RAD(cmd->m_viewangles.y);
+				const float yaw = math::DEG2RAD(cmd->m_viewangles.y);
 				const auto velocityVec = game::localPlayer->m_vecVelocity();
 				const float velocityDirection = std::atan2(velocityVec.y, velocityVec.x) - yaw;
 				const float bestAngleMove = std::atan2(-cmd->m_sidemove, cmd->m_forwardmove);

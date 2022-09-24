@@ -1,11 +1,11 @@
 #include "SEHcatch.hpp"
 
+#include <utilities/console/console.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+
 #include <DbgHelp.h>
 #include <unordered_map>
-
-#include "utilities/console/console.hpp"
-#include "utilities/tools/tools.hpp"
-#include "utilities/tools/wrappers.hpp"
 
 // exception to string
 #define E2S(e) { e, #e }

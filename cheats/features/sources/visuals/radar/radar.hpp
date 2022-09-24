@@ -1,13 +1,12 @@
 #pragma once
 
-#include "../../../classes/renderableToPresent.hpp"
-#include "../../../classes/overViewMap.hpp"
+#include <features/classes/renderableToPresent.hpp>
+#include <features/classes/overViewMap.hpp>
+#include <SDK/math/Vector2D.hpp>
+#include <SDK/math/Vector.hpp>
 
 #include <cstdint>
 #include <string>
-
-#include "../../../../../SDK/math/Vector2D.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
 
 class RadarSizeHelper;
 struct IDirect3DTexture9;

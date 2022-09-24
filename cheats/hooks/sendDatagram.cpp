@@ -1,13 +1,13 @@
 #include "hooks.hpp"
 
-#include "../../SDK/IVEngineClient.hpp"
-#include "../../SDK/ICvar.hpp"
-#include "../../SDK/ConVar.hpp"
-#include "../../SDK/interfaces/interfaces.hpp"
-
-#include "../../config/vars.hpp"
-#include "../game.hpp"
 #include "../features/sources/fakelatency/fakelatency.hpp"
+
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
+#include <game/game.hpp>
 
 int __fastcall hooks::sendDatagram::hooked(INetChannel* netChannel, void* edx, void* datagram)
 {

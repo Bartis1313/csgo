@@ -1,25 +1,25 @@
 #include "tracer.hpp"
 
-#include <ranges>
-
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IGameEvent.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/IEngineTrace.hpp"
-#include "../../../../../SDK/IViewRenderBeams.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-#include "../../../../../utilities/utilities.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-
 #include "../../events/events.hpp"
-#include "../../../../menu/GUI-ImGui/selections.hpp"
+
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IGameEvent.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/IEngineTrace.hpp>
+#include <SDK/IViewRenderBeams.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/utilities.hpp>
+#include <menu/GUI-ImGui/selections.hpp>
+
+#include <ranges>
 
 
 void BulletTracer::init()

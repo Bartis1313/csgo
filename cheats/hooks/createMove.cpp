@@ -1,19 +1,18 @@
 #include "hooks.hpp"
 
-#include "../../SDK/CUserCmd.hpp"
-#include "../../SDK/Input.hpp"
-#include "../../SDK/IClientEntityList.hpp"
-#include "../../SDK/IVEngineClient.hpp"
-#include "../../SDK/ClientClass.hpp"
-#include "../../SDK/interfaces/interfaces.hpp"
-
 #include "../features/classes/createMove.hpp"
 #include "../features/sources/prediction/prediction.hpp"
 #include "../features/sources/misc/movement/movement.hpp"
 #include "../features/sources/misc/cameras/freeCam.hpp"
 
-#include "../game.hpp"
-#include "../globals.hpp"
+#include <SDK/CUserCmd.hpp>
+#include <SDK/Input.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/ClientClass.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
 
 #pragma warning(disable: 4409)
 

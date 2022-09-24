@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../classes/doPostScreen.hpp"
+#include <features/classes/doPostScreen.hpp>
 
 class IConVar;
 

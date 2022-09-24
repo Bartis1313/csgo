@@ -1,19 +1,18 @@
 #include "smoke.hpp"
 
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IEffects.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-#include "../../../../../utilities/math/math.hpp"
 #include "../../cache/cache.hpp"
-#include "../../../../../gamememory/memory.hpp"
+
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IEffects.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/math/math.hpp>
+#include <memory/memory.hpp>
 
 void SmokeDraw::init()
 {

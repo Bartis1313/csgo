@@ -7,7 +7,7 @@
 #include <format>
 #include <functional>
 
-#include "../../../dependencies/ImGui/imgui.h"
+#include <deps/ImGui/imgui.h>
 
 class CfgColor;
 class Key;

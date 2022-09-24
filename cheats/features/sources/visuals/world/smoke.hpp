@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../classes/renderableToSurface.hpp"
-#include "../../../classes/frameStage.hpp"
+#include <features/classes/renderableToSurface.hpp>
+#include <features/classes/frameStage.hpp>
 
 struct Vector;
 class Color;

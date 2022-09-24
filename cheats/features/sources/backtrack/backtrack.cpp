@@ -1,21 +1,21 @@
 #include "backtrack.hpp"
 
-#include "../../../../SDK/IVEngineClient.hpp"
-#include "../../../../SDK/CUserCmd.hpp"
-#include "../../../../SDK/CGlobalVars.hpp"
-#include "../../../../SDK/IClientEntityList.hpp"
-#include "../../../../SDK/vars.hpp"
-#include "../../../../SDK/Enums.hpp"
-#include "../../../../SDK/structs/Entity.hpp"
-#include "../../../../SDK/ICvar.hpp"
-#include "../../../../SDK/ConVar.hpp"
-#include "../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../game.hpp"
-#include "../../../../config/vars.hpp"
-#include "../../../../utilities/math/math.hpp"
-#include "../../../../utilities/tools/tools.hpp"
 #include "../cache/cache.hpp"
+
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/CUserCmd.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/vars.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <config/vars.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/tools/tools.hpp>
 
 void Backtrack::init()
 {

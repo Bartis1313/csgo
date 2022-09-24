@@ -1,11 +1,11 @@
 #include "prediction.hpp"
 
-#include "../../../SDK/CGameMovement.hpp"
-#include "../../../SDK/CUserCmd.hpp"
-#include "../../../SDK/CGlobalVars.hpp"
-
-#include "../../../game.hpp"
-#include "../../../../gamememory/memory.hpp"
+#include <SDK/CGameMovement.hpp>
+#include <SDK/CUserCmd.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <memory/memory.hpp>
 
 void Prediction::init()
 {
@@ -62,7 +62,7 @@ void Prediction::addToPrediction(CUserCmd* cmd, const std::function<void()>& fun
 	end();
 }
 
-#include "../../../SDK/IClientState.hpp"
+#include <SDK/IClientState.hpp>
 
 void Prediction::update()
 {

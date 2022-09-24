@@ -1,14 +1,14 @@
 #include "freeCam.hpp"
 
-#include "../../../SDK/CViewSetup.hpp"
-#include "../../../utilities/inputSystem.hpp"
-#include "../../../SDK/math/Vector.hpp"
-#include "../../../utilities/math/math.hpp"
-#include "../../../config/vars.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../../menu/GUI-ImGui/menu.hpp"
+#include <SDK/CViewSetup.hpp>
+#include <SDK/math/Vector.hpp>
+#include <utilities/inputSystem.hpp>
+#include <utilities/math/math.hpp>
+#include <config/vars.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <menu/GUI-ImGui/menu.hpp>
 
-#include "../../../../game.hpp"
+#include <game/game.hpp>
 
 void Freecam::init()
 {
@@ -39,10 +39,10 @@ void Freecam::run(CViewSetup* view)
 		float& speed = config.getRef<float>(vars.fFreeCam);
 		Vector ang = view->m_angles;
 
-		float sinYaw = std::sin(DEG2RAD(ang.y));
-		float sinPitch = std::sin(DEG2RAD(ang.x));
-		float cosYaw = std::cos(DEG2RAD(ang.y));
-		float cosPitch = std::cos(DEG2RAD(ang.x));
+		float sinYaw = std::sin(math::DEG2RAD(ang.y));
+		float sinPitch = std::sin(math::DEG2RAD(ang.x));
+		float cosYaw = std::cos(math::DEG2RAD(ang.y));
+		float cosPitch = std::cos(math::DEG2RAD(ang.x));
 
 		// to make this ideal we also can do cases like W+A
 		// pseudo: correct.x = (-sin(view.x) + cos(view.x)) / 2.0f; ...something like this
@@ -58,7 +58,7 @@ void Freecam::run(CViewSetup* view)
 		{
 			v.x += cosYaw * cosPitch;
 			v.y += sinYaw * cosPitch;
-			v.z += sin(DEG2RAD(-(ang.x - 90.0f)));
+			v.z += std::sin(math::DEG2RAD(-(ang.x - 90.0f)));
 		}
 		if(inputHandler.isKeyDown(0x57)) // w
 		{
@@ -68,8 +68,8 @@ void Freecam::run(CViewSetup* view)
 		}
 		if (inputHandler.isKeyDown(0x41)) // a
 		{
-			v.x += std::cos(DEG2RAD(ang.y + 90.0f)) * cosPitch;
-			v.y += std::sin(DEG2RAD(ang.y + 90.0f)) * cosPitch;
+			v.x += std::cos(math::DEG2RAD(ang.y + 90.0f)) * cosPitch;
+			v.y += std::sin(math::DEG2RAD(ang.y + 90.0f)) * cosPitch;
 			v.z += -sinPitch;
 		}
 		if (inputHandler.isKeyDown(0x53)) // s
@@ -80,8 +80,8 @@ void Freecam::run(CViewSetup* view)
 		}
 		if (inputHandler.isKeyDown(0x44)) // d
 		{
-			v.x -= std::cos(DEG2RAD(ang.y + 90.0f)) * cosPitch;
-			v.y -= std::sin(DEG2RAD(ang.y + 90.0f)) * cosPitch;
+			v.x -= std::cos(math::DEG2RAD(ang.y + 90.0f)) * cosPitch;
+			v.y -= std::sin(math::DEG2RAD(ang.y + 90.0f)) * cosPitch;
 			v.z += -sinPitch;
 		}
 		view->m_origin = v * speed;
@@ -94,9 +94,9 @@ void Freecam::run(CViewSetup* view)
 	}
 }
 
-#include "../../../../../dependencies/ImGui/imgui.h"
-#include "../../../../..//utilities/tools/tools.hpp"
-#include "../../../../..//utilities/tools/wrappers.hpp"
+#include <deps/ImGui/imgui.h>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
 
 void FreecamDraw::init()
 {

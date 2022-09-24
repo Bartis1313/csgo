@@ -2,22 +2,21 @@
 
 #include <d3d9.h>
 
-#include "../../../dependencies/ImGui/imgui.h"
+#include <deps/ImGui/imgui.h>
 
-#include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../SDK/IMaterialSystem.hpp"
-#include "../../../SDK/ITexture.hpp"
-#include "../../../SDK/IMatRenderContext.hpp"
-#include "../../../SDK/CViewSetup.hpp"
-#include "../../../SDK/IVRenderView.hpp"
-#include "../../../SDK/CGlobalVars.hpp"
-
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../hooks/hooks.hpp"
-#include "../../../../game.hpp"
-#include "../../../utilities/inputSystem.hpp"
-#include "../../../config/vars.hpp"
-#include "../../../utilities/console/console.hpp"
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/IMaterialSystem.hpp>
+#include <SDK/ITexture.hpp>
+#include <SDK/IMatRenderContext.hpp>
+#include <SDK/CViewSetup.hpp>
+#include <SDK/IVRenderView.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/inputSystem.hpp>
+#include <utilities/console/console.hpp>
+#include <hooks/hooks.hpp>
+#include <game/game.hpp>
+#include <config/vars.hpp>
 
 void MirrorCam::init()
 {

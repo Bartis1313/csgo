@@ -1,21 +1,19 @@
 #include "hooks.hpp"
 
-#include "../../SDK/IVEngineClient.hpp"
-#include "../../SDK/IPanel.hpp"
-#include "../../SDK/interfaces/interfaces.hpp"
-
 #include "../features/classes/renderableToSurface.hpp"
-
-#include "../globals.hpp"
-#include "../../config/vars.hpp"
-#include "../../utilities/renderer/renderer.hpp"
-#include "../menu/x88Menu/x88menu.hpp"
-#include "../../utilities/res.hpp"
-#include "../../utilities/tools/tools.hpp"
 #include "../../resource.h"
 
-#pragma region "Paint Helpers"
-// run current screensize
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/IPanel.hpp>
+#include <SDK/ISurface.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <menu/x88Menu/x88menu.hpp>
+#include <utilities/res.hpp>
+#include <utilities/tools/tools.hpp>
+
 static void getScreen()
 {
 	int x, y;
@@ -31,7 +29,6 @@ static void getMouse()
 	globals::mouseX = x;
 	globals::mouseY = y;
 }
-#pragma endregion
 
 void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
 {

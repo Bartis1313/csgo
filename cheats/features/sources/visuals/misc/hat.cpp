@@ -1,15 +1,14 @@
 #include "hat.hpp"
 
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/Input.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/math/math.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/Input.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/renderer/renderer.hpp>
 
 void Hat::init()
 {

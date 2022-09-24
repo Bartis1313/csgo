@@ -1,21 +1,19 @@
 #include "hooks.hpp"
 #include "helpers/helper.hpp"
 
-#include "../../SDK/structs/IDXandPaterrns.hpp"
-#include "../../SDK/ConVar.hpp"
-#include "../../SDK/ICvar.hpp"
-#include "../../SDK/interfaces/interfaces.hpp"
-
-#include "../../dependencies/minhook/Minhook.h"
-#include "../../dependencies/ImGui/imgui.h"
-#include "../../dependencies/ImGui/imgui_impl_win32.h"
-#include "../../cheats/menu/GUI-ImGui/menu.hpp"
-
-#include "../../config/vars.hpp"
-#include "../../utilities/renderer/renderer.hpp"
-#include "../../utilities/console/console.hpp"
-#include "../../utilities/tools/tools.hpp"
-#include "../../gamememory/memory.hpp"
+#include <SDK/structs/indexes.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <deps/minhook/Minhook.h>
+#include <deps/ImGui/imgui.h>
+#include <deps/ImGui/imgui_impl_win32.h>
+#include <menu/GUI-ImGui/menu.hpp>
+#include <config/vars.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/console/console.hpp>
+#include <utilities/tools/tools.hpp>
+#include <memory/memory.hpp>
 
 void hooks::init()
 {
@@ -78,10 +76,10 @@ void hooks::wndProcSys::init()
 	wndProcOriginal = reinterpret_cast<WNDPROC>(LI_FN(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndproc)));
 }
 
-#include "../../SDK/InputSystem.hpp"
-#include "../../config/key.hpp"
-#include "../../utilities/inputSystem.hpp"
-#include "../menu/x88Menu/x88menu.hpp"
+#include <SDK/InputSystem.hpp>
+#include <config/key.hpp>
+#include <utilities/inputSystem.hpp>
+#include <menu/x88Menu/x88menu.hpp>
 
 void hooks::wndProcSys::shutdown()
 {

@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../../classes/onlyInit.hpp"
+#include <features/classes/onlyInit.hpp>
+#include <SDK/CClientEffectRegistration.hpp>
 
 #include <vector>
 #include <string>
-
-#include "../../../SDK/CClientEffectRegistration.hpp"
 
 class Callbacks : public OnlyInitType
 {

@@ -1,18 +1,18 @@
 #include "RCS.hpp"
 
-#include "../../../../SDK/CUserCmd.hpp"
-#include "../../../../SDK/ICvar.hpp"
-#include "../../../../SDK/ConVar.hpp"
-#include "../../../../SDK/IVEngineClient.hpp"
-#include "../../../../SDK/math/Vector.hpp"
-#include "../../../../SDK/interfaces/interfaces.hpp"
-#include "../../../../SDK/structs/Entity.hpp"
-
-#include "../../../game.hpp"
-#include "../../../../config/vars.hpp"
-#include "../../../../utilities/tools/tools.hpp"
-
 #include "../aimbot/aimbot.hpp"
+
+#include <SDK/CUserCmd.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/structs/Entity.hpp>
+
+#include <game/game.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
 
 void RCS::init()
 {

@@ -1,14 +1,25 @@
 #pragma once
 
-#include "../../classes/createMove.hpp"
-#include "../../../../SDK/math/Vector.hpp"
-#include "../../../../config/cfgWeapon.hpp"
+#include <features/classes/createMove.hpp>
+#include <SDK/math/Vector.hpp>
+#include <config/cfgWeapon.hpp>
 
 #include <vector>
 
 class CUserCmd;
 class Player_t;
 class Weapon_t;
+
+struct AimbotTarget_t
+{
+	Player_t* m_player;
+	uint64_t m_playerGuid;
+	float m_fov;
+	size_t m_index;
+	Vector m_pos;
+
+	bool isBlackListed() const;
+};
 
 class Aimbot : public CreateMoveInPredictionType
 {
@@ -36,6 +47,8 @@ private:
 	Vector m_view;
 	int m_bestId;
 	CfgWeapon m_config;
+
+	std::vector<AimbotTarget_t> m_targets;
 };
 
 [[maybe_unused]] inline auto g_Aimbot = Aimbot{};

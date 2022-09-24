@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../classes/screen2dEffects.hpp"
+#include <features/classes/screen2dEffects.hpp>
 
 #include <vector>
 

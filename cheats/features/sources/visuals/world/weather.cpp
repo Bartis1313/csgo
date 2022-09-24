@@ -1,22 +1,22 @@
 #include "weather.hpp"
 
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IEffects.hpp"
-#include "../../../../../SDK/Enums.hpp"
-#include "../../../../../SDK/ClientClass.hpp"
-#include "../../../../../SDK/IBaseClientDll.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
-#include "../../../../../SDK/ICollideable.hpp"
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/utilities.hpp"
-#include "../../../../../dependencies/ImGui/imgui.h"
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IEffects.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/ClientClass.hpp>
+#include <SDK/IBaseClientDll.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/ICollideable.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/utilities.hpp>
+#include <utilities/rand.hpp>
+#include <deps/ImGui/imgui.h>
 
 void WeatherController::init()
 {

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../classes/renderableToSurface.hpp"
+#include <features/classes/renderableToSurface.hpp>
 
 class Inferno_t;
 

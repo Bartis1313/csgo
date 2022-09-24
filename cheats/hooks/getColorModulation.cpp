@@ -1,7 +1,8 @@
 #include "hooks.hpp"
 
 #include "../features/sources/visuals/world/modulateColors.hpp"
-#include "../globals.hpp"
+
+#include <game/globals.hpp>
 
 void __fastcall hooks::getColorModulation::hooked(FAST_ARGS, float* r, float* g, float* b)
 {

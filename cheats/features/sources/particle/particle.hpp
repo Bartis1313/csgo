@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../classes/onlyInit.hpp"
+#include <features/classes/onlyInit.hpp>
 
 #include <string>
 

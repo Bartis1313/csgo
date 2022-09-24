@@ -1,16 +1,15 @@
 #include "projectiles.hpp"
 
-#include "../../../../../SDK/IWeapon.hpp"
-#include "../../../../../SDK/IVModelInfo.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-
 #include "nadewarn.hpp"
 #include "../../cache/cache.hpp"
+
+#include <SDK/IWeapon.hpp>
+#include <SDK/IVModelInfo.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/renderer/renderer.hpp>
 
 void Projectiles::init()
 {

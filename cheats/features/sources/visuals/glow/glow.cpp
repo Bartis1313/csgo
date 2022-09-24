@@ -1,14 +1,13 @@
 #include "glow.hpp"
 
-#include "../../../../../SDK/IMaterialSystem.hpp"
-#include "../../../../../SDK/IVModelRender.hpp"
-#include "../../../../../SDK/CGlowManager.hpp"
-#include "../../../../../SDK/ClientClass.hpp"
-#include "../../../../../SDK/Enums.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../../config/vars.hpp"
+#include <SDK/IMaterialSystem.hpp>
+#include <SDK/IVModelRender.hpp>
+#include <SDK/CGlowManager.hpp>
+#include <SDK/ClientClass.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <config/vars.hpp>
 
 void Glow::init()
 {

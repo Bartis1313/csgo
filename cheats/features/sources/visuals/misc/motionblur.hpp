@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../classes/overrideView.hpp"
-#include "../../../SDK/math/Vector.hpp"
+#include <features/classes/overrideView.hpp>
+#include <SDK/math/Vector.hpp>
 
 #include <array>
 

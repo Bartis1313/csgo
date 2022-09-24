@@ -1,10 +1,10 @@
 #include "hooks.hpp"
 
-#include "../../SDK/IVModelRender.hpp"
-#include "../../SDK/IVEngineClient.hpp"
-#include "../../SDK/interfaces/interfaces.hpp"
-
 #include "../features/classes/drawModel.hpp"
+
+#include <SDK/IVModelRender.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 
 void __stdcall hooks::drawModel::hooked(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
 {

@@ -1,18 +1,18 @@
 #include "motionblur.hpp"
 
-#include "../../../../../SDK/CViewSetup.hpp"
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IMaterialSystem.hpp"
-#include "../../../../../SDK/ITexture.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
+#include <SDK/CViewSetup.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IMaterialSystem.hpp>
+#include <SDK/ITexture.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/math/math.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../gamememory/memory.hpp"
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/tools/tools.hpp>
+#include <memory/memory.hpp>
 
 void MotionBlur::init()
 {
@@ -84,7 +84,7 @@ void MotionBlur::run(CViewSetup* view)
 			const float verticalFov = (view->m_aspectRatio <= 0.0f) ? (view->m_fov) : (view->m_fov / view->m_aspectRatio);
 			const float viewDotMotion = currentForwardVec.dot(positionChange);
 
-			if (true)
+			if (config.get<bool>(vars.bMotionBlurForward))
 				m_motionBlurValues[2] = viewDotMotion;
 			else
 				m_motionBlurValues[2] = viewDotMotion * std::abs(currentForwardVec[2]);

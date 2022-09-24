@@ -1,15 +1,14 @@
 #include "drawinfo.hpp"
 
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/IWeapon.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/IWeapon.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/renderer/renderer.hpp>
 
 void Info::init()
 {

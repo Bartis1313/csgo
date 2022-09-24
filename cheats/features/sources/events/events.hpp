@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../SDK/IGameEvent.hpp"
+#include <SDK/IGameEvent.hpp>
 
 #include <string>
 #include <functional>

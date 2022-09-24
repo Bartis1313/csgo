@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../classes/renderableToSurface.hpp"
-#include "../../../classes/doPostScreen.hpp"
+#include <features/classes/renderableToSurface.hpp>
+#include <features/classes/doPostScreen.hpp>
 
 class IMaterial;
 

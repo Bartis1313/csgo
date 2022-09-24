@@ -1,9 +1,8 @@
 #pragma once
 
-#include "../../../classes/renderableToPresent.hpp"
-#include "../../../classes/renderView.hpp"
-
-#include "../../../SDK/math/Vector2D.hpp"
+#include <features/classes/renderableToPresent.hpp>
+#include <features/classes/renderView.hpp>
+#include <SDK/math/Vector2D.hpp>
 
 class CViewSetup;
 class ITexture;

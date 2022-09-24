@@ -1,12 +1,10 @@
 #include "callbacks.hpp"
 
-#include "../../../../SDK/structs/IDXandPaterrns.hpp"
-#include "../../../../SDK/CEffectData.hpp"
-
-#include "../../../../utilities/tools/tools.hpp"
-#include "../../../../utilities/tools/wrappers.hpp"
-#include "../../../../utilities/console/console.hpp"
-#include "../../../../gamememory/memory.hpp"
+#include <SDK/CEffectData.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/console/console.hpp>
+#include <memory/memory.hpp>
 
 void Callbacks::addCallBack(const clbStruct& callb)
 {

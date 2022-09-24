@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../../classes/renderableToSurface.hpp"
+#include <features/classes/renderableToSurface.hpp>
 
-#include "../../../SDK/math/Vector.hpp"
-#include "../../../SDK/math/Vector2D.hpp"
+#include <SDK/math/Vector.hpp>
+#include <SDK/math/Vector2D.hpp>
 
 #include <array>
 #include <deque>

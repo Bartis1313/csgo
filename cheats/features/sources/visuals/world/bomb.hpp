@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../classes/renderableToPresent.hpp"
-#include "../../../classes/frameStage.hpp"
+#include <features/classes/renderableToPresent.hpp>
+#include <features/classes/frameStage.hpp>
 
 class Bomb_t;
 class IConVar;

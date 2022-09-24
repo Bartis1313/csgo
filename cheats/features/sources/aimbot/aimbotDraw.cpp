@@ -1,16 +1,15 @@
 #include "aimbotDraw.hpp"
 
-#include "../../../../SDK/IWeapon.hpp"
-#include "../../../../SDK/IEngineTrace.hpp"
-#include "../../../../SDK/structs/Entity.hpp"
-#include "../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../game.hpp"
-#include "../../../globals.hpp"
-#include "../../../../config/vars.hpp"
-#include "../../../../utilities/math/math.hpp"
-#include "../../../../utilities/renderer/renderer.hpp"
-#include "../../../../utilities/tools/wrappers.hpp"
+#include <SDK/IWeapon.hpp>
+#include <SDK/IEngineTrace.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/tools/wrappers.hpp>
 
 #include "aimbot.hpp"
 
@@ -55,7 +54,7 @@ void AimbotDraw::drawFov()
     {
     case E2T(AimbotMethod::CROSSHAIR):
     {
-        radius = std::tan(DEG2RAD(cfg.m_fov) / 2.0f) / std::tan(DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
+        radius = std::tan(math::DEG2RAD(cfg.m_fov) / 2.0f) / std::tan(math::DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
 
         break;
     }

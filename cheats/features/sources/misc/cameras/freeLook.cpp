@@ -1,11 +1,10 @@
 #include "freeLook.hpp"
 
-#include "../../../SDK/CUserCmd.hpp"
-#include "../../../SDK/CViewSetup.hpp"
-#include "../../../SDK/IVEngineClient.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../config/vars.hpp"
+#include <SDK/CUserCmd.hpp>
+#include <SDK/CViewSetup.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
 
 void FreeLook::init()
 {

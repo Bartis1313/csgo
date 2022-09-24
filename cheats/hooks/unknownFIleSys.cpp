@@ -4,11 +4,11 @@
 #include <intrin.h>
 
 #include "../features/sources/visuals/radar/radar.hpp"
-#include "../../SDK/interfaces/interfaces.hpp"
-#include "../../utilities/res.hpp"
-#include "../../utilities/console/console.hpp"
-#include "../../utilities/tools/tools.hpp"
-#include "../../gamememory/memory.hpp"
+
+#include <SDK/interfaces/interfaces.hpp>
+#include <utilities/console/console.hpp>
+#include <utilities/tools/tools.hpp>
+#include <memory/memory.hpp>
 
 #define DDS_HEADER 542327876
 

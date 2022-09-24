@@ -1,27 +1,26 @@
 #include "nadepred.hpp"
 
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/IWeapon.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IEngineTrace.hpp"
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/Convar.hpp"
-#include "../../../../../SDK/Enums.hpp"
-#include "../../../../../SDK/CUserCmd.hpp"
-
-#include "../../../config/vars.hpp"
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../../utilities/math/math.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
-#include "../../../../../gamememory/memory.hpp"
-
-#include "../../../../../SDK/ClientClass.hpp"
-#include "../../../../../SDK/IVModelInfo.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
+#include <SDK/math/Vector.hpp>
+#include <SDK/IWeapon.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IEngineTrace.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/Convar.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/CUserCmd.hpp>
+#include <SDK/ClientClass.hpp>
+#include <SDK/IVModelInfo.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <memory/memory.hpp>
 
 #include "../../cache/cache.hpp"
 
@@ -167,7 +166,7 @@ void GrenadePrediction::draw()
 
 			float d = ((deltaDist - b) / c);
 			float dmg = a * std::exp(-d * d);
-			float resultDmg = utilities::scaleDamageArmor(dmg, ent->m_ArmorValue());
+			float resultDmg = game::scaleDamageArmor(dmg, ent->m_ArmorValue());
 			if (resultDmg < 0.1f)
 				continue;
 
@@ -335,7 +334,7 @@ bool GrenadePrediction::checkDetonate(const Vector& vecThrow, const Trace_t& tr,
 		const static float molotov_throw_detonate_time = interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"))->getFloat();
 		const static float weapon_molotov_maxdetonateslope = interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
 
-		if (tr.didHit() && tr.m_plane.m_normal.z >= std::cos(DEG2RAD(weapon_molotov_maxdetonateslope)))
+		if (tr.didHit() && tr.m_plane.m_normal.z >= std::cos(math::DEG2RAD(weapon_molotov_maxdetonateslope)))
 			return true;
 
 		return time >= molotov_throw_detonate_time && check(0.1f);

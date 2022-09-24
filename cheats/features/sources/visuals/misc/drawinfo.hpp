@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../../classes/renderableToPresent.hpp"
+#include <features/classes/renderableToPresent.hpp>
 
 class Info : public RenderablePresentType
 {

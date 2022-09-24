@@ -1,17 +1,16 @@
 #include "enemyWarn.hpp"
 
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/IEngineTrace.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-#include "../../../../../SDK/structs/Entity.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/math/math.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/IEngineTrace.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/tools/tools.hpp>
 
 
 void EnemyWarning::init()

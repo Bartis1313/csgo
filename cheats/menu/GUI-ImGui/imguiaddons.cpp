@@ -1,11 +1,8 @@
 #include "imguiaddons.hpp"
 
-#include "../../../config/key.hpp"
-
-#include "../../../utilities/utilities.hpp"
-#define IMGUI_DEFINE_MATH_OPERATORS
-#include "../../../dependencies/ImGui/imgui_internal.h"
-#include "../../globals.hpp"
+#include <config/config.hpp>
+#include <utilities/utilities.hpp>
+#include <game/globals.hpp>
 
 void ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& size)
 {
@@ -76,7 +73,7 @@ void ImGui::HelpMarker(const char* desc)
     }
 }
 
-#include "../../../config/cfgcolor.hpp"
+#include <config/cfgcolor.hpp>
 
 bool ImGui::ColorPicker(const char* label, CfgColor* clr)
 {
@@ -238,7 +235,7 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
     ImGui::PushItemWidth(ImMax(0.0f, itemWidth - frameHeight));
 }
 
-#include "../../../utilities/renderer/renderer.hpp"
+#include <utilities/renderer/renderer.hpp>
 
 void ImGui::EndGroupPanel()
 {

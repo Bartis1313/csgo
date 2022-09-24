@@ -1,11 +1,10 @@
 #include "removeSky.hpp"
 
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/Convar.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
+#include <SDK/ICvar.hpp>
+#include <SDK/Convar.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
 
 void RemoveSky::init()
 {

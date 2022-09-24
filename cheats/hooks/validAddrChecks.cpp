@@ -1,9 +1,9 @@
 #include "hooks.hpp"
 
-#include <intrin.h>
+#include <config/vars.hpp>
+#include <memory/memory.hpp>
 
-#include "../../config/vars.hpp"
-#include "../../gamememory/memory.hpp"
+#include <intrin.h>
 
 char __fastcall hooks::clientValidAddr::hooked(FAST_ARGS, const char* lpModuleName)
 {
@@ -48,7 +48,7 @@ int __fastcall hooks::unkFileCheck::hooked(FAST_ARGS)
 
 bool __fastcall hooks::sv_cheats::hooked(FAST_ARGS)
 {
-	if (_ReturnAddress() == g_Memory.m_camThink.cast<void*>()() && config.get<bool>(vars.bThirdp))
+	if (_ReturnAddress() == g_Memory.m_camThink() && config.get<bool>(vars.bThirdp))
 		return true;
 
 	return original(thisptr);

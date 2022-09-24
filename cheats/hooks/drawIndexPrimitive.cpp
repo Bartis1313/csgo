@@ -1,11 +1,11 @@
 #include "hooks.hpp"
 
-#include "../../gamememory/memory.hpp"
-#include "../../SDK/structs/Entity.hpp"
-#include "../../SDK/IClientEntityList.hpp"
-#include "../../SDK/IVEngineClient.hpp"
-
-#include "../game.hpp"
+#include <memory/memory.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <game/globals.hpp>
+#include <game/game.hpp>
 
 static void* getStack(void** data)
 {

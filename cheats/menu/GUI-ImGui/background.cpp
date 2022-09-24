@@ -1,24 +1,26 @@
 #include "background.hpp"
 
-#include "../../globals.hpp"
-#include "../../../utilities/utilities.hpp"
-#include "../../../dependencies/ImGui/imgui.h"
 #include "menu.hpp"
-#include "../../../config/vars.hpp"
+
+#include <deps/ImGui/imgui.h>
+#include <game/globals.hpp>
+#include <utilities/utilities.hpp>
+#include <utilities/rand.hpp>
+#include <config/vars.hpp>
 
 void Background::drawLine(const Vector2D& start, const Vector2D& end, const Color& color, float thickness)
 {
-	m_draw->AddLine(ImVec2{ start.x, start.y }, ImVec2{ end.x, end.y }, U32(color), thickness);
+	m_draw->AddLine(ImVec2{ start.x, start.y }, ImVec2{ end.x, end.y }, Color::U32(color), thickness);
 }
 
 void Background::drawCircleFilled(const Vector2D& pos, float radius, size_t points, const Color& color)
 {
-	m_draw->AddCircleFilled(ImVec2{ pos.x, pos.y }, radius, U32(color), points);
+	m_draw->AddCircleFilled(ImVec2{ pos.x, pos.y }, radius, Color::U32(color), points);
 }
 
 void Background::drawRectFilled(float x, float y, float width, float height, const Color& color)
 {
-	m_draw->AddRectFilled(ImVec2{ x, y }, ImVec2{ x + width, y + height }, U32(color), 0.0f, 0);
+	m_draw->AddRectFilled(ImVec2{ x, y }, ImVec2{ x + width, y + height }, Color::U32(color));
 }
 
 void Background::init()

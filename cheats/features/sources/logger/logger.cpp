@@ -1,10 +1,9 @@
 #include "logger.hpp"
 
-#include "../../../SDK/CGlobalVars.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../../config/vars.hpp"
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <config/vars.hpp>
 
 void Logger::init()
 {

@@ -1,14 +1,14 @@
 #include "counters.hpp"
 
-#include "../../../../../SDK/IGameEvent.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
 #include "../../events/events.hpp"
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
+
+#include <SDK/IGameEvent.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <utilities/tools/tools.hpp>
 
 void Counters::init()
 {

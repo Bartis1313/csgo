@@ -1,11 +1,10 @@
 #pragma once
 
-#include "../../classes/renderableToSurface.hpp"
+#include <features/classes/renderableToSurface.hpp>
+#include <SDK/Color.hpp>
 
 #include <vector>
 #include <string>
-
-#include "../../../SDK/Color.hpp"
 
 struct ImFont;
 

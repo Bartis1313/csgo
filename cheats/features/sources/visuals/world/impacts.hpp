@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../../classes/renderableToSurface.hpp"
-#include "../../../classes/onlyInit.hpp"
+#include <features/classes/renderableToSurface.hpp>
+#include <features/classes/onlyInit.hpp>
 
-#include "../../../../../SDK/math/Vector.hpp"
+#include <SDK/math/Vector.hpp>
 
 class IGameEvent;
 

@@ -1,15 +1,14 @@
 #include "thirdperson.hpp"
 
-#include "../../../../../SDK/IEngineTrace.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/Input.hpp"
-#include "../../../../../SDK/vars.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../utilities/math/math.hpp"
-#include "../../../../../config/vars.hpp"
+#include <SDK/IEngineTrace.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/Input.hpp>
+#include <SDK/vars.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <utilities/math/math.hpp>
+#include <config/vars.hpp>
 
 
 void Thirdperson::init()
@@ -37,9 +36,9 @@ void Thirdperson::run(CViewSetup* view)
 
 		Vector camera =
 		{
-			std::cos(DEG2RAD(fixedY)) * config.get<float>(vars.fThirdpDistance),
-			std::sin(DEG2RAD(fixedY)) * config.get<float>(vars.fThirdpDistance),
-			std::sin(DEG2RAD(-fixedX)) * config.get<float>(vars.fThirdpDistance),
+			std::cos(math::DEG2RAD(fixedY)) * config.get<float>(vars.fThirdpDistance),
+			std::sin(math::DEG2RAD(fixedY)) * config.get<float>(vars.fThirdpDistance),
+			std::sin(math::DEG2RAD(-fixedX))* config.get<float>(vars.fThirdpDistance),
 		};
 		Vector eyePos = game::localPlayer->getEyePos();
 		TraceFilter filter;

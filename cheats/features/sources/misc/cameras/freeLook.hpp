@@ -1,9 +1,9 @@
 #pragma once
 
-#include "../../../classes/createMove.hpp"
-#include "../../../classes/overrideView.hpp"
+#include <features/classes/createMove.hpp>
+#include <features/classes/overrideView.hpp>
 
-#include "../../../SDK/math/Vector.hpp"
+#include <SDK/math/Vector.hpp>
 
 class CUserCmd;
 class CViewSetup;

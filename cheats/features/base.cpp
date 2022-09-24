@@ -1,6 +1,6 @@
 #include "base.hpp"
 
-#include "../../utilities/console/console.hpp"
+#include <utilities/console/console.hpp>
 
 void BaseHack::initAll()
 {
@@ -14,9 +14,4 @@ void BaseHack::shutdownAll()
 {
 	for (auto el : m_hacks)
 		el->shutdown();
-}
-
-void HackException::handleError(const HackException& err) const
-{
-	console.log(TypeLogs::LOG_ERR, XOR("Reason of crash {}"), err.what());
 }

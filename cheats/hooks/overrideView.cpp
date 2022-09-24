@@ -1,13 +1,13 @@
 #include "hooks.hpp"
 
-#include "../../SDK/CViewSetup.hpp"
-#include "../../SDK/interfaces/interfaces.hpp"
-
 #include "../features/classes/overrideView.hpp"
 
-#include "../globals.hpp"
-#include "../game.hpp"
-#include "../../config/vars.hpp"
+#include <SDK/CViewSetup.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/globals.hpp>
+#include <game/game.hpp>
+#include <config/vars.hpp>
 
 void __stdcall hooks::overrideView::hooked(CViewSetup* view)
 {	

@@ -1,20 +1,19 @@
 #include "triggerbot.hpp"
 
-#include "../../../SDK/IVEngineClient.hpp"
-#include "../../../SDK/CUserCmd.hpp"
-#include "../../../SDK/CGlobalVars.hpp"
-#include "../../../SDK/IClientEntityList.hpp"
-#include "../../../SDK/vars.hpp"
-#include "../../../SDK/structs/Entity.hpp"
-#include "../../../SDK/IWeapon.hpp"
-#include "../../../SDK/IEngineTrace.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../config/vars.hpp"
-#include "../../../game.hpp"
-#include "../../../utilities/math/math.hpp"
-
 #include "../aimbot/aimbot.hpp"
+
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/CUserCmd.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/vars.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <SDK/IWeapon.hpp>
+#include <SDK/IEngineTrace.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
+#include <game/game.hpp>
+#include <utilities/math/math.hpp>
 
 void Triggerbot::init()
 {

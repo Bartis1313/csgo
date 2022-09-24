@@ -1,26 +1,28 @@
 #include "bomb.hpp"
 
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IEffects.hpp"
-#include "../../../../../SDK/Enums.hpp"
-#include "../../../../../SDK/ClientClass.hpp"
-#include "../../../../../SDK/IBaseClientDll.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-
 #include "../../events/events.hpp"
 #include "../../cache/cache.hpp"
+
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IEffects.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/ClientClass.hpp>
+#include <SDK/IBaseClientDll.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/IGameEvent.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/renderer/renderer.hpp>
+
 
 void BombOverlay::init()
 {
@@ -59,7 +61,7 @@ void BombOverlay::draw()
 	constexpr float bombRadius = 500.0f; // there is no info for this, run some map scanner
 	constexpr float sigma = (500.0f * 3.5f) / 3.0f;
 	const float hypDist = (m_bombEnt->getEyePos() - game::localPlayer->getEyePos()).length();
-	const float dmg = utilities::scaleDamageArmor((bombRadius * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
+	const float dmg = game::scaleDamageArmor((bombRadius * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
 	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 
 	float scaled = m_bombEnt->m_hBombDefuser() > 0 ? (defusetime / defuseMaxTime) : (bombtime / m_timer->getFloat());
@@ -75,7 +77,7 @@ void BombOverlay::draw()
 
 	constexpr ImVec2 size = { 300, 150 };
 	ImGui::SetNextWindowSize(size);
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, U32(config.get<CfgColor>(vars.cBombBackground).getColor()));
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, Color::U32(config.get<CfgColor>(vars.cBombBackground).getColor()));
 	if (ImGui::Begin(XOR("Bomb c4"), &ref, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
 		imRenderWindow.addList();

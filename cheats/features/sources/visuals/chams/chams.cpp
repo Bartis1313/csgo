@@ -2,20 +2,20 @@
 
 #include <format>
 
-#include "../../../SDK/material.hpp"
-#include "../../../SDK/IMaterialSystem.hpp"
-#include "../../../SDK/KeyValuesSys.hpp"
-#include "../../../SDK/KeyValues.hpp"
-#include "../../../SDK/IClientEntityList.hpp"
-#include "../../../SDK/IVModelRender.hpp"
-#include "../../../SDK/IVModelInfo.hpp"
-#include "../../../SDK/IVStudioRender.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
+#include <SDK/material.hpp>
+#include <SDK/IMaterialSystem.hpp>
+#include <SDK/KeyValuesSys.hpp>
+#include <SDK/KeyValues.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/IVModelRender.hpp>
+#include <SDK/IVModelInfo.hpp>
+#include <SDK/IVStudioRender.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 
-#include "../../../../../utilities/tools/wrappers.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../config/vars.hpp"
-#include "../../../../game.hpp"
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/tools/tools.hpp>
+#include <config/vars.hpp>
+#include <game/game.hpp>
 
 void Chams::init()
 {	
@@ -169,8 +169,8 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 	}
 }
 
-#include "../../backtrack/backtrack.hpp"
-#include "../../../SDK/CGlobalVars.hpp"
+#include <features/sources/backtrack/backtrack.hpp>
+#include <SDK/CGlobalVars.hpp>
 
 void Chams::drawBackTrack(Player_t* ent)
 {

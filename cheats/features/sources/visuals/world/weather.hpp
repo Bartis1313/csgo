@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../classes/frameStage.hpp"
-#include "../../../classes/overViewMap.hpp"
+#include <features/classes/frameStage.hpp>
+#include <features/classes/overViewMap.hpp>
 
 class Entity_t;
 class ClientClass;

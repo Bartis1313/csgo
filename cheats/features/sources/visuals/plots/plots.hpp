@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../classes/renderableToPresent.hpp"
-#include "../../../classes/createMove.hpp"
+#include <features/classes/renderableToPresent.hpp>
+#include <features/classes/createMove.hpp>
 
 #include <deque>
 

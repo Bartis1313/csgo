@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../../../classes/onlyInit.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
+#include <features/classes/onlyInit.hpp>
+#include <SDK/math/Vector.hpp>
 
 #include <array>
 #include <deque>

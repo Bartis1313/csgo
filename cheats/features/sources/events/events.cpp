@@ -1,6 +1,6 @@
 #include "events.hpp"
 
-#include "../../../SDK/interfaces/interfaces.hpp"
+#include <SDK/interfaces/interfaces.hpp>
 
 void Events::add(const std::string& eventName, const std::function<void(IGameEvent*)>& fun)
 {

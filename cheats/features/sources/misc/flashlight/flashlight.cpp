@@ -1,21 +1,19 @@
 #include "flashlight.hpp"
 
-#include "../../../../../SDK/CFlashlightEffect.hpp"
-#include "../../../../../SDK/IMemAlloc.hpp"
-#include "../../../../../SDK/Enums.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/ISurface.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-#include "../../../../../SDK/structs/Entity.hpp"
-#include "../../../../../SDK/structs/IDXandPaterrns.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/math/math.hpp"
-#include "../../../../../gamememory/memory.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
+#include <SDK/CFlashlightEffect.hpp>
+#include <SDK/IMemAlloc.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/ISurface.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/structs/Entity.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/math/math.hpp>
+#include <memory/memory.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/tools/tools.hpp>
 
 void Flashlight::init()
 {

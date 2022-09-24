@@ -1,11 +1,10 @@
 #include "boxes.hpp"
 
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
-#include "../../../../../utilities/math/math.hpp"
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/math/math.hpp>
 
 void BoxesDraw::drawBox2D(const Box& box, bool isDormant, float dormacyAlpha)
 {
@@ -92,12 +91,12 @@ void BoxesDraw::drawBox3DFilledMultiColor(const Box& box, bool isDormant, float 
 
 	std::vector colors =
 	{
-		U32(Color::rainbowColor(time, speed).getColorEditAlpha(alpha)),
-		U32(Color::rainbowColor(time + 1.0f, speed).getColorEditAlpha(alpha)),
-		U32(Color::rainbowColor(time + 2.0f, speed).getColorEditAlpha(alpha)),
-		U32(Color::rainbowColor(time + 3.0f, speed).getColorEditAlpha(alpha)),
-		U32(Color::rainbowColor(time + 4.0f, speed).getColorEditAlpha(alpha)),
-		U32(Color::rainbowColor(time + 5.0f, speed).getColorEditAlpha(alpha)),
+		Color::U32(Color::rainbowColor(time, speed).getColorEditAlpha(alpha)),
+		Color::U32(Color::rainbowColor(time + 1.0f, speed).getColorEditAlpha(alpha)),
+		Color::U32(Color::rainbowColor(time + 2.0f, speed).getColorEditAlpha(alpha)),
+		Color::U32(Color::rainbowColor(time + 3.0f, speed).getColorEditAlpha(alpha)),
+		Color::U32(Color::rainbowColor(time + 4.0f, speed).getColorEditAlpha(alpha)),
+		Color::U32(Color::rainbowColor(time + 5.0f, speed).getColorEditAlpha(alpha)),
 	};
 
 	auto points = math::grahamScan(box.points);

@@ -1,10 +1,10 @@
 #include "hooks.hpp"
 
+#include <SDK/CParticelCollection.hpp>
+#include <config/vars.hpp>
+
 #include <array>
 #include <string>
-
-#include "../../SDK/CParticelCollection.hpp"
-#include "../../config/vars.hpp"
 
 constexpr std::array mollyNames =
 {

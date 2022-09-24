@@ -1,19 +1,18 @@
 #include "hooks.hpp"
 
-#include <d3d9.h>
-
-#include "../../dependencies/ImGui/imgui_impl_dx9.h"
-#include "../../dependencies/ImGui/imgui_impl_win32.h"
-#include "../../dependencies/ImGui/imgui.h"
-#include "../menu/GUI-ImGui/menu.hpp"
-#include "../menu/GUI-ImGui/background.hpp"
-
 #include "../features/classes/renderableToPresent.hpp"
-
-#include "../../utilities/renderer/renderer.hpp"
-#include "../../utilities/console/console.hpp"
-#include "../../utilities/res.hpp"
 #include "../../resource.h"
+
+#include <deps/ImGui/imgui_impl_dx9.h>
+#include <deps/ImGui/imgui_impl_win32.h>
+#include <deps/ImGui/imgui.h>
+#include <menu/GUI-ImGui/menu.hpp>
+#include <menu/GUI-ImGui/background.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/console/console.hpp>
+#include <utilities/res.hpp>
+
+#include <d3d9.h>
 
 long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {

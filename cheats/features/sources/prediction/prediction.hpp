@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../classes/onlyInit.hpp"
-
-#include "../../../SDK/IPrediction.hpp"
+#include <features/classes/onlyInit.hpp>
+#include <SDK/IPrediction.hpp>
 
 #include <functional>
 

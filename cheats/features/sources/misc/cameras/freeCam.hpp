@@ -1,8 +1,7 @@
 #pragma once
 
-#include "../../../classes/overrideView.hpp"
-
-#include "../../../SDK/math/Vector.hpp"
+#include <features/classes/overrideView.hpp>
+#include <SDK/math/Vector.hpp>
 
 class CViewSetup;
 
@@ -24,7 +23,7 @@ private:
 
 [[maybe_unused]] inline auto g_Freecam = Freecam{};
 
-#include "../../../classes/renderableToPresent.hpp"
+#include <features/classes/renderableToPresent.hpp>
 
 class FreecamDraw : public RenderablePresentType
 {

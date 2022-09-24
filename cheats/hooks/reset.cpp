@@ -1,8 +1,8 @@
 #include "hooks.hpp"
 
-#include <d3d9.h>
+#include <deps/ImGui/imgui_impl_dx9.h>
 
-#include "../../dependencies/ImGui/imgui_impl_dx9.h"
+#include <d3d9.h>
 
 long __stdcall hooks::reset::hooked(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 {

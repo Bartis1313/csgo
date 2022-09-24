@@ -1,8 +1,8 @@
 #include "hooks.hpp"
 
-#include "../../SDK/CStudioHdr.hpp"
-#include "../../SDK/CUtlVector.hpp"
-#include "../../SDK/math/matrix.hpp"
+#include <SDK/CStudioHdr.hpp>
+#include <SDK/CUtlVector.hpp>
+#include <SDK/math/matrix.hpp>
 
 //#include "../../SDK/CGlobalVars.hpp"
 //#include "../../SDK/structs/Entity.hpp"

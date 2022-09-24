@@ -1,26 +1,26 @@
 #include "radar.hpp"
 
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/MapStruct.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/res.hpp>
+#include <utilities/console/console.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+
+#include <deps/ImGui/imgui.h>
+#include <deps/ImGui/imgui_internal.h>
+
 #include <d3dx9.h>
-
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-#include "../../../../../SDK/MapStruct.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../config/vars.hpp"
-#include "../../../../globals.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../../utilities/math/math.hpp"
-#include "../../../utilities/res.hpp"
-#include "../../../utilities/console/console.hpp"
-#include "../../../../../utilities/tools/tools.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
-
-#include "../../../dependencies/ImGui/imgui.h"
-#include "../../../dependencies/ImGui/imgui_internal.h"
 
 void Radar::init()
 {
@@ -36,7 +36,7 @@ Vector2D Radar::entToRadar(const Vector& eye, const Vector& angles, const Vector
 
 	auto yawDeg = angles.y - 90.0f;
 	// calculate dots of radian and return correct view
-	const auto yawToRadian = DEG2RAD(yawDeg);
+	const auto yawToRadian = math::DEG2RAD(yawDeg);
 	float dotX = (directionX * std::cos(yawToRadian) - directionY * std::sin(yawToRadian)) / 20.0f;
 	float dotY = (directionX * std::sin(yawToRadian) + directionY * std::cos(yawToRadian)) / 20.0f;
 	// return correct scale, it zooms in/out depends what value is thrown
@@ -91,7 +91,7 @@ void Radar::manuallyInitPos()
 	if (!game::isAvailable())
 		return;
 
-	const auto map = reinterpret_cast<MapStruct*>(utilities::findHudElement(XOR("CCSGO_MapOverview")));
+	const auto map = reinterpret_cast<MapStruct*>(game::findHudElement(XOR("CCSGO_MapOverview")));
 	m_pos = map->m_origin;
 	m_scale = map->m_scale;
 
@@ -200,7 +200,7 @@ void Radar::draw()
 		auto rect = imRenderWindow.getRect();
 		float scaledFov = globals::FOV / 5.0f;
 		// assume calculation is only in straight line representing 2D, so max = 180 deg, and this is not correct in 100%, idk better solution
-		float fovAddon = rect.y / std::tan(DEG2RAD((180.0f - (globals::FOV + scaledFov)) / 2.0f));
+		float fovAddon = rect.y / std::tan(math::DEG2RAD((180.0f - (globals::FOV + scaledFov)) / 2.0f));
 
 		float middleX = rect.x / 2.0f;
 		float middleY = rect.y / 2.0f;
@@ -252,8 +252,8 @@ void Radar::draw()
 
 			auto dotRad = config.get<float>(vars.fRadarLenght);
 
-			const auto finalX = dotRad * std::cos(DEG2RAD(rotated));
-			const auto finalY = dotRad * std::sin(DEG2RAD(rotated));
+			const auto finalX = dotRad * std::cos(math::DEG2RAD(rotated));
+			const auto finalY = dotRad * std::sin(math::DEG2RAD(rotated));
 
 			if (config.get<bool>(vars.bRadarRanges) ? true : !entRotatedPos.isZero())
 			{

@@ -1,8 +1,8 @@
 #include "hooks.hpp"
 
-#include "../../SDK/interfaces/interfaces.hpp"
-
 #include "../features/classes/doPostScreen.hpp"
+
+#include <SDK/interfaces/interfaces.hpp>
 
 int __stdcall hooks::doPostScreenEffects::hooked(int val)
 {

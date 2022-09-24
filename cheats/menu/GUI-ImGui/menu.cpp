@@ -1,13 +1,17 @@
 #include "menu.hpp"
-#include "../../../dependencies/ImGui/imgui.h"
-#include "../../../dependencies/ImGui/imgui_impl_win32.h"
-#include "../../../dependencies/ImGui/imgui_impl_dx9.h"
-#include "../../../dependencies/ImGui/imgui_internal.h"
-#include "../../../utilities/utilities.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../../utilities/console/console.hpp"
-#include "../../../config/vars.hpp"
+
 #include "styles.hpp"
+
+#include <deps/ImGui/imgui.h>
+#include <deps/ImGui/imgui_impl_win32.h>
+#include <deps/ImGui/imgui_impl_dx9.h>
+#include <deps/ImGui/imgui_internal.h>
+#include <deps/ImGui/imgui_stdlib.h>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/console/console.hpp>
+#include <config/vars.hpp>
 
 void runStyle(const int idx);
 
@@ -52,7 +56,6 @@ void ImGuiMenu::example()
 
 #pragma region menu_functionalities
 #include "imguiaddons.hpp"
-#include "../../../config/vars.hpp"
 #include "selections.hpp"
 
 static ImVec2 availRegion()
@@ -379,12 +382,11 @@ static void renderVisuals()
 	ImGui::Columns();
 }
 
-#include "../../features/sources/visuals/radar/radar.hpp"
-#include "../../features/sources/visuals/world/skybox.hpp"
-#include "../../features/sources/visuals/world/weather.hpp"
-#include "../../features/sources/visuals/world/ambient.hpp"
-#include "../../features/sources/visuals/world/tone.hpp"
-#include "../../../dependencies/ImGui/imgui_stdlib.h"
+#include <features/sources/visuals/radar/radar.hpp>
+#include <features/sources/visuals/world/skybox.hpp>
+#include <features/sources/visuals/world/weather.hpp>
+#include <features/sources/visuals/world/ambient.hpp>
+#include <features/sources/visuals/world/tone.hpp>
 
 static void renderMisc()
 {
@@ -976,8 +978,8 @@ void ImGuiMenu::renderAll()
 		float width = ImGui::GetContentRegionAvail().x;
 
 		// remove tab underline
-		ImGui::PushStyleColor(ImGuiCol_TabActive, U32(Colors::Blank));
-		ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, U32(Colors::Blank));
+		ImGui::PushStyleColor(ImGuiCol_TabActive, Color::U32(Colors::Blank));
+		ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, Color::U32(Colors::Blank));
 
 		if (ImGui::BeginTabBar(XOR("tabbar")))
 		{

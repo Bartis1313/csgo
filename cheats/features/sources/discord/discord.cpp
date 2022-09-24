@@ -2,19 +2,17 @@
 
 #include <discord_register.h>
 #include <discord_rpc.h>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <config/vars.hpp>
+#include <game/game.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
 
 #include <cstring>
 #include <chrono>
 #include <unordered_map>
-
-#include "../../../SDK/IVEngineClient.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../config/vars.hpp"
-#include "../../../SDK/CGlobalVars.hpp"
-
-#include "../../../game.hpp"
-#include "../../../../utilities/tools/tools.hpp"
-#include "../../../../utilities/tools/wrappers.hpp"
 
 void DiscordPresence::init()
 {
@@ -55,9 +53,6 @@ static std::pair<std::string, std::string> getImage(const std::string& map)
 
 void DiscordPresence::run()
 {
-	if (!interfaces::done)
-		return;
-
 	if (!config.get<bool>(vars.bDiscord))
 		return;
 

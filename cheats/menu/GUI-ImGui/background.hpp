@@ -2,8 +2,8 @@
 
 #include <vector>
 
-#include "../../../SDK/Color.hpp"
-#include "../../../SDK/math/Vector2D.hpp"
+#include <SDK/Color.hpp>
+#include <SDK/math/Vector2D.hpp>
 
 struct ImDrawList;
 

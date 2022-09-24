@@ -1,25 +1,26 @@
 #include "nadewarn.hpp"
 
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/IWeapon.hpp"
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/CGlobalVars.hpp"
-#include "../../../../../SDK/IEngineTrace.hpp"
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/Convar.hpp"
-#include "../../../../../SDK/Enums.hpp"
-#include "../../../../../SDK/CUserCmd.hpp"
-
-#include "../../../config/vars.hpp"
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../utilities/renderer/renderer.hpp"
-#include "../../../utilities/math/math.hpp"
-#include "../../../../../gamememory/memory.hpp"
-
-#include "../../../../../SDK/ClientClass.hpp"
-#include "../../../../../SDK/IVModelInfo.hpp"
-#include "../../../../../SDK/IClientEntityList.hpp"
+#include <SDK/math/Vector.hpp>
+#include <SDK/IWeapon.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/IEngineTrace.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/Convar.hpp>
+#include <SDK/Enums.hpp>
+#include <SDK/CUserCmd.hpp>
+#include <SDK/ClientClass.hpp>
+#include <SDK/IVModelInfo.hpp>
+#include <SDK/IClientEntityList.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <utilities/renderer/renderer.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/tools/tools.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <memory/memory.hpp>
 
 void GrenadeWarning::init()
 {
@@ -93,7 +94,7 @@ void GrenadeWarning::NadeTrace_t::pushEntity(const Vector& src, Trace_t& tr)
 	{
 		const static float weapon_molotov_maxdetonateslope = interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
 
-		if (bool res = tr.didHit() && tr.m_plane.m_normal.z >= std::cos(DEG2RAD(weapon_molotov_maxdetonateslope)); res)
+		if (bool res = tr.didHit() && tr.m_plane.m_normal.z >= std::cos(math::DEG2RAD(weapon_molotov_maxdetonateslope)); res)
 			destroyTrace();
 	}
 }
@@ -325,7 +326,7 @@ bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 		auto screenPosition = centre;
 		screenPosition.x -= std::clamp(localPos.distTo(m_pos), 120.0f, centre.y - 12.0f); // 12.0f - min size possible here so wanna clip it
 
-		const auto pos = rotatePoint2D(centre, screenPosition, DEG2RAD(angleToNade.y));
+		const auto pos = rotatePoint2D(centre, screenPosition, math::DEG2RAD(angleToNade.y));
 
 		imRender.drawCircleFilled(pos.x, pos.y, rad, 32, Colors::Black);
 		imRender.drawProgressRing(pos.x, pos.y, rad, 32, -90.0f, scale, 3.0f, Colors::Green);

@@ -1,9 +1,10 @@
 #include "fog.hpp"
 
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
 #include "../../cache/cache.hpp"
+
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
 
 void FogController::init()
 {

@@ -1,7 +1,8 @@
 #include "hooks.hpp"
 
-#include "../../SDK/MapStruct.hpp"
 #include "../features/classes/overViewMap.hpp"
+
+#include <SDK/MapStruct.hpp>
 
 int __fastcall hooks::unknownOverViewFun::hooked(MapStruct* map, void* edx, int unk)
 {

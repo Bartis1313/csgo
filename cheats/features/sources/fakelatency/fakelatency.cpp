@@ -1,10 +1,9 @@
 #include "fakelatency.hpp"
 
-#include "../../../SDK/IVEngineClient.hpp"
-#include "../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../config/vars.hpp"
-#include "../../../game.hpp"
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <config/vars.hpp>
+#include <game/game.hpp>
 
 void FakeLatency::init()
 {

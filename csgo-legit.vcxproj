@@ -43,16 +43,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SolutionDir)dependencies\discord\include;$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)dependencies\freetype\win32\debug;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)gamememory;$(SolutionDir)utilities;$(SolutionDir)config;$(SolutionDir)dependencies;$(SolutionDir)cheats;$(SolutionDir)SDK;$(SolutionDir)dependencies\deps\discord\include;$(SolutionDir)dependencies\deps\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)dependencies\deps\freetype\win32\debug;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
     <OutDir>.\build\debug\</OutDir>
     <TargetName>Debug_$(ProjectName)</TargetName>
     <SourcePath>$(SolutionDir)dependencies\discord\src;$(SourcePath)</SourcePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>.\build\Release\</OutDir>
-    <LibraryPath>$(SolutionDir)dependencies\freetype\win32\release;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
-    <IncludePath>$(SolutionDir)dependencies\discord\include;$(SolutionDir)dependencies\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)dependencies\deps\freetype\win32\release;$(DXSDK_DIR)Lib\x86;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)gamememory;$(SolutionDir)utilities;$(SolutionDir)config;$(SolutionDir)dependencies;$(SolutionDir)cheats;$(SolutionDir)SDK;$(SolutionDir)dependencies\deps\discord\include;$(SolutionDir)dependencies\deps\freetype\include;$(DXSDK_DIR)Include;$(IncludePath)</IncludePath>
     <TargetName>$(ProjectName)</TargetName>
     <SourcePath>$(SolutionDir)dependencies\discord\src;$(SourcePath)</SourcePath>
     <LinkIncremental>false</LinkIncremental>
@@ -177,6 +177,7 @@
     </ClCompile>
     <ClCompile Include="cheats\features\sources\RCS\RCS.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\hitmarker\hitmark.cpp" />
+    <ClCompile Include="cheats\features\sources\visuals\list\playerlist.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\mirrorcam\mirrorCam.cpp" />
     <ClCompile Include="cheats\features\sources\particle\particle.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\misc\crosshair.cpp" />
@@ -221,16 +222,17 @@
     <ClCompile Include="cheats\hooks\unknownOverviewMap.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
     <ClCompile Include="cheats\menu\x88Menu\x88menu.cpp" />
-    <ClCompile Include="config\cfgcolor.cpp" />
-    <ClCompile Include="config\cfgWeapon.cpp" />
-    <ClCompile Include="config\key.cpp" />
-    <ClCompile Include="dependencies\discord\src\connection_win.cpp" />
-    <ClCompile Include="dependencies\discord\src\discord_register_win.cpp" />
-    <ClCompile Include="dependencies\discord\src\discord_rpc.cpp" />
-    <ClCompile Include="dependencies\discord\src\rpc_connection.cpp" />
-    <ClCompile Include="dependencies\discord\src\serialization.cpp" />
-    <ClCompile Include="gamememory\memory.cpp" />
-    <ClCompile Include="SDK\KeyValues.cpp" />
+    <ClCompile Include="config\config\cfgcolor.cpp" />
+    <ClCompile Include="config\config\cfgWeapon.cpp" />
+    <ClCompile Include="config\config\key.cpp" />
+    <ClCompile Include="dependencies\deps\discord\src\connection_win.cpp" />
+    <ClCompile Include="dependencies\deps\discord\src\discord_register_win.cpp" />
+    <ClCompile Include="dependencies\deps\discord\src\discord_rpc.cpp" />
+    <ClCompile Include="dependencies\deps\discord\src\rpc_connection.cpp" />
+    <ClCompile Include="dependencies\deps\discord\src\serialization.cpp" />
+    <ClCompile Include="gamememory\memory\memory.cpp" />
+    <ClCompile Include="SDK\SDK\interfaces\interfaces.cpp" />
+    <ClCompile Include="SDK\SDK\KeyValues.cpp" />
     <ClCompile Include="SEHcatch.cpp" />
     <ClCompile Include="cheats\features\sources\visuals\chams\chams.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -242,7 +244,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\features\sources\visuals\radar\radar.cpp" />
-    <ClCompile Include="cheats\game.cpp">
+    <ClCompile Include="cheats\game\game.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\hooks\createMove.cpp">
@@ -273,19 +275,19 @@
     <ClCompile Include="cheats\menu\GUI-ImGui\imguiaddons.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\menu.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\styles.cpp" />
-    <ClCompile Include="config\config.cpp">
+    <ClCompile Include="config\config\config.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="dependencies\ImGui\imgui.cpp" />
-    <ClCompile Include="dependencies\ImGui\imgui_demo.cpp" />
-    <ClCompile Include="dependencies\ImGui\imgui_draw.cpp" />
-    <ClCompile Include="dependencies\ImGui\imgui_freetype.cpp" />
-    <ClCompile Include="dependencies\ImGui\imgui_impl_dx9.cpp" />
-    <ClCompile Include="dependencies\ImGui\imgui_impl_win32.cpp" />
-    <ClCompile Include="dependencies\ImGui\imgui_stdlib.cpp" />
-    <ClCompile Include="dependencies\ImGui\imgui_tables.cpp" />
-    <ClCompile Include="dependencies\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="dependencies\minhook\buffer.c">
+    <ClCompile Include="dependencies\deps\ImGui\imgui.cpp" />
+    <ClCompile Include="dependencies\deps\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="dependencies\deps\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="dependencies\deps\ImGui\imgui_freetype.cpp" />
+    <ClCompile Include="dependencies\deps\ImGui\imgui_impl_dx9.cpp" />
+    <ClCompile Include="dependencies\deps\ImGui\imgui_impl_win32.cpp" />
+    <ClCompile Include="dependencies\deps\ImGui\imgui_stdlib.cpp" />
+    <ClCompile Include="dependencies\deps\ImGui\imgui_tables.cpp" />
+    <ClCompile Include="dependencies\deps\ImGui\imgui_widgets.cpp" />
+    <ClCompile Include="dependencies\deps\minhook\buffer.c">
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)-c.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -294,7 +296,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="dependencies\minhook\hde\hde32.c">
+    <ClCompile Include="dependencies\deps\minhook\hde\hde32.c">
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)-c.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -303,7 +305,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="dependencies\minhook\hde\hde64.c">
+    <ClCompile Include="dependencies\deps\minhook\hde\hde64.c">
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)-c.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -312,7 +314,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="dependencies\minhook\hook.c">
+    <ClCompile Include="dependencies\deps\minhook\hook.c">
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)-c.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -321,7 +323,7 @@
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
       </ForcedIncludeFiles>
     </ClCompile>
-    <ClCompile Include="dependencies\minhook\trampoline.c">
+    <ClCompile Include="dependencies\deps\minhook\trampoline.c">
       <PrecompiledHeaderOutputFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(IntDir)$(TargetName)-c.pch</PrecompiledHeaderOutputFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <ForcedIncludeFiles Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -335,29 +337,28 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="SDK\checksum_crc.cpp" />
-    <ClCompile Include="SDK\Color.cpp" />
-    <ClCompile Include="SDK\structs\Entity.cpp">
+    <ClCompile Include="SDK\SDK\checksum_crc.cpp" />
+    <ClCompile Include="SDK\SDK\Color.cpp" />
+    <ClCompile Include="SDK\SDK\structs\Entity.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="utilities\console\console.cpp">
+    <ClCompile Include="setup.cpp" />
+    <ClCompile Include="utilities\utilities\console\console.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="utilities\inputSystem.cpp" />
-    <ClCompile Include="utilities\math\math.cpp">
+    <ClCompile Include="utilities\utilities\inputSystem.cpp" />
+    <ClCompile Include="utilities\utilities\math\math.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="utilities\netvars\netvars.cpp">
+    <ClCompile Include="utilities\utilities\netvars\netvars.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="utilities\renderer\renderer.cpp">
+    <ClCompile Include="utilities\utilities\renderer\renderer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="utilities\res.cpp" />
-    <ClCompile Include="utilities\utilities.cpp">
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="SDK\interfaces\interfaces.cpp">
+    <ClCompile Include="utilities\utilities\renderer\structures.cpp" />
+    <ClCompile Include="utilities\utilities\res.cpp" />
+    <ClCompile Include="utilities\utilities\utilities.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="source.cpp">
@@ -396,6 +397,7 @@
     <ClInclude Include="cheats\features\sources\prediction\prediction.hpp" />
     <ClInclude Include="cheats\features\sources\RCS\RCS.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\hitmarker\hitmark.hpp" />
+    <ClInclude Include="cheats\features\sources\visuals\list\playerlist.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\mirrorcam\mirrorCam.hpp" />
     <ClInclude Include="cheats\features\sources\particle\particle.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\misc\crosshair.hpp" />
@@ -429,84 +431,88 @@
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />
-    <ClInclude Include="config\cfgcolor.hpp" />
-    <ClInclude Include="config\cfgWeapon.hpp" />
-    <ClInclude Include="config\enums.hpp" />
-    <ClInclude Include="config\key.hpp" />
-    <ClInclude Include="dependencies\discord\include\discord_register.h" />
-    <ClInclude Include="dependencies\discord\include\discord_rpc.h" />
-    <ClInclude Include="dependencies\discord\src\backoff.h" />
-    <ClInclude Include="dependencies\discord\src\connection.h" />
-    <ClInclude Include="dependencies\discord\src\msg_queue.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\allocators.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\cursorstreamwrapper.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\document.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\encodedstream.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\encodings.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\error\en.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\error\error.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\filereadstream.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\filewritestream.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\fwd.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\biginteger.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\clzll.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\diyfp.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\dtoa.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\ieee754.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\itoa.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\meta.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\pow10.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\regex.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\stack.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\strfunc.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\strtod.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\internal\swap.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\istreamwrapper.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\memorybuffer.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\memorystream.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\msinttypes\inttypes.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\msinttypes\stdint.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\ostreamwrapper.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\pointer.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\prettywriter.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\rapidjson.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\reader.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\schema.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\stream.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\stringbuffer.h" />
-    <ClInclude Include="dependencies\discord\src\rapidjson\writer.h" />
-    <ClInclude Include="dependencies\discord\src\rpc_connection.h" />
-    <ClInclude Include="dependencies\discord\src\serialization.h" />
-    <ClInclude Include="dependencies\stb_image.h" />
-    <ClInclude Include="gamememory\memory.hpp" />
+    <ClInclude Include="config\config\cfgcolor.hpp" />
+    <ClInclude Include="config\config\cfgWeapon.hpp" />
+    <ClInclude Include="config\config\enums.hpp" />
+    <ClInclude Include="config\config\key.hpp" />
+    <ClInclude Include="dependencies\deps\discord\include\discord_register.h" />
+    <ClInclude Include="dependencies\deps\discord\include\discord_rpc.h" />
+    <ClInclude Include="dependencies\deps\discord\src\backoff.h" />
+    <ClInclude Include="dependencies\deps\discord\src\connection.h" />
+    <ClInclude Include="dependencies\deps\discord\src\msg_queue.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\allocators.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\cursorstreamwrapper.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\document.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\encodedstream.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\encodings.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\error\en.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\error\error.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\filereadstream.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\filewritestream.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\fwd.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\biginteger.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\clzll.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\diyfp.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\dtoa.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\ieee754.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\itoa.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\meta.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\pow10.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\regex.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\stack.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\strfunc.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\strtod.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\internal\swap.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\istreamwrapper.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\memorybuffer.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\memorystream.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\msinttypes\inttypes.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\msinttypes\stdint.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\ostreamwrapper.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\pointer.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\prettywriter.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\rapidjson.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\reader.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\schema.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\stream.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\stringbuffer.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rapidjson\writer.h" />
+    <ClInclude Include="dependencies\deps\discord\src\rpc_connection.h" />
+    <ClInclude Include="dependencies\deps\discord\src\serialization.h" />
+    <ClInclude Include="dependencies\deps\stb_image.h" />
+    <ClInclude Include="gamememory\memory\memory.hpp" />
     <ClInclude Include="resource.h" />
-    <ClInclude Include="SDK\CClientEffectRegistration.hpp" />
-    <ClInclude Include="SDK\CEffectData.hpp" />
-    <ClInclude Include="SDK\CFlashlightEffect.hpp" />
-    <ClInclude Include="SDK\CGameRules.hpp" />
-    <ClInclude Include="SDK\CHudChat.hpp" />
-    <ClInclude Include="SDK\CParticelCollection.hpp" />
-    <ClInclude Include="SDK\CStudioHdr.hpp" />
-    <ClInclude Include="SDK\CTeslaInfo.hpp" />
-    <ClInclude Include="SDK\CUtlReference.hpp" />
-    <ClInclude Include="SDK\CUtlString.hpp" />
-    <ClInclude Include="SDK\CViewSetup.hpp" />
-    <ClInclude Include="SDK\IClientState.hpp" />
-    <ClInclude Include="SDK\IMatRenderContext.hpp" />
-    <ClInclude Include="SDK\IMemAlloc.hpp" />
-    <ClInclude Include="SDK\ITexture.hpp" />
-    <ClInclude Include="SDK\IViewRender.hpp" />
-    <ClInclude Include="SDK\KeyValues.hpp" />
-    <ClInclude Include="SDK\KeyValuesSys.hpp" />
-    <ClInclude Include="SDK\MapStruct.hpp" />
-    <ClInclude Include="SDK\math\AABB.hpp" />
+    <ClInclude Include="SDK\SDK\CClientEffectRegistration.hpp" />
+    <ClInclude Include="SDK\SDK\CEffectData.hpp" />
+    <ClInclude Include="SDK\SDK\CFlashlightEffect.hpp" />
+    <ClInclude Include="SDK\SDK\CGameRules.hpp" />
+    <ClInclude Include="SDK\SDK\CHudChat.hpp" />
+    <ClInclude Include="SDK\SDK\CParticelCollection.hpp" />
+    <ClInclude Include="SDK\SDK\CStudioHdr.hpp" />
+    <ClInclude Include="SDK\SDK\CTeslaInfo.hpp" />
+    <ClInclude Include="SDK\SDK\CUtlReference.hpp" />
+    <ClInclude Include="SDK\SDK\CUtlString.hpp" />
+    <ClInclude Include="SDK\SDK\CViewSetup.hpp" />
+    <ClInclude Include="SDK\SDK\IClientState.hpp" />
+    <ClInclude Include="SDK\SDK\IMatRenderContext.hpp" />
+    <ClInclude Include="SDK\SDK\IMemAlloc.hpp" />
+    <ClInclude Include="SDK\SDK\interfaces\interfaces.hpp" />
+    <ClInclude Include="SDK\SDK\ITexture.hpp" />
+    <ClInclude Include="SDK\SDK\IViewRender.hpp" />
+    <ClInclude Include="SDK\SDK\KeyValues.hpp" />
+    <ClInclude Include="SDK\SDK\KeyValuesSys.hpp" />
+    <ClInclude Include="SDK\SDK\MapStruct.hpp" />
+    <ClInclude Include="SDK\SDK\math\AABB.hpp" />
+    <ClInclude Include="SDK\SDK\math\matrix.hpp" />
+    <ClInclude Include="SDK\SDK\math\Vector.hpp" />
+    <ClInclude Include="SDK\SDK\math\Vector2D.hpp" />
     <ClInclude Include="SEHcatch.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\chams\chams.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\player\player.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\glow\glow.hpp" />
     <ClInclude Include="cheats\features\sources\visuals\radar\radar.hpp" />
-    <ClInclude Include="cheats\game.hpp" />
-    <ClInclude Include="cheats\globals.hpp" />
+    <ClInclude Include="cheats\game\game.hpp" />
+    <ClInclude Include="cheats\game\globals.hpp" />
     <ClInclude Include="cheats\hooks\hooks.hpp" />
     <ClInclude Include="cheats\hooks\helpers\helper.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\imguiaddons.hpp" />
@@ -514,200 +520,200 @@
     <ClInclude Include="cheats\menu\GUI-ImGui\selections.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\styles.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\tabrender.hpp" />
-    <ClInclude Include="config\vars.hpp" />
-    <ClInclude Include="dependencies\freetype\include\freetype\config\ftconfig.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\config\ftheader.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\config\ftmodule.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\config\ftoption.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\config\ftstdlib.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\config\integer-types.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\config\mac-support.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\config\public-macros.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\freetype.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftadvanc.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftbbox.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftbdf.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftbitmap.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftbzip2.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftcache.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftchapters.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftcid.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftcolor.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftdriver.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\fterrdef.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\fterrors.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftfntfmt.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftgasp.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftglyph.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftgxval.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftgzip.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftimage.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftincrem.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftlcdfil.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftlist.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftlogging.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftlzw.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftmac.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftmm.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftmodapi.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftmoderr.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftotval.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftoutln.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftparams.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftpfr.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftrender.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftsizes.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftsnames.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftstroke.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftsynth.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftsystem.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\fttrigon.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\fttypes.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ftwinfnt.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\autohint.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\cffotypes.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\cfftypes.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\compiler-macros.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftcalc.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftdebug.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftdrv.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftgloadr.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\fthash.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftmemory.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftobjs.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftpsprop.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftrfork.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftserv.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftstream.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\fttrace.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\ftvalid.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\psaux.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\pshints.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svbdf.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svcfftl.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svcid.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svfntfmt.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svgldict.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svgxval.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svkern.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svmetric.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svmm.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svotval.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svpfr.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svpostnm.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svprop.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svpscmap.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svpsinfo.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svsfnt.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svttcmap.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svtteng.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svttglyf.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\services\svwinfnt.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\sfnt.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\svginterface.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\t1types.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\tttypes.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\internal\wofftypes.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\otsvg.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\t1tables.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\ttnameid.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\tttables.h" />
-    <ClInclude Include="dependencies\freetype\include\freetype\tttags.h" />
-    <ClInclude Include="dependencies\freetype\include\ft2build.h" />
-    <ClInclude Include="dependencies\ImGui\imconfig.h" />
-    <ClInclude Include="dependencies\ImGui\imgui.h" />
-    <ClInclude Include="dependencies\ImGui\imgui_freetype.h" />
-    <ClInclude Include="dependencies\ImGui\imgui_impl_dx9.h" />
-    <ClInclude Include="dependencies\ImGui\imgui_impl_win32.h" />
-    <ClInclude Include="dependencies\ImGui\imgui_internal.h" />
-    <ClInclude Include="dependencies\ImGui\imgui_stdlib.h" />
-    <ClInclude Include="dependencies\ImGui\imstb_rectpack.h" />
-    <ClInclude Include="dependencies\ImGui\imstb_textedit.h" />
-    <ClInclude Include="dependencies\ImGui\imstb_truetype.h" />
-    <ClInclude Include="dependencies\json.hpp" />
-    <ClInclude Include="dependencies\minhook\buffer.h" />
-    <ClInclude Include="dependencies\minhook\hde\hde32.h" />
-    <ClInclude Include="dependencies\minhook\hde\hde64.h" />
-    <ClInclude Include="dependencies\minhook\hde\pstdint.h" />
-    <ClInclude Include="dependencies\minhook\hde\table32.h" />
-    <ClInclude Include="dependencies\minhook\hde\table64.h" />
-    <ClInclude Include="dependencies\minhook\trampoline.h" />
+    <ClInclude Include="config\config\vars.hpp" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\config\ftconfig.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\config\ftheader.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\config\ftmodule.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\config\ftoption.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\config\ftstdlib.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\config\integer-types.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\config\mac-support.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\config\public-macros.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\freetype.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftadvanc.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftbbox.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftbdf.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftbitmap.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftbzip2.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftcache.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftchapters.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftcid.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftcolor.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftdriver.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\fterrdef.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\fterrors.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftfntfmt.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftgasp.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftglyph.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftgxval.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftgzip.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftimage.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftincrem.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftlcdfil.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftlist.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftlogging.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftlzw.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftmac.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftmm.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftmodapi.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftmoderr.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftotval.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftoutln.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftparams.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftpfr.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftrender.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftsizes.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftsnames.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftstroke.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftsynth.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftsystem.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\fttrigon.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\fttypes.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ftwinfnt.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\autohint.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\cffotypes.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\cfftypes.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\compiler-macros.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftcalc.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftdebug.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftdrv.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftgloadr.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\fthash.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftmemory.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftobjs.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftpsprop.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftrfork.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftserv.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftstream.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\fttrace.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\ftvalid.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\psaux.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\pshints.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svbdf.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svcfftl.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svcid.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svfntfmt.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svgldict.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svgxval.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svkern.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svmetric.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svmm.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svotval.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svpfr.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svpostnm.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svprop.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svpscmap.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svpsinfo.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svsfnt.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svttcmap.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svtteng.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svttglyf.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\services\svwinfnt.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\sfnt.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\svginterface.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\t1types.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\tttypes.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\internal\wofftypes.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\otsvg.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\t1tables.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\ttnameid.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\tttables.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\freetype\tttags.h" />
+    <ClInclude Include="dependencies\deps\freetype\include\ft2build.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imconfig.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imgui.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imgui_freetype.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imgui_impl_dx9.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imgui_impl_win32.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imgui_internal.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imgui_stdlib.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imstb_textedit.h" />
+    <ClInclude Include="dependencies\deps\ImGui\imstb_truetype.h" />
+    <ClInclude Include="dependencies\deps\json.hpp" />
+    <ClInclude Include="dependencies\deps\minhook\buffer.h" />
+    <ClInclude Include="dependencies\deps\minhook\hde\hde32.h" />
+    <ClInclude Include="dependencies\deps\minhook\hde\hde64.h" />
+    <ClInclude Include="dependencies\deps\minhook\hde\pstdint.h" />
+    <ClInclude Include="dependencies\deps\minhook\hde\table32.h" />
+    <ClInclude Include="dependencies\deps\minhook\hde\table64.h" />
+    <ClInclude Include="dependencies\deps\minhook\trampoline.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="SDK\animations.hpp" />
-    <ClInclude Include="SDK\CGameMovement.hpp" />
-    <ClInclude Include="SDK\checksum_crc.hpp" />
-    <ClInclude Include="SDK\ClientMode.hpp" />
-    <ClInclude Include="SDK\CPlayerResource.hpp" />
-    <ClInclude Include="SDK\IEffects.hpp" />
-    <ClInclude Include="SDK\InputSystem.hpp" />
-    <ClInclude Include="config\config.hpp" />
-    <ClInclude Include="dependencies\lazy_importer.hpp" />
-    <ClInclude Include="dependencies\minhook\Minhook.h" />
+    <ClInclude Include="SDK\SDK\animations.hpp" />
+    <ClInclude Include="SDK\SDK\CGameMovement.hpp" />
+    <ClInclude Include="SDK\SDK\checksum_crc.hpp" />
+    <ClInclude Include="SDK\SDK\ClientMode.hpp" />
+    <ClInclude Include="SDK\SDK\CPlayerResource.hpp" />
+    <ClInclude Include="SDK\SDK\IEffects.hpp" />
+    <ClInclude Include="SDK\SDK\InputSystem.hpp" />
+    <ClInclude Include="config\config\config.hpp" />
+    <ClInclude Include="dependencies\deps\lazy_importer.hpp" />
+    <ClInclude Include="dependencies\deps\minhook\Minhook.h" />
     <ClInclude Include="dependencies\interfaces\ienginetrace.hpp" />
-    <ClInclude Include="dependencies\xorstr.hpp" />
-    <ClInclude Include="SDK\Enums.hpp" />
-    <ClInclude Include="SDK\ICollideable.hpp" />
-    <ClInclude Include="SDK\ICvar.hpp" />
-    <ClInclude Include="SDK\IVEffects.hpp" />
-    <ClInclude Include="SDK\IViewRenderBeams.hpp" />
-    <ClInclude Include="SDK\CUtlVector.hpp" />
-    <ClInclude Include="SDK\structs\IDXandPaterrns.hpp" />
-    <ClInclude Include="utilities\console\console.hpp" />
-    <ClInclude Include="utilities\inputSystem.hpp" />
-    <ClInclude Include="utilities\math\math.hpp" />
-    <ClInclude Include="utilities\netvars\netvars.hpp" />
-    <ClInclude Include="utilities\pad.hpp" />
-    <ClInclude Include="utilities\renderer\iconfont.hpp" />
-    <ClInclude Include="utilities\renderer\renderer.hpp" />
+    <ClInclude Include="dependencies\deps\xorstr.hpp" />
+    <ClInclude Include="SDK\SDK\Enums.hpp" />
+    <ClInclude Include="SDK\SDK\ICollideable.hpp" />
+    <ClInclude Include="SDK\SDK\ICvar.hpp" />
+    <ClInclude Include="SDK\SDK\IVEffects.hpp" />
+    <ClInclude Include="SDK\SDK\IViewRenderBeams.hpp" />
+    <ClInclude Include="SDK\SDK\CUtlVector.hpp" />
+    <ClInclude Include="SDK\SDK\structs\indexes.hpp" />
+    <ClInclude Include="setup.hpp" />
+    <ClInclude Include="utilities\utilities\console\console.hpp" />
+    <ClInclude Include="utilities\utilities\console\consoleUtils.hpp" />
+    <ClInclude Include="utilities\utilities\inputSystem.hpp" />
+    <ClInclude Include="utilities\utilities\math\math.hpp" />
+    <ClInclude Include="utilities\utilities\netvars\netvars.hpp" />
+    <ClInclude Include="utilities\utilities\pad.hpp" />
+    <ClInclude Include="utilities\utilities\rand.hpp" />
+    <ClInclude Include="utilities\utilities\renderer\iconfont.hpp" />
+    <ClInclude Include="utilities\utilities\renderer\renderer.hpp" />
     <ClInclude Include="utilities\csgo.hpp" />
-    <ClInclude Include="utilities\res.hpp" />
-    <ClInclude Include="utilities\simpleTimer.hpp" />
-    <ClInclude Include="utilities\tools\tools.hpp" />
-    <ClInclude Include="utilities\tools\wrappers.hpp" />
-    <ClInclude Include="utilities\utilities.hpp" />
-    <ClInclude Include="SDK\CGlowManager.hpp" />
-    <ClInclude Include="SDK\ClientClass.hpp" />
-    <ClInclude Include="SDK\Color.hpp" />
-    <ClInclude Include="SDK\ConVar.hpp" />
-    <ClInclude Include="SDK\CUserCmd.hpp" />
-    <ClInclude Include="SDK\interfaces\interfaces.hpp" />
-    <ClInclude Include="SDK\ISurface.hpp" />
-    <ClInclude Include="SDK\IVDebugOverlay.hpp" />
-    <ClInclude Include="SDK\IVEngineClient.hpp" />
-    <ClInclude Include="SDK\IVModelInfo.hpp" />
-    <ClInclude Include="SDK\IVModelRender.hpp" />
-    <ClInclude Include="SDK\IBaseClientDll.hpp" />
-    <ClInclude Include="SDK\IClientEntityList.hpp" />
-    <ClInclude Include="SDK\material.hpp" />
-    <ClInclude Include="SDK\IGameEvent.hpp" />
-    <ClInclude Include="SDK\Input.hpp" />
-    <ClInclude Include="SDK\ILocalize.hpp" />
-    <ClInclude Include="SDK\IMaterialSystem.hpp" />
-    <ClInclude Include="SDK\IPanel.hpp" />
-    <ClInclude Include="SDK\IPrediction.hpp" />
-    <ClInclude Include="SDK\IVRenderView.hpp" />
-    <ClInclude Include="SDK\IVStudioRender.hpp" />
-    <ClInclude Include="SDK\IEngineTrace.hpp" />
-    <ClInclude Include="SDK\IWeapon.hpp" />
-    <ClInclude Include="SDK\CGlobalVars.hpp" />
-    <ClInclude Include="SDK\Recv.hpp" />
-    <ClInclude Include="SDK\vars.hpp" />
-    <ClInclude Include="SDK\math\Vector.hpp" />
-    <ClInclude Include="SDK\math\Vector2D.hpp" />
-    <ClInclude Include="SDK\math\matrix.hpp" />
-    <ClInclude Include="SDK\structs\Entity.hpp" />
-    <ClInclude Include="utilities\vfunc.hpp" />
+    <ClInclude Include="utilities\utilities\renderer\structures.hpp" />
+    <ClInclude Include="utilities\utilities\res.hpp" />
+    <ClInclude Include="utilities\utilities\simpleTimer.hpp" />
+    <ClInclude Include="utilities\utilities\tools\tools.hpp" />
+    <ClInclude Include="utilities\utilities\tools\wrappers.hpp" />
+    <ClInclude Include="utilities\utilities\utilities.hpp" />
+    <ClInclude Include="SDK\SDK\CGlowManager.hpp" />
+    <ClInclude Include="SDK\SDK\ClientClass.hpp" />
+    <ClInclude Include="SDK\SDK\Color.hpp" />
+    <ClInclude Include="SDK\SDK\ConVar.hpp" />
+    <ClInclude Include="SDK\SDK\CUserCmd.hpp" />
+    <ClInclude Include="SDK\SDK\ISurface.hpp" />
+    <ClInclude Include="SDK\SDK\IVDebugOverlay.hpp" />
+    <ClInclude Include="SDK\SDK\IVEngineClient.hpp" />
+    <ClInclude Include="SDK\SDK\IVModelInfo.hpp" />
+    <ClInclude Include="SDK\SDK\IVModelRender.hpp" />
+    <ClInclude Include="SDK\SDK\IBaseClientDll.hpp" />
+    <ClInclude Include="SDK\SDK\IClientEntityList.hpp" />
+    <ClInclude Include="SDK\SDK\material.hpp" />
+    <ClInclude Include="SDK\SDK\IGameEvent.hpp" />
+    <ClInclude Include="SDK\SDK\Input.hpp" />
+    <ClInclude Include="SDK\SDK\ILocalize.hpp" />
+    <ClInclude Include="SDK\SDK\IMaterialSystem.hpp" />
+    <ClInclude Include="SDK\SDK\IPanel.hpp" />
+    <ClInclude Include="SDK\SDK\IPrediction.hpp" />
+    <ClInclude Include="SDK\SDK\IVRenderView.hpp" />
+    <ClInclude Include="SDK\SDK\IVStudioRender.hpp" />
+    <ClInclude Include="SDK\SDK\IEngineTrace.hpp" />
+    <ClInclude Include="SDK\SDK\IWeapon.hpp" />
+    <ClInclude Include="SDK\SDK\CGlobalVars.hpp" />
+    <ClInclude Include="SDK\SDK\Recv.hpp" />
+    <ClInclude Include="SDK\SDK\vars.hpp" />
+    <ClInclude Include="SDK\SDK\structs\Entity.hpp" />
+    <ClInclude Include="utilities\utilities\vfunc.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="dependencies\images\fatchad.png" />
+    <Image Include="dependencies\deps\images\fatchad.png" />
   </ItemGroup>
   <ItemGroup>
-    <Library Include="dependencies\freetype\Win32\debug\freetype.lib" />
-    <Library Include="dependencies\freetype\Win32\release\freetype.lib" />
+    <Library Include="dependencies\deps\freetype\Win32\debug\freetype.lib" />
+    <Library Include="dependencies\deps\freetype\Win32\release\freetype.lib" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="dependencies\discord\src\CMakeLists.txt" />
-    <Text Include="dependencies\ImGui\LICENSE.txt" />
+    <Text Include="dependencies\deps\discord\src\CMakeLists.txt" />
+    <Text Include="dependencies\deps\ImGui\LICENSE.txt" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="csgo-legit.rc" />

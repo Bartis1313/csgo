@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../../classes/renderableToSurface.hpp"
-#include "../../../../../SDK/math/Vector.hpp"
-#include "../../../../../SDK/Color.hpp"
+#include <features/classes/renderableToSurface.hpp>
+#include <SDK/math/Vector.hpp>
+#include <SDK/Color.hpp>
 
 class Trails : RenderableSurfaceType
 {

@@ -1,11 +1,9 @@
 #include "particle.hpp"
 
-#include "../../../SDK/interfaces/interfaces.hpp"
-#include "../../../SDK/math/Vector.hpp"
-#include "../../../SDK/structs/IDXandPaterrns.hpp"
-
-#include "../../../utilities/utilities.hpp"
-#include "../../../../gamememory/memory.hpp"
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/math/Vector.hpp>
+#include <utilities/utilities.hpp>
+#include <memory/memory.hpp>
 
 void Particle::init()
 {

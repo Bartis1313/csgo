@@ -1,18 +1,17 @@
 #include "crosshair.hpp"
 
-#include "../../../../../SDK/IVEngineClient.hpp"
-#include "../../../../../SDK/IEngineTrace.hpp"
-#include "../../../../../SDK/ICvar.hpp"
-#include "../../../../../SDK/ConVar.hpp"
-#include "../../../../../SDK/IWeapon.hpp"
-#include "../../../../../SDK/interfaces/interfaces.hpp"
-
-#include "../../../../game.hpp"
-#include "../../../../globals.hpp"
-#include "../../../../../config/vars.hpp"
-#include "../../../../../utilities/tools/wrappers.hpp"
-#include "../../../../../utilities/math/math.hpp"
-#include "../../../../../utilities/renderer/renderer.hpp"
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/IEngineTrace.hpp>
+#include <SDK/ICvar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/IWeapon.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
+#include <game/globals.hpp>
+#include <config/vars.hpp>
+#include <utilities/tools/wrappers.hpp>
+#include <utilities/math/math.hpp>
+#include <utilities/renderer/renderer.hpp>
 
 void Crosshair::init()
 {
