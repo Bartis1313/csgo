@@ -2,7 +2,7 @@
 
 #include "menu.hpp"
 
-#include <deps/ImGui/imgui.h>
+#include <dependencies/ImGui/imgui.h>
 #include <game/globals.hpp>
 #include <utilities/utilities.hpp>
 #include <utilities/rand.hpp>

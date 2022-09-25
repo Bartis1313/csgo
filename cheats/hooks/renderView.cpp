@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/classes/renderView.hpp"
+#include "../classes/renderView.hpp"
 
 #include <SDK/CViewSetup.hpp>
 

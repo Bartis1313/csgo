@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/classes/overViewMap.hpp"
+#include "../classes/overViewMap.hpp"
 
 #include <SDK/MapStruct.hpp>
 

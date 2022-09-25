@@ -1,4 +1,4 @@
-#include "setup.hpp"
+#include "setup/setup.hpp"
 
 #include <game/globals.hpp>
 #include <utilities/tools/tools.hpp>

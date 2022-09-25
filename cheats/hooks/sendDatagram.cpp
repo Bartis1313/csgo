@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/sources/fakelatency/fakelatency.hpp"
+#include "../features/fakelatency/fakelatency.hpp"
 
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/ICvar.hpp>

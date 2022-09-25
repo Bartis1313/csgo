@@ -1,7 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/classes/renderableToSurface.hpp"
-#include "../../resource.h"
+#include "../classes/renderableToSurface.hpp"
 
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/IPanel.hpp>

@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/sources/visuals/world/modulateColors.hpp"
+#include "../features/visuals/world/modulateColors.hpp"
 
 #include <game/globals.hpp>
 

@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/classes/frameStage.hpp"
+#include "../classes/frameStage.hpp"
 
 #include <SDK/interfaces/interfaces.hpp>
 

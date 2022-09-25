@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include <memory/memory.hpp>
+#include <gamememory/memory.hpp>
 #include <SDK/structs/Entity.hpp>
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/IVEngineClient.hpp>

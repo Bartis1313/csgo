@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/classes/drawModel.hpp"
+#include "../classes/drawModel.hpp"
 
 #include <SDK/IVModelRender.hpp>
 #include <SDK/IVEngineClient.hpp>

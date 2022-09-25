@@ -1,11 +1,10 @@
 #include "hooks.hpp"
 
-#include "../features/classes/renderableToPresent.hpp"
-#include "../../resource.h"
+#include "../classes/renderableToPresent.hpp"
 
-#include <deps/ImGui/imgui_impl_dx9.h>
-#include <deps/ImGui/imgui_impl_win32.h>
-#include <deps/ImGui/imgui.h>
+#include <dependencies/ImGui/imgui_impl_dx9.h>
+#include <dependencies/ImGui/imgui_impl_win32.h>
+#include <dependencies/ImGui/imgui.h>
 #include <menu/GUI-ImGui/menu.hpp>
 #include <menu/GUI-ImGui/background.hpp>
 #include <utilities/renderer/renderer.hpp>

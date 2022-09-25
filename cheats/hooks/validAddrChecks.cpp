@@ -1,7 +1,7 @@
 #include "hooks.hpp"
 
 #include <config/vars.hpp>
-#include <memory/memory.hpp>
+#include <gamememory/memory.hpp>
 
 #include <intrin.h>
 

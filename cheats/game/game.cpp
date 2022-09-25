@@ -4,7 +4,7 @@
 #include <SDK/CUserCmd.hpp>
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
-#include <memory/memory.hpp>
+#include <gamememory/memory.hpp>
 
 bool game::isAvailable()
 {

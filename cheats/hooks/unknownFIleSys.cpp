@@ -3,12 +3,12 @@
 #include <d3dx9.h>
 #include <intrin.h>
 
-#include "../features/sources/visuals/radar/radar.hpp"
+#include "../features/visuals/radar/radar.hpp"
 
 #include <SDK/interfaces/interfaces.hpp>
 #include <utilities/console/console.hpp>
 #include <utilities/tools/tools.hpp>
-#include <memory/memory.hpp>
+#include <gamememory/memory.hpp>
 
 #define DDS_HEADER 542327876
 

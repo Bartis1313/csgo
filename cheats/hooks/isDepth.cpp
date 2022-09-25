@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/sources/visuals/misc/motionblur.hpp"
+#include "../features/visuals/misc/motionblur.hpp"
 
 bool __stdcall hooks::isDepthOfField::hooked()
 {

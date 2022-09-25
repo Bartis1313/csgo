@@ -1,9 +1,9 @@
 #include "hooks.hpp"
 
-#include "../features/classes/createMove.hpp"
-#include "../features/sources/prediction/prediction.hpp"
-#include "../features/sources/misc/movement/movement.hpp"
-#include "../features/sources/misc/cameras/freeCam.hpp"
+#include "../classes/createMove.hpp"
+#include "../features/prediction/prediction.hpp"
+#include "../features/misc/movement/movement.hpp"
+#include "../features/misc/cameras/freeCam.hpp"
 
 #include <SDK/CUserCmd.hpp>
 #include <SDK/Input.hpp>

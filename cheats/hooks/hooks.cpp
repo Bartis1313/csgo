@@ -5,15 +5,15 @@
 #include <SDK/ConVar.hpp>
 #include <SDK/ICvar.hpp>
 #include <SDK/interfaces/interfaces.hpp>
-#include <deps/minhook/Minhook.h>
-#include <deps/ImGui/imgui.h>
-#include <deps/ImGui/imgui_impl_win32.h>
+#include <dependencies/minhook/Minhook.h>
+#include <dependencies/ImGui/imgui.h>
+#include <dependencies/ImGui/imgui_impl_win32.h>
 #include <menu/GUI-ImGui/menu.hpp>
 #include <config/vars.hpp>
 #include <utilities/renderer/renderer.hpp>
 #include <utilities/console/console.hpp>
 #include <utilities/tools/tools.hpp>
-#include <memory/memory.hpp>
+#include <gamememory/memory.hpp>
 
 void hooks::init()
 {

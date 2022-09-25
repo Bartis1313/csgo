@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/classes/doPostScreen.hpp"
+#include "../classes/doPostScreen.hpp"
 
 #include <SDK/interfaces/interfaces.hpp>
 

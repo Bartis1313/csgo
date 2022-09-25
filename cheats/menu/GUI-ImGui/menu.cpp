@@ -2,11 +2,11 @@
 
 #include "styles.hpp"
 
-#include <deps/ImGui/imgui.h>
-#include <deps/ImGui/imgui_impl_win32.h>
-#include <deps/ImGui/imgui_impl_dx9.h>
-#include <deps/ImGui/imgui_internal.h>
-#include <deps/ImGui/imgui_stdlib.h>
+#include <dependencies/ImGui/imgui.h>
+#include <dependencies/ImGui/imgui_impl_win32.h>
+#include <dependencies/ImGui/imgui_impl_dx9.h>
+#include <dependencies/ImGui/imgui_internal.h>
+#include <dependencies/ImGui/imgui_stdlib.h>
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/renderer/renderer.hpp>
@@ -382,11 +382,11 @@ static void renderVisuals()
 	ImGui::Columns();
 }
 
-#include <features/sources/visuals/radar/radar.hpp>
-#include <features/sources/visuals/world/skybox.hpp>
-#include <features/sources/visuals/world/weather.hpp>
-#include <features/sources/visuals/world/ambient.hpp>
-#include <features/sources/visuals/world/tone.hpp>
+#include <features/visuals/radar/radar.hpp>
+#include <features/visuals/world/skybox.hpp>
+#include <features/visuals/world/weather.hpp>
+#include <features/visuals/world/ambient.hpp>
+#include <features/visuals/world/tone.hpp>
 
 static void renderMisc()
 {

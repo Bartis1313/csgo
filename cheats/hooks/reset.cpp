@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include <deps/ImGui/imgui_impl_dx9.h>
+#include <dependencies/ImGui/imgui_impl_dx9.h>
 
 #include <d3d9.h>
 

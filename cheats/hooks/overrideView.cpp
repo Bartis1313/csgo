@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-#include "../features/classes/overrideView.hpp"
+#include "../classes/overrideView.hpp"
 
 #include <SDK/CViewSetup.hpp>
 #include <SDK/structs/Entity.hpp>

@@ -4,7 +4,7 @@
 
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
-#include <memory/memory.hpp>
+#include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
 bool __fastcall hooks::isHltv::hooked(FAST_ARGS)
