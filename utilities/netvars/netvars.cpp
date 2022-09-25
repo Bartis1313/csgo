@@ -132,7 +132,7 @@ void NetvarManager::dump(RecvTable* recvTable)
 		if (::isdigit(recvProp->m_varName[0]))
 			continue;
 
-		file << FORMAT(XOR(" | [{}::{}] -> 0x{:X} -> ()"),
+		file << FORMAT(XOR("[{}::{}] -> 0x{:X} -> ({})"),
 			recvTable->m_netTableName,
 			recvName, recvProp->m_offset,
 			getType(recvProp))
@@ -143,18 +143,23 @@ void NetvarManager::dump(RecvTable* recvTable)
 	}
 }
 
+#include "../simpleTimer.hpp"
+
 void NetvarManager::dump()
 {
-	file = std::ofstream{ config.getPathForSave(XOR("netvarsDump.txt")), std::ofstream::out | std::ofstream::trunc};
+	file = std::ofstream{ config.getPathForSave(XOR("netvarsDump.txt")), std::ofstream::out | std::ofstream::trunc };
+	file << FORMAT(XOR("Netvars from: {}"), utilities::getTime()) << "\n\n";
 
-	file << XOR("Netvars from: ") << utilities::getTime() << "\n\n";
-
+	TimeCount timer{};
 	auto client = interfaces::client->getAllClasses();
 	do {
 		const auto recvTable = client->m_recvTable;
 		dump(recvTable);
 		client = client->m_next;
 	} while (client);
+	timer.end();
+
+	file << '\n' << FORMAT(XOR("Finished in {:.4f} secs"), timer.getSec());
 
 	file.close();
 }
