@@ -22,6 +22,8 @@
 #include <utilities/tools/wrappers.hpp>
 #include <gamememory/memory.hpp>
 
+#include <ranges>
+
 void GrenadeWarning::init()
 {
 	
@@ -50,7 +52,7 @@ void GrenadeWarning::NadeTrace_t::physicsClipVelocity(const Vector& in, const Ve
 	constexpr float STOP_EPSILON = 0.1f;
 
 	float backoff = in.dot(normal) * overbounce;
-	for (int i = 0; i < 3; i++)
+	for (auto i : std::views::iota(0, 3))
 	{
 		out[i] = in[i] - (normal[i] * backoff);
 

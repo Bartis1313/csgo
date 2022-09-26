@@ -24,6 +24,8 @@
 
 #include "../../cache/cache.hpp"
 
+#include <ranges>
+
 #define DETONATE 1
 #define BOUNCE 2
 
@@ -102,12 +104,6 @@ public:
 	Color m_color;
 };
 
-static Color colorBased(int health)
-{
-	int g = health * 2.55f;
-	int r = 255 - g;
-	return Color{ r, g, 0, 255 };
-}
 
 void GrenadePrediction::init()
 {
@@ -174,7 +170,7 @@ void GrenadePrediction::draw()
 			if (Vector2D pos; imRender.worldToScreen(ent->absOrigin(), pos))
 			{
 				std::string text = dmgDealt < 0.0f ? XOR("DIE") : FORMAT(XOR("{:.2f}"), -resultDmg);
-				nadesDmg.emplace_back(pos, text, colorBased(dmgDealt));
+				nadesDmg.emplace_back(pos, text, Color::healthBased(dmgDealt));
 			}
 		}
 		else if (idx == WEAPON_MOLOTOV || idx == WEAPON_INCGRENADE)
@@ -260,7 +256,7 @@ void GrenadePrediction::simulate()
 	m_path.clear();
 	m_bounces.clear();
 
-	for (size_t i = 0; i < 1024; ++i) // 1024 is hardcoded, we prob will never ever reach it
+	for (auto i : std::views::iota(0, 1024)) // 1024 is hardcoded, we prob will never ever reach it
 	{
 		if (!logtimer)
 			m_path.push_back(vecSrc);
@@ -295,7 +291,7 @@ size_t GrenadePrediction::step(Vector& src, Vector& vecThrow, int tick, float in
 	if (checkDetonate(vecThrow, tr, tick, interval))
 		result |= DETONATE;
 
-	if (tr.m_fraction != 1.0f)
+	if (tr.didHit())
 	{
 		result |= BOUNCE;
 		resolveFlyCollisionCustom(tr, vecThrow, move, interval);
@@ -438,7 +434,7 @@ void GrenadePrediction::physicsClipVelocity(const Vector& in, const Vector& norm
 	constexpr float STOP_EPSILON = 0.1f;
 
 	float backoff = in.dot(normal) * overbounce;
-	for (int i = 0; i < 3; i++)
+	for (auto i : std::views::iota(0, 3))
 	{
 		out[i] = in[i] - (normal[i] * backoff);
 

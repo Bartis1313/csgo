@@ -117,7 +117,7 @@ std::string NetvarManager::getType(RecvProp* recvTable) const
 
 void NetvarManager::dump(RecvTable* recvTable)
 {
-	for (int i = 0; i < recvTable->m_propsNum; i++)
+	for (auto i : std::views::iota(0, recvTable->m_propsNum))
 	{
 		auto recvProp = &recvTable->m_props[i];
 
