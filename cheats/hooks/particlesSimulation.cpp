@@ -5,6 +5,7 @@
 
 #include <array>
 #include <string>
+#include <ranges>
 
 constexpr std::array mollyNames =
 {
@@ -50,7 +51,7 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	{
 		if (auto itr = std::find(smokenames.cbegin(), smokenames.cend(), name); itr != smokenames.cend())
 		{
-			for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+			for (auto i : std::views::iota(0, thisPtr->m_activeParticles))
 			{
 				thisPtr->m_particleAttributes.modulateColor(colorSmoke.getColor(), i);
 			}
@@ -61,7 +62,7 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	{
 		if (auto itr = std::find(bloodnames.cbegin(), bloodnames.cend(), name); itr != bloodnames.cend())
 		{
-			for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+			for (auto i : std::views::iota(0, thisPtr->m_activeParticles))
 			{
 				thisPtr->m_particleAttributes.modulateColor(colorBlood.getColor(), i);
 			}
@@ -72,7 +73,7 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	{
 		if (auto itr = std::find(mollyNames.cbegin(), mollyNames.cend(), name); itr != mollyNames.cend())
 		{
-			for (size_t i = 0; i < thisPtr->m_activeParticles; i++)
+			for (auto i : std::views::iota(0, thisPtr->m_activeParticles))
 			{
 				thisPtr->m_particleAttributes.modulateColor(colorMolly.getColor(), i);
 			}

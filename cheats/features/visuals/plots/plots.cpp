@@ -163,7 +163,7 @@ void Plots::drawVelocity()
 			{
 				imRenderWindow.drawLine(currentX, currentY, prevX, prevY, config.get<CfgColor>(vars.cVelocityPlot).getColor());
 				if (deltaVel > 20) // would need proper edge detection
-					imRenderWindow.drawText(static_cast<int>(currentX) + 10, static_cast<int>(currentY) - 10, scaledFontSize, ImFonts::franklinGothic30,
+					imRenderWindow.drawText(currentX + 10.0f, currentY - 10.0f, scaledFontSize, ImFonts::franklinGothic30,
 						std::format("{}", std::round(currentVel)), true, Colors::Pink, false);
 			}
 			prevX = currentX; prevY = currentY;

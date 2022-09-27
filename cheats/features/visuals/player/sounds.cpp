@@ -27,8 +27,8 @@ void SoundDraw::findBest(Entity_t* ent)
 
 	int index = ent->getIndex();
 
-	int x = globals::screenX / 2.0f;
-	int y = globals::screenY / 2.0f;
+	float x = globals::screenX / 2.0f;
+	float y = globals::screenY / 2.0f;
 	float maxDist = config.get<float>(vars.fStepMaxDist);
 	float maxDistLine = config.get<float>(vars.fStepMaxLineDist);
 
@@ -63,7 +63,7 @@ void SoundDraw::findBest(Entity_t* ent)
 		};
 
 		float rad = scaledFont(50.0f, 3.0f, 8.0f);
-		imRender.drawCircleFilled(elPos.x, elPos.y, rad, 32.0f,
+		imRender.drawCircleFilled(elPos.x, elPos.y, rad, 32,
 			config.get<CfgColor>(vars.cSoundEsp).getColor().getColorEditAlpha(alpha));
 
 		float distFromMiddle = std::round(std::sqrt((elPos.x - x) * (elPos.x - x) + (elPos.y - y) * (elPos.y - y)));
@@ -87,8 +87,8 @@ void SoundDraw::findBest(Entity_t* ent)
 
 void SoundDraw::draw()
 {
-	int x = globals::screenX / 2.0f;
-	int y = globals::screenY / 2.0f;
+	float x = globals::screenX / 2.0f;
+	float y = globals::screenY / 2.0f;
 
 	if (m_bestStep.m_player)
 	{

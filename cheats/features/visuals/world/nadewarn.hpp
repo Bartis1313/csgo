@@ -26,7 +26,6 @@ public:
 
 	virtual void init();
 private:
-
 	class NadeTrace_t
 	{
 	public:
@@ -35,7 +34,7 @@ private:
 			m_nadeOwner{ owner }, m_index{ index }
 		{}
 
-		void simulate(const Vector& pos, const Vector& velocity, float nadeThrowTime, int ticks);
+		void simulate(const Vector& pos, const Vector& velocity, float nadeThrowTime, uint32_t ticks);
 		bool draw(Entity_t* entity, WeaponIndex idx);
 	private:
 		void addGravityMove(Vector& move, Vector& vel, float frametime);
@@ -68,11 +67,6 @@ private:
 	};
 
 	std::unordered_map<int, NadeTrace_t> m_datas = {};
-public:
-	// studio is special case arg - because henade and flashbang have exactly same class id
-	// and people who think definition index is ok are wrong, player ents DON'T hold the nade anymore in that case
-	WeaponIndex getIndexByClass(int idx, Studiohdr_t* studio);
-
 	friend GrenadeWarningPaint;
 };
 

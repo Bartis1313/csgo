@@ -180,7 +180,7 @@ static void renderVisuals()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Player boxes"), []()
 					{
-						ImGui::Combo(XOR("Boxes mode"), &config.getRef<int>(vars.iEsp), selections::espNames, 40.0f);
+						ImGui::Combo(XOR("Boxes mode"), &config.getRef<int>(vars.iEsp), selections::espNames, 40);
 						ImGui::ColorPicker(XOR("color##box"), &config.getRef<CfgColor>(vars.cBox));
 						ImGui::ColorPicker(XOR("filled##box"), &config.getRef<CfgColor>(vars.cBoxFill));
 						ImGui::Checkbox(XOR("Outlined"), &config.getRef<bool>(vars.bBoxOutlined));

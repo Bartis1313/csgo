@@ -61,7 +61,7 @@ void BombOverlay::draw()
 	constexpr float bombRadius = 500.0f; // there is no info for this, run some map scanner
 	constexpr float sigma = (500.0f * 3.5f) / 3.0f;
 	const float hypDist = (m_bombEnt->getEyePos() - game::localPlayer->getEyePos()).length();
-	const float dmg = game::scaleDamageArmor((bombRadius * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), game::localPlayer->m_ArmorValue());
+	const float dmg = game::scaleDamageArmor((bombRadius * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), static_cast<float>(game::localPlayer->m_ArmorValue()));
 	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 
 	float scaled = m_bombEnt->m_hBombDefuser() > 0 ? (defusetime / defuseMaxTime) : (bombtime / m_timer->getFloat());

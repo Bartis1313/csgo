@@ -53,9 +53,9 @@ public:
 	[[nodiscard]] constexpr uint8_t aMultiplied() const { return static_cast<uint8_t>(m_color.at(3) * 255.0f); }
 
 	constexpr const float& operator[](int index) const { return m_color.at(index); }
-	constexpr float& operator[](int index) { return m_color.at(index); }
-	constexpr const float& at(int index) const { if (index >= m_color.size() || index < 0) throw std::runtime_error("Out of range!"); return m_color.at(index); } // as std, at() is safe
-	constexpr float& at(int index) { if (index >= m_color.size() || index < 0) throw std::runtime_error("Out of range!"); return m_color.at(index); }
+	constexpr float& operator[](size_t index) { return m_color.at(index); }
+	constexpr const float& at(size_t index) const { if (index >= m_color.size()) throw std::runtime_error("Out of range!"); return m_color.at(index); } // as std, at() is safe
+	constexpr float& at(size_t index) { if (index >= m_color.size()) throw std::runtime_error("Out of range!"); return m_color.at(index); }
 	constexpr bool operator == (const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
 	constexpr bool operator != (const Color& rhs) const { return !(operator==(rhs)); }
 	[[nodiscard]] static Color fromHSB(float hue, float saturation, float brightness);

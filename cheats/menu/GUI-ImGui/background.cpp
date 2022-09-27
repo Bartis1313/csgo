@@ -97,7 +97,7 @@ void Background::draw(ImDrawList* _draw)
 	if (!config.get<bool>(vars.bBackround))
 		return;
 
-	drawRectFilled(0, 0, globals::screenX, globals::screenY, Colors::Grey);
+	drawRectFilled(0.0f, 0.0f, static_cast<float>(globals::screenX), static_cast<float>(globals::screenY), Colors::Grey);
 
 	for (auto& el : m_particleArr)
 	{

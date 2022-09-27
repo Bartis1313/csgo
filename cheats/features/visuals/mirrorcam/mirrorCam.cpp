@@ -42,7 +42,7 @@ void MirrorCam::run(const CViewSetup& view)
 	v.y = v.yOld = 0;
 	v.m_width = v.m_widthOld = static_cast<int>(m_size.x);
 	v.m_height = v.m_heightOld = static_cast<int>(m_size.y);
-	v.m_aspectRatio = v.m_width / v.m_height;
+	v.m_aspectRatio = static_cast<float>(v.m_width / v.m_height);
 	v.m_nearZ = v.m_nearViewModelZ = 7.0f;
 	v.m_fov = 50.0f;
 

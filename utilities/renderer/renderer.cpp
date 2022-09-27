@@ -5,74 +5,14 @@
 #include "../tools/tools.hpp"
 
 #include <SDK/interfaces/interfaces.hpp>
-#include <SDK/ICollideable.hpp>
 #include <SDK/ISurface.hpp>
 #include <SDk/math/matrix.hpp>
 #include <SDK/math/Vector.hpp>
 #include <SDK/math/Vector2D.hpp>
 #include <SDK/Color.hpp>
-#include <SDK/structs/Entity.hpp>
 #include <utilities/res.hpp>
 
-bool Box::getBox(Entity_t* ent, Box& box)
-{
-	// pretty much nothing to explain here, using engine and detect mins/maxs
-	const auto col = ent->collideable();
-	if (!col)
-		return false;
-
-	const auto& min = col->OBBMins();
-	const auto& max = col->OBBMaxs();
-
-	const auto& matrixWorld = ent->renderableToWorldTransform();
-
-	float left = std::numeric_limits<float>::max();
-	float top = std::numeric_limits<float>::max();
-	float right = -std::numeric_limits<float>::max();
-	float bottom = -std::numeric_limits<float>::max();
-
-	std::array points =
-	{
-		Vector{ min.x, min.y, min.z },
-		Vector{ min.x, max.y, min.z },
-		Vector{ max.x, max.y, min.z },
-		Vector{ max.x, min.y, min.z },
-		Vector{ min.x, min.y, max.z },
-		Vector{ min.x, max.y, max.z },
-		Vector{ max.x, max.y, max.z },
-		Vector{ max.x, min.y, max.z }
-	};
-
-	std::array<ImVec2, 8> screen = {};
-	for (size_t i = 0; auto & el : screen)
-	{
-		if (!imRender.worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
-			return false;
-
-		left = std::min(left, el.x);
-		top = std::min(top, el.y);
-		right = std::max(right, el.x);
-		bottom = std::max(bottom, el.y);
-
-		box.points.at(i) = el;
-
-		i++;
-	}
-
-	box.x = left;
-	box.y = top;
-	box.w = right - left;
-	box.h = bottom - top;
-
-	// get important points, eg: if you use 3d box, you want to render health by quads, not rects
-
-	box.topleft = screen.at(7);
-	box.topright = screen.at(6);
-	box.bottomleft = screen.at(3);
-	box.bottomright = screen.at(2);
-
-	return true;
-}
+#include <ranges>
 
 #define BUFFER_SIZE 256
 
@@ -117,7 +57,8 @@ void SurfaceRender::drawLine(const int x, const int y, const int x2, const int y
 
 void SurfaceRender::drawLine(const Vector2D& start, const Vector2D& end, const Color& color)
 {
-	drawLine(start.x, start.y, end.x, end.y, color);
+	drawLine(static_cast<int>(start.x), static_cast<int>(start.y),
+		static_cast<int>(end.x), static_cast<int>(end.y), color);
 }
 
 void SurfaceRender::drawRect(const int x, const int y, const int w, const int h, const Color& color)
@@ -128,7 +69,8 @@ void SurfaceRender::drawRect(const int x, const int y, const int w, const int h,
 
 void SurfaceRender::drawRect(const Vector2D& start, const Vector2D& end, const Color& color)
 {
-	drawRect(start.x, start.y, end.x, end.y, color);
+	drawRect(static_cast<int>(start.x), static_cast<int>(start.y),
+		static_cast<int>(end.x), static_cast<int>(end.y), color);
 }
 
 void SurfaceRender::drawRectFilled(const int x, const int y, const int w, const int h, const Color& color)
@@ -296,10 +238,10 @@ void SurfaceRender::drawPolyLine(const int count, Vertex_t* verts, const Color& 
 	auto x = std::make_unique<int[]>(count);
 	auto y = std::make_unique<int[]>(count);
 
-	for (int i = 0; i < count; i++)
+	for (auto i : std::views::iota(0, count))
 	{
-		x[i] = verts[i].m_Position.x;
-		y[i] = verts[i].m_Position.y;
+		x[i] = static_cast<int>(verts[i].m_Position.x);
+		y[i] = static_cast<int>(verts[i].m_Position.y);
 	}
 
 	drawPolyLine(x.get(), y.get(), count, color);
@@ -319,8 +261,8 @@ void SurfaceRender::drawGradient(const int x, const int y, const int w, const in
 		interfaces::surface->drawSetColor(clr);
 		interfaces::surface->drawFilledFadeRect(
 			x, y, w, h,
-			reversed ? clr.a() : 0,
-			reversed ? 0 : clr.a(),
+			reversed ? clr.aMultiplied() : 0,
+			reversed ? 0 : clr.aMultiplied(),
 			horizontal ? true : false);
 	};
 
@@ -346,8 +288,8 @@ void SurfaceRender::drawGradient(const int x, const int y, const int w, const in
 		interfaces::surface->drawSetColor(clr);
 		interfaces::surface->drawFilledFadeRect(
 			x, y, w, h,
-			reversed ? clr.a() : 0,
-			reversed ? 0 : clr.a(),
+			reversed ? clr.aMultiplied() : 0,
+			reversed ? 0 : clr.aMultiplied(),
 			horizontal ? true : false);
 	};
 

@@ -98,7 +98,7 @@ void Aimbot::run(CUserCmd* cmd)
         int boneID = 8; // HEAD start
         if (auto modelStudio = interfaces::modelInfo->getStudioModel(player->getModel()); modelStudio != nullptr)
         {
-            if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(index); hitbox != nullptr)
+            if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(player->getIndex()); hitbox != nullptr)
             {
                 boneID = hitbox->m_bone;
             }

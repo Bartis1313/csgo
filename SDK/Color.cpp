@@ -106,7 +106,7 @@ Color Color::rainbowColor(const float gameTime, const float multiply)
 
 Color Color::healthBased(uint8_t health, uint8_t alpha)
 {
-	int g = health * 2.55f;
+	int g = static_cast<int>(health * 2.55f);
 	int r = 255 - g;
 	return Color(r, g, 0, alpha);
 }

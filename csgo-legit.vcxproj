@@ -62,7 +62,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>TurnOffAllWarnings</WarningLevel>
+      <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>false</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
@@ -127,6 +127,7 @@
       </ForcedUsingFiles>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <OmitFramePointers>true</OmitFramePointers>
+      <WarningLevel>Level3</WarningLevel>
     </ClCompile>
     <Link>
       <IgnoreSpecificDefaultLibraries>
@@ -355,6 +356,7 @@
     <ClCompile Include="utilities\netvars\netvars.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="utilities\renderer\BBox.cpp" />
     <ClCompile Include="utilities\renderer\renderer.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -506,6 +508,7 @@
     <ClInclude Include="SDK\MapStruct.hpp" />
     <ClInclude Include="SDK\math\AABB.hpp" />
     <ClInclude Include="SDK\math\matrix.hpp" />
+    <ClInclude Include="SDK\math\Vec.hpp" />
     <ClInclude Include="SDK\math\Vector.hpp" />
     <ClInclude Include="SDK\math\Vector2D.hpp" />
     <ClInclude Include="setup\SEHcatch.hpp" />
@@ -668,6 +671,7 @@
     <ClInclude Include="utilities\netvars\netvars.hpp" />
     <ClInclude Include="utilities\pad.hpp" />
     <ClInclude Include="utilities\rand.hpp" />
+    <ClInclude Include="utilities\renderer\BBox.hpp" />
     <ClInclude Include="utilities\renderer\iconfont.hpp" />
     <ClInclude Include="utilities\renderer\renderer.hpp" />
     <ClInclude Include="utilities\csgo.hpp" />

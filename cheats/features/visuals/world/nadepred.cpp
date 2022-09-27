@@ -162,7 +162,7 @@ void GrenadePrediction::draw()
 
 			float d = ((deltaDist - b) / c);
 			float dmg = a * std::exp(-d * d);
-			float resultDmg = game::scaleDamageArmor(dmg, ent->m_ArmorValue());
+			float resultDmg = game::scaleDamageArmor(dmg, static_cast<float>(ent->m_ArmorValue()));
 			if (resultDmg < 0.1f)
 				continue;
 
@@ -170,7 +170,7 @@ void GrenadePrediction::draw()
 			if (Vector2D pos; imRender.worldToScreen(ent->absOrigin(), pos))
 			{
 				std::string text = dmgDealt < 0.0f ? XOR("DIE") : FORMAT(XOR("{:.2f}"), -resultDmg);
-				nadesDmg.emplace_back(pos, text, Color::healthBased(dmgDealt));
+				nadesDmg.emplace_back(pos, text, Color::healthBased(static_cast<uint8_t>(dmgDealt)));
 			}
 		}
 		else if (idx == WEAPON_MOLOTOV || idx == WEAPON_INCGRENADE)
@@ -250,7 +250,7 @@ void GrenadePrediction::simulate()
 	setup(vecSrc, vecThrow, angles);
 
 	float interval = interfaces::globalVars->m_intervalPerTick;
-	int logstep = static_cast<int>(0.05f / interval);
+	size_t logstep = static_cast<size_t>(0.05f / interval);
 	size_t logtimer = 0;
 
 	m_path.clear();

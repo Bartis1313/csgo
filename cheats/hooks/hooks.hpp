@@ -37,7 +37,7 @@ struct MapStruct;
 class IMaterialSystem;
 struct Vector;
 
-#define FAST_ARGS void* thisptr, void* edx
+#define FAST_ARGS [[maybe_unused]] void* thisptr, [[maybe_unused]] void* edx
 
 namespace hooks
 {

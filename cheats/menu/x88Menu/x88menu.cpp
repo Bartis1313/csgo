@@ -13,6 +13,8 @@
 
 void X88Menu::draw()
 {
+	Vector2D man;
+
 	if (!config.get<bool>(vars.bMenuOpenedx88))
 		return;
 
@@ -23,7 +25,7 @@ void X88Menu::draw()
 	const static Color normal = Colors::White;
 	const static auto font = fonts::tahoma;
 
-	int x = globals::screenX * 0.2f;
+	int x = static_cast<int>(globals::screenX * 0.2f);
 	int y = 20;
 
 	// start
@@ -56,35 +58,33 @@ void X88Menu::draw()
 		auto value = x88p.second;
 		auto name = x88p.first;
 
+		auto vecSize = surfaceRender.getTextSizeXY(font, name);
+		auto vecX = static_cast<int>(vecSize.x);
+		auto vecY = static_cast<int>(vecSize.y);
+
 		if (std::holds_alternative<bool*>(value))
 		{
 			auto val = *std::get<bool*>(value);
 			Color active = val ? Colors::LightBlue : Colors::White;
 
-			auto vecSize = surfaceRender.getTextSizeXY(font, name);
-
 			surfaceRender.text(x, y, font, name, false, color);
-			surfaceRender.text(x + addSpaces(name) + vecSize.x, y, font,
+			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
 				FORMAT(XOR("{}"), val), false, active);
-			y += vecSize.y;
+			y += vecY;
 		}
 		else if(std::holds_alternative<int*>(value))
 		{
-			auto vecSize = surfaceRender.getTextSizeXY(font, name);
-
 			surfaceRender.text(x, y, font, name, false, color);
-			surfaceRender.text(x + addSpaces(name) + vecSize.x, y, font,
+			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
 				FORMAT(XOR("{}"), *std::get<int*>(value)), false, color);
-			y += vecSize.y;
+			y += vecY;
 		}
 		else if (std::holds_alternative<float*>(value))
 		{
-			auto vecSize = surfaceRender.getTextSizeXY(font, name);
-
 			surfaceRender.text(x, y, font, name, false, color);
-			surfaceRender.text(x + addSpaces(name) + vecSize.x, y, font,
+			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
 				FORMAT(XOR("{:.2f}"), *std::get<float*>(value)), false, color);
-			y += vecSize.y;
+			y += vecY;
 		}
 
 		i++;
@@ -109,7 +109,7 @@ void X88Menu::init()
 	size_t longest = 0;
 	for (const auto& [x88p, limits] : x88types.getVars())
 	{
-		if (auto size = surfaceRender.getTextSizeXY(fonts::tahoma, x88p.first).x; size > longest)
+		if (auto size = static_cast<size_t>(surfaceRender.getTextSizeXY(fonts::tahoma, x88p.first).x); size > longest)
 			longest = size;
 	}
 	m_longestNameSize = longest;
@@ -121,7 +121,7 @@ size_t X88Menu::addSpaces(const std::string& text)
 {
 	// 5px added to align them well for max size
 	auto size = (m_longestNameSize + 5) - surfaceRender.getTextSizeXY(fonts::tahoma, text).x;
-	return size;
+	return static_cast<size_t>(size);
 }
 
 void X88Menu::handleKeys()

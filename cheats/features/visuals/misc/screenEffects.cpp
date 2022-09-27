@@ -49,6 +49,6 @@ void ScreenEffects::run()
 
 	auto ctx = interfaces::matSys->getRenderContext();
 	ctx->drawScreenSpaceRectangle(material, 0, 0, globals::screenX, globals::screenY, 0, 0,
-		globals::screenX, globals::screenY, globals::screenX, globals::screenY);
+	 static_cast<float>(globals::screenX), static_cast<float>(globals::screenY), globals::screenX, globals::screenY);
 	ctx->release();
 }

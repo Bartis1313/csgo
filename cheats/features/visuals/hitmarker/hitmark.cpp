@@ -36,8 +36,8 @@ void Hitmarker::draw()
 	bool mode3D = config.get<bool>(vars.bDrawHitmarker3D);
 	if (!mode3D)
 	{
-		x = globals::screenX / 2.0f;
-		y = globals::screenY / 2.0f;
+		x = globals::screenX / 2;
+		y = globals::screenY / 2;
 	}
 
 	float currentAlpha = 0.0f;
@@ -55,8 +55,8 @@ void Hitmarker::draw()
 		{
 			if (ImVec2 s; imRender.worldToScreen(el.m_pos, s))
 			{
-				x = s.x;
-				y = s.y;
+				x = static_cast<int>(s.x);
+				y = static_cast<int>(s.y);
 			}
 			else
 				continue;

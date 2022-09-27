@@ -28,6 +28,8 @@
 #include <utilities/math/math.hpp>
 #include <game/globals.hpp>
 
+#include <ranges>
+
 void PlayerVisuals::init()
 {
 	g_Events.add(XOR("round_prestart"), std::bind(&PlayerVisuals::resetDormacy, this, std::placeholders::_1));
@@ -119,7 +121,7 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 	auto& health = m_health.at(ent->getIndex());
 
 	if (auto realHealth = ent->m_iHealth(); health > realHealth)
-		health -= 2.0f * interfaces::globalVars->m_frametime;
+		health -= static_cast<int>(2.0f * interfaces::globalVars->m_frametime);
 	else
 		health = realHealth;
 
@@ -158,7 +160,7 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 	auto& armor = m_armor.at(ent->getIndex());
 
 	if (auto realArmor = ent->m_ArmorValue(); armor > realArmor)
-		armor -= 2.0f * interfaces::globalVars->m_frametime;
+		armor -= static_cast<int>(2.0f * interfaces::globalVars->m_frametime);
 	else
 		armor = realArmor;
 
@@ -218,7 +220,7 @@ void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 		2.0f
 	};
 
-	int barWidth = currentAmmo * box.w / maxAmmo;
+	float barWidth = currentAmmo * box.w / maxAmmo;
 	bool isReloading = false;
 	auto animlayer = ent->getAnimOverlays()[1];
 
@@ -336,7 +338,7 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 	constexpr auto chest = 6;
 	constexpr auto lowerChest = 5;
 
-	for (int i = 0; i < studio->m_bonesCount; i++)
+	for (auto i : std::views::iota(0, studio->m_bonesCount))
 	{
 		auto bone = studio->getBone(i);
 		if (!bone)
@@ -385,7 +387,7 @@ void PlayerVisuals::drawSnapLine(Player_t* ent, const Box& box)
 	if (ent == g_Aimbot.getTargetted())
 	{
 		// lines on the bottom and center bottom box
-		imRender.drawLine(globals::screenX / 2, globals::screenY, box.x + box.w / 2, box.y + box.h, Colors::Purple);
+		imRender.drawLine(globals::screenX / 2.0f, static_cast<float>(globals::screenY), box.x + box.w / 2, box.y + box.h, Colors::Purple);
 	}
 }
 
@@ -430,8 +432,8 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 	if (!config.get<bool>(vars.bEsp))
 		return;
 
-	Box box;
-	if (!Box::getBox(ent, box))
+	Box box{ ent };
+	if (!box.isValid())
 		return;
 
 	constexpr float maxDist = 100.0f; // start fade

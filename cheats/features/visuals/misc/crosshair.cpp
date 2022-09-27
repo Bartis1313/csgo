@@ -15,14 +15,15 @@
 
 void Crosshair::init()
 {
-	m_scale = interfaces::cvar->findVar(XOR("cl_crosshair_recoil"));
+	m_crosshairRecoil = interfaces::cvar->findVar(XOR("cl_crosshair_recoil"));
+	m_scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
 }
 
 void Crosshair::draw()
 {
 	int cfgCross = config.get<int>(vars.iCrosshair);
 
-	m_scale->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
+	m_crosshairRecoil->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
 
 	if (!cfgCross)
 		return;
@@ -36,10 +37,8 @@ void Crosshair::draw()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	int x = globals::screenX;
-	int y = globals::screenY;
-	x /= 2.0f;
-	y /= 2.0f;
+	float x = globals::screenX / 2.0f;
+	float y = globals::screenY / 2.0f;
 
 	const auto weapon = game::localPlayer->getActiveWeapon();
 	if (!weapon)
@@ -76,8 +75,8 @@ void Crosshair::draw()
 	{
 		if (Vector2D endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
 		{
-			int x = endScreen.x;
-			int y = endScreen.y;
+			float x = endScreen.x;
+			float y = endScreen.y;
 
 			float moveCross = 8.0f;
 
@@ -104,9 +103,9 @@ void Crosshair::draw()
 			if (game::localPlayer->m_vecVelocity().length2D() > 0.0f)
 				radiusSpread = inaccuracy * 1000.0f;*/
 			float inaccuracy = weapon->getInaccuracy();
-			int radiusSpread = inaccuracy * 1000.0f;
-			int x = endScreen.x;
-			int y = endScreen.y;
+			float radiusSpread = inaccuracy * 1000.0f;
+			float x = endScreen.x;
+			float y = endScreen.y;
 
 			imRender.drawCircle(x, y, radiusSpread, 32, Colors::Black);
 			imRender.drawCircleFilled(x, y, radiusSpread, 32, Colors::LightBlue.getColorEditAlpha(0.2f));

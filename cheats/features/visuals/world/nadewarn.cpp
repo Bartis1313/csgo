@@ -203,7 +203,7 @@ void GrenadeWarning::NadeTrace_t::handleDetonates()
 	}
 }
 
-void GrenadeWarning::NadeTrace_t::simulate(const Vector& pos, const Vector& velocity, float nadeThrowTime, int ticks)
+void GrenadeWarning::NadeTrace_t::simulate(const Vector& pos, const Vector& velocity, float nadeThrowTime, uint32_t ticks)
 {
 	m_pos = pos;
 	m_velocity = velocity;
@@ -236,35 +236,6 @@ void GrenadeWarning::NadeTrace_t::destroyTrace()
 void GrenadeWarning::NadeTrace_t::push()
 {
 	m_path.push_back(m_pos);
-}
-
-WeaponIndex GrenadeWarning::getIndexByClass(int idx, Studiohdr_t* studio)
-{
-	switch (std::string_view name = studio->m_name; idx)
-	{
-	case CBaseCSGrenadeProjectile:
-	{
-		if (name.find(XOR("ggrenade")) != std::string::npos)
-			return WEAPON_HEGRENADE;
-		else
-			return WEAPON_FLASHBANG;
-	}
-	case CSmokeGrenadeProjectile:
-		return WEAPON_SMOKEGRENADE;
-	case CMolotovProjectile:
-	{
-		if (name.find(XOR("molotov")) != std::string::npos)
-			return WEAPON_MOLOTOV;
-		else
-			return WEAPON_INCGRENADE;
-	}
-	case CDecoyProjectile:
-		return WEAPON_DECOY;
-	default:
-		break;
-	}
-
-	return WEAPON_NONE;
 }
 
 bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
@@ -371,7 +342,7 @@ void GrenadeWarningPaint::draw()
 		if (!studio)
 			return;
 
-		auto wpnIdx = g_GrenadeWarning.getIndexByClass(classID, studio);
+		auto wpnIdx = game::getNadeByClass(classID, studio);
 		if (wpnIdx == WEAPON_NONE)
 			return;
 

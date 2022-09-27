@@ -89,3 +89,34 @@ float game::getScaledFont(const Vector& source, const Vector& destination, const
 	float fontSize = std::clamp(division / (dist / division), min, max);
 	return fontSize;
 }
+
+#include <SDK/CStudioHdr.hpp>
+
+WeaponIndex game::getNadeByClass(int idx, Studiohdr_t* studio)
+{
+	switch (std::string_view name = studio->m_name; idx)
+	{
+	case CBaseCSGrenadeProjectile:
+	{
+		if (name.find(XOR("ggrenade")) != std::string::npos)
+			return WEAPON_HEGRENADE;
+		else
+			return WEAPON_FLASHBANG;
+	}
+	case CSmokeGrenadeProjectile:
+		return WEAPON_SMOKEGRENADE;
+	case CMolotovProjectile:
+	{
+		if (name.find(XOR("molotov")) != std::string::npos)
+			return WEAPON_MOLOTOV;
+		else
+			return WEAPON_INCGRENADE;
+	}
+	case CDecoyProjectile:
+		return WEAPON_DECOY;
+	default:
+		break;
+	}
+
+	return WEAPON_NONE;
+}

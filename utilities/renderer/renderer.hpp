@@ -1,6 +1,6 @@
 #pragma once
 
-#pragma warning(disable:26495)
+#include "BBox.hpp"
 
 #include <string>
 #include <mutex>
@@ -18,27 +18,6 @@ class Color;
 class Resource;
 class Entity_t;
 struct Vertex_t;
-
-struct Box
-{
-	Box() = default;
-	constexpr Box(float x, float y, float w, float h) :
-		x{ x }, y{ y }, w{ w }, h{ h }
-	{}
-	constexpr Box(const std::array<ImVec2, 8>& arr) :
-		points{ arr }
-	{}
-
-	std::array<ImVec2, 8> points;
-	float x, y, w, h;
-
-	ImVec2 topleft;
-	ImVec2 topright;
-	ImVec2 bottomleft;
-	ImVec2 bottomright;
-
-	static bool getBox(Entity_t* ent, Box& box);
-};
 
 namespace fonts
 {

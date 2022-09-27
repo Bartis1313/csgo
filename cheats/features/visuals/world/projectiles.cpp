@@ -38,7 +38,7 @@ void Projectiles::draw()
 		if (!wpn) // should not ever happen
 			continue;
 
-		auto wpnIdx = g_GrenadeWarning.getIndexByClass(classID, studio);
+		auto wpnIdx = game::getNadeByClass(classID, studio);
 		if (wpnIdx == WEAPON_NONE)
 			continue;
 
@@ -81,8 +81,7 @@ void Projectiles::draw()
 		case WEAPON_NONE: // understand as NADE_NONE
 			return;
 		}
-
-		if (Box box; Box::getBox(entity, box))
+		if (Box box{ entity }; box.isValid())
 			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana12, nades.first, true, nades.second.getColor());
 	}
 }

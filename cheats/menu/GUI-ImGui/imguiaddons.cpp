@@ -337,13 +337,13 @@ static bool arrGetter(void* data, int idx, const char** out)
     return true;
 }
 
-bool ImGui::Combo(const char* label, int* item, std::span<const char*> arr, const float width)
+bool ImGui::Combo(const char* label, int* item, std::span<const char*> arr, const int width)
 {
     bool ret = ImGui::Combo(label, item, arr.data(), arr.size(), width);
     return ret;
 }
 
-bool ImGui::Combo(const char* label, int* item, std::span<const std::string> arr, const float width)
+bool ImGui::Combo(const char* label, int* item, std::span<const std::string> arr, const int width)
 {
     bool ret = ImGui::Combo(label, item, &arrGetterStr, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), width);
     return ret;
@@ -367,7 +367,7 @@ void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, s
     size_t size = names.size(); // does not matter if you pass options size here
 
     ImVector<const char*> actives = {};
-    for (size_t i = 0; const auto & el : options)
+    for (size_t i = 0; const auto el : options)
     {
         if (el) // if active selected
             actives.push_back(names[i]);
@@ -376,7 +376,7 @@ void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, s
     }
 
     std::string previewName = "";
-    for (size_t i = 0; const auto & el : actives)
+    for (int i = 0; const auto & el : actives)
     {
         previewName += el;
 

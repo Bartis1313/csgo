@@ -89,7 +89,7 @@ void BulletTracer::draw(IGameEvent* event)
 	info.m_blue = color.getColor().bMultiplied();
 	info.m_brightness = color.getColor().aMultiplied();
 	info.m_speed = config.get<float>(vars.fBulletTracerSpeed);
-	info.m_startFrame = config.get<float>(vars.fBulletTracerStartFrame);
+	info.m_startFrame = static_cast<int>(config.get<float>(vars.fBulletTracerStartFrame));
 	info.m_frameRate = config.get<float>(vars.fBulletTracerFrameRate);
 	info.m_vecStart = src;
 	info.m_vecEnd = tr.m_end;

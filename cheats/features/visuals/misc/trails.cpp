@@ -64,7 +64,7 @@ void Trails::draw()
 		info.m_green = color.getColor().gMultiplied();
 		info.m_blue = color.getColor().bMultiplied();
 		info.m_speed = config.get<float>(vars.fMovementBeamSpeed);
-		info.m_startFrame = 0.0f;
+		info.m_startFrame = 0;
 		info.m_frameRate = 0.0f;
 		info.m_segments = 2;
 		info.m_renderable = true;

@@ -125,19 +125,20 @@ void Backtrack::run(CUserCmd* cmd)
 
 		bestFov = 180.0f;
 
-		for (int i = 0; i < m_records.at(bestPlayerIdx).size(); i++)
+		for (size_t i = 0; const auto & el : m_records.at(bestPlayerIdx))
 		{
-			const auto& record = m_records.at(bestPlayerIdx).at(i);
-			if (!isValid(record.m_simtime))
+			if (!isValid(el.m_simtime))
 				continue;
 
-			const auto fov = math::calcFovReal(myEye, record.m_head, cmd->m_viewangles + aimPunch);
+			const auto fov = math::calcFovReal(myEye, el.m_head, cmd->m_viewangles + aimPunch);
 
 			if (fov < bestFov)
 			{
 				bestFov = fov;
 				bestRecordIdx = i;
 			}
+
+			i++;
 		}
 	}
 
