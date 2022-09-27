@@ -65,6 +65,8 @@ Box Box::transformPoints(Entity_t* ent)
 	resBox.bottomleft = screen.at(3);
 	resBox.bottomright = screen.at(2);
 
+	m_isValid = true;
+
 	return resBox;
 }
 
