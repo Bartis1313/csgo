@@ -20,8 +20,8 @@ public:
 	virtual void init();
 	virtual void run(CUserCmd* cmd);
 private:
-	Vector m_lastAngle;
-	Vector m_lastAngleLook;
+	Vec3 m_lastAngle;
+	Vec3 m_lastAngleLook;
 
 	friend FreeLookViewer;
 };

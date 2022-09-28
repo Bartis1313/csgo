@@ -2,7 +2,6 @@
 
 #include <classes/createMove.hpp>
 
-struct Vector;
 class IConVar;
 
 class RCS : public CreateMoveInPredictionType

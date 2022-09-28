@@ -8,14 +8,14 @@
 #include <utilities/rand.hpp>
 #include <config/vars.hpp>
 
-void Background::drawLine(const Vector2D& start, const Vector2D& end, const Color& color, float thickness)
+void Background::drawLine(const Vec2& start, const Vec2& end, const Color& color, float thickness)
 {
-	m_draw->AddLine(ImVec2{ start.x, start.y }, ImVec2{ end.x, end.y }, Color::U32(color), thickness);
+	m_draw->AddLine(ImVec2{ start[Coord::X], start[Coord::Y] }, ImVec2{ end[Coord::X], end[Coord::Y] }, Color::U32(color), thickness);
 }
 
-void Background::drawCircleFilled(const Vector2D& pos, float radius, size_t points, const Color& color)
+void Background::drawCircleFilled(const Vec2& pos, float radius, size_t points, const Color& color)
 {
-	m_draw->AddCircleFilled(ImVec2{ pos.x, pos.y }, radius, Color::U32(color), points);
+	m_draw->AddCircleFilled(ImVec2{ pos[Coord::X], pos[Coord::Y] }, radius, Color::U32(color), points);
 }
 
 void Background::drawRectFilled(float x, float y, float width, float height, const Color& color)
@@ -47,8 +47,8 @@ void Background::pushRandomPoints()
 		m_particleArr.emplace_back(
 			ParticlePoint_t
 			{
-				Vector2D{ static_cast<float>(Random::getRandom<size_t>(0, globals::screenX)), static_cast<float>(Random::getRandom<size_t>(0, globals::screenY)) }, // pos
-				Vector2D{ Random::getRandom<float>(-0.1f, 0.1f) * speed, Random::getRandom<float>(-0.1f, 0.1f) * speed }, // move
+				Vec2{ static_cast<float>(Random::getRandom<size_t>(0, globals::screenX)), static_cast<float>(Random::getRandom<size_t>(0, globals::screenY)) }, // pos
+				Vec2{ Random::getRandom<float>(-0.1f, 0.1f) * speed, Random::getRandom<float>(-0.1f, 0.1f) * speed }, // move
 				Color	{ m_colorArr.at(Random::getRandom<size_t>(0, m_colorArr.size() - 1)) } // color
 			});
 	}
@@ -56,11 +56,11 @@ void Background::pushRandomPoints()
 
 void Background::update(ParticlePoint_t& particle)
 {
-	if (particle.m_pos.x > globals::screenX || particle.m_pos.x < 0)
-		particle.m_move.x = -particle.m_move.x;
+	if (particle.m_pos[Coord::X] > globals::screenX || particle.m_pos[Coord::X] < 0)
+		particle.m_move[Coord::X] = -particle.m_move[Coord::X];
 
-	if (particle.m_pos.y > globals::screenY || particle.m_pos.y < 0)
-		particle.m_move.y = -particle.m_move.y;
+	if (particle.m_pos[Coord::Y] > globals::screenY || particle.m_pos[Coord::Y] < 0)
+		particle.m_move[Coord::Y] = -particle.m_move[Coord::Y];
 
 	particle.m_pos += particle.m_move;
 }

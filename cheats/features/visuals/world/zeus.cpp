@@ -31,7 +31,7 @@ void ZeusDraw::draw()
 	if (weapon->m_iItemDefinitionIndex() == WEAPON_TASER)
 	{
 		const static float range = weapon->getWpnInfo()->m_range;
-		const Vector abs = game::localPlayer->absOrigin() + Vector(0.0f, 0.0f, 30.0f); // small correction to get correct trace visually, will still throw false positives on stairs etc...
+		const Vec3 abs = game::localPlayer->absOrigin() + Vec3{ 0.0f, 0.0f, 30.0f }; // small correction to get correct trace visually, will still throw false positives on stairs etc...
 
 		CfgColor color = config.get<CfgColor>(vars.cZeusRange);
 

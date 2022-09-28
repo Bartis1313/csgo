@@ -47,8 +47,8 @@ void Info::draw()
 		text(FORMAT(XOR("[{} / {}] DMG [{}HP]"), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount(), weapon->getWpnInfo()->m_damage), Colors::Yellow);
 		text(FORMAT(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100.0f), Colors::Yellow);
 		text(FORMAT(XOR("Zoom level {}"), weapon->m_zoomLevel()), Colors::Yellow);
-		text(FORMAT(XOR("POS: X {:.2f} Y {:.2f} Z {:.2f}"), game::localPlayer->absOrigin().x, game::localPlayer->absOrigin().y, game::localPlayer->absOrigin().z), Colors::Yellow);
-		text(FORMAT(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().length2D()), Colors::Yellow);
+		text(FORMAT(XOR("POS: X {:.2f} Y {:.2f} Z {:.2f}"), game::localPlayer->absOrigin()[Coord::X], game::localPlayer->absOrigin()[Coord::Y], game::localPlayer->absOrigin()[Coord::Z]), Colors::Yellow);
+		text(FORMAT(XOR("Velocity {:.2f}"), game::localPlayer->m_vecVelocity().toVec2D().length()), Colors::Yellow);
 		text(FORMAT(XOR("Kills {}"), game::localPlayer->getKills()), Colors::Yellow);
 		text(FORMAT(XOR("Deaths {}"), game::localPlayer->getDeaths()), Colors::Yellow);
 		// escape divide by zero exceptions by using this trick

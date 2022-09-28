@@ -1,38 +1,41 @@
 #include "math.hpp"
 
-Vector math::calcAngleRelative(const Vector& source, const Vector& destination, const Vector& viewAngles)
+Vec3 math::calcAngleRelative(const Vec3& source, const Vec3& destination, const Vec3& viewAngles)
 {
 	const auto delta = destination - source;
 
-	Vector angles(
-		RAD2DEG(std::atan2(-delta.z, std::hypot(delta.x, delta.y))) - viewAngles.x,
-		RAD2DEG(std::atan2(delta.y, delta.x)) - viewAngles.y,
+	Vec3 angles
+	{
+		RAD2DEG(std::atan2(-delta[2], std::hypot(delta[0], delta[1]))) - viewAngles[0],
+		RAD2DEG(std::atan2(delta[1], delta[0])) - viewAngles[1],
 		0.0f
-	);
-	return angles.normalize();
-}
-
-Vector math::calcAngle(const Vector& source, const Vector& destination)
-{
-	const auto delta = destination - source;
-
-	Vector angles(
-		RAD2DEG(std::atan2(-delta.z, std::hypot(delta.x, delta.y))),
-		RAD2DEG(std::atan2(delta.y, delta.x)),
-		0.0f
-	);
+	};
 
 	return angles.normalize();
 }
 
-float math::calcFov(const Vector& source, const Vector& destination, const Vector& viewAngles)
+Vec3 math::calcAngle(const Vec3& source, const Vec3& destination)
+{
+	const auto delta = destination - source;
+
+	Vec3 angles
+	{
+		RAD2DEG(std::atan2(-delta[2], std::hypot(delta[0], delta[1]))),
+		RAD2DEG(std::atan2(delta[1], delta[0])),
+		0.0f
+	};
+
+	return angles.normalize();
+}
+
+float math::calcFov(const Vec3& source, const Vec3& destination, const Vec3& viewAngles)
 {
 	const auto angle = calcAngleRelative(source, destination, viewAngles);
-	const auto fov = std::hypot(angle.x, angle.y);
+	const auto fov = std::hypot(angle[0], angle[1]);
 	return fov;
 }
 
-float math::calcFovReal(const Vector& source, const Vector& destination, const Vector& viewAngles)
+float math::calcFovReal(const Vec3& source, const Vec3& destination, const Vec3& viewAngles)
 {
 	float dist = source.distTo(destination);
 	float realDist = dist / 10.0f;
@@ -43,48 +46,54 @@ float math::calcFovReal(const Vector& source, const Vector& destination, const V
 	return start.distTo(end);
 }
 
-Vector math::transformVector(const Vector& in, const Matrix3x4& matrix)
+Vec3 math::transformVector(const Vec3& in, const Matrix3x4& matrix)
 {
-	return Vector(in.dot(matrix[0]) + matrix[0][3], in.dot(matrix[1]) + matrix[1][3],
-		in.dot(matrix[2]) + matrix[2][3]);
+	return Vec3(in.dot(Vec3{ matrix[0].data() }) + matrix[0][3], in.dot(Vec3{ matrix[1].data() }) + matrix[1][3],
+		in.dot(Vec3{ matrix[2].data() }) + matrix[2][3]);
 }
 
-Vector math::angleVec(const Vector& angle)
+Vec3 math::angleVec(const Vec3& angle)
 {
-	auto sy = std::sin(DEG2RAD(angle.y));
-	auto cy = std::cos(DEG2RAD(angle.y));
+	auto sy = std::sin(DEG2RAD(angle[1]));
+	auto cy = std::cos(DEG2RAD(angle[1]));
 
-	auto sp = std::sin(DEG2RAD(angle.x));
-	auto cp = std::cos(DEG2RAD(angle.x));
+	auto sp = std::sin(DEG2RAD(angle[0]));
+	auto cp = std::cos(DEG2RAD(angle[0]));
 
-	return Vector(cp * cy, cp * sy, -sp);
+	return Vec3{ cp * cy, cp * sy, -sp };
 }
 
-std::tuple<Vector, Vector, Vector> math::angleVectors(const Vector& angle)
+std::tuple<Vec3, Vec3, Vec3> math::angleVectors(const Vec3& angle)
 {
-	auto sy = std::sin(DEG2RAD(angle.y));
-	auto cy = std::cos(DEG2RAD(angle.y));
+	auto sy = std::sin(DEG2RAD(angle[1]));
+	auto cy = std::cos(DEG2RAD(angle[1]));
 
-	auto sp = std::sin(DEG2RAD(angle.x));
-	auto cp = std::cos(DEG2RAD(angle.x));
+	auto sp = std::sin(DEG2RAD(angle[0]));
+	auto cp = std::cos(DEG2RAD(angle[0]));
 
-	auto sr = std::sin(DEG2RAD(angle.z));
-	auto cr = std::cos(DEG2RAD(angle.z));
+	auto sr = std::sin(DEG2RAD(angle[2]));
+	auto cr = std::cos(DEG2RAD(angle[2]));
 
-	Vector forward;
-	forward.x = cp * cy;
-	forward.y = cp * sy;
-	forward.z = -sp;
+	Vec3 forward
+	{
+		cp * cy,
+		cp * sy,
+		-sp
+	};
 
-	Vector right;
-	right.x = (-1.0f * sr * sp * cy + -1.0f * cr * -sy);
-	right.y = (-1.0f * sr * sp * sy + -1.0f * cr * cy);
-	right.z = -1.0f * sr * cp;
+	Vec3 right
+	{
+		-1.0f * sr * sp * cy + -1.0f * cr * -sy,
+		-1.0f * sr * sp * sy + -1.0f * cr * cy,
+		-1.0f * sr * cp
+	};	
 
-	Vector up;
-	up.x = (cr * sp * cy + -sr * -sy);
-	up.y = (cr * sp * sy + -sr * cy);
-	up.z = cr * cp;
+	Vec3 up
+	{
+		cr * sp * cy + -sr * -sy,
+		cr * sp * sy + -sr * cy,
+		cr * cp
+	};
 
 	return { forward, right, up };
 }
@@ -111,43 +120,44 @@ float math::normalizePitch(float pitch)
 	return pitch;
 }
 
-Vector math::vectorToAngle(const Vector& vec)
+Vec3 math::vectorToAngle(const Vec3& vec)
 {
-	Vector angle = {};
-	if (vec.x == 0.0f && vec.y == 0.0f)
+	Vec3 angle;
+	if (vec[0] == 0.0f && vec[1] == 0.0f)
 	{
-		angle.x = (vec.z > 0.0f) ? 270.0f : 90.0f;
-		angle.y = 0.0f;
+		angle[0] = (vec[2] > 0.0f) ? 270.0f : 90.0f;
+		angle[1] = 0.0f;
 	}
 	else
 	{
-		angle.x = RAD2DEG(std::atan2(-vec.z, std::hypot(vec.x, vec.y)));
-		angle.y = RAD2DEG(std::atan2(vec.y, vec.x));
+		angle[0] = RAD2DEG(std::atan2(-vec[2], std::hypot(vec[0], vec[1])));
+		angle[1] = RAD2DEG(std::atan2(vec[1], vec[0]));
 
-		if (angle.y > 90.0f)
-			angle.y -= 180.0f;
-		else if (angle.y < 90.0f)
-			angle.y += 180.0f;
-		else if (angle.y == 90.0f)
-			angle.y = 0.0f;
+		if (angle[1] > 90.0f)
+			angle[1] -= 180.0f;
+		else if (angle[1] < 90.0f)
+			angle[1] += 180.0f;
+		else if (angle[1] == 90.0f)
+			angle[1] = 0.0f;
 	}
-	angle.z = 0.0f;
+	angle[2] = 0.0f;
 	return angle;
 }
 
-std::pair<Vector, Vector> math::transformAABB(const Matrix3x4& transform, const Vector& mins, const Vector& maxs)
+std::pair<Vec3, Vec3> math::transformAABB(const Matrix3x4& transform, const Vec3& mins, const Vec3& maxs)
 {
-	Vector localCenter = mins + maxs;
+	Vec3 localCenter = mins + maxs;
 	localCenter *= 0.5f;
 
-	Vector localExtents = maxs - localCenter;
+	Vec3 localExtents = maxs - localCenter;
 
-	Vector worldCenter = transformVector(localCenter, transform);
+	Vec3 worldCenter = transformVector(localCenter, transform);
 
-	Vector worldExtents;
-	worldExtents.x = localExtents.dot(transform[0]);
-	worldExtents.y = localExtents.dot(transform[1]);
-	worldExtents.z = localExtents.dot(transform[2]);
+	Vec3 worldExtents;
+
+	worldExtents[0] = localExtents.dot(Vec3{ transform[0].data() });
+	worldExtents[1] = localExtents.dot(Vec3{ transform[1].data() });
+	worldExtents[2] = localExtents.dot(Vec3{ transform[2].data() });
 
 	return {
 		worldCenter - worldExtents,

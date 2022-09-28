@@ -35,8 +35,8 @@ public:
 	PAD(4);
 	int m_commandNumber;
 	int m_tickcount;
-	Vector m_viewangles;
-	Vector m_aimdirection;
+	Vec3 m_viewangles;
+	Vec3 m_aimdirection;
 	float m_forwardmove;
 	float m_sidemove;
 	float m_upmove;

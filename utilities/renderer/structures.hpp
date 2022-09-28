@@ -5,7 +5,6 @@
 
 struct ImDrawList;
 struct ImVec2;
-struct Vector;
 struct ImFont;
 
 // raw drawing

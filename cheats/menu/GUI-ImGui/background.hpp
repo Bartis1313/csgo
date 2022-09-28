@@ -3,18 +3,18 @@
 #include <vector>
 
 #include <SDK/Color.hpp>
-#include <SDK/math/Vector2D.hpp>
+#include <SDK/math/Vector.hpp>
 
 struct ImDrawList;
 
 struct ParticlePoint_t
 {
-	constexpr ParticlePoint_t(const Vector2D& pos, const Vector2D& move, const Color& color) :
+	constexpr ParticlePoint_t(const Vec2& pos, const Vec2& move, const Color& color) :
 		m_pos{ pos }, m_move{ move }, m_color{ color }
 	{}
 
-	Vector2D m_pos; // actual pos to draw
-	Vector2D m_move; // how much to move the element +/- need small values!
+	Vec2 m_pos; // actual pos to draw
+	Vec2 m_move; // how much to move the element +/- need small values!
 	Color m_color;
 	float m_alpha = 1.0f;
 };
@@ -34,8 +34,8 @@ private:
 	void pushRandomPoints();
 	void update(ParticlePoint_t& particle);
 	void find(ParticlePoint_t& particle);
-	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color, float thickness = 1.0f);
-	void drawCircleFilled(const Vector2D& pos, float radius, size_t points, const Color& color);
+	void drawLine(const Vec2& start, const Vec2& end, const Color& color, float thickness = 1.0f);
+	void drawCircleFilled(const Vec2& pos, float radius, size_t points, const Color& color);
 	void drawRectFilled(float x, float y, float width, float height, const Color& color);
 
 	size_t m_size; // how many particless

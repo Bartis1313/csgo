@@ -71,7 +71,7 @@ void AimbotDraw::drawFov()
         const auto destination = trace.m_end;
 
         // turn for visualization
-        auto forward = math::angleVec({ view.x, view.y + 90.f, 0.f });
+        auto forward = math::angleVec(Vec3{ view[0], view[1] + 90.f, 0.f });
         // dist in calcFovReal
         forward *= cfg.m_fov * 10.0f;
         // final vector where we aim
@@ -99,6 +99,6 @@ void AimbotDraw::drawBestPoint()
     if (hitbox.isZero())
         return;
 
-    if (Vector2D p; imRender.worldToScreen(hitbox, p))
+    if (ImVec2 p; imRender.worldToScreen(hitbox, p))
         imRender.drawCircleFilled(p.x, p.y, 5, 12, Colors::Cyan);
 }

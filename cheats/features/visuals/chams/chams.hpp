@@ -2,6 +2,8 @@
 
 #include <classes/drawModel.hpp>
 #include <SDK/IVModelRender.hpp>
+#include <SDK/IVModelRender.hpp>
+#include <SDK/math/matrix.hpp>
 
 #include <string>
 #include <vector>
@@ -9,11 +11,9 @@
 class Color;
 struct DrawModelState_t;
 struct ModelRenderInfo_t;
-struct Matrix3x4;
 class Player_t;
 class IMaterial;
 class KeyValues;
-struct Matrix3x4;
 
 class Chams : public DrawModelType
 {

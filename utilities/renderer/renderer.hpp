@@ -10,10 +10,9 @@
 #include <deque>
 #include <array>
 
+#include <SDK/math/Vector.hpp>
 #include <dependencies/ImGui/imgui.h>
 
-struct Vector;
-struct Vector2D;
 class Color;
 class Resource;
 class Entity_t;
@@ -35,21 +34,21 @@ public:
 	[[nodiscard]] unsigned long  __createFont(const char* fontName, const int size, const int weight, const unsigned long flags);
 
 	void drawLine(const int x, const int y, const int x2, const int y2, const Color& color);
-	void drawLine(const Vector2D& start, const Vector2D& end, const Color& color);
+	void drawLine(const Vec2& start, const Vec2& end, const Color& color);
 	void drawRect(const int x, const int y, const int w, const int h, const Color& color);
-	void drawRect(const Vector2D& start, const Vector2D& end, const Color& color);
+	void drawRect(const Vec2& start, const Vec2& end, const Color& color);
 	void drawRectFilled(const int x, const int y, const int w, const int h, const Color& color);
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/181578-draw-rounded-box-static-dynamic.html
 	void drawRoundedRect(const int x, const int y, const int w, const int h, const int radius, const int numberOfVertices, const Color& color);
 	void drawRoundedRectFilled(const int x, const int y, const int w, const int h, const int radius, const int numberOfVertices, const Color& color);
 	void drawCircle(const int x, const int y, const int radius, const int points, const Color& color);
 	void drawCircleFilled(const int x, const int y, const int radius, const int points, const Color& color);
-	void drawCircle3D(const Vector& pos, const int radius, const int points, const Color& color);
-	void drawFilledCircle3D(const Vector& pos, const int radius, const int points, const Color& color);
-	void drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
-	void drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color);
-	void drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
-	void drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color);
+	void drawCircle3D(const Vec3& pos, const int radius, const int points, const Color& color);
+	void drawFilledCircle3D(const Vec3& pos, const int radius, const int points, const Color& color);
+	void drawTriangle(const Vec2& p1, const Vec2& p2, const Vec2& p3, const Color& color);
+	void drawTriangleFilled(const Vec2& p1, const Vec2& p2, const Vec2& p3, const Color& color);
+	void drawQuad(const Vec2& p1, const Vec2& p2, const Vec2& p3, const Vec2& p4, const Color& color);
+	void drawQuadFilled(const Vec2& p1, const Vec2& p2, const Vec2& p3, const Vec2& p4, const Color& color);
 	void drawPolyLine(int* x, int* y, const int count, const Color& color);
 	void drawPolyLine(const int count, Vertex_t* verts, const Color& color);
 	void drawPolyGon(const int count, Vertex_t* verts, const Color& color, const bool clipped = true);
@@ -59,15 +58,14 @@ public:
 	void text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color);
 	void textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...);
 	[[deprecated("You should only read comments from there, better results are with ImGuiRender class")]]
-	void drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled = false);
+	void drawBox3D(const std::array<Vec3, 8>& box, const Color& color, bool filled = false);
 	// percent should be passed in 0.0-1.0 range, credits for helping Carlos1216
 	void drawProgressRing(const int x, const int y, float radius, const int points, float percent, const float thickness, const Color& color);
 	// width only
 	[[nodiscard]] int getTextSize(const unsigned long font, const std::string& text);
 	// width and height
-	[[nodiscard]] Vector2D getTextSizeXY(const unsigned long font, const std::string& text);
-	[[nodiscard]] bool worldToScreen(const Vector& in, Vector& out);
-	[[nodiscard]] bool worldToScreen(const Vector& in, Vector2D& out);
+	[[nodiscard]] Vec2 getTextSizeXY(const unsigned long font, const std::string& text);
+	[[nodiscard]] bool worldToScreen(const Vec3& in, Vec2& out);
 	void initNewTexture(int& id, Color* RGBA, const int w, const int h);
 	void initNewTexture(int& id, unsigned char* RGBA, const int w, const int h);
 	void drawImage(const Resource& res, const int x, const int y, const int w, const int h, const Color& color);
@@ -108,10 +106,10 @@ public:
 		const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft);
 	void drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness = 1.0f);
 	void drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color);
-	void drawCircle3D(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);
-	void drawCircle3DTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
-	void drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
-	void drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawCircle3D(const Vec3& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawCircle3DTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawCircle3DFilled(const Vec3& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawCircle3DFilledTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 	void drawTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color, const float thickness = 1.0f);
 	void drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color);
 	void drawTrianglePoly(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color);
@@ -131,12 +129,12 @@ public:
 	// pass pos from world, you will often pass width.x == width.y
 	// width.x -> pass starting width at front
 	// width.y -> pass width of the box, between points at side
-	void drawBox3D(const Vector& pos, const ImVec2& width, const float height, const Color& color, bool outlined = false, const float thickness = 2.0f);
+	void drawBox3D(const Vec3& pos, const ImVec2& width, const float height, const Color& color, bool outlined = false, const float thickness = 2.0f);
 	// pass pos from world, you will often pass width.x == width.y
 	// width.x -> pass starting width at front
 	// width.y -> pass width of the box, between points at side
-	void drawBox3DFilled(const Vector& pos, const ImVec2& width, const float height, const Color& color, const Color& filling, bool outlined = false, const float thickness = 2.0f);
-	void drawCone(const Vector& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags = 1, const float thickness = 1.0f);
+	void drawBox3DFilled(const Vec3& pos, const ImVec2& width, const float height, const Color& color, const Color& filling, bool outlined = false, const float thickness = 2.0f);
+	void drawCone(const Vec3& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 
 	/*
 	* arcs - there are few problems with them. Especially you can see it when trying to do arc that is a full circle.
@@ -149,11 +147,9 @@ public:
 
 	void drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 	void drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags = 0);
-	void drawSphere(const Vector& pos, float radius, float angleSphere, const Color& color);
+	void drawSphere(const Vec3& pos, float radius, float angleSphere, const Color& color);
 	[[nodiscard]] ImVec2 getTextSize(ImFont* font, const std::string& text);
-	[[nodiscard]] bool worldToScreen(const Vector& in, Vector& out);
-	[[nodiscard]] bool worldToScreen(const Vector& in, Vector2D& out);
-	[[nodiscard]] bool worldToScreen(const Vector& in, ImVec2& out);
+	[[nodiscard]] bool worldToScreen(const Vec3& in, ImVec2& out);
 
 	// add to present
 	void renderPresent(ImDrawList* draw);

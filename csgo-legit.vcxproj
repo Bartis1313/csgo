@@ -508,9 +508,8 @@
     <ClInclude Include="SDK\MapStruct.hpp" />
     <ClInclude Include="SDK\math\AABB.hpp" />
     <ClInclude Include="SDK\math\matrix.hpp" />
-    <ClInclude Include="SDK\math\Vec.hpp" />
     <ClInclude Include="SDK\math\Vector.hpp" />
-    <ClInclude Include="SDK\math\Vector2D.hpp" />
+    <ClInclude Include="SDK\math\VectorAligned.hpp" />
     <ClInclude Include="setup\SEHcatch.hpp" />
     <ClInclude Include="cheats\features\visuals\chams\chams.hpp" />
     <ClInclude Include="cheats\features\visuals\player\player.hpp" />

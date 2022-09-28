@@ -2,7 +2,6 @@
 
 #include <classes/renderableToPresent.hpp>
 #include <classes/overViewMap.hpp>
-#include <SDK/math/Vector2D.hpp>
 #include <SDK/math/Vector.hpp>
 
 #include <cstdint>
@@ -26,20 +25,20 @@ public:
 	// will only work for vanilla maps
 	bool manuallyInitTexture();
 private:
-	_NODISCARD Vector2D entToRadar(const Vector& eye, const Vector& angles, const Vector& entPos, const Vector2D& pos, const Vector2D& size, const float scale, bool clipRanges);
+	_NODISCARD Vec2 entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const Vec2& pos, const Vec2& size, const float scale, bool clipRanges);
 	struct MapPos
 	{
-		Vector2D m_pos;
+		Vec2 m_pos;
 		float m_scale;
 	};
 	MapPos getMapPos() const;
 	void drawMap();
 	void manuallyInitPos();
 
-	Vector2D m_pos;
+	Vec2 m_pos;
 	float m_scale;
-	Vector2D m_drawSize;
-	Vector2D m_drawPos;
+	Vec2 m_drawSize;
+	Vec2 m_drawPos;
 	bool m_inited;
 	IDirect3DTexture9* m_mapTexture;
 

@@ -47,15 +47,15 @@ void RCS::prepare(CUserCmd* cmd)
 {
     auto cfg = g_Aimbot.getCachedConfig();
 
-    static Vector oldPunch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
+    static auto oldPunch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
     if (cmd->m_buttons & IN_ATTACK)
     {
-        Vector punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
+        auto punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
 
-        punch.x *= cfg.m_RcsX / 100.0f;
-        punch.y *= cfg.m_RcsY / 100.0f;
+        punch[Coord::X] *= cfg.m_RcsX / 100.0f;
+        punch[Coord::Y] *= cfg.m_RcsY / 100.0f;
 
-        Vector toMove = cmd->m_viewangles += (oldPunch - punch);
+        auto toMove = cmd->m_viewangles += (oldPunch - punch);
         toMove.clamp();
 
         interfaces::engine->setViewAngles(toMove);
@@ -64,9 +64,9 @@ void RCS::prepare(CUserCmd* cmd)
     }
     else
     {
-        Vector punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
-        punch.x *= cfg.m_RcsX / 100.0f;
-        punch.y *= cfg.m_RcsY / 100.0f;
+        auto punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
+        punch[Coord::X] *= cfg.m_RcsX / 100.0f;
+        punch[Coord::Y] *= cfg.m_RcsY / 100.0f;
 
         oldPunch = punch;
     }

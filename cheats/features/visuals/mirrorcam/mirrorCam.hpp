@@ -2,7 +2,8 @@
 
 #include <classes/renderableToPresent.hpp>
 #include <classes/renderView.hpp>
-#include <SDK/math/Vector2D.hpp>
+
+#include <SDK/math/Vector.hpp>
 
 class CViewSetup;
 class ITexture;
@@ -19,10 +20,10 @@ public:
 	virtual void init();
 	virtual void run(const CViewSetup& view);
 private:
-	constexpr void setSize(const Vector2D& size) { m_size = size; }
+	constexpr void setSize(const Vec2& size) { m_size = size; }
 	IDirect3DTexture9* getTexture() const;
 
-	Vector2D m_size = { 1.0f, 1.0f };
+	Vec2 m_size = Vec2{ 1.0f, 1.0f };
 	ITexture* m_texture;
 	bool m_inited = false;
 

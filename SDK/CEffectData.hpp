@@ -5,10 +5,10 @@
 class CEffectData
 {
 public:
-	Vector m_origin;
-	Vector m_start;
-	Vector m_normal;
-	Vector m_angles;
+	Vec3 m_origin;
+	Vec3 m_start;
+	Vec3 m_normal;
+	Vec3 m_angles;
 	int m_flags;
 	int m_entityIdx;
 	float m_scale;

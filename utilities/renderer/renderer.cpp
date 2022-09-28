@@ -7,8 +7,6 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <SDK/ISurface.hpp>
 #include <SDk/math/matrix.hpp>
-#include <SDK/math/Vector.hpp>
-#include <SDK/math/Vector2D.hpp>
 #include <SDK/Color.hpp>
 #include <utilities/res.hpp>
 
@@ -55,10 +53,10 @@ void SurfaceRender::drawLine(const int x, const int y, const int x2, const int y
 	interfaces::surface->drawLine(x, y, x2, y2);
 }
 
-void SurfaceRender::drawLine(const Vector2D& start, const Vector2D& end, const Color& color)
+void SurfaceRender::drawLine(const Vec2& start, const Vec2& end, const Color& color)
 {
-	drawLine(static_cast<int>(start.x), static_cast<int>(start.y),
-		static_cast<int>(end.x), static_cast<int>(end.y), color);
+	drawLine(static_cast<int>(start[Coord::X]), static_cast<int>(start[Coord::Y]),
+		static_cast<int>(end[Coord::X]), static_cast<int>(end[Coord::Y]), color);
 }
 
 void SurfaceRender::drawRect(const int x, const int y, const int w, const int h, const Color& color)
@@ -67,10 +65,10 @@ void SurfaceRender::drawRect(const int x, const int y, const int w, const int h,
 	interfaces::surface->drawOutlinedRect(x, y, w, h);
 }
 
-void SurfaceRender::drawRect(const Vector2D& start, const Vector2D& end, const Color& color)
+void SurfaceRender::drawRect(const Vec2& start, const Vec2& end, const Color& color)
 {
-	drawRect(static_cast<int>(start.x), static_cast<int>(start.y),
-		static_cast<int>(end.x), static_cast<int>(end.y), color);
+	drawRect(static_cast<int>(start[Coord::X]), static_cast<int>(start[Coord::Y]),
+		static_cast<int>(end[Coord::X]), static_cast<int>(end[Coord::Y]), color);
 }
 
 void SurfaceRender::drawRectFilled(const int x, const int y, const int w, const int h, const Color& color)
@@ -95,7 +93,7 @@ void SurfaceRender::drawRoundedRect(const int x, const int y, const int w, const
 		{
 			float rad = math::DEG2RAD((90.f * i) + (j / static_cast<float>(numberOfVertices - 1)) * 90.f);
 
-			roundV[(i * numberOfVertices) + j] = Vertex_t{ Vector2D{_x + radius * std::sin(rad), _y - radius * std::cos(rad)} };
+			roundV[(i * numberOfVertices) + j] = Vertex_t{ Vec2{_x + radius * std::sin(rad), _y - radius * std::cos(rad)} };
 		}
 	}
 
@@ -118,7 +116,7 @@ void SurfaceRender::drawRoundedRectFilled(const int x, const int y, const int w,
 		{
 			float rad = math::DEG2RAD((90.f * i) + (j / static_cast<float>(numberOfVertices - 1)) * 90.f);
 
-			roundV[(i * numberOfVertices) + j] = Vertex_t{ Vector2D{_x + radius * std::sin(rad), _y - radius * std::cos(rad)} };
+			roundV[(i * numberOfVertices) + j] = Vertex_t{ Vec2{_x + radius * std::sin(rad), _y - radius * std::cos(rad)} };
 		}
 	}
 
@@ -138,38 +136,38 @@ void SurfaceRender::drawCircleFilled(const int x, const int y, const int radius,
 	float step = math::PI *2.0f / points;
 	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
-		verts.emplace_back(Vector2D{ x + (radius * std::cos(angle)), y + (radius * std::sin(angle)) });
+		verts.emplace_back(Vec2{ x + (radius * std::cos(angle)), y + (radius * std::sin(angle)) });
 	}
 
 	drawPolyGon(verts.size(), verts.data(), color);
 }
 
-void SurfaceRender::drawCircle3D(const Vector& pos, const int radius, const int points, const Color& color)
+void SurfaceRender::drawCircle3D(const Vec3& pos, const int radius, const int points, const Color& color)
 {
 	float step = math::PI *2.0f / points;
 	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
-		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
-		Vector worldEnd = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
+		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
+		Vec3 worldEnd = Vec3{ radius * std::cos(angle + step) + pos[Coord::X], radius * std::sin(angle + step) + pos[Coord::Y], pos[Coord::Z] };
 
-		if (Vector2D start, end; worldToScreen(worldStart, start) && worldToScreen(worldEnd, end))
+		if (Vec2 start, end; worldToScreen(worldStart, start) && worldToScreen(worldEnd, end))
 			drawLine(start, end, color);
 	}
 }
 
-void SurfaceRender::drawFilledCircle3D(const Vector& pos, const int radius, const int points, const Color& color)
+void SurfaceRender::drawFilledCircle3D(const Vec3& pos, const int radius, const int points, const Color& color)
 {
-	Vector2D orignalW2S = {};
+	Vec2 orignalW2S = {};
 	if (!worldToScreen(pos, orignalW2S))
 		return;
 
 	float step = math::PI *2.0f / points;
 	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
-		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
-		Vector worldEnd = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
+		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
+		Vec3 worldEnd = Vec3{ radius * std::cos(angle + step) + pos[Coord::X], radius * std::sin(angle + step) + pos[Coord::Y], pos[Coord::Z] };
 
-		if (Vector2D start, end; worldToScreen(worldStart, start) && worldToScreen(worldEnd, end))
+		if (Vec2 start, end; worldToScreen(worldStart, start) && worldToScreen(worldEnd, end))
 		{
 			drawLine(start, end, color);
 			drawTriangle(orignalW2S, start, end, Color(color.r(), color.g(), color.b(), color.a() / 4.0f));
@@ -177,7 +175,7 @@ void SurfaceRender::drawFilledCircle3D(const Vector& pos, const int radius, cons
 	}
 }
 
-void SurfaceRender::drawTriangle(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
+void SurfaceRender::drawTriangle(const Vec2& p1, const Vec2& p2, const Vec2& p3, const Color& color)
 {
 	std::array verts =
 	{
@@ -189,7 +187,7 @@ void SurfaceRender::drawTriangle(const Vector2D& p1, const Vector2D& p2, const V
 	drawPolyLine(verts.size(), verts.data(), color);
 }
 
-void SurfaceRender::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Color& color)
+void SurfaceRender::drawTriangleFilled(const Vec2& p1, const Vec2& p2, const Vec2& p3, const Color& color)
 {
 	std::array verts =
 	{
@@ -201,7 +199,7 @@ void SurfaceRender::drawTriangleFilled(const Vector2D& p1, const Vector2D& p2, c
 	drawPolyGon(verts.size(), verts.data(), color);
 }
 
-void SurfaceRender::drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
+void SurfaceRender::drawQuadFilled(const Vec2& p1, const Vec2& p2, const Vec2& p3, const Vec2& p4, const Color& color)
 {
 	std::array verts =
 	{
@@ -214,7 +212,7 @@ void SurfaceRender::drawQuadFilled(const Vector2D& p1, const Vector2D& p2, const
 	drawPolyGon(verts.size(), verts.data(), color);
 }
 
-void SurfaceRender::drawQuad(const Vector2D& p1, const Vector2D& p2, const Vector2D& p3, const Vector2D& p4, const Color& color)
+void SurfaceRender::drawQuad(const Vec2& p1, const Vec2& p2, const Vec2& p3, const Vec2& p4, const Color& color)
 {
 	std::array verts =
 	{
@@ -240,8 +238,8 @@ void SurfaceRender::drawPolyLine(const int count, Vertex_t* verts, const Color& 
 
 	for (auto i : std::views::iota(0, count))
 	{
-		x[i] = static_cast<int>(verts[i].m_Position.x);
-		y[i] = static_cast<int>(verts[i].m_Position.y);
+		x[i] = static_cast<int>(verts[i].m_Position[Coord::X]);
+		y[i] = static_cast<int>(verts[i].m_Position[Coord::Y]);
 	}
 
 	drawPolyLine(x.get(), y.get(), count, color);
@@ -370,62 +368,45 @@ int SurfaceRender::getTextSize(const unsigned long font, const std::string& text
 	return width;
 }
 
-Vector2D SurfaceRender::getTextSizeXY(const unsigned long font, const std::string& text)
+Vec2 SurfaceRender::getTextSizeXY(const unsigned long font, const std::string& text)
 {
 	std::wstring wtext(text.begin(), text.end());
 
 	int width, height;
 	interfaces::surface->getTextSize(font, wtext.c_str(), width, height);
 
-	return { (float)width, (float)height };
+	return Vec2{ (float)width, (float)height };
 }
 
 #include <gamememory/memory.hpp>
 #include <game/globals.hpp>
 
-bool SurfaceRender::worldToScreen(const Vector& in, Vector& out)
+bool SurfaceRender::worldToScreen(const Vec3& in, Vec2& out)
 {
 	auto screenMatrix = g_Memory.m_viewMatrixAddr();
 
-	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
+	float w = screenMatrix[3][0] * in[Coord::X] + screenMatrix[3][1] * in[Coord::Y] + screenMatrix[3][2] * in[Coord::Z] + screenMatrix[3][3];
 
 	if (w < 0.001f)
 		return false;
 
-	Vector2D viewport = { (float)globals::screenX, (float)globals::screenY };
+	Vec2 viewport = Vec2{ (float)globals::screenX, (float)globals::screenY };
 
 	float inversed = 1.0f / w;
-	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
-	out.y = (viewport.y / 2.0f) - (0.5f * ((screenMatrix[1][0] * in.x + screenMatrix[1][1] * in.y + screenMatrix[1][2] * in.z + screenMatrix[1][3]) * inversed) * viewport.y + 0.5f);
-	out.z = 0.0f;
-
-	return true;
-}
-
-bool SurfaceRender::worldToScreen(const Vector& in, Vector2D& out)
-{
-	auto screenMatrix = g_Memory.m_viewMatrixAddr();
-
-	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
-
-	if (w < 0.001f)
-		return false;
-
-	Vector2D viewport = { (float)globals::screenX, (float)globals::screenY };
-
-	float inversed = 1.0f / w;
-	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
-	out.y = (viewport.y / 2.0f) - (0.5f * ((screenMatrix[1][0] * in.x + screenMatrix[1][1] * in.y + screenMatrix[1][2] * in.z + screenMatrix[1][3]) * inversed) * viewport.y + 0.5f);
+	out[Coord::X] = (viewport[Coord::X] / 2.0f) +
+		(0.5f * ((screenMatrix[0][0] * in[Coord::X] + screenMatrix[0][1] * in[Coord::Y] + screenMatrix[0][2] * in[Coord::Z] + screenMatrix[0][3]) * inversed) * viewport[Coord::X] + 0.5f);
+	out[Coord::Y] = (viewport[Coord::Y] / 2.0f) -
+		(0.5f * ((screenMatrix[1][0] * in[Coord::X] + screenMatrix[1][1] * in[Coord::Y] + screenMatrix[1][2] * in[Coord::Z] + screenMatrix[1][3]) * inversed) * viewport[Coord::Y] + 0.5f);
 
 	return true;
 }
 
 // cs engine lines are not anti aliased :(
 
-void SurfaceRender::drawBox3D(const std::array<Vector, 8>& box, const Color& color, bool filled)
+void SurfaceRender::drawBox3D(const std::array<Vec3, 8>& box, const Color& color, bool filled)
 {
 	// transormed points to get pos.x/.y
-	std::array<Vector2D, 8> lines = {};
+	std::array<Vec2, 8> lines = {};
 
 	for (size_t i = 0; auto& el : lines)
 	{
@@ -513,10 +494,10 @@ void SurfaceRender::drawProgressRing(const int x, const int y, float radius, con
 
 		// somethign brokey in this function, that's why this order
 		drawQuadFilled(
-			Vector2D{ cx, cy },
-			Vector2D{ dx, dy },
-			Vector2D{ bx, by },
-			Vector2D{ ax, ay },
+			Vec2{ cx, cy },
+			Vec2{ dx, dy },
+			Vec2{ bx, by },
+			Vec2{ ax, ay },
 			color);
 	}
 }
@@ -640,7 +621,7 @@ static ImVec2 operator+(const ImVec2& v, float val)
 	return ImVec2{ v.x + val, v.y + val };
 }
 
-void ImGuiRender::drawBox3D(const Vector& pos, const ImVec2& width, const float height, const Color& color, bool outlined, const float thickness)
+void ImGuiRender::drawBox3D(const Vec3& pos, const ImVec2& width, const float height, const Color& color, bool outlined, const float thickness)
 {
 	// dividing to get a centre to world position
 	float boxW = width.x / 2.0f;
@@ -652,14 +633,14 @@ void ImGuiRender::drawBox3D(const Vector& pos, const ImVec2& width, const float 
 
 	std::array box =
 	{
-		Vector{ pos.x - boxW, pos.y - boxWidthSide, pos.z },
-		Vector{ pos.x - boxW, pos.y - boxWidthSide, pos.z + boxH },
-		Vector{ pos.x + boxW, pos.y - boxWidthSide, pos.z + boxH },
-		Vector{ pos.x + boxW, pos.y - boxWidthSide, pos.z },
-		Vector{ pos.x - boxW, pos.y + boxWidthSide, pos.z },
-		Vector{ pos.x - boxW, pos.y + boxWidthSide, pos.z + boxH },
-		Vector{ pos.x + boxW, pos.y + boxWidthSide, pos.z + boxH },
-		Vector{ pos.x + boxW, pos.y + boxWidthSide, pos.z },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] + boxH },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] + boxH },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] + boxH },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] + boxH },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] },
 	};
 
 	std::array<ImVec2, box.size()> lines = {};
@@ -691,7 +672,7 @@ void ImGuiRender::drawBox3D(const Vector& pos, const ImVec2& width, const float 
 	}
 }
 
-void ImGuiRender::drawBox3DFilled(const Vector& pos, const ImVec2& width, const float height, const Color& color, const Color& filling, bool outlined, const float thickness)
+void ImGuiRender::drawBox3DFilled(const Vec3& pos, const ImVec2& width, const float height, const Color& color, const Color& filling, bool outlined, const float thickness)
 {
 	// dividing to get a centre to world position
 	float boxW = width.x / 2.0f;
@@ -703,14 +684,14 @@ void ImGuiRender::drawBox3DFilled(const Vector& pos, const ImVec2& width, const 
 
 	std::array box =
 	{
-		Vector{ pos.x - boxW, pos.y - boxWidthSide, pos.z },
-		Vector{ pos.x - boxW, pos.y - boxWidthSide, pos.z + boxH },
-		Vector{ pos.x + boxW, pos.y - boxWidthSide, pos.z + boxH },
-		Vector{ pos.x + boxW, pos.y - boxWidthSide, pos.z },
-		Vector{ pos.x - boxW, pos.y + boxWidthSide, pos.z },
-		Vector{ pos.x - boxW, pos.y + boxWidthSide, pos.z + boxH },
-		Vector{ pos.x + boxW, pos.y + boxWidthSide, pos.z + boxH },
-		Vector{ pos.x + boxW, pos.y + boxWidthSide, pos.z },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] + boxH },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] + boxH },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] + boxH },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] + boxH },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] },
 	};
 
 	// transormed points to get pos.x/.y
@@ -757,14 +738,14 @@ void ImGuiRender::drawCircleFilled(const float x, const float y, const float rad
 	m_drawData.emplace_back(std::make_shared<drawing::CircleFilled>(ImVec2{ x, y }, radius, points, Color::U32(color)));
 }
 
-void ImGuiRender::drawCircle3D(const Vector& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImGuiRender::drawCircle3D(const Vec3& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
 {
 	float step = math::PI * 2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
 	for (float angle = 0.0f; angle < (math::PI * 2.0f); angle += step)
 	{
-		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
+		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 		if (ImVec2 screenStart; worldToScreen(worldStart, screenStart))
 			pointsVec.push_back(screenStart);
 	}
@@ -775,14 +756,14 @@ void ImGuiRender::drawCircle3D(const Vector& pos, const float radius, const int 
 #include <SDK/IEngineTrace.hpp>
 #include <SDK/vars.hpp>
 
-void ImGuiRender::drawCircle3DTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImGuiRender::drawCircle3DTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
 {
 	float step = math::PI *2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
 	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
-		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
+		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 
 		Trace_t trace;
 		TraceFilter filter;
@@ -797,14 +778,14 @@ void ImGuiRender::drawCircle3DTraced(const Vector& pos, const float radius, cons
 	drawPolyLine(pointsVec, color, flags, thickness);
 }
 
-void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
+void ImGuiRender::drawCircle3DFilled(const Vec3& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
 	float step = math::PI *2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
 	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
-		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
+		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 		if (ImVec2 screenStart; worldToScreen(worldStart, screenStart))
 			pointsVec.push_back(screenStart);
 	}
@@ -813,14 +794,14 @@ void ImGuiRender::drawCircle3DFilled(const Vector& pos, const float radius, cons
 	drawPolyLine(pointsVec, color, flags, thickness);
 }
 
-void ImGuiRender::drawCircle3DFilledTraced(const Vector& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
+void ImGuiRender::drawCircle3DFilledTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
 	float step = math::PI *2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
 	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
-		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
+		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 
 		Trace_t trace;
 		TraceFilter filter;
@@ -936,11 +917,11 @@ ImVec2 ImGuiRender::getTextSize(ImFont* font, const std::string& text)
 	return ret;
 }
 
-bool ImGuiRender::worldToScreen(const Vector& in, Vector& out)
+bool ImGuiRender::worldToScreen(const Vec3& in, ImVec2& out)
 {
 	auto screenMatrix = g_Memory.m_viewMatrixAddr();
 
-	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
+	float w = screenMatrix[3][0] * in[Coord::X] + screenMatrix[3][1] * in[Coord::Y] + screenMatrix[3][2] * in[Coord::Z] + screenMatrix[3][3];
 
 	if (w < 0.001f)
 		return false;
@@ -948,45 +929,10 @@ bool ImGuiRender::worldToScreen(const Vector& in, Vector& out)
 	ImVec2 viewport = ImGui::GetIO().DisplaySize;
 
 	float inversed = 1.0f / w;
-	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
-	out.y = (viewport.y / 2.0f) - (0.5f * ((screenMatrix[1][0] * in.x + screenMatrix[1][1] * in.y + screenMatrix[1][2] * in.z + screenMatrix[1][3]) * inversed) * viewport.y + 0.5f);
-	out.z = 0.0f;
-
-	return true;
-}
-
-bool ImGuiRender::worldToScreen(const Vector& in, Vector2D& out)
-{
-	auto screenMatrix = g_Memory.m_viewMatrixAddr();
-
-	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
-
-	if (w < 0.001f)
-		return false;
-
-	ImVec2 viewport = ImGui::GetIO().DisplaySize;
-
-	float inversed = 1.0f / w;
-	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
-	out.y = (viewport.y / 2.0f) - (0.5f * ((screenMatrix[1][0] * in.x + screenMatrix[1][1] * in.y + screenMatrix[1][2] * in.z + screenMatrix[1][3]) * inversed) * viewport.y + 0.5f);
-
-	return true;
-}
-
-bool ImGuiRender::worldToScreen(const Vector& in, ImVec2& out)
-{
-	auto screenMatrix = g_Memory.m_viewMatrixAddr();
-
-	float w = screenMatrix[3][0] * in.x + screenMatrix[3][1] * in.y + screenMatrix[3][2] * in.z + screenMatrix[3][3];
-
-	if (w < 0.001f)
-		return false;
-
-	ImVec2 viewport = ImGui::GetIO().DisplaySize;
-
-	float inversed = 1.0f / w;
-	out.x = (viewport.x / 2.0f) + (0.5f * ((screenMatrix[0][0] * in.x + screenMatrix[0][1] * in.y + screenMatrix[0][2] * in.z + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
-	out.y = (viewport.y / 2.0f) - (0.5f * ((screenMatrix[1][0] * in.x + screenMatrix[1][1] * in.y + screenMatrix[1][2] * in.z + screenMatrix[1][3]) * inversed) * viewport.y + 0.5f);
+	out.x = (viewport.x / 2.0f) +
+		(0.5f * ((screenMatrix[0][0] * in[Coord::X] + screenMatrix[0][1] * in[Coord::Y] + screenMatrix[0][2] * in[Coord::Z] + screenMatrix[0][3]) * inversed) * viewport.x + 0.5f);
+	out.y = (viewport.y / 2.0f) -
+		(0.5f * ((screenMatrix[1][0] * in[Coord::X] + screenMatrix[1][1] * in[Coord::Y] + screenMatrix[1][2] * in[Coord::Z] + screenMatrix[1][3]) * inversed) * viewport.y + 0.5f);
 
 	return true;
 }
@@ -1002,7 +948,7 @@ void ImGuiRender::drawProgressRing(const float x, const float y, const float rad
 	m_drawData.emplace_back(std::make_shared<drawing::Arc>(ImVec2{ x, y }, radius, math::DEG2RAD(angleMin), math::DEG2RAD(maxAngle), points, Color::U32(color), flags, thickness));
 }
 
-void ImGuiRender::drawSphere(const Vector& pos, float radius, float angleSphere, const Color& color)
+void ImGuiRender::drawSphere(const Vec3& pos, float radius, float angleSphere, const Color& color)
 {
 	std::vector<ImVec2> verts = {};
 
@@ -1012,11 +958,11 @@ void ImGuiRender::drawSphere(const Vector& pos, float radius, float angleSphere,
 		verts.clear();
 		for (float angleBetween = 0.0f; angleBetween < math::PI * 2; angleBetween += step)
 		{
-			Vector worldStart =
+			Vec3 worldStart = Vec3
 			{
-				radius * std::sin(angle) * std::cos(angleBetween) + pos.x,
-				radius * std::sin(angle) * std::sin(angleBetween) + pos.y,
-				radius * std::cos(angle) + pos.z
+				radius * std::sin(angle) * std::cos(angleBetween) + pos[Coord::X],
+				radius * std::sin(angle) * std::sin(angleBetween) + pos[Coord::Y],
+				radius * std::cos(angle) + pos[Coord::Z]
 			};
 
 			if (ImVec2 screenStart; imRender.worldToScreen(worldStart, screenStart))
@@ -1030,7 +976,7 @@ void ImGuiRender::drawSphere(const Vector& pos, float radius, float angleSphere,
 	}
 }
 
-void ImGuiRender::drawCone(const Vector& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags, const float thickness)
+void ImGuiRender::drawCone(const Vec3& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags, const float thickness)
 {
 	ImVec2 orignalW2S = {};
 	if (!worldToScreen(pos, orignalW2S))
@@ -1040,8 +986,8 @@ void ImGuiRender::drawCone(const Vector& pos, const float radius, const int poin
 
 	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
 	{
-		Vector worldStart = { radius * std::cos(angle) + pos.x, radius * std::sin(angle) + pos.y, pos.z };
-		Vector worldEnd = { radius * std::cos(angle + step) + pos.x, radius * std::sin(angle + step) + pos.y, pos.z };
+		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
+		Vec3 worldEnd = Vec3{ radius * std::cos(angle + step) + pos[Coord::X], radius * std::sin(angle + step) + pos[Coord::Y], pos[Coord::Z] };
 
 		if (ImVec2 start, end; worldToScreen(worldStart, start) && worldToScreen(worldEnd, end))
 		{

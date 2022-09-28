@@ -6,7 +6,6 @@
 #include <array>
 
 class CViewSetup;
-struct Vector;
 
 class MotionBlur : public OverrideViewType
 {
@@ -24,13 +23,13 @@ private:
 	{
 		MotionBlurHistory_t() :
 			m_lastTimeUpdate{ 0.0f }, m_previousPitch{ 0.0f }, m_previousYaw{ 0.0f },
-			m_previousPositon{ Vector{} }, m_noRotationalMotionBlurUntil{ 0.0f }
+			m_previousPositon{ Vec3{} }, m_noRotationalMotionBlurUntil{ 0.0f }
 		{}
 
 		float m_lastTimeUpdate;
 		float m_previousPitch;
 		float m_previousYaw;
-		Vector m_previousPositon;
+		Vec3 m_previousPositon;
 		float m_noRotationalMotionBlurUntil;
 	} m_motionHistory;
 

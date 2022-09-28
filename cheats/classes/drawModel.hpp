@@ -1,12 +1,12 @@
 #pragma once
 
 #include "base.hpp"
+#include <SDK/math/matrix.hpp>
 
 #include <vector>
 
 struct DrawModelState_t;
 struct ModelRenderInfo_t;
-struct Matrix3x4;
 
 class DrawModelType : public BaseHack
 {

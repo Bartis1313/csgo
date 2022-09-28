@@ -58,8 +58,8 @@ public:
 	VFUNC(bool, isConnected, 27, (), (this));
 	VFUNC(int, getLocalPlayer, 12, (), (this));
 	VFUNC(int, getPlayerID, 9, (int id), (this, id));
-	VFUNC(void, setViewAngles, 19, (const Vector& angles), (this, std::cref(angles)));
-	VFUNC(void, getViewAngles, 18, (Vector& angles), (this, std::ref(angles)));
+	VFUNC(void, setViewAngles, 19, (const Vec3& angles), (this, std::cref(angles)));
+	VFUNC(void, getViewAngles, 18, (Vec3& angles), (this, std::ref(angles)));
 	VFUNC(int, getMaxClients, 20, (), (this));
 	VFUNC(int, getPlayerInfo, 8, (int index, PlayerInfo_t* info), (this, index, info));
 	VFUNC(void, getScreenSize, 5, (int& width, int& height), (this, std::ref(width), std::ref(height)));

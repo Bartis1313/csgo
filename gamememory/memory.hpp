@@ -1,5 +1,8 @@
 #pragma once
 
+#include <SDK/math/Vector.hpp>
+#include <SDK/math/matrix.hpp>
+
 #include <cstdint>
 #include <string>
 #include <unordered_map>
@@ -8,8 +11,6 @@
 struct CClientEffectRegistration;
 class Player_t;
 class AnimationLayer;
-struct Matrix4x4;
-struct Vector;
 class CMoveData;
 class ClientMode;
 class IViewRenderBeams;
@@ -72,17 +73,17 @@ private:
 	using loadSky_t = void(__fastcall*)(const char*);
 	using findHud_t = uintptr_t*(__thiscall*)(void* /*uintptr_t*/, const char*);
 	using sequenceActivity_t = int(__fastcall*)(void*, void*, int);
-	using inSmoke_t = bool(__cdecl*)(Vector, Vector);
+	using inSmoke_t = bool(__cdecl*)(Vec3, Vec3);
 	using isBreakable_t = bool(__thiscall*)(void*);
 	using flashlightDestroy_t = void(__thiscall*)(void*, void*);
-	using flashlightUpdate_t =  void(__thiscall*)(void*, int, const Vector&, const Vector&, const Vector&, const Vector&, float, float, float, bool, const char*);
-	using setAbsOrigin_t = void(__thiscall*)(void*, const Vector&);
+	using flashlightUpdate_t =  void(__thiscall*)(void*, int, const Vec3&, const Vec3&, const Vec3&, const Vec3&, float, float, float, bool, const char*);
+	using setAbsOrigin_t = void(__thiscall*)(void*, const Vec3&);
 	using isC4Owner_t = bool(__thiscall*)(void*);
 	using teslaCreate_t = void(__thiscall*)(CTeslaInfo&);
 	using dispatchEffect_t = int(__fastcall*)(const char*, const CEffectData&);
 	using particleCached_t = bool(__thiscall*)(void*, const char*);
 	using particleFindString_t = void(__thiscall*)(void*, int*, const char*);
-	using setParticleControlPoint_t = void(__thiscall*)(void*, int, Vector*);
+	using setParticleControlPoint_t = void(__thiscall*)(void*, int, Vec3*);
 
 
 	std::pair<uintptr_t, bool> scan(const std::string& mod, const std::string& sig, const uintptr_t offsetToAdd = 0);

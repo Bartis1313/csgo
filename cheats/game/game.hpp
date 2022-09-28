@@ -38,7 +38,7 @@ namespace game
     [[nodiscard]] float scaleDamageArmor(float dmg, const float armor);
     [[nodiscard]] uintptr_t* findHudElement(const std::string_view name);
     [[nodiscard]] bool isChatOpen();
-    [[nodiscard]] float getScaledFont(const Vector& source, const Vector& destination, const float division = 80.0f, const float min = 12.0f, const float max = 30.0f);
+    [[nodiscard]] float getScaledFont(const Vec3& source, const Vec3& destination, const float division = 80.0f, const float min = 12.0f, const float max = 30.0f);
     // studio is special case arg - because henade and flashbang have exactly same class id
     // and people who think definition index is ok are wrong, player ents DON'T hold the nade anymore in that case
     [[nodiscard]] WeaponIndex getNadeByClass(int idx, Studiohdr_t* studio);

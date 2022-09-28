@@ -41,9 +41,9 @@ void BulletTracer::draw(IGameEvent* event)
 	float y = event->getFloat(XOR("y"));
 	float z = event->getFloat(XOR("z"));
 
-	Vector src = local->getEyePos();
-	src.z += 1.0f;
-	Vector dst = { x, y, z };
+	Vec3 src = local->getEyePos();
+	src[Coord::Z] += 1.0f;
+	Vec3 dst = Vec3{ x, y, z };
 
 	if (!config.get<bool>(vars.bBulletTracer))
 		return;

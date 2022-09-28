@@ -2,7 +2,7 @@
 
 #include <classes/renderableToSurface.hpp>
 #include <SDK/math/Vector.hpp>
-#include <SDK/math/Vector2D.hpp>
+#include <SDK/math/Vector.hpp>
 
 #include <array>
 #include <deque>
@@ -43,7 +43,7 @@ private:
 	struct DormacyInfo_t
 	{
 		float m_alpha;
-		Vector m_lastPos;
+		Vec3 m_lastPos;
 		float m_lastUpdate;
 		bool m_calledEvent;
 

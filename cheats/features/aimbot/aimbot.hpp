@@ -16,7 +16,7 @@ struct AimbotTarget_t
 	uint64_t m_playerGuid;
 	float m_fov;
 	size_t m_index;
-	Vector m_pos;
+	Vec3 m_pos;
 
 	bool isBlackListed() const;
 };
@@ -31,20 +31,20 @@ public:
 	virtual void init();
 	virtual void run(CUserCmd* cmd);
 	Player_t* getTargetted() const;
-	Vector getCachedView() const;
-	Vector getBestHibox() const;
+	Vec3 getCachedView() const;
+	Vec3 getBestHibox() const;
 	CfgWeapon getCachedConfig() const;
 private:
 	void resetFields();
 	[[nodiscard]] bool isClicked(CUserCmd* cmd);
-	[[nodiscard]] bool getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, const Vector& punch);
+	[[nodiscard]] bool getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const Vec3& punch);
 
 	[[nodiscard]]  std::vector<size_t> getHitboxes();
 	Player_t* m_bestEnt;
-	Vector m_bestHitpos;
+	Vec3 m_bestHitpos;
 	bool m_delay;
 	float m_delayTime;
-	Vector m_view;
+	Vec3 m_view;
 	int m_bestId;
 	CfgWeapon m_config;
 

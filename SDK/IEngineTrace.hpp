@@ -1,6 +1,7 @@
 #pragma once
 
 #include "math/Vector.hpp"
+#include "math/VectorAligned.hpp"
 #include "math/matrix.hpp"
 #include "math/AABB.hpp"
 #include "Enums.hpp"
@@ -24,12 +25,12 @@ public:
 	bool m_isSwept;
 
 	Ray_t() = default;
-	Ray_t(const Vector& src, const Vector& dest) :
+	Ray_t(const Vec3& src, const Vec3& dest) :
 		m_start{ src }, m_delta{ dest - src }, m_mattrixWorldAxis{ nullptr }, m_isRay{ true }
 	{
 		m_isSwept = m_delta.lengthSqrt();
 	}
-	Ray_t(const Vector& src, const Vector& dest, const Vector& min, const Vector& max)
+	Ray_t(const Vec3& src, const Vec3& dest, const Vec3& min, const Vec3& max)
 	{
 		m_delta = (dest - src);
 
@@ -56,7 +57,7 @@ struct Csurface_t
 
 struct Cplane_t
 {
-	Vector m_normal;
+	Vec3 m_normal;
 	float m_distance;
 	char m_type;
 	char m_signBits;
@@ -65,8 +66,8 @@ struct Cplane_t
 
 struct Trace_t
 {
-	Vector m_start;
-	Vector m_end;
+	Vec3 m_start;
+	Vec3 m_end;
 	Cplane_t m_plane;
 	float m_fraction;
 	int m_contents;
@@ -111,7 +112,7 @@ public:
 class IEngineTrace
 {
 public:
-	VFUNC(int, getPointContents, 0, (const Vector& absPosition, int contentsMask), (this, std::cref(absPosition), contentsMask, nullptr));
+	VFUNC(int, getPointContents, 0, (const Vec3& absPosition, int contentsMask), (this, std::cref(absPosition), contentsMask, nullptr));
 	VFUNC(void, traceRay, 5, (const Ray_t& ray, unsigned int mask, TraceFilter* filter, Trace_t* trace), (this, std::cref(ray), mask, filter, trace));
-	VFUNC(bool, isFullyOccluded, 26, (int occlusionKey, const AABB_t& from, const AABB_t& to, const Vector& shadow), (this, occlusionKey, std::cref(from), std::cref(to), std::cref(shadow)));
+	VFUNC(bool, isFullyOccluded, 26, (int occlusionKey, const AABB_t& from, const AABB_t& to, const Vec3& shadow), (this, occlusionKey, std::cref(from), std::cref(to), std::cref(shadow)));
 };

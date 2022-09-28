@@ -37,11 +37,11 @@ void MirrorCam::run(const CViewSetup& view)
 
 	CViewSetup v = std::move(view);
 
-	v.m_angles.y = v.m_angles.y + 180.0f; // back
+	v.m_angles[Coord::Y] = v.m_angles[Coord::Y] + 180.0f; // back
 	v.x = v.xOld = 0;
 	v.y = v.yOld = 0;
-	v.m_width = v.m_widthOld = static_cast<int>(m_size.x);
-	v.m_height = v.m_heightOld = static_cast<int>(m_size.y);
+	v.m_width = v.m_widthOld = static_cast<int>(m_size[Coord::X]);
+	v.m_height = v.m_heightOld = static_cast<int>(m_size[Coord::Y]);
 	v.m_aspectRatio = static_cast<float>(v.m_width / v.m_height);
 	v.m_nearZ = v.m_nearViewModelZ = 7.0f;
 	v.m_fov = 50.0f;
@@ -98,7 +98,7 @@ void MirrorCamDraw::draw()
 			float xRatio = static_cast<float>(g_MirrorCam.m_texture->getActualWidth()) / size.x;
 			float yRatio = static_cast<float>(g_MirrorCam.m_texture->getActualHeight()) / size.y;
 
-			g_MirrorCam.setSize({ size.x * xRatio, size.y * yRatio });
+			g_MirrorCam.setSize(Vec2{ size.x * xRatio, size.y * yRatio });
 			ImGui::Image(g_MirrorCam.getTexture(), size);
 		}
 

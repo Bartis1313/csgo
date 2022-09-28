@@ -48,13 +48,13 @@ void MotionBlur::run(CViewSetup* view)
 	{
 		float timeElapsed = interfaces::globalVars->m_realtime - m_motionHistory.m_lastTimeUpdate;
 
-		float currentPitch = view->m_angles.x;
+		float currentPitch = view->m_angles[Coord::X];
 		while (currentPitch > 180.0f)
 			currentPitch -= 360.0f;
 		while (currentPitch < -180.0f)
 			currentPitch += 360.0f;
 
-		float currentYaw = view->m_angles.y;
+		float currentYaw = view->m_angles[Coord::Y];
 		while (currentYaw > 180.0f)
 			currentYaw -= 360.0f;
 		while (currentYaw < -180.0f)
@@ -62,8 +62,8 @@ void MotionBlur::run(CViewSetup* view)
 
 		auto [currentForwardVec, currentSideVec, uselessVec ] = math::angleVectors(view->m_angles);
 
-		Vector currentPosition = view->m_origin;
-		Vector positionChange = m_motionHistory.m_previousPositon - currentPosition;
+		Vec3 currentPosition = view->m_origin;
+		Vec3 positionChange = m_motionHistory.m_previousPositon - currentPosition;
 
 		if ((positionChange.length() > 30.0f) && (timeElapsed >= 0.5f))
 		{

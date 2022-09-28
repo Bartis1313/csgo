@@ -24,7 +24,7 @@ private:
 		int m_dmg;
 		int m_health;
 		bool m_head;
-		Vector m_pos;
+		Vec3 m_pos;
 
 		bool isAvailable() const { return m_health >= 0; }
 	};

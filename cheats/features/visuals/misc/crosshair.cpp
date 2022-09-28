@@ -46,7 +46,7 @@ void Crosshair::draw()
 
 	auto getPunchPos = [=]()
 	{
-		Vector angle;
+		Vec3 angle;
 		interfaces::engine->getViewAngles(angle);
 		angle += game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
 
@@ -73,7 +73,7 @@ void Crosshair::draw()
 	}
 	case E2T(CrossHairTypes::RECOIL):
 	{
-		if (Vector2D endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
+		if (ImVec2 endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
 		{
 			float x = endScreen.x;
 			float y = endScreen.y;
@@ -92,7 +92,7 @@ void Crosshair::draw()
 	}
 	case E2T(CrossHairTypes::SPREAD):
 	{
-		if (Vector2D endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
+		if (ImVec2 endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
 		{
 			// this is game's logic how to do it
 			/*float spread = weapon->getSpread();

@@ -368,7 +368,7 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 		if (i == lowerChest)
 			child = breast;
 
-		if (std::abs(deltachild.z) < 5.0f && deltaparent.length() < 5.0f && deltachild.length() < 5.0f || i == chest)
+		if (std::abs(deltachild[Coord::Z]) < 5.0f && deltaparent.length() < 5.0f && deltachild.length() < 5.0f || i == chest)
 			continue;
 
 		if (config.get<bool>(vars.bSkeletonDebugPoints))
@@ -432,7 +432,7 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 	if (!config.get<bool>(vars.bEsp))
 		return;
 
-	Box box{ ent };
+	Box box{ent};
 	if (!box.isValid())
 		return;
 

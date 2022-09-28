@@ -3,7 +3,8 @@
 #include <classes/renderableToSurface.hpp>
 #include <classes/frameStage.hpp>
 
-struct Vector;
+#include <SDK/math/Vector.hpp>
+
 class Color;
 struct ImFont;
 using ImDrawFlags = int;
@@ -18,7 +19,7 @@ public:
 	virtual void init();
 	virtual void draw();
 private:
-	void drawCustomSmokeEffect(const Vector& pos, float radius);
+	void drawCustomSmokeEffect(const Vec3& pos, float radius);
 };
 
 [[maybe_unused]] inline auto g_SmokeSraw = SmokeDraw{};

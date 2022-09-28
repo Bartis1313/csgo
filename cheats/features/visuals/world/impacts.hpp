@@ -19,14 +19,14 @@ public:
 private:
 	struct ClientHitVerify_t
 	{
-		Vector m_pos;
+		Vec3 m_pos;
 		float m_time;
 		float m_expire;
 	};
 
 	struct HitStruct_t
 	{
-		Vector m_pos;
+		Vec3 m_pos;
 		float m_expire;
 	};
 
@@ -48,8 +48,8 @@ private:
 	void pushBullet(IGameEvent* event);
 	struct HitStructLocal_t
 	{
-		Vector m_start;
-		Vector m_end;
+		Vec3 m_start;
+		Vec3 m_end;
 		float m_expire;
 	};
 

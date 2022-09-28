@@ -79,7 +79,7 @@ void Backtrack::run(CUserCmd* cmd)
 	Player_t* bestPlayer = nullptr;
 	int bestPlayerIdx = -1;
 	int bestRecordIdx = -1;
-	Vector bestPos = {};
+	Vec3 bestPos = {};
 
 	const auto aimPunch = game::localPlayer->getAimPunch();
 	const auto myEye = game::localPlayer->getEyePos();

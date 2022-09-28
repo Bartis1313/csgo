@@ -34,18 +34,18 @@ private:
 			m_nadeOwner{ owner }, m_index{ index }
 		{}
 
-		void simulate(const Vector& pos, const Vector& velocity, float nadeThrowTime, uint32_t ticks);
+		void simulate(const Vec3& pos, const Vec3& velocity, float nadeThrowTime, uint32_t ticks);
 		bool draw(Entity_t* entity, WeaponIndex idx);
 	private:
-		void addGravityMove(Vector& move, Vector& vel, float frametime);
-		void physicsClipVelocity(const Vector& in, const Vector& normal, Vector& out, float overbounce);
+		void addGravityMove(Vec3& move, Vec3& vel, float frametime);
+		void physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce);
 		void destroyTrace();
 		void push();
 		void handleDetonates();
 		void handleDestroy();
 		bool step(float interval);
-		void traceHull(const Vector& src, const Vector& end, Entity_t* entity, Trace_t* tr);
-		void pushEntity(const Vector& src, Trace_t& tr);
+		void traceHull(const Vec3& src, const Vec3& end, Entity_t* entity, Trace_t* tr);
+		void pushEntity(const Vec3& src, Trace_t& tr);
 		void resolveFlyCollisionCustom(Trace_t& tr, float interval);
 
 		bool m_detonated = false;
@@ -59,11 +59,11 @@ private:
 		size_t m_bouncesCheck = 0;
 
 		Player_t* m_nadeOwner = nullptr;
-		Vector m_pos = {};
-		Vector m_velocity = {};
+		Vec3 m_pos = {};
+		Vec3 m_velocity = {};
 		float m_nadeDetonateTime = {};
 		float m_nadeEndTime = {};
-		std::vector<Vector> m_path = {};
+		std::vector<Vec3> m_path = {};
 	};
 
 	std::unordered_map<int, NadeTrace_t> m_datas = {};

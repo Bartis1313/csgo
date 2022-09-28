@@ -14,8 +14,8 @@ struct BeamInfo_t
 	int m_startAttachment;
 	Entity_t* m_endEnt;
 	int m_EndAttachment;
-	Vector m_vecStart;
-	Vector m_vecEnd;
+	Vec3 m_vecStart;
+	Vec3 m_vecEnd;
 	int m_modelIndex;
 	const char* m_modelName;
 	int m_haloIndex;
@@ -36,7 +36,7 @@ struct BeamInfo_t
 	bool m_renderable;
 	int m_segments;
 	int m_flags;
-	Vector m_vecCenter;
+	Vec3 m_vecCenter;
 	float m_startRadius;
 	float m_endRadius;
 

@@ -26,7 +26,7 @@ std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
 	if (!game::isAvailable())
 		return { false, false };
 
-	Vector posDelta = ent->getEyePos() - game::localPlayer->getEyePos();
+	auto posDelta = ent->getEyePos() - game::localPlayer->getEyePos();
 	/*Vector idealAimAngle = math::vectorToAngle(posDelta);
 
 	idealAimAngle -= ent->m_aimPunchAngle() * m_scale->getFloat();
@@ -34,7 +34,7 @@ std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
 	Vector curEnemyAngle = ent->m_angEyeAngles();
 	curEnemyAngle.normalize();*/
 
-	Vector forward = math::angleVec(game::localPlayer->m_angEyeAngles());
+	auto forward = math::angleVec(game::localPlayer->m_angEyeAngles());
 	// yeah that's hardcoded and not 100% accurate, I thought of something like in radar as "fov view", but we can't be sure if enemy uses fov changer
 	bool isBehind = posDelta.dot(forward) < 15.0f;
 

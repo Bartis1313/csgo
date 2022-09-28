@@ -1,12 +1,12 @@
 #pragma once
 #pragma warning(disable:26495)
 
+#include <SDK/math/Vector.hpp>
 #include <dependencies/ImGui/imgui.h>
 
 #include <array>
 #include <utility>
 
-struct Vector;
 class Entity_t;
 
 struct Box final
@@ -29,7 +29,6 @@ struct Box final
 	ImVec2 bottomleft;
 	ImVec2 bottomright;
 private:
-	std::array<Vector, 8> buildAABB(const Vector& min, const Vector& max);
-	Box transformPoints(Entity_t* ent);
+	std::array<Vec3, 8> buildAABB(const Vec3& min, const Vec3& max);
 	bool m_isValid;
 };

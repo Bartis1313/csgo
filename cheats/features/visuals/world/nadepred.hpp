@@ -50,20 +50,20 @@ public:
 	virtual void init();
 	virtual void draw();
 private:
-	std::vector<Vector> m_path;
-	std::vector<Vector> m_bounces;
+	std::vector<Vec3> m_path;
+	std::vector<Vec3> m_bounces;
 protected:
-	void setup(Vector& src, Vector& vecThrow, const Vector& viewangles);
-	size_t step(Vector& src, Vector& vecThrow, int tick, float interval);
+	void setup(Vec3& src, Vec3& vecThrow, const Vec3& viewangles);
+	size_t step(Vec3& src, Vec3& vecThrow, int tick, float interval);
 	void simulate();
-	bool checkDetonate(const Vector& vecThrow, const Trace_t& tr, int tick, float interval);
-	void addGravityMove(Vector& move, Vector& vel, float frametime);
+	bool checkDetonate(const Vec3& vecThrow, const Trace_t& tr, int tick, float interval);
+	void addGravityMove(Vec3& move, Vec3& vel, float frametime);
 private:
-	void traceHull(Vector& src, Vector& end, Trace_t& tr);
-	void pushEntity(Vector& src, const Vector& move, Trace_t& tr);
-	void resolveFlyCollisionCustom(Trace_t& tr, Vector& velocity, const Vector& move, float interval);
+	void traceHull(Vec3& src, Vec3& end, Trace_t& tr);
+	void pushEntity(Vec3& src, const Vec3& move, Trace_t& tr);
+	void resolveFlyCollisionCustom(Trace_t& tr, Vec3& velocity, const Vec3& move, float interval);
 protected:
-	void physicsClipVelocity(const Vector& in, const Vector& normal, Vector& out, float overbounce);
+	void physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce);
 };
 
 [[maybe_unused]] inline auto g_GrenadePrediction = GrenadePrediction{};

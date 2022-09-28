@@ -24,7 +24,7 @@ public:
         long m_int;
         char* m_string;
         void* m_data;
-        Vector m_vector;
+        Vec3 m_vector;
         __int64 m_int64;
     };
     SendPropType  m_type;

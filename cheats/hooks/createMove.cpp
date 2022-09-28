@@ -45,7 +45,7 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	if (!verifiedCmd)
 		return;
 
-	Vector oldAngle = cmd->m_viewangles;
+	Vec3 oldAngle = cmd->m_viewangles;
 
 	// otherwise we moving
 	if (g_Freecam.isInCam())

@@ -22,9 +22,9 @@ void* Particle::getCallAddr(const std::string& name)
 	return *reinterpret_cast<void**>(*reinterpret_cast<uintptr_t*>(g_Memory.m_particleSystem()) + (0x4 * static_cast<uint16_t>(ret)));
 }
 
-void Particle::dispatchParticle(const std::string& name, const Vector& pos)
+void Particle::dispatchParticle(const std::string& name, const Vec3& pos)
 {
-	Vector copyPos = pos;
+	Vec3 copyPos = pos;
 
 	void* addr = getCallAddr(name);
 	const static auto _call = g_Memory.m_particleCall();
@@ -32,7 +32,7 @@ void Particle::dispatchParticle(const std::string& name, const Vector& pos)
 
 	// update pos, you can see bytes in set control point
 	__asm add esp, 8
-	*reinterpret_cast<Vector*>(reinterpret_cast<uintptr_t>(created) + 0x3B4) = copyPos;
+	*reinterpret_cast<Vec3*>(reinterpret_cast<uintptr_t>(created) + 0x3B4) = copyPos;
 
 
 	g_Memory.m_particleSetControlPoint()(created, 0, &copyPos);
@@ -41,7 +41,7 @@ void Particle::dispatchParticle(const std::string& name, const Vector& pos)
 
 // because calling ParticleStart or doing this by DispatchEvent did not work
 // have to wrap this for new particle keyvalues method, new because judging by xrefs there was some "old" method
-__declspec(naked) void* Particle::createParticle(void* caller, void* addr, Vector* pos)
+__declspec(naked) void* Particle::createParticle(void* caller, void* addr, Vec3* pos)
 {
 	__asm
 	{

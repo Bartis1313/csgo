@@ -66,7 +66,7 @@ void Aimbot::run(CUserCmd* cmd)
         return;
 
     const auto myEye = game::localPlayer->getEyePos();
-    const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::localPlayer->getAimPunch() : Vector{};
+    const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::localPlayer->getAimPunch() : Vec3{};
 
     if (!isClicked(cmd))
     {
@@ -110,7 +110,7 @@ void Aimbot::run(CUserCmd* cmd)
     auto angle = math::calcAngleRelative(myEye, bestpos, cmd->m_viewangles + punch);
     angle.clamp();
 
-    Vector delta = angle + cmd->m_viewangles - m_view;
+    Vec3 delta = angle + cmd->m_viewangles - m_view;
 
     if (auto smoothing = m_config.m_smooth; smoothing)
         angle /= smoothing;
@@ -122,7 +122,7 @@ void Aimbot::run(CUserCmd* cmd)
 
 //#include "../../../utilities/console/console.hpp"
 
-bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, const Vector& punch)
+bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
 { 
     /*bool isSame = m_temp == m_bestEnt;
     console.print("{}\n", isSame);*/
@@ -188,7 +188,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vector& eye, cons
 
         for (const auto pos : hitboxes)
         {
-            Vector hitPos = ent->getHitboxPos(pos);
+            Vec3 hitPos = ent->getHitboxPos(pos);
 
             auto angles = cmd->m_viewangles + punch;
             angles.clamp();
@@ -221,12 +221,12 @@ Player_t* Aimbot::getTargetted() const
     return m_bestEnt;
 }
 
-Vector Aimbot::getCachedView() const
+Vec3 Aimbot::getCachedView() const
 {
     return m_view;
 }
 
-Vector Aimbot::getBestHibox() const
+Vec3 Aimbot::getBestHibox() const
 {
     return m_bestHitpos;
 }

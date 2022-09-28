@@ -48,7 +48,7 @@ void Flashlight::destroyFlashLight(CFlashlightEffect* flashlight)
 	g_Memory.m_flashlightDestroy()(flashlight, nullptr); // second arg is not even used there
 }
 
-void Flashlight::updateFlashlight(CFlashlightEffect* flashlight, const Vector& pos, const Vector& forward, const Vector& right, const Vector& up)
+void Flashlight::updateFlashlight(CFlashlightEffect* flashlight, const Vec3& pos, const Vec3& forward, const Vec3& right, const Vec3& up)
 {
 	g_Memory.m_flashlightUpdate()(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov, flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
 }
@@ -120,7 +120,7 @@ void Flashlight::run(int frame)
 	if (!m_flashlight)
 		return;
 
-	Vector angle;
+	Vec3 angle;
 	interfaces::engine->getViewAngles(angle);
 	auto [forward, right, up] = math::angleVectors(angle);
 

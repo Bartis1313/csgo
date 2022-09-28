@@ -8,21 +8,14 @@
 
 Box::Box(Entity_t* ent)
 {
-	transformPoints(ent);
-}
-
-Box Box::transformPoints(Entity_t* ent)
-{
 	const auto col = ent->collideable();
 	if (!col)
 	{
 		m_isValid = false;
-		return {};
+		return;
 	}
-
 	const auto& min = col->OBBMins();
 	const auto& max = col->OBBMaxs();
-
 	const auto& matrixWorld = ent->renderableToWorldTransform();
 
 	float left = std::numeric_limits<float>::max();
@@ -30,17 +23,15 @@ Box Box::transformPoints(Entity_t* ent)
 	float right = -std::numeric_limits<float>::max();
 	float bottom = -std::numeric_limits<float>::max();
 
-	auto points = buildAABB(min, max);
+	const auto points = buildAABB(min, max);
 
 	std::array<ImVec2, 8> screen = {};
-	Box resBox = {};
-
 	for (size_t i = 0; auto & el : screen)
 	{
 		if (!imRender.worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
 		{
 			m_isValid = false;
-			return {};
+			return;
 		}
 
 		left = std::min(left, el.x);
@@ -48,40 +39,38 @@ Box Box::transformPoints(Entity_t* ent)
 		right = std::max(right, el.x);
 		bottom = std::max(bottom, el.y);
 
-		resBox.points.at(i) = el;
+		this->points.at(i) = el;
 
 		i++;
 	}
 
-	resBox.x = left;
-	resBox.y = top;
-	resBox.w = right - left;
-	resBox.h = bottom - top;
+	this->x = left;
+	this->y = top;
+	this->w = right - left;
+	this->h = bottom - top;
 
 	// get important points, eg: if you use 3d box, you want to render health by quads, not rects
 
-	resBox.topleft = screen.at(7);
-	resBox.topright = screen.at(6);
-	resBox.bottomleft = screen.at(3);
-	resBox.bottomright = screen.at(2);
+	this->topleft = screen.at(7);
+	this->topright = screen.at(6);
+	this->bottomleft = screen.at(3);
+	this->bottomright = screen.at(2);
 
 	m_isValid = true;
-
-	return resBox;
 }
 
-std::array<Vector, 8> Box::buildAABB(const Vector& min, const Vector& max)
+std::array<Vec3, 8> Box::buildAABB(const Vec3& min, const Vec3& max)
 {
 	std::array points =
 	{
-		Vector{ min.x, min.y, min.z },
-		Vector{ min.x, max.y, min.z },
-		Vector{ max.x, max.y, min.z },
-		Vector{ max.x, min.y, min.z },
-		Vector{ min.x, min.y, max.z },
-		Vector{ min.x, max.y, max.z },
-		Vector{ max.x, max.y, max.z },
-		Vector{ max.x, min.y, max.z }
+		Vec3{ min[Coord::X], min[Coord::Y], min[Coord::Z] },
+		Vec3{ min[Coord::X], max[Coord::Y], min[Coord::Z] },
+		Vec3{ max[Coord::X], max[Coord::Y], min[Coord::Z] },
+		Vec3{ max[Coord::X], min[Coord::Y], min[Coord::Z] },
+		Vec3{ min[Coord::X], min[Coord::Y], max[Coord::Z] },
+		Vec3{ min[Coord::X], max[Coord::Y], max[Coord::Z] },
+		Vec3{ max[Coord::X], max[Coord::Y], max[Coord::Z] },
+		Vec3{ max[Coord::X], min[Coord::Y], max[Coord::Z] }
 	};
 
 	return points;

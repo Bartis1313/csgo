@@ -36,10 +36,10 @@ class Entity_t
 {
 public:
 	NETVAR(int, m_iTeamNum, "DT_CSPlayer", "m_iTeamNum");
-	NETVAR(Vector, m_vecOrigin, "DT_BasePlayer", "m_vecOrigin");
+	NETVAR(Vec3, m_vecOrigin, "DT_BasePlayer", "m_vecOrigin");
 	NETVAR(int, m_hOwnerEntity, "DT_BaseEntity", "m_hOwnerEntity");
 	NETVAR(int, m_CollisionGroup, "DT_BasePlayer", "m_CollisionGroup");
-	NETVAR(Vector, m_ViewOffset, "DT_BasePlayer", "m_vecViewOffset[0]");
+	NETVAR(Vec3, m_ViewOffset, "DT_BasePlayer", "m_vecViewOffset[0]");
 	NETVAR(bool, m_bSpotted, "DT_BaseEntity", "m_bSpotted");
 	NETVAR(float, m_flSimulationTime, "DT_BasePlayer", "m_flSimulationTime");
 	NETVAR(float, m_flMaxspeed, "DT_BasePlayer", "m_flMaxspeed");
@@ -47,12 +47,12 @@ public:
 	//NETVAR_ADDR(Matrix3x4, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
 	NETVAR(PrecipitationType_t, m_nPrecipType, "DT_Precipitation", "m_nPrecipType");
 
-	VFUNC(Vector&, absOrigin, ABS_ORIGIN, (), (this));
-	VFUNC(Vector&, absAngles, ABS_ANGLE, (), (this));
+	VFUNC(Vec3&, absOrigin, ABS_ORIGIN, (), (this));
+	VFUNC(Vec3&, absAngles, ABS_ANGLE, (), (this));
 	VFUNC(ClientClass*, clientClass, CLIENT_CLASS, (), (this + NETWORKABLE));
 	VFUNC(ICollideable*, collideable, COLLIDEABLE, (), (this));
 	VFUNC(int, getIndex, GET_INDEX, (), (this + NETWORKABLE));
-	VFUNC(void, getRenderBounds, RENDER_BOUNDS, (Vector& mins, Vector& maxs), (this + RENDERABLE, std::ref(mins), std::ref(maxs)));
+	VFUNC(void, getRenderBounds, RENDER_BOUNDS, (Vec3& mins, Vec3& maxs), (this + RENDERABLE, std::ref(mins), std::ref(maxs)));
 	VFUNC(bool, isPlayer, ISPLAYER, (), (this));
 	VFUNC(bool, isWeapon, ISWEAPON, (), (this));
 	VFUNC(bool, setupBones, SETUP_BONES, (Matrix3x4* out, int maxBones, int mask, float time), (this + RENDERABLE, out, maxBones, mask, time));
@@ -68,8 +68,8 @@ public:
 	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 
 	_NODISCARD CUtlVector<Matrix3x4> m_CachedBoneData();
-	_NODISCARD Vector getAimPunch();
-	_NODISCARD Vector getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
+	_NODISCARD Vec3 getAimPunch();
+	_NODISCARD Vec3 getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
 	_NODISCARD AnimationLayer* getAnimOverlays();
 	_NODISCARD size_t getSequenceActivity(size_t sequence);
 
@@ -126,7 +126,7 @@ public:
 	PTRNETVAR(int, m_fireXDelta, "DT_Inferno", "m_fireXDelta");
 	PTRNETVAR(int, m_fireYDelta, "DT_Inferno", "m_fireYDelta");
 	PTRNETVAR(int, m_fireZDelta, "DT_Inferno", "m_fireZDelta");
-	_NODISCARD Vector getInfernoPos(size_t indexFire);
+	_NODISCARD Vec3 getInfernoPos(size_t indexFire);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -137,8 +137,8 @@ public:
 	NETVAR_ADDR(float, m_flSpawnTime, "DT_BaseCSGrenadeProjectile", "m_vecExplodeEffectOrigin", 0xC);
 	NETVAR(int, m_hThrower, "DT_BaseCSGrenadeProjectile", "m_hThrower");
 	NETVAR(int, m_nExplodeEffectTickBegin, "DT_BaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin");
-	NETVAR(Vector, m_vecVelocity, "DT_BaseCSGrenadeProjectile", "m_vecVelocity");
-	NETVAR(Vector, m_vecOrigin, "DT_BaseCSGrenadeProjectile", "m_vecOrigin");
+	NETVAR(Vec3, m_vecVelocity, "DT_BaseCSGrenadeProjectile", "m_vecVelocity");
+	NETVAR(Vec3, m_vecOrigin, "DT_BaseCSGrenadeProjectile", "m_vecOrigin");
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -168,10 +168,10 @@ public:
 class Player_t : public Entity_t
 {
 public:
-	NETVAR(Vector, m_angEyeAngles, "DT_CSPlayer", "m_angEyeAngles");
-	NETVAR(Vector, m_viewPunchAngle, "DT_BasePlayer", "m_viewPunchAngle");
-	NETVAR(Vector, m_aimPunchAngle, "DT_BasePlayer", "m_aimPunchAngle");
-	NETVAR(Vector, m_vecVelocity, "DT_BasePlayer", "m_vecVelocity[0]");
+	NETVAR(Vec3, m_angEyeAngles, "DT_CSPlayer", "m_angEyeAngles");
+	NETVAR(Vec3, m_viewPunchAngle, "DT_BasePlayer", "m_viewPunchAngle");
+	NETVAR(Vec3, m_aimPunchAngle, "DT_BasePlayer", "m_aimPunchAngle");
+	NETVAR(Vec3, m_vecVelocity, "DT_BasePlayer", "m_vecVelocity[0]");
 	NETVAR(int, m_iHealth, "DT_CSPlayer", "m_iHealth");
 	NETVAR(int, m_ArmorValue, "DT_CSPlayer", "m_ArmorValue");
 	NETVAR(bool, m_bIsScoped, "DT_CSPlayer", "m_bIsScoped");
@@ -199,15 +199,15 @@ public:
 	NETVAR(int, m_iAccount, "DT_CSPlayer", "m_iAccount");
 	PTRNETVAR(const char, m_szLastPlaceName, "DT_BasePlayer", "m_szLastPlaceName");
 
-	void setAbsOrigin(const Vector& origin);
+	void setAbsOrigin(const Vec3& origin);
 	_NODISCARD Weapon_t* getActiveWeapon();
 	_NODISCARD bool isAlive() { return m_iHealth() > 0; }
 	_NODISCARD bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
-	_NODISCARD bool isMoving() { return m_vecVelocity().length2D() > 0.1f; }
+	_NODISCARD bool isMoving() { return m_vecVelocity().toVec2D().length() > 0.1f; }
 
-	_NODISCARD Vector getHitboxPos(const int id);
-	_NODISCARD Vector getBonePos(const int id);
-	_NODISCARD Vector getHitgroupPos(const int hitgroup);
+	_NODISCARD Vec3 getHitboxPos(const int id);
+	_NODISCARD Vec3 getBonePos(const int id);
+	_NODISCARD Vec3 getHitgroupPos(const int hitgroup);
 	_NODISCARD bool isC4Owner();
 	_NODISCARD std::string getName();
 	_NODISCARD int getKills();
@@ -215,8 +215,8 @@ public:
 	_NODISCARD int getPing();
 	_NODISCARD std::string getRank(bool useShortName = false);
 	_NODISCARD int getWins();
-	_NODISCARD bool isPossibleToSee(Player_t* player, const Vector& pos);
-	_NODISCARD bool isViewInSmoke(const Vector& pos);
+	_NODISCARD bool isPossibleToSee(Player_t* player, const Vec3& pos);
+	_NODISCARD bool isViewInSmoke(const Vec3& pos);
 	_NODISCARD bool isOtherTeam(Player_t* player);
 	// address as number
 	_NODISCARD uintptr_t getLiteralAddress();
@@ -256,7 +256,7 @@ public:
 class EnvAmbientLight_t : public Entity_t
 {
 public:
-	NETVAR(Vector, m_vecColor, "DT_EnvAmbientLight", "m_vecColor");
+	NETVAR(Vec3, m_vecColor, "DT_EnvAmbientLight", "m_vecColor");
 };
 
 #undef RENDERABLE

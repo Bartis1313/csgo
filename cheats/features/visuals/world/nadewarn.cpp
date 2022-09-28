@@ -34,7 +34,7 @@ bool GrenadeWarning::NadeTrace_t::step(float interval)
 	if (m_detonated)
 		return true;
 
-	Vector move;
+	Vec3 move;
 	addGravityMove(move, m_velocity, interval);
 	Trace_t tr;
 	pushEntity(move, tr);
@@ -47,7 +47,7 @@ bool GrenadeWarning::NadeTrace_t::step(float interval)
 	return false;
 }
 
-void GrenadeWarning::NadeTrace_t::physicsClipVelocity(const Vector& in, const Vector& normal, Vector& out, float overbounce)
+void GrenadeWarning::NadeTrace_t::physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce)
 {
 	constexpr float STOP_EPSILON = 0.1f;
 
@@ -61,20 +61,20 @@ void GrenadeWarning::NadeTrace_t::physicsClipVelocity(const Vector& in, const Ve
 	}
 }
 
-void GrenadeWarning::NadeTrace_t::addGravityMove(Vector& move, Vector& vel, float frametime)
+void GrenadeWarning::NadeTrace_t::addGravityMove(Vec3& move, Vec3& vel, float frametime)
 {
-	move.x = vel.x * frametime;
-	move.y = vel.y * frametime;
+	move[Coord::X] = vel[Coord::X] * frametime;
+	move[Coord::Y] = vel[Coord::Y] * frametime;
 
 	const static float svgrav = interfaces::cvar->findVar(XOR("sv_gravity"))->getFloat();
 	float gravity = svgrav * 0.4f;
-	float z = vel.z - (gravity * frametime);
-	move.z = ((vel.z + z) / 2.0f) * frametime;
+	float z = vel[Coord::Z] - (gravity * frametime);
+	move[Coord::Z] = ((vel[Coord::Z] + z) / 2.0f) * frametime;
 
-	vel.z = z;
+	vel[Coord::Z] = z;
 }
 
-void GrenadeWarning::NadeTrace_t::traceHull(const Vector& src, const Vector& end, Entity_t* entity, Trace_t* tr)
+void GrenadeWarning::NadeTrace_t::traceHull(const Vec3& src, const Vec3& end, Entity_t* entity, Trace_t* tr)
 {
 	uintptr_t filter[] =
 	{
@@ -84,10 +84,10 @@ void GrenadeWarning::NadeTrace_t::traceHull(const Vector& src, const Vector& end
 		0
 	};
 
-	interfaces::trace->traceRay({ src, end, { -2.0f, -2.0f, -2.0f }, { 2.f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), tr);
+	interfaces::trace->traceRay({ src, end, Vec3{ -2.0f, -2.0f, -2.0f }, Vec3{ 2.f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), tr);
 }
 
-void GrenadeWarning::NadeTrace_t::pushEntity(const Vector& src, Trace_t& tr)
+void GrenadeWarning::NadeTrace_t::pushEntity(const Vec3& src, Trace_t& tr)
 {
 	traceHull(m_pos, m_pos + src, m_nadeOwner, &tr);
 
@@ -96,7 +96,7 @@ void GrenadeWarning::NadeTrace_t::pushEntity(const Vector& src, Trace_t& tr)
 	{
 		const static float weapon_molotov_maxdetonateslope = interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
 
-		if (bool res = tr.didHit() && tr.m_plane.m_normal.z >= std::cos(math::DEG2RAD(weapon_molotov_maxdetonateslope)); res)
+		if (bool res = tr.didHit() && tr.m_plane.m_normal[Coord::Z] >= std::cos(math::DEG2RAD(weapon_molotov_maxdetonateslope)); res)
 			destroyTrace();
 	}
 }
@@ -129,7 +129,7 @@ void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float i
 	float totalElascity = surfaceElasticity * nadeElascity;
 	totalElascity = std::clamp(totalElascity, 0.0f, 0.9f);
 
-	Vector absVelocity;
+	Vec3 absVelocity;
 	physicsClipVelocity(m_velocity, tr.m_plane.m_normal, absVelocity, 2.0f);
 	absVelocity *= totalElascity;
 
@@ -139,7 +139,7 @@ void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float i
 	if (speedAbsSqr < minSpeed)
 		absVelocity = {};
 
-	if (tr.m_plane.m_normal.z > 0.7f)
+	if (tr.m_plane.m_normal[Coord::Z] > 0.7f)
 	{
 		m_velocity = absVelocity;
 		absVelocity *= ((1.0f - tr.m_fraction) * interval);
@@ -158,7 +158,7 @@ void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float i
 void GrenadeWarning::NadeTrace_t::handleDestroy()
 {
 	if (m_index == WEAPON_DECOY || m_index == WEAPON_SMOKEGRENADE)
-		if (m_velocity.length2D() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
+		if (m_velocity.toVec2D().length() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
 		{
 			//printf("did destroy\n");
 			destroyTrace();
@@ -203,7 +203,7 @@ void GrenadeWarning::NadeTrace_t::handleDetonates()
 	}
 }
 
-void GrenadeWarning::NadeTrace_t::simulate(const Vector& pos, const Vector& velocity, float nadeThrowTime, uint32_t ticks)
+void GrenadeWarning::NadeTrace_t::simulate(const Vec3& pos, const Vec3& velocity, float nadeThrowTime, uint32_t ticks)
 {
 	m_pos = pos;
 	m_velocity = velocity;
@@ -247,7 +247,7 @@ bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 	if (float dist = m_path.back().distToMeters(game::localPlayer->absOrigin()); dist > config.get<float>(vars.fNadeTracerMaxDist))
 		return false;
 
-	for (Vector prev = m_path.front(); const auto & el : m_path)
+	for (Vec3 prev = m_path.front(); const auto & el : m_path)
 	{
 		if (ImVec2 end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
 			imRender.drawLine(start, end, config.get<CfgColor>(vars.cNadeTracer).getColor(), 2.0f);
@@ -273,40 +273,40 @@ bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 	auto size = ImFonts::icon->CalcTextSizeA(rad + 5.0f, std::numeric_limits<float>::max(), 0.0f, name.c_str());
 	imRender.text(start.x, start.y - (size.y / 2.0f), rad + 5.0f, ImFonts::icon, name, true, Colors::White, false);
 
-	auto rotatePoint2D = [](const Vector2D& source, const Vector2D& dest, float rotateAngle)
+	auto rotatePoint2D = [](const Vec2& source, const Vec2& dest, float rotateAngle)
 	{
 		const auto delta = dest - source;
 
-		Vector2D pointRotation
+		Vec2 pointRotation
 		{
-			delta.x * std::sin(rotateAngle) - delta.y * std::cos(rotateAngle),
-			delta.x * std::cos(rotateAngle) + delta.y * std::sin(rotateAngle)
+			delta[Coord::X] * std::sin(rotateAngle) - delta[Coord::Y] * std::cos(rotateAngle),
+			delta[Coord::X] * std::cos(rotateAngle) + delta[Coord::Y] * std::sin(rotateAngle)
 		};
 
 		return source + pointRotation;
 	};
 
-	Vector2D uselessVec;
+	ImVec2 uselessVec;
 	if (config.get<bool>(vars.bNadeTracerWarn) && !imRender.worldToScreen(m_pos, uselessVec))
 	{
-		const auto centre = Vector2D{ globals::screenX / 2.0f, globals::screenY / 2.0f };
+		const auto centre = Vec2{ globals::screenX / 2.0f, globals::screenY / 2.0f };
 
-		Vector localViewAngle;
+		Vec3 localViewAngle;
 		interfaces::engine->getViewAngles(localViewAngle);
 		const auto& localPos = game::localPlayer->absOrigin();
 		const auto angleToNade = math::calcAngleRelative(localPos, m_pos, localViewAngle);
 
 		auto screenPosition = centre;
-		screenPosition.x -= std::clamp(localPos.distTo(m_pos), 120.0f, centre.y - 12.0f); // 12.0f - min size possible here so wanna clip it
+		screenPosition[Coord::X] -= std::clamp(localPos.distTo(m_pos), 120.0f, centre[Coord::Y] - 12.0f); // 12.0f - min size possible here so wanna clip it
 
-		const auto pos = rotatePoint2D(centre, screenPosition, math::DEG2RAD(angleToNade.y));
+		const auto pos = rotatePoint2D(centre, screenPosition, math::DEG2RAD(angleToNade[Coord::Y]));
 
-		imRender.drawCircleFilled(pos.x, pos.y, rad, 32, Colors::Black);
-		imRender.drawProgressRing(pos.x, pos.y, rad, 32, -90.0f, scale, 3.0f, Colors::Green);
+		imRender.drawCircleFilled(pos[Coord::X], pos[Coord::Y], rad, 32, Colors::Black);
+		imRender.drawProgressRing(pos[Coord::X], pos[Coord::Y], rad, 32, -90.0f, scale, 3.0f, Colors::Green);
 
 		auto name = utilities::u8toStr(reinterpret_cast<Weapon_t*>(entity)->getIcon(idx));
 		auto size = ImFonts::icon->CalcTextSizeA(rad + 5.0f, std::numeric_limits<float>::max(), 0.0f, name.c_str());
-		imRender.text(pos.x, pos.y - (size.y / 2.0f), rad + 5.0f, ImFonts::icon, name, true, Colors::White, false);
+		imRender.text(pos[Coord::X], pos[Coord::Y] - (size.y / 2.0f), rad + 5.0f, ImFonts::icon, name, true, Colors::White, false);
 	}
 
 	return true;

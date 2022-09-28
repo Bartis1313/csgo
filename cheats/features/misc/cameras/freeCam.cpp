@@ -30,19 +30,19 @@ void Freecam::run(CViewSetup* view)
 	}
 
 	// OR get center from map info?
-	static Vector v = view->m_angles;
+	static Vec3 v = view->m_angles;
 
 	if (config.get<Key>(vars.kFreeCam).isEnabled())
 	{
 		m_inCam = true;
 
 		float& speed = config.getRef<float>(vars.fFreeCam);
-		Vector ang = view->m_angles;
+		Vec3 ang = view->m_angles;
 
-		float sinYaw = std::sin(math::DEG2RAD(ang.y));
-		float sinPitch = std::sin(math::DEG2RAD(ang.x));
-		float cosYaw = std::cos(math::DEG2RAD(ang.y));
-		float cosPitch = std::cos(math::DEG2RAD(ang.x));
+		float sinYaw = std::sin(math::DEG2RAD(ang[1]));
+		float sinPitch = std::sin(math::DEG2RAD(ang[0]));
+		float cosYaw = std::cos(math::DEG2RAD(ang[1]));
+		float cosPitch = std::cos(math::DEG2RAD(ang[0]));
 
 		// to make this ideal we also can do cases like W+A
 		// pseudo: correct.x = (-sin(view.x) + cos(view.x)) / 2.0f; ...something like this
@@ -56,33 +56,33 @@ void Freecam::run(CViewSetup* view)
 
 		if (inputHandler.isKeyDown(VK_SPACE))
 		{
-			v.x += cosYaw * cosPitch;
-			v.y += sinYaw * cosPitch;
-			v.z += std::sin(math::DEG2RAD(-(ang.x - 90.0f)));
+			v[0] += cosYaw * cosPitch;
+			v[1] += sinYaw * cosPitch;
+			v[2] += std::sin(math::DEG2RAD(-(ang[0] - 90.0f)));
 		}
 		if(inputHandler.isKeyDown(0x57)) // w
 		{
-			v.x += cosYaw * cosPitch;
-			v.y += sinYaw * cosPitch;
-			v.z += -sinPitch;
+			v[0] += cosYaw * cosPitch;
+			v[1] += sinYaw * cosPitch;
+			v[2] += -sinPitch;
 		}
 		if (inputHandler.isKeyDown(0x41)) // a
 		{
-			v.x += std::cos(math::DEG2RAD(ang.y + 90.0f)) * cosPitch;
-			v.y += std::sin(math::DEG2RAD(ang.y + 90.0f)) * cosPitch;
-			v.z += -sinPitch;
+			v[0] += std::cos(math::DEG2RAD(ang[1] + 90.0f)) * cosPitch;
+			v[1] += std::sin(math::DEG2RAD(ang[1] + 90.0f)) * cosPitch;
+			v[2] += -sinPitch;
 		}
 		if (inputHandler.isKeyDown(0x53)) // s
 		{
-			v.x -= cosYaw * cosPitch;
-			v.y -= sinYaw * cosPitch;
-			v.z -= -sinPitch;
+			v[0] -= cosYaw * cosPitch;
+			v[1] -= sinYaw * cosPitch;
+			v[2] -= -sinPitch;
 		}
 		if (inputHandler.isKeyDown(0x44)) // d
 		{
-			v.x -= std::cos(math::DEG2RAD(ang.y + 90.0f)) * cosPitch;
-			v.y -= std::sin(math::DEG2RAD(ang.y + 90.0f)) * cosPitch;
-			v.z += -sinPitch;
+			v[0] -= std::cos(math::DEG2RAD(ang[1] + 90.0f)) * cosPitch;
+			v[1] -= std::sin(math::DEG2RAD(ang[1] + 90.0f)) * cosPitch;
+			v[2] += -sinPitch;
 		}
 		view->m_origin = v * speed;
 	}

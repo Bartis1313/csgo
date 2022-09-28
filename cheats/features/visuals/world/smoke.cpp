@@ -55,10 +55,15 @@ void SmokeDraw::draw()
 	}
 }
 
-void SmokeDraw::drawCustomSmokeEffect(const Vector& pos, float radius)
+void SmokeDraw::drawCustomSmokeEffect(const Vec3& pos, float radius)
 {
 	// clockwise for better effect
-	Vector end = { radius * std::sin(interfaces::globalVars->m_curtime) + pos.x, radius * std::cos(interfaces::globalVars->m_curtime) + pos.y, pos.z };
+	Vec3 end = Vec3
+	{
+		radius * std::sin(interfaces::globalVars->m_curtime) + pos[Coord::X],
+		radius * std::cos(interfaces::globalVars->m_curtime) + pos[Coord::Y],
+		pos[Coord::Z]
+	};
 
 	interfaces::effects->smoke(end, -1, 5.0f, 1.0f);
 }

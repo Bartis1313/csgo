@@ -31,9 +31,9 @@ private:
 	struct StoredRecord
 	{
 		float m_simtime = 0.0f;
-		Vector m_head = {};
+		Vec3 m_head = {};
 		// use origin to set abs or for whatever need
-		Vector m_origin = {};
+		Vec3 m_origin = {};
 		std::array<Matrix3x4, BONE_USED_BY_HITBOX> m_matrix;
 	};
 

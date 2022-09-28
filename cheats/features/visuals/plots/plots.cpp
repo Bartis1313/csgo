@@ -189,7 +189,7 @@ void Plots::drawVelocity()
 		};
 
 		text(imRenderWindow.getPos().x + width / 2.0f, imRenderWindow.getPos().y + 20.0f + height, 30.0f, ImFonts::franklinGothic30,
-			std::format("{}", std::round(game::localPlayer->m_vecVelocity().length2D())), true, Colors::Pink, false);
+			FORMAT(XOR("{}"), std::round(game::localPlayer->m_vecVelocity().toVec2D().length())), true, Colors::Pink, false);
 
 		imRenderWindow.end();
 		ImGui::End();
@@ -217,14 +217,14 @@ void VelocityGather::run(CUserCmd* cmd)
 		return;
 	}
 
-	float vel = game::localPlayer->m_vecVelocity().length2D();
+	float vel = game::localPlayer->m_vecVelocity().toVec2D().length();
 	if (std::isinf(vel))
 	{
 		console.log(TypeLogs::LOG_WARN, XOR("record for plot got skipped due to infinity"));
 		return;
 	}
 
-	g_Plots.m_VelocityRecords.emplace_back(game::localPlayer->m_vecVelocity().length2D());
+	g_Plots.m_VelocityRecords.emplace_back(game::localPlayer->m_vecVelocity().toVec2D().length());
 
 	// width
 	while (g_Plots.m_VelocityRecords.size() > static_cast<size_t>(g_Plots.RECORDS_SIZE / g_Plots.m_acceptanceVelocity))

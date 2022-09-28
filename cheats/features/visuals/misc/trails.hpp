@@ -16,7 +16,7 @@ public:
 private:
 	struct Trail_t
 	{
-		Vector m_pos;
+		Vec3 m_pos;
 		float m_expire;
 		Color m_col;
 	};

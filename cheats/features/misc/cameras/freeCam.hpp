@@ -18,7 +18,7 @@ public:
 	_NODISCARD constexpr bool isInCam() const { return m_inCam; }
 private:
 	bool m_inCam = false;
-	Vector m_view;
+	Vec3 m_view;
 };
 
 [[maybe_unused]] inline auto g_Freecam = Freecam{};

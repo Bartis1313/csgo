@@ -18,7 +18,7 @@ void Trails::init()
 
 void Trails::draw()
 {
-	static Vector end;
+	static Vec3 end;
 
 	if (!game::isAvailable())
 		return;
@@ -43,7 +43,7 @@ void Trails::draw()
 		if (!game::localPlayer->isMoving()) // do not add beams on not moving
 			return;
 
-		const Vector start = game::localPlayer->m_vecOrigin();
+		const Vec3 start = game::localPlayer->m_vecOrigin();
 
 		BeamInfo_t info = {};
 
@@ -83,7 +83,7 @@ void Trails::draw()
 		if (game::localPlayer->isMoving())
 			m_trails.push_back(Trail_t{ game::localPlayer->m_vecOrigin(), curtime + config.get<float>(vars.fMovementLife), color.getColor() });
 
-		Vector last = {};
+		Vec3 last = {};
 		if (!m_trails.empty())
 			last = m_trails.front().m_pos;
 

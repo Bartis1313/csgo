@@ -35,7 +35,7 @@ private:
 	};
 public:
 	int m_flags;
-	Vector m_origin;
+	Vec3 m_origin;
 	float m_radius;
 	DColor m_color;
 	char m_exponent;
@@ -44,7 +44,7 @@ public:
 	float m_minlight;
 	int m_key;
 	int m_style;
-	Vector m_direction;
+	Vec3 m_direction;
 	float m_innerAngle;
 	float m_outerAngle;
 };

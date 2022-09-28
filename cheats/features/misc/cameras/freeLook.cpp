@@ -50,7 +50,7 @@ void FreeLookViewer::run(CViewSetup* view)
 		if (look.isZero())
 			return;
 
-		view->m_angles.x = look.x;
-		view->m_angles.y = look.y;
+		view->m_angles[0] = look[0];
+		view->m_angles[1] = look[1];
 	}
 }

@@ -21,9 +21,9 @@
 
 ////////////////////////////////////////////////////////////////////////
 
-Vector Entity_t::getAimPunch()
+Vec3 Entity_t::getAimPunch()
 {
-	Vector vec = {};
+	Vec3 vec = {};
 	vfunc::callVFunc<void, PUNCH>(this, std::ref(vec));
 	return vec;
 }
@@ -379,7 +379,7 @@ size_t Weapon_t::getNadeRadius()
 
 /////////////////////////////////////////////////////////////////////////////////
 
-void Player_t::setAbsOrigin(const Vector& origin)
+void Player_t::setAbsOrigin(const Vec3& origin)
 {
 	g_Memory.m_setAbsOrigin()(this, std::cref(origin));
 }
@@ -389,7 +389,7 @@ Weapon_t* Player_t::getActiveWeapon()
 	return reinterpret_cast<Weapon_t*>(interfaces::entList->getClientFromHandle(this->m_hActiveWeapon()));
 }
 
-Vector Player_t::getHitboxPos(const int id)
+Vec3 Player_t::getHitboxPos(const int id)
 {
 	/*if (Matrix3x4 matBone[MAX_BONES]; setupBones(matBone, MAX_BONES, BONE_USED_BY_HITBOX, 0.0f))
 	{
@@ -409,22 +409,22 @@ Vector Player_t::getHitboxPos(const int id)
 	{
 		if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(id); hitbox != nullptr)
 		{
-			Vector min = math::transformVector(hitbox->m_bbmin, m_CachedBoneData().m_memory[hitbox->m_bone]);
-			Vector max = math::transformVector(hitbox->m_bbmax, m_CachedBoneData().m_memory[hitbox->m_bone]);
+			Vec3 min = math::transformVector(hitbox->m_bbmin, m_CachedBoneData().m_memory[hitbox->m_bone]);
+			Vec3 max = math::transformVector(hitbox->m_bbmax, m_CachedBoneData().m_memory[hitbox->m_bone]);
 
-			return Vector{ min + max } *0.5f;
+			return Vec3{ min + max } *0.5f;
 		}
 	}
 
 	return {};
 }
 
-Vector Player_t::getBonePos(const int id)
+Vec3 Player_t::getBonePos(const int id)
 {
 	return m_CachedBoneData().m_memory[id].origin();
 }
 
-Vector Player_t::getHitgroupPos(const int hitgroup)
+Vec3 Player_t::getHitgroupPos(const int hitgroup)
 {
 	auto fixHitgroupIndex = [h = hitgroup]()
 	{
@@ -453,9 +453,9 @@ Vector Player_t::getHitgroupPos(const int hitgroup)
 	{
 		if (auto hitbox = modelStudio->getHitboxSet(this->m_nHitboxSet())->getHitbox(fixHitgroupIndex()); hitbox != nullptr)
 		{
-			Vector min = math::transformVector(hitbox->m_bbmin, m_CachedBoneData().m_memory[hitbox->m_bone]);
-			Vector max = math::transformVector(hitbox->m_bbmax, m_CachedBoneData().m_memory[hitbox->m_bone]);
-			return Vector{ min + max } *0.5f;
+			Vec3 min = math::transformVector(hitbox->m_bbmin, m_CachedBoneData().m_memory[hitbox->m_bone]);
+			Vec3 max = math::transformVector(hitbox->m_bbmax, m_CachedBoneData().m_memory[hitbox->m_bone]);
+			return Vec3{ min + max } *0.5f;
 		}
 	}
 	return {};
@@ -531,7 +531,7 @@ int Player_t::getWins()
 	return -1;
 }
 
-bool Player_t::isPossibleToSee(Player_t* player, const Vector& pos)
+bool Player_t::isPossibleToSee(Player_t* player, const Vec3& pos)
 {
 	Trace_t tr;
 	TraceFilter filter;
@@ -541,7 +541,7 @@ bool Player_t::isPossibleToSee(Player_t* player, const Vector& pos)
 	return tr.m_entity == player || tr.m_fraction > 0.97f;
 }
 
-bool Player_t::isViewInSmoke(const Vector& pos)
+bool Player_t::isViewInSmoke(const Vec3& pos)
 {
 	return g_Memory.m_throughSmoke()(this->getEyePos(), pos);
 }
@@ -592,8 +592,8 @@ AABB_t Player_t::getCameraBounds()
 	float jumpMargin = occlusion_test_jump_margin->getFloat();
 
 	return {
-		pos + Vector{ 0.0f, 0.0f, 46.0f } - Vector{ cameraMargins, cameraMargins, 0.0f },
-		pos + Vector{ 0.0f, 0.0f, 64.0f } + Vector{ cameraMargins, cameraMargins, jumpMargin }
+		pos + Vec3{ 0.0f, 0.0f, 46.0f } - Vec3{ cameraMargins, cameraMargins, 0.0f },
+		pos + Vec3{ 0.0f, 0.0f, 64.0f } + Vec3{ cameraMargins, cameraMargins, jumpMargin }
 	};
 }
 
@@ -615,9 +615,9 @@ bool Player_t::isOtherTeam(Player_t* player)
 
 ////////////////////////////////////////////////////////////////
 
-Vector Inferno_t::getInfernoPos(size_t indexFire)
+Vec3 Inferno_t::getInfernoPos(size_t indexFire)
 {
-	return Vector{
+	return Vec3{
 		static_cast<float>(m_fireXDelta()[indexFire]),
 		static_cast<float>(m_fireYDelta()[indexFire]),
 		static_cast<float>(m_fireZDelta()[indexFire]) };

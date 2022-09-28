@@ -2,7 +2,7 @@
 
 #include <classes/renderableToSurface.hpp>
 
-struct Vector;
+#include <SDK/math/Vector.hpp>
 
 class Hat : public RenderableSurfaceType
 {
@@ -14,7 +14,7 @@ public:
 	virtual void init();
 	virtual void draw();
 private:
-	void drawConeEditedRainbow(const Vector& pos, const float radius, const int points, const float size,
+	void drawConeEditedRainbow(const Vec3& pos, const float radius, const int points, const float size,
 		const float speed, const int trianglesAlpha, const int linesAlpha, const float thickness = 2.0f);
 };
 

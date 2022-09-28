@@ -28,7 +28,7 @@ private:
 class MovementFix
 {
 public:
-	virtual void run(CUserCmd* cmd, const Vector& oldAngle);
+	virtual void run(CUserCmd* cmd, const Vec3& oldAngle);
 };
 
 [[maybe_unused]] inline auto g_MovementFix = MovementFix{};

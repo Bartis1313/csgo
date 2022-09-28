@@ -77,16 +77,16 @@ void WeatherController::run(int frame)
 		if (!m_weather.m_ent)
 			return;
 
-		constexpr float halfP = Vector::MAX_ARG / 2.0f;
-		constexpr float halfM = -Vector::MAX_ARG / 2.0f;
+		constexpr float halfP = Vec3::MAX_ARG / 2.0f;
+		constexpr float halfM = -Vec3::MAX_ARG / 2.0f;
 
 		m_weather.m_ent->m_nPrecipType() = PRECIPITATION_TYPE_SNOW;
 
 		m_weather.m_ent->preDataUpdate(DATA_UPDATE_CREATED);
 		m_weather.m_ent->onPreDataChanged(DATA_UPDATE_CREATED);
 
-		m_weather.m_ent->collideable()->OBBMins() = { halfM, halfM, halfM };
-		m_weather.m_ent->collideable()->OBBMaxs() = { halfP, halfP, halfP };
+		m_weather.m_ent->collideable()->OBBMins() = Vec3{ halfM, halfM, halfM };
+		m_weather.m_ent->collideable()->OBBMaxs() = Vec3{ halfP, halfP, halfP };
 
 		m_weather.m_ent->onDataChanged(DATA_UPDATE_CREATED);
 		m_weather.m_ent->postDataUpdate(DATA_UPDATE_CREATED);

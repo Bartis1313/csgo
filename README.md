@@ -125,6 +125,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.5.9 - Memory cleanup, static offsets were always a problem due to short lag while gathering the offset. Now it run once at the start + adding it should be very easy. Handled exports, mostly needed for sig scan and CreateInterface.
 * 1.6.0 - Include paths.
 * 1.6.1 - Include paths v2.
+* 1.6.2 - Source cleanup, generic vector & matrix.
 </details>
 
 # Dependencies

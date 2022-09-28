@@ -1,5 +1,8 @@
 #pragma once
 
+#include <SDK/math/matrix.hpp>
+#include <SDK/math/Vector.hpp>
+
 #include <d3d9.h>
 
 enum hookIndexes
@@ -29,13 +32,11 @@ class IPanel;
 class CViewSetup;
 struct DrawModelState_t;
 struct ModelRenderInfo_t;
-struct Matrix3x4;
 struct CStudioHdr;
 class CParticleCollection;
 class INetChannel;
 struct MapStruct;
 class IMaterialSystem;
-struct Vector;
 
 #define FAST_ARGS [[maybe_unused]] void* thisptr, [[maybe_unused]] void* edx
 
@@ -292,8 +293,8 @@ namespace hooks
 
 	struct fxBlood
 	{
-		using fn = void(__thiscall*)(void*, Vector&, Vector&, float, float, float, float);
-		static void __fastcall hooked(FAST_ARGS, Vector& pos, Vector& dir, float r, float g, float b, float a);
+		using fn = void(__thiscall*)(void*, Vec3&, Vec3&, float, float, float, float);
+		static void __fastcall hooked(FAST_ARGS, Vec3& pos, Vec3& dir, float r, float g, float b, float a);
 		inline static fn original = nullptr;
 	};
 }

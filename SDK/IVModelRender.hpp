@@ -12,14 +12,14 @@ class IMaterial;
 
 struct ModelRenderInfo_t
 {
-	Vector m_origin;
-	Vector m_angles;
+	Vec3 m_origin;
+	Vec3 m_angles;
 	PAD(4);
 	void* m_renderable;
 	const Model_t* m_model;
 	const Matrix3x4* m_modelWorld;
 	const Matrix3x4* m_lightOffset;
-	const Vector* m_lightOrigin;
+	const Vec3* m_lightOrigin;
 	int m_flags;
 	int m_entIndex;
 	int m_skin;

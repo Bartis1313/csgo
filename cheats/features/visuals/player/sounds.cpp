@@ -42,7 +42,7 @@ void SoundDraw::findBest(Entity_t* ent)
 			continue;
 		}
 
-		Vector2D elPos;
+		ImVec2 elPos;
 		if (!imRender.worldToScreen(el.m_pos, elPos))
 			continue;
 
@@ -92,7 +92,7 @@ void SoundDraw::draw()
 
 	if (m_bestStep.m_player)
 	{
-		if (Vector2D pos; imRender.worldToScreen(m_bestStep.m_pos, pos))
+		if (ImVec2 pos; imRender.worldToScreen(m_bestStep.m_pos, pos))
 		{
 			std::string_view place = m_bestStep.m_player->m_szLastPlaceName();
 			if (place.empty())

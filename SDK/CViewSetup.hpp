@@ -18,8 +18,8 @@ public:
 	PAD(144);
 	float m_fov;
 	float m_viewModelFov;
-	Vector m_origin;
-	Vector m_angles;
+	Vec3 m_origin;
+	Vec3 m_angles;
 	float m_nearZ;
 	float m_farZ;
 	float m_nearViewModelZ;
@@ -34,10 +34,10 @@ public:
 	float m_doFQuality;
 	int m_motionBlurMode;
 	float m_shutterTime;
-	Vector m_shutterOpenPosition;
-	Vector m_shutterOpenAngles;
-	Vector m_shutterClosePosition;
-	Vector m_shutterCloseAngles;
+	Vec3 m_shutterOpenPosition;
+	Vec3 m_shutterOpenAngles;
+	Vec3 m_shutterClosePosition;
+	Vec3 m_shutterCloseAngles;
 	float m_offCenterTop;
 	float m_offCenterBottom;
 	float m_offCenterLeft;

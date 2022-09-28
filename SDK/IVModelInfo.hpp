@@ -18,8 +18,8 @@ struct Mstudiobbox_t
 {
 	int m_bone;
 	int m_group;
-	Vector m_bbmin;
-	Vector m_bbmax;
+	Vec3 m_bbmin;
+	Vec3 m_bbmax;
 	int m_hitboxnameindex;
 	PAD(12);
 	float m_radius;
@@ -56,8 +56,8 @@ struct Model_t
 	int m_serverCount;
 	int m_type;
 	int m_flags;
-	Vector m_vecMins;
-	Vector m_vecMaxs;
+	Vec3 m_vecMins;
+	Vec3 m_vecMaxs;
 	float m_radius;
 	PAD(28);
 };
@@ -69,12 +69,12 @@ struct Studiohdr_t
 	long m_checksum;
 	char m_name[64];
 	int m_length;
-	Vector m_eyePos;
-	Vector m_illiumPos;
-	Vector m_hullMins;
-	Vector m_hullMaxs;
-	Vector m_mins;
-	Vector m_maxs;
+	Vec3 m_eyePos;
+	Vec3 m_illiumPos;
+	Vec3 m_hullMins;
+	Vec3 m_hullMaxs;
+	Vec3 m_mins;
+	Vec3 m_maxs;
 	int m_flags;
 	int m_bonesCount;
 	int m_boneIndex;
