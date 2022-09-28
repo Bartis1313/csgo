@@ -181,6 +181,9 @@ void Radar::draw()
 	{
 		imRenderWindow.addList();
 
+		m_drawSize = Vec2{ imRenderWindow.getRect().x, imRenderWindow.getRect().y };
+		m_drawPos = Vec2{ imRenderWindow.getPos().x, imRenderWindow.getPos().y };
+
 		const auto myEye = game::localPlayer->getEyePos();
 		Vec3 ang = {};
 		interfaces::engine->getViewAngles(ang);

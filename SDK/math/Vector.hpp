@@ -51,6 +51,31 @@ private:
 			return *this;
 		}
 
+		[[nodiscard]] constexpr auto begin()
+		{
+			return m_arr.begin();
+		}
+
+		[[nodiscard]] const constexpr auto begin() const
+		{
+			return m_arr.cbegin();
+		}
+
+		[[nodiscard]] constexpr auto end()
+		{
+			return m_arr.end();
+		}
+
+		[[nodiscard]] const constexpr auto end() const
+		{
+			return m_arr.cend();
+		}
+
+		[[nodiscard]] constexpr size_t size() const
+		{
+			return m_numArgs;
+		}
+
 		[[nodiscard]] constexpr bool isZero() const
 		{
 			bool res = std::all_of(m_arr.cbegin(), m_arr.cend(),

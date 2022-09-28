@@ -21,8 +21,8 @@ public:
 	VectorAligned m_startOffset;
 	VectorAligned m_extents;
 	const Matrix3x4* m_mattrixWorldAxis;
-	bool m_isRay;
-	bool m_isSwept;
+	bool m_isRay{};
+	bool m_isSwept{};
 
 	Ray_t() = default;
 	Ray_t(const Vec3& src, const Vec3& dest) :
