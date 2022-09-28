@@ -91,14 +91,14 @@ void Aimbot::run(CUserCmd* cmd)
             return lhs.m_fov < rhs.m_fov;
         });
 
-    auto [player, guid, fov, index, bestpos] = m_targets.front();
+    auto [player, guid, fov, index, bestHitbox, bestpos] = m_targets.front();
 
     if (m_config.m_aimbacktrack)
     {
         int boneID = 8; // HEAD start
         if (auto modelStudio = interfaces::modelInfo->getStudioModel(player->getModel()); modelStudio != nullptr)
         {
-            if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(player->getIndex()); hitbox != nullptr)
+            if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(bestHitbox); hitbox != nullptr)
             {
                 boneID = hitbox->m_bone;
             }
@@ -208,7 +208,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const 
                 PlayerInfo_t info;
                 interfaces::engine->getPlayerInfo(idx, &info);
 
-                m_targets.emplace_back(AimbotTarget_t{ ent, info.m_steamID64, fov, idx, hitPos });
+                m_targets.emplace_back(AimbotTarget_t{ ent, info.m_steamID64, fov, idx, pos, hitPos });
             }
         }
     }

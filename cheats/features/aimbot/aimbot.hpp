@@ -16,6 +16,7 @@ struct AimbotTarget_t
 	uint64_t m_playerGuid;
 	float m_fov;
 	size_t m_index;
+	size_t m_bestHitboxID;
 	Vec3 m_pos;
 
 	bool isBlackListed() const;
