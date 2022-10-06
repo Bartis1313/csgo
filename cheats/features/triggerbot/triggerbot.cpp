@@ -24,7 +24,7 @@ void Triggerbot::run(CUserCmd* cmd)
 {
 	auto cfg = g_Aimbot.getCachedConfig();
 
-	if (!cfg.m_TriggerEnabled)
+	if (!cfg.triggerbot)
 		return;
 
 	if (!game::isAvailable())
@@ -56,16 +56,16 @@ void Triggerbot::run(CUserCmd* cmd)
 	const auto current = interfaces::globalVars->m_realtime;
 
 	// because this time is in seconds, so delay must be /1000 (s->ms), when using chrono, you can cast to ms so it's more flexible
-	if ((current - delay) < cfg.m_TriggerDelay / 1000.0f)
+	if ((current - delay) < cfg.triggerbotDelay / 1000.0f)
 		return;
 
 	if (game::localPlayer->m_flFlashDuration() > 0.0f)
 	{
-		if (game::localPlayer->m_flFlashBangTime() >= cfg.m_flashAlphaLimit)
+		if (game::localPlayer->m_flFlashBangTime() >= cfg.flashLimit)
 			return;
 	}
 
-	if (cfg.m_smokeCheck && game::localPlayer->isViewInSmoke(end))
+	if (cfg.smokeCheck && game::localPlayer->isViewInSmoke(end))
 		return;
 
 	Trace_t trace;

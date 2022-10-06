@@ -32,7 +32,7 @@ void MirrorCam::init()
 void MirrorCam::run(const CViewSetup& view)
 {
 	// this might eat some FPS, if enabled
-	if (!config.get<bool>(vars.bMirrorCam))
+	if (!vars::misc->mirrorCam->enabled)
 		return;
 
 	CViewSetup v = std::move(view);
@@ -74,12 +74,12 @@ void MirrorCamDraw::draw()
 	if (!game::isAvailable())
 		return;
 
-	if (!config.get<bool>(vars.bMirrorCam))
+	if (!vars::misc->mirrorCam->enabled)
 		return;
 
-	if (config.get<bool>(vars.bMirrorCamOnKey))
+	if (vars::misc->mirrorCam->onKey)
 	{
-		if (!config.get<Key>(vars.kMirrorCam).isEnabled())
+		if (!vars::keys->mirrorCam.isEnabled())
 			return;
 	}
 

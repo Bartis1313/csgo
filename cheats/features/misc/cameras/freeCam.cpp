@@ -23,7 +23,7 @@ void Freecam::run(CViewSetup* view)
 	if (!game::isAvailable())
 		return;
 
-	if (!config.get<bool>(vars.bFreeCam))
+	if (!vars::misc->freeCam->enabled)
 	{
 		m_inCam = false;
 		return;
@@ -32,11 +32,11 @@ void Freecam::run(CViewSetup* view)
 	// OR get center from map info?
 	static Vec3 v = view->m_angles;
 
-	if (config.get<Key>(vars.kFreeCam).isEnabled())
+	if (vars::keys->freeCam.isEnabled())
 	{
 		m_inCam = true;
 
-		float& speed = config.getRef<float>(vars.fFreeCam);
+		float speed = vars::misc->freeCam->speed;
 		Vec3 ang = view->m_angles;
 
 		float sinYaw = std::sin(math::DEG2RAD(ang[1]));
@@ -110,7 +110,7 @@ void FreecamDraw::draw()
 
 	if (ImGui::Begin(XOR("Info##cam"), nullptr, ImGuiWindowFlags_AlwaysAutoResize /*| ImGuiWindowFlags_NoResize*/ | ImGuiWindowFlags_NoCollapse))
 	{
-		ImGui::TextUnformatted(FORMAT(XOR("Speed: {:.2f}"), config.get<float>(vars.fFreeCam)).c_str());
+		ImGui::TextUnformatted(FORMAT(XOR("Speed: {:.2f}"), vars::misc->freeCam->speed).c_str());
 
 		ImGui::End();
 	}

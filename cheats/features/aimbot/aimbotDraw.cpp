@@ -28,13 +28,13 @@ void AimbotDraw::drawFov()
 {
     auto cfg = g_Aimbot.getCachedConfig();
 
-    if (!config.get<bool>(vars.bDrawFov))
+    if (!vars::aimPaint->enabledFov)
         return;
 
-    if (!cfg.m_aimEnabled)
+    if (!cfg.enabled)
         return;
 
-    if (!cfg.m_fov)
+    if (!cfg.fov)
         return;
 
     if (!game::isAvailable())
@@ -50,11 +50,11 @@ void AimbotDraw::drawFov()
 
     float radius = 0.0f;
 
-    switch (cfg.m_methodAim)
+    switch (cfg.methodAim)
     {
     case E2T(AimbotMethod::CROSSHAIR):
     {
-        radius = std::tan(math::DEG2RAD(cfg.m_fov) / 2.0f) / std::tan(math::DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
+        radius = std::tan(math::DEG2RAD(cfg.fov) / 2.0f) / std::tan(math::DEG2RAD(globals::FOV) / 2.0f) * globals::screenX;
 
         break;
     }
@@ -73,7 +73,7 @@ void AimbotDraw::drawFov()
         // turn for visualization
         auto forward = math::angleVec(Vec3{ view[0], view[1] + 90.f, 0.f });
         // dist in calcFovReal
-        forward *= cfg.m_fov * 10.0f;
+        forward *= cfg.fov * 10.0f;
         // final vector where we aim
         auto aimingView = destination + forward;
 
@@ -84,12 +84,12 @@ void AimbotDraw::drawFov()
     }
     }
 
-    imRender.drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, config.get<CfgColor>(vars.cDrawFov).getColor());
+    imRender.drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, vars::aimPaint->colorFov());
 }
 
 void AimbotDraw::drawBestPoint()
 {
-    if (!config.get<bool>(vars.bDrawBestPoint))
+    if (!vars::aimPaint->enabledPoint)
         return;
 
     if (!game::isAvailable())
@@ -100,5 +100,5 @@ void AimbotDraw::drawBestPoint()
         return;
 
     if (ImVec2 p; imRender.worldToScreen(hitbox, p))
-        imRender.drawCircleFilled(p.x, p.y, 5, 12, Colors::Cyan);
+        imRender.drawCircleFilled(p.x, p.y, 5, 12, vars::aimPaint->colorPoint());
 }

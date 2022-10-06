@@ -352,7 +352,6 @@ void SurfaceRender::textf(const int x, const int y, const unsigned long font, co
 
 	va_start(args, fmt);
 	vsnprintf(buf.data(), sizeof(buf), fmt, args);
-	buf[sizeof(buf) - 1] = 0;
 	va_end(args);
 
 	text(x, y, font, buf.data(), centered, color);
@@ -621,26 +620,24 @@ static ImVec2 operator+(const ImVec2& v, float val)
 	return ImVec2{ v.x + val, v.y + val };
 }
 
-void ImGuiRender::drawBox3D(const Vec3& pos, const ImVec2& width, const float height, const Color& color, bool outlined, const float thickness)
+void ImGuiRender::drawBox3D(const Vec3& pos, const float width, const float height, const Color& color, bool outlined, const float thickness)
 {
 	// dividing to get a centre to world position
-	float boxW = width.x / 2.0f;
-	float boxH = height;
+	float boxW = width / 2.0f;
+	float boxH = height / 2.0f;
 
 	outlined = false; // looks bad
 
-	float boxWidthSide = width.y / 2.0f;
-
 	std::array box =
 	{
-		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] },
-		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] + boxH },
-		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] + boxH },
-		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] },
-		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] },
-		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] + boxH },
-		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] + boxH },
-		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxH, pos[Coord::Z] - boxW},
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxH, pos[Coord::Z] + boxW },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxH, pos[Coord::Z] + boxW },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxH, pos[Coord::Z] - boxW},
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxH, pos[Coord::Z] - boxW},
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxH, pos[Coord::Z] + boxW },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxH, pos[Coord::Z] + boxW },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxH, pos[Coord::Z] - boxW},
 	};
 
 	std::array<ImVec2, box.size()> lines = {};
@@ -672,26 +669,24 @@ void ImGuiRender::drawBox3D(const Vec3& pos, const ImVec2& width, const float he
 	}
 }
 
-void ImGuiRender::drawBox3DFilled(const Vec3& pos, const ImVec2& width, const float height, const Color& color, const Color& filling, bool outlined, const float thickness)
+void ImGuiRender::drawBox3DFilled(const Vec3& pos, const float width, const float height, const Color& color, const Color& filling, bool outlined, const float thickness)
 {
 	// dividing to get a centre to world position
-	float boxW = width.x / 2.0f;
-	float boxH = height;
+	float boxW = width / 2.0f;
+	float boxH = height / 2.0f;
 
 	outlined = false; // looks bad
 
-	float boxWidthSide = width.y / 2.0f;
-
 	std::array box =
 	{
-		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] },
-		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] + boxH },
-		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] + boxH },
-		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxWidthSide, pos[Coord::Z] },
-		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] },
-		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] + boxH },
-		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] + boxH },
-		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxWidthSide, pos[Coord::Z] },
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxH, pos[Coord::Z] - boxW},
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] - boxH, pos[Coord::Z] + boxW },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxH, pos[Coord::Z] + boxW },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] - boxH, pos[Coord::Z] - boxW},
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxH, pos[Coord::Z] - boxW},
+		Vec3{ pos[Coord::X] - boxW, pos[Coord::Y] + boxH, pos[Coord::Z] + boxW },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxH, pos[Coord::Z] + boxW },
+		Vec3{ pos[Coord::X] + boxW, pos[Coord::Y] + boxH, pos[Coord::Z] - boxW},
 	};
 
 	// transormed points to get pos.x/.y
@@ -905,7 +900,6 @@ void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool c
 
 	va_start(args, fmt);
 	vsnprintf(buf.data(), sizeof(buf), fmt, args);
-	buf[sizeof(buf) - 1] = 0;
 	va_end(args);
 
 	text(x, y, font, buf.data(), centered, color, dropShadow);

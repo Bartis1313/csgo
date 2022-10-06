@@ -44,10 +44,10 @@ void GreandePredictionButton::init()
 
 void GreandePredictionButton::run(CUserCmd* cmd)
 {
-	if (!config.get<bool>(vars.bNadePred))
+	if (!vars::misc->nade->enabledPred)
 		return;
 
-	if (config.get<bool>(vars.bNadePredAlways))
+	if (vars::misc->nade->predAlways)
 	{
 		m_button = ACT_THROW;
 		return;
@@ -73,7 +73,7 @@ void GreandePredictionButton::run(CUserCmd* cmd)
 
 void GreandePredictionButton::runView()
 {
-	if (!config.get<bool>(vars.bNadePred))
+	if (!vars::misc->nade->enabledPred)
 		return;
 
 	if (!game::isAvailable())
@@ -112,7 +112,7 @@ void GrenadePrediction::init()
 
 void GrenadePrediction::draw()
 {
-	if (!config.get<bool>(vars.bNadePred))
+	if (!vars::misc->nade->enabledPred)
 		return;
 
 	if (!game::isAvailable())
@@ -186,14 +186,14 @@ void GrenadePrediction::draw()
 	for (Vec3 prev = m_path.front(); const auto & el : m_path)
 	{
 		if (ImVec2 start, end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
-			imRender.drawLine(start, end, config.get<CfgColor>(vars.cNadePredColor).getColor(), 2.0f);
+			imRender.drawLine(start, end, vars::misc->nade->colorPredLine(), 2.0f);
 
 		prev = el;
 	}
 
 	for (const auto& el : m_bounces)
 	{
-		imRender.drawBox3DFilled(el, { 2.0f, 2.0f }, 2.0f, config.get<CfgColor>(vars.cNadeBoxColorOutline).getColor(), config.get<CfgColor>(vars.cNadeBoxColorFill).getColor());
+		imRender.drawBox3DFilled(el, 2.0f, 2.0f, vars::misc->nade->colorPredBox(), vars::misc->nade->colorPredBoxFill());
 	}
 
 	for (const auto& [pos, text, color] : nadesDmg)
@@ -318,11 +318,11 @@ bool GrenadePrediction::checkDetonate(const Vec3& vecThrow, const Trace_t& tr, i
 	{
 	case WEAPON_SMOKEGRENADE:
 	{
-		return vecThrow.toVec2D().length() <= 0.1f && check();
+		return vecThrow.toVecPrev().length() <= 0.1f && check();
 	}
 	case WEAPON_DECOY:
 	{
-		return vecThrow.toVec2D().length() <= 0.2f && check();
+		return vecThrow.toVecPrev().length() <= 0.2f && check();
 	}
 	case WEAPON_MOLOTOV:
 	case WEAPON_INCGRENADE:

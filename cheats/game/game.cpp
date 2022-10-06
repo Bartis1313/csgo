@@ -120,3 +120,11 @@ WeaponIndex game::getNadeByClass(int idx, Studiohdr_t* studio)
 
 	return WEAPON_NONE;
 }
+
+Vec3 game::getViewAngles()
+{
+	Vec3 ret;
+	interfaces::engine->getViewAngles(ret);
+
+	return ret;
+}

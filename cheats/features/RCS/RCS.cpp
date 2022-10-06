@@ -23,7 +23,7 @@ void RCS::run(CUserCmd* cmd)
 {
     auto cfg = g_Aimbot.getCachedConfig();
 
-    if (!cfg.m_RcsEnabled)
+    if (!cfg.rcs)
         return;
 
     if (!game::isAvailable())
@@ -52,8 +52,8 @@ void RCS::prepare(CUserCmd* cmd)
     {
         auto punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
 
-        punch[Coord::X] *= cfg.m_RcsX / 100.0f;
-        punch[Coord::Y] *= cfg.m_RcsY / 100.0f;
+        punch[Coord::X] *= cfg.rcsX;
+        punch[Coord::Y] *= cfg.rcsY;
 
         auto toMove = cmd->m_viewangles += (oldPunch - punch);
         toMove.clamp();
@@ -65,8 +65,8 @@ void RCS::prepare(CUserCmd* cmd)
     else
     {
         auto punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
-        punch[Coord::X] *= cfg.m_RcsX / 100.0f;
-        punch[Coord::Y] *= cfg.m_RcsY / 100.0f;
+        punch[Coord::X] *= cfg.rcsX;
+        punch[Coord::Y] *= cfg.rcsY;
 
         oldPunch = punch;
     }

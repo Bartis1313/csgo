@@ -126,14 +126,8 @@ public:
 	void text(const float x, const float y, const float fontSize, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...);
-	// pass pos from world, you will often pass width.x == width.y
-	// width.x -> pass starting width at front
-	// width.y -> pass width of the box, between points at side
-	void drawBox3D(const Vec3& pos, const ImVec2& width, const float height, const Color& color, bool outlined = false, const float thickness = 2.0f);
-	// pass pos from world, you will often pass width.x == width.y
-	// width.x -> pass starting width at front
-	// width.y -> pass width of the box, between points at side
-	void drawBox3DFilled(const Vec3& pos, const ImVec2& width, const float height, const Color& color, const Color& filling, bool outlined = false, const float thickness = 2.0f);
+	void drawBox3D(const Vec3& pos, const float width, const float height, const Color& color, bool outlined = false, const float thickness = 2.0f);
+	void drawBox3DFilled(const Vec3& pos, const float width, const float height, const Color& color, const Color& filling, bool outlined = false, const float thickness = 2.0f);
 	void drawCone(const Vec3& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 
 	/*

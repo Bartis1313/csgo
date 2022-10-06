@@ -41,8 +41,7 @@ void BombOverlay::draw()
 	if (!m_bombEnt)
 		return;
 
-	bool& ref = config.getRef<bool>(vars.bDrawBomb);
-	if (!ref)
+	if (!vars::visuals->world->bomb->enabled)
 		return;
 
 	const auto bombent = reinterpret_cast<Bomb_t*>(m_bombEnt);
@@ -77,8 +76,8 @@ void BombOverlay::draw()
 
 	constexpr ImVec2 size = { 300, 150 };
 	ImGui::SetNextWindowSize(size);
-	ImGui::PushStyleColor(ImGuiCol_WindowBg, Color::U32(config.get<CfgColor>(vars.cBombBackground).getColor()));
-	if (ImGui::Begin(XOR("Bomb c4"), &ref, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+	ImGui::PushStyleColor(ImGuiCol_WindowBg, Color::U32(vars::visuals->world->bomb->background()));
+	if (ImGui::Begin(XOR("Bomb c4"), &vars::visuals->world->bomb->enabled, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
 		imRenderWindow.addList();
 

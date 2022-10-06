@@ -27,10 +27,10 @@ void SkyboxEdit::run(int frame)
 
 	// bool to point true = custom
 	std::pair<int, bool> keySky;
-	if (auto custom = config.get<int>(vars.iCustomSkyBox); custom > 0)
+	if (auto custom = vars::visuals->world->sky->indexCustom; custom > 0)
 		keySky = { custom, true };
 	else
-		keySky = { config.get<int>(vars.iSkyBox), false };
+		keySky = { vars::visuals->world->sky->indexNormal, false };
 
 	if (keySky.first != 0 && !globals::isShutdown) // is not none and there is no shutdown
 	{

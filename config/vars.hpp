@@ -1,304 +1,568 @@
 #pragma once
 
-#include <Windows.h>
-
-#include "config.hpp"
 #include "enums.hpp"
+#include "cfgWeapon.hpp"
+#include "cfgcolor.hpp"
+#include "key.hpp"
+#include "cfgBeam.hpp"
 
-#include <utilities/utilities.hpp>
-#include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 
-// type - template
-// name - name of var
-// defaVal - default value for the var
-// nameSave - name to be stored in json
-#define CONFIG_ADD_VARIABLE(type, name, defVal, nameSave) \
-	const size_t name = config.addVar<type>(defVal, XOR(nameSave));
-// type - template
-// name - name of var
-// amount - size of the vector to be filled
-// defaVal - default value for the var
-// nameSave - name to be stored in json
-#define CONFIG_ADD_VEC(type, name, amount, defVal, nameSave) \
-	const size_t name = config.addVar<std::vector<type>>(utilities::getFilledVec<type, amount>(defVal), XOR(nameSave));
+#include <memory>
+#include <cstdint>
+#include <array>
 
-struct Variables
+#define USE_NAMESPACE_VARS(cl, name) \
+namespace vars { \
+	inline std::unique_ptr<cl> name{ new cl }; \
+}
+
+struct VarAim
 {
+	std::array<CfgWeapon, E2T(WeaponList::LIST_SIZE)> weapons;
+	bool useKey = false;
+};
+USE_NAMESPACE_VARS(VarAim, aim);
 
-	// AIMBOT & TRIGGERBOT
+struct VarAimPaint
+{
+	bool enabledFov = false;
+	bool enabledPoint = false;
+	CfgColor colorFov = Colors::LightBlue;
+	CfgColor colorPoint = Colors::LightBlue;
+};
+USE_NAMESPACE_VARS(VarAimPaint, aimPaint);
 
-	CONFIG_ADD_VEC(CfgWeapon, arrAimbot, E2T(WeaponList::LIST_SIZE) - 1, CfgWeapon(), "Aimbot settings");
+struct VarVisuals
+{
+	struct VarChams
+	{
+		bool enabled = false;
+		bool players = false;
+		int indexPlayers = 0;
+		CfgColor colorPlayers = Color{ 255, 0, 255, 255 };
+		bool enabledXQZPlayers = false;
+		CfgColor colorXQZPlayers = Color{ 0, 100, 255, 255 };
+		bool enabledWeapons = false;
+		bool weaponHide = false;
+		int indexWeapons = 0;
+		CfgColor colorWeapons = Color{ 255, 0, 255, 255 };
+		bool armsHide = false;
+		bool enabledArms = false;
+		CfgColor colorArms = Color{ 255, 0, 255, 255 };
+		int indexArms = 0;
+		int indexBacktrack = 0;
+		bool enabledBacktrack = false;
+		CfgColor colorBacktrack = Color{ 255, 0, 255, 255 };
+		int modeBacktrack = 0;
+		bool rainbowBacktrack = false;
+		float rainbowBacktrackSpeed = 0.5f;
+	};
+	std::unique_ptr<VarChams> chams{ new VarChams };
 
-	
-	CONFIG_ADD_VARIABLE(bool, bDrawFov, false, "draw fov representing aimbot range");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawFov, Colors::LightBlue, "draw fov representing aimbot range color");
-	CONFIG_ADD_VARIABLE(bool, bDrawBestPoint, false, "draw best point of hitbox");
-	CONFIG_ADD_VARIABLE(bool, bAimbotUseKey, false, "Use aimbot on key");
-	CONFIG_ADD_VARIABLE(Key, kAimbotKey, Key(KeyMode::DOWN, VK_LBUTTON), "aimbot key");
+	struct VarGlow
+	{
+		bool enabled = false;
+		CfgColor colorPlayer = Colors::Purple;
+	};
+	std::unique_ptr<VarGlow> glow{ new VarGlow };
 
-	// VISUALS
+	struct VarEsp
+	{
+		struct VarBoxes
+		{
+			bool enabled = false;
+			int mode = 0;
+			CfgColor color = Colors::Purple;
+			CfgColor fill = Color{ 0, 0, 0, 140 };
+			bool multiColor = false;
+			bool outline = false;
+			float multiColorSpeed = 1.0f;
+		};
+		std::unique_ptr<VarBoxes> boxes{ new VarBoxes };
 
-	CONFIG_ADD_VARIABLE(bool, bChams, false, "chams enabled");
-	CONFIG_ADD_VARIABLE(bool, bChamsPlayers, false, "chams enabled player");
-	CONFIG_ADD_VARIABLE(int, iChamsPlayers, 0, "chams mode Players");
-	CONFIG_ADD_VARIABLE(CfgColor, cChamsPlayers, Color(255, 0, 255, 255), "chams color player");
-	CONFIG_ADD_VARIABLE(bool, bChamsXQZPlayers, false, "chams XQZ enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cChamsXQZPlayers, Color(0, 100, 255, 255), "chamsXQZ color player");
-	CONFIG_ADD_VARIABLE(bool, bChamsWeapons, false, "chams weapons enabled");
-	CONFIG_ADD_VARIABLE(bool, bChamsWeaponsDisable, false, "chams weapons enabled to insvisible");
-	CONFIG_ADD_VARIABLE(int, iChamsWeapons, 0, "chams mode Weapons");
-	CONFIG_ADD_VARIABLE(CfgColor, cChamsWeapons, Color(255, 0, 255, 255), "chams color weapon");
-	CONFIG_ADD_VARIABLE(bool, bChamsArmsDisable, false, "chams arms enabled to insvisible");
-	CONFIG_ADD_VARIABLE(bool, bChamsArms, false, "chams arms enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cChamsArms, Color(255, 0, 255, 255), "chams color arms");
-	CONFIG_ADD_VARIABLE(int, iChamsArms, 0, "chams mode Weapons");
-	CONFIG_ADD_VARIABLE(int, iChamsBacktrack, 0, "chams mode backtrack (not style)");
-	CONFIG_ADD_VARIABLE(bool, bChamsBacktrack, false, "chams arms enabled backtrack");
-	CONFIG_ADD_VARIABLE(CfgColor, cChamsBacktrack, Color(255, 0, 255, 255), "chams color backtrack");
-	CONFIG_ADD_VARIABLE(int, iChamsBacktrackMode, 0, "chams mode backtrack");
-	CONFIG_ADD_VARIABLE(bool, bChamsbacktrackRainbow, false, "backtrack chams rainbow enabled");
-	CONFIG_ADD_VARIABLE(float, fChamsBacktrackRainbowSpeed, 0.5f, "backtrack chams rainbow speed");
-	CONFIG_ADD_VARIABLE(bool, bGlow, false, "glow enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cGlow, Colors::Purple, "glow color");
-	CONFIG_ADD_VARIABLE(bool, bEsp, false, "ESP enabled");
-	CONFIG_ADD_VARIABLE(int, iEsp, 0, "esp mode");
-	CONFIG_ADD_VARIABLE(CfgColor, cBox, Colors::Purple, "BOX color");
-	CONFIG_ADD_VARIABLE(CfgColor, cBoxFill, Color(0, 0, 0, 140), "BOX fill color");
-	CONFIG_ADD_VARIABLE(bool, bBoxMultiColor, false, "BOX multicolor FILL only");
-	CONFIG_ADD_VARIABLE(bool, bBoxOutlined, false, "BOX outlined lines");
-	CONFIG_ADD_VARIABLE(float, fBoxMultiColor, 1.0f, "BOX multicolor FILL color speed");
-	CONFIG_ADD_VARIABLE(bool, bDrawHealth, false, "draw health enabled");
-	CONFIG_ADD_VARIABLE(bool, bDrawArmor, false, "draw armor enabled");
-	CONFIG_ADD_VARIABLE(bool, bDrawWeapon, false, "draw weapon enabled");
-	CONFIG_ADD_VARIABLE(bool, bDrawWeaponTranslate, false, "draw weapon in your lang translated by the game");
-	CONFIG_ADD_VARIABLE(CfgColor, cWeaponText, Colors::White, "weapon text color");
-	CONFIG_ADD_VARIABLE(CfgColor, cReloadbar, Colors::Turquoise, "weapon reload time bar color");
-	CONFIG_ADD_VARIABLE(bool, bDrawName, false, "draw name enabled");
-	CONFIG_ADD_VARIABLE(bool, bDrawSkeleton, false, "draw skeleton enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cSkeleton, Colors::White, "skeleton color");
-	CONFIG_ADD_VARIABLE(bool, bSkeletonDebugPoints, false, "skeleton debug points enabled");
-	CONFIG_ADD_VARIABLE(bool, bDLight, false, "DLight enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cDlight, Color(20, 70, 150, 255), "Dlight color");
-	CONFIG_ADD_VARIABLE(float, fDlightRadius, 50.0f, "DLight radius");
-	CONFIG_ADD_VARIABLE(float, fDlightDecay, 30.0f, "DLight radius");
-	CONFIG_ADD_VARIABLE(float, fDlightExponent, 8.0f, "DLight exponent");
-	CONFIG_ADD_VARIABLE(bool, bShowInfo, false, "show info enabled");
-	CONFIG_ADD_VARIABLE(bool, bShowFlags, false, "show flags enabled");
-	CONFIG_ADD_VARIABLE(bool, bEspLasers, false, "Esp Lasers enabled");
-	CONFIG_ADD_VARIABLE(bool, bDrawDeadOnly, false, "draw esp only when dead");
-	CONFIG_ADD_VEC(bool, vFlags, E2T(EspFlags::FLAGS_SIZE), false, "Esp flags");
-	CONFIG_ADD_VARIABLE(bool, bDrawDropped, false, "draw dropped weapons");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawDropped, Colors::White, "draw dropped weapons color");
-	CONFIG_ADD_VEC(bool, vDroppedFlags, E2T(DroppedFlags::FLAGS_SIZE), false, "Esp dropped flags");
-	CONFIG_ADD_VARIABLE(bool, bSoundEsp, false, "sound esp enabled");
-	CONFIG_ADD_VARIABLE(Color, cSoundEsp, Colors::LightBlue, "sound esp color");
-	CONFIG_ADD_VARIABLE(float, fStepTime, 10.0f, "max step time");
-	CONFIG_ADD_VARIABLE(float, fStepMaxDist, 50.0f, "max distance of steps");
-	CONFIG_ADD_VARIABLE(float, fStepMaxLineDist, 80.0f, "max distance of line draw with info");
-	CONFIG_ADD_VARIABLE(Color, cStepLine, Colors::White, "step line info color");
-	CONFIG_ADD_VARIABLE(bool, bLogEnabled, false, "enable log printing");
-	CONFIG_ADD_VARIABLE(float, fLogMaxTime, 4.0f, "time for how long the log should be visible");
-	CONFIG_ADD_VARIABLE(float, fVisDormacyTime, 1.0f, "dormacy fade time");
-	CONFIG_ADD_VARIABLE(float, fVisDormacyTimeLimit, 15.0f, "dormacy fade time limit (for boxes)");
-	
+		struct VarHealthBar
+		{
+			bool enabled = false;
+		};
+		std::unique_ptr<VarHealthBar> healthBar{ new VarHealthBar };
 
-	// WORLD
+		struct VarArmorBar
+		{
+			bool enabled = false;
+		};
+		std::unique_ptr<VarArmorBar> armorBar{ new VarArmorBar };
 
-	CONFIG_ADD_VARIABLE(bool, bDrawBomb, false, "draw c4");
-	CONFIG_ADD_VARIABLE(CfgColor, cBombBackground, Colors::Black, "bomb background color");
-	CONFIG_ADD_VARIABLE(bool, bDrawProjectiles, false, "draw projectiles enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cFlashBang, Color(130, 0, 200, 255), "flashbang color");
-	CONFIG_ADD_VARIABLE(CfgColor, cGranede, Color(130, 180, 20, 255), "granede color");
-	CONFIG_ADD_VARIABLE(CfgColor, cMolotov, Color(130, 200, 120, 255), "molotov color");
-	CONFIG_ADD_VARIABLE(CfgColor, cIncediary, Color(130, 200, 120, 255), "incediary color");
-	CONFIG_ADD_VARIABLE(CfgColor, cSmoke, Color(20, 70, 30, 255), "smoke color");
-	CONFIG_ADD_VARIABLE(CfgColor, cDecoy, Color(0, 30, 60, 255), "decoy color");
-	CONFIG_ADD_VARIABLE(CfgColor, cDropped, Colors::White, "dropped weapons color");
-	CONFIG_ADD_VARIABLE(int, iSkyBox, 0, "custom skybox index");
-	CONFIG_ADD_VARIABLE(int, iCustomSkyBox, 0, "custom skybox index (not from game)");
-	CONFIG_ADD_VARIABLE(bool, bRemoveSky, false, "removes the sky");
-	CONFIG_ADD_VARIABLE(bool, bFixProps, false, "fix props in world");
-	CONFIG_ADD_VARIABLE(bool, bModulateColor, false, "world edit enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cWorldTexture, Colors::White, "world textture color");
-	CONFIG_ADD_VARIABLE(CfgColor, cWorldProp, Colors::White, "world prop color");
-	CONFIG_ADD_VARIABLE(CfgColor, cSkyBox, Colors::White, "world skybox color");
-	CONFIG_ADD_VARIABLE(float, fShaderParam, 100.0f, "shader percent param");
-	CONFIG_ADD_VARIABLE(bool, bDrawmolotovRange, false, "draw mololotov range enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cMolotovRange, Colors::Red.getColorEditAlpha(0.3f), "mololotov range color");
-	CONFIG_ADD_VARIABLE(CfgColor, cMolotovRangeText, Colors::White, "mololotov range color for text");
-	CONFIG_ADD_VARIABLE(bool, bDrawZeusRange, false, "draw zeus range enabled");
-	CONFIG_ADD_VARIABLE(bool, bZeusPartyMode, false, "zeus party mode enabled");
-	CONFIG_ADD_VARIABLE(bool, bZeusUseTracing, false, "draw zeus with tracing the circle");
-	CONFIG_ADD_VARIABLE(CfgColor, cZeusRange, CfgColor(Colors::Palevioletred, true, 4.0f), "zeus range color");
-	CONFIG_ADD_VARIABLE(bool, bDrawSmoke, false, "draw smoke enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawSmoke, Colors::White, "draw smoke color");
-	CONFIG_ADD_VARIABLE(bool, bEditEffectsBlood, false, "enabled editing game's effects (BLOOD)");
-	CONFIG_ADD_VARIABLE(bool, bEditEffectsMoly, false, "enabled editing game's effects (MOLOTOV)");
-	CONFIG_ADD_VARIABLE(bool, bEditEffectsSmoke, false, "enabled editing game's effects (SMOKE)");
-	CONFIG_ADD_VARIABLE(CfgColor, cEditMolotov, Colors::Purple, "color molotov edited");
-	CONFIG_ADD_VARIABLE(CfgColor, cEditBlood, Colors::Purple, "color blood edited");
-	CONFIG_ADD_VARIABLE(CfgColor, cEditSmoke, Colors::Purple, "color smoke edited");
-	CONFIG_ADD_VARIABLE(bool, bBulletTracer, false, "bullet tracer enabled");
-	CONFIG_ADD_VARIABLE(int, iBulletTracer, 0, "bullet tracer name idx");
-	/*CONFIG_ADD_VARIABLE(std::string, sBulletTracerType, "0", "bullet tracer type");*/
-	CONFIG_ADD_VARIABLE(std::string, sBulletTracer, "4|8", "bullet tracer flags");
-	CONFIG_ADD_VARIABLE(float, fBulletTracerLife, 2.0f, "bullet tracer time");
-	CONFIG_ADD_VARIABLE(CfgColor, cBulletTracer, Colors::LightBlue, "bullet tracer color");
-	CONFIG_ADD_VARIABLE(float, fBulletTracerWidth, 2.0f, "bullet tracer width");
-	CONFIG_ADD_VARIABLE(float, fBulletTracerFadeLength, 1.0f, "bullet tracer fade length");
-	CONFIG_ADD_VARIABLE(float, fBulletTracerAmplitude, 2.0f, "bullet tracer amplitude");
-	CONFIG_ADD_VARIABLE(float, fBulletTracerSpeed, 1.0f, "bullet tracer speed");
-	CONFIG_ADD_VARIABLE(float, fBulletTracerStartFrame, 0.0f, "bullet tracer start frame");
-	CONFIG_ADD_VARIABLE(float, fBulletTracerFrameRate, 60.0f, "bullet tracer framerate");
-	CONFIG_ADD_VARIABLE(int, fBulletTracerSegments, 2, "bullet tracer segments");
-	CONFIG_ADD_VARIABLE(bool, bDrawClientSideImpacts, false, "draw impacts from client side");
-	CONFIG_ADD_VARIABLE(float, fDrawClientSideImpacts, 3.0f, "draw impacts from client side time");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawClientSideImpactsLine, Colors::Cyan, "draw impacts from client side color lines");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawClientSideImpactsFill, Colors::Red, "draw impacts from client side color fill");
-	CONFIG_ADD_VARIABLE(bool, bDrawLocalSideImpacts, false, "draw impacts from local side");
-	CONFIG_ADD_VARIABLE(float, fDrawLocalSideImpacts, 3.0f, "draw impacts from local side time");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawLocalSideImpactsLine, Colors::Cyan, "draw impacts from local side color lines");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawLocalSideImpactsFill, Colors::Red, "draw impacts from local side color fill");
-	CONFIG_ADD_VARIABLE(bool, bFog, false, "fog enabled");
-	CONFIG_ADD_VARIABLE(float, fFogDistance, 500.0f, "fog distance");
-	CONFIG_ADD_VARIABLE(CfgColor, cFog, Colors::Purple, "fog color");
-	CONFIG_ADD_VARIABLE(int, iScreenEffect, 0, "screen effect index");
-	CONFIG_ADD_VARIABLE(float, fScreenEffectParam, 1.0f, "screen effect value");
-	CONFIG_ADD_VARIABLE(CfgColor, cScreenEffect, Colors::LightBlue, "screen color value");
-	CONFIG_ADD_VARIABLE(bool, bControlTone, false, "control tone enabled");
-	CONFIG_ADD_VARIABLE(float, fControlToneMin, 0.5f, "control tone min");
-	CONFIG_ADD_VARIABLE(float, fControlToneMax, 0.5f, "control tone max");
-	CONFIG_ADD_VARIABLE(float, fControlToneBloomScale, 0.0f, "control bloom scale");
-	CONFIG_ADD_VARIABLE(bool, bWeather, false, "custom weather enabled");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainLenght, 0.0f, "weather rain lenght");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainSpeed, 0.0f, "weather rain speed");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainRadius, 0.0f, "weather rain radius");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainWidth, 0.0f, "weather rain width");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainSideVel, 0.0f, "weather rain side vel");
-	CONFIG_ADD_VARIABLE(float, fWeatherRainAlpha, 0.0f, "weather rain alpha");
-	CONFIG_ADD_VARIABLE(float, fWeatherWindSpeed, 0.0f, "weather rain wind speed");
-	CONFIG_ADD_VARIABLE(bool, bAmbientLight, false, "ambient light enabled");
-	CONFIG_ADD_VARIABLE(Color, cAmbientLight, Colors::LightBlue, "ambient light color");
+		struct VarWeaponBar
+		{
+			bool enabled = false;
+			bool translate = false;
+			CfgColor text = Colors::White;
+			CfgColor bar = Colors::Turquoise;
+		};
+		std::unique_ptr<VarWeaponBar> weaponBar{ new VarWeaponBar };
 
-	// MASTER SWITCHES
+		struct VarName
+		{
+			bool enabled = false;
+		};
+		std::unique_ptr<VarName> nameBar{ new VarName };
 
-	CONFIG_ADD_VARIABLE(bool, bMenuOpenedx88, true, "x88 menu enabled");
-	CONFIG_ADD_VARIABLE(Key, kMenu, Key(KeyMode::TOGGLE, VK_INSERT), "key for imgui menu");
-	CONFIG_ADD_VARIABLE(Key, kPanic, Key(KeyMode::DOWN, VK_DELETE), "key for shutdown");
-	CONFIG_ADD_VARIABLE(Key, kConsoleLog, Key(KeyMode::TOGGLE, VK_HOME), "key for log console");
+		struct VarSkeleton
+		{
+			bool enabled = false;
+			CfgColor color = Colors::White;
+			bool showDebug = false;
+		};
+		std::unique_ptr<VarSkeleton> skeleton{ new VarSkeleton };
 
+		struct VarDlight
+		{
+			bool enabled = false;
+			CfgColor color = Color{ 20, 70, 150, 255 };
+			float radius = 50.0f;
+			float decay = 30.0f;
+			float exponent = 8.0f;
+		};
+		std::unique_ptr<VarDlight> dlight{ new VarDlight };
 
-	// MISC
+		struct VarExtraInfo
+		{
+			bool enabled = false;
+		};
+		std::unique_ptr<VarExtraInfo> extraInfo{ new VarExtraInfo };
 
-	CONFIG_ADD_VARIABLE(float, fFOV, 0, "fov for +/- view");
-	CONFIG_ADD_VARIABLE(bool, bThirdp, false, "third person enabled");
-	CONFIG_ADD_VARIABLE(Key, kThirdp, Key(KeyMode::TOGGLE, 0x56), "third person key");
-	CONFIG_ADD_VARIABLE(float, fThirdpDistance, 200.0f, "third person distance");
-	CONFIG_ADD_VARIABLE(float, fThirdpX, 0.0f, "third personX");
-	CONFIG_ADD_VARIABLE(float, fThirdpY, 0.0f, "third personY");
-	CONFIG_ADD_VARIABLE(int, iCrosshair, 0, "crosshair mode");
-	CONFIG_ADD_VARIABLE(bool, bBacktrack, false, "backtrack enabled");
-	CONFIG_ADD_VARIABLE(float, fBacktrackTick, 200.0f, "backtrack amount of ticks to manipulate");
-	CONFIG_ADD_VARIABLE(bool, bBacktrackSmoke, true, "backtrack smoke check");
-	CONFIG_ADD_VARIABLE(float, fBacktrackFlashStart, 120.0f, "backtrack flash alpha");
-	CONFIG_ADD_VARIABLE(bool, bFakeLatency, false, "fake latency enabled");
-	CONFIG_ADD_VARIABLE(float, fFakeLatency, 200.0f, "fake latency amount");
-	CONFIG_ADD_VARIABLE(bool, bBunnyHop, false, "bunnyhop enabled");
-	CONFIG_ADD_VARIABLE(int, iBunnyHopChance, 0, "bunnyhop chance");
-	CONFIG_ADD_VARIABLE(int, iAutoStrafe, 0, "autostrafe mode");
-	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker, false, "draw hitmarker enabled");
-	CONFIG_ADD_VARIABLE(bool, bPlayHitmarker, false, "play sound hitmarker enabled");
-	CONFIG_ADD_VARIABLE(bool, bDrawHitmarker3D, false, "draw hitmarker enabled in 3D");
-	CONFIG_ADD_VARIABLE(bool, bDrawHitmarkerResize, false, "draw hitmarker with resizing lines");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawHitmarkerNormal, Colors::White, "draw hitmarker normal hit");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawHitmarkerHead, Colors::Pink, "draw hitmarker head hit");
-	CONFIG_ADD_VARIABLE(CfgColor, cDrawHitmarkerDead, Colors::Green, "draw hitmarker dead hit");
-	CONFIG_ADD_VARIABLE(float, fHitmarkerTime, 0.8f, "hitmarker time");
-	CONFIG_ADD_VARIABLE(bool, bNoScope, false, "no scope enabled");
-	CONFIG_ADD_VARIABLE(bool, bShowFpsPlot, false, "show fps plot");
-	CONFIG_ADD_VARIABLE(bool, bShowVelocityPlot, false, "show velocity plot");
-	CONFIG_ADD_VARIABLE(CfgColor, cVelocityPlot, Colors::White, "lines velocity plot color");
-	CONFIG_ADD_VARIABLE(bool, bDrawMiscInfo, false, "draw misc info");
-	CONFIG_ADD_VARIABLE(bool, bAimingWarn, false, "aiming at you warning enabled");
-	CONFIG_ADD_VARIABLE(bool, bRadar, false, "2D radar enabled");
-	CONFIG_ADD_VARIABLE(CfgColor, cRadarLine, Colors::White, "radar player lines color");
-	CONFIG_ADD_VARIABLE(CfgColor, cRadarPlayer, Colors::Purple, "radar player color");
-	CONFIG_ADD_VARIABLE(float, fRadarThickness, 5.0f, "radar thickness");
-	CONFIG_ADD_VARIABLE(float, fRadarLenght, 20.0f, "radar lenght of line");
-	CONFIG_ADD_VARIABLE(float, fRadarScale, 1.8f, "radar scaling");
-	CONFIG_ADD_VARIABLE(bool, bRadarRanges, true, "enable radar ranges");
-	CONFIG_ADD_VARIABLE(float, fRadarSize, 200.0f, "Radar size");
-	CONFIG_ADD_VARIABLE(int, iRunMovementTrail, 0, "movement trail line type");
-	CONFIG_ADD_VARIABLE(bool, bRunMovementTrail, false, "enable movement trail line");
-	CONFIG_ADD_VARIABLE(CfgColor, cMovementTrail, Colors::Coral, "movement trail color");
-	CONFIG_ADD_VARIABLE(bool, bMovementRainbow, false, "prefer rainbow color for trail");
-	CONFIG_ADD_VARIABLE(float, fMovementRainbowSpeed, 3.0f, "speed of color change (movement trail)");
-	CONFIG_ADD_VARIABLE(float, fMovementBeamSpeed, 2.0f, "speed of beam movement");
-	CONFIG_ADD_VARIABLE(float, fMovementLife, 4.0f, "life of beam movement");
-	CONFIG_ADD_VARIABLE(bool, bNadePred, false, "nade prediction trace");
-	CONFIG_ADD_VARIABLE(bool, bNadePredAlways, false, "nade prediction will show line even if not throwing nade");
-	CONFIG_ADD_VARIABLE(Color, cNadePredColor, Colors::LightBlue, "nade prediction line color");
-	CONFIG_ADD_VARIABLE(Color, cNadeBoxColorFill, Colors::Green, "nade prediction cube fill color");
-	CONFIG_ADD_VARIABLE(Color, cNadeBoxColorOutline, Colors::Green, "nade prediction cube outline color");
-	CONFIG_ADD_VARIABLE(bool, bHat, false, "draw a cone on local player's head");
-	CONFIG_ADD_VARIABLE(bool, bHatRainbow, false, "is hat a rainbow");
-	CONFIG_ADD_VARIABLE(float, fHatSpeed, 3.0f, "rainbow hat speed");
-	CONFIG_ADD_VARIABLE(float, fHatSize, -30.0f, "hat size");
-	CONFIG_ADD_VARIABLE(float, fHatRadius, 20.0f, "hat radius");
-	CONFIG_ADD_VARIABLE(int, iHatTriangleAlpha, 70, "hat rainbow triangle alpha");
-	CONFIG_ADD_VARIABLE(int, iHatLinesAlpha, 180, "hat rainbow lines alpha");
-	CONFIG_ADD_VARIABLE(CfgColor, cHatTriangle, Colors::Palevioletred, "color for the hat, triangle");
-	CONFIG_ADD_VARIABLE(CfgColor, cHatLine, Colors::Palevioletred, "color for the hat, line");
-	CONFIG_ADD_VARIABLE(CfgColor, cFps, Colors::White, "color fps line");
-	CONFIG_ADD_VARIABLE(float, fFPSCap, false, "FPS value for plot (in game)");
-	CONFIG_ADD_VARIABLE(bool, bFPSCustom, false, "helper window for fps");
-	CONFIG_ADD_VARIABLE(bool, bVelocityCustom, false, "helper window for velocity");
-	CONFIG_ADD_VARIABLE(bool, bRemoveBloodSpray, false, "[DEPRECATED] remove blood spray");
-	CONFIG_ADD_VARIABLE(bool, bNadeTracer, false, "run nade tracer");
-	CONFIG_ADD_VARIABLE(Color, cNadeTracer, Colors::LightBlue, "nade tracer color");
-	CONFIG_ADD_VARIABLE(float, fNadeTracerMaxDist, 30.0f, "max meters for nade tracer");
-	CONFIG_ADD_VARIABLE(bool, bNadeTracerWarn, false, "run nade tracer warning");
-	CONFIG_ADD_VARIABLE(bool, bDiscord, false, "run discord rpc");
-	CONFIG_ADD_VARIABLE(bool, bFreeLook, false, "freelook enable");
-	CONFIG_ADD_VARIABLE(Key, kFreeLook, Key(KeyMode::DOWN, VK_MENU), "freelook key");
-	CONFIG_ADD_VARIABLE(bool, bMirrorCam, false, "mirrorcam enable");
-	CONFIG_ADD_VARIABLE(bool, bMirrorCamOnKey, false, "mirrorcam enable only on key");
-	CONFIG_ADD_VARIABLE(Key, kMirrorCam, Key(KeyMode::TOGGLE, VK_F1), "mirrorcam key");
-	CONFIG_ADD_VARIABLE(bool, bFreeCam, false, "freecam enable");
-	CONFIG_ADD_VARIABLE(float, fFreeCam, 1.0f, "freecam speed");
-	CONFIG_ADD_VARIABLE(Key, kFreeCam, Key(KeyMode::TOGGLE, VK_F2), "freecam key");
-	CONFIG_ADD_VARIABLE(bool, bFlashlight, false, "flashlight enable");
-	CONFIG_ADD_VARIABLE(Key, kFlashlight, Key(KeyMode::TOGGLE, 0x4C), "flashlight key"); // L key
-	CONFIG_ADD_VARIABLE(bool, bFlashlightBigMode, false, "flashlight big mode enabled");
-	CONFIG_ADD_VARIABLE(float, fFlashlightFov, 30.0f, "flashlight fov");
+		struct VarFlags
+		{
+			std::array<bool, E2T(EspFlags::FLAGS_SIZE)> flags{ false };
+			bool enabled = false;
+		};
+		std::unique_ptr<VarFlags> flags{ new VarFlags };
 
-	// EFFECTS - TODO sort this
+		struct VarLasers
+		{
+			bool enabled = false;
+		};
+		std::unique_ptr<VarLasers> lasers{ new VarLasers };
 
-	CONFIG_ADD_VARIABLE(bool, bMotionBlur, false, "motion blur enabled");
-	CONFIG_ADD_VARIABLE(bool, bMotionBlurForward, false, "motion blur enabled forward");
-	CONFIG_ADD_VARIABLE(float, fMotionBlurFallingIntensity, 1.0f, "motion blur FallingIntensity");
-	CONFIG_ADD_VARIABLE(float, fMotionBlurFallingMin, 10.0f, "motion blur FallingMin");
-	CONFIG_ADD_VARIABLE(float, fMotionBlurFallingMax, 20.0f, "motion blur FallingMax");
-	CONFIG_ADD_VARIABLE(float, fMotionBlurGlobalStrength, 1.0f, "motion blur GlobalStrength");
-	CONFIG_ADD_VARIABLE(float, fMotionBlurRotationIntensity, 0.15f, "motion blur RotationIntensity");
-	CONFIG_ADD_VARIABLE(float, fMotionBlurRollIntensity, 0.3f, "motion blur RollIntensity");
+		struct VarChecks
+		{
+			bool dead = false;
+			bool smoke = false;
+			bool visible = false;
+			float flashLimit = 120.0f;
+		};
+		std::unique_ptr<VarChecks> checks{ new VarChecks };
 
-	// STYLING
+		struct VarDropped
+		{
+			bool enabled = false;
+			CfgColor color = Colors::White;
+			std::array<bool, E2T(DroppedFlags::FLAGS_SIZE)> flags{ false };
+		};
+		std::unique_ptr<VarDropped> dropped{ new VarDropped };
+	};
+	std::unique_ptr<VarEsp> esp{ new VarEsp };
 
-	CONFIG_ADD_VARIABLE(int, iStyleMenu, 0, "style of the menu");
-	CONFIG_ADD_VARIABLE(bool, bBackround, false, "run menu background");
-	CONFIG_ADD_VARIABLE(float, fBackground, 2.0f, "background speed");
-	CONFIG_ADD_VARIABLE(float, fBackgroundDistance, 200.0f, "background lines max distance");
-	CONFIG_ADD_VARIABLE(int, iBackgroundSize, 150, "background amount of records");
-	CONFIG_ADD_VARIABLE(CfgColor, cBackGround1, Color(220, 10, 100, 255), "background color1");
-	CONFIG_ADD_VARIABLE(CfgColor, cBackGround2, Color(65, 75, 105, 255), "background color2");
-	CONFIG_ADD_VARIABLE(CfgColor, cBackGround3, Color(220, 240, 240, 255), "background color3");
+	struct VarSound
+	{
+		bool enabled = false;
+		CfgColor color = Colors::LightBlue;
+		float time = 10.0f;
+		float maxDist = 50.0f;
+		float maxDistLine = 80.0f;
+		CfgColor colorLine = Colors::White;
+	};
+	std::unique_ptr<VarSound> sound{ new VarSound };
 
-	// had to place them there, there is some really weird error with variant and adding vars
+	struct VarDormacy
+	{
+		float time = 1.0f;
+		float limit = 15.0f;
+	};
+	std::unique_ptr<VarDormacy> dormacy{ new VarDormacy };
 
-	CONFIG_ADD_VARIABLE(bool, bVisSmokeCheck, false, "visuals smoke check");
-	CONFIG_ADD_VARIABLE(bool, bVisVisibleCheck, false, "visuals visible check");
-	CONFIG_ADD_VARIABLE(float, fVisFlashAlphaLimit, 120.0f, "visuals flash alpha limit");
+	struct VarWorld
+	{
+		struct VarBomb
+		{
+			bool enabled = false;
+			CfgColor background = Colors::Black;
+		};
+		std::unique_ptr<VarBomb> bomb{ new VarBomb };
 
-} inline vars;
+		struct VarProjectiles
+		{
+			bool enabled = false;
+			CfgColor flash = Color{ 130, 0, 200, 255 };
+			CfgColor nade = Color{ 130, 180, 20, 255 };
+			CfgColor molotov = Color{ 130, 200, 120, 255 };
+			CfgColor smoke = Color{ 20, 70, 30, 255 };
+			CfgColor decoy = Color{ 0, 30, 60, 255 };
+		};
+		std::unique_ptr<VarProjectiles> projectiles{ new VarProjectiles };
+
+		struct VarSky
+		{
+			int indexNormal = 0U;
+			int indexCustom = 0U;
+			bool removeSky = false;
+		};
+		std::unique_ptr<VarSky> sky{ new VarSky };
+
+		struct VarModulate
+		{
+			bool enabled = false;
+			CfgColor texture = Colors::White;
+			CfgColor prop = Colors::White;
+			CfgColor sky = Colors::White;
+			float shader = 100.0f;
+		};
+		std::unique_ptr<VarModulate> modulate{ new VarModulate };
+
+		struct VarMolotov
+		{
+			bool enabled = false;
+			CfgColor color = Colors::Red.getColorEditAlpha(0.3f);
+			CfgColor colorText = Colors::White;
+		};
+		std::unique_ptr<VarMolotov> molotov{ new VarMolotov };
+
+		struct VarSmoke
+		{
+			bool enabled = false;
+			CfgColor color = Colors::White;
+		};
+		std::unique_ptr<VarSmoke> smoke{ new VarSmoke };
+
+		struct VarZeus
+		{
+			bool enabled = false;
+			bool party = false;
+			bool tracing = false;
+			CfgColor color = CfgColor{ Colors::Palevioletred, true, 4.0f };
+		};
+		std::unique_ptr<VarZeus> zeus{ new VarZeus };
+
+		struct VarParticles
+		{
+			bool enabledBlood = false;
+			CfgColor colorBlood = Colors::Purple;
+			bool enabledMolotov = false;
+			CfgColor colorMolotov = Colors::Purple;
+			bool enabledSmoke = false;
+			CfgColor colorSmoke = Colors::Purple;
+		};
+		std::unique_ptr<VarParticles> particles{ new VarParticles };
+
+		struct VarTracer
+		{
+			bool enabled = false;
+			CfgBeam beamTracer = CfgBeam
+			{
+				0U,
+				"4|8",
+				2.0f,
+				Colors::LightBlue,
+				2.0f,
+				1.0f,
+				2.0f,
+				1.0f,
+				0.0f,
+				60.0f,
+				2
+			};
+		};
+		std::unique_ptr<VarTracer> tracer{ new VarTracer };
+
+		struct VarImpacts
+		{
+			bool enabledClient = false;
+			float timeClient = 3.0f;
+			CfgColor colorClient = Colors::Cyan;
+			CfgColor colorClientFill = Colors::Red;
+			bool enabledLocal = false;
+			float timeLocal = 3.0f;
+			CfgColor colorLocal = Colors::Cyan;
+			CfgColor colorLocalFill = Colors::Red;
+		};
+		std::unique_ptr<VarImpacts> impacts{ new VarImpacts };
+
+		struct VarFog
+		{
+			bool enabled = false;
+			float distance = 500.0f;
+			CfgColor color = Colors::Purple;
+		};
+		std::unique_ptr<VarFog> fog{ new VarFog };
+
+		struct VarScreenEffect
+		{
+			int index = 0U;
+			float param = 1.0f;
+			CfgColor color = Colors::LightBlue;
+		};
+		std::unique_ptr<VarScreenEffect> screenEffect{ new VarScreenEffect };
+
+		struct VarTone
+		{
+			bool enabled = false;
+			float min = 0.5f;
+			float max = 0.5f;
+			float bloom = 0.0f;
+		};
+		std::unique_ptr<VarTone> tone{ new VarTone };
+
+		struct VarWeather
+		{
+			bool enabled = false;
+			float length = 0.0f;
+			float rainSpeed = 0.0f;
+			float radius = 0.0f;
+			float width = 0.0f;
+			float velocity = 0.0f;
+			float alpha = 0.0f;
+			float windSpeed = 0.0f;
+		};
+		std::unique_ptr<VarWeather> weather{ new VarWeather };
+
+		struct VarAmbient
+		{
+			bool enabled = false;
+			CfgColor color = Colors::LightBlue;
+		};
+		std::unique_ptr<VarAmbient> ambient{ new VarAmbient };
+	};
+	std::unique_ptr<VarWorld> world{ new VarWorld };
+};
+USE_NAMESPACE_VARS(VarVisuals, visuals);
+
+struct VarKeys
+{
+	bool enabledX88Menu = true;
+	Key aimbot = Key{ KeyMode::DOWN, VK_LBUTTON };
+	Key menu = Key{ KeyMode::TOGGLE, VK_INSERT };
+	Key panic = Key{ KeyMode::DOWN, VK_DELETE };
+	Key console = Key{ KeyMode::TOGGLE, VK_HOME };
+	Key freeLook = Key{ KeyMode::DOWN, VK_MENU };
+	Key mirrorCam = Key{ KeyMode::TOGGLE, VK_F1 };
+	Key freeCam = Key{ KeyMode::TOGGLE, VK_F2 };
+	Key flashLight = Key{ KeyMode::TOGGLE, 0x4C }; // L key
+	Key thirdP = Key{ KeyMode::TOGGLE, 0x56 }; // V key
+};
+USE_NAMESPACE_VARS(VarKeys, keys);
+
+struct VarBacktrack
+{
+	bool enabled = false;
+	float time = 200.0f;
+	bool smoke = true;
+	float flashLimit = 120.0f;
+};
+USE_NAMESPACE_VARS(VarBacktrack, backtrack);
+
+struct VarMisc
+{
+	struct VarLogs
+	{
+		float time = 4.0f;
+		bool enabled = false;
+	};
+	std::unique_ptr<VarLogs> logs{ new VarLogs };
+
+	struct VarFov
+	{
+		float value = 0.0f;
+	};
+	std::unique_ptr<VarFov> fov{ new VarFov };
+
+	struct VarThridP
+	{
+		bool enabled = false;
+		float distance = 200.0f;
+		float x = 0.0f;
+		float y = 0.0f;
+	};
+	std::unique_ptr<VarThridP> thirdp{ new VarThridP };
+
+	struct VarCrosshair
+	{
+		int index = 0;
+	};
+	std::unique_ptr<VarCrosshair> crosshair{ new VarCrosshair };
+
+	struct VarFakeLatency
+	{
+		bool enabled = false;
+		float amount = 200.0f;
+	};
+	std::unique_ptr<VarFakeLatency> fakeLatency{ new VarFakeLatency };
+
+	struct VarBunnyHop
+	{
+		bool enabled = false;
+		int chance = 0;
+		int indexStrafe = 0;
+	};
+	std::unique_ptr<VarBunnyHop> bunnyHop{ new VarBunnyHop };
+
+	struct VarHitmarker
+	{
+		bool enabled = false;
+		bool play = false;
+		bool enabled3D = false;
+		bool enabledResize = false;
+		CfgColor colorNormal = Colors::White;
+		CfgColor colorHead = Colors::Pink;
+		CfgColor colorDead = Colors::Green;
+		float time = 0.8f;
+	};
+	std::unique_ptr<VarHitmarker> hitmarker{ new VarHitmarker };
+
+	struct VarScope
+	{
+		bool enabled = false;
+	};
+	std::unique_ptr<VarScope> scope{ new VarScope };
+
+	struct VarPlots
+	{
+		bool enabledFps = false;
+		bool enabledVelocity = false;
+		CfgColor colorVelocity = Colors::White;
+		CfgColor colorFPS = Colors::White;
+		float fpsCap = false;
+		bool fpsCustom = false;
+		bool velocityCustom = false;
+		bool velocityCap = false;
+	};
+	std::unique_ptr<VarPlots> plots{ new VarPlots };
+
+	struct VarInfo
+	{
+		bool enabled = false;
+	};
+	std::unique_ptr<VarInfo> info{ new VarInfo };
+
+	struct VarAimWarn
+	{
+		bool enabled = false;
+	};
+	std::unique_ptr<VarAimWarn> aimWarn{ new VarAimWarn };
+
+	struct VarRadar
+	{
+		bool enabled = false;
+		CfgColor colorLine = Colors::White;
+		CfgColor colorPlayer = Colors::Purple;
+		float thickness = 5.0f;
+		float length = 20.0f;
+		float scale = 1.8f;
+		bool ranges = true;
+		float size = 200.0f;
+	};
+	std::unique_ptr<VarRadar> radar{ new VarRadar };
+
+	struct VarTrail
+	{
+		int mode = 0;
+		bool enabled = false;
+		CfgColor color = Colors::Coral;
+		bool rainbow = false;
+		float rainbowSpeed = 3.0f;
+		float beamSpeed = 2.0f;
+		float time = 4.0f;
+	};
+	std::unique_ptr<VarTrail> trail{ new VarTrail };
+
+	struct VarNades
+	{
+		bool enabledPred = false;
+		bool predAlways = false;
+		CfgColor colorPredLine = Colors::LightBlue;
+		CfgColor colorPredBoxFill = Colors::Green;
+		CfgColor colorPredBox = Colors::Green;
+		bool enabledTracer = false;
+		CfgColor colorTracer = Colors::LightBlue;
+		float tracerDist = 30.0f;
+		bool tracerWarn = false;
+	};
+	std::unique_ptr<VarNades> nade{ new VarNades };
+
+	struct VarHat
+	{
+		bool enabled = false;
+		bool rainbow = false;
+		float rainbowSpeed = 3.0f;
+		float size = -30.0f;
+		float radius = 20.0f;
+		int rainbowAlpha = 70;
+		int rainbowLinesAlpha = 180;
+		CfgColor colorTriangle = Colors::Palevioletred;
+		CfgColor colorLine = Colors::Palevioletred;
+	};
+	std::unique_ptr<VarHat> hat{ new VarHat };
+
+	struct VarDiscord
+	{
+		bool enabled = false;
+	};
+	std::unique_ptr<VarDiscord> discord{ new VarDiscord };
+
+	struct VarMotionBlur
+	{
+		bool enabled = false;
+		bool forward = false;
+		float fallingIntensity = 1.0f;
+		float fallingMin = 10.0f;
+		float fallingMax = 20.0f;
+		float strength = 1.0f;
+		float rotationIntensity = 0.15f;
+		float rollIntensity = 0.3f;
+	};
+	std::unique_ptr<VarMotionBlur> motionBlur{ new VarMotionBlur };
+
+	struct VarFreeLook
+	{
+		bool enabled = false;
+	};
+	std::unique_ptr<VarFreeLook> freeLook{ new VarFreeLook };
+
+	struct VarMirrorCam
+	{
+		bool enabled = false;
+		bool onKey = false;
+	};
+	std::unique_ptr<VarMirrorCam> mirrorCam{ new VarMirrorCam };
+
+	struct VarFreeCam
+	{
+		bool enabled = false;
+		float speed = 1.0f;
+	};
+	std::unique_ptr<VarFreeCam> freeCam{ new VarFreeCam };
+
+	struct VarFlashlight
+	{
+		bool enabled = false;
+		bool bigMode = false;
+		float fov = 30.0f;
+	};
+	std::unique_ptr<VarFlashlight> flashLight{ new VarFlashlight };
+};
+USE_NAMESPACE_VARS(VarMisc, misc);
+
+struct VarStyling
+{
+	int index = 0;
+	bool background = false;
+	float speed = 2.0f;
+	float distance = 200.0f;
+	int size = 150;
+	CfgColor color1 = Color{ 220, 10, 100, 255 };
+	CfgColor color2 = Color{ 65, 75, 105, 255 };
+	CfgColor color3 = Color{ 220, 240, 240, 255 };
+};
+USE_NAMESPACE_VARS(VarStyling, styling);
+
+#undef USE_NAMESPACE_VARS

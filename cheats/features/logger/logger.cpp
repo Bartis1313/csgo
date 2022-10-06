@@ -12,7 +12,7 @@ void Logger::init()
 
 void Logger::add(const Log_t& log)
 {
-	if (!config.get<bool>(vars.bLogEnabled))
+	if (!vars::misc->logs->enabled)
 		return;
 
 	m_logs.push_back(log);
@@ -20,7 +20,7 @@ void Logger::add(const Log_t& log)
 
 void Logger::draw()
 {
-	if (!config.get<bool>(vars.bLogEnabled))
+	if (!vars::misc->logs->enabled)
 		return;
 
 	for (size_t i = 0; auto & el : m_logs)
@@ -33,7 +33,7 @@ void Logger::draw()
 			continue;
 		}
 
-		float scale = diff / config.get<float>(vars.fLogMaxTime);
+		float scale = diff / vars::misc->logs->time;
 
 		
 		if(float y = el.m_font->FontSize; scale > 0.1f) // normal pos

@@ -20,7 +20,7 @@ void FakeLatency::updateSequences()
 	if (!game::isAvailable())
 		return;
 
-	if (!config.get<bool>(vars.bFakeLatency))
+	if (!vars::misc->fakeLatency->enabled)
 	{
 		clearSequences();
 		return;

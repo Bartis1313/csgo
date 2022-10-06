@@ -126,6 +126,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.6.0 - Include paths.
 * 1.6.1 - Include paths v2.
 * 1.6.2 - Source cleanup, generic vector & matrix.
+* 1.6.3 - Once again better generic vector. Config is now stored in nice-looking json + accessing values is not painful. Cleanup is still needed. Better smoothing included in aimbot, still needs some extensions.  
 </details>
 
 # Dependencies

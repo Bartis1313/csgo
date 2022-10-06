@@ -17,7 +17,7 @@ void Hat::init()
 
 void Hat::draw()
 {
-	if (!config.get<bool>(vars.bHat))
+	if (!vars::misc->hat->enabled)
 		return;
 
 	if (!game::isAvailable())
@@ -30,15 +30,15 @@ void Hat::draw()
 
 	// config.get<> enjoyer
 
-	if (config.get<bool>(vars.bHatRainbow))
+	if (vars::misc->hat->rainbow)
 	{
-		drawConeEditedRainbow(pos, config.get<float>(vars.fHatRadius), 86, config.get<float>(vars.fHatSize),
-			config.get<float>(vars.fHatSpeed), config.get<int>(vars.iHatTriangleAlpha), config.get<int>(vars.iHatLinesAlpha));
+		drawConeEditedRainbow(pos, vars::misc->hat->radius, 86, vars::misc->hat->size,
+			vars::misc->hat->rainbowSpeed, vars::misc->hat->rainbowAlpha, vars::misc->hat->rainbowLinesAlpha);
 	}
 	else
 	{
-		imRender.drawCone(pos, config.get<float>(vars.fHatRadius), 86, config.get<float>(vars.fHatSize),
-			config.get<CfgColor>(vars.cHatTriangle).getColor(), config.get<CfgColor>(vars.cHatLine).getColor(), true, 2.0f);
+		imRender.drawCone(pos, vars::misc->hat->radius, 86, vars::misc->hat->size,
+			vars::misc->hat->colorTriangle(), vars::misc->hat->colorLine(), true, 2.0f);
 	}
 }
 

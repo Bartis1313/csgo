@@ -20,7 +20,7 @@ bool __fastcall hooks::isHltv::hooked(FAST_ARGS)
     if (ret == occlusion)
     {
         // no need to set those values for normal view
-        if (config.get<bool>(vars.bMirrorCam) && ent)
+        if (vars::misc->mirrorCam->enabled && ent)
         {
             /**(_DWORD*)(ent + 0xA24) = -1;
             *(_DWORD*)(ent + 0xA30) = *(_DWORD*)(globalvarsPTR + 4);

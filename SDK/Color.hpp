@@ -33,9 +33,16 @@ public:
 		setColor(col.r(), col.g(), col.b(), alpha);
 	}
 
-	constexpr void setColor(float r, float g, float b, float a = 1.0f) { m_color.at(0) = r; m_color.at(1) = g; m_color.at(2) = b; m_color.at(3) = a; }
+	constexpr void setColor(float r, float g, float b, float a = 1.0f) 
+	{
+		m_color.at(0) = r; m_color.at(1) = g; m_color.at(2) = b; m_color.at(3) = a;
+	}
+
 	constexpr void setAlpha(float a) { m_color.at(3) = a; }
 	constexpr void setAlphaInt(int a) { m_color.at(3) = a / 255.0f; }
+
+	constexpr auto get() const { return m_color; }
+	constexpr auto& get() { return m_color; }
 
 	[[nodiscard]] constexpr float r() const { return m_color.at(0); }
 	[[nodiscard]] constexpr float g() const { return m_color.at(1); }
@@ -52,12 +59,12 @@ public:
 	[[nodiscard]] constexpr uint8_t bMultiplied() const { return static_cast<uint8_t>(m_color.at(2) * 255.0f); }
 	[[nodiscard]] constexpr uint8_t aMultiplied() const { return static_cast<uint8_t>(m_color.at(3) * 255.0f); }
 
-	constexpr const float& operator[](int index) const { return m_color.at(index); }
+	constexpr const float operator[](size_t index) const { return m_color.at(index); }
 	constexpr float& operator[](size_t index) { return m_color.at(index); }
-	constexpr const float& at(size_t index) const { if (index >= m_color.size()) throw std::runtime_error("Out of range!"); return m_color.at(index); } // as std, at() is safe
+	constexpr const float at(size_t index) const { if (index >= m_color.size()) throw std::runtime_error("Out of range!"); return m_color.at(index); } // as std, at() is safe
 	constexpr float& at(size_t index) { if (index >= m_color.size()) throw std::runtime_error("Out of range!"); return m_color.at(index); }
-	constexpr bool operator == (const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
-	constexpr bool operator != (const Color& rhs) const { return !(operator==(rhs)); }
+	constexpr bool operator==(const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
+	constexpr bool operator!=(const Color& rhs) const { return !(operator==(rhs)); }
 	[[nodiscard]] static Color fromHSB(float hue, float saturation, float brightness);
 	//https://gist.github.com/mjackson/5311256
 	[[nodiscard]] static Color hslToRGB(float hue, float saturation, float lightness);

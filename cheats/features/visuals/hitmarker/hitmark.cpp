@@ -23,7 +23,7 @@ void Hitmarker::init()
 
 void Hitmarker::draw()
 {
-	if (!config.get<bool>(vars.bDrawHitmarker))
+	if (!vars::misc->hitmarker->enabled)
 		return;
 
 	if (!game::localPlayer)
@@ -33,7 +33,7 @@ void Hitmarker::draw()
 		return;
 
 	int x, y;
-	bool mode3D = config.get<bool>(vars.bDrawHitmarker3D);
+	bool mode3D = vars::misc->hitmarker->enabled3D;
 	if (!mode3D)
 	{
 		x = globals::screenX / 2;
@@ -62,22 +62,22 @@ void Hitmarker::draw()
 				continue;
 		}
 
-		currentAlpha = diff / config.get<float>(vars.fHitmarkerTime);
+		currentAlpha = diff / vars::misc->hitmarker->time;
 		float sizeFont = 16.0f;
-		CfgColor actualColor = config.get<CfgColor>(vars.cDrawHitmarkerNormal).getColor().getColorEditAlpha(currentAlpha);
+		Color actualColor = vars::misc->hitmarker->colorNormal().getColorEditAlpha(currentAlpha);
 		float lineX = 10.0f;
 		float lineY = 5.0f;
 
 		if (el.isAvailable() && el.m_head)
 		{
-			actualColor = config.get<CfgColor>(vars.cDrawHitmarkerHead).getColor().getColorEditAlpha(currentAlpha);
+			actualColor = vars::misc->hitmarker->colorHead().getColorEditAlpha(currentAlpha);
 			sizeFont = 24.0f;
 			lineX = 14.0f;
 			lineY = 7.0f;
 		}
 		else if (!el.isAvailable())
 		{
-			actualColor = config.get<CfgColor>(vars.cDrawHitmarkerDead).getColor().getColorEditAlpha(currentAlpha);
+			actualColor = vars::misc->hitmarker->colorDead().getColorEditAlpha(currentAlpha);
 			sizeFont = 28.0f;
 			lineX = 18.0f;
 			lineY = 9.0f;
@@ -85,23 +85,23 @@ void Hitmarker::draw()
 
 		float lineAddonX = lineX;
 		float lineAddonY = lineY;
-		if (config.get<bool>(vars.bDrawHitmarkerResize))
+		if (vars::misc->hitmarker->enabledResize)
 		{
 			lineAddonX = lineX / (1.0f / (currentAlpha + 0.01f)); // prevent division by 0 and make ratio
 			lineAddonY = lineY / (1.0f / (currentAlpha + 0.01f));
 		}
 
-		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor.getColor());
-		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor.getColor());
-		imRender.drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor.getColor());
-		imRender.drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor.getColor());
+		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor);
+		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor);
+		imRender.drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor);
+		imRender.drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor);
 
 		constexpr int moveMultiply = 25;
 		float correction = (1.0f - currentAlpha) * moveMultiply; // this maybe should have el.expire ratio to previous one
 		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
 		float Ycorrection = y - (correction * 4.0f); // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
 
-		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma14, FORMAT(XOR("{}"), el.m_dmg), false, actualColor.getColor(), false);
+		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma14, FORMAT(XOR("{}"), el.m_dmg), false, actualColor, false);
 
 		i++;
 	}
@@ -109,7 +109,7 @@ void Hitmarker::draw()
 
 void Hitmarker::handleHits(IGameEvent* event)
 {
-	if (!config.get<bool>(vars.bDrawHitmarker))
+	if (!vars::misc->hitmarker->enabled)
 		return;
 
 	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
@@ -130,13 +130,14 @@ void Hitmarker::handleHits(IGameEvent* event)
 
 	Hitmark_t hit =
 	{
-		interfaces::globalVars->m_curtime + config.get<float>(vars.fHitmarkerTime),
+		interfaces::globalVars->m_curtime + vars::misc->hitmarker->time,
 		dmg_health,
 		ent->m_iHealth() - dmg_health,
 		hitgroup == 1, // head
 		ent->getHitgroupPos(hitgroup)
 	};
 	m_hitmarkers.push_back(hit);
-	if (config.get<bool>(vars.bPlayHitmarker))
+
+	if (vars::misc->hitmarker->play)
 		interfaces::surface->playSound(XOR("buttons\\arena_switch_press_02.wav"));
 }

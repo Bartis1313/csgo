@@ -64,7 +64,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>false</SDLCheck>
+      <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
@@ -74,7 +74,7 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <WholeProgramOptimization>false</WholeProgramOptimization>
@@ -83,6 +83,8 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <FloatingPointModel>Fast</FloatingPointModel>
     </ClCompile>
     <ProjectReference>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
@@ -128,6 +130,8 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <OmitFramePointers>true</OmitFramePointers>
       <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <IgnoreSpecificDefaultLibraries>
@@ -227,6 +231,7 @@
     <ClCompile Include="cheats\menu\x88Menu\x88menu.cpp" />
     <ClCompile Include="config\cfgcolor.cpp" />
     <ClCompile Include="config\cfgWeapon.cpp" />
+    <ClCompile Include="config\jsonExtended.cpp" />
     <ClCompile Include="config\key.cpp" />
     <ClCompile Include="dependencies\discord\src\connection_win.cpp" />
     <ClCompile Include="dependencies\discord\src\discord_register_win.cpp" />
@@ -435,9 +440,11 @@
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />
+    <ClInclude Include="config\cfgBeam.hpp" />
     <ClInclude Include="config\cfgcolor.hpp" />
     <ClInclude Include="config\cfgWeapon.hpp" />
     <ClInclude Include="config\enums.hpp" />
+    <ClInclude Include="config\jsonExtended.hpp" />
     <ClInclude Include="config\key.hpp" />
     <ClInclude Include="dependencies\discord\include\discord_register.h" />
     <ClInclude Include="dependencies\discord\include\discord_rpc.h" />

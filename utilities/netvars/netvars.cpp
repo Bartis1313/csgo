@@ -147,7 +147,7 @@ void NetvarManager::dump(RecvTable* recvTable)
 
 void NetvarManager::dump()
 {
-	file = std::ofstream{ config.getPathForSave(XOR("netvarsDump.txt")), std::ofstream::out | std::ofstream::trunc };
+	file = std::ofstream{ config.getHackPath() / XOR("netvarsDump.txt") };
 	file << FORMAT(XOR("Netvars from: {}"), utilities::getTime()) << "\n\n";
 
 	TimeCount timer{};

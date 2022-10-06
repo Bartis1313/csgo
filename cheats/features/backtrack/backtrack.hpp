@@ -42,7 +42,7 @@ private:
 		IConVar* updateRate;
 		IConVar* maxUpdateRate;
 		IConVar* minUpdateRate;
-	} cvars;
+	} cvars{};
 
 	struct convarRatios
 	{

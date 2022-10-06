@@ -109,15 +109,15 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 
 	if (ent && ent->isPlayer() && ent->isAlive() && ent->isOtherTeam(game::localPlayer()))
 	{
-		if (!config.get<bool>(vars.bChamsPlayers))
+		if (!vars::visuals->chams->players)
 			return;
 
-		if (config.get<bool>(vars.bChamsXQZPlayers))
+		if (vars::visuals->chams->enabledXQZPlayers)
 		{
-			overrideChams(config.get<int>(vars.iChamsPlayers), true, false, config.get<CfgColor>(vars.cChamsXQZPlayers).getColor());
+			overrideChams(vars::visuals->chams->indexPlayers, true, false, vars::visuals->chams->colorXQZPlayers());
 		}
 
-		overrideChams(config.get<int>(vars.iChamsPlayers), false, false, config.get<CfgColor>(vars.cChamsPlayers).getColor(), true, false);
+		overrideChams(vars::visuals->chams->indexPlayers, false, false, vars::visuals->chams->colorPlayers(), true, false);
 		return;
 
 	}
@@ -127,21 +127,21 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 
 		if (name.find(XOR("arms")) != std::string::npos)
 		{
-			if (!config.get<bool>(vars.bChamsArms))
+			if (!vars::visuals->chams->enabledArms)
 				return;
 
 			auto mat = interfaces::matSys->findMaterial(name.data(), XOR(TEXTURE_GROUP_MODEL));
 			if (!mat)
 				return;
 
-			if (config.get<bool>(vars.bChamsArmsDisable))
+			if (vars::visuals->chams->armsHide)
 			{
 				mat->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
 				interfaces::studioRender->forcedMaterialOverride(mat);
 				return;
 			}
 
-			overrideChams(config.get<int>(vars.iChamsArms), false, false, config.get<CfgColor>(vars.cChamsArms).getColor(), true, false);
+			overrideChams(vars::visuals->chams->indexArms, false, false, vars::visuals->chams->colorArms(), true, false);
 			return;
 		}
 		else if (name.find(XOR("fists")) == std::string::npos &&
@@ -149,21 +149,21 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 			name.find(XOR("arms")) == std::string::npos &&
 			!game::localPlayer->m_bIsScoped())
 		{
-			if (!config.get<bool>(vars.bChamsWeapons))
+			if (!vars::visuals->chams->enabledWeapons)
 				return;
 
 			auto mat = interfaces::matSys->findMaterial(name.data(), XOR(TEXTURE_GROUP_MODEL));
 			if (!mat)
 				return;
 
-			if (config.get<bool>(vars.bChamsWeaponsDisable))
+			if (vars::visuals->chams->weaponHide)
 			{
 				mat->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
 				interfaces::studioRender->forcedMaterialOverride(mat);
 				return;
 			}
 
-			overrideChams(config.get<int>(vars.iChamsWeapons), false, false, config.get<CfgColor>(vars.cChamsWeapons).getColor(), true, false);
+			overrideChams(vars::visuals->chams->indexWeapons, false, false, vars::visuals->chams->colorWeapons(), true, false);
 			return;
 		}
 	}
@@ -174,7 +174,7 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 
 void Chams::drawBackTrack(Player_t* ent)
 {
-	if (!config.get<bool>(vars.bChamsBacktrack))
+	if (!vars::visuals->chams->enabledBacktrack)
 		return;
 
 	if (!ent)
@@ -193,7 +193,7 @@ void Chams::drawBackTrack(Player_t* ent)
 	if (record->empty())
 		return;
 
-	switch (config.get<int>(vars.iChamsBacktrack))
+	switch (vars::visuals->chams->indexBacktrack)
 	{
 	case E2T(BTChamsID::STABLE):
 	{
@@ -202,7 +202,7 @@ void Chams::drawBackTrack(Player_t* ent)
 			if (!g_Backtrack.isValid(record->at(i).m_simtime))
 				continue;
 
-			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, config.get<CfgColor>(vars.cChamsBacktrack).getColor(), true, false);
+			overrideChams(vars::visuals->chams->modeBacktrack, false, false, vars::visuals->chams->colorBacktrack(), true, false);
 			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
@@ -212,7 +212,7 @@ void Chams::drawBackTrack(Player_t* ent)
 	{
 		if (g_Backtrack.isValid(record->front().m_simtime))
 		{
-			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, config.get<CfgColor>(vars.cChamsBacktrack).getColor(), true, false);
+			overrideChams(vars::visuals->chams->modeBacktrack, false, false, vars::visuals->chams->colorBacktrack(), true, false);
 			CALL(m_result, m_state, m_info, record->back().m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
@@ -225,8 +225,8 @@ void Chams::drawBackTrack(Player_t* ent)
 			if (!g_Backtrack.isValid(record->at(i).m_simtime))
 				continue;
 
-			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false,
-				Color::rainbowColor(interfaces::globalVars->m_curtime + (i / 3.0f), config.get<float>(vars.fChamsBacktrackRainbowSpeed)), true, false);
+			overrideChams(vars::visuals->chams->modeBacktrack, false, false,
+				Color::rainbowColor(interfaces::globalVars->m_curtime + (i / 3.0f), vars::visuals->chams->rainbowBacktrackSpeed), true, false);
 			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
@@ -234,17 +234,17 @@ void Chams::drawBackTrack(Player_t* ent)
 	}
 	case E2T(BTChamsID::COLOR_CHANGE):
 	{
-		CfgColor fromCfg = config.get<CfgColor>(vars.cChamsBacktrack);
+		Color fromCfg = vars::visuals->chams->colorBacktrack();
 		
 		for (size_t i = 0; i < record->size(); i++)
 		{
 			if (!g_Backtrack.isValid(record->at(i).m_simtime))
 				continue;
 			
-			Color color(fromCfg.getColor().r() - (i * (1.0f / record->size())),
-				i * (fromCfg.getColor().g() / record->size()), fromCfg.getColor().b(), fromCfg.getColor().a());
+			Color color(fromCfg.r() - (i * (1.0f / record->size())),
+				i * (fromCfg.g() / record->size()), fromCfg.b(), fromCfg.a());
 			
-			overrideChams(config.get<int>(vars.iChamsBacktrackMode), false, false, color, true, false);
+			overrideChams(vars::visuals->chams->modeBacktrack, false, false, color, true, false);
 			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
 			interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}

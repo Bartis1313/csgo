@@ -28,7 +28,7 @@ void Radar::init()
 
 Vec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const Vec2& pos, const Vec2& size, const float scale, bool clipRanges)
 {
-	float dotThickness = config.get<float>(vars.fRadarThickness);
+	float dotThickness = vars::misc->radar->thickness;
 
 	float directionX = entPos[Coord::X] - eye[Coord::X];
 	float directionY = -(entPos[Coord::Y] - eye[Coord::Y]);
@@ -48,12 +48,12 @@ Vec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, 
 	// do not draw out of range, added pos, even we pass 0, but for clarity
 	if (clipRanges)
 	{
-		if (!config.get<bool>(vars.bRadarRanges))
+		if (!vars::misc->radar->ranges)
 		{
 			if (dotX < pos[Coord::X])
 				return {}; // this is zero vector
 
-			if (dotX > pos[Coord::Y] + size[Coord::X]- dotThickness)
+			if (dotX > pos[Coord::Y] + size[Coord::X] - dotThickness)
 				return {};
 
 			if (dotY < pos[Coord::Y])
@@ -153,7 +153,7 @@ void Radar::drawMap()
 	const auto myEye = game::localPlayer->getEyePos();
 	Vec3 ang = {};
 	interfaces::engine->getViewAngles(ang);
-	float scale = config.get<float>(vars.fRadarScale);
+	float scale = vars::misc->radar->scale;
 
 	auto p1 = entToRadar(myEye, ang, poses.at(0), m_drawPos, m_drawSize, scale, false).toImVec();
 	auto p2 = entToRadar(myEye, ang, poses.at(1), m_drawPos, m_drawSize, scale, false).toImVec();
@@ -165,8 +165,7 @@ void Radar::drawMap()
 
 void Radar::draw()
 {
-	bool& ref = config.getRef<bool>(vars.bRadar);
-	if (!ref)
+	if (!vars::misc->radar->enabled)
 		return;
 
 	if (!game::localPlayer)
@@ -175,9 +174,9 @@ void Radar::draw()
 	if (!interfaces::engine->isInGame())
 		return;
 
-	float size = config.get<float>(vars.fRadarSize);
+	float size = vars::misc->radar->size;
 	ImGui::SetNextWindowSize({ size, size });
-	if (ImGui::Begin(XOR("Radar"), &ref, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+	if (ImGui::Begin(XOR("Radar"), &vars::misc->radar->enabled, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
 		imRenderWindow.addList();
 
@@ -232,7 +231,8 @@ void Radar::draw()
 			if (!ent->isOtherTeam(game::localPlayer()))
 				continue;
 
-			const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vec2{}, Vec2{ imRenderWindow.getWidth(), imRenderWindow.getHeight() }, config.get<float>(vars.fRadarScale), true);
+			const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vec2{}, Vec2{ imRenderWindow.getWidth(), imRenderWindow.getHeight() },
+				vars::misc->radar->scale, true);
 
 			auto entYaw = ent->m_angEyeAngles()[Coord::Y];
 
@@ -241,21 +241,21 @@ void Radar::draw()
 
 			const auto rotated = 270.0f - entYaw + ang[Coord::Y];
 
-			auto dotRad = config.get<float>(vars.fRadarLenght);
+			auto dotRad = vars::misc->radar->length;
 
 			const auto finalX = dotRad * std::cos(math::DEG2RAD(rotated));
 			const auto finalY = dotRad * std::sin(math::DEG2RAD(rotated));
 
-			if (config.get<bool>(vars.bRadarRanges) ? true : !entRotatedPos.isZero())
+			if (vars::misc->radar->ranges ? true : !entRotatedPos.isZero())
 			{
-				auto dotThickness = config.get<float>(vars.fRadarThickness);
+				auto dotThickness = vars::misc->radar->thickness;
 
-				CfgColor colLine = config.get<CfgColor>(vars.cRadarLine);
+				Color colLine = vars::misc->radar->colorLine();
 				imRenderWindow.drawLine(entRotatedPos[Coord::X] - 1, entRotatedPos[Coord::Y] - 1, entRotatedPos[Coord::X] + finalX, entRotatedPos[Coord::Y] + finalY,
-					game::localPlayer->isPossibleToSee(ent, ent->getBonePos(8)) ? colLine.getColor() : colLine.getColor().getColorEditAlpha(0.5f));
-				CfgColor colPlayer = config.get<CfgColor>(vars.cRadarPlayer);
+					game::localPlayer->isPossibleToSee(ent, ent->getBonePos(8)) ? colLine : colLine.getColorEditAlpha(0.5f));
+				Color colPlayer = vars::misc->radar->colorPlayer();
 				imRenderWindow.drawCircleFilled(entRotatedPos[Coord::X], entRotatedPos[Coord::Y], dotThickness, 32,
-					game::localPlayer->isPossibleToSee(ent, ent->getBonePos(8)) ? colPlayer.getColor() : colPlayer.getColor().getColorEditAlpha(0.5f));
+					game::localPlayer->isPossibleToSee(ent, ent->getBonePos(8)) ? colPlayer : colPlayer.getColorEditAlpha(0.5f));
 
 			}
 		}

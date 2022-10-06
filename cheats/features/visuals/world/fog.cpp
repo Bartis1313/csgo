@@ -37,7 +37,7 @@ void FogController::run(int frame)
 			break;
 		}
 
-		if (bool opt = config.get<bool>(vars.bFog); opt)
+		if (bool opt = vars::visuals->world->fog->enabled; opt)
 			ent->m_fogenable() = opt;
 		else
 		{
@@ -45,10 +45,10 @@ void FogController::run(int frame)
 			break;
 		}
 
-		SDKColor col = config.get<CfgColor>(vars.cFog).getColor();
+		SDKColor col = vars::visuals->world->fog->color();
 
 		ent->m_fogstart() = 0.0f;
-		ent->m_fogend() = config.get<float>(vars.fFogDistance) * 10.0f;
+		ent->m_fogend() = vars::visuals->world->fog->distance * 10.0f;
 		ent->m_fogmaxdensity() = col.a / 100.0f;
 		ent->m_fogcolorPrimary() = U32RGB(col);
 		ent->m_fogcolorSecondary() = U32RGB(col);

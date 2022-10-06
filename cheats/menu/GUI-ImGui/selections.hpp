@@ -11,6 +11,13 @@ namespace selections
 		"CHEST"
 	};
 
+	inline std::array smoothMehods =
+	{
+		"LINEAR",
+		"SLOWER",
+		"HUMANIZED"
+	};
+
 	inline std::array espNames =
 	{
 		"OFF",

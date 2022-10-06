@@ -28,11 +28,11 @@ void ScreenEffects::run()
 	if (!game::isAvailable())
 		return;
 
-	int cfg = config.get<int>(vars.iScreenEffect);
+	int cfg = vars::visuals->world->screenEffect->index;
 	if (cfg == 0)
 		return;
 
-	Color color = config.get<CfgColor>(vars.cScreenEffect).getColor();
+	Color color = vars::visuals->world->screenEffect->color();
 
 	auto material = m_materials.at(cfg).first;
 	material->colorModulate(color); // -> works for night vision
@@ -40,7 +40,7 @@ void ScreenEffects::run()
 	static bool found = false;
 	auto var = material->findVar(XOR("$c0_x"), &found);
 	if(found)
-		var->setValue(config.get<float>(vars.fScreenEffectParam));
+		var->setValue(vars::visuals->world->screenEffect->param);
 
 	if (m_materials.at(cfg).second) //nightvisioson
 		game::localPlayer->m_flNightVisionAlpha() = color.a();

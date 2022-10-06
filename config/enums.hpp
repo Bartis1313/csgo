@@ -8,6 +8,13 @@ enum class AimbotID : size_t
 	CHEST
 };
 
+enum class SmoothMode : size_t
+{
+	LINEAR,
+	SLOWER,
+	HUMANIZED
+};
+
 enum class CrossHairTypes : size_t
 {
 	OFF,

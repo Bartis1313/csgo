@@ -27,7 +27,7 @@ char __fastcall hooks::materialSystemValidAddr::hooked(FAST_ARGS, [[maybe_unused
 
 bool __fastcall hooks::isUsingStaticPropDebugModes::hooked(FAST_ARGS)
 {
-	return config.get<bool>(vars.bModulateColor); // might check ret addr, but pretty useless imho
+	return vars::visuals->world->modulate->enabled; // might check ret addr, but pretty useless imho
 }
 
 void __fastcall hooks::doExtraBonesProcessing::hooked(FAST_ARGS,
@@ -51,7 +51,7 @@ int __fastcall hooks::unkFileCheck::hooked(FAST_ARGS)
 
 bool __fastcall hooks::sv_cheats::hooked(FAST_ARGS)
 {
-	if (_ReturnAddress() == g_Memory.m_camThink() && config.get<bool>(vars.bThirdp))
+	if (_ReturnAddress() == g_Memory.m_camThink() && vars::misc->thirdp->enabled)
 		return true;
 
 	return original(thisptr);

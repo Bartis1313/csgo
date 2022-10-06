@@ -53,7 +53,7 @@ static std::pair<std::string, std::string> getImage(const std::string& map)
 
 void DiscordPresence::run()
 {
-	if (!config.get<bool>(vars.bDiscord))
+	if (!vars::misc->discord->enabled)
 		return;
 
 	DiscordRichPresence pres;

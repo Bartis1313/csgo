@@ -19,7 +19,7 @@ void MolotovDraw::init()
 
 void MolotovDraw::draw()
 {
-	if (!config.get<bool>(vars.bDrawmolotovRange))
+	if (!vars::visuals->world->molotov->enabled)
 		return;
 
 	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::GRENADE_PROJECTILES))
@@ -44,14 +44,14 @@ void MolotovDraw::draw()
 		constexpr int molotovRadius = 60; // 30 * 2
 
 		//std::vector<ImVec2> points = {};
-		CfgColor col = config.get<CfgColor>(vars.cMolotovRange);
+		Color col = vars::visuals->world->molotov->color();
 
 		//std::vector<ImVec2> points;
 
 		for (int i = 0; i < molotov->m_fireCount(); i++)
 		{
 			auto pos = origin + molotov->getInfernoPos(i);
-			imRender.drawCircle3DFilled(pos, molotovRadius, 32, col.getColor(), col.getColor());
+			imRender.drawCircle3DFilled(pos, molotovRadius, 32, col, col);
 
 			/*ImVec2 posw;
 			if (!imRender.worldToScreen(pos, posw))

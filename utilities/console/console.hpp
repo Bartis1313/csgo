@@ -62,7 +62,7 @@ void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 	if (fmt.empty())
 		return;
 
-	std::ofstream log{ config.getPathForSave(m_logName), std::ofstream::out | std::ofstream::app };
+	std::ofstream log{ config.getHackPath() / m_logName, std::ofstream::out | std::ofstream::app };
 
 #ifdef _DEBUG
 	setColor(colorsForConsole[type]);

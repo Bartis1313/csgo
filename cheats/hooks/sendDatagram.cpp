@@ -11,7 +11,7 @@
 
 int __fastcall hooks::sendDatagram::hooked(INetChannel* netChannel, void* edx, void* datagram)
 {
-	if (datagram || !config.get<bool>(vars.bFakeLatency) || !game::isAvailable())
+	if (datagram || !vars::misc->fakeLatency->enabled || !game::isAvailable())
 		return original(netChannel, datagram);
 
 	int reliableStateBackup = netChannel->m_inReliableState;
@@ -19,7 +19,7 @@ int __fastcall hooks::sendDatagram::hooked(INetChannel* netChannel, void* edx, v
 
 	const static auto sv_maxunlag = interfaces::cvar->findVar(XOR("sv_maxunlag"));
 
-	float maxLatency = std::max(0.0f, std::clamp(config.get<float>(vars.fFakeLatency) / 1000.f, 0.f, sv_maxunlag->getFloat()) - netChannel->getLatency(FLOW_OUTGOING));
+	float maxLatency = std::max(0.0f, std::clamp(vars::misc->fakeLatency->amount / 1000.f, 0.f, sv_maxunlag->getFloat()) - netChannel->getLatency(FLOW_OUTGOING));
 	g_FakeLatency.addLatency(netChannel, maxLatency);
 
 	const auto ret = original(netChannel, datagram);

@@ -20,9 +20,9 @@ void AmbientLight::run(int frame)
 	if (frame != FRAME_RENDER_START)
 		return;
 
-	if (auto cfg = config.get<bool>(vars.bAmbientLight); cfg && (m_buttonState || m_pickerState))
+	if (auto cfg = vars::visuals->world->ambient->enabled; cfg && (m_buttonState || m_pickerState))
 	{
-		auto cfgCol = config.get<CfgColor>(vars.cAmbientLight).getColor();
+		auto cfgCol = vars::visuals->world->ambient->color();
 
 		m_ambientR->setValue(cfgCol.r());
 		m_ambientG->setValue(cfgCol.g());

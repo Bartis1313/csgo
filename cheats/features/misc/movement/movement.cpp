@@ -30,7 +30,7 @@ void Movement::run(CUserCmd* cmd)
 
 void Movement::bunnyhop(CUserCmd* cmd)
 {
-	if (!config.get<bool>(vars.bBunnyHop))
+	if (!vars::misc->bunnyHop->enabled)
 		return;
 
 	static bool skip = false;
@@ -42,7 +42,7 @@ void Movement::bunnyhop(CUserCmd* cmd)
 	if (auto renderMode = game::localPlayer->m_nRenderMode(); renderMode == NOCLIP || renderMode == LADDER)
 		return;
 
-	if (Random::getRandom<int>(0, 100) > config.get<int>(vars.iBunnyHopChance))
+	if (Random::getRandom<int>(0, 100) > vars::misc->bunnyHop->chance)
 		return;
 
 	const bool jump = cmd->m_buttons & IN_JUMP;
@@ -74,7 +74,7 @@ void Movement::bunnyhop(CUserCmd* cmd)
 
 void Movement::strafe(CUserCmd* cmd)
 {
-	const int mode = config.get<int>(vars.iAutoStrafe);
+	const int mode = vars::misc->bunnyHop->indexStrafe;
 	if (mode == E2T(MovementStraferMode::OFF))
 		return;
 
@@ -90,7 +90,7 @@ void Movement::strafe(CUserCmd* cmd)
 	if (!game::localPlayer->isMoving())
 		return;
 
-	const float speed = game::localPlayer->m_vecVelocity().toVec2D().length();
+	const float speed = game::localPlayer->m_vecVelocity().toVecPrev().length();
 
 	switch (mode)
 	{

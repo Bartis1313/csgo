@@ -18,27 +18,26 @@ void Thirdperson::init()
 
 void Thirdperson::run(CViewSetup* view)
 {
-	if (!config.get<bool>(vars.bThirdp))
+	if (!vars::misc->thirdp->enabled)
 		return;
 
 	if (!game::isAvailable())
 		return;
 
-	if (bool state = config.get<Key>(vars.kThirdp).isEnabled(); state)
+	if (bool state = vars::keys->thirdP.isEnabled(); state)
 	{
-		Vec3 angles;
-		interfaces::engine->getViewAngles(angles);
+		Vec3 angles = game::getViewAngles();
 
 		Trace_t trace;
 
-		float fixedX = angles[0] += config.get<float>(vars.fThirdpX);
-		float fixedY = angles[1] += config.get<float>(vars.fThirdpY);
+		float fixedX = angles[0] += vars::misc->thirdp->x;
+		float fixedY = angles[1] += vars::misc->thirdp->y;
 
 		Vec3 camera = Vec3
 		{
-			std::cos(math::DEG2RAD(fixedY)) * config.get<float>(vars.fThirdpDistance),
-			std::sin(math::DEG2RAD(fixedY)) * config.get<float>(vars.fThirdpDistance),
-			std::sin(math::DEG2RAD(-fixedX))* config.get<float>(vars.fThirdpDistance),
+			std::cos(math::DEG2RAD(fixedY)) * vars::misc->thirdp->distance,
+			std::sin(math::DEG2RAD(fixedY)) * vars::misc->thirdp->distance,
+			std::sin(math::DEG2RAD(-fixedX))* vars::misc->thirdp->distance,
 		};
 		Vec3 eyePos = game::localPlayer->getEyePos();
 		TraceFilter filter;
@@ -46,7 +45,7 @@ void Thirdperson::run(CViewSetup* view)
 		interfaces::trace->traceRay({ eyePos, (eyePos - camera) }, MASK_SOLID, &filter, &trace);
 
 		interfaces::input->m_cameraInThirdPerson = state;
-		interfaces::input->m_cameraOffset = Vec3{ fixedX, fixedY, config.get<float>(vars.fThirdpDistance) * ((trace.m_fraction < 1.0f) ? trace.m_fraction : 1.0f) };
+		interfaces::input->m_cameraOffset = Vec3{ fixedX, fixedY, vars::misc->thirdp->distance * ((trace.m_fraction < 1.0f) ? trace.m_fraction : 1.0f) };
 	}
 	else if (globals::isShutdown || !state)
 	{

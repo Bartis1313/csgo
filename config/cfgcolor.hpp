@@ -13,6 +13,8 @@ public:
 	CfgColor& operator=(const CfgColor& other);
 	CfgColor& operator=(const Color& other);
 
+	constexpr auto operator()() const { return m_color; }
+
 	constexpr Color getColor() const { return m_color; }
 	constexpr Color& getColorRef() { return m_color; }
 	constexpr bool getRainbow() const { return m_rainbow; }

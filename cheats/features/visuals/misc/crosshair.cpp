@@ -21,7 +21,7 @@ void Crosshair::init()
 
 void Crosshair::draw()
 {
-	int cfgCross = config.get<int>(vars.iCrosshair);
+	int cfgCross = vars::misc->crosshair->index;
 
 	m_crosshairRecoil->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
 

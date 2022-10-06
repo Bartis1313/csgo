@@ -20,7 +20,7 @@ void EnemyWarning::init()
 
 std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
 {
-	if (!config.get<bool>(vars.bAimingWarn))
+	if (!vars::misc->aimWarn->enabled)
 		return { false, false };
 
 	if (!game::isAvailable())

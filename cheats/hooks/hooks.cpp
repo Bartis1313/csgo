@@ -103,21 +103,16 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 	inputHandler.run(message, wparam);
 	x88menu.handleKeys();
 
-	auto& aimbotKey = config.getRef<Key>(vars.kAimbotKey);
-	aimbotKey.update();
-	auto& thirdpKey = config.getRef<Key>(vars.kThirdp);
-	thirdpKey.update();
-	auto& freeLookKey = config.getRef<Key>(vars.kFreeLook);
-	freeLookKey.update();
-	auto& freeCamKey = config.getRef<Key>(vars.kFreeCam);
-	freeCamKey.update();
-	auto& cameraKey = config.getRef<Key>(vars.kMirrorCam);
-	cameraKey.update();
+	vars::keys->aimbot.update();
+	vars::keys->thirdP.update();
+	vars::keys->freeLook.update();
+	vars::keys->freeCam.update();
+	vars::keys->mirrorCam.update();
 
-	if(config.get<Key>(vars.kMenu).isPressed())
+	if(vars::keys->menu.isPressed())
 		menu.changeActive();
 
-	if (config.get<Key>(vars.kConsoleLog).isPressed())
+	if (vars::keys->console.isPressed())
 		console.changeActiveLog();
 
 	interfaces::iSystem->enableInput(!menu.isMenuActive());

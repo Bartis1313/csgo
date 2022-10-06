@@ -45,10 +45,10 @@ void BulletTracer::draw(IGameEvent* event)
 	src[Coord::Z] += 1.0f;
 	Vec3 dst = Vec3{ x, y, z };
 
-	if (!config.get<bool>(vars.bBulletTracer))
+	if (!vars::visuals->world->tracer->enabled)
 		return;
 
-	CfgColor color = config.get<CfgColor>(vars.cBulletTracer);
+	CfgBeam cfgbeam = vars::visuals->world->tracer->beamTracer;
 
 	Trace_t tr;
 	TraceFilter filter;
@@ -70,30 +70,30 @@ void BulletTracer::draw(IGameEvent* event)
 
 	BeamInfo_t info = {};
 
-	auto strWithoutSpaces = config.get<std::string>(vars.sBulletTracer);
+	auto strWithoutSpaces = cfgbeam.flags;
 	strWithoutSpaces.erase(std::remove(strWithoutSpaces.begin(), strWithoutSpaces.end(), ' '), strWithoutSpaces.end());
 
 	info.m_type = /*convertToFlag(config.get<std::string>(vars.sBulletTracerType))*/ TE_BEAMPOINTS;
 	info.m_flags = convertToFlag(strWithoutSpaces);
-	info.m_modelName = selections::beamNames.at(config.get<int>(vars.iBulletTracer));
+	info.m_modelName = selections::beamNames.at(cfgbeam.index);
 	info.m_modelIndex = -1;
 	info.m_haloIndex = -1;
 	info.m_haloScale = 0.0f;
-	info.m_life = config.get<float>(vars.fBulletTracerLife);
-	info.m_width = config.get<float>(vars.fBulletTracerWidth);
-	info.m_endWidth = config.get<float>(vars.fBulletTracerWidth);
-	info.m_fadeLength = config.get<float>(vars.fBulletTracerFadeLength);
-	info.m_amplitude = config.get<float>(vars.fBulletTracerAmplitude);
-	info.m_red = color.getColor().rMultiplied();
-	info.m_green = color.getColor().gMultiplied();
-	info.m_blue = color.getColor().bMultiplied();
-	info.m_brightness = color.getColor().aMultiplied();
-	info.m_speed = config.get<float>(vars.fBulletTracerSpeed);
-	info.m_startFrame = static_cast<int>(config.get<float>(vars.fBulletTracerStartFrame));
-	info.m_frameRate = config.get<float>(vars.fBulletTracerFrameRate);
+	info.m_life = cfgbeam.life;
+	info.m_width = cfgbeam.width;
+	info.m_endWidth = cfgbeam.width;
+	info.m_fadeLength = cfgbeam.fadeLength;
+	info.m_amplitude = cfgbeam.amplitude;
+	info.m_red = cfgbeam.color().rMultiplied();
+	info.m_green = cfgbeam.color().gMultiplied();
+	info.m_blue = cfgbeam.color().bMultiplied();
+	info.m_brightness = cfgbeam.color().aMultiplied();
+	info.m_speed = cfgbeam.speed;
+	info.m_startFrame = static_cast<int>(cfgbeam.startFrame);
+	info.m_frameRate = cfgbeam.frameRate;
 	info.m_vecStart = src;
 	info.m_vecEnd = tr.m_end;
-	info.m_segments = config.get<int>(vars.fBulletTracerSegments);
+	info.m_segments = cfgbeam.segments;
 	info.m_renderable = true;
 
 	interfaces::beams->createBeamPoints(info);

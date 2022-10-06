@@ -37,20 +37,20 @@ void PlayerVisuals::init()
 
 void PlayerVisuals::draw()
 {
-	if (!config.get<bool>(vars.bEsp))
+	if (!vars::visuals->esp->boxes->enabled)
 		return;
 
 	if (!game::isAvailable())
 		return;
 
-	bool drawDead = config.get<bool>(vars.bDrawDeadOnly);
+	bool drawDead = vars::visuals->esp->checks->dead;
 
 	std::pair<bool, bool> warnChecks = { false, false };
 
 	bool isFlashOk = true;
 	if (game::localPlayer->m_flFlashDuration() > 0.0f)
 	{
-		if (game::localPlayer->m_flFlashBangTime() >= config.get<float>(vars.fVisFlashAlphaLimit))
+		if (game::localPlayer->m_flFlashBangTime() >= vars::visuals->esp->checks->flashLimit)
 			isFlashOk = false;
 	}
 
@@ -81,11 +81,11 @@ void PlayerVisuals::draw()
 
 		auto runFeatures = [=]()
 		{
-			if (config.get<bool>(vars.bVisVisibleCheck)
+			if (vars::visuals->esp->checks->visible
 				&& !game::localPlayer->isPossibleToSee(ent, ent->getHitboxPos(HITBOX_HEAD)))
 				return;
 
-			if (config.get<bool>(vars.bVisSmokeCheck)
+			if (vars::visuals->esp->checks->visible
 				&& game::localPlayer->isViewInSmoke(ent->getHitboxPos(HITBOX_BELLY)))
 				return;
 
@@ -115,7 +115,7 @@ void PlayerVisuals::draw()
 
 void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 {
-	if (!config.get<bool>(vars.bDrawHealth))
+	if (!vars::visuals->esp->healthBar->enabled)
 		return;
 
 	auto& health = m_health.at(ent->getIndex());
@@ -154,7 +154,7 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 
 void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 {
-	if (!config.get<bool>(vars.bDrawArmor))
+	if (!vars::visuals->esp->armorBar->enabled)
 		return;
 
 	auto& armor = m_armor.at(ent->getIndex());
@@ -192,21 +192,21 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 
 void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 {
-	if (!config.get<bool>(vars.bDrawWeapon))
+	if (!vars::visuals->esp->weaponBar->enabled)
 		return;
 
 	auto weapon = ent->getActiveWeapon();
 	if (!weapon)
 		return;
 
-	CfgColor tex = config.get<CfgColor>(vars.cWeaponText);
+	Color tex = vars::visuals->esp->weaponBar->text();
 
 	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
 	int currentAmmo = weapon->m_iClip1();
 
 	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, FORMAT(XOR("{} {}/{}"),
-		config.get<bool>(vars.bDrawWeaponTranslate) ? interfaces::localize->findAsUTF8(weapon->getWpnInfo()->m_WeaponName) : ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo),
-		true, tex.getColor().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+		vars::visuals->esp->weaponBar->translate ? interfaces::localize->findAsUTF8(weapon->getWpnInfo()->m_WeaponName) : ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo),
+		true, tex.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 
 	// skip useless trash for calculations
 	if (weapon->isNonAimable())
@@ -234,7 +234,7 @@ void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 	}
 
 	imRender.drawRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, newBox.w, 4.0f, Colors::Black.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
-	imRender.drawRectFilled(newBox.x, newBox.y, barWidth, 2.0f, config.get<CfgColor>(vars.cReloadbar).getColor().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+	imRender.drawRectFilled(newBox.x, newBox.y, barWidth, 2.0f, vars::visuals->esp->weaponBar->bar().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 }
 
 void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
@@ -246,20 +246,22 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 	if (!interfaces::engine->getPlayerInfo(ent->getIndex(), &info))
 		return;
 
-	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::BOT)))
+	auto cfgflags = vars::visuals->esp->flags->flags;
+
+	if (cfgflags.at(E2T(EspFlags::BOT)))
 		if(info.m_fakePlayer)
 			flags.emplace_back(std::make_pair(XOR("BOT"), Colors::Yellow.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
-	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::MONEY)))
+	if (cfgflags.at(E2T(EspFlags::MONEY)))
 		flags.emplace_back(std::make_pair(FORMAT(XOR("{}$"), ent->m_iAccount()), Colors::Green.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
-	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::WINS)))
+	if (cfgflags.at(E2T(EspFlags::WINS)))
 		flags.emplace_back(std::make_pair(FORMAT(XOR("Wins {}"), ent->getWins()), Colors::Green.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
-	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::RANK)))
+	if (cfgflags.at(E2T(EspFlags::RANK)))
 		flags.emplace_back(std::make_pair(FORMAT(XOR("Rank {}"), ent->getRank()), Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
-	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::ARMOR)))
+	if (cfgflags.at(E2T(EspFlags::ARMOR)))
 	{
 		std::string text = "";
 		if (ent->m_bHasHelmet() && ent->m_ArmorValue())
@@ -270,18 +272,18 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 		flags.emplace_back(std::make_pair(text, Colors::White));
 	}
 
-	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::ZOOM)))
+	if (cfgflags.at(E2T(EspFlags::ZOOM)))
 		if(ent->m_bIsScoped())
 			flags.emplace_back(std::make_pair(XOR("ZOOM"), Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
-	if (config.get<cont>(vars.vFlags).at(E2T(EspFlags::C4)))
+	if (cfgflags.at(E2T(EspFlags::C4)))
 		if (ent->isC4Owner())
 			flags.emplace_back(std::make_pair(XOR("C4"), Colors::Orange.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
 	float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
 
 	float padding = 0.0f;
-	float addon = config.get<bool>(vars.bDrawArmor) ? 6.0f : 0.0f;
+	float addon = vars::visuals->esp->armorBar->enabled ? 6.0f : 0.0f;
 
 	for (size_t i = 0; const auto & [name, color] : flags)
 	{
@@ -301,7 +303,7 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 
 void PlayerVisuals::drawnName(Player_t* ent, const Box& box)
 {
-	if (!config.get<bool>(vars.bDrawName))
+	if (!vars::visuals->esp->nameBar->enabled)
 		return;
 
 	float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer()->absOrigin());
@@ -313,7 +315,7 @@ void PlayerVisuals::drawnName(Player_t* ent, const Box& box)
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
 void PlayerVisuals::drawSkeleton(Player_t* ent)
 {
-	if (!config.get<bool>(vars.bDrawSkeleton))
+	if (!vars::visuals->esp->skeleton->enabled)
 		return;
 
 	auto model = ent->getModel();
@@ -371,14 +373,14 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 		if (std::abs(deltachild[Coord::Z]) < 5.0f && deltaparent.length() < 5.0f && deltachild.length() < 5.0f || i == chest)
 			continue;
 
-		if (config.get<bool>(vars.bSkeletonDebugPoints))
+		if (vars::visuals->esp->skeleton->showDebug)
 		{
 			if (ImVec2 s; imRender.worldToScreen(ent->getBonePos(i), s))
 				imRender.text(s.x, s.y, ImFonts::franklinGothic12, FORMAT(XOR("{}"), i), true, Colors::White, true);
 		}
 
 		if (ImVec2 start, end; imRender.worldToScreen(parent, start) && imRender.worldToScreen(child, end))
-			imRender.drawLine(start, end, config.get<CfgColor>(vars.cSkeleton).getColor().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+			imRender.drawLine(start, end, vars::visuals->esp->skeleton->color().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 	}
 }
 
@@ -393,7 +395,7 @@ void PlayerVisuals::drawSnapLine(Player_t* ent, const Box& box)
 
 void PlayerVisuals::drawLaser(Player_t* ent)
 {
-	if (!config.get<bool>(vars.bEspLasers))
+	if (!vars::visuals->esp->lasers->enabled)
 		return;
 
 	// get from where to start, "laser ESP" is always starting from head I think
@@ -414,22 +416,22 @@ void PlayerVisuals::runDLight(Player_t* ent)
 {
 	// https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/client/c_spotlight_end.cpp#L112
 
-	if (!config.get<bool>(vars.bDLight))
+	if (!vars::visuals->esp->dlight->enabled)
 		return;
 
 	auto dLight = interfaces::efx->clAllocDLight(ent->getIndex());
-	dLight->m_color = config.get<CfgColor>(vars.cDlight).getColor();
+	dLight->m_color = vars::visuals->esp->dlight->color();
 	dLight->m_origin = ent->m_vecOrigin();
-	dLight->m_radius = config.get<float>(vars.fDlightRadius);
+	dLight->m_radius = vars::visuals->esp->dlight->radius;
 	dLight->m_die = interfaces::globalVars->m_curtime + 0.1f;
-	dLight->m_exponent = static_cast<char>(config.get<float>(vars.fDlightExponent));
-	dLight->m_decay = config.get<float>(vars.fDlightDecay);
+	dLight->m_exponent = static_cast<char>(vars::visuals->esp->dlight->exponent);
+	dLight->m_decay = vars::visuals->esp->dlight->decay;
 	dLight->m_key = ent->getIndex();
 }
 
 void PlayerVisuals::drawPlayer(Player_t* ent)
 {
-	if (!config.get<bool>(vars.bEsp))
+	if (!vars::visuals->esp->boxes->enabled)
 		return;
 
 	Box box{ent};
@@ -447,7 +449,7 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 		m_boxAlpha.at(ent->getIndex()) = dormacyA;
 	else // if not, use distance fade logic
 	{
-		float ratioDormant = 1.0f / (1.0f / config.get<float>(vars.fVisDormacyTime));
+		float ratioDormant = 1.0f / (1.0f / vars::visuals->dormacy->time);
 		float step = ratioDormant * interfaces::globalVars->m_frametime;
 
 		m_boxAlpha.at(ent->getIndex()) += step;
@@ -456,7 +458,7 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 
 	bool isDormant = ent->isDormant();
 
-	switch (config.get<int>(vars.iEsp))
+	switch (vars::visuals->esp->boxes->mode)
 	{
 	case E2T(BoxTypes::BOX2D):
 		g_BoxesDraw.drawBox2D(box, isDormant, m_boxAlpha.at(ent->getIndex()));
@@ -469,7 +471,7 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 		break;
 	case E2T(BoxTypes::FILLED3D):
 	{
-		if (!config.get<bool>(vars.bBoxMultiColor))
+		if (!vars::visuals->esp->boxes->multiColor)
 			g_BoxesDraw.drawBox3DFilled(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		else
 			g_BoxesDraw.drawBox3DFilledMultiColor(box, isDormant, m_boxAlpha.at(ent->getIndex()));
@@ -491,7 +493,7 @@ void PlayerVisuals::updateDormacy(Player_t* ent)
 {
 	auto& dormacy = m_dormant.at(ent->getIndex());
 
-	float ratio = 1.0f / config.get<float>(vars.fVisDormacyTime);
+	float ratio = 1.0f / vars::visuals->dormacy->time;
 	float step = ratio * interfaces::globalVars->m_frametime;
 
 	if (ent->isDormant())
@@ -512,7 +514,7 @@ void PlayerVisuals::updateDormacy(Player_t* ent)
 
 bool PlayerVisuals::DormacyInfo_t::isValid() const
 {
-	return interfaces::globalVars->m_curtime - m_lastUpdate < config.get<float>(vars.fVisDormacyTimeLimit);
+	return interfaces::globalVars->m_curtime - m_lastUpdate < vars::visuals->dormacy->limit;
 }
 
 void PlayerVisuals::resetDormacy(IGameEvent* event)

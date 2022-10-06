@@ -19,9 +19,9 @@ void ZeusDraw::draw()
 	if (!game::isAvailable())
 		return;
 
-	config.get<bool>(vars.bZeusPartyMode) ? m_party->setValue(true) : m_party->setValue(false);
+	vars::visuals->world->zeus->party ? m_party->setValue(true) : m_party->setValue(false);
 
-	if (!config.get<bool>(vars.bDrawZeusRange))
+	if (!vars::visuals->world->zeus->enabled)
 		return;
 
 	auto weapon = game::localPlayer->getActiveWeapon();
@@ -33,11 +33,11 @@ void ZeusDraw::draw()
 		const static float range = weapon->getWpnInfo()->m_range;
 		const Vec3 abs = game::localPlayer->absOrigin() + Vec3{ 0.0f, 0.0f, 30.0f }; // small correction to get correct trace visually, will still throw false positives on stairs etc...
 
-		CfgColor color = config.get<CfgColor>(vars.cZeusRange);
+		Color color = vars::visuals->world->zeus->color();
 
-		if (config.get<bool>(vars.bZeusUseTracing))
-			imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer(), color.getColor(), true, 2.5f);
+		if (vars::visuals->world->zeus->tracing)
+			imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer(), color, true, 2.5f);
 		else
-			imRender.drawCircle3D(abs, range, 32, color.getColor(), true, 2.0f);
+			imRender.drawCircle3D(abs, range, 32, color, true, 2.0f);
 	}
 }

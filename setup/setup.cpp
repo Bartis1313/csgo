@@ -42,7 +42,7 @@ bool Setup::init(void* instance)
         config.init(
             XOR("default.cfg"), XOR("load.LOAD"),
             std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"),
-            std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo") / XOR("utility"));
+            XOR("utility"));
         g_Memory.init();
         game::localPlayer.init();
         interfaces::init();
@@ -55,7 +55,7 @@ bool Setup::init(void* instance)
         g_Events.init();
         hooks::init();
     }
-    catch (const std::runtime_error& err)
+    catch (const std::exception& err)
     {
         LI_FN(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
         console.log(TypeLogs::LOG_ERR, XOR("Runtime hack error {}"), err.what());
@@ -92,7 +92,7 @@ void Setup::looper(void* instance)
     using namespace std::chrono_literals;
 
     m_dc.init();
-    while (!config.get<Key>(vars.kPanic).isPressed())
+    while (!vars::keys->panic.isPressed())
     {
         if (m_inited)
         {

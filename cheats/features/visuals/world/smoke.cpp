@@ -21,7 +21,7 @@ void SmokeDraw::init()
 
 void SmokeDraw::draw()
 {
-	if (!config.get<bool>(vars.bDrawSmoke))
+	if (!vars::visuals->world->smoke->enabled)
 		return;
 
 	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::GRENADE_PROJECTILES))
@@ -81,6 +81,6 @@ void SmokeRemoval::run(int frame)
 	if (!game::localPlayer)
 		return;
 
-	if (config.get<bool>(vars.bEditEffectsSmoke)) // remove effects from inside, this is why we nulling smoke count
+	if (vars::visuals->world->smoke->enabled) // remove effects from inside, this is why we nulling smoke count
 		*reinterpret_cast<uintptr_t*>(g_Memory.m_smokeCount()) = 0;
 }

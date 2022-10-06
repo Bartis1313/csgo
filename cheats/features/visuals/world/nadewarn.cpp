@@ -20,6 +20,7 @@
 #include <utilities/math/math.hpp>
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
+#include <utilities/utilities.hpp>
 #include <gamememory/memory.hpp>
 
 #include <ranges>
@@ -158,7 +159,7 @@ void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float i
 void GrenadeWarning::NadeTrace_t::handleDestroy()
 {
 	if (m_index == WEAPON_DECOY || m_index == WEAPON_SMOKEGRENADE)
-		if (m_velocity.toVec2D().length() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
+		if (m_velocity.toVecPrev().length() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
 		{
 			//printf("did destroy\n");
 			destroyTrace();
@@ -244,13 +245,13 @@ bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 		return false;
 
 	ImVec2 start; // need access outside
-	if (float dist = m_path.back().distToMeters(game::localPlayer->absOrigin()); dist > config.get<float>(vars.fNadeTracerMaxDist))
+	if (float dist = m_path.back().distToMeters(game::localPlayer->absOrigin()); dist > vars::misc->nade->tracerDist)
 		return false;
 
 	for (Vec3 prev = m_path.front(); const auto & el : m_path)
 	{
 		if (ImVec2 end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
-			imRender.drawLine(start, end, config.get<CfgColor>(vars.cNadeTracer).getColor(), 2.0f);
+			imRender.drawLine(start, end, vars::misc->nade->colorTracer(), 2.0f);
 
 		prev = el;
 	}
@@ -287,7 +288,7 @@ bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 	};
 
 	ImVec2 uselessVec;
-	if (config.get<bool>(vars.bNadeTracerWarn) && !imRender.worldToScreen(m_pos, uselessVec))
+	if (vars::misc->nade->tracerWarn && !imRender.worldToScreen(m_pos, uselessVec))
 	{
 		const auto centre = Vec2{ globals::screenX / 2.0f, globals::screenY / 2.0f };
 
@@ -324,7 +325,7 @@ void GrenadeWarningPaint::draw()
 	if (!g_GrenadeWarning.m_datas.empty())
 		g_GrenadeWarning.m_datas.clear();
 
-	if (!config.get<bool>(vars.bNadeTracer))
+	if (!vars::misc->nade->enabledTracer)
 		return;
 
 	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::GRENADE_PROJECTILES))

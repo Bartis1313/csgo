@@ -61,7 +61,7 @@ void WeatherController::run(int frame)
 	};
 
 	// it will only actually reset when the rain is created
-	if (globals::isShutdown || !config.get<bool>(vars.bWeather))
+	if (globals::isShutdown || !vars::visuals->world->weather->enabled)
 	{
 		reset();
 		return;
@@ -116,33 +116,33 @@ void WeatherController::implMenu()
 		std::make_pair(cvarWindSpeed, cvarWindSpeed->getFloat()),
 	};
 
-	if (ImGui::SliderFloat(XOR("r_rainlength"), &config.getRef<float>(vars.fWeatherRainLenght), 0.0f, 1.0f))
+	if (ImGui::SliderFloat(XOR("r_rainlength"), &vars::visuals->world->weather->length, 0.0f, 1.0f))
 	{
-		cvarLenght->setValue(config.get<float>(vars.fWeatherRainLenght));
+		cvarLenght->setValue(vars::visuals->world->weather->length);
 	}
-	if (ImGui::SliderFloat(XOR("r_rainspeed"), &config.getRef<float>(vars.fWeatherRainSpeed), 0.0f, 1000.0f))
+	if (ImGui::SliderFloat(XOR("r_rainspeed"), &vars::visuals->world->weather->rainSpeed, 0.0f, 1000.0f))
 	{
-		cvarRainSpeed->setValue(config.get<float>(vars.fWeatherRainSpeed));
+		cvarRainSpeed->setValue(vars::visuals->world->weather->rainSpeed);
 	}
-	if (ImGui::SliderFloat(XOR("r_rainradius"), &config.getRef<float>(vars.fWeatherRainRadius), 0.0f, 3000.0f))
+	if (ImGui::SliderFloat(XOR("r_rainradius"), &vars::visuals->world->weather->radius, 0.0f, 3000.0f))
 	{
-		cvarRadius->setValue(config.get<float>(vars.fWeatherRainRadius));
+		cvarRadius->setValue(vars::visuals->world->weather->radius);
 	}
-	if (ImGui::SliderFloat(XOR("r_rainwidth"), &config.getRef<float>(vars.fWeatherRainWidth), 0.0f, 5.0f))
+	if (ImGui::SliderFloat(XOR("r_rainwidth"), &vars::visuals->world->weather->width, 0.0f, 5.0f))
 	{
-		cvarWidth->setValue(config.get<float>(vars.fWeatherRainWidth));
+		cvarWidth->setValue(vars::visuals->world->weather->width);
 	}
-	if (ImGui::SliderFloat(XOR("r_RainSideVel"), &config.getRef<float>(vars.fWeatherRainSideVel), 0.0f, 1000.0f))
+	if (ImGui::SliderFloat(XOR("r_RainSideVel"), &vars::visuals->world->weather->velocity, 0.0f, 1000.0f))
 	{
-		cvarSidevel->setValue(config.get<float>(vars.fWeatherRainSideVel));
+		cvarSidevel->setValue(vars::visuals->world->weather->velocity);
 	}
-	if (ImGui::SliderFloat(XOR("r_rainalpha"), &config.getRef<float>(vars.fWeatherRainAlpha), 0.0f, 1.0f))
+	if (ImGui::SliderFloat(XOR("r_rainalpha"), &vars::visuals->world->weather->alpha, 0.0f, 1.0f))
 	{
-		cvarAlpha->setValue(config.get<float>(vars.fWeatherRainAlpha));
+		cvarAlpha->setValue(vars::visuals->world->weather->alpha);
 	}
-	if (ImGui::SliderFloat(XOR("cl_windspeed"), &config.getRef<float>(vars.fWeatherWindSpeed), 0.0f, 1000.0f))
+	if (ImGui::SliderFloat(XOR("cl_windspeed"), &vars::visuals->world->weather->windSpeed, 0.0f, 1000.0f))
 	{
-		cvarWindSpeed->setValue(config.get<float>(vars.fWeatherWindSpeed));
+		cvarWindSpeed->setValue(vars::visuals->world->weather->windSpeed);
 	}
 	if (ImGui::Button(XOR("Default rain cvars")))
 	{

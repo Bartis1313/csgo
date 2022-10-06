@@ -55,15 +55,15 @@ bool Backtrack::isValid(float simtime) const
 
 float Backtrack::extraTicks() const
 {
-	if (!config.get<bool>(vars.bFakeLatency))
+	if (!vars::misc->fakeLatency->enabled)
 		return 0.0f;
 
-	return config.get<float>(vars.fFakeLatency) / 1000.0f;
+	return vars::misc->fakeLatency->amount / 1000.0f;
 }
 
 void Backtrack::run(CUserCmd* cmd)
 {
-	if (!config.get<bool>(vars.bBacktrack))
+	if (!vars::backtrack->enabled)
 		return;
 
 	if (!game::localPlayer)
@@ -116,11 +116,11 @@ void Backtrack::run(CUserCmd* cmd)
 	{
 		if (game::localPlayer->m_flFlashDuration() > 0.0f)
 		{
-			if (game::localPlayer->m_flFlashBangTime() >= config.get<float>(vars.fBacktrackFlashStart))
+			if (game::localPlayer->m_flFlashBangTime() >= vars::backtrack->flashLimit)
 				return;
 		}
 
-		if (config.get<bool>(vars.bBacktrackSmoke) && game::localPlayer->isViewInSmoke(bestPos))
+		if (vars::backtrack->smoke && game::localPlayer->isViewInSmoke(bestPos))
 			return;
 
 		bestFov = 180.0f;
@@ -157,14 +157,14 @@ void BackTrackUpdater::init()
 void BackTrackUpdater::run(int frame)
 {
 	// get time from every frame
-	float correcttime = config.get<float>(vars.fBacktrackTick) / 1000.0f + g_Backtrack.extraTicks();
+	float correcttime = vars::backtrack->time / 1000.0f + g_Backtrack.extraTicks();
 
 	if (frame != FRAME_RENDER_START)
 		return;
 
 	auto& records = g_Backtrack.getAllRecords();
 
-	if (!game::localPlayer || !config.get<bool>(vars.bBacktrack) || !game::localPlayer->isAlive())
+	if (!game::localPlayer || !vars::backtrack->enabled || !game::localPlayer->isAlive())
 	{
 		// basically reset all
 		for (auto& el : records)

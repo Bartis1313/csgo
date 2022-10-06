@@ -49,7 +49,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 	}
 	else if (panelScope == panel)
 	{
-		if (interfaces::engine->isInGame() && config.get<bool>(vars.bNoScope))
+		if (interfaces::engine->isInGame() && vars::misc->scope->enabled)
 			return;
 	}
 

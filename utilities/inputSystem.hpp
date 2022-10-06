@@ -22,7 +22,7 @@ public:
     _NODISCARD constexpr int getVKey() const { return m_vKey; }
 private:
     inline constexpr static size_t KEYS_SIZE = 256;
-    std::array<KeyState, KEYS_SIZE> m_keys;
+    std::array<KeyState, KEYS_SIZE> m_keys{};
     int m_vKey = 0;
 };
 

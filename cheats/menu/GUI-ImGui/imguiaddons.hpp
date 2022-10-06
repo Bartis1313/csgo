@@ -28,9 +28,9 @@ namespace ImGui
 	bool Combo(const char* label, int* item, std::span<const char*> arr, const int = -1);
 	bool Combo(const char* label, int* item, std::span<const std::string> arr, const int width = -1);
 	bool ListBox(const char* label, int* item, std::span<const char*> arr, const int heightItem = -1);
-	bool ListBox(const char* label, int* item, std::span<const std::string> arr, const int heightItem = -1);
-	// need return anything? maybe, but useless at all for my use
-	void MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options, const float width = 140.0f);
+	bool ListBox(const char* label, int* item, std::span<const std::string> arr, const int heightItem = -1);	
+	template<size_t SIZE>
+	void MultiCombo(const char* label, const std::span<const char*>& names, std::array<bool, SIZE>* options);
 	bool PopupButton(const char* label, const std::function<void()>& fun);
 
 	// from demo, slight edit, usage same as normal console.log
@@ -71,4 +71,44 @@ void ImGui::ExampleAppLog::AddLog(const std::string& fmt, const Args_t&... args)
 	for (int newSize = Buf.size(); oldSize < newSize; oldSize++)
 		if (Buf[oldSize] == '\n')
 			LineOffsets.push_back(oldSize + 1);
+}
+
+template<size_t SIZE>
+void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, std::array<bool, SIZE>* options)
+{
+	bool check = names.size() != options->size() || !names.empty() || !options->empty();
+	assert(check && "given size of arrays args was not equal or one of them was empty");
+
+	size_t size = names.size(); // does not matter if you pass options size here
+
+	ImVector<const char*> actives = {};
+	for (size_t i = 0; const auto el : *options)
+	{
+		if (el) // if active selected
+			actives.push_back(names[i]);
+
+		i++;
+	}
+
+	std::string previewName = "";
+	for (int i = 0; const auto & el : actives)
+	{
+		previewName += el;
+
+		if (i < actives.size() - 1) // add ", " on every option but not last
+			previewName += ", ";
+
+		i++;
+	}
+
+	if (ImGui::BeginCombo(label, previewName.c_str()))
+	{
+		for (size_t i = 0; i < size; i++)
+		{
+			if (ImGui::Selectable(names[i], options->at(i), ImGuiSelectableFlags_DontClosePopups))
+				options->at(i) = !options->at(i);
+		}
+
+		ImGui::EndCombo();
+	}
 }

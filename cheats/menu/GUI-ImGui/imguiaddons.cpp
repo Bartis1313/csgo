@@ -359,47 +359,6 @@ bool ImGui::ListBox(const char* label, int* item, std::span<const char*> arr, co
     return ImGui::ListBox(label, item, &arrGetter, const_cast<void*>(reinterpret_cast<const void*>(&arr)), arr.size(), heightItem);
 }
 
-void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, std::vector<bool>& options, const float width)
-{
-    bool check = names.size() != options.size() || !names.empty() || !options.empty();
-    assert(check && "given size of arrays args was not equal or one of them was empty");
-
-    size_t size = names.size(); // does not matter if you pass options size here
-
-    ImVector<const char*> actives = {};
-    for (size_t i = 0; const auto el : options)
-    {
-        if (el) // if active selected
-            actives.push_back(names[i]);
-
-        i++;
-    }
-
-    std::string previewName = "";
-    for (int i = 0; const auto & el : actives)
-    {
-        previewName += el;
-
-        if (i < actives.size() - 1) // add ", " on every option but not last
-            previewName += ", ";
-
-        i++;
-    }
-
-    PushItemWidth(width);
-    if (BeginCombo(label, previewName.c_str()))
-    {
-        for (size_t i = 0; i < size; i++)
-        {
-            if(Selectable(names[i], options.at(i), ImGuiSelectableFlags_DontClosePopups))
-                options.at(i) = !options.at(i);
-        }
-
-        EndCombo();
-    }
-    PopItemWidth();
-}
-
 bool ImGui::PopupButton(const char* label, const std::function<void()>& fun)
 {
     ImGui::PushID(label);

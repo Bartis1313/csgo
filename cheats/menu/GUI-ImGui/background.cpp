@@ -25,13 +25,13 @@ void Background::drawRectFilled(float x, float y, float width, float height, con
 
 void Background::init()
 {
-	m_size = static_cast<size_t>(config.get<int>(vars.iBackgroundSize));
-	m_maxDistLines = config.get<float>(vars.fBackgroundDistance);
+	m_size = static_cast<size_t>(vars::styling->size);
+	m_maxDistLines = vars::styling->distance;
 	m_colorArr =
 	{
-		config.get<CfgColor>(vars.cBackGround1).getColor(),
-		config.get<CfgColor>(vars.cBackGround2).getColor(),
-		config.get<CfgColor>(vars.cBackGround3).getColor()
+		vars::styling->color1(),
+		vars::styling->color2(),
+		vars::styling->color3()
 	};
 
 	pushRandomPoints();
@@ -41,7 +41,7 @@ void Background::pushRandomPoints()
 {
 	m_particleArr.clear();
 
-	float speed = config.get<float>(vars.fBackground);
+	float speed = vars::styling->speed;
 	for (size_t i = 0; i < m_size; i++)
 	{
 		m_particleArr.emplace_back(
@@ -94,7 +94,7 @@ void Background::draw(ImDrawList* _draw)
 	if (!menu.isMenuActive())
 		return;
 
-	if (!config.get<bool>(vars.bBackround))
+	if (!vars::styling->background)
 		return;
 
 	drawRectFilled(0.0f, 0.0f, static_cast<float>(globals::screenX), static_cast<float>(globals::screenY), Colors::Grey);

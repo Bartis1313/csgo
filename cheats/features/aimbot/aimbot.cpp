@@ -20,10 +20,53 @@
 #include <game/game.hpp>
 #include <utilities/math/math.hpp>
 #include <utilities/tools/wrappers.hpp>
+#include <utilities/rand.hpp>
 
 void Aimbot::init()
 {
-    
+    m_scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+}
+
+Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
+{
+    if (cfgSmooth == 0.0f)
+        return angle;
+
+    Vec3 delta = angle;
+    Vec3 ret;
+    const float smooth = std::min(0.99f, cfgSmooth); // allow 1.0 value to be max
+    float acceleration;
+
+    switch (m_config.smoothMode)
+    {
+    case E2T(SmoothMode::LINEAR):
+    {
+        ret = angle * cfgSmooth;
+        acceleration = cfgSmooth;
+    }
+    case E2T(SmoothMode::HUMANIZED):
+        const float length = delta.length();
+        const float deltaSmooth = 1.0f - smooth;
+        // results in constant adding, value will not be slightly different each time
+        acceleration = (deltaSmooth) / length * std::exp(deltaSmooth);
+
+        // values higher than 1.0 are invalid
+        // because we want to slow it down
+        acceleration = std::min(1.0f, acceleration);
+
+        if (acceleration == 1.0f) // smoothing ended, return original
+            return angle;
+
+        ret = delta * acceleration; // apply changes
+    }
+
+    if (m_config.curveAim)
+    {
+        Vec3 curved = angle + Vec3(angle[1] * m_config.curveX, angle[0] * m_config.curveY, 0.0f);
+        ret = curved * acceleration;
+    }
+
+    return ret;
 }
 
 bool AimbotTarget_t::isBlackListed() const
@@ -45,9 +88,9 @@ void Aimbot::run(CUserCmd* cmd)
         return;
 
     auto indexCfg = E2T(weaponCfg);
-    m_config = config.get<std::vector<CfgWeapon>>(vars.arrAimbot).at(indexCfg);
+    m_config = vars::aim->weapons.at(indexCfg);
 
-    if (!m_config.m_aimEnabled)
+    if (!m_config.enabled)
         return;
 
     if (!game::isAvailable())
@@ -79,10 +122,10 @@ void Aimbot::run(CUserCmd* cmd)
 
     if (m_targets.front().m_pos.isZero())
         return;
-    
+
     // everything sorted by fov. Blacklists go on top + they ofc are sorted
     // we always want front() as current target
-    std::sort(m_targets.begin(), m_targets.end(), 
+    std::sort(m_targets.begin(), m_targets.end(),
         [this](const AimbotTarget_t& lhs, const AimbotTarget_t& rhs) // std::tie won't work in that case
         {
             if (lhs.isBlackListed() ^ rhs.isBlackListed())
@@ -93,7 +136,7 @@ void Aimbot::run(CUserCmd* cmd)
 
     auto [player, guid, fov, index, bestHitbox, bestpos] = m_targets.front();
 
-    if (m_config.m_aimbacktrack)
+    if (m_config.aimBacktrack)
     {
         int boneID = 8; // HEAD start
         if (auto modelStudio = interfaces::modelInfo->getStudioModel(player->getModel()); modelStudio != nullptr)
@@ -106,21 +149,16 @@ void Aimbot::run(CUserCmd* cmd)
         auto record = g_Backtrack.getAllRecords().at(player->getIndex());
         bestpos = record.at(record.size() / 2).m_matrix[boneID].origin(); // middle, u can play with this as u want to
     }
-   
-    auto angle = math::calcAngleRelative(myEye, bestpos, cmd->m_viewangles + punch);
+
+    auto angle = math::calcAngleRelative(myEye, bestpos, Vec3{ m_view + punch });
     angle.clamp();
 
-    Vec3 delta = angle + cmd->m_viewangles - m_view;
-
-    if (auto smoothing = m_config.m_smooth; smoothing)
-        angle /= smoothing;
+    angle = smoothAim(angle, m_config.smooth);
 
     cmd->m_viewangles += angle;
-
     interfaces::engine->setViewAngles(cmd->m_viewangles);
-}
 
-//#include "../../../utilities/console/console.hpp"
+}
 
 bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
 { 
@@ -131,7 +169,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const 
     // will not work for the special case:
     // delay did not hit timer limit but we switched manually to new target -> should reset the timer. I couldn't detect it without false positives :(
     // epic solution - stop shooting and start again
-    if (m_config.m_aimDelayEnabled)
+    if (m_config.aimDelay)
     {
         /*if (m_bestEnt && m_bestEnt->isAlive())
         {
@@ -140,7 +178,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const 
         if (m_targets.size() && !m_delay && !m_targets.front().m_player->isAlive()) // if ent is found and dead, then set field to delay and wait curr time + cfgtime
         {
             m_delay = true;
-            delay = interfaces::globalVars->m_curtime + (m_config.m_aimDelay / 1000.0f);
+            delay = interfaces::globalVars->m_curtime + (m_config.aimDelayVal / 1000.0f);
         }
         if (m_delay) // if the delay is hit, check time, so when ent died
         {
@@ -160,7 +198,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const 
 
     if (game::localPlayer->m_flFlashDuration() > 0.0f)
     {
-        if (game::localPlayer->m_flFlashBangTime() >= m_config.m_flashAlphaLimit)
+        if (game::localPlayer->m_flFlashBangTime() >= m_config.flashLimit)
             return false;
     }
 
@@ -196,14 +234,14 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const 
             if (!game::localPlayer->isPossibleToSee(ent, hitPos))
                 continue;
 
-            if (m_config.m_smokeCheck && game::localPlayer->isViewInSmoke(hitPos))
+            if (m_config.smokeCheck && game::localPlayer->isViewInSmoke(hitPos))
                 continue;
 
-            auto fov = m_config.m_methodAim == E2T(AimbotMethod::CROSSHAIR)
+            auto fov = m_config.methodAim == E2T(AimbotMethod::CROSSHAIR)
                 ? math::calcFov(eye, hitPos, angles)
                 : math::calcFovReal(eye, hitPos, angles);
 
-            if (fov <= m_config.m_fov)
+            if (fov <= m_config.fov)
             {
                 PlayerInfo_t info;
                 interfaces::engine->getPlayerInfo(idx, &info);
@@ -244,9 +282,9 @@ void Aimbot::resetFields()
 
 bool Aimbot::isClicked(CUserCmd* cmd)
 {
-    if (config.get<bool>(vars.bAimbotUseKey))
+    if (vars::aim->useKey)
     {
-        if (config.get<Key>(vars.kAimbotKey).isEnabled())
+        if (vars::keys->aimbot.isEnabled())
             return true;
         else
             return false;
@@ -259,7 +297,7 @@ std::vector<size_t> Aimbot::getHitboxes()
 {
     std::vector<size_t> hitboxes;
 
-    switch (m_config.m_aimSelection)
+    switch (m_config.aimSelection)
     {
     case E2T(AimbotID::NEAREST):
     {

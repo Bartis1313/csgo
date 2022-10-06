@@ -13,5 +13,5 @@ void RemoveSky::init()
 
 void RemoveSky::run()
 {
-	config.get<bool>(vars.bRemoveSky) ? m_sky->setValue(false) : m_sky->setValue(true);
+	vars::visuals->world->sky->removeSky ? m_sky->setValue(false) : m_sky->setValue(true);
 }

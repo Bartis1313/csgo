@@ -44,7 +44,11 @@ public:
 	NETVAR(float, m_flSimulationTime, "DT_BasePlayer", "m_flSimulationTime");
 	NETVAR(float, m_flMaxspeed, "DT_BasePlayer", "m_flMaxspeed");
 	NETVAR_ADDR(int, m_nRenderMode, "DT_BasePlayer", "m_nRenderMode", 0x1);
-	//NETVAR_ADDR(Matrix3x4, m_rgflCoordinateFrame, "DT_BaseEntity", "m_CollisionGroup", -0x30);
+	NETVAR(Vec3, m_vecMins, "DT_BaseEntity", "m_vecMins");
+	NETVAR(Vec3, m_vecMaxs, "DT_BaseEntity", "m_vecMaxs");
+	NETVAR(int, moveparent, "DT_BaseEntity", "moveparent");
+	NETVAR(int, m_fEffects, "DT_BaseEntity", "m_fEffects");
+	NETVAR(int, m_nModelIndex, "DT_BaseEntity", "m_nModelIndex");
 	NETVAR(PrecipitationType_t, m_nPrecipType, "DT_Precipitation", "m_nPrecipType");
 
 	VFUNC(Vec3&, absOrigin, ABS_ORIGIN, (), (this));
@@ -203,7 +207,7 @@ public:
 	_NODISCARD Weapon_t* getActiveWeapon();
 	_NODISCARD bool isAlive() { return m_iHealth() > 0; }
 	_NODISCARD bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
-	_NODISCARD bool isMoving() { return m_vecVelocity().toVec2D().length() > 0.1f; }
+	_NODISCARD bool isMoving() { return m_vecVelocity().toVecPrev().length() > 0.1f; }
 
 	_NODISCARD Vec3 getHitboxPos(const int id);
 	_NODISCARD Vec3 getBonePos(const int id);

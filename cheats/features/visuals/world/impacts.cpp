@@ -21,7 +21,7 @@ void BulletImpactsClient::init()
 
 void BulletImpactsClient::draw()
 {
-	if (!config.get<bool>(vars.bDrawClientSideImpacts))
+	if (!vars::visuals->world->impacts->enabledClient)
 		return;
 
 	if (!game::isAvailable())
@@ -35,14 +35,14 @@ void BulletImpactsClient::draw()
 		m_hitsClientSide.emplace_back(HitStruct_t
 			{
 				m_vecBulletVerifyListClient[i - 1].m_pos,
-				interfaces::globalVars->m_curtime + config.get<float>(vars.fDrawClientSideImpacts)
+				interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeClient
 			});
 
 	if (m_vecBulletVerifyListClient.m_size != gameBulletCount)
 		gameBulletCount = m_vecBulletVerifyListClient.m_size;
 
-	CfgColor outline = config.get<CfgColor>(vars.cDrawClientSideImpactsLine);
-	CfgColor fill = config.get<CfgColor>(vars.cDrawClientSideImpactsFill);
+	Color outline = vars::visuals->world->impacts->colorClient();
+	Color fill = vars::visuals->world->impacts->colorClientFill();
 
 	for (size_t i = 0; const auto & el : m_hitsClientSide)
 	{
@@ -54,8 +54,7 @@ void BulletImpactsClient::draw()
 			continue;
 		}
 
-		imRender.drawBox3DFilled(el.m_pos, { 4.0f, 4.0f }, 4.0f,
-			outline.getColor(), fill.getColor());
+		imRender.drawBox3DFilled(el.m_pos, 4.0f, 4.0f, outline, fill);
 
 		i++;
 	}
@@ -68,11 +67,11 @@ void BulletImpactsLocal::init()
 
 void BulletImpactsLocal::draw()
 {
-	if (!config.get<bool>(vars.bDrawLocalSideImpacts))
+	if (!vars::visuals->world->impacts->enabledLocal)
 		return;
 
-	CfgColor outline = config.get<CfgColor>(vars.cDrawLocalSideImpactsLine);
-	CfgColor fill = config.get<CfgColor>(vars.cDrawLocalSideImpactsFill);
+	Color outline = vars::visuals->world->impacts->colorLocal();
+	Color fill = vars::visuals->world->impacts->colorLocalFill();
 
 	for (size_t i = 0; const auto & el : m_hitsLocal)
 	{
@@ -89,8 +88,7 @@ void BulletImpactsLocal::draw()
 		filter.m_skip = game::localPlayer();
 		interfaces::trace->traceRay({ el.m_start, el.m_end }, MASK_PLAYER, &filter, &tr);
 
-		imRender.drawBox3DFilled(tr.m_end, { 4.0f, 4.0f }, 4.0f,
-			outline.getColor(), fill.getColor());
+		imRender.drawBox3DFilled(tr.m_end, 4.0f, 4.0f, outline, fill);
 
 		i++;
 	}
@@ -98,7 +96,7 @@ void BulletImpactsLocal::draw()
 
 void BulletImpactsLocal::pushBullet(IGameEvent* event)
 {
-	if (!config.get<bool>(vars.bDrawLocalSideImpacts))
+	if (!vars::visuals->world->impacts->enabledLocal)
 		return;
 
 	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
@@ -117,6 +115,6 @@ void BulletImpactsLocal::pushBullet(IGameEvent* event)
 	Vec3 src = local->getEyePos();
 	Vec3 dst = Vec3{ x, y, z };
 
-	HitStructLocal_t hit = { src, dst, interfaces::globalVars->m_curtime + config.get<float>(vars.fDrawLocalSideImpacts) };
+	HitStructLocal_t hit = { src, dst, interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeLocal };
 	m_hitsLocal.push_back(hit);
 }

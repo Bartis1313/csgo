@@ -30,11 +30,6 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		return true;
 	} ();
 
-	IDirect3DVertexDeclaration9* ppdecl;
-	IDirect3DVertexShader9* ppshader;
-	device->GetVertexDeclaration(&ppdecl);
-	device->GetVertexShader(&ppshader);
-
 	static Resource res{ IDB_PNG1, "PNG" };
 
 	// BEGIN DRAW
@@ -62,9 +57,6 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 		device->EndScene();
 	}
-
-	device->SetVertexDeclaration(ppdecl);
-	device->SetVertexShader(ppshader);
 
 	return original(device, srcRect, dstRect, window, region);
 }
