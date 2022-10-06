@@ -44,7 +44,7 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
         ret = angle * cfgSmooth;
         acceleration = cfgSmooth;
     }
-    case E2T(SmoothMode::HUMANIZED):
+    case E2T(SmoothMode::NON_LINEAR):
         const float length = delta.length();
         const float deltaSmooth = 1.0f - smooth;
         // results in constant adding, value will not be slightly different each time

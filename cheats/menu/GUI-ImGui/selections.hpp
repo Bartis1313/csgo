@@ -14,8 +14,7 @@ namespace selections
 	inline std::array smoothMehods =
 	{
 		"LINEAR",
-		"SLOWER",
-		"HUMANIZED"
+		"NON-LINEAR"
 	};
 
 	inline std::array espNames =

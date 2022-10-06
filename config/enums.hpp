@@ -11,8 +11,7 @@ enum class AimbotID : size_t
 enum class SmoothMode : size_t
 {
 	LINEAR,
-	SLOWER,
-	HUMANIZED
+	NON_LINEAR
 };
 
 enum class CrossHairTypes : size_t
