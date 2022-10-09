@@ -17,7 +17,7 @@ public:
 	bool startLoad();
 	bool startSave(const std::string& name);
 
-	bool save(const std::string& file, bool init = false);
+	bool save(const std::string& file);
 	bool load(const std::string& file);
 	void deleteCfg(const std::string& file);
 	/// <summary>
@@ -40,10 +40,10 @@ public:
 	[[nodiscard]] static std::filesystem::path getDocumentsPath();
 	// file to load
 	[[nodiscard]] std::string getCfgToLoad() const { return loadedCfgName; }
-private:
-	[[nodiscard]] std::filesystem::path getPathForConfig(const std::string& file);
 	// get DEFAULT name, returns the field m_defaultConfig which never change
 	[[nodiscard]] std::string getDefaultConfigName() const { return m_defaultConfig; }
+private:
+	[[nodiscard]] std::filesystem::path getPathForConfig(const std::string& file);
 
 	std::vector<std::string> m_allFilesInFolder;
 	std::string m_defaultConfig;

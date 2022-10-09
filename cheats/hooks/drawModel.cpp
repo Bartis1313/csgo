@@ -11,7 +11,6 @@ void __stdcall hooks::drawModel::hooked(void* result, const DrawModelState_t& st
 	if(!interfaces::engine->isInGame() || interfaces::modelRender->isForcedMaterial())
 		return original(interfaces::modelRender, result, state, info, matrix);
 
-
 	DrawModelType::runAll(result, state, info, matrix);
 
 	original(interfaces::modelRender, result, state, info, matrix);

@@ -8,8 +8,7 @@
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/inputSystem.hpp>
-
-#include <format>
+#include <dependencies/magic_enum.hpp>
 
 void X88Menu::draw()
 {
@@ -94,7 +93,7 @@ void X88Menu::draw()
 
 void X88Menu::init()
 {
-	x88types.push(XOR("Chams"), &vars::visuals->chams->indexPlayers, 4);
+	x88types.push(XOR("Chams"), &vars::visuals->chams->indexPlayers, magic_enum::enum_count<ChamsType>() - 1);
 	x88types.push(XOR("ESP"), &vars::visuals->esp->boxes->enabled);
 	x88types.push(XOR("FOV"), &vars::misc->fov->value, { -50.0f, 50.0f} );
 	x88types.push(XOR("Backtrack"), &vars::backtrack->enabled);
@@ -102,7 +101,7 @@ void X88Menu::init()
 	x88types.push(XOR("No Sky"), &vars::visuals->world->sky->removeSky);
 	x88types.push(XOR("2D Radar"), &vars::misc->radar->enabled);
 	x88types.push(XOR("Bunnyhop"), &vars::misc->bunnyHop->enabled);
-	x88types.push(XOR("Autostrafe"), &vars::misc->bunnyHop->indexStrafe, 3);
+	x88types.push(XOR("Autostrafe"), &vars::misc->bunnyHop->indexStrafe, magic_enum::enum_count<MovementStraferMode>() - 1);
 	x88types.push(XOR("ThirdP"), &vars::misc->thirdp->enabled);
 	x88types.push(XOR("Draw Info"), &vars::misc->info->enabled);
 

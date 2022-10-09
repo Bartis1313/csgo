@@ -10,6 +10,7 @@
 #include <game/globals.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <SDK/ISurface.hpp>
+#include <cheats/menu/GUI-ImGui/imguiaddons.hpp>
 
 #include <Windows.h>
 #include <d3dx9.h>

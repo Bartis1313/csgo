@@ -127,6 +127,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.6.1 - Include paths v2.
 * 1.6.2 - Source cleanup, generic vector & matrix.
 * 1.6.3 - Once again better generic vector. Config is now stored in nice-looking json + accessing values is not painful. Cleanup is still needed. Better smoothing included in aimbot, still needs some extensions.  
+* 1.6.4 - Config fix again, added magic_enum to not repat same names in the selections namespace.
 </details>
 
 # Dependencies
@@ -135,6 +136,9 @@ This is a trianing software. No further actions taken by people are heeded.
 * [xorstr](https://github.com/JustasMasiulis/xorstr)
 * [json](https://github.com/nlohmann/json)
 * [ImGui](https://github.com/ocornut/imgui)
+* [freetype](https://gitlab.freedesktop.org/freetype/freetype)
+* [stb_image](https://github.com/nothings/stb)
+* [magic_enum](https://github.com/Neargye/magic_enum)
 
 # People who helped
 * [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs18 leak which made reversing even easier.

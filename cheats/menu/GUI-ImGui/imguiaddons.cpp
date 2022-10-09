@@ -480,3 +480,79 @@ void ImGui::ExampleAppLog::Draw(const char* title, bool* p_open)
     ImGui::EndChild();
     ImGui::End();
 }
+
+#include <d3d9.h>
+
+#ifdef IMGUI_USE_BGRA_PACKED_COLOR
+#define IMGUI_COL_TO_DX9_ARGB(_COL)     (_COL)
+#else
+#define IMGUI_COL_TO_DX9_ARGB(_COL)     (((_COL) & 0xFF00FF00) | (((_COL) & 0xFF0000) >> 16) | (((_COL) & 0xFF) << 16))
+#endif
+
+struct ImGui_ImplDX9_Data
+{
+    LPDIRECT3DDEVICE9           pd3dDevice;
+    LPDIRECT3DVERTEXBUFFER9     pVB;
+    LPDIRECT3DINDEXBUFFER9      pIB;
+    LPDIRECT3DTEXTURE9          FontTexture;
+    int                         VertexBufferSize;
+    int                         IndexBufferSize;
+
+    ImGui_ImplDX9_Data() { memset(this, 0, sizeof(*this)); VertexBufferSize = 5000; IndexBufferSize = 10000; }
+};
+
+static ImGui_ImplDX9_Data* ImGui_ImplDX9_GetBackendData()
+{
+    return ImGui::GetCurrentContext() ? (ImGui_ImplDX9_Data*)ImGui::GetIO().BackendRendererUserData : NULL;
+}
+
+void* ImGui_CreateTexture(const void* data, int width, int height)
+{
+    ImGui_ImplDX9_Data* bd = ImGui_ImplDX9_GetBackendData();
+    unsigned char* pixels;
+
+    if (!bd || !bd->pd3dDevice || !data)
+        return NULL;
+
+    // Convert RGBA32 to BGRA32 (because RGBA32 is not well supported by DX9 devices)
+#ifndef IMGUI_USE_BGRA_PACKED_COLOR
+    ImU32* dst_start = (ImU32*)ImGui::MemAlloc((size_t)width * height * 4);
+    for (ImU32* src = (ImU32*)data, *dst = dst_start, *dst_end = dst_start + (size_t)width * height; dst < dst_end; src++, dst++)
+        *dst = IMGUI_COL_TO_DX9_ARGB(*src);
+    pixels = (unsigned char*)dst_start;
+#endif
+
+    LPDIRECT3DTEXTURE9 temp;
+    if (bd->pd3dDevice->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_SYSTEMMEM, &temp, NULL) < 0)
+        return NULL;
+    D3DLOCKED_RECT tex_locked_rect;
+    if (temp->LockRect(0, &tex_locked_rect, NULL, D3DLOCK_DISCARD) != D3D_OK)
+    {
+        temp->Release();
+        return NULL;
+    }
+    for (int y = 0; y < height; ++y)
+        memcpy((unsigned char*)tex_locked_rect.pBits + tex_locked_rect.Pitch * y, pixels + (width * 4) * y, (width * 4));
+    temp->UnlockRect(0);
+
+    LPDIRECT3DTEXTURE9 texture;
+    if (bd->pd3dDevice->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture, NULL) != D3D_OK)
+    {
+        temp->Release();
+        return NULL;
+    }
+    bd->pd3dDevice->UpdateTexture(temp, texture);
+    temp->Release();
+
+#ifndef IMGUI_USE_BGRA_PACKED_COLOR
+    ImGui::MemFree(pixels);
+#endif
+
+    return texture;
+}
+
+void ImGui_DestroyTexture(void* texture)
+{
+    IM_ASSERT(texture != NULL && "passed texture to destroy was null!");
+    reinterpret_cast<IDirect3DTexture9*>(texture)->Release();
+}

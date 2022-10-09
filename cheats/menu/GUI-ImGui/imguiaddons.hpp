@@ -29,8 +29,8 @@ namespace ImGui
 	bool Combo(const char* label, int* item, std::span<const std::string> arr, const int width = -1);
 	bool ListBox(const char* label, int* item, std::span<const char*> arr, const int heightItem = -1);
 	bool ListBox(const char* label, int* item, std::span<const std::string> arr, const int heightItem = -1);	
-	template<size_t SIZE>
-	void MultiCombo(const char* label, const std::span<const char*>& names, std::array<bool, SIZE>* options);
+	template<typename T, size_t SIZE>
+	void MultiCombo(const char* label, const std::array<T, SIZE>& names, std::array<bool, SIZE>* options);
 	bool PopupButton(const char* label, const std::function<void()>& fun);
 
 	// from demo, slight edit, usage same as normal console.log
@@ -50,6 +50,9 @@ namespace ImGui
 		void Draw(const char* title, bool* p_open = NULL);
 	};
 }
+
+IMGUI_IMPL_API void* ImGui_CreateTexture(const void* data, int width, int height);
+IMGUI_IMPL_API void	ImGui_DestroyTexture(void* texture);
 
 template<typename... Args_t>
 void ImGui::ExampleAppLog::AddLog(const std::string& fmt, const Args_t&... args)
@@ -73,15 +76,15 @@ void ImGui::ExampleAppLog::AddLog(const std::string& fmt, const Args_t&... args)
 			LineOffsets.push_back(oldSize + 1);
 }
 
-template<size_t SIZE>
-void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, std::array<bool, SIZE>* options)
+template<typename T, size_t SIZE>
+void ImGui::MultiCombo(const char* label, const std::array<T, SIZE>& names, std::array<bool, SIZE>* options)
 {
 	bool check = names.size() != options->size() || !names.empty() || !options->empty();
 	assert(check && "given size of arrays args was not equal or one of them was empty");
 
 	size_t size = names.size(); // does not matter if you pass options size here
 
-	ImVector<const char*> actives = {};
+	ImVector<T> actives = {};
 	for (size_t i = 0; const auto el : *options)
 	{
 		if (el) // if active selected
@@ -103,9 +106,9 @@ void ImGui::MultiCombo(const char* label, const std::span<const char*>& names, s
 
 	if (ImGui::BeginCombo(label, previewName.c_str()))
 	{
-		for (size_t i = 0; i < size; i++)
+		for (size_t i = 0; i < size; i++) // creating view to make it "forced" to detect it as valid function args
 		{
-			if (ImGui::Selectable(names[i], options->at(i), ImGuiSelectableFlags_DontClosePopups))
+			if (ImGui::Selectable(std::string_view{ names[i] }.data(), options->at(i), ImGuiSelectableFlags_DontClosePopups))
 				options->at(i) = !options->at(i);
 		}
 

@@ -16,17 +16,11 @@
 #include <utilities/tools/wrappers.hpp>
 #include <SDK/Color.hpp>
 
-bool Config::save(const std::string& file, bool init)
+bool Config::save(const std::string& file)
 {
 	if (file.empty())
 	{
 		console.log(TypeLogs::LOG_ERR, XOR("provided config name was empty"));
-		return false;
-	}
-
-	if (!init && utilities::toLowerCase(file) == getDefaultConfigName())
-	{
-		console.log(TypeLogs::LOG_ERR, XOR("provided config name was same as default"));
 		return false;
 	}
 
@@ -118,7 +112,7 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 	{
 		console.log(TypeLogs::LOG_INFO, XOR("Creating default file, because it doesn't exist: {}"), path.string());
 
-		if (!save(m_defaultConfig, true))
+		if (!save(m_defaultConfig))
 			return false;
 	}
 

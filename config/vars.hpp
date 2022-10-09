@@ -7,6 +7,7 @@
 #include "cfgBeam.hpp"
 
 #include <utilities/tools/wrappers.hpp>
+#include <dependencies/magic_enum.hpp>
 
 #include <memory>
 #include <cstdint>
@@ -19,7 +20,7 @@ namespace vars { \
 
 struct VarAim
 {
-	std::array<CfgWeapon, E2T(WeaponList::LIST_SIZE)> weapons;
+	std::array<CfgWeapon, magic_enum::enum_count<WeaponList>()> weapons;
 	bool useKey = false;
 };
 USE_NAMESPACE_VARS(VarAim, aim);
@@ -134,7 +135,7 @@ struct VarVisuals
 
 		struct VarFlags
 		{
-			std::array<bool, E2T(EspFlags::FLAGS_SIZE)> flags{ false };
+			std::array<bool, magic_enum::enum_count<EspFlags>()> flags{ false };
 			bool enabled = false;
 		};
 		std::unique_ptr<VarFlags> flags{ new VarFlags };
@@ -158,7 +159,7 @@ struct VarVisuals
 		{
 			bool enabled = false;
 			CfgColor color = Colors::White;
-			std::array<bool, E2T(DroppedFlags::FLAGS_SIZE)> flags{ false };
+			std::array<bool, magic_enum::enum_count<DroppedFlags>()> flags{ false };
 		};
 		std::unique_ptr<VarDropped> dropped{ new VarDropped };
 	};

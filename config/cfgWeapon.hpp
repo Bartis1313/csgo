@@ -17,7 +17,6 @@ enum class WeaponList
 	WEAPON_AUTOSNIPER,
 	WEAPON_SHOTGUN,
 	WEAPON_UNKNOWN,
-	LIST_SIZE
 };
 
 class CfgWeapon
@@ -32,7 +31,7 @@ public:
 	float curveX = 0.5f;
 	float curveY = 0.3f;
 	int methodAim = static_cast<int>(AimbotMethod::CROSSHAIR);;
-	int aimSelection = static_cast<int>(AimbotID::NEAREST);
+	int aimSelection = static_cast<int>(AimbotHitboxes::NEAREST);
 	bool aimDelay = false;
 	float aimDelayVal = 0.0f;
 	bool aimBacktrack = false;

@@ -7,6 +7,7 @@
 #include <dependencies/ImGui/imgui_impl_dx9.h>
 #include <dependencies/ImGui/imgui_internal.h>
 #include <dependencies/ImGui/imgui_stdlib.h>
+#include <dependencies/magic_enum.hpp>
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/renderer/renderer.hpp>
@@ -93,17 +94,17 @@ static void renderAimbot()
 		{
 			ImGui::BeginGroupPanel(XOR("Aimbot"), availRegion());
 			{
-				ImGui::ListBox(XOR("Weapon selection"), &index, selections::aimbotWeapons);
+				ImGui::ListBox(XOR("Weapon selection"), &index, magic_enum::enum_names_pretty<AimbotWeapon>());
 				ImGui::Checkbox(XOR("Enabled##aim"), &cfg.enabled);
 				ImGui::SameLine();
 				ImGui::Checkbox(XOR("Use key##aimbot"), &vars::aim->useKey);
 				ImGui::SameLine();
 				ImGui::Hotkey("", &vars::keys->aimbot);
 				ImGui::SliderFloat(XOR("Fov##aim"), &cfg.fov, 0.0f, 50.0f);
-				ImGui::Combo(XOR("Method##Aim"), &cfg.methodAim, selections::aimbotMethods);
-				ImGui::Combo(XOR("Hitboxes##aim"), &cfg.aimSelection, selections::aimbotHitboxes);
+				ImGui::Combo(XOR("Method##Aim"), &cfg.methodAim, magic_enum::enum_names_pretty<AimbotMethod>());
+				ImGui::Combo(XOR("Hitboxes##aim"), &cfg.aimSelection, magic_enum::enum_names_pretty<AimbotHitboxes>());
 				ImGui::SliderFloat(XOR("Smooth##aim"), &cfg.smooth, 0.0f, 1.0f);
-				ImGui::Combo(XOR("Smooth method##aim"), &cfg.smoothMode, selections::smoothMehods);
+				ImGui::Combo(XOR("Smooth method##aim"), &cfg.smoothMode, magic_enum::enum_names_pretty<SmoothMode>());
 				/*if (cfg.smoothMode == E2T(SmoothMode::HUMANIZED))
 				{
 					ImGui::Checkbox(XOR("Extra speed#aim"), &cfg.useExtraSpeed);
@@ -195,7 +196,7 @@ static void renderVisuals()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Player boxes"), []()
 					{
-						ImGui::Combo(XOR("Boxes mode"), &vars::visuals->esp->boxes->mode, selections::espNames, 40);
+						ImGui::Combo(XOR("Boxes mode"), &vars::visuals->esp->boxes->mode, magic_enum::enum_names_pretty<BoxTypes>(), 40);
 						ImGui::ColorPicker(XOR("color##box"), &vars::visuals->esp->boxes->color);
 						ImGui::ColorPicker(XOR("filled##box"), &vars::visuals->esp->boxes->fill);
 						ImGui::Checkbox(XOR("Outlined"), &vars::visuals->esp->boxes->outline);
@@ -242,7 +243,7 @@ static void renderVisuals()
 						ImGui::SliderFloat(XOR("Dlight decay"), &vars::visuals->esp->dlight->decay, 0.0f, 100.0f);
 					}
 				);
-				ImGui::MultiCombo(XOR("Esp flags"), selections::flags, &vars::visuals->esp->flags->flags);
+				ImGui::MultiCombo(XOR("Esp flags"), magic_enum::enum_names_pretty<EspFlags>(), &vars::visuals->esp->flags->flags);
 				ImGui::Checkbox(XOR("Visible only##Visuals"), &vars::visuals->esp->checks->visible);
 				ImGui::Checkbox(XOR("Dead only ##Visuals"), &vars::visuals->esp->checks->dead);
 				ImGui::Checkbox(XOR("Smoke check##Visuals"), &vars::visuals->esp->checks->smoke);
@@ -259,7 +260,7 @@ static void renderVisuals()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Chams options players"), []()
 					{
-						ImGui::Combo(XOR("Chams type Players"), &vars::visuals->chams->indexPlayers, selections::chamsNames);
+						ImGui::Combo(XOR("Chams type Players"), &vars::visuals->chams->indexPlayers, magic_enum::enum_names_pretty<ChamsType>());
 						ImGui::ColorPicker(XOR("Chams color Players"), &vars::visuals->chams->colorPlayers);
 						ImGui::Checkbox(XOR("Chams XQZ"), &vars::visuals->chams->enabledXQZPlayers);
 						ImGui::ColorPicker(XOR("Chams XQZ color"), &vars::visuals->chams->colorXQZPlayers);
@@ -268,7 +269,7 @@ static void renderVisuals()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Chams options weapons"), []()
 					{
-						ImGui::Combo(XOR("Chams type Weapons"), &vars::visuals->chams->indexWeapons, selections::chamsNames);
+						ImGui::Combo(XOR("Chams type Weapons"), &vars::visuals->chams->indexWeapons, magic_enum::enum_names_pretty<ChamsType>());
 						ImGui::ColorPicker(XOR("Chams color Weapons"), &vars::visuals->chams->colorWeapons);
 						ImGui::Checkbox(XOR("Disable weapon"), &vars::visuals->chams->weaponHide);
 					});
@@ -276,7 +277,7 @@ static void renderVisuals()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Chams options arms"), []()
 					{
-						ImGui::Combo(XOR("Chams type Arms"), &vars::visuals->chams->indexArms, selections::chamsNames);
+						ImGui::Combo(XOR("Chams type Arms"), &vars::visuals->chams->indexArms, magic_enum::enum_names_pretty<ChamsType>());
 						ImGui::ColorPicker(XOR("Chams color Arms"), &vars::visuals->chams->colorArms);
 						ImGui::Checkbox(XOR("Disable arms"), &vars::visuals->chams->armsHide);
 					});
@@ -284,9 +285,9 @@ static void renderVisuals()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Chams options backtrack"), []()
 					{
-						ImGui::Combo(XOR("Chams type Backtrack"), &vars::visuals->chams->modeBacktrack, selections::chamsNames);
+						ImGui::Combo(XOR("Chams type Backtrack"), &vars::visuals->chams->modeBacktrack, magic_enum::enum_names_pretty<ChamsType>());
 						ImGui::ColorPicker(XOR("Backtrack chams col"), &vars::visuals->chams->colorBacktrack);
-						ImGui::Combo(XOR("Chams style Backtrack"), &vars::visuals->chams->indexBacktrack, selections::btChams);
+						ImGui::Combo(XOR("Chams style Backtrack"), &vars::visuals->chams->indexBacktrack, magic_enum::enum_names_pretty<BTChamsType>());
 					});
 				ImGui::Checkbox(XOR("Enabled glow"), &vars::visuals->glow->enabled);
 				ImGui::SameLine();
@@ -355,7 +356,7 @@ static void renderVisuals()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Dropped weapons draw"), []()
 					{
-						ImGui::MultiCombo(XOR("Dropped flags"), selections::droppedFlags, &vars::visuals->esp->dropped->flags);
+						ImGui::MultiCombo(XOR("Dropped flags"), magic_enum::enum_names_pretty<DroppedFlags>(), &vars::visuals->esp->dropped->flags);
 						ImGui::ColorPicker(XOR("Dropped color"), &vars::visuals->esp->dropped->color);
 					}
 				);
@@ -455,7 +456,7 @@ static void renderMisc()
 						ImGui::SliderFloat(XOR("Extra Y##thirdp"), &vars::misc->thirdp->y, -180.0f, 180.0f);
 					}
 				);
-				ImGui::Combo(XOR("Crosshair type"), &vars::misc->crosshair->index, selections::crossHairNames);
+				ImGui::Combo(XOR("Crosshair type"), &vars::misc->crosshair->index, magic_enum::enum_names_pretty<CrossHairTypes>());
 
 				ImGui::EndGroupPanel();
 			}
@@ -500,7 +501,7 @@ static void renderMisc()
 				{
 					ImGui::SliderInt(XOR("Bunnyhop hitchance"), &vars::misc->bunnyHop->chance, 0, 100, "%i%%");
 				}
-				ImGui::Combo(XOR("Autostrafe"), &vars::misc->bunnyHop->indexStrafe, selections::straferModes);
+				ImGui::Combo(XOR("Autostrafe"), &vars::misc->bunnyHop->indexStrafe, magic_enum::enum_names_pretty<MovementStraferMode>());
 
 				ImGui::EndGroupPanel();
 			}
@@ -605,7 +606,7 @@ static void renderMisc()
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Movement trails pop"), []()
 					{
-						ImGui::Combo(XOR("Trail type"), &vars::misc->trail->mode, selections::trails);
+						ImGui::Combo(XOR("Trail type"), &vars::misc->trail->mode, magic_enum::enum_names_pretty<MovementTrail>());
 						ImGui::ColorPicker(XOR("Movement trail color"), &vars::misc->trail->color);
 						ImGui::SliderFloat(XOR("Trail speed"), &vars::misc->trail->beamSpeed, 1.0f, 10.0f);
 						ImGui::SliderFloat(XOR("Trail life"), &vars::misc->trail->time, 1.0f, 10.0f);
@@ -810,9 +811,14 @@ static void renderConfig()
 			{
 				if (ImGui::InputText(XOR("Config name"), &text, ImGuiInputTextFlags_EnterReturnsTrue))
 				{
-					config.save(text);
-					text.clear();
-					config.reload();
+					if (utilities::toLowerCase(text) != config.getDefaultConfigName())
+					{
+						config.save(text);
+						text.clear();
+						config.reload();
+					}
+					else
+						console.log(TypeLogs::LOG_ERR, XOR("provided config name was same as default"));
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Press enter to create new config"));
@@ -940,7 +946,7 @@ static void renderStyles()
 		{
 			ImGui::BeginGroupPanel(XOR("Style"), availRegion());
 			{
-				ImGui::ListBox(XOR("Menu styles"), &vars::styling->index, selections::styleNames);
+				ImGui::ListBox(XOR("Menu styles"), &vars::styling->index, magic_enum::enum_names_pretty<MenuTypes>());
 				if (ImGui::Button(XOR("Run")))
 				{
 					runStyle(vars::styling->index);

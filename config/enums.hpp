@@ -1,20 +1,33 @@
 #pragma once
 
-#pragma region enums
-enum class AimbotID : size_t
+enum class AimbotWeapon
+{
+	RIFFLE,
+	SMG,
+	MACHINE_GUN,
+	PISTOL,
+	DEAGLE,
+	REVOLVER,
+	SCOUT,
+	AWP,
+	AUTO_SNIPER,
+	SHOTGUN
+};
+
+enum class AimbotHitboxes
 {
 	NEAREST,
 	HEAD,
 	CHEST
 };
 
-enum class SmoothMode : size_t
+enum class SmoothMode
 {
 	LINEAR,
 	NON_LINEAR
 };
 
-enum class CrossHairTypes : size_t
+enum class CrossHairTypes
 {
 	OFF,
 	STATIC,
@@ -23,7 +36,7 @@ enum class CrossHairTypes : size_t
 	SPREAD
 };
 
-enum class ChamsID : size_t
+enum class ChamsType
 {
 	FLAT,
 	GENERIC,
@@ -32,7 +45,7 @@ enum class ChamsID : size_t
 	PEARLSCENT
 };
 
-enum class BTChamsID : size_t
+enum class BTChamsType
 {
 	STABLE,
 	LAST_TICK,
@@ -40,7 +53,7 @@ enum class BTChamsID : size_t
 	COLOR_CHANGE
 };
 
-enum class BoxTypes : size_t
+enum class BoxTypes
 {
 	OFF,
 	BOX2D,
@@ -49,14 +62,14 @@ enum class BoxTypes : size_t
 	FILLED3D
 };
 
-enum class MovementTrail : size_t
+enum class MovementTrail
 {
 	BEAM,
 	LINE,
 	SPLASH
 };
 
-enum class EspFlags : size_t
+enum class EspFlags
 {
 	BOT,
 	MONEY,
@@ -65,19 +78,17 @@ enum class EspFlags : size_t
 	ARMOR,
 	ZOOM,
 	C4,
-	FLAGS_SIZE
 };
 
-enum class DroppedFlags : size_t
+enum class DroppedFlags
 {
 	BOX,
 	TEXT,
 	ICON,
 	AMMO,
-	FLAGS_SIZE
 };
 
-enum class MovementStraferMode : size_t
+enum class MovementStraferMode
 {
 	OFF,
 	SIDESPEED,
@@ -85,10 +96,16 @@ enum class MovementStraferMode : size_t
 	DIRECTIONAL
 };
 
-enum class AimbotMethod : size_t
+enum class AimbotMethod
 {
 	CROSSHAIR,
 	DYNAMIC
 };
 
-#pragma endregion
+enum class MenuTypes
+{
+	CHERRY,
+	DARK,
+	CLASSIC,
+	WHITE
+};

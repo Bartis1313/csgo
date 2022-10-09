@@ -299,17 +299,17 @@ std::vector<size_t> Aimbot::getHitboxes()
 
     switch (m_config.aimSelection)
     {
-    case E2T(AimbotID::NEAREST):
+    case E2T(AimbotHitboxes::NEAREST):
     {
         for (size_t i = HITBOX_HEAD; i < HITBOX_MAX; i++)
             hitboxes.push_back(i);
 
         break;
     }
-    case E2T(AimbotID::HEAD):
+    case E2T(AimbotHitboxes::HEAD):
         hitboxes = { HITBOX_HEAD };
         break;
-    case E2T(AimbotID::CHEST):
+    case E2T(AimbotHitboxes::CHEST):
         hitboxes = { HITBOX_LOWER_CHEST };
         break;
     default:

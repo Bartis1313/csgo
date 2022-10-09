@@ -30,7 +30,10 @@ public:
 	bool isDown() const;
 	bool isToggled() const;
 	int getKeyCode() const { return m_keyCode; }
+	int& getKeyCode() { return m_keyCode; }
 	KeyMode getKeyMode() const { return m_keyMode; }
+	KeyMode& getKeyMode() { return m_keyMode; }
+	int& getKeyModeInt() { return (int&)(m_keyMode); }
 	void setKeyMode(KeyMode mode) { m_keyMode = mode; }
 	static std::array<std::pair<KeyMode, const char*>, E2T(KeyMode::KEYMODE_SIZE)> getKeyPairs();
 private:

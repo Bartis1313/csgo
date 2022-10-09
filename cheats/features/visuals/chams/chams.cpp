@@ -38,19 +38,19 @@ void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& 
 	Mat_t mat;
 	switch (styles)
 	{
-	case E2T(ChamsID::FLAT):
+	case E2T(ChamsType::FLAT):
 		mat = m_flat;
 		break;
-	case E2T(ChamsID::GENERIC):
+	case E2T(ChamsType::GENERIC):
 		mat = m_generic;
 		break;
-	case E2T(ChamsID::GLOW):
+	case E2T(ChamsType::GLOW):
 		mat = m_glow;
 		break;
-	case E2T(ChamsID::METALIC):
+	case E2T(ChamsType::METALIC):
 		mat = m_metalic;
 		break;
-	case E2T(ChamsID::PEARLSCENT):
+	case E2T(ChamsType::PEARLSCENT):
 		mat = m_pearlescent;
 		break;
 	default:
@@ -195,7 +195,7 @@ void Chams::drawBackTrack(Player_t* ent)
 
 	switch (vars::visuals->chams->indexBacktrack)
 	{
-	case E2T(BTChamsID::STABLE):
+	case E2T(BTChamsType::STABLE):
 	{
 		for (size_t i = 0; i < record->size(); i++)
 		{
@@ -208,7 +208,7 @@ void Chams::drawBackTrack(Player_t* ent)
 		}
 		break;
 	}
-	case E2T(BTChamsID::LAST_TICK):
+	case E2T(BTChamsType::LAST_TICK):
 	{
 		if (g_Backtrack.isValid(record->front().m_simtime))
 		{
@@ -218,7 +218,7 @@ void Chams::drawBackTrack(Player_t* ent)
 		}
 		break;
 	}
-	case E2T(BTChamsID::RAINBOW):
+	case E2T(BTChamsType::RAINBOW):
 	{
 		for (size_t i = 0; i < record->size(); i++)
 		{
@@ -232,7 +232,7 @@ void Chams::drawBackTrack(Player_t* ent)
 		}
 		break;
 	}
-	case E2T(BTChamsID::COLOR_CHANGE):
+	case E2T(BTChamsType::COLOR_CHANGE):
 	{
 		Color fromCfg = vars::visuals->chams->colorBacktrack();
 		
