@@ -41,7 +41,6 @@ void from_json(const json& j, const std::string& key, std::string& val)
 	if (auto jval = j.at(key); jval.is_string())
 		jval.get_to(val);
 }
-#include <iostream>
 
 template<typename T, size_t SIZE>
 void from_json(const json& j, const std::string& key, std::array<T, SIZE>& val)
@@ -107,14 +106,15 @@ void to_json(json& j, const CfgWeapon& val)
 
 void from_json(const json& j, const std::string& key, CfgColor& val)
 {
-	from_json(j[key], "RGBA", val.getColor().get());
+	from_json(j[key], "RGBA", val.getColorRef().getRef());
 	from_json(j[key], "Rainbow", val.getRainbowRef());
 	from_json(j[key], "Speed", val.getSpeedRef());
 }
+#include <iostream>
 
 void to_json(json& j, const std::string key, const CfgColor& val)
 {
-	j[key]["RGBA"] = val().get();
+	j[key]["RGBA"] = val.getColor().get();
 	j[key]["Rainbow"] = val.getRainbow();
 	j[key]["Speed"] = val.getSpeed();
 }

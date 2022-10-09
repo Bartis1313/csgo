@@ -38,10 +38,14 @@ bool Config::save(const std::string& file)
 	{
 		std::ofstream out{ utilities::toLowerCase((getHackPath() / getPathForConfig(file)).string()) };
 		if (!out)
+		{
+			out.close();
 			return false;
+		}
 
 		out << std::setw(4) << j;
 
+		out.close();
 	}
 	catch (const std::ofstream::failure& err)
 	{
@@ -57,9 +61,14 @@ bool Config::load(const std::string& file)
 {
 	std::ifstream input{ getHackPath() / getPathForConfig(file) };
 	if (!input)
+	{
 		return false;
+		input.close();
+	}
 
 	json j = json::parse(input);
+
+	input.close();
 
 	from_json(j["Aim"], *vars::aim);
 	from_json(j["AimPaint"], *vars::aimPaint);

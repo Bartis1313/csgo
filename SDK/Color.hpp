@@ -42,7 +42,7 @@ public:
 	constexpr void setAlphaInt(int a) { m_color.at(3) = a / 255.0f; }
 
 	constexpr auto get() const { return m_color; }
-	constexpr auto& get() { return m_color; }
+	constexpr auto& getRef() { return m_color; }
 
 	[[nodiscard]] constexpr float r() const { return m_color.at(0); }
 	[[nodiscard]] constexpr float g() const { return m_color.at(1); }
