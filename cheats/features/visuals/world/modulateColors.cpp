@@ -12,11 +12,12 @@ void ModulateColor::run(void* thisptr, float* r, float* g, float* b)
 	if (!vars::visuals->world->modulate->enabled)
 		return;
 
-	auto editColor = [=](const CfgColor& color)
+	auto editColor = [=](CfgColor* color)
 	{
-		*r = color().r();
-		*g = color().g();
-		*b = color().b();
+		*r = color->getColor().r();
+		*g = color->getColor().g();
+		*b = color->getColor().b();
+		color->refresh();
 	};
 
 	auto material = reinterpret_cast<IMaterial*>(thisptr);
@@ -40,7 +41,7 @@ void ModulateColor::run(void* thisptr, float* r, float* g, float* b)
 
 	if (auto itr = mapped.find(name); itr != mapped.end())
 	{
-		editColor(*itr->second);
+		editColor(itr->second);
 		goodMat = true;
 	}
 

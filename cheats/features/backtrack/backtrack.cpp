@@ -84,7 +84,7 @@ void Backtrack::run(CUserCmd* cmd)
 	const auto aimPunch = game::localPlayer->getAimPunch();
 	const auto myEye = game::localPlayer->getEyePos();
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
 		auto ent = reinterpret_cast<Player_t*>(entity);
 
@@ -189,7 +189,7 @@ void BackTrackUpdater::run(int frame)
 		return true;
 	};
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
 		auto ent = reinterpret_cast<Player_t*>(entity);
 

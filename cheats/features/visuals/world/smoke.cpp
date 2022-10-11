@@ -24,7 +24,7 @@ void SmokeDraw::draw()
 	if (!vars::visuals->world->smoke->enabled)
 		return;
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::GRENADE_PROJECTILES))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::GRENADE_PROJECTILES))
 	{
 		if (classID != CSmokeGrenadeProjectile)
 			continue;

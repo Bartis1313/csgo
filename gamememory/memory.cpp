@@ -236,15 +236,6 @@ Memory::Address<T> Memory::Address<T>::initAddr(const std::string& mod, const st
 	return Address<T>{ addr };
 }
 
-template<typename T>
-Memory::Address<T> Memory::Address<T>::ref(Dereference times)
-{
-	for ([[maybe_unused]] auto i : std::views::iota(0U, E2T(times)))
-		m_addr = *reinterpret_cast<uintptr_t*>(m_addr);
-
-	return Address<T>{ m_addr };
-}
-
 std::pair<uintptr_t, bool> Memory::scan(const std::string& mod, const std::string& sig, const uintptr_t offsetToAdd)
 {
 	std::istringstream iss{ sig };

@@ -16,6 +16,7 @@
 #include <classes/base.hpp>
 #include <features/events/events.hpp>
 #include <features/discord/discord.hpp>
+#include <features/cache/cache.hpp>
 #include <game/globals.hpp>
 #include <game/game.hpp>
 #include <gamememory/memory.hpp>
@@ -31,7 +32,9 @@ DiscordPresence Setup::m_dc;
 bool Setup::init(void* instance)
 {
 	// pass custom handler
-	AddVectoredExceptionHandler(TRUE, SEHcatch::memErrorCatch);
+    // commented due to false-positives thrown by steam server
+    // they handle it somehow to prevent such crash, but exception pointers report it
+	//AddVectoredExceptionHandler(TRUE, SEHcatch::memErrorCatch);
 
 	console.init(XOR("CSGO DEBUG"), XOR("hack.log"));
 
@@ -54,6 +57,7 @@ bool Setup::init(void* instance)
         x88menu.init();
         g_Events.init();
         hooks::init();
+        EntityCache::init();
     }
     catch (const std::exception& err)
     {
@@ -73,7 +77,7 @@ void Setup::shutdown(void* instance)
 {
     globals::isShutdown = true;
 
-    RemoveVectoredExceptionHandler(globals::instance);
+    //RemoveVectoredExceptionHandler(globals::instance);
     hooks::wndProcSys::shutdown();
     BaseHack::shutdownAll();
     Events::shutdownAllEvents();

@@ -22,7 +22,7 @@ void MolotovDraw::draw()
 	if (!vars::visuals->world->molotov->enabled)
 		return;
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::GRENADE_PROJECTILES))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::GRENADE_PROJECTILES))
 	{
 		if (classID != CInferno)
 			continue;

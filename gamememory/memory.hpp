@@ -7,6 +7,7 @@
 #include <string>
 #include <unordered_map>
 #include <Windows.h>
+#include <variant>
 
 struct CClientEffectRegistration;
 class Player_t;
@@ -41,31 +42,48 @@ public:
 	struct Address
 	{
 	public:
-		Address() = default;
+		constexpr Address() = default;
 		// pass by offset
-		constexpr Address(uintptr_t addr) :
+		constexpr Address(const uintptr_t addr) :
 			m_addr{ addr }
+		{}
+		constexpr Address(const uintptr_t* addr) :
+			m_addr{ reinterpret_cast<uintptr_t>(addr) }
+		{}
+		constexpr Address(const void* addr) :
+			m_addr{ reinterpret_cast<uintptr_t>(addr) }
 		{}
 
 		// raw place in memory as offset
-		uintptr_t getRawAddr() { return m_addr; }
+		constexpr uintptr_t getRawAddr() const { return m_addr; }
 		// cast to anything
-		template<typename type>
-		Address<type> cast() { return Address<type>{ m_addr }; }
+		template<typename K>
+		constexpr auto cast() const { return Address<K>{ m_addr }; }
 		// wrapper for sig scan, when error it throws one
 		Address<T> initAddr(const std::string& mod, const std::string& sig, uintptr_t offset = 0);
 		// add bytes, useful for creating "chains" with ref(), depends on use case.
-		Address<T> add(uintptr_t extraOffset) { return Address{ m_addr + extraOffset }; }
+		constexpr Address<T> add(uintptr_t extraOffset) const { return Address{ m_addr + extraOffset }; }
 		// dereference x times. Possible args are: 1, 2, 3. There will for sure won't be a case for 4 level dereference. 3rd is very rare.
-		Address<T> ref(Dereference times = Dereference::ONCE);
-		// get as rel32 offset
-		Address<T> rel(uintptr_t extraOffset = 0)
+		template<typename K = T>
+		constexpr auto ref(Dereference times = Dereference::ONCE) const
 		{
-			m_addr += extraOffset;
-			return (T)(m_addr + 4 + *reinterpret_cast<uintptr_t*>(m_addr));
+			auto addr = m_addr;
+
+			for ([[maybe_unused]] auto i : std::views::iota(0U, E2T(times)))
+				addr = *reinterpret_cast<uintptr_t*>(addr);
+
+			return Address<K>{ addr };
+		}
+		// get as rel32
+		template<typename K = T>
+		constexpr auto rel(uintptr_t relOffset = 0x1, uintptr_t absOffset = 0x0) const
+		{
+			const auto jump = m_addr + relOffset;
+			const auto target = *reinterpret_cast<decltype(jump)*>(jump);
+			return Address<K>{ jump + absOffset + 0x4 + target };
 		}
 		// will work for classes types too
-		constexpr T operator()();
+		constexpr T operator()() const;
 	private:
 		uintptr_t m_addr;
 	};
@@ -161,7 +179,7 @@ public:
 #include <type_traits>
 
 template<typename T>
-constexpr T Memory::Address<T>::operator()()
+constexpr T Memory::Address<T>::operator()() const
 {
 	if constexpr (std::is_class_v<T>)
 		return *reinterpret_cast<T*>(m_addr);

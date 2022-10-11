@@ -24,7 +24,7 @@ void Projectiles::draw()
 	if (!vars::visuals->world->projectiles->enabled)
 		return;
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::GRENADE_PROJECTILES))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::GRENADE_PROJECTILES))
 	{
 		auto model = entity->getModel();
 		if (!model)

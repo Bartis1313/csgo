@@ -58,6 +58,8 @@ hookHelper::tryHook(target, &hookStructName::hooked, \
 	HOOK_SAFE_VFUNC(interfaces::viewRender, renderView);
 	HOOK_SAFE_VFUNC(interfaces::viewRender, screen2DEffect);
 	HOOK_SAFE_VFUNC(interfaces::engine, isHltv);
+	HOOK_SAFE_VFUNC(interfaces::entList, addEnt);
+	HOOK_SAFE_VFUNC(interfaces::entList, removeEnt);
 
 #undef HOOK_SAFE_VFUNC
 #undef HOOK_SAFE_SIG

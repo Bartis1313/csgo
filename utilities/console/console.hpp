@@ -51,7 +51,7 @@ private:
 // https://youtu.be/TxhQQLGafZ4?t=78
 // :D
 
-template<typename... Args_t>
+template</*TypeLogs type, */typename... Args_t>
 void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 {
 	std::scoped_lock lock{ mutex };
@@ -74,7 +74,7 @@ void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 	buffer += FORMAT(XOR("[{}] "), utilities::getTime());
 
 	if constexpr (sizeof...(args) > 0)
-		buffer += std::vformat(std::locale(), fmt, std::make_format_args(args...));
+		buffer += std::vformat(fmt, std::make_format_args(args...));
 	else
 		buffer += fmt;
 

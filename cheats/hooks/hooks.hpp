@@ -26,6 +26,8 @@ enum hookIndexes
 	RENDER_VIEW = 6,
 	IS_HLTV = 93,
 	SCREEN_2D_EFFECT = 39,
+	ADD_ENT = 11,
+	REMOVE_ENT = 12
 };
 
 class IPanel;
@@ -50,7 +52,7 @@ namespace hooks
 		using fn = void(__thiscall*)(IPanel*, unsigned int, bool, bool);
 		static void __stdcall hooked(unsigned int panel, bool forceRepaint, bool allowForce);
 		inline static fn original = nullptr;
-		static const int index = PAINTTRAVERSE;
+		static constexpr int index = PAINTTRAVERSE;
 	};
 
 	/*struct createMove
@@ -66,7 +68,7 @@ namespace hooks
 		using fn = void(__thiscall*)(void*, void*, const DrawModelState_t&, const ModelRenderInfo_t&, Matrix3x4*);
 		static void __stdcall hooked(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 		inline static fn original = nullptr;
-		static const int index = DRAWMODEL;
+		static constexpr int index = DRAWMODEL;
 	};
 
 	struct overrideView
@@ -74,7 +76,7 @@ namespace hooks
 		using fn = void(__stdcall*)(CViewSetup*);
 		static void __stdcall hooked(CViewSetup* view);
 		inline static fn original = nullptr;
-		static const int index = OVERRIDE;
+		static constexpr int index = OVERRIDE;
 	};
 
 	struct doPostScreenEffects
@@ -82,7 +84,7 @@ namespace hooks
 		using fn = int(__thiscall*)(void*, int);
 		static int __stdcall hooked(int val);
 		inline static fn original = nullptr;
-		static const int index = POSTSCREENEFFECT;
+		static constexpr int index = POSTSCREENEFFECT;
 	};
 
 	struct frameStageNotify
@@ -90,7 +92,7 @@ namespace hooks
 		using fn = void(__thiscall*)(void*, int);
 		static void __stdcall hooked(int frame);
 		inline static fn original = nullptr;
-		static const int index = FRAMESTAGE;
+		static constexpr int index = FRAMESTAGE;
 	};	
 
 	struct clientValidAddr
@@ -133,7 +135,7 @@ namespace hooks
 		using fn = void(__thiscall*)(void*);
 		static void __stdcall hooked();
 		inline static fn original = nullptr;
-		static const int index = LOCK_CURSOR;
+		static constexpr int index = LOCK_CURSOR;
 	};
 
 	struct reset
@@ -141,7 +143,7 @@ namespace hooks
 		using fn = long(__stdcall*)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 		static long __stdcall hooked(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params);
 		inline static fn original = nullptr;
-		static const int index = RESETDX;
+		static constexpr int index = RESETDX;
 	};
 
 	struct present
@@ -149,7 +151,7 @@ namespace hooks
 		using fn = long(__stdcall*)(IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
 		static long __stdcall hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region);
 		inline static fn original = nullptr;
-		static const int index = PRESENTDX;
+		static constexpr int index = PRESENTDX;
 	};
 
 	struct drawIndexedPrimitive
@@ -183,7 +185,7 @@ namespace hooks
 		using fn = void(__stdcall*)(int, float, bool);
 		static void __stdcall hooked(int sequence, float inputFrame, bool active);
 		inline static fn original = nullptr;
-		static const int index = PROXY_MOVE;
+		static constexpr int index = PROXY_MOVE;
 	};
 
 	struct getColorModulation
@@ -212,7 +214,7 @@ namespace hooks
 		using fn = bool(__thiscall*)(void*);
 		static bool __fastcall hooked(FAST_ARGS);
 		inline static fn original = nullptr;
-		static const int index = SV_CHEATS;
+		static constexpr int index = SV_CHEATS;
 	};
 
 	struct particlesSimulations
@@ -249,7 +251,7 @@ namespace hooks
 		using fn = int(__thiscall*)(void*, int);
 		static int __fastcall hooked(FAST_ARGS, int maxFiles);
 		inline static fn original = nullptr;
-		static const int index = UNVERIFIED_FILE_HASHES;
+		static constexpr int index = UNVERIFIED_FILE_HASHES;
 	};
 
 	struct unkFileCheck
@@ -257,7 +259,7 @@ namespace hooks
 		using fn = int(__thiscall*)(void*);
 		static int __fastcall hooked(FAST_ARGS);
 		inline static fn original = nullptr;
-		static const int index = UNK_FILE_CHECK;
+		static constexpr int index = UNK_FILE_CHECK;
 	};
 
 	struct renderView
@@ -265,7 +267,7 @@ namespace hooks
 		using fn = void(__thiscall*)(void*, const CViewSetup&, const CViewSetup&, int, int);
 		static void __fastcall hooked(FAST_ARGS, const CViewSetup& view, const CViewSetup& hud, int clearFlags, int whatToDraw);
 		inline static fn original = nullptr;
-		static const int index = RENDER_VIEW;
+		static constexpr int index = RENDER_VIEW;
 	};
 
 	struct isHltv
@@ -273,7 +275,7 @@ namespace hooks
 		using fn = bool(__thiscall*)(void*);
 		static bool __fastcall hooked(FAST_ARGS);
 		inline static fn original = nullptr;
-		static const int index = IS_HLTV;
+		static constexpr int index = IS_HLTV;
 	};
 
 	struct screen2DEffect
@@ -281,7 +283,7 @@ namespace hooks
 		using fn = void(__stdcall*)(CViewSetup*);
 		static void __stdcall hooked(CViewSetup* view);
 		inline static fn original = nullptr;
-		static const int index = SCREEN_2D_EFFECT;
+		static constexpr int index = SCREEN_2D_EFFECT;
 	};
 
 	struct isDepthOfField
@@ -296,5 +298,21 @@ namespace hooks
 		using fn = void(__thiscall*)(void*, Vec3&, Vec3&, float, float, float, float);
 		static void __fastcall hooked(FAST_ARGS, Vec3& pos, Vec3& dir, float r, float g, float b, float a);
 		inline static fn original = nullptr;
+	};
+
+	struct addEnt
+	{
+		using fn = void(__thiscall*)(void*, void*, int);
+		static void __fastcall hooked(FAST_ARGS, void* handleEnt, int handle);
+		inline static fn original = nullptr;
+		static constexpr int index = ADD_ENT;
+	};
+
+	struct removeEnt
+	{
+		using fn = void(__thiscall*)(void*, void*, int);
+		static void __fastcall hooked(FAST_ARGS, void* handleEnt, int handle);
+		inline static fn original = nullptr;
+		static constexpr int index = REMOVE_ENT;
 	};
 }

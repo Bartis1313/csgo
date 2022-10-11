@@ -5,6 +5,7 @@
 #include <vector>
 #include <unordered_map>
 #include <utility>
+#include <optional>
 
 class Entity_t;
 
@@ -17,26 +18,30 @@ enum class EntCacheType // add more if needed, each group should contain many id
 	WEAPON,
 };
 
-// might be also run with: present & reset
-class EntityCache : public FrameStageType
+class EntityCache
 {
 public:
-	EntityCache() : 
-		FrameStageType{}
-	{}
-
-	virtual void init();
-	virtual void run(int frame);
-	// ents
-	auto getCache(const EntCacheType& type) { return m_entCache[type]; }
-	// map
-	auto getCache() const { return m_entCache; }
+	static void add(Entity_t* ent);
+	static void erase(Entity_t* ent);
+	static void clear();
+	// we need to call this once
+	// manual init is a thing due to unload during the round
+	static void init();
 private:
-	void fill(); // FRAME_NET_UPDATE_END
-	void clear(); // FRAME_NET_UPDATE_START
-	// pointer to ent, index, classID
-	using typeCont = std::tuple<Entity_t*, size_t, size_t>;
-	std::unordered_map<EntCacheType, std::vector<typeCont>> m_entCache;
+	struct HolderData
+	{
+		Entity_t* ent;
+		size_t idx;
+		size_t classID;
+	};
+	static void fill(const HolderData& data);
+	static bool checkRepeatable(Entity_t* ent);
+	static std::optional<std::pair<size_t, size_t>> getIndexes(Entity_t* ent);
+public:
+	inline static auto getCache(const EntCacheType& type)
+	{
+		return m_entCache[type];
+	}
+private:
+	inline static std::unordered_map<EntCacheType, std::vector<HolderData>> m_entCache;
 };
-
-[[maybe_unused]] inline auto g_EntCache = EntityCache{};

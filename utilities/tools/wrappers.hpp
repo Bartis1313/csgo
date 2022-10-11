@@ -2,7 +2,6 @@
 
 #include <type_traits>
 #include <string>
-#include <locale>
 #include <format>
 
 template<typename T>
@@ -16,9 +15,14 @@ template<typename T>
     return std::string{ str, str + s };
 }
 
+[[nodiscard]] inline constexpr auto operator"" _hash(const char* str, size_t s)
+{
+    return li::detail::khash(str);
+}
+
 // format string at runtime
 template<typename... Args_t>
 [[nodiscard]] inline constexpr std::string FORMAT(const std::string_view fmt, Args_t&&... args)
 {
-    return std::vformat(std::locale(), fmt, std::make_format_args(args...));
+    return std::vformat(fmt, std::make_format_args(args...));
 }

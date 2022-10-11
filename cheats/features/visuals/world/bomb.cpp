@@ -137,7 +137,7 @@ void BombOverlayEntGrabber::run(int frame)
 	if (frame != FRAME_RENDER_START)
 		return;
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::WORLD_ENTS))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::WORLD_ENTS))
 	{
 		if (classID != CPlantedC4)
 			continue;

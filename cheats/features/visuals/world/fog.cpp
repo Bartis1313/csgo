@@ -24,7 +24,7 @@ void FogController::run(int frame)
 	if (!game::isAvailable())
 		return;
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::CONTROLLERS))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::CONTROLLERS))
 	{
 		if (classID != CFogController)
 			continue;

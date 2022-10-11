@@ -25,7 +25,7 @@ void DroppedWeapons::draw()
 	if (!vars::visuals->esp->dropped->enabled)
 		return;
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::WEAPON))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::WEAPON))
 	{
 		auto handle = interfaces::entList->getClientFromHandle(entity->m_hOwnerEntity());
 		if (handle)

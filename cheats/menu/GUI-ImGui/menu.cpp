@@ -256,7 +256,7 @@ static void renderVisuals()
 
 			ImGui::BeginGroupPanel(XOR("Chams"), availRegion());
 			{
-				ImGui::Checkbox(XOR("Chams enabled Players"), &vars::visuals->chams->enabled);
+				ImGui::Checkbox(XOR("Chams enabled Players"), &vars::visuals->chams->players);
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Chams options players"), []()
 					{

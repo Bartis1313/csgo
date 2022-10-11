@@ -54,7 +54,7 @@ void PlayerVisuals::draw()
 			isFlashOk = false;
 	}
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
 		auto ent = reinterpret_cast<Player_t*>(entity);
 

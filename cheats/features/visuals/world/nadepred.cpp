@@ -138,7 +138,7 @@ void GrenadePrediction::draw()
 	constexpr float b = 25.0f;
 	constexpr float c = 140.0f;
 
-	for (auto [entity, idx, classID] : g_EntCache.getCache(EntCacheType::PLAYER))
+	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
 		auto ent = reinterpret_cast<Player_t*>(entity);
 		if (!ent)
