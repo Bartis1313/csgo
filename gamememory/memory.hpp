@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <Windows.h>
 #include <variant>
+#include <type_traits>
 
 struct CClientEffectRegistration;
 class Player_t;
@@ -44,13 +45,13 @@ public:
 	public:
 		constexpr Address() = default;
 		// pass by offset
-		constexpr Address(const uintptr_t addr) :
+		constexpr Address(uintptr_t addr) :
 			m_addr{ addr }
 		{}
-		constexpr Address(const uintptr_t* addr) :
+		constexpr Address(uintptr_t* addr) :
 			m_addr{ reinterpret_cast<uintptr_t>(addr) }
 		{}
-		constexpr Address(const void* addr) :
+		constexpr Address(void* addr) :
 			m_addr{ reinterpret_cast<uintptr_t>(addr) }
 		{}
 
@@ -64,7 +65,6 @@ public:
 		// add bytes, useful for creating "chains" with ref(), depends on use case.
 		constexpr Address<T> add(uintptr_t extraOffset) const { return Address{ m_addr + extraOffset }; }
 		// dereference x times. Possible args are: 1, 2, 3. There will for sure won't be a case for 4 level dereference. 3rd is very rare.
-		template<typename K = T>
 		constexpr auto ref(Dereference times = Dereference::ONCE) const
 		{
 			auto addr = m_addr;
@@ -72,18 +72,23 @@ public:
 			for ([[maybe_unused]] auto i : std::views::iota(0U, E2T(times)))
 				addr = *reinterpret_cast<uintptr_t*>(addr);
 
-			return Address<K>{ addr };
+			return Address<T>{ addr };
 		}
 		// get as rel32
-		template<typename K = T>
 		constexpr auto rel(uintptr_t relOffset = 0x1, uintptr_t absOffset = 0x0) const
 		{
 			const auto jump = m_addr + relOffset;
 			const auto target = *reinterpret_cast<decltype(jump)*>(jump);
-			return Address<K>{ jump + absOffset + 0x4 + target };
+			return Address<T>{ jump + absOffset + 0x4 + target };
 		}
 		// will work for classes types too
-		constexpr T operator()() const;
+		constexpr T operator()() const
+		{
+			if constexpr (std::is_class_v<T>)
+				return *reinterpret_cast<T*>(m_addr);
+			else
+				return (T)(m_addr);
+		}
 	private:
 		uintptr_t m_addr;
 	};
@@ -175,16 +180,5 @@ public:
 	Address<teslaCreate_t> m_tesla;
 	Address<dispatchEffect_t> m_dispatchEffect;
 };
-
-#include <type_traits>
-
-template<typename T>
-constexpr T Memory::Address<T>::operator()() const
-{
-	if constexpr (std::is_class_v<T>)
-		return *reinterpret_cast<T*>(m_addr);
-	else
-		return (T)(m_addr);
-}
 
 [[maybe_unused]] inline auto g_Memory = Memory{};
