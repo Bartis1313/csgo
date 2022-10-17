@@ -187,7 +187,7 @@ std::optional<std::vector<ImVec2>> math::grahamScan(std::span<const ImVec2> poin
 		// is left? a lexicographically before b
 		[](const ImVec2& a, const ImVec2& b) constexpr
 		{
-			return (a.x < b.x || (a.y == b.x && a.y < b.y));
+			return (a.x < b.x || (a.x == b.x && a.y < b.y));
 		}
 	));
 
