@@ -18,11 +18,6 @@
 #include <utilities/rand.hpp>
 #include <dependencies/ImGui/imgui.h>
 
-void WeatherController::init()
-{
-
-}
-
 void WeatherController::run(int frame)
 {
 	if (frame != FRAME_RENDER_START)
@@ -151,12 +146,7 @@ void WeatherController::implMenu()
 	}
 }
 
-void WeatherReset::init()
-{
-
-}
-
 void WeatherReset::run(MapStruct* map)
 {
-	g_WeatherController.m_weather.m_created = false;
+	g_WeatherController->m_weather.m_created = false;
 }

@@ -25,7 +25,7 @@ public:
 	{}
 
 	virtual void init() override; // optonal to declare it here and later define
-	virtual void reset() override; // optional, resets what you need when ``levelInitPostEntity`` is called
+	virtual void reset() override; // optional, resets what you need when levelInitPostEntity is called
 	virtual void draw() override; // put all stuff that draws anything related with "player render" keyword
 private:
 	void renderBox(...);
@@ -37,4 +37,4 @@ There are also types that don't run anything, look ``OnlyInitType``
 
 Hooks body code is not modified due to the fact ``runAll()`` methods are static, as well as any base method ending with ``All()``
 Keep in mind that very specific hooks for the feature are not stored in vector anyhow. There is no need to store this object and execute only 1 element.
-For example motion blur, cache.
+For example motion blur, cache, fakelatency, modulateColor. Those are executed by public static methods.

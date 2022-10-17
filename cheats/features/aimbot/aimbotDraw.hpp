@@ -2,18 +2,17 @@
 
 #include <classes/renderableToSurface.hpp>
 
-class AimbotDraw : public RenderableSurfaceType
+class AimbotDraw : protected RenderableSurfaceType
 {
 public:
 	constexpr AimbotDraw() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+	virtual void draw() override;
 private:
 	void drawFov();
 	void drawBestPoint();
 };
 
-[[maybe_unused]] inline auto g_AimbotDraw = AimbotDraw{};
+GLOBAL_FEATURE(AimbotDraw);

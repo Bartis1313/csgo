@@ -6,6 +6,7 @@
 
 class CUserCmd;
 class INetChannel;
+class IConVar;
 
 class FakeLatency : public CreateMovePrePredictionType
 {
@@ -14,10 +15,14 @@ public:
 		CreateMovePrePredictionType{}
 	{}
 
-	virtual void init();
-	virtual void run([[maybe_unused]] CUserCmd* cmd);
-	void addLatency(INetChannel* netChannel, float latency);
+public:
+	static int runDatagram(INetChannel* netChannel, void* datagram);
+protected:
+	virtual void run([[maybe_unused]] CUserCmd* cmd) override;
+	virtual void init() override;
 private:
+	static void addLatency(INetChannel* netChannel, float latency);
+	static int CALL(INetChannel* netChannel, void* datagram);
 	void updateSequences();
 	void clearSequences();
 
@@ -30,7 +35,8 @@ private:
 	};
 
 	int m_lastSequence = 0;
-	std::deque<SequenceRecord> m_sequences;
+	inline static std::deque<SequenceRecord> m_sequences;
+	inline static IConVar* maxUnlag = nullptr;
 };
 
-[[maybe_unused]] inline auto g_FakeLatency = FakeLatency{};
+GLOBAL_FEATURE(FakeLatency);

@@ -17,10 +17,10 @@
 
 void SoundDraw::init()
 {
-	g_Events.add(XOR("player_footstep"), std::bind(&SoundDraw::pushSteps, this, std::placeholders::_1));
+	g_Events->add(XOR("player_footstep"), std::bind(&SoundDraw::pushSteps, this, std::placeholders::_1));
 }
 
-void SoundDraw::findBest(Entity_t* ent)
+void SoundDraw::findBest(Player_t* ent)
 {
 	if (!vars::visuals->sound->enabled)
 		return;

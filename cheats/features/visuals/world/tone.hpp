@@ -2,20 +2,20 @@
 
 #include <classes/frameStage.hpp>
 
-class ToneController : public FrameStageType
+class ToneController : protected FrameStageType
 {
 public:
 	constexpr ToneController() :
 		FrameStageType{}
 	{}
 
-	virtual void init();
-	virtual void run(int frame);
 	void setStateSlider(bool state) { m_checkStateSlider = state; }
 	void setStateButton(bool state) { m_checkStateButton = state; }
+protected:
+	virtual void run(int frame) override;
 private:
 	bool m_checkStateSlider = false;
 	bool m_checkStateButton = false;
 };
 
-[[maybe_unused]] inline auto g_ToneController = ToneController{};
+GLOBAL_FEATURE(ToneController);

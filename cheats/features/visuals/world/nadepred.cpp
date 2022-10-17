@@ -37,11 +37,6 @@ enum ACT
 	ACT_DROP,
 };
 
-void GreandePredictionButton::init()
-{
-
-}
-
 void GreandePredictionButton::run(CUserCmd* cmd)
 {
 	if (!vars::misc->nade->enabledPred)
@@ -86,7 +81,7 @@ void GreandePredictionButton::runView()
 	if (m_button != ACT_NONE)
 	{
 		m_weaponIdx = wpn->m_iItemDefinitionIndex();
-		g_GrenadePrediction.simulate();
+		g_GrenadePrediction->simulate();
 	}
 	else
 		m_weaponIdx = 0;
@@ -104,12 +99,6 @@ public:
 	Color m_color;
 };
 
-
-void GrenadePrediction::init()
-{
-
-}
-
 void GrenadePrediction::draw()
 {
 	if (!vars::misc->nade->enabledPred)
@@ -125,7 +114,7 @@ void GrenadePrediction::draw()
 	if (!weapon->isGrenade())
 		return;
 
-	if (!g_GrenadePredictionButton.getWeaponIdx())
+	if (!g_GreandePredictionButton->getWeaponIdx())
 		return;
 
 	if (m_path.empty())
@@ -314,7 +303,7 @@ bool GrenadePrediction::checkDetonate(const Vec3& vecThrow, const Trace_t& tr, i
 
 	const float time = game::ticksToTime(tick);
 
-	switch (g_GrenadePredictionButton.getWeaponIdx())
+	switch (g_GreandePredictionButton->getWeaponIdx())
 	{
 	case WEAPON_SMOKEGRENADE:
 	{

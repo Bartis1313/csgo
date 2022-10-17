@@ -4,17 +4,18 @@
 
 class IConVar;
 
-class ZeusDraw : public RenderableSurfaceType
+class ZeusDraw : protected RenderableSurfaceType
 {
 public:
 	constexpr ZeusDraw() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
+	virtual void init() override;
 private:
 	IConVar* m_party;
 };
 
-[[maybe_unused]] inline auto g_ZeusDraw = ZeusDraw{};
+GLOBAL_FEATURE(ZeusDraw);

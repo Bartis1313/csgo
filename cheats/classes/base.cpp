@@ -7,11 +7,17 @@ void BaseHack::initAll()
 	for (auto el : m_hacks)
 		el->init();
 
-	console.log(TypeLogs::LOG_INFO, XOR("Inited {} functions!"), m_hacks.size());
+	LOG_INFO(XOR("Inited {} functions!"), m_hacks.size());
 }
 
 void BaseHack::shutdownAll()
 {
 	for (auto el : m_hacks)
 		el->shutdown();
+}
+
+void BaseHack::resetAll()
+{
+	for (auto el : m_hacks)
+		el->reset();
 }

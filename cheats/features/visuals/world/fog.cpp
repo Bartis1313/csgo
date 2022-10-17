@@ -6,11 +6,6 @@
 #include <game/globals.hpp>
 #include <config/vars.hpp>
 
-void FogController::init()
-{
-
-}
-
 static constexpr uint32_t U32RGB(const SDKColor& clr)
 {
 	return (clr.r & 0x0FF) | ((clr.g & 0x0FF) << 8) | ((clr.b & 0x0FF) << 16);

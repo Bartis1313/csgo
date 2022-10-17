@@ -1,18 +1,46 @@
 #include "fakelatency.hpp"
 
 #include <SDK/IVEngineClient.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/ICvar.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <config/vars.hpp>
 #include <game/game.hpp>
+#include <hooks/hooks.hpp>
 
 void FakeLatency::init()
 {
+	maxUnlag = interfaces::cvar->findVar(XOR("sv_maxunlag"));
+}
 
+int FakeLatency::runDatagram(INetChannel* netChannel, void* datagram)
+{
+	if (datagram || !vars::misc->fakeLatency->enabled || !game::isAvailable())
+		return CALL(netChannel, datagram);
+
+	int reliableStateBackup = netChannel->m_inReliableState;
+	int sequenceNrBackup = netChannel->m_inSequenceNr;
+
+	float maxLatency = std::max(0.0f, std::clamp(vars::misc->fakeLatency->amount / 1000.f, 0.f, maxUnlag->getFloat())
+		- netChannel->getLatency(FLOW_OUTGOING));
+	addLatency(netChannel, maxLatency);
+
+	const auto ret = CALL(netChannel, datagram);
+
+	netChannel->m_inReliableState = reliableStateBackup;
+	netChannel->m_inSequenceNr = sequenceNrBackup;
+
+	return ret;
 }
 
 void FakeLatency::run(CUserCmd* cmd)
 {
 	updateSequences();
+}
+
+int FakeLatency::CALL(INetChannel* netChannel, void* datagram)
+{
+	return hooks::sendDatagram::original(netChannel, datagram);
 }
 
 void FakeLatency::updateSequences()

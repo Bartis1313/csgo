@@ -9,7 +9,7 @@ bool Console::init(const std::string& title, const std::string& logName)
 	colorsForConsole =
 	{
 		{ TypeLogs::LOG_NO, ColorsConsole::CONSOLE_WHITE },
-		{ TypeLogs::LOG_INFO, ColorsConsole::CONSOLE_GREEN },
+		{ TypeLogs::LOG_INFO, ColorsConsole::CONSOLE_CYAN },
 		{ TypeLogs::LOG_ERR, ColorsConsole::CONSOLE_DARKRED },
 		{ TypeLogs::LOG_WARN, ColorsConsole::CONSOLE_YELLOW }
 	};
@@ -17,9 +17,9 @@ bool Console::init(const std::string& title, const std::string& logName)
 	consoleStrings = 
 	{
 		{ TypeLogs::LOG_NO, ""},
-		{ TypeLogs::LOG_INFO, "[info] "},
+		{ TypeLogs::LOG_INFO, "[info]"},
 		{ TypeLogs::LOG_ERR, "[err] "},
-		{ TypeLogs::LOG_WARN, "[warn] "},
+		{ TypeLogs::LOG_WARN, "[warn]"},
 	};
 
 	colorsForView = 
@@ -29,6 +29,20 @@ bool Console::init(const std::string& title, const std::string& logName)
 		{ TypeLogs::LOG_ERR, Colors::Red },
 		{ TypeLogs::LOG_WARN, Colors::Yellow }
 	};
+
+	signs = 
+	{
+		{ TypeLogs::LOG_NO, ' '},
+		{ TypeLogs::LOG_INFO, '+' },
+		{ TypeLogs::LOG_ERR, '!' },
+		{ TypeLogs::LOG_WARN, '*' }
+	};
+
+	using typeVeh = std::string;
+
+	std::map<std::string, std::map<typeVeh, size_t>> mappedLimits;
+
+	auto KILLS = mappedLimits["Siege"]["Tank"];
 
 	if (!logName.empty())
 		m_logName = logName;

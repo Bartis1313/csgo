@@ -15,7 +15,7 @@
 [[nodiscard]] std::add_lvalue_reference_t<type> name() { \
 	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
 	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset ); \
-    }
+	}
 
 // generate netvar, but address as the pointer
 // type - template type for return type
@@ -26,7 +26,7 @@
 [[nodiscard]] std::add_pointer_t<type> name() { \
 	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
 	return reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset); \
-    }
+	}
 
 // define literal offset
 // type - template type for return type
@@ -35,6 +35,15 @@
 #define OFFSET(type, name, offset) \
 [[nodiscard]] std::add_lvalue_reference_t<type> name() { \
 	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset); \
+	}
+
+// define literal offset as pointer
+// type - template type for return type
+// name - name your function
+// offset - offset to add
+#define PTROFFSET(type, name, offset) \
+[[nodiscard]] std::add_pointer_t<type> name() { \
+	return reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset); \
 	}
 
 // use like normal netvar, with bytes to add as last argument

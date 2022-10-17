@@ -7,21 +7,20 @@
 
 class CViewSetup;
 
-class MotionBlur : public OverrideViewType
+class MotionBlur : protected OverrideViewType
 {
 public:
 	MotionBlur() :
 		OverrideViewType{}
 	{}
 	
-	virtual void init();
-	virtual void run(CViewSetup* view);
-	// no point in making it virtual
-	void render();
+	static void render();
+protected:
+	virtual void run(CViewSetup* view) override;
 private:
 	struct MotionBlurHistory_t
 	{
-		MotionBlurHistory_t() :
+		constexpr MotionBlurHistory_t() :
 			m_lastTimeUpdate{ 0.0f }, m_previousPitch{ 0.0f }, m_previousYaw{ 0.0f },
 			m_previousPositon{ Vec3{} }, m_noRotationalMotionBlurUntil{ 0.0f }
 		{}
@@ -33,8 +32,8 @@ private:
 		float m_noRotationalMotionBlurUntil;
 	} m_motionHistory;
 
-	std::array<float, 4> m_motionBlurValues = { 0.0f, 0.0f, 0.0f, 0.0f };
-	std::array<float, 4> m_motionBlurViewportValues = { 0.0f, 0.0f, 0.0f, 0.0f };
+	inline static std::array<float, 4> m_motionBlurValues = { 0.0f, 0.0f, 0.0f, 0.0f };
+	inline static std::array<float, 4> m_motionBlurViewportValues = { 0.0f, 0.0f, 0.0f, 0.0f };
 };
 
-[[maybe_unused]] inline auto g_MotionBlur = MotionBlur{};
+GLOBAL_FEATURE(MotionBlur);

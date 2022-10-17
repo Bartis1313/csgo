@@ -8,7 +8,7 @@
 struct DrawModelState_t;
 struct ModelRenderInfo_t;
 
-class DrawModelType : public BaseHack
+class DrawModelType : protected BaseHack
 {
 public:
 	constexpr DrawModelType() :
@@ -17,8 +17,15 @@ public:
 		m_hacksRun.push_back(this);
 	}
 
-	virtual void run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix) {};
+public:
 	static void runAll(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 protected:
+	virtual void run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix) = 0;
+	// keep those methods to be nothing as default
+	// mostly we don't need all of them
+	virtual void init() override {};
+	virtual void reset() override {};
+	virtual void shutdown() override {};
+private:
 	inline static std::vector<DrawModelType*> m_hacksRun;
 };

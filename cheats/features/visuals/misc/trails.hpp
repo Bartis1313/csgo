@@ -4,15 +4,15 @@
 #include <SDK/math/Vector.hpp>
 #include <SDK/Color.hpp>
 
-class Trails : RenderableSurfaceType
+class Trails : protected RenderableSurfaceType
 {
 public:
 	constexpr Trails() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
 private:
 	struct Trail_t
 	{
@@ -24,4 +24,4 @@ private:
 	std::vector<Trail_t> m_trails;
 };
 
-[[maybe_unused]] inline auto g_Trails = Trails{};
+GLOBAL_FEATURE(Trails);

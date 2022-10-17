@@ -7,16 +7,17 @@
 
 class CUserCmd;
 
-class Prediction : public OnlyInitType
+class Prediction : protected OnlyInitType
 {
 public:
 	constexpr Prediction() :
 		OnlyInitType{}
 	{}
 
-	virtual void init();
 	void addToPrediction(CUserCmd* cmd, const std::function<void()>& fun);
 	void update();
+protected:
+	virtual void init() override;
 private:
 	void start(CUserCmd* cmd);
 	void end();
@@ -26,4 +27,4 @@ private:
 	CMoveData* m_data = {};
 };
 
-[[maybe_unused]] inline auto g_Prediction = Prediction{};
+GLOBAL_FEATURE(Prediction);

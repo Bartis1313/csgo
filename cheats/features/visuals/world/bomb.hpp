@@ -8,16 +8,19 @@ class IConVar;
 class IGameEvent;
 class BombOverlayEntGrabber;
 
-class BombOverlay : public RenderablePresentType
+class BombOverlay : protected RenderablePresentType
 {
 public:
 	constexpr BombOverlay() :
 		RenderablePresentType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
 	void setBombEnt(Bomb_t* ent) { m_bombEnt = ent; }
+protected:
+	virtual void draw() override;
+	virtual void init() override;
+	virtual void reset() override {};
+	virtual void shutdown() override {};
 private:
 	void handleWhoPlanted(IGameEvent* event);
 	void handleBombExplode(IGameEvent* event);
@@ -30,17 +33,18 @@ private:
 	friend BombOverlayEntGrabber;
 };
 
-[[maybe_unused]] inline auto g_BombOverlay = BombOverlay{};
+GLOBAL_FEATURE(BombOverlay);
 
-class BombOverlayEntGrabber : public FrameStageType
+class BombOverlayEntGrabber : protected FrameStageType
 {
 public:
 	constexpr BombOverlayEntGrabber()
 		: FrameStageType{}
 	{}
 
-	virtual void init();
-	virtual void run(int frame);
+protected:
+	virtual void run(int frame) override;
+	virtual void init() override;
 };
 
-[[maybe_unused]] inline auto g_BombOverlayEntGrabber = BombOverlayEntGrabber{};
+GLOBAL_FEATURE(BombOverlayEntGrabber);

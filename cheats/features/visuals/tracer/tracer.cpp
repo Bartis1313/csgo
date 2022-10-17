@@ -23,7 +23,7 @@
 
 void BulletTracer::init()
 {
-	g_Events.add(XOR("bullet_impact"), std::bind(&BulletTracer::draw, this, std::placeholders::_1));
+	g_Events->add(XOR("bullet_impact"), std::bind(&BulletTracer::draw, this, std::placeholders::_1));
 }
 
 void BulletTracer::draw(IGameEvent* event)

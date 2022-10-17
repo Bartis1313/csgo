@@ -15,11 +15,6 @@
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/tools/tools.hpp>
 
-void Flashlight::init()
-{
-
-}
-
 CFlashlightEffect* Flashlight::createFlashlight(float fov, Entity_t* ent, const char* effectName,
 	float farZ, float linearAtten)
 {

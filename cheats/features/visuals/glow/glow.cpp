@@ -9,11 +9,6 @@
 #include <game/game.hpp>
 #include <config/vars.hpp>
 
-void Glow::init()
-{
-
-}
-
 void Glow::run()
 {
 	if (!vars::visuals->glow->enabled)

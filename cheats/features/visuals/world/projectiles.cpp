@@ -11,11 +11,6 @@
 #include <utilities/tools/tools.hpp>
 #include <utilities/renderer/renderer.hpp>
 
-void Projectiles::init()
-{
-
-}
-
 void Projectiles::draw()
 {
 	if(!game::isAvailable())

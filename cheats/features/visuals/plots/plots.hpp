@@ -8,16 +8,15 @@
 class VelocityGather;
 class CUserCmd;
 
-class Plots : public RenderablePresentType
+class Plots : protected RenderablePresentType
 {
 public:
 	Plots() :
 		RenderablePresentType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
-
+protected:
+	virtual void draw() override;
 private:
 	void drawFps();
 	void drawVelocity();
@@ -31,17 +30,17 @@ private:
 	friend VelocityGather;
 };
 
-[[maybe_unused]] inline auto g_Plots = Plots{};
+GLOBAL_FEATURE(Plots);
 
-class VelocityGather : public CreateMoveInPredictionType
+class VelocityGather : protected CreateMoveInPredictionType
 {
 public:
 	constexpr VelocityGather() :
 		CreateMoveInPredictionType{}
 	{}
 
-	virtual void init();
-	virtual void run(CUserCmd* cmd);
+protected:
+	virtual void run(CUserCmd* cmd) override;
 };
 
-[[maybe_unused]] inline auto g_VelocityGather = VelocityGather{};
+GLOBAL_FEATURE(VelocityGather);

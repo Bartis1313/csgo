@@ -8,5 +8,5 @@ void __fastcall hooks::getColorModulation::hooked(FAST_ARGS, float* r, float* g,
 {
 	original(thisptr, r, g, b);
 
-	g_ModulateColor.run(thisptr, r, g, b);
+	ModulateColor::run(thisptr, r, g, b);
 }

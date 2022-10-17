@@ -8,16 +8,16 @@
 class Entity_t;
 class CFlashlightEffect;
 
-class Flashlight : public FrameStageType
+class Flashlight : protected FrameStageType
 {
 public:
 	constexpr Flashlight() :
 		FrameStageType{}
 	{}
 
-	virtual void init();
-	virtual void run(int frame);
-	virtual void shutdown();
+protected:
+	virtual void run(int frame) override;
+	virtual void shutdown() override;
 private:
 	CFlashlightEffect* createFlashlight(float fov, Entity_t* ent, const char* effectName = XOR("effects/flashlight001"),
 		float farZ = 1000.0f, float linearAtten = 1000.0f);
@@ -27,4 +27,4 @@ private:
 	CFlashlightEffect* m_flashlight = nullptr;
 };
 
-[[maybe_unused]] inline auto g_Flashlight = Flashlight{};
+GLOBAL_FEATURE(Flashlight);

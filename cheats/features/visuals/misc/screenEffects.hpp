@@ -6,17 +6,18 @@
 
 class IMaterial;
 
-class ScreenEffects : public Screen2DEffectsType
+class ScreenEffects : protected Screen2DEffectsType
 {
 public:
 	constexpr ScreenEffects() :
 		Screen2DEffectsType{}
 	{}
 
-	virtual void init();
-	virtual void run();
+protected:
+	virtual void run() override;
+	virtual void init() override;
 private:
 	std::vector<std::pair<IMaterial*, bool>> m_materials;
 };
 
-[[maybe_unused]] inline auto g_ScreenEffects = ScreenEffects{};
+GLOBAL_FEATURE(ScreenEffects);

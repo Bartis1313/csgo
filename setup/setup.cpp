@@ -32,78 +32,78 @@ DiscordPresence Setup::m_dc;
 bool Setup::init(void* instance)
 {
 	// pass custom handler
-    // commented due to false-positives thrown by steam server
-    // they handle it somehow to prevent such crash, but exception pointers report it
+	// commented due to false-positives thrown by steam server
+	// they handle it somehow to prevent such crash, but exception pointers report it
 	//AddVectoredExceptionHandler(TRUE, SEHcatch::memErrorCatch);
 
 	console.init(XOR("CSGO DEBUG"), XOR("hack.log"));
 
 	TimeCount initTimer{};
 
-    try
-    {
-        config.init(
-            XOR("default.cfg"), XOR("load.LOAD"),
-            std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"),
-            XOR("utility"));
-        g_Memory.init();
-        game::localPlayer.init();
-        interfaces::init();
-        netvarMan.init();
-        netvarMan.dump();
-        hooks::wndProcSys::init();
-        BaseHack::initAll();
-        surfaceRender.init();
-        x88menu.init();
-        g_Events.init();
-        hooks::init();
-        EntityCache::init();
-    }
-    catch (const std::exception& err)
-    {
-        LI_FN(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
-        console.log(TypeLogs::LOG_ERR, XOR("Runtime hack error {}"), err.what());
-        LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_FAILURE);
-    }
+	try
+	{
+		config.init(
+			XOR("default.cfg"), XOR("load.LOAD"),
+			std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"),
+			XOR("utility"));
+		g_Memory.init();
+		game::localPlayer.init();
+		interfaces::init();
+		netvarMan.init();
+		netvarMan.dump();
+		hooks::wndProcSys::init();
+		BaseHack::initAll();
+		surfaceRender.init();
+		x88menu.init();
+		g_Events->init();
+		hooks::init();
+		EntityCache::init();
+	}
+	catch (const std::exception& err)
+	{
+		LI_FN(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
+		LOG_ERR(XOR("Runtime hack error {}"), err.what());
+		LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_FAILURE);
+	}
 
-    initTimer.end();
-    console.log(TypeLogs::LOG_INFO, XOR("main thread took {:.5f}s"), initTimer.getSec());
-    m_inited = true;
+	initTimer.end();
+	LOG_INFO(XOR("main thread took {:.5f}s"), initTimer.getSec());
+	m_inited = true;
 
-    return true;
+	return true;
 }
 
 void Setup::shutdown(void* instance)
 {
-    globals::isShutdown = true;
+	globals::isShutdown = true;
 
-    //RemoveVectoredExceptionHandler(globals::instance);
-    hooks::wndProcSys::shutdown();
-    BaseHack::shutdownAll();
-    Events::shutdownAllEvents();
-    Resource::destroyAll();
-    hooks::shutdown();
-    menu.shutdown();
-    console.log(TypeLogs::LOG_INFO, XOR("Hack shutdown"));
-    console.shutdown();
-    m_dc.shutdown();
+	//RemoveVectoredExceptionHandler(globals::instance);
+	hooks::wndProcSys::shutdown();
+	BaseHack::shutdownAll();
+	Events::shutdownAllEvents();
+	Resource::destroyAll();
+	hooks::shutdown();
+	menu.shutdown();
+	LOG_INFO(XOR("Hack shutdown"));
+	console.shutdown();
+	m_dc.shutdown();
 
-    LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
+	LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
 }
 
 void Setup::looper(void* instance)
 {
-    using namespace std::chrono_literals;
+	using namespace std::chrono_literals;
 
-    m_dc.init();
-    while (!vars::keys->panic.isPressed())
-    {
-        if (m_inited)
-        {
-            m_dc.run();
-            std::this_thread::sleep_for(1s);
-        }
-    }
+	m_dc.init();
+	while (!vars::keys->panic.isPressed())
+	{
+		if (m_inited)
+		{
+			m_dc.run();
+			std::this_thread::sleep_for(1s);
+		}
+	}
 
-    shutdown(instance);
+	shutdown(instance);
 }

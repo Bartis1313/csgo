@@ -16,11 +16,6 @@
 
 #include <numeric>
 
-void Plots::init()
-{
-
-}
-
 void Plots::draw()
 {
 	drawFps();
@@ -47,7 +42,7 @@ void Plots::drawFps()
 	// when loading, you have a chance of freezing
 	if (std::isinf(fps))
 	{
-		console.log(TypeLogs::LOG_WARN, XOR("record for plot got skipped due to infinity"));
+		LOG_WARN("record for plot got skipped due to infinity");
 		return;
 	}
 
@@ -192,11 +187,6 @@ void Plots::drawVelocity()
 	}
 }
 
-void VelocityGather::init()
-{
-
-}
-
 void VelocityGather::run(CUserCmd* cmd)
 {
 	if (!vars::misc->plots->enabledVelocity)
@@ -207,20 +197,20 @@ void VelocityGather::run(CUserCmd* cmd)
 
 	if (!interfaces::engine->isInGame() || !game::localPlayer->isAlive())
 	{
-		g_Plots.m_VelocityRecords.clear();
+		g_Plots->m_VelocityRecords.clear();
 		return;
 	}
 
 	float vel = game::localPlayer->m_vecVelocity().toVecPrev().length();
 	if (std::isinf(vel))
 	{
-		console.log(TypeLogs::LOG_WARN, XOR("record for plot got skipped due to infinity"));
+		LOG_WARN("record for plot got skipped due to infinity");
 		return;
 	}
 
-	g_Plots.m_VelocityRecords.emplace_back(game::localPlayer->m_vecVelocity().toVecPrev().length());
+	g_Plots->m_VelocityRecords.emplace_back(game::localPlayer->m_vecVelocity().toVecPrev().length());
 
 	// width
-	while (g_Plots.m_VelocityRecords.size() > static_cast<size_t>(g_Plots.RECORDS_SIZE / g_Plots.m_acceptanceVelocity))
-		g_Plots.m_VelocityRecords.pop_front();
+	while (g_Plots->m_VelocityRecords.size() > static_cast<size_t>(g_Plots->RECORDS_SIZE / g_Plots->m_acceptanceVelocity))
+		g_Plots->m_VelocityRecords.pop_front();
 }

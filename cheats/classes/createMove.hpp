@@ -6,7 +6,7 @@
 
 class CUserCmd;
 
-class CreateMoveInPredictionType : public BaseHack
+class CreateMoveInPredictionType : protected BaseHack
 {
 public:
 	constexpr CreateMoveInPredictionType() :
@@ -15,13 +15,19 @@ public:
 		m_hacksRun.push_back(this);
 	}
 
-	virtual void run(CUserCmd* cmd) {};
 	static void runAll(CUserCmd* cmd);
 protected:
+	virtual void run(CUserCmd* cmd) = 0;
+	// keep those methods to be nothing as default
+	// mostly we don't need all of them
+	virtual void init() override {};
+	virtual void reset() override {};
+	virtual void shutdown() override {};
+private:
 	inline static std::vector<CreateMoveInPredictionType*> m_hacksRun;
 };
 
-class CreateMovePrePredictionType : public BaseHack
+class CreateMovePrePredictionType : protected BaseHack
 {
 public:
 	constexpr CreateMovePrePredictionType() :
@@ -30,13 +36,19 @@ public:
 		m_hacksRun.push_back(this);
 	}
 
-	virtual void run(CUserCmd* cmd) {};
 	static void runAll(CUserCmd* cmd);
 protected:
+	virtual void run(CUserCmd* cmd) = 0;
+	// keep those methods to be nothing as default
+	// mostly we don't need all of them
+	virtual void init() override {};
+	virtual void reset() override {};
+	virtual void shutdown() override {};
+private:
 	inline static std::vector<CreateMovePrePredictionType*> m_hacksRun;
 };
 
-class CreateMovePostPredictionType : public BaseHack
+class CreateMovePostPredictionType : protected BaseHack
 {
 public:
 	constexpr CreateMovePostPredictionType() :
@@ -45,8 +57,14 @@ public:
 		m_hacksRun.push_back(this);
 	}
 
-	virtual void run(CUserCmd* cmd) {};
 	static void runAll(CUserCmd* cmd);
 protected:
+	virtual void run(CUserCmd* cmd) = 0;
+	// keep those methods to be nothing as default
+	// mostly we don't need all of them
+	virtual void init() override {};
+	virtual void reset() override {};
+	virtual void shutdown() override {};
+private:
 	inline static std::vector<CreateMovePostPredictionType*> m_hacksRun;
 };

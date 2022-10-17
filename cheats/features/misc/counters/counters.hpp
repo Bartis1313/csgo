@@ -4,18 +4,19 @@
 
 class IGameEvent;
 
-class Counters : public OnlyInitType
+class Counters : protected OnlyInitType
 {
 public:
 	constexpr Counters() :
 		OnlyInitType{}
 	{}
 
-	virtual void init();
+protected:
+	virtual void init() override;
 private:
 	void addShots(IGameEvent* event);
 	void addHits(IGameEvent* event);
-	void reset(IGameEvent* event);
+	void resetShots(IGameEvent* event);
 };
 
-[[maybe_unused]] inline auto g_Counters = Counters{};
+GLOBAL_FEATURE(Counters);

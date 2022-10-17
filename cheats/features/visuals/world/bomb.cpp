@@ -28,9 +28,9 @@ void BombOverlay::init()
 {
 	m_timer = interfaces::cvar->findVar(XOR("mp_c4timer"));
 
-	g_Events.add(XOR("bomb_planted"), std::bind(&BombOverlay::handleWhoPlanted, this, std::placeholders::_1));
-	g_Events.add(XOR("bomb_exploded"), std::bind(&BombOverlay::handleBombExplode, this, std::placeholders::_1));
-	g_Events.add(XOR("round_prestart"), std::bind(&BombOverlay::handleResetBomb, this, std::placeholders::_1));
+	g_Events->add(XOR("bomb_planted"), std::bind(&BombOverlay::handleWhoPlanted, this, std::placeholders::_1));
+	g_Events->add(XOR("bomb_exploded"), std::bind(&BombOverlay::handleBombExplode, this, std::placeholders::_1));
+	g_Events->add(XOR("round_prestart"), std::bind(&BombOverlay::handleResetBomb, this, std::placeholders::_1));
 }
 
 void BombOverlay::draw()
@@ -142,6 +142,6 @@ void BombOverlayEntGrabber::run(int frame)
 		if (classID != CPlantedC4)
 			continue;
 
-		g_BombOverlay.m_bombEnt = reinterpret_cast<Bomb_t*>(entity);
+		g_BombOverlay->m_bombEnt = reinterpret_cast<Bomb_t*>(entity);
 	}
 }

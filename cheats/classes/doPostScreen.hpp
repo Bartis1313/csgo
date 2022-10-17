@@ -4,7 +4,7 @@
 
 #include <vector>
 
-class DoPostScreenType : public BaseHack
+class DoPostScreenType : protected BaseHack
 {
 public:
 	constexpr DoPostScreenType() :
@@ -12,9 +12,15 @@ public:
 	{
 		m_hacksRun.push_back(this);
 	}
-
-	virtual void run() {};
+public:
 	static void runAll();
 protected:
+	virtual void run() = 0;
+	// keep those methods to be nothing as default
+	// mostly we don't need all of them
+	virtual void init() override {};
+	virtual void reset() override {};
+	virtual void shutdown() override {};
+private:
 	inline static std::vector<DoPostScreenType*> m_hacksRun;
 };

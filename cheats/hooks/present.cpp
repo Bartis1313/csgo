@@ -25,7 +25,7 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		// style, colors, ini file etc.
 		menu.init();
 
-		console.log(TypeLogs::LOG_INFO, XOR("init for present success"));
+		LOG_INFO(XOR("init for present success"));
 
 		return true;
 	} ();
@@ -41,7 +41,6 @@ long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, R
 		menu.draw();
 		console.drawLog();
 		const auto imdraw = ImGui::GetBackgroundDrawList();
-		//imRender.drawImage(imdraw, res, 300, 300, 200, 200);
 		imRender.renderPresent(imdraw);
 		background.draw(imdraw);
 		RenderablePresentType::runAll();

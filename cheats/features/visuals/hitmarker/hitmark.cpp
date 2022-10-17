@@ -18,7 +18,7 @@
 
 void Hitmarker::init()
 {
-	g_Events.add(XOR("player_hurt"), std::bind(&Hitmarker::handleHits, this, std::placeholders::_1));
+	g_Events->add(XOR("player_hurt"), std::bind(&Hitmarker::handleHits, this, std::placeholders::_1));
 }
 
 void Hitmarker::draw()

@@ -21,7 +21,6 @@ void Backtrack::init()
 {
 	cvars.updateRate = interfaces::cvar->findVar(XOR("cl_updaterate"));
 	cvars.maxUpdateRate = interfaces::cvar->findVar(XOR("sv_maxupdaterate"));
-	cvars.minUpdateRate = interfaces::cvar->findVar(XOR("sv_minupdaterate"));
 
 	cvarsRatios.interp = interfaces::cvar->findVar(XOR("cl_interp"))->getFloat();
 	cvarsRatios.interpRatio = interfaces::cvar->findVar(XOR("cl_interp_ratio"))->getFloat();
@@ -32,9 +31,11 @@ void Backtrack::init()
 
 float Backtrack::getLerp() const
 {
-	// get the correct value from ratio cvars, this can be done by only this way
-	auto ratio = std::clamp(cvarsRatios.interpRatio, cvarsRatios.minInterpRatio, cvarsRatios.maxInterpRatio);
-	return std::max(cvarsRatios.interp, (ratio / ((cvars.maxUpdateRate) ? cvars.maxUpdateRate->getFloat() : cvars.updateRate->getFloat())));
+	float updateRate = cvars.maxUpdateRate ? cvars.maxUpdateRate->getFloat() : cvars.updateRate->getFloat();
+	float ratio = cvarsRatios.interpRatio == 0.0f ? 1.0f : cvarsRatios.interpRatio;
+
+	ratio = std::clamp(ratio, cvarsRatios.minInterpRatio, cvarsRatios.maxInterpRatio);
+	return std::max(cvarsRatios.interp, (ratio / updateRate));
 }
 
 bool Backtrack::isValid(float simtime) const
@@ -49,7 +50,8 @@ bool Backtrack::isValid(float simtime) const
 		return false;
 	}
 
-	auto delta = std::clamp(network->getLatency(FLOW_OUTGOING) + network->getLatency(FLOW_INCOMING) + getLerp(), 0.0f, cvarsRatios.maxUnlag) - (game::serverTime() - simtime);
+	auto delta = std::clamp(network->getLatency(FLOW_OUTGOING) + network->getLatency(FLOW_INCOMING) + getLerp(),
+		0.0f, cvarsRatios.maxUnlag) - (game::serverTime() - simtime);
 	return std::abs(delta) <= 0.2f;
 }
 
@@ -145,28 +147,26 @@ void Backtrack::run(CUserCmd* cmd)
 	if (bestRecordIdx != -1)
 	{
 		const auto& record = m_records.at(bestPlayerIdx).at(bestRecordIdx);
-		cmd->m_tickcount = game::timeToTicks(record.m_simtime);
+
+		auto simTimeCorrected = record.m_simtime;
+		if (auto deltaLerp = getLerp() - interfaces::globalVars->m_intervalPerTick; deltaLerp > 0.0f)
+			simTimeCorrected += interfaces::globalVars->m_intervalPerTick - deltaLerp;
+
+		cmd->m_tickcount = game::timeToTicks(simTimeCorrected + getLerp());
 	}
-}
-
-void BackTrackUpdater::init()
-{
-
 }
 
 void BackTrackUpdater::run(int frame)
 {
-	// get time from every frame
-	float correcttime = vars::backtrack->time / 1000.0f + g_Backtrack.extraTicks();
+	m_correctTime = vars::backtrack->time / 1000.0f + g_Backtrack->extraTicks();
 
 	if (frame != FRAME_RENDER_START)
 		return;
 
-	auto& records = g_Backtrack.getAllRecords();
+	auto& records = g_Backtrack->getAllRecords();
 
 	if (!game::localPlayer || !vars::backtrack->enabled || !game::localPlayer->isAlive())
 	{
-		// basically reset all
 		for (auto& el : records)
 			el.clear();
 		return;
@@ -197,16 +197,14 @@ void BackTrackUpdater::run(int frame)
 
 		if (!isGoodEnt(ent))
 		{
-			// don't add bunch of useless records
 			records.at(i).clear();
 			continue;
 		}
 
-		// if record at this index is filled and has exactly same simulation time, don't update it
 		if (records.at(i).size() && (records.at(i).front().m_simtime == ent->m_flSimulationTime()))
 			continue;
 
-		if (!g_Backtrack.isValid(ent->m_flSimulationTime() /*m_correct.at(i).m_correctSimtime*/))
+		if (!g_Backtrack->isValid(ent->m_flSimulationTime() /*m_correct.at(i).m_correctSimtime*/))
 			continue;
 
 		Backtrack::StoredRecord record = {};
@@ -217,18 +215,16 @@ void BackTrackUpdater::run(int frame)
 			continue;
 		record.m_head = record.m_matrix[8].origin();
 
-		// fill them
 		records.at(i).push_front(record);
 
-		// when records are FULL and bigger than ticks we set in backtrack, then pop them
-		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(game::timeToTicks(correcttime)))
+		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(game::timeToTicks(m_correctTime)))
 			records.at(i).pop_back();
 
 		auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [this](const Backtrack::StoredRecord& rec)
 			{
-				return !g_Backtrack.isValid(rec.m_simtime);
+				return !g_Backtrack->isValid(rec.m_simtime);
 			});
-		// if it's not valid then clean up everything on this record
+
 		if (invalid != std::cend(records.at(i)))
 			records.at(i).erase(invalid, std::cend(records.at(i)));
 

@@ -10,11 +10,6 @@
 #include <utilities/tools/tools.hpp>
 #include <utilities/renderer/renderer.hpp>
 
-void NoScope::init()
-{
-
-}
-
 void NoScope::draw()
 {
 	if (!vars::misc->scope->enabled)

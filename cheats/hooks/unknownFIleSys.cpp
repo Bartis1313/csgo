@@ -12,9 +12,9 @@
 
 #define DDS_HEADER 542327876
 
-int __stdcall hooks::unknownFileSystem::hooked(void* image)
+int __fastcall hooks::unknownFileSystem::hooked(FAST_ARGS, void* image)
 {
-	uintptr_t thisptr;
+	uintptr_t thisptrStack;
 	__asm mov thisptr, ebx;
 
 	//const static auto ret = utilities::patternScan(PANORAMA_DLL, UNK_FILESYS);
@@ -22,16 +22,16 @@ int __stdcall hooks::unknownFileSystem::hooked(void* image)
 	// dunno, this had to be inited before (retAddr)
 	if (image && _ReturnAddress() == g_Memory.m_returnAddrRadarImage() && *reinterpret_cast<uintptr_t*>(image) == DDS_HEADER)
 	{
-		size_t size = *reinterpret_cast<size_t*>(thisptr + 0x50);
+		size_t size = *reinterpret_cast<size_t*>(thisptrStack + 0x50);
 		// again broken
 		/*Resource res{ image, size };
 		radar.m_mapTexture = res.getTexture();*/
 
-		if (auto hr = D3DXCreateTextureFromFileInMemory(interfaces::dx9Device, image, size, &g_Radar.getTexture()); hr == D3D_OK)
-			console.log(TypeLogs::LOG_INFO, XOR("Created map texture, size: {}"), size);
+		if (auto hr = D3DXCreateTextureFromFileInMemory(interfaces::dx9Device, image, size, &g_Radar->getTexture()); hr == D3D_OK)
+			LOG_INFO(XOR("Created map texture, size: {}"), size);
 		else
-			console.log(TypeLogs::LOG_ERR, XOR("Creating map texture failed, code: {}"), hr);
+			LOG_ERR(XOR("Creating map texture failed, code: {}"), hr);
 	}
 
-	return original(image);
+	return original(thisptr, image);
 }

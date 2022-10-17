@@ -25,12 +25,7 @@
 
 #include <ranges>
 
-void GrenadeWarning::init()
-{
-	
-}
-
-bool GrenadeWarning::NadeTrace_t::step(float interval)
+bool NadeTrace_t::step(float interval)
 {
 	if (m_detonated)
 		return true;
@@ -48,7 +43,7 @@ bool GrenadeWarning::NadeTrace_t::step(float interval)
 	return false;
 }
 
-void GrenadeWarning::NadeTrace_t::physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce)
+void NadeTrace_t::physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce)
 {
 	constexpr float STOP_EPSILON = 0.1f;
 
@@ -62,7 +57,7 @@ void GrenadeWarning::NadeTrace_t::physicsClipVelocity(const Vec3& in, const Vec3
 	}
 }
 
-void GrenadeWarning::NadeTrace_t::addGravityMove(Vec3& move, Vec3& vel, float frametime)
+void NadeTrace_t::addGravityMove(Vec3& move, Vec3& vel, float frametime)
 {
 	move[Coord::X] = vel[Coord::X] * frametime;
 	move[Coord::Y] = vel[Coord::Y] * frametime;
@@ -75,7 +70,7 @@ void GrenadeWarning::NadeTrace_t::addGravityMove(Vec3& move, Vec3& vel, float fr
 	vel[Coord::Z] = z;
 }
 
-void GrenadeWarning::NadeTrace_t::traceHull(const Vec3& src, const Vec3& end, Entity_t* entity, Trace_t* tr)
+void NadeTrace_t::traceHull(const Vec3& src, const Vec3& end, Entity_t* entity, Trace_t* tr)
 {
 	uintptr_t filter[] =
 	{
@@ -88,7 +83,7 @@ void GrenadeWarning::NadeTrace_t::traceHull(const Vec3& src, const Vec3& end, En
 	interfaces::trace->traceRay({ src, end, Vec3{ -2.0f, -2.0f, -2.0f }, Vec3{ 2.f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), tr);
 }
 
-void GrenadeWarning::NadeTrace_t::pushEntity(const Vec3& src, Trace_t& tr)
+void NadeTrace_t::pushEntity(const Vec3& src, Trace_t& tr)
 {
 	traceHull(m_pos, m_pos + src, m_nadeOwner, &tr);
 
@@ -102,7 +97,7 @@ void GrenadeWarning::NadeTrace_t::pushEntity(const Vec3& src, Trace_t& tr)
 	}
 }
 
-void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float interval)
+void NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float interval)
 {
 	/*float surfaceElasticity = 1.0;*/
 	if (auto e = tr.m_entity; e) // if it's any entity
@@ -156,7 +151,7 @@ void GrenadeWarning::NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float i
 	++m_bouncesCheck;
 }
 
-void GrenadeWarning::NadeTrace_t::handleDestroy()
+void NadeTrace_t::handleDestroy()
 {
 	if (m_index == WEAPON_DECOY || m_index == WEAPON_SMOKEGRENADE)
 		if (m_velocity.toVecPrev().length() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
@@ -171,7 +166,7 @@ void GrenadeWarning::NadeTrace_t::handleDestroy()
 	m_nextTick = m_tick + game::timeToTicks(0.2f);
 }
 
-void GrenadeWarning::NadeTrace_t::handleDetonates()
+void NadeTrace_t::handleDetonates()
 {
 	switch (m_index)
 	{
@@ -204,7 +199,7 @@ void GrenadeWarning::NadeTrace_t::handleDetonates()
 	}
 }
 
-void GrenadeWarning::NadeTrace_t::simulate(const Vec3& pos, const Vec3& velocity, float nadeThrowTime, uint32_t ticks)
+void NadeTrace_t::simulate(const Vec3& pos, const Vec3& velocity, float nadeThrowTime, uint32_t ticks)
 {
 	m_pos = pos;
 	m_velocity = velocity;
@@ -229,17 +224,17 @@ void GrenadeWarning::NadeTrace_t::simulate(const Vec3& pos, const Vec3& velocity
 	m_nadeEndTime = nadeThrowTime + game::ticksToTime(m_tick);
 }
 
-void GrenadeWarning::NadeTrace_t::destroyTrace()
+void NadeTrace_t::destroyTrace()
 {
 	m_detonated = true;
 }
 
-void GrenadeWarning::NadeTrace_t::push()
+void NadeTrace_t::push()
 {
 	m_path.push_back(m_pos);
 }
 
-bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
+bool NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 {
 	if (m_path.empty())
 		return false;
@@ -315,15 +310,10 @@ bool GrenadeWarning::NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 
 #include "../../cache/cache.hpp"
 
-void GrenadeWarningPaint::init()
-{
-
-}
-
 void GrenadeWarningPaint::draw()
 {
-	if (!g_GrenadeWarning.m_datas.empty())
-		g_GrenadeWarning.m_datas.clear();
+	if (!m_datas.empty())
+		m_datas.clear();
 
 	if (!vars::misc->nade->enabledTracer)
 		return;
@@ -347,16 +337,16 @@ void GrenadeWarningPaint::draw()
 		if (wpnIdx == WEAPON_NONE)
 			return;
 
-		g_GrenadeWarning.m_datas.emplace(std::make_pair(
+		m_datas.emplace(std::make_pair(
 			idx,
-			GrenadeWarning::NadeTrace_t
+			NadeTrace_t
 			{
 				reinterpret_cast<Player_t*>(interfaces::entList->getClientFromHandle(ent->m_hThrower())),
 				wpnIdx
 			}));
 
 		// simulates, in this place because there is no much math related stuff needed for angles etc
-		g_GrenadeWarning.m_datas.at(idx).simulate(
+		m_datas.at(idx).simulate(
 			ent->m_vecOrigin(),
 			reinterpret_cast<Player_t*>(ent)->m_vecVelocity(),
 			ent->m_flSpawnTime(),
@@ -364,7 +354,7 @@ void GrenadeWarningPaint::draw()
 		);
 
 		// if no path, then delete this owner from map
-		if (!g_GrenadeWarning.m_datas.at(idx).draw(ent, wpnIdx))
-			g_GrenadeWarning.m_datas.erase(idx);
+		if (!m_datas.at(idx).draw(ent, wpnIdx))
+			m_datas.erase(idx);
 	}
 }

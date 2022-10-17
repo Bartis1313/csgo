@@ -44,7 +44,7 @@ void SurfaceRender::init()
 	fonts::franklinGothic = __createFont(XOR("Franklin Gothic"), 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 	fonts::verdana = __createFont(XOR("Verdana"), 12, 350, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 
-	console.log(TypeLogs::LOG_INFO, XOR("render init success"));
+	LOG_INFO(XOR("render init success"));
 }
 
 void SurfaceRender::drawLine(const int x, const int y, const int x2, const int y2, const Color& color)
@@ -558,7 +558,7 @@ void ImGuiRender::init(ImGuiIO& io)
 	else
 		throw std::runtime_error(XOR("could not reach windows path"));
 
-	console.log(TypeLogs::LOG_INFO, XOR("init imgui fonts success"));
+	LOG_INFO(XOR("init imgui fonts success"));
 }
 
 void ImGuiRender::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)
@@ -700,7 +700,12 @@ void ImGuiRender::drawBox3DFilled(const Vec3& pos, const float width, const floa
 		i++;
 	}
 
-	auto points = math::grahamScan(lines);
+	auto maybeScanned = math::grahamScan(lines);
+	if (!maybeScanned.has_value())
+		return;
+
+	auto points = maybeScanned.value();
+
 	std::reverse(points.begin(), points.end());
 	drawPolyGon(points, filling);
 
@@ -817,8 +822,32 @@ void ImGuiRender::drawTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2&
 	m_drawData.emplace_back(std::make_shared<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
 }
 
+void ImGuiRender::drawTriangle(const float x, const float y, const float w, const float h, const Color& color, const float angle, const float thickness)
+{
+	float radian = math::DEG2RAD(angle);
+	float radian90 = math::DEG2RAD(angle + 90);
+
+	const ImVec2 p1 = ImVec2{ (w / 2.0f) * std::cos(radian) + x, (w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian) + x, (-w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian90) + y };
+
+	m_drawData.emplace_back(std::make_shared<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
+}
+
 void ImGuiRender::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
 {
+	m_drawData.emplace_back(std::make_shared<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
+}
+
+void ImGuiRender::drawTriangleFilled(const float x, const float y, const float w, const float h, const float angle, const Color& color)
+{
+	float radian = math::DEG2RAD(angle);
+	float radian90 = math::DEG2RAD(angle + 90);
+
+	const ImVec2 p1 = ImVec2{ (w / 2.0f) * std::cos(radian) + x, (w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian) + x, (-w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian90) + y };
+
 	m_drawData.emplace_back(std::make_shared<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
 }
 
@@ -1118,6 +1147,20 @@ void ImGuiRenderWindow::drawText(const float x, const float y, const float size,
 void ImGuiRenderWindow::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
 {
 	RUNTIME_CHECK_RENDER_WINDOW;
+	m_drawing->AddTriangleFilled({ m_pos.x + p1.x,m_pos.y + p1.y }, { m_pos.x + p2.x, m_pos.y + p2.y }, { m_pos.x + p3.x, m_pos.y + p3.y }, Color::U32(color));
+}
+
+void ImGuiRenderWindow::drawTriangleFilled(const float x, const float y, const float w, const float h, const float angle, const Color& color)
+{
+	RUNTIME_CHECK_RENDER_WINDOW;
+
+	float radian = math::DEG2RAD(angle);
+	float radian90 = math::DEG2RAD(angle + 90);
+
+	const ImVec2 p1 = ImVec2{ (w / 2.0f) * std::cos(radian90) + x, (w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian90) + x, (-w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian) + y };
+
 	m_drawing->AddTriangleFilled({ m_pos.x + p1.x,m_pos.y + p1.y }, { m_pos.x + p2.x, m_pos.y + p2.y }, { m_pos.x + p3.x, m_pos.y + p3.y }, Color::U32(color));
 }
 

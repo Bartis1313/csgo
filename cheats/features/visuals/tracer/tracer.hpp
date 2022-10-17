@@ -5,16 +5,17 @@
 class IGameEvent;
 
 // intended to only run it by engine
-class BulletTracer : public OnlyInitType
+class BulletTracer : protected OnlyInitType
 {
 public:
 	constexpr BulletTracer() :
 		OnlyInitType{}
 	{}
 
-	virtual void init();
+protected:
+	virtual void init() override;
 private:
 	void draw(IGameEvent* event);
 };
 
-[[maybe_unused]] inline auto g_BulletTracer = BulletTracer{};
+GLOBAL_FEATURE(BulletTracer);

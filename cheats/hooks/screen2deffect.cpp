@@ -2,9 +2,9 @@
 
 #include "../classes/screen2dEffects.hpp"
 
-void __stdcall hooks::screen2DEffect::hooked(CViewSetup* view)
+void __fastcall hooks::screen2DEffect::hooked(FAST_ARGS, CViewSetup* view)
 {
 	Screen2DEffectsType::runAll();
 
-	original(view);
+	original(thisptr, view);
 }

@@ -10,13 +10,7 @@
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/renderer/renderer.hpp>
 
-void Info::init()
-{
-
-}
-
-// TODO: make transparent imgui window for this
-void Info::draw()
+void MiscInfo::draw()
 {
 	if (!vars::misc->info->enabled)
 		return;

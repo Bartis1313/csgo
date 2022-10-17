@@ -96,13 +96,15 @@ public:
 		return res;
 	}
 
-	constexpr void clamp()
+	constexpr auto& clamp()
 	{
 		ASSERT_VEC3;
 
 		m_arr[0] = std::clamp(m_arr[0], (T)-89, (T)89);
 		m_arr[1] = std::clamp(std::remainder(m_arr[1], (T)360), (T)-180, (T)180);
 		m_arr[2] = std::clamp(m_arr[2], (T)-50, (T)50);
+
+		return *this;
 	}
 
 	[[nodiscard]] T length() const

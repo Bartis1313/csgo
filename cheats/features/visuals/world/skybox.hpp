@@ -6,17 +6,18 @@
 #include <filesystem>
 #include <vector>
 
-class SkyboxEdit : public FrameStageType
+class SkyboxEdit : protected FrameStageType
 {
 public:
 	constexpr SkyboxEdit() :
 		FrameStageType{}
 	{}
 
-	virtual void init();
-	virtual void run(int frame);
 	void reloadCustomSkyboxes();
 	std::vector<std::string> getAllCustomSkyBoxes() const { return m_allCustomSkyboxes; }
+protected:
+	virtual void run(int frame) override;
+	virtual void init() override;
 private:
 	void loadSkybox(const std::string& name);
 	void checkCustomSkybox();
@@ -25,4 +26,4 @@ private:
 	std::vector<std::string> m_allCustomSkyboxes;
 };
 
-[[maybe_unused]] inline auto g_SkyboxEdit = SkyboxEdit{};
+GLOBAL_FEATURE(SkyboxEdit);

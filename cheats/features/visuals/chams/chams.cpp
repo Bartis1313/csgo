@@ -186,7 +186,7 @@ void Chams::drawBackTrack(Player_t* ent)
 	if (!ent->isOtherTeam(game::localPlayer())) // backtrack works only for enemies here anyway
 		return;
 
-	auto record = &g_Backtrack.getAllRecords().at(m_info.m_entIndex);
+	auto record = &g_Backtrack->getAllRecords().at(m_info.m_entIndex);
 	if (!record)
 		return;
 
@@ -199,7 +199,7 @@ void Chams::drawBackTrack(Player_t* ent)
 	{
 		for (size_t i = 0; i < record->size(); i++)
 		{
-			if (!g_Backtrack.isValid(record->at(i).m_simtime))
+			if (!g_Backtrack->isValid(record->at(i).m_simtime))
 				continue;
 
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false, vars::visuals->chams->colorBacktrack(), true, false);
@@ -210,7 +210,7 @@ void Chams::drawBackTrack(Player_t* ent)
 	}
 	case E2T(BTChamsType::LAST_TICK):
 	{
-		if (g_Backtrack.isValid(record->front().m_simtime))
+		if (g_Backtrack->isValid(record->front().m_simtime))
 		{
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false, vars::visuals->chams->colorBacktrack(), true, false);
 			CALL(m_result, m_state, m_info, record->back().m_matrix.data());
@@ -222,7 +222,7 @@ void Chams::drawBackTrack(Player_t* ent)
 	{
 		for (size_t i = 0; i < record->size(); i++)
 		{
-			if (!g_Backtrack.isValid(record->at(i).m_simtime))
+			if (!g_Backtrack->isValid(record->at(i).m_simtime))
 				continue;
 
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false,
@@ -238,7 +238,7 @@ void Chams::drawBackTrack(Player_t* ent)
 		
 		for (size_t i = 0; i < record->size(); i++)
 		{
-			if (!g_Backtrack.isValid(record->at(i).m_simtime))
+			if (!g_Backtrack->isValid(record->at(i).m_simtime))
 				continue;
 			
 			Color color(fromCfg.r() - (i * (1.0f / record->size())),

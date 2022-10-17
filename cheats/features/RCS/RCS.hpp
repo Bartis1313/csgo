@@ -4,18 +4,21 @@
 
 class IConVar;
 
-class RCS : public CreateMoveInPredictionType
+class RCS : protected CreateMoveInPredictionType
 {
 public:
 	constexpr RCS() :
 		CreateMoveInPredictionType{}
 	{}
 
-	virtual void init();
-	virtual void run(CUserCmd* cmd);
+protected:
+	virtual void init() override;
+	virtual void run(CUserCmd* cmd) override;
+	virtual void reset() override {};
+	virtual void shutdown() override {};
 private:
 	void prepare(CUserCmd* cmd);
 	IConVar* m_scale;
 };
 
-[[maybe_unused]] inline auto g_Rcs = RCS{};
+GLOBAL_FEATURE(RCS);

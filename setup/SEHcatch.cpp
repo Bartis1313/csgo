@@ -53,7 +53,7 @@ void SEHcatch::printStack()
 	for (int i = 3; i < frames; i++) // skip 3 records which are useless to print, you might call some other walkstack functions to get more info
 	{
 		LI_FN_CACHED(SymFromAddr)(process, reinterpret_cast<DWORD64>(stack[i]), NULL, symbol);
-		console.log(TypeLogs::LOG_ERR, XOR("{}: {} - 0x{:X}"), frames - i - 1, symbol->Name, symbol->Address);
+		LOG_ERR(XOR("{}: {} - 0x{:X}"), frames - i - 1, symbol->Name, symbol->Address);
 	}
 	free(symbol);
 }
@@ -79,17 +79,17 @@ LONG WINAPI SEHcatch::memErrorCatch(EXCEPTION_POINTERS* pExceptionInfo)
 
 				const auto info = FORMAT(XOR("Exception (fatal) {} at address {} ({}), flags - {}, params - {}"), crashName, addr, name, flag, params);
 				// x86
-				console.log(TypeLogs::LOG_ERR, XOR("EAX - 0x{:X}"), pExceptionInfo->ContextRecord->Eax);
-				console.log(TypeLogs::LOG_ERR, XOR("EBP - 0x{:X}"), pExceptionInfo->ContextRecord->Ebp);
-				console.log(TypeLogs::LOG_ERR, XOR("EBX - 0x{:X}"), pExceptionInfo->ContextRecord->Ebx);
-				console.log(TypeLogs::LOG_ERR, XOR("ECX - 0x{:X}"), pExceptionInfo->ContextRecord->Ecx);
-				console.log(TypeLogs::LOG_ERR, XOR("EDI - 0x{:X}"), pExceptionInfo->ContextRecord->Edi);
-				console.log(TypeLogs::LOG_ERR, XOR("EDX - 0x{:X}"), pExceptionInfo->ContextRecord->Edx);
-				console.log(TypeLogs::LOG_ERR, XOR("EIP - 0x{:X}"), pExceptionInfo->ContextRecord->Eip);
-				console.log(TypeLogs::LOG_ERR, XOR("ESI - 0x{:X}"), pExceptionInfo->ContextRecord->Esi);
-				console.log(TypeLogs::LOG_ERR, XOR("ESP - 0x{:X}"), pExceptionInfo->ContextRecord->Esp);
+				LOG_ERR(XOR("EAX - 0x{:X}"), pExceptionInfo->ContextRecord->Eax);
+				LOG_ERR(XOR("EBP - 0x{:X}"), pExceptionInfo->ContextRecord->Ebp);
+				LOG_ERR(XOR("EBX - 0x{:X}"), pExceptionInfo->ContextRecord->Ebx);
+				LOG_ERR(XOR("ECX - 0x{:X}"), pExceptionInfo->ContextRecord->Ecx);
+				LOG_ERR(XOR("EDI - 0x{:X}"), pExceptionInfo->ContextRecord->Edi);
+				LOG_ERR(XOR("EDX - 0x{:X}"), pExceptionInfo->ContextRecord->Edx);
+				LOG_ERR(XOR("EIP - 0x{:X}"), pExceptionInfo->ContextRecord->Eip);
+				LOG_ERR(XOR("ESI - 0x{:X}"), pExceptionInfo->ContextRecord->Esi);
+				LOG_ERR(XOR("ESP - 0x{:X}"), pExceptionInfo->ContextRecord->Esp);
 
-				console.log(TypeLogs::LOG_ERR, info);
+				LOG_ERR(info);
 				printStack();
 				LI_FN(MessageBoxA)(nullptr, info.c_str(), XOR("Fatal error!"), MB_ICONERROR | MB_OK);
 				free(symbol);

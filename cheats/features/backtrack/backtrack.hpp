@@ -14,19 +14,20 @@ class INetChannel;
 class IConVar;
 class BackTrackUpdater;
 
-class Backtrack : public CreateMoveInPredictionType
+class Backtrack : protected CreateMoveInPredictionType
 {
 public:
 	Backtrack() :
 		CreateMoveInPredictionType{}
 	{}
 
+	[[nodiscard]] bool isValid(float simtime) const;
+protected:
 	virtual void run(CUserCmd* cmd);
 	virtual void init();
-	_NODISCARD bool isValid(float simtime) const;
 private:
-	_NODISCARD float getLerp() const;
-	_NODISCARD float extraTicks() const;
+	[[nodiscard]] float getLerp() const;
+	[[nodiscard]] float extraTicks() const;
 
 	struct StoredRecord
 	{
@@ -39,10 +40,9 @@ private:
 
 	struct convars
 	{
-		IConVar* updateRate;
-		IConVar* maxUpdateRate;
-		IConVar* minUpdateRate;
-	} cvars{};
+		IConVar* updateRate = nullptr;
+		IConVar* maxUpdateRate = nullptr;
+	} cvars;
 
 	struct convarRatios
 	{
@@ -55,22 +55,24 @@ private:
 	
 	std::array<std::deque<StoredRecord>, 65> m_records;
 public:
-	_NODISCARD auto& getAllRecords() { return m_records; }
+	[[nodiscard]] auto& getAllRecords() { return m_records; }
 
 	friend BackTrackUpdater;
 };
 
-[[maybe_unused]] inline auto g_Backtrack = Backtrack{};
+GLOBAL_FEATURE(Backtrack);
 
-class BackTrackUpdater : public FrameStageType
+class BackTrackUpdater : protected FrameStageType
 {
 public:
 	constexpr BackTrackUpdater() :
 		FrameStageType{}
 	{}
 
-	virtual void init();
-	virtual void run(int frame);
+protected:
+	virtual void run(int frame) override;
+private:
+	float m_correctTime;
 };
 
-[[maybe_unused]] inline auto g_BackTrackUpdater = BackTrackUpdater{};
+GLOBAL_FEATURE(BackTrackUpdater);

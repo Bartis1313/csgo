@@ -2,15 +2,15 @@
 
 #include <classes/renderableToSurface.hpp>
 
-class DroppedWeapons : public RenderableSurfaceType
+class DroppedWeapons : protected RenderableSurfaceType
 {
 public:
 	constexpr DroppedWeapons() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
 };
 
-[[maybe_unused]] inline auto g_DroppedWeapons = DroppedWeapons{};
+GLOBAL_FEATURE(DroppedWeapons);

@@ -6,11 +6,6 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <config/vars.hpp>
 
-void FreeLook::init()
-{
-
-}
-
 void FreeLook::run(CUserCmd* cmd)
 {
 	if (!vars::misc->freeLook->enabled)
@@ -33,11 +28,6 @@ void FreeLook::run(CUserCmd* cmd)
 	}
 }
 
-void FreeLookViewer::init()
-{
-
-}
-
 void FreeLookViewer::run(CViewSetup* view)
 {
 	if (!vars::misc->freeLook->enabled)
@@ -45,7 +35,7 @@ void FreeLookViewer::run(CViewSetup* view)
 
 	if (vars::keys->freeLook.isEnabled())
 	{
-		const auto look = g_FreeLook.m_lastAngleLook;
+		const auto look = g_FreeLook->m_lastAngleLook;
 
 		if (look.isZero())
 			return;

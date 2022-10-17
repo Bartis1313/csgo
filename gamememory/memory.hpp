@@ -56,14 +56,14 @@ public:
 		{}
 
 		// raw place in memory as offset
-		constexpr uintptr_t getRawAddr() const { return m_addr; }
+		constexpr auto getRawAddr() const { return m_addr; }
 		// cast to anything
 		template<typename K>
 		constexpr auto cast() const { return Address<K>{ m_addr }; }
 		// wrapper for sig scan, when error it throws one
 		Address<T> initAddr(const std::string& mod, const std::string& sig, uintptr_t offset = 0);
 		// add bytes, useful for creating "chains" with ref(), depends on use case.
-		constexpr Address<T> add(uintptr_t extraOffset) const { return Address{ m_addr + extraOffset }; }
+		constexpr auto add(uintptr_t extraOffset) const { return Address{ m_addr + extraOffset }; }
 		// dereference x times. Possible args are: 1, 2, 3. There will for sure won't be a case for 4 level dereference. 3rd is very rare.
 		constexpr auto ref(Dereference times = Dereference::ONCE) const
 		{

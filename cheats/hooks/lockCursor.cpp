@@ -4,7 +4,7 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
 
-void __stdcall hooks::lockCursor::hooked()
+void __fastcall hooks::lockCursor::hooked(FAST_ARGS)
 {
 	if (menu.isMenuActive())
 	{
@@ -12,5 +12,5 @@ void __stdcall hooks::lockCursor::hooked()
 		return;
 	}
 
-	original(interfaces::surface);
+	original(thisptr);
 }

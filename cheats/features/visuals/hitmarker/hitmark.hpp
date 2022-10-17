@@ -5,16 +5,16 @@
 
 class IGameEvent;
 
-class Hitmarker : public RenderableSurfaceType
+class Hitmarker : protected RenderableSurfaceType
 {
 public:
 	constexpr Hitmarker() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
-
+protected:
+	virtual void draw() override;
+	virtual void init() override;
 private:
 	void handleHits(IGameEvent* event);
 
@@ -31,4 +31,4 @@ private:
 	std::vector<Hitmark_t> m_hitmarkers;
 };
 
-[[maybe_unused]] inline auto g_Hitmarker = Hitmarker{};
+GLOBAL_FEATURE(Hitmarker);

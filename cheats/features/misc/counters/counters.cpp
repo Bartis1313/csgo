@@ -12,9 +12,9 @@
 
 void Counters::init()
 {
-	g_Events.add(XOR("weapon_fire"), std::bind(&Counters::addShots, this, std::placeholders::_1));
-	g_Events.add(XOR("player_hurt"), std::bind(&Counters::addHits, this, std::placeholders::_1));
-	g_Events.add(XOR("round_start"), std::bind(&Counters::reset, this, std::placeholders::_1));
+	g_Events->add(XOR("weapon_fire"), std::bind(&Counters::addShots, this, std::placeholders::_1));
+	g_Events->add(XOR("player_hurt"), std::bind(&Counters::addHits, this, std::placeholders::_1));
+	g_Events->add(XOR("round_start"), std::bind(&Counters::resetShots, this, std::placeholders::_1));
 }
 
 void Counters::addShots(IGameEvent* event)
@@ -49,7 +49,7 @@ void Counters::addHits(IGameEvent* event)
 		globals::shotsHead++;
 }
 
-void Counters::reset(IGameEvent* event)
+void Counters::resetShots(IGameEvent* event)
 {
 	globals::shotsFired = 0;
 	globals::shotsHit = 0;

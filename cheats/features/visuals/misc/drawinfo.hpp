@@ -2,15 +2,15 @@
 
 #include <classes/renderableToPresent.hpp>
 
-class Info : public RenderablePresentType
+class MiscInfo : protected RenderablePresentType
 {
 public:
-	constexpr Info() :
+	constexpr MiscInfo() :
 		RenderablePresentType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
 };
 
-[[maybe_unused]] inline auto g_Information = Info{};
+GLOBAL_FEATURE(MiscInfo);

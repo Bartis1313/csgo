@@ -4,7 +4,7 @@
 
 #include <vector>
 
-class Screen2DEffectsType : public BaseHack
+class Screen2DEffectsType : protected BaseHack
 {
 public:
 	constexpr Screen2DEffectsType() :
@@ -13,8 +13,14 @@ public:
 		m_hacksRun.push_back(this);
 	}
 
-	virtual void run() {};
 	static void runAll();
 protected:
+	virtual void run() = 0;
+	// keep those methods to be nothing as default
+	// mostly we don't need all of them
+	virtual void init() override {};
+	virtual void reset() override {};
+	virtual void shutdown() override {};
+private:
 	inline static std::vector<Screen2DEffectsType*> m_hacksRun;
 };

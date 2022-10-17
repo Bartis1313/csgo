@@ -5,35 +5,35 @@
 
 class CViewSetup;
 
-class Freecam : public OverrideViewType
+class Freecam : protected OverrideViewType
 {
 public:
 	constexpr Freecam() :
 		OverrideViewType{}
 	{}
 
-	virtual void init();
+	[[nodiscard]] constexpr bool isInCam() const { return m_inCam; }
+protected:
 	// need to set angles to remove view effect
-	virtual void run(CViewSetup* view);
-	_NODISCARD constexpr bool isInCam() const { return m_inCam; }
+	virtual void run(CViewSetup* view) override;
 private:
 	bool m_inCam = false;
 	Vec3 m_view;
 };
 
-[[maybe_unused]] inline auto g_Freecam = Freecam{};
+GLOBAL_FEATURE(Freecam);
 
 #include <classes/renderableToPresent.hpp>
 
-class FreecamDraw : public RenderablePresentType
+class FreecamDraw : protected RenderablePresentType
 {
 public:
 	constexpr FreecamDraw() :
 		RenderablePresentType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
 };
 
-[[maybe_unused]] inline auto g_FreecamDraw = FreecamDraw{};
+GLOBAL_FEATURE(FreecamDraw);

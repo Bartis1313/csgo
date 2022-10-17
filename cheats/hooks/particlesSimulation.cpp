@@ -34,11 +34,12 @@ constexpr std::array bloodnames =
 	"blood_impact_light_headshot"
 };
 
-void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr, void* edx)
+void __fastcall hooks::particlesSimulations::hooked(FAST_ARGS)
 {
-	original(thisPtr);
+	original(thisptr);
 
-	CParticleCollection* root = thisPtr;
+	auto ptr = reinterpret_cast<CParticleCollection*>(thisptr);
+	CParticleCollection* root = ptr;
 	while (root->m_parent)
 		root = root->m_parent;
 
@@ -51,9 +52,9 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	{
 		if (auto itr = std::find(smokenames.cbegin(), smokenames.cend(), name); itr != smokenames.cend())
 		{
-			for (auto i : std::views::iota(0, thisPtr->m_activeParticles))
+			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{
-				thisPtr->m_particleAttributes.modulateColor(colorSmoke, i);
+				ptr->m_particleAttributes.modulateColor(colorSmoke, i);
 			}
 		}
 	}
@@ -62,9 +63,9 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	{
 		if (auto itr = std::find(bloodnames.cbegin(), bloodnames.cend(), name); itr != bloodnames.cend())
 		{
-			for (auto i : std::views::iota(0, thisPtr->m_activeParticles))
+			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{
-				thisPtr->m_particleAttributes.modulateColor(colorBlood, i);
+				ptr->m_particleAttributes.modulateColor(colorBlood, i);
 			}
 		}
 	}
@@ -73,9 +74,9 @@ void __fastcall hooks::particlesSimulations::hooked(CParticleCollection* thisPtr
 	{
 		if (auto itr = std::find(mollyNames.cbegin(), mollyNames.cend(), name); itr != mollyNames.cend())
 		{
-			for (auto i : std::views::iota(0, thisPtr->m_activeParticles))
+			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{
-				thisPtr->m_particleAttributes.modulateColor(colorMolly, i);
+				ptr->m_particleAttributes.modulateColor(colorMolly, i);
 			}
 		}
 	}

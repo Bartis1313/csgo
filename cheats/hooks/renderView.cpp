@@ -8,5 +8,5 @@ void __fastcall hooks::renderView::hooked(FAST_ARGS, const CViewSetup& view, con
 {
 	RenderViewType::runAll(view);
 
- 	original(thisptr, view, hud, clearFlags, whatToDraw);
+	original(thisptr, view, hud, clearFlags, whatToDraw);
 }

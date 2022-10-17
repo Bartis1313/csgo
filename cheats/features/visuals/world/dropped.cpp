@@ -15,11 +15,6 @@
 #include <utilities/renderer/renderer.hpp>
 #include <utilities/utilities.hpp>
 
-void DroppedWeapons::init()
-{
-
-}
-
 void DroppedWeapons::draw()
 {
 	if (!vars::visuals->esp->dropped->enabled)

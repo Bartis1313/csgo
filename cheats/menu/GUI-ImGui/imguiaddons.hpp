@@ -3,13 +3,13 @@
 #include <span>
 #include <string>
 #include <vector>
-#include <locale>
 #include <format>
 #include <functional>
 
 #include <dependencies/ImGui/imgui.h>
 
 class CfgColor;
+class Color;
 class Key;
 using ImGuiColorEditFlags = int;
 
@@ -44,37 +44,13 @@ namespace ImGui
 		ExampleAppLog();
 		void Clear();
 
-		// edited 
-		template<typename... Args_t>
-		void AddLog(const std::string& fmt, const Args_t&... args);
+		void AddLog(const std::string& buffer);
 		void Draw(const char* title, bool* p_open = NULL);
 	};
 }
 
 IMGUI_IMPL_API void* ImGui_CreateTexture(const void* data, int width, int height);
 IMGUI_IMPL_API void	ImGui_DestroyTexture(void* texture);
-
-template<typename... Args_t>
-void ImGui::ExampleAppLog::AddLog(const std::string& fmt, const Args_t&... args)
-{
-	if (fmt.empty())
-		return;
-
-	std::string res;
-
-	if constexpr (sizeof...(args) > 0)
-		res += std::vformat(std::locale(), fmt, std::make_format_args(args...));
-	else
-		res += fmt;
-
-	int oldSize = Buf.size();
-
-	Buf.append(res.c_str());
-
-	for (int newSize = Buf.size(); oldSize < newSize; oldSize++)
-		if (Buf[oldSize] == '\n')
-			LineOffsets.push_back(oldSize + 1);
-}
 
 template<typename T, size_t SIZE>
 void ImGui::MultiCombo(const char* label, const std::array<T, SIZE>& names, std::array<bool, SIZE>* options)

@@ -224,6 +224,9 @@
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
     <ClCompile Include="cheats\hooks\isDepth.cpp" />
     <ClCompile Include="cheats\hooks\isHltv.cpp" />
+    <ClCompile Include="cheats\hooks\levelInitPostEntity.cpp" />
+    <ClCompile Include="cheats\hooks\levelInitPreEntity.cpp" />
+    <ClCompile Include="cheats\hooks\levelShutdown.cpp" />
     <ClCompile Include="cheats\hooks\renderView.cpp" />
     <ClCompile Include="cheats\hooks\screen2deffect.cpp" />
     <ClCompile Include="cheats\hooks\sendDatagram.cpp" />
@@ -273,7 +276,7 @@
     <ClCompile Include="cheats\hooks\hooks.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="cheats\hooks\lokcCursor.cpp" />
+    <ClCompile Include="cheats\hooks\lockCursor.cpp" />
     <ClCompile Include="cheats\hooks\present.cpp" />
     <ClCompile Include="cheats\hooks\overrideView.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -513,6 +516,7 @@
     <ClInclude Include="SDK\IClientState.hpp" />
     <ClInclude Include="SDK\IMatRenderContext.hpp" />
     <ClInclude Include="SDK\IMemAlloc.hpp" />
+    <ClInclude Include="SDK\interfaceNode.hpp" />
     <ClInclude Include="SDK\interfaces\interfaces.hpp" />
     <ClInclude Include="SDK\ITexture.hpp" />
     <ClInclude Include="SDK\IViewRender.hpp" />
@@ -523,6 +527,7 @@
     <ClInclude Include="SDK\math\matrix.hpp" />
     <ClInclude Include="SDK\math\Vector.hpp" />
     <ClInclude Include="SDK\math\VectorAligned.hpp" />
+    <ClInclude Include="SDK\varMapping.hpp" />
     <ClInclude Include="setup\SEHcatch.hpp" />
     <ClInclude Include="cheats\features\visuals\chams\chams.hpp" />
     <ClInclude Include="cheats\features\visuals\player\player.hpp" />

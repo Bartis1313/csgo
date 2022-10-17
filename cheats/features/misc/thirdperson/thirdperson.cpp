@@ -10,12 +10,6 @@
 #include <utilities/math/math.hpp>
 #include <config/vars.hpp>
 
-
-void Thirdperson::init()
-{
-	
-}
-
 void Thirdperson::run(CViewSetup* view)
 {
 	if (!vars::misc->thirdp->enabled)

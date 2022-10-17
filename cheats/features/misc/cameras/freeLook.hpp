@@ -10,15 +10,15 @@ class CViewSetup;
 class FreeLookViewer;
 
 // pubg like freelook
-class FreeLook : public CreateMovePrePredictionType
+class FreeLook : protected CreateMovePrePredictionType
 {
 public:
 	constexpr FreeLook() :
 		CreateMovePrePredictionType{}
 	{}
 
-	virtual void init();
-	virtual void run(CUserCmd* cmd);
+protected:
+	virtual void run(CUserCmd* cmd) override;
 private:
 	Vec3 m_lastAngle;
 	Vec3 m_lastAngleLook;
@@ -26,17 +26,17 @@ private:
 	friend FreeLookViewer;
 };
 
-[[maybe_unused]] inline auto g_FreeLook = FreeLook{};
+GLOBAL_FEATURE(FreeLook);
 
-class FreeLookViewer : public OverrideViewType
+class FreeLookViewer : protected OverrideViewType
 {
 public:
 	constexpr FreeLookViewer() :
 		OverrideViewType{}
 	{}
 
-	virtual void init();
-	virtual void run(CViewSetup* view);
+protected:
+	virtual void run(CViewSetup* view) override;
 };
 
-[[maybe_unused]] inline auto g_FreeLookView = FreeLookViewer{};
+GLOBAL_FEATURE(FreeLookViewer);

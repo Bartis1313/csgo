@@ -17,7 +17,7 @@ namespace hookHelper
 		const MH_STATUS hk = MH_CreateHook(static_cast<LPVOID>(target), static_cast<LPVOID>(detour), static_cast<LPVOID*>(original));
 		if (hk != MH_OK)
 			throw std::runtime_error(FORMAT(XOR("{} hook error"), name));
-		console.log(TypeLogs::LOG_INFO, XOR("{} -> {} hooked at addr 0x{:X}"), name, MH_StatusToString(hk), reinterpret_cast<uintptr_t>(target));
+		LOG_INFO(XOR("{} -> {} hooked at addr 0x{:X}"), name, MH_StatusToString(hk), reinterpret_cast<uintptr_t>(target));
 	}
 
 	inline void checkAllHooks()

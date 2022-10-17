@@ -1,5 +1,7 @@
 #include "radar.hpp"
 
+#include <features/cache/cache.hpp>
+
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/IClientEntityList.hpp>
@@ -20,11 +22,6 @@
 #include <dependencies/ImGui/imgui_internal.h>
 
 #include <d3dx9.h>
-
-void Radar::init()
-{
-	
-}
 
 Vec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const Vec2& pos, const Vec2& size, const float scale, bool clipRanges)
 {
@@ -118,10 +115,10 @@ bool Radar::manuallyInitTexture()
 		return false;*/
 
 	if (auto hr = D3DXCreateTextureFromFileA(interfaces::dx9Device, path.c_str(), &m_mapTexture); hr == D3D_OK)
-		console.log(TypeLogs::LOG_INFO, "Created map texture from path: {}", path);
+		LOG_INFO(XOR("Created map texture from path: {}"), path);
 	else
 	{
-		console.log(TypeLogs::LOG_ERR, "Creating map texture from path failed, code: {}", hr);
+		LOG_ERR(XOR("Creating map texture from path failed, code: {}"), hr);
 		return false;
 	}
 
@@ -212,9 +209,9 @@ void Radar::draw()
 		// draw small circle where are we
 		imRenderWindow.drawCircleFilled(middleX, middleY, 5.0f, 12, Colors::Green);
 
-		for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++) // uisng cache might be not so much updated each frame, so I am using standard way
+		for(auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 		{
-			auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(i));
+			auto ent = reinterpret_cast<Player_t*>(entity);
 
 			if (!ent)
 				continue;
@@ -234,6 +231,7 @@ void Radar::draw()
 			const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vec2{}, Vec2{ imRenderWindow.getWidth(), imRenderWindow.getHeight() },
 				vars::misc->radar->scale, true);
 
+			// or use calcangle, this will be faster though
 			auto entYaw = ent->m_angEyeAngles()[Coord::Y];
 
 			if (entYaw < 0.0f)
@@ -250,12 +248,14 @@ void Radar::draw()
 			{
 				auto dotThickness = vars::misc->radar->thickness;
 
-				Color colLine = vars::misc->radar->colorLine();
-				imRenderWindow.drawLine(entRotatedPos[Coord::X] - 1, entRotatedPos[Coord::Y] - 1, entRotatedPos[Coord::X] + finalX, entRotatedPos[Coord::Y] + finalY,
-					game::localPlayer->isPossibleToSee(ent, ent->getBonePos(8)) ? colLine : colLine.getColorEditAlpha(0.5f));
-				Color colPlayer = vars::misc->radar->colorPlayer();
+				imRenderWindow.drawLine(entRotatedPos[Coord::X] - 1, entRotatedPos[Coord::Y] - 1, entRotatedPos[Coord::X] + finalX,
+					entRotatedPos[Coord::Y] + finalY, vars::misc->radar->colorLine());
+				
 				imRenderWindow.drawCircleFilled(entRotatedPos[Coord::X], entRotatedPos[Coord::Y], dotThickness, 32,
-					game::localPlayer->isPossibleToSee(ent, ent->getBonePos(8)) ? colPlayer : colPlayer.getColorEditAlpha(0.5f));
+					vars::misc->radar->colorPlayer());
+
+				//imRenderWindow.drawTriangleFilled(entRotatedPos[Coord::X], entRotatedPos[Coord::Y], dotThickness,
+				//	dotThickness, rotated, vars::misc->radar->colorPlayer());
 
 			}
 		}
@@ -278,5 +278,5 @@ void RadarSizeHelper::run(MapStruct* map)
 	// although by CCSGO_MapOverview it has 256 still...
 	// so we trick it to load manually on new map
 
-	g_Radar.m_inited = false;
+	g_Radar->m_inited = false;
 }

@@ -4,17 +4,18 @@
 
 class IConVar;
 
-class RemoveSky : public DoPostScreenType
+class RemoveSky : protected DoPostScreenType
 {
 public:
 	constexpr RemoveSky() :
 		DoPostScreenType{}
 	{}
 
-	virtual void init();
+protected:
 	virtual void run();
+	virtual void init() override;
 private:
 	IConVar* m_sky;
 };
 
-[[maybe_unused]] inline auto g_RemoveSky = RemoveSky{};
+GLOBAL_FEATURE(RemoveSky);

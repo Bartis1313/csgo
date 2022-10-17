@@ -16,45 +16,44 @@ struct Studiohdr_t;
 
 class GrenadePrediction;
 
-class GreandePredictionButton : public CreateMovePrePredictionType
+class GreandePredictionButton : protected CreateMovePrePredictionType
 {
 public:
 	constexpr GreandePredictionButton() :
 		CreateMovePrePredictionType{}
 	{}
 
-	virtual void init();
+	[[nodiscard]] int getButton() const { return m_button; }
+	[[nodiscard]] int getWeaponIdx() const { return m_weaponIdx; }
+protected:
 	virtual void run(CUserCmd* cmd);
-
-	_NODISCARD int getButton() const { return m_button; }
-	_NODISCARD int getWeaponIdx() const { return m_weaponIdx; }
 private:
 	void runView();
 	int m_button;
 	int m_weaponIdx;
 };
 
-[[maybe_unused]] inline auto g_GrenadePredictionButton = GreandePredictionButton{};
+GLOBAL_FEATURE(GreandePredictionButton);
 
 // a lot of code is in cstrike15 leak, as I tried to do this I run on few cases where it was not pixel perfect
 // fix is def needed, for breakables bounces
-class GrenadePrediction : public RenderableSurfaceType
+class GrenadePrediction : protected RenderableSurfaceType
 {
 public:
 	constexpr GrenadePrediction() :
 		RenderableSurfaceType{}
 	{}
 
+protected:
 	friend GreandePredictionButton;
 
-	virtual void init();
-	virtual void draw();
+	virtual void draw() override;
 private:
 	std::vector<Vec3> m_path;
 	std::vector<Vec3> m_bounces;
 protected:
 	void setup(Vec3& src, Vec3& vecThrow, const Vec3& viewangles);
-	size_t step(Vec3& src, Vec3& vecThrow, int tick, float interval);
+	[[nodiscard]] size_t step(Vec3& src, Vec3& vecThrow, int tick, float interval);
 	void simulate();
 	bool checkDetonate(const Vec3& vecThrow, const Trace_t& tr, int tick, float interval);
 	void addGravityMove(Vec3& move, Vec3& vel, float frametime);
@@ -66,4 +65,4 @@ protected:
 	void physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce);
 };
 
-[[maybe_unused]] inline auto g_GrenadePrediction = GrenadePrediction{};
+GLOBAL_FEATURE(GrenadePrediction);

@@ -8,17 +8,17 @@ class ClientClass;
 class WeatherReset;
 struct MapStruct;
 
-class WeatherController : public FrameStageType
+class WeatherController : protected FrameStageType
 {
 public:
 	constexpr WeatherController() :
 		FrameStageType{}
 	{}
 
-	virtual void init();
-	virtual void run(int frame);
 	// add to imgui
 	void implMenu();
+protected:
+	virtual void run(int frame) override;
 private:
 	struct WeatherFields_t
 	{
@@ -30,17 +30,17 @@ private:
 	friend WeatherReset;
 };
 
-[[maybe_unused]] inline auto g_WeatherController = WeatherController{};
+GLOBAL_FEATURE(WeatherController);
 
-class WeatherReset : public OverViewMapType
+class WeatherReset : protected OverViewMapType
 {
 public:
 	constexpr WeatherReset() :
 		OverViewMapType{}
 	{}
 
-	virtual void init();
-	virtual void run([[maybe_unused]] MapStruct* map);
+protected:
+	virtual void run([[maybe_unused]] MapStruct* map) override;
 };
 
-[[maybe_unused]] inline auto g_WeatherReset = WeatherReset{};
+GLOBAL_FEATURE(WeatherReset);

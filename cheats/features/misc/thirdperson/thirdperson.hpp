@@ -4,15 +4,15 @@
 
 class CViewSetup;
 
-class Thirdperson : public OverrideViewType
+class Thirdperson : protected OverrideViewType
 {
 public:
 	constexpr Thirdperson() :
 		OverrideViewType{}
 	{}
 
-	virtual void init();
-	virtual void run([[maybe_unused]] CViewSetup* view);
+protected:
+	virtual void run([[maybe_unused]] CViewSetup* view) override;
 };
 
-[[maybe_unused]] inline auto g_Thirdperson = Thirdperson{};
+GLOBAL_FEATURE(Thirdperson);

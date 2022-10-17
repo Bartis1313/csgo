@@ -23,15 +23,16 @@ struct AimbotTarget_t
 	bool isBlackListed() const;
 };
 
-class Aimbot : public CreateMoveInPredictionType
+class Aimbot : protected CreateMoveInPredictionType
 {
 public:
 	constexpr Aimbot() :
 		CreateMoveInPredictionType{}
 	{}
 
-	virtual void init();
-	virtual void run(CUserCmd* cmd);
+	virtual void init() override;
+	virtual void run(CUserCmd* cmd) override;
+
 	Player_t* getTargetted() const;
 	Vec3 getCachedView() const;
 	Vec3 getBestHibox() const;
@@ -57,4 +58,4 @@ private:
 	std::vector<AimbotTarget_t> m_targets;
 };
 
-[[maybe_unused]] inline auto g_Aimbot = Aimbot{};
+GLOBAL_FEATURE(Aimbot);

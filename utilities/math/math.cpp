@@ -173,11 +173,11 @@ static constexpr float orient(const ImVec2& a, const ImVec2& b, const ImVec2& c)
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
-std::vector<ImVec2> math::grahamScan(std::span<const ImVec2> points)
+std::optional<std::vector<ImVec2>> math::grahamScan(std::span<const ImVec2> points)
 {
 	// case when it's impossible
 	if (points.size() < 3)
-		return {};
+		std::nullopt;
 
 	// make a temp copy to allow use swap
 	std::vector<ImVec2> v{ points.begin(), points.end() };
@@ -187,42 +187,36 @@ std::vector<ImVec2> math::grahamScan(std::span<const ImVec2> points)
 		// is left? a lexicographically before b
 		[](const ImVec2& a, const ImVec2& b) constexpr
 		{
-			return (a.x < b.x || (a.x == b.x && a.y < b.y));
+			return (a.x < b.x || (a.y == b.x && a.y < b.y));
 		}
 	));
 
 	std::sort(v.begin() + 1, v.end(),
-		[v = v](const ImVec2& a, const ImVec2& b) constexpr
+		[p0 = v.at(0)](const ImVec2& a, const ImVec2& b) constexpr
 		{
-			return orient(v.at(0), a, b) < 0.0f;
+			auto _orient = orient(p0, a, b);
+			return _orient == 0.0f ? ImLengthSqr(p0 - a) < ImLengthSqr(p0 - b) : _orient < 0.0f;
 		}
 	);
 
 	std::vector<ImVec2> hull;
 
-	// always push 3 to start hull
-	auto it = v.begin();
-	hull.push_back(*it++);
-	hull.push_back(*it++);
-	hull.push_back(*it++);
-
-	while (it != v.end()) 
+	for (const auto& el : v)
 	{
-		// we make angle with convex?
-		while (orient(*(hull.rbegin() + 1), *(hull.rbegin()), *it) >= 0.0f)
+		while (hull.size() > 1 && orient(hull[hull.size() - 2], hull[hull.size() - 1], el) >= 0.0f)
 			hull.pop_back();
 
-		hull.push_back(*it++);
+		hull.push_back(el);
 	}
 
 	return hull;
 }
 
-std::vector<ImVec2> math::giftWrap(std::span<const ImVec2> points)
+std::optional<std::vector<ImVec2>> math::giftWrap(std::span<const ImVec2> points)
 {
 	// case when it's impossible
 	if (points.size() < 3)
-		return {};
+		return std::nullopt;
 
 	// make a temp copy to allow use swap
 	std::vector<ImVec2> v{ points.begin(), points.end() };
@@ -238,16 +232,17 @@ std::vector<ImVec2> math::giftWrap(std::span<const ImVec2> points)
 	
 	std::vector<ImVec2> hull;
 
-	// first to last hull
+	auto p0 = v.at(0);
+	auto h0 = hull.at(0);
 	do {
-		hull.push_back(v.at(0));
-		std::swap(v[0], *std::min_element(v.begin() + 1, v.end(),
-			[v = v](const ImVec2& a, const ImVec2& b) constexpr
+		hull.push_back(p0);
+		std::swap(p0, *std::min_element(v.begin() + 1, v.end(),
+			[p0](const ImVec2& a, const ImVec2& b) constexpr
 			{
-				return orient(v.at(0), a, b) < 0.0f;
+				return orient(p0, a, b) < 0.0f;
 			}
 		));
-	} while (v.at(0).x != hull.at(0).x && v.at(0).y != hull.at(0).y); // when it is point[0]
+	} while (p0.x != h0.x && p0.y != h0.y); // when it is point[0]
 
 	return hull;
 }

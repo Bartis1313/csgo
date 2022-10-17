@@ -4,15 +4,15 @@
 
 class Inferno_t;
 
-class MolotovDraw : public RenderableSurfaceType
+class MolotovDraw : protected RenderableSurfaceType
 {
 public:
 	constexpr MolotovDraw() : 
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
 };
 
-[[maybe_unused]] inline auto g_Molotov = MolotovDraw{};
+GLOBAL_FEATURE(MolotovDraw);

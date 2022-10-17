@@ -14,15 +14,16 @@ class Entity_t;
 struct Box3D;
 class Color;
 
-class PlayerVisuals : public RenderableSurfaceType
+class PlayerVisuals : protected RenderableSurfaceType
 {
 public:
 	constexpr PlayerVisuals() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
+	virtual void init() override;
 private:
 	void drawInfo(Player_t* ent, const Box& box);
 	void drawnName(Player_t* ent, const Box& box);
@@ -57,4 +58,4 @@ private:
 	bool m_calledEvent; // for dormacy resets
 };
 
-[[maybe_unused]] inline auto g_PlayerVisuals = PlayerVisuals{};
+GLOBAL_FEATURE(PlayerVisuals);

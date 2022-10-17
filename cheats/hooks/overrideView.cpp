@@ -9,10 +9,10 @@
 #include <game/game.hpp>
 #include <config/vars.hpp>
 
-void __stdcall hooks::overrideView::hooked(CViewSetup* view)
+void __fastcall hooks::overrideView::hooked(FAST_ARGS, CViewSetup* view)
 {	
 	if(!game::isAvailable())
-		return original(view);
+		return original(thisptr, view);
 
 	if (!game::localPlayer->m_bIsScoped())
 		if (auto fov = vars::misc->fov->value; fov > 0.0f || fov < 0.0f)
@@ -21,5 +21,5 @@ void __stdcall hooks::overrideView::hooked(CViewSetup* view)
 	globals::FOV = view->m_fov;
 	OverrideViewType::runAll(view);
 
-	original(view);
+	original(thisptr, view);
 }

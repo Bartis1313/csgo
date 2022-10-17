@@ -35,7 +35,7 @@ void ImGuiMenu::init()
 	}
 	catch (const std::runtime_error& err)
 	{
-		console.log(TypeLogs::LOG_ERR, err.what());
+		LOG_ERR(err.what());
 	}
 }
 
@@ -411,13 +411,13 @@ static void renderMisc()
 		{
 			ImGui::BeginGroupPanel(XOR("Skybox"), availRegion());
 			{
-				const auto customsky = g_SkyboxEdit.getAllCustomSkyBoxes();
+				const auto customsky = g_SkyboxEdit->getAllCustomSkyBoxes();
 
 				ImGui::Combo(XOR("Normal"), &vars::visuals->world->sky->indexNormal, selections::skyboxes);
 				ImGui::Combo(XOR("Custom##Skybox"), &vars::visuals->world->sky->indexCustom, customsky);
 				if (ImGui::Button(XOR("Reload Custom Skybox")))
 				{
-					g_SkyboxEdit.reloadCustomSkyboxes();
+					g_SkyboxEdit->reloadCustomSkyboxes();
 				}
 
 				ImGui::EndGroupPanel();
@@ -480,7 +480,7 @@ static void renderMisc()
 				);
 				if (ImGui::Button(XOR("Refresh texture manually")))
 				{
-					g_Radar.manuallyInitTexture();
+					g_Radar->manuallyInitTexture();
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Will not for workshop maps\nYou can try forcing the engine to re-render by pressing escape few times"));
@@ -735,7 +735,7 @@ static void renderMisc()
 				);
 				bool changedbut = false;
 				changedbut |= ImGui::Checkbox(XOR("ControlTone enabled"), &vars::visuals->world->tone->enabled);
-				g_ToneController.setStateButton(changedbut);
+				g_ToneController->setStateButton(changedbut);
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Tone control pop"), []()
 					{
@@ -743,14 +743,14 @@ static void renderMisc()
 						changed |= ImGui::SliderFloat(XOR("Tone min"), &vars::visuals->world->tone->min, 0.0f, 1.0f);
 						changed |= ImGui::SliderFloat(XOR("Tone max"), &vars::visuals->world->tone->max, 0.0f, 1.0f);
 						changed |= ImGui::SliderFloat(XOR("Tone bloom scale"), &vars::visuals->world->tone->bloom, 0.0f, 16.0f);
-						g_ToneController.setStateSlider(changed);
+						g_ToneController->setStateSlider(changed);
 					}
 				);
 				ImGui::Checkbox(XOR("Weather"), &vars::visuals->world->weather->enabled);
 				ImGui::SameLine();
 				ImGui::PopupButton(XOR("##Weather control pop"), []()
 					{
-						g_WeatherController.implMenu();
+						g_WeatherController->implMenu();
 					}
 				);				
 				ImGui::Checkbox(XOR("Motion blur"), &vars::misc->motionBlur->enabled);
@@ -767,11 +767,11 @@ static void renderMisc()
 				);
 				bool changedbut2 = false;
 				changedbut2 |= ImGui::Checkbox(XOR("Ambient"), &vars::visuals->world->ambient->enabled);
-				g_AmbientLight.setButtonState(changedbut2);
+				g_AmbientLight->setButtonState(changedbut2);
 				ImGui::SameLine();
 				bool changed = false;
 				changed |= ImGui::ColorPicker(XOR("Color##ambient col"), &vars::visuals->world->ambient->color);
-				g_AmbientLight.setPickerState(changed);
+				g_AmbientLight->setPickerState(changed);
 				ImGui::SameLine();
 				
 				ImGui::EndGroupPanel();
@@ -818,7 +818,7 @@ static void renderConfig()
 						config.reload();
 					}
 					else
-						console.log(TypeLogs::LOG_ERR, XOR("provided config name was same as default"));
+						LOG_ERR(XOR("provided config name was same as default"));
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Press enter to create new config"));
@@ -897,7 +897,7 @@ static void renderConfig()
 				{
 					// this is only saving the load name, nothing more
 					config.startSave(allcfg.at(currentcfg));
-					console.log(TypeLogs::LOG_INFO, XOR("{} will be now loaded config on the start"), allcfg.at(currentcfg));
+					LOG_INFO(XOR("{} will be now loaded config on the start"), allcfg.at(currentcfg));
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("This config will load on the start"));

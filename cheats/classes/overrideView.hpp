@@ -6,7 +6,7 @@
 
 class CViewSetup;
 
-class OverrideViewType : public BaseHack
+class OverrideViewType : protected BaseHack
 {
 public:
 	constexpr OverrideViewType() :
@@ -15,8 +15,14 @@ public:
 		m_hacksRun.push_back(this);
 	}
 
-	virtual void run(CViewSetup* view) {};
 	static void runAll(CViewSetup* view);
 protected:
+	virtual void run(CViewSetup* view) = 0;
+	// keep those methods to be nothing as default
+	// mostly we don't need all of them
+	virtual void init() override {};
+	virtual void reset() override {};
+	virtual void shutdown() override {};
+private:
 	inline static std::vector<OverrideViewType*> m_hacksRun;
 };

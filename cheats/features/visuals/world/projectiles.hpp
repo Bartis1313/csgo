@@ -2,15 +2,15 @@
 
 #include <classes/renderableToSurface.hpp>
 
-class Projectiles : public RenderableSurfaceType
+class Projectiles : protected RenderableSurfaceType
 {
 public:
 	constexpr Projectiles() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
 };
 
-[[maybe_unused]] inline auto g_Projectiles = Projectiles{};
+GLOBAL_FEATURE(Projectiles);

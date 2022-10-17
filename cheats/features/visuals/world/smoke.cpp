@@ -14,11 +14,6 @@
 #include <utilities/math/math.hpp>
 #include <gamememory/memory.hpp>
 
-void SmokeDraw::init()
-{
-
-}
-
 void SmokeDraw::draw()
 {
 	if (!vars::visuals->world->smoke->enabled)
@@ -66,11 +61,6 @@ void SmokeDraw::drawCustomSmokeEffect(const Vec3& pos, float radius)
 	};
 
 	interfaces::effects->smoke(end, -1, 5.0f, 1.0f);
-}
-
-void SmokeRemoval::init()
-{
-	
 }
 
 void SmokeRemoval::run(int frame)

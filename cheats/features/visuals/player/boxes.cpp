@@ -69,7 +69,12 @@ void BoxesDraw::drawBox3DFilled(const Box& box, bool isDormant, float dormacyAlp
 
 	bool outlined = /*config.get<bool>(vars.bBoxOutlined)*/ false; // looks bad on 3d
 
-	auto points = math::grahamScan(box.points);
+	auto maybeScanned = math::grahamScan(box.points);
+	if (!maybeScanned.has_value())
+		return;
+
+	auto points = maybeScanned.value();
+
 	std::reverse(points.begin(), points.end());
 	imRender.drawPolyGon(points, fill);
 
@@ -99,7 +104,12 @@ void BoxesDraw::drawBox3DFilledMultiColor(const Box& box, bool isDormant, float 
 		Color::U32(Color::rainbowColor(time + 5.0f, speed).getColorEditAlpha(alpha)),
 	};
 
-	auto points = math::grahamScan(box.points);
+	auto maybeScanned = math::grahamScan(box.points);
+	if (!maybeScanned.has_value())
+		return;
+
+	auto points = maybeScanned.value();
+
 	size_t delta = colors.size() - points.size();
 	std::reverse(points.begin(), points.end());
 	imRender.drawPolyGonMultiColor(points, colors); // any way to make it smooth trnasmition in vertex? I couldn't think of

@@ -4,18 +4,19 @@
 
 class IConVar;
 
-class Crosshair : public RenderableSurfaceType
+class Crosshair : protected RenderableSurfaceType
 {
 public:
 	constexpr Crosshair() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void init() override;
+	virtual void draw() override;
 private:
 	IConVar* m_scale;
 	IConVar* m_crosshairRecoil;
 };
 
-[[maybe_unused]] inline auto g_Crosshair = Crosshair{};
+GLOBAL_FEATURE(Crosshair);

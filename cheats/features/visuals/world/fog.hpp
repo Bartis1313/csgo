@@ -4,15 +4,15 @@
 
 class FogController_t;
 
-class FogController : public FrameStageType
+class FogController : protected FrameStageType
 {
 public:
 	constexpr FogController() :
 		FrameStageType{}
 	{}
 
-	virtual void init();
-	virtual void run(int frame);
+protected:
+	virtual void run(int frame) override;
 };
 
-[[maybe_unused]] inline auto g_FogController = FogController{};
+GLOBAL_FEATURE(FogController);

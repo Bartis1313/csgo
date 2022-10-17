@@ -111,7 +111,9 @@ public:
 	void drawCircle3DFilled(const Vec3& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 	void drawCircle3DFilledTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags = 1, const float thickness = 1.0f);
 	void drawTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color, const float thickness = 1.0f);
+	void drawTriangle(const float x, const float y, const float w, const float h, const Color& color, const float angle, const float thickness = 1.0f);
 	void drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color);
+	void drawTriangleFilled(const float x, const float y, const float w, const float h, const float angle, const Color& color);
 	void drawTrianglePoly(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color);
 	void drawQuad(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color, const float thickness = 1.0f);
 	void drawQuadFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color);
@@ -161,6 +163,7 @@ private:
 
 inline ImGuiRender imRender;
 
+// todo: deprecate this
 // simple wrapper, use for anything that is not needed for w2s, and by itself draws inside destination window
 class ImGuiRenderWindow
 {
@@ -181,6 +184,7 @@ public:
 	void drawPolyLine(const int count, ImVec2* verts, const Color& color, ImDrawFlags flags = 0, float thickness = 1.0f);
 	void drawText(const float x, const float y, const float size, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow = true);
 	void drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color);
+	void drawTriangleFilled(const float x, const float y, const float w, const float h, const float angle, const Color& color);
 	void drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 
 	// remember it's a "cursor window pos"

@@ -46,10 +46,10 @@ enum BeamTypes
 * let arr = str.split('\n');
 
 for(let i = 0; i < arr.length; i++) {
-    let s = arr[i];
-    let endPos = s.indexOf('(');
-    let resultString = arr[i].substring(0, endPos);
-    console.log(resultString + ',');
+	let s = arr[i];
+	let endPos = s.indexOf('(');
+	let resultString = arr[i].substring(0, endPos);
+	console.log(resultString + ',');
 }
 */
 

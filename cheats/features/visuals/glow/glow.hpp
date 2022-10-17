@@ -2,15 +2,15 @@
 
 #include <classes/doPostScreen.hpp>
 
-class Glow : public DoPostScreenType
+class Glow : protected DoPostScreenType
 {
 public:
 	constexpr Glow() :
 		DoPostScreenType{}
 	{}
 
-	virtual void init();
-	virtual void run();
+protected:
+	virtual void run() override;
 };
 
-[[maybe_unused]] inline auto g_Glow = Glow{};
+GLOBAL_FEATURE(Glow);

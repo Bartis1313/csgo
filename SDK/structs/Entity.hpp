@@ -6,6 +6,7 @@
 #include "../math/Vector.hpp"
 #include "../math/matrix.hpp"
 #include "../math/AABB.hpp"
+#include "../varMapping.hpp"
 #include "indexes.hpp"
 
 #include <utilities/netvars/netvars.hpp>
@@ -71,13 +72,13 @@ public:
 	VFUNC(void, preDataUpdate, PRE_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 
-	_NODISCARD CUtlVector<Matrix3x4> m_CachedBoneData();
-	_NODISCARD Vec3 getAimPunch();
-	_NODISCARD Vec3 getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
-	_NODISCARD AnimationLayer* getAnimOverlays();
-	_NODISCARD size_t getSequenceActivity(size_t sequence);
+	[[nodiscard]] CUtlVector<Matrix3x4> m_CachedBoneData();
+	[[nodiscard]] Vec3 getAimPunch();
+	[[nodiscard]] Vec3 getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
+	[[nodiscard]] AnimationLayer* getAnimOverlays();
+	[[nodiscard]] size_t getSequenceActivity(size_t sequence);
 
-	_NODISCARD bool isBreakable();
+	[[nodiscard]] bool isBreakable();
 };
 
 class Weapon_t : public Entity_t
@@ -102,21 +103,21 @@ public:
 	VFUNC(float, getSpread, SPREAD, (), (this));
 	VFUNC(WeaponInfo*, getWpnInfo, WEAPONINFO, (), (this));
 
-	_NODISCARD std::string getWpnName();
-	_NODISCARD std::u8string getIcon(int correctIndex = -1);
+	[[nodiscard]] std::string getWpnName();
+	[[nodiscard]] std::u8string getIcon(int correctIndex = -1);
 
-	_NODISCARD bool isEmpty() { return m_iClip1() <= 0; }
-	_NODISCARD bool isRifle();
-	_NODISCARD bool isSmg();
-	_NODISCARD bool isMachineGun();
-	_NODISCARD bool isShotgun();
-	_NODISCARD bool isPistol();
-	_NODISCARD bool isSniper();
-	_NODISCARD bool isGrenade();
-	_NODISCARD bool isKnife();
-	_NODISCARD bool isNonAimable();
+	[[nodiscard]] bool isEmpty() { return m_iClip1() <= 0; }
+	[[nodiscard]] bool isRifle();
+	[[nodiscard]] bool isSmg();
+	[[nodiscard]] bool isMachineGun();
+	[[nodiscard]] bool isShotgun();
+	[[nodiscard]] bool isPistol();
+	[[nodiscard]] bool isSniper();
+	[[nodiscard]] bool isGrenade();
+	[[nodiscard]] bool isKnife();
+	[[nodiscard]] bool isNonAimable();
 
-	_NODISCARD size_t getNadeRadius();
+	[[nodiscard]] size_t getNadeRadius();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,13 +125,13 @@ public:
 class Inferno_t : public Entity_t
 {
 public:
-	_NODISCARD static float expireTime() { return 7.0f; }
+	[[nodiscard]] static float expireTime() { return 7.0f; }
 	OFFSET(float, spawnTime, 0x20);
 	NETVAR(int, m_fireCount, "DT_Inferno", "m_fireCount");
 	PTRNETVAR(int, m_fireXDelta, "DT_Inferno", "m_fireXDelta");
 	PTRNETVAR(int, m_fireYDelta, "DT_Inferno", "m_fireYDelta");
 	PTRNETVAR(int, m_fireZDelta, "DT_Inferno", "m_fireZDelta");
-	_NODISCARD Vec3 getInfernoPos(size_t indexFire);
+	[[nodiscard]] Vec3 getInfernoPos(size_t indexFire);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +151,7 @@ public:
 class Smoke_t : public Entity_t
 {
 public:
-	_NODISCARD static float expireTime() { return 19.0f; }
+	[[nodiscard]] static float expireTime() { return 19.0f; }
 	NETVAR(int, m_nSmokeEffectTickBegin, "DT_SmokeGrenadeProjectile", "m_nSmokeEffectTickBegin");
 };
 
@@ -164,7 +165,7 @@ public:
 	NETVAR(float, m_flC4Blow, "DT_PlantedC4", "m_flC4Blow");
 	NETVAR(bool, m_bBombDefused, "DT_PlantedC4", "m_bBombDefused");
 	NETVAR(bool, m_nBombSite, "DT_PlantedC4", "m_nBombSite");
-	_NODISCARD char getBombSiteName() { return m_nBombSite() == 0 ? 'A' : 'B'; }
+	[[nodiscard]] char getBombSiteName() { return m_nBombSite() == 0 ? 'A' : 'B'; }
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,33 +203,35 @@ public:
 	NETVAR(int, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
 	NETVAR(int, m_iAccount, "DT_CSPlayer", "m_iAccount");
 	PTRNETVAR(const char, m_szLastPlaceName, "DT_BasePlayer", "m_szLastPlaceName");
+	//FRAME_NET_UPDATE_POSTDATAUPDATE_END
+	PTROFFSET(VarMapping_t, getVarMap, 0x24);
 
 	void setAbsOrigin(const Vec3& origin);
-	_NODISCARD Weapon_t* getActiveWeapon();
-	_NODISCARD bool isAlive() { return m_iHealth() > 0; }
-	_NODISCARD bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
-	_NODISCARD bool isMoving() { return m_vecVelocity().toVecPrev().length() > 0.1f; }
+	[[nodiscard]] Weapon_t* getActiveWeapon();
+	[[nodiscard]] bool isAlive() { return m_iHealth() > 0; }
+	[[nodiscard]] bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }
+	[[nodiscard]] bool isMoving() { return m_vecVelocity().toVecPrev().length() > 0.1f; }
 
-	_NODISCARD Vec3 getHitboxPos(const int id);
-	_NODISCARD Vec3 getBonePos(const int id);
-	_NODISCARD Vec3 getHitgroupPos(const int hitgroup);
-	_NODISCARD bool isC4Owner();
-	_NODISCARD std::string getName();
-	_NODISCARD int getKills();
-	_NODISCARD int getDeaths();
-	_NODISCARD int getPing();
-	_NODISCARD std::string getRank(bool useShortName = false);
-	_NODISCARD int getWins();
-	_NODISCARD bool isPossibleToSee(Player_t* player, const Vec3& pos);
-	_NODISCARD bool isViewInSmoke(const Vec3& pos);
-	_NODISCARD bool isOtherTeam(Player_t* player);
+	[[nodiscard]] Vec3 getHitboxPos(const int id);
+	[[nodiscard]] Vec3 getBonePos(const int id);
+	[[nodiscard]] Vec3 getHitgroupPos(const int hitgroup);
+	[[nodiscard]] bool isC4Owner();
+	[[nodiscard]] std::string getName();
+	[[nodiscard]] int getKills();
+	[[nodiscard]] int getDeaths();
+	[[nodiscard]] int getPing();
+	[[nodiscard]] std::string getRank(bool useShortName = false);
+	[[nodiscard]] int getWins();
+	[[nodiscard]] bool isPossibleToSee(Player_t* player, const Vec3& pos);
+	[[nodiscard]] bool isViewInSmoke(const Vec3& pos);
+	[[nodiscard]] bool isOtherTeam(Player_t* player);
 	// address as number
-	_NODISCARD uintptr_t getLiteralAddress();
+	[[nodiscard]] uintptr_t getLiteralAddress();
 
 	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/shared/collisionproperty.cpp#L845
-	_NODISCARD AABB_t getOcclusionBounds();
+	[[nodiscard]] AABB_t getOcclusionBounds();
 	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/server/gameinterface.cpp#L2772
-	_NODISCARD AABB_t getCameraBounds();
+	[[nodiscard]] AABB_t getCameraBounds();
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////

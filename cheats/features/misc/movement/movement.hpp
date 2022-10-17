@@ -6,15 +6,16 @@
 class CUserCmd;
 class IConVar;
 
-class Movement : public CreateMovePrePredictionType
+class Movement : protected CreateMovePrePredictionType
 {
 public:
 	constexpr Movement() :
 		CreateMovePrePredictionType{}
 	{}
 
-	virtual void init();
-	virtual void run(CUserCmd* cmd);
+protected:
+	virtual void run(CUserCmd* cmd) override;
+	virtual void init() override;
 private:
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/333797-humanised-bhop.html
 	void bunnyhop(CUserCmd* cmd);
@@ -23,12 +24,10 @@ private:
 	IConVar* m_sideSpeed;
 };
 
-[[maybe_unused]] inline auto g_Movement = Movement{};
+GLOBAL_FEATURE(Movement);
 
 class MovementFix
 {
 public:
-	virtual void run(CUserCmd* cmd, const Vec3& oldAngle);
+	static void run(CUserCmd* cmd, const Vec3& oldAngle);
 };
-
-[[maybe_unused]] inline auto g_MovementFix = MovementFix{};

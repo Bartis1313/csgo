@@ -11,21 +11,21 @@ class RadarSizeHelper;
 struct IDirect3DTexture9;
 
 // texture - https://www.unknowncheats.me/forum/counterstrike-global-offensive/317765-getting-map-overview-information-textured-radar.html
-class Radar : public RenderablePresentType
+class Radar : protected RenderablePresentType
 {
 public:
 	constexpr Radar() :
 		RenderablePresentType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
-	_NODISCARD constexpr IDirect3DTexture9*& getTexture() { return m_mapTexture; }
+	[[nodiscard]] constexpr IDirect3DTexture9*& getTexture() { return m_mapTexture; }
 	constexpr void setInited(bool val) { m_inited = val; }
 	// will only work for vanilla maps
 	bool manuallyInitTexture();
+protected:
+	virtual void draw() override;
 private:
-	_NODISCARD Vec2 entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const Vec2& pos, const Vec2& size, const float scale, bool clipRanges);
+	[[nodiscard]] Vec2 entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const Vec2& pos, const Vec2& size, const float scale, bool clipRanges);
 	struct MapPos
 	{
 		Vec2 m_pos;
@@ -45,7 +45,7 @@ private:
 	friend RadarSizeHelper;
 };
 
-[[maybe_unused]] inline auto g_Radar = Radar{};
+GLOBAL_FEATURE(Radar);
 
 class RadarSizeHelper : public OverViewMapType
 {
@@ -54,8 +54,9 @@ public:
 		OverViewMapType{}
 	{}
 
+protected:
 	virtual void init();
 	virtual void run(MapStruct* map);
 };
 
-[[maybe_unused]] inline auto g_RadarSizeHelper = RadarSizeHelper{};
+GLOBAL_FEATURE(RadarSizeHelper);

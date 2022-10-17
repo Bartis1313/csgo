@@ -5,30 +5,31 @@
 
 class IMaterial;
 
-class NoScope : public RenderableSurfaceType
+class NoScope : protected RenderableSurfaceType
 {
 public:
 	constexpr NoScope() :
 		RenderableSurfaceType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
 };
 
-[[maybe_unused]] inline auto g_NoScope = NoScope{};
+GLOBAL_FEATURE(NoScope);
 
-class NoScopeBlur : DoPostScreenType
+class NoScopeBlur : protected DoPostScreenType
 {
 public:
 	constexpr NoScopeBlur() :
 		DoPostScreenType{}
 	{}
 
-	virtual void init();
-	virtual void run();
+protected:
+	virtual void run() override;
+	virtual void init() override;
 private:
 	IMaterial* m_blurScope;
 };
 
-[[maybe_unused]] inline auto g_NoScopeBlur = NoScopeBlur{};
+GLOBAL_FEATURE(NoScopeBlur);

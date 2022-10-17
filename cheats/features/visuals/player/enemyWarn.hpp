@@ -7,18 +7,19 @@
 class Player_t;
 class IConVar;
 
-class EnemyWarning : public OnlyInitType
+class EnemyWarning : protected OnlyInitType
 {
 public:
 	constexpr EnemyWarning() :
 		OnlyInitType{}
 	{}
 
-	virtual void init();
- 	std::pair<bool, bool> check(Player_t* ent);
+	std::pair<bool, bool> check(Player_t* ent);
 	void draw(const std::pair<bool, bool>& checks);
+protected:
+	virtual void init() override;
 private:
 	IConVar* m_scale;
 };
 
-[[maybe_unused]] inline auto g_EnemyWarning = EnemyWarning{};
+GLOBAL_FEATURE(EnemyWarning);

@@ -10,15 +10,16 @@ class ITexture;
 struct IDirect3DTexture9;
 class MirrorCamDraw;
 
-class MirrorCam : public RenderViewType
+class MirrorCam : protected RenderViewType
 {
 public:
 	constexpr MirrorCam() :
 		RenderViewType{}
 	{}
 
-	virtual void init();
-	virtual void run(const CViewSetup& view);
+protected:
+	virtual void run(const CViewSetup& view) override;
+	virtual void init() override;
 private:
 	constexpr void setSize(const Vec2& size) { m_size = size; }
 	IDirect3DTexture9* getTexture() const;
@@ -30,18 +31,17 @@ private:
 	friend MirrorCamDraw;
 };
 
-[[maybe_unused]] inline auto g_MirrorCam = MirrorCam{};
+GLOBAL_FEATURE(MirrorCam);
 
-class MirrorCamDraw : public RenderablePresentType
+class MirrorCamDraw : protected RenderablePresentType
 {
 public:
 	constexpr MirrorCamDraw() :
 		RenderablePresentType{}
 	{}
 
-	virtual void init();
-	virtual void draw();
+protected:
+	virtual void draw() override;
 };
 
-[[maybe_unused]] inline auto g_MirrorCamDraw = MirrorCamDraw{};
-
+GLOBAL_FEATURE(MirrorCamDraw);

@@ -27,16 +27,12 @@ public:
 public:
 	// logs into console + draw + file
 	template<typename... Args_t>
-	void log(TypeLogs type, const std::string_view fmt, Args_t&&... args);
-
-	// only puts it inside drawing
-	// There is no date, no automatic newline
-	template<typename... Args_t>
-	void print(const std::string& fmt, Args_t&&... args);
+	void log(const char* loc, TypeLogs type, const std::string_view fmt, Args_t&&... args);
 private:
 	std::unordered_map<TypeLogs, ColorsConsole> colorsForConsole;
 	std::unordered_map<TypeLogs, std::string_view> consoleStrings;
-	std::unordered_map<TypeLogs, SDKColor> colorsForView;
+	std::unordered_map<TypeLogs, Color> colorsForView;
+	std::unordered_map<TypeLogs, char> signs;
 
 	void setColor(ColorsConsole color);
 	void reset();
@@ -51,8 +47,8 @@ private:
 // https://youtu.be/TxhQQLGafZ4?t=78
 // :D
 
-template</*TypeLogs type, */typename... Args_t>
-void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
+template<typename... Args_t>
+void Console::log(const char* loc, TypeLogs type, const std::string_view fmt, Args_t&&... args)
 {
 	std::scoped_lock lock{ mutex };
 
@@ -63,13 +59,15 @@ void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 		return;
 
 	std::ofstream log{ config.getHackPath() / m_logName, std::ofstream::out | std::ofstream::app };
+	std::string buffer{};
 
 #ifdef _DEBUG
-	setColor(colorsForConsole[type]);
-	std::cout << consoleStrings[type];
-	reset();
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(colorsForConsole[type]));
+	if (type != TypeLogs::LOG_NO)
+		std::cout << FORMAT(XOR("{}{} {} "), signs[type], consoleStrings[type], loc);
+
+	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(ColorsConsole::CONSOLE_WHITE));
 #endif
-	std::string buffer;
 
 	buffer += FORMAT(XOR("[{}] "), utilities::getTime());
 
@@ -79,20 +77,20 @@ void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 		buffer += fmt;
 
 	buffer += '\n';
+
 #ifdef _DEBUG
 	std::cout << buffer;
 #endif
-	log << consoleStrings[type] << buffer;
+
+	log << buffer;
 	m_log.AddLog(buffer);
+
 	log.close();
 }
 
-template<typename... Args_t>
-void Console::print(const std::string& fmt, Args_t&&... args)
-{
-	std::scoped_lock lock{ mutex };
-	// we don't need to take of anything because I set it already
-	m_log.AddLog(fmt, args...);
-}
-
 inline Console console;
+
+#define LOG_INFO(fmt, ...) console.log(XOR(__FUNCTION__), TypeLogs::LOG_INFO, fmt, __VA_ARGS__)
+#define LOG_ERR(fmt, ...) console.log(XOR(__FUNCTION__), TypeLogs::LOG_ERR, fmt, __VA_ARGS__)
+#define LOG_WARN(fmt, ...) console.log(XOR(__FUNCTION__), TypeLogs::LOG_WARN, fmt, __VA_ARGS__)
+#define LOG_EMPTY(fmt, ...) console.log(XOR(__FUNCTION__), TypeLogs::LOG_NO, fmt, __VA_ARGS__)

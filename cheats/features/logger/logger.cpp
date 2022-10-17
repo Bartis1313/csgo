@@ -5,11 +5,6 @@
 #include <utilities/renderer/renderer.hpp>
 #include <config/vars.hpp>
 
-void Logger::init()
-{
-
-}
-
 void Logger::add(const Log_t& log)
 {
 	if (!vars::misc->logs->enabled)

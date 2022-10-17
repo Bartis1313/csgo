@@ -4,7 +4,7 @@
 
 #include <vector>
 
-class FrameStageType : public BaseHack
+class FrameStageType : protected BaseHack
 {
 public:
 	constexpr FrameStageType() :
@@ -13,8 +13,14 @@ public:
 		m_hacksRun.push_back(this);
 	}
 
-	virtual void run(int frame) {};
 	static void runAll(int frame);
 protected:
+	virtual void run(int frame) = 0;
+	// keep those methods to be nothing as default
+	// mostly we don't need all of them
+	virtual void init() override {};
+	virtual void reset() override {};
+	virtual void shutdown() override {};
+private:
 	inline static std::vector<FrameStageType*> m_hacksRun;
 };

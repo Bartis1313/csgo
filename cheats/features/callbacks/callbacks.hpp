@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 
-class Callbacks : public OnlyInitType
+class Callbacks : protected OnlyInitType
 {
 public:
 	constexpr Callbacks() :
@@ -14,8 +14,9 @@ public:
 	{}
 
 	clientEffectCallback getCallbackByMemory(/*const */clientEffectCallback/*&*/ callb);
-	virtual void init();
-	virtual void shutdown();
+protected:
+	virtual void init() override;
+	virtual void shutdown() override;
 private:
 	struct clbStruct
 	{
@@ -30,4 +31,4 @@ private:
 	CClientEffectRegistration* m_head;
 };
 
-[[maybe_unused]] inline auto g_Callbacks = Callbacks{};
+GLOBAL_FEATURE(Callbacks);

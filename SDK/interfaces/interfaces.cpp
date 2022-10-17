@@ -1,5 +1,7 @@
 #include "interfaces.hpp"
 
+#include "../interfaceNode.hpp"
+
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/console/console.hpp>
@@ -11,16 +13,12 @@
 #include <string>
 #include <optional>
 
-struct InterfacesNode
-{
-	std::add_pointer_t<void* ()> m_createFn;
-	const char* m_name;
-	InterfacesNode* m_next;
-};
-
 #define EXPORT(var, hash, _module) \
+	var = ::li::detail::lazy_function<hash, decltype(var)>().in(g_Memory.getModule(_module));
+
+#define EXPORT_LOG(var, hash, _module) \
 	var = ::li::detail::lazy_function<hash, decltype(var)>().in(g_Memory.getModule(_module)); \
-	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var)));
+	LOG_INFO(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var));
 
 template <typename T>
 static std::optional<T*> getInterface(const std::string_view moduleName, const std::string_view interfaceName)
@@ -41,6 +39,8 @@ static std::optional<T*> getInterface(const std::string_view moduleName, const s
 	return std::nullopt;
 }
 
+#undef EXPORT
+
 // capture and log
 // var - var you want to init
 // type - type for template
@@ -51,15 +51,15 @@ static std::optional<T*> getInterface(const std::string_view moduleName, const s
 		var = val.value(); \
 	else \
 		throw std::runtime_error(FORMAT(XOR("Interface {} was nullptr"), _interface)); \
-	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), _interface, reinterpret_cast<uintptr_t>(var)));
+	LOG_INFO(XOR("found {} at addr: 0x{:X}"), _interface, reinterpret_cast<uintptr_t>(var));
 
 #define ADD(var, mem) \
 	var = mem; \
-	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var)));
+	LOG_INFO(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var));
 
 #define FROM_VFUNC(var, expression) \
 	var = expression; \
-	console.log(TypeLogs::LOG_INFO, FORMAT(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var)));
+	LOG_INFO(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var));
 
 #define ENGINE_DLL					XOR("engine.dll")
 #define CLIENT_DLL					XOR("client.dll")
@@ -101,10 +101,10 @@ bool interfaces::init()
 
 #undef CAP
 
-	EXPORT(keyValuesSys, "KeyValuesSystem"_hash, VSTD_DLL);
-	EXPORT(memAlloc, "g_pMemAlloc"_hash, TIER_DLL);
+	EXPORT_LOG(keyValuesSys, "KeyValuesSystem"_hash, VSTD_DLL);
+	EXPORT_LOG(memAlloc, "g_pMemAlloc"_hash, TIER_DLL);
 
-#undef EXPORT
+#undef EXPORT_LOG
 
 	FROM_VFUNC(globalVars, Memory::Address<CGlobalVarsBase*>{ vfunc::getVFunc(client, 0) }.add(0x1F).ref(Memory::Dereference::TWICE)());
 	FROM_VFUNC(clientMode, Memory::Address<ClientMode*>{ vfunc::getVFunc(client, 10) }.add(0x5).ref(Memory::Dereference::TWICE)());
@@ -124,6 +124,6 @@ bool interfaces::init()
 
 #undef ADD
 
-	console.log(TypeLogs::LOG_INFO, XOR("interfaces success"));
+	LOG_INFO(XOR("interfaces success"));
 	return true;
 }

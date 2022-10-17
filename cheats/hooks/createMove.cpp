@@ -33,9 +33,9 @@
 //}
 
 // to get the sendPacket correctly and no need to define it anywhere in headers
-void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool& sendPacket)
+void __fastcall createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool active, bool& sendPacket)
 {
-	hooks::proxyCreateMove::original(sequence, inputTime, active);
+	hooks::proxyCreateMove::original(thisptr, sequence, inputTime, active);
 
 	CUserCmd* cmd = interfaces::input->getUserCmd(0, sequence);
 	if (!cmd || !cmd->m_commandNumber)
@@ -48,7 +48,7 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	Vec3 oldAngle = cmd->m_viewangles;
 
 	// otherwise we moving
-	if (g_Freecam.isInCam())
+	if (g_Freecam->isInCam())
 	{
 		cmd->m_forwardmove = 0;
 		cmd->m_sidemove = 0;
@@ -57,15 +57,15 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 	game::serverTime(cmd);
 	CreateMovePrePredictionType::runAll(cmd);
 
-	g_Prediction.update();
-	g_Prediction.addToPrediction(cmd, [=]()
+	g_Prediction->update();
+	g_Prediction->addToPrediction(cmd, [=]()
 		{
 			CreateMoveInPredictionType::runAll(cmd);
 		});
 
 	CreateMovePostPredictionType::runAll(cmd);
 
-	g_MovementFix.run(cmd, oldAngle);
+	MovementFix::run(cmd, oldAngle);
 
 	// don't get untrusted
 	cmd->m_viewangles.normalize();
@@ -76,15 +76,14 @@ void __stdcall createMoveProxy(int sequence, float inputTime, bool active, bool&
 }
 
 // wrapper for function
-__declspec(naked) void __stdcall hooks::proxyCreateMove::hooked(int sequence, float inputFrame, bool active)
+__declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(FAST_ARGS, int sequence, float inputFrame, bool active)
 {
 	__asm
 	{
 		push ebp
 		mov ebp, esp
 		push ebx
-		lea ecx, [esp]
-		push ecx
+		push esp
 		/*push dword ptr[active]
 		push dword ptr[inputFrame]
 		push dword ptr[sequence]*/

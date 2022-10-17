@@ -13,11 +13,6 @@
 #include <utilities/tools/tools.hpp>
 #include <gamememory/memory.hpp>
 
-void MotionBlur::init()
-{
-	
-}
-
 // 1:1 from https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/viewpostprocess.cpp#L2996
 // with small reduce of code because we dont care for portal/ps3 stuff and also we dont care for detecting blur, but knowing it's enabled
 void MotionBlur::run(CViewSetup* view)

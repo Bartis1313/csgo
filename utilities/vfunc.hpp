@@ -30,5 +30,5 @@ namespace vfunc
 // variables - variables from args, the starting will always be a pointer to class, eg: (this, value)
 #define VFUNC(type, name, index, args, variables) \
 type name args { \
-    return vfunc::callVFunc<type, index>variables; \
+	return vfunc::callVFunc<type, index>variables; \
 }

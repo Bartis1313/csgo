@@ -12,11 +12,6 @@
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 
-void MolotovDraw::init()
-{
-
-}
-
 void MolotovDraw::draw()
 {
 	if (!vars::visuals->world->molotov->enabled)

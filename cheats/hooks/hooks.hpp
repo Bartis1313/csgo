@@ -27,7 +27,10 @@ enum hookIndexes
 	IS_HLTV = 93,
 	SCREEN_2D_EFFECT = 39,
 	ADD_ENT = 11,
-	REMOVE_ENT = 12
+	REMOVE_ENT = 12,
+	LEVEL_INIT_PREENT = 5,
+	LEVEL_INIT_POSTENT = 6,
+	LEVEL_SHUTDOWN = 7,
 };
 
 class IPanel;
@@ -41,135 +44,83 @@ struct MapStruct;
 class IMaterialSystem;
 
 #define FAST_ARGS [[maybe_unused]] void* thisptr, [[maybe_unused]] void* edx
+#define FASTCALL __fastcall
+
+#define HOOK_STRUCT_VFUNC(name, type, idx, ...) \
+struct name { \
+	using fn = type(__thiscall*)(void*, __VA_ARGS__); \
+	static type __fastcall hooked(FAST_ARGS, __VA_ARGS__); \
+	inline static fn original = nullptr; \
+	static constexpr int index = idx; \
+};
+
+#define HOOK_STRUCT_FUNC(name, type, ...) \
+struct name { \
+	using fn = type(__thiscall*)(void*, __VA_ARGS__); \
+	static type __fastcall hooked(FAST_ARGS, __VA_ARGS__); \
+	inline static fn original = nullptr; \
+};
+
+#define HOOK_STRUCT_API_VFUNC(name, type, idx, ...) \
+struct name { \
+	using fn = type(__stdcall*)(__VA_ARGS__); \
+	static type __stdcall hooked(__VA_ARGS__); \
+	inline static fn original = nullptr; \
+	static constexpr int index = idx; \
+};
+
+#define HOOK_STRUCT_API(name, type, ...) \
+struct name { \
+	using fn = type(__stdcall*)(__VA_ARGS__); \
+	static type __stdcall hooked(__VA_ARGS__); \
+	inline static fn original = nullptr; \
+};
 
 namespace hooks
 {
 	void init();
 	void shutdown();
 
-	struct paintTraverse
-	{
-		using fn = void(__thiscall*)(IPanel*, unsigned int, bool, bool);
-		static void __stdcall hooked(unsigned int panel, bool forceRepaint, bool allowForce);
-		inline static fn original = nullptr;
-		static constexpr int index = PAINTTRAVERSE;
-	};
+	HOOK_STRUCT_VFUNC(paintTraverse, void, PAINTTRAVERSE, unsigned int, bool, bool);
+	HOOK_STRUCT_VFUNC(drawModel, void, DRAWMODEL, void*, const DrawModelState_t&, const ModelRenderInfo_t&, Matrix3x4*);
+	HOOK_STRUCT_VFUNC(overrideView, void, OVERRIDE, CViewSetup*);
+	HOOK_STRUCT_VFUNC(doPostScreenEffects, int, POSTSCREENEFFECT, int);
+	HOOK_STRUCT_VFUNC(frameStageNotify, void, FRAMESTAGE, int);
+	HOOK_STRUCT_VFUNC(lockCursor, void, LOCK_CURSOR);
+	HOOK_STRUCT_VFUNC(proxyCreateMove, void, PROXY_MOVE, int, float, bool);
+	HOOK_STRUCT_VFUNC(unknownFileSystem, int, UNKOWN_FILESYS, void*);
+	HOOK_STRUCT_VFUNC(getUnverifiedFileHashes, int, UNVERIFIED_FILE_HASHES, int);
+	HOOK_STRUCT_VFUNC(unkFileCheck, int, UNK_FILE_CHECK);
+	HOOK_STRUCT_VFUNC(sv_cheats, bool, SV_CHEATS);
+	HOOK_STRUCT_VFUNC(renderView, void, RENDER_VIEW, const CViewSetup&, const CViewSetup&, int, int);
+	HOOK_STRUCT_VFUNC(isHltv, bool, IS_HLTV);
+	HOOK_STRUCT_VFUNC(screen2DEffect, void, SCREEN_2D_EFFECT, CViewSetup*);
+	HOOK_STRUCT_VFUNC(addEnt, void, ADD_ENT, void*, int);
+	HOOK_STRUCT_VFUNC(removeEnt, void, REMOVE_ENT, void*, int);
+	// reset everything
+	HOOK_STRUCT_VFUNC(levelInitPreEntity, void, LEVEL_INIT_PREENT, const char*);
+	// map loads - use any visual change
+	HOOK_STRUCT_VFUNC(levelInitPostEntity, void, LEVEL_INIT_POSTENT);
+	HOOK_STRUCT_VFUNC(levelShutdown, void, LEVEL_SHUTDOWN);
 
-	/*struct createMove
-	{
-		using fn = bool(__stdcall*)(float, CUserCmd*);
-		static bool __stdcall hooked(float inputFrame, CUserCmd* cmd);
-		inline static fn original = nullptr;
-		static const int index = CREATEMOVE;
-	};*/
+	HOOK_STRUCT_FUNC(getColorModulation, void, float* r, float* g, float* b);
+	HOOK_STRUCT_FUNC(buildTransformations, void, CStudioHdr*, void*, void*, const Matrix3x4&, int, void*);
+	HOOK_STRUCT_FUNC(doExtraBonesProcessing, void, void* hdr, void* pos, void* q, const Matrix3x4& matrix, void* computed, void* contex);
+	HOOK_STRUCT_FUNC(particlesSimulations, void);
+	HOOK_STRUCT_FUNC(sendDatagram, int, void*);
+	HOOK_STRUCT_FUNC(unknownOverViewFun, int, int);
+	HOOK_STRUCT_FUNC(isDepthOfField, bool);
+	HOOK_STRUCT_FUNC(fxBlood, void, Vec3&, Vec3&, float, float, float, float);
+	HOOK_STRUCT_FUNC(clientValidAddr, char, const char*);
+	HOOK_STRUCT_FUNC(engineValidAddr, char, const char*);
+	HOOK_STRUCT_FUNC(studioRenderValidAddr, char, const char*);
+	HOOK_STRUCT_FUNC(materialSystemValidAddr, char, const char*);
+	HOOK_STRUCT_FUNC(isUsingStaticPropDebugModes, bool);
 
-	struct drawModel
-	{
-		using fn = void(__thiscall*)(void*, void*, const DrawModelState_t&, const ModelRenderInfo_t&, Matrix3x4*);
-		static void __stdcall hooked(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
-		inline static fn original = nullptr;
-		static constexpr int index = DRAWMODEL;
-	};
-
-	struct overrideView
-	{
-		using fn = void(__stdcall*)(CViewSetup*);
-		static void __stdcall hooked(CViewSetup* view);
-		inline static fn original = nullptr;
-		static constexpr int index = OVERRIDE;
-	};
-
-	struct doPostScreenEffects
-	{
-		using fn = int(__thiscall*)(void*, int);
-		static int __stdcall hooked(int val);
-		inline static fn original = nullptr;
-		static constexpr int index = POSTSCREENEFFECT;
-	};
-
-	struct frameStageNotify
-	{
-		using fn = void(__thiscall*)(void*, int);
-		static void __stdcall hooked(int frame);
-		inline static fn original = nullptr;
-		static constexpr int index = FRAMESTAGE;
-	};	
-
-	struct clientValidAddr
-	{
-		using fn = char(__thiscall*)(void*, const char*);
-		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
-		inline static fn original = nullptr;
-	};
-
-	struct engineValidAddr
-	{
-		using fn = char(__thiscall*)(void*, const char*);
-		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
-		inline static fn original = nullptr;
-	};
-
-	struct studioRenderValidAddr
-	{
-		using fn = char(__thiscall*)(void*, const char*);
-		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
-		inline static fn original = nullptr;
-	};
-
-	struct materialSystemValidAddr
-	{
-		using fn = char(__thiscall*)(void*, const char*);
-		static char __fastcall hooked(FAST_ARGS, const char* lpModuleName);
-		inline static fn original = nullptr;
-	};
-
-	struct isUsingStaticPropDebugModes
-	{
-		using fn = bool(__thiscall*)(void*);
-		static bool __fastcall hooked(FAST_ARGS);
-		inline static fn original = nullptr;
-	};
-
-	struct lockCursor
-	{
-		using fn = void(__thiscall*)(void*);
-		static void __stdcall hooked();
-		inline static fn original = nullptr;
-		static constexpr int index = LOCK_CURSOR;
-	};
-
-	struct reset
-	{
-		using fn = long(__stdcall*)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
-		static long __stdcall hooked(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params);
-		inline static fn original = nullptr;
-		static constexpr int index = RESETDX;
-	};
-
-	struct present
-	{
-		using fn = long(__stdcall*)(IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
-		static long __stdcall hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region);
-		inline static fn original = nullptr;
-		static constexpr int index = PRESENTDX;
-	};
-
-	struct drawIndexedPrimitive
-	{
-		using fn = long(__stdcall*)(IDirect3DDevice9*, D3DPRIMITIVETYPE, INT, UINT, UINT, UINT, UINT);
-		static long __stdcall hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex, UINT numVertices, UINT startIndex, UINT primCount);
-		inline static fn original = nullptr;
-		static const int index = DRAW_IDX_PRIMITIVE;
-	};
-
-	/*struct endScene
-	{
-		using fn = long(__stdcall*)(IDirect3DDevice9*);
-		static long __stdcall hooked(IDirect3DDevice9* device);
-		inline static fn original;
-		static const int index = END_SCENE;
-	};*/
-
+	HOOK_STRUCT_API_VFUNC(reset, long, RESETDX, IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
+	HOOK_STRUCT_API_VFUNC(present, long, PRESENTDX, IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
+	HOOK_STRUCT_API_VFUNC(drawIndexedPrimitive, long, DRAW_IDX_PRIMITIVE, IDirect3DDevice9*, D3DPRIMITIVETYPE, INT, UINT, UINT, UINT, UINT);
+	// move this somewhere?
 	struct wndProcSys
 	{
 		inline static WNDPROC wndProcOriginal = nullptr;
@@ -179,140 +130,9 @@ namespace hooks
 		static void init();
 		static void shutdown();
 	};
-
-	struct proxyCreateMove
-	{
-		using fn = void(__stdcall*)(int, float, bool);
-		static void __stdcall hooked(int sequence, float inputFrame, bool active);
-		inline static fn original = nullptr;
-		static constexpr int index = PROXY_MOVE;
-	};
-
-	struct getColorModulation
-	{
-		using fn = void(__thiscall*)(void*, float*, float*, float*);
-		static void __fastcall hooked(FAST_ARGS, float* r, float* g, float* b);
-		inline static fn original = nullptr;
-	};
-
-	struct buildTransformations
-	{
-		using fn = void(__thiscall*)(void*, CStudioHdr*, void*, void*, const Matrix3x4&, int, void*);
-		static void __fastcall hooked(FAST_ARGS, CStudioHdr* hdr, void* pos, void* q, const Matrix3x4& matrix, int boneMask, void* computed);
-		inline static fn original = nullptr;
-	};
-
-	struct doExtraBonesProcessing
-	{
-		using fn = void(__thiscall*)(void*, void*, void*, const Matrix3x4&, void*, void*);
-		static void __fastcall hooked(FAST_ARGS, void* hdr, void* pos, void* q, const Matrix3x4& matrix, void* computed, void* contex);
-		inline static fn original = nullptr;
-	};
-
-	struct sv_cheats
-	{
-		using fn = bool(__thiscall*)(void*);
-		static bool __fastcall hooked(FAST_ARGS);
-		inline static fn original = nullptr;
-		static constexpr int index = SV_CHEATS;
-	};
-
-	struct particlesSimulations
-	{
-		using fn = void(__thiscall*)(CParticleCollection*);
-		static void __fastcall hooked(CParticleCollection* thisPtr, void* edx);
-		inline static fn original = nullptr;
-	};
-
-	struct sendDatagram
-	{
-		using fn = int(__thiscall*)(INetChannel*, void*);
-		static int __fastcall hooked(INetChannel* netChannel , void* edx, void* datagram);
-		inline static fn original = nullptr;
-	};
-
-	struct unknownFileSystem
-	{
-		using fn = int(__stdcall*)(void*);
-		static int __stdcall hooked(void* image);
-		inline static fn original = nullptr;
-		static const int index = UNKOWN_FILESYS;
-	};
-
-	struct unknownOverViewFun
-	{
-		using fn = int(__thiscall*)(MapStruct*, int);
-		static int __fastcall hooked(MapStruct* map, void* edx, int unk);
-		inline static fn original = nullptr;
-	};
-
-	struct getUnverifiedFileHashes
-	{
-		using fn = int(__thiscall*)(void*, int);
-		static int __fastcall hooked(FAST_ARGS, int maxFiles);
-		inline static fn original = nullptr;
-		static constexpr int index = UNVERIFIED_FILE_HASHES;
-	};
-
-	struct unkFileCheck
-	{
-		using fn = int(__thiscall*)(void*);
-		static int __fastcall hooked(FAST_ARGS);
-		inline static fn original = nullptr;
-		static constexpr int index = UNK_FILE_CHECK;
-	};
-
-	struct renderView
-	{
-		using fn = void(__thiscall*)(void*, const CViewSetup&, const CViewSetup&, int, int);
-		static void __fastcall hooked(FAST_ARGS, const CViewSetup& view, const CViewSetup& hud, int clearFlags, int whatToDraw);
-		inline static fn original = nullptr;
-		static constexpr int index = RENDER_VIEW;
-	};
-
-	struct isHltv
-	{
-		using fn = bool(__thiscall*)(void*);
-		static bool __fastcall hooked(FAST_ARGS);
-		inline static fn original = nullptr;
-		static constexpr int index = IS_HLTV;
-	};
-
-	struct screen2DEffect
-	{
-		using fn = void(__stdcall*)(CViewSetup*);
-		static void __stdcall hooked(CViewSetup* view);
-		inline static fn original = nullptr;
-		static constexpr int index = SCREEN_2D_EFFECT;
-	};
-
-	struct isDepthOfField
-	{
-		using fn = bool(__stdcall*)();
-		static bool __stdcall hooked();
-		inline static fn original = nullptr;
-	};
-
-	struct fxBlood
-	{
-		using fn = void(__thiscall*)(void*, Vec3&, Vec3&, float, float, float, float);
-		static void __fastcall hooked(FAST_ARGS, Vec3& pos, Vec3& dir, float r, float g, float b, float a);
-		inline static fn original = nullptr;
-	};
-
-	struct addEnt
-	{
-		using fn = void(__thiscall*)(void*, void*, int);
-		static void __fastcall hooked(FAST_ARGS, void* handleEnt, int handle);
-		inline static fn original = nullptr;
-		static constexpr int index = ADD_ENT;
-	};
-
-	struct removeEnt
-	{
-		using fn = void(__thiscall*)(void*, void*, int);
-		static void __fastcall hooked(FAST_ARGS, void* handleEnt, int handle);
-		inline static fn original = nullptr;
-		static constexpr int index = REMOVE_ENT;
-	};
 }
+
+#undef HOOK_STRUCT_VFUNC
+#undef HOOK_STRUCT_FUNC
+#undef HOOK_STRUCT_API_VFUNC
+#undef HOOK_STRUCT_API

@@ -2,15 +2,15 @@
 
 #include <classes/createMove.hpp>
 
-class Triggerbot : public CreateMoveInPredictionType
+class Triggerbot : protected CreateMoveInPredictionType
 {
 public:
 	constexpr Triggerbot() :
 		CreateMoveInPredictionType{}
 	{}
 
-	virtual void init();
-	virtual void run(CUserCmd* cmd);
+protected:
+	virtual void run(CUserCmd* cmd) override;
 };
 
-[[maybe_unused]] inline auto g_Triggerbot = Triggerbot{};
+GLOBAL_FEATURE(Triggerbot);

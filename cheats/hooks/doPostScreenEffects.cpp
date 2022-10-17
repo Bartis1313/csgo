@@ -4,7 +4,7 @@
 
 #include <SDK/interfaces/interfaces.hpp>
 
-int __stdcall hooks::doPostScreenEffects::hooked(int val)
+int __fastcall hooks::doPostScreenEffects::hooked(FAST_ARGS, int val)
 {
 	DoPostScreenType::runAll();
 

@@ -15,14 +15,9 @@
 #include <game/game.hpp>
 #include <utilities/math/math.hpp>
 
-void Triggerbot::init()
-{
-
-}
-
 void Triggerbot::run(CUserCmd* cmd)
 {
-	auto cfg = g_Aimbot.getCachedConfig();
+	auto cfg = g_Aimbot->getCachedConfig();
 
 	if (!cfg.triggerbot)
 		return;

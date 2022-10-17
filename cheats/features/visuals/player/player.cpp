@@ -32,7 +32,7 @@
 
 void PlayerVisuals::init()
 {
-	g_Events.add(XOR("round_prestart"), std::bind(&PlayerVisuals::resetDormacy, this, std::placeholders::_1));
+	g_Events->add(XOR("round_prestart"), std::bind(&PlayerVisuals::resetDormacy, this, std::placeholders::_1));
 }
 
 void PlayerVisuals::draw()
@@ -96,7 +96,7 @@ void PlayerVisuals::draw()
 			drawSkeleton(ent);
 			runDLight(ent);
 			drawLaser(ent);
-			g_SoundDraw.findBest(entity);
+			g_SoundDraw->findBest(ent);
 		};
 
 		if (drawDead)
@@ -107,10 +107,10 @@ void PlayerVisuals::draw()
 		else
 			runFeatures();
 
-		warnChecks = g_EnemyWarning.check(ent);
+		warnChecks = g_EnemyWarning->check(ent);
 	}
-	g_SoundDraw.draw();
-	g_EnemyWarning.draw(warnChecks);
+	g_SoundDraw->draw();
+	g_EnemyWarning->draw(warnChecks);
 }
 
 void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
@@ -327,7 +327,7 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 		return;
 
 	// have to check if selected record is filled, if no then just skip
-	auto record = !g_Backtrack.getAllRecords().at(ent->getIndex()).empty() ? &g_Backtrack.getAllRecords().at(ent->getIndex()) : nullptr;
+	auto record = !g_Backtrack->getAllRecords().at(ent->getIndex()).empty() ? &g_Backtrack->getAllRecords().at(ent->getIndex()) : nullptr;
 	auto skeletPos = [=](const size_t idx)
 	{
 		auto child = record != nullptr
@@ -352,7 +352,7 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 		if (!(bone->m_flags & BONE_USED_BY_HITBOX))
 			continue;
 
-		if (record && !g_Backtrack.isValid(record->front().m_simtime)) // if backtrack
+		if (record && !g_Backtrack->isValid(record->front().m_simtime)) // if backtrack
 			continue;
 
 		auto child = skeletPos(i);
@@ -386,7 +386,7 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 
 void PlayerVisuals::drawSnapLine(Player_t* ent, const Box& box)
 {
-	if (ent == g_Aimbot.getTargetted())
+	if (ent == g_Aimbot->getTargetted())
 	{
 		// lines on the bottom and center bottom box
 		imRender.drawLine(globals::screenX / 2.0f, static_cast<float>(globals::screenY), box.x + box.w / 2, box.y + box.h, Colors::Purple);
@@ -461,20 +461,20 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 	switch (vars::visuals->esp->boxes->mode)
 	{
 	case E2T(BoxTypes::BOX2D):
-		g_BoxesDraw.drawBox2D(box, isDormant, m_boxAlpha.at(ent->getIndex()));
+		BoxesDraw::drawBox2D(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		break;
 	case E2T(BoxTypes::FILLED2D):
-		g_BoxesDraw.drawBox2DFilled(box, isDormant, m_boxAlpha.at(ent->getIndex()));
+		BoxesDraw::drawBox2DFilled(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		break;
 	case E2T(BoxTypes::BOX3D):
-		g_BoxesDraw.drawBox3D(box, isDormant, m_boxAlpha.at(ent->getIndex()));
+		BoxesDraw::drawBox3D(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		break;
 	case E2T(BoxTypes::FILLED3D):
 	{
 		if (!vars::visuals->esp->boxes->multiColor)
-			g_BoxesDraw.drawBox3DFilled(box, isDormant, m_boxAlpha.at(ent->getIndex()));
+			BoxesDraw::drawBox3DFilled(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		else
-			g_BoxesDraw.drawBox3DFilledMultiColor(box, isDormant, m_boxAlpha.at(ent->getIndex()));
+			BoxesDraw::drawBox3DFilledMultiColor(box, isDormant, m_boxAlpha.at(ent->getIndex()));
 		break;
 	}
 	default:

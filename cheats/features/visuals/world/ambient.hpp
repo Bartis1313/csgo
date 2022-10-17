@@ -4,18 +4,18 @@
 
 class IConVar;
 
-class AmbientLight : public FrameStageType
+class AmbientLight : protected FrameStageType
 {
 public:
 	constexpr AmbientLight() :
 		FrameStageType{}
 	{}
 
-	virtual void init();
-	virtual void run(int frame);
-
 	void setButtonState(bool state) { m_buttonState = state; }
 	void setPickerState(bool state) { m_pickerState = state; }
+protected:
+	virtual void run(int frame) override;
+	virtual void init() override;
 private:
 	IConVar* m_ambientR;
 	IConVar* m_ambientG;
@@ -25,4 +25,4 @@ private:
 	bool m_pickerState = false;
 };
 
-[[maybe_unused]] inline auto g_AmbientLight = AmbientLight{};
+GLOBAL_FEATURE(AmbientLight);

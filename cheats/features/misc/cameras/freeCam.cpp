@@ -10,11 +10,6 @@
 
 #include <game/game.hpp>
 
-void Freecam::init()
-{
-
-}
-
 void Freecam::run(CViewSetup* view)
 {
 	if (menu.isMenuActive())
@@ -98,14 +93,9 @@ void Freecam::run(CViewSetup* view)
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 
-void FreecamDraw::init()
-{
-
-}
-
 void FreecamDraw::draw()
 {
-	if (!g_Freecam.isInCam())
+	if (!g_Freecam->isInCam())
 		return;
 
 	if (ImGui::Begin(XOR("Info##cam"), nullptr, ImGuiWindowFlags_AlwaysAutoResize /*| ImGuiWindowFlags_NoResize*/ | ImGuiWindowFlags_NoCollapse))

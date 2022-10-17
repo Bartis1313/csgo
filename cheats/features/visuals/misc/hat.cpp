@@ -10,11 +10,6 @@
 #include <utilities/math/math.hpp>
 #include <utilities/renderer/renderer.hpp>
 
-void Hat::init()
-{
-
-}
-
 void Hat::draw()
 {
 	if (!vars::misc->hat->enabled)

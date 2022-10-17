@@ -29,7 +29,7 @@ static void getMouse()
 	globals::mouseY = y;
 }
 
-void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepaint, bool allowForce)
+void __fastcall hooks::paintTraverse::hooked(FAST_ARGS, unsigned int panel, bool forceRepaint, bool allowForce)
 {
 	getScreen();
 	getMouse();
@@ -53,7 +53,7 @@ void __stdcall hooks::paintTraverse::hooked(unsigned int panel, bool forceRepain
 			return;
 	}
 
-	original(interfaces::panel, panel, forceRepaint, allowForce);
+	original(thisptr, panel, forceRepaint, allowForce);
 
 	//static Resource res{ IDB_PNG1, "PNG" };
 

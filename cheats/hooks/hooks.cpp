@@ -46,6 +46,9 @@ hookHelper::tryHook(target, &hookStructName::hooked, \
 	HOOK_SAFE_VFUNC(interfaces::dx9Device, drawIndexedPrimitive);
 	HOOK_SAFE_VFUNC(interfaces::client, proxyCreateMove);
 	HOOK_SAFE_VFUNC(interfaces::client, frameStageNotify);
+	HOOK_SAFE_VFUNC(interfaces::client, levelInitPreEntity);
+	HOOK_SAFE_VFUNC(interfaces::client, levelInitPostEntity);
+	HOOK_SAFE_VFUNC(interfaces::client, levelShutdown);
 	HOOK_SAFE_VFUNC(interfaces::panel, paintTraverse);
 	HOOK_SAFE_VFUNC(interfaces::modelRender, drawModel);
 	HOOK_SAFE_VFUNC(interfaces::clientMode, overrideView);
@@ -66,7 +69,7 @@ hookHelper::tryHook(target, &hookStructName::hooked, \
 
 	hookHelper::checkAllHooks();
 
-	console.log(TypeLogs::LOG_INFO, XOR("hooks success"));
+	LOG_INFO(XOR("hooks success"));
 }
 
 #pragma region wndproc
@@ -97,7 +100,7 @@ LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wpa
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(hwnd);
 
-		console.log(TypeLogs::LOG_INFO, XOR("init for wndProc success"));
+		LOG_INFO(XOR("init for wndProc success"));
 
 		return true;
 	} ();

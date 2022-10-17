@@ -93,7 +93,7 @@ std::pair<uintptr_t, bool> Memory::scan(const std::string& mod, const std::strin
 void Memory::init()
 {
 #define ADD_TO_MAP(name) \
-	m_ModulesAddr[name] = (HMODULE)(LI_MODULE(name).cached()); \
+	m_ModulesAddr[name] = (HMODULE)(::li::detail::lazy_module<name##_hash>().cached()); \
 
 	ADD_TO_MAP("engine.dll");
 	ADD_TO_MAP("client.dll");
@@ -182,5 +182,5 @@ void Memory::init()
 	m_tesla						= m_tesla.initAddr(CLIENT_DLL, FX_TESLA);
 	m_dispatchEffect			= m_dispatchEffect.initAddr(CLIENT_DLL, DISPATCH_EFFECT);
 
-	console.log(TypeLogs::LOG_INFO, XOR("memory init success, {} sigs done"), m_countedPatterns);
+	LOG_INFO(XOR("memory init success, {} sigs done"), m_countedPatterns);
 }

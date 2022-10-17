@@ -11,11 +11,6 @@
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 
-void Trails::init()
-{
-
-}
-
 void Trails::draw()
 {
 	static Vec3 end;

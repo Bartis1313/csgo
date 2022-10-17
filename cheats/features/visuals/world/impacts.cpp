@@ -14,11 +14,6 @@
 #include <utilities/renderer/renderer.hpp>
 #include <utilities/tools/tools.hpp>
 
-void BulletImpactsClient::init()
-{
-
-}
-
 void BulletImpactsClient::draw()
 {
 	if (!vars::visuals->world->impacts->enabledClient)
@@ -62,7 +57,7 @@ void BulletImpactsClient::draw()
 
 void BulletImpactsLocal::init()
 {
-	g_Events.add(XOR("bullet_impact"), std::bind(&BulletImpactsLocal::pushBullet, this, std::placeholders::_1));
+	g_Events->add(XOR("bullet_impact"), std::bind(&BulletImpactsLocal::pushBullet, this, std::placeholders::_1));
 }
 
 void BulletImpactsLocal::draw()

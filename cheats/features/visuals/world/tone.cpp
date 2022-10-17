@@ -6,11 +6,6 @@
 #include <game/globals.hpp>
 #include <config/vars.hpp>
 
-void ToneController::init()
-{
-
-}
-
 void ToneController::run(int frame)
 {
 	if (frame != FRAME_RENDER_START)
