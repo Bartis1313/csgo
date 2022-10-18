@@ -15,7 +15,7 @@
 int __fastcall hooks::unknownFileSystem::hooked(FAST_ARGS, void* image)
 {
 	uintptr_t thisptrStack;
-	__asm mov thisptr, ebx;
+	__asm mov thisptrStack, ebx;
 
 	//const static auto ret = utilities::patternScan(PANORAMA_DLL, UNK_FILESYS);
 
