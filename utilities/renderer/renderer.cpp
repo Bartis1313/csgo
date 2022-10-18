@@ -827,9 +827,9 @@ void ImGuiRender::drawTriangle(const float x, const float y, const float w, cons
 	float radian = math::DEG2RAD(angle);
 	float radian90 = math::DEG2RAD(angle + 90);
 
-	const ImVec2 p1 = ImVec2{ (w / 2.0f) * std::cos(radian) + x, (w / 2.0f) * std::sin(radian90) + y };
-	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian) + x, (-w / 2.0f) * std::sin(radian90) + y };
-	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian90) + y };
+	const ImVec2 p1 = ImVec2{ (w / 2.0f) * std::cos(radian90) + x, (w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian90) + x, (-w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian) + y };
 
 	m_drawData.emplace_back(std::make_shared<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
 }
@@ -844,9 +844,9 @@ void ImGuiRender::drawTriangleFilled(const float x, const float y, const float w
 	float radian = math::DEG2RAD(angle);
 	float radian90 = math::DEG2RAD(angle + 90);
 
-	const ImVec2 p1 = ImVec2{ (w / 2.0f) * std::cos(radian) + x, (w / 2.0f) * std::sin(radian90) + y };
-	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian) + x, (-w / 2.0f) * std::sin(radian90) + y };
-	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian90) + y };
+	const ImVec2 p1 = ImVec2{ (w / 2.0f) * std::cos(radian90) + x, (w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian90) + x, (-w / 2.0f) * std::sin(radian90) + y };
+	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian) + y };
 
 	m_drawData.emplace_back(std::make_shared<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
 }
