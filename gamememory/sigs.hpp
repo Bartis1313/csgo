@@ -46,8 +46,11 @@
 // #STR: "func_breakable", "func_breakable_surf"
 #define IS_BREAKBLE					XOR("55 8B EC 51 56 8B F1 85 F6 74 68")
 // this is needed because this convar will rely on many things, the r_drawspecificstaticprop and forcing isn't enough
-// to find it use live debugger, or go by some entity save str
-#define IS_USING_PROP_DEBUG			XOR("8B 0D ? ? ? ? 81 F9 ? ? ? ? 75 ? A1 ? ? ? ? 35 ? ? ? ? EB ? 8B 01 FF 50 ? 83 F8 ? 0F 85 ? ? ? ? 8B 0D")
+// #STR: "CStaticProp::DrawModel", "Static_Prop_Rendering"
+// just like in engine source, before Static_Prop_Rendering there will be a jump to that function
+// first call is that function
+// now, normal sig from selection points to many other functions so use a relative one
+#define IS_USING_PROP_DEBUG			XOR("E8 ? ? ? ? 84 C0 8B 45 08")
 // see how many pushes are logically to color struct
 // should call this one:
 // #STR: "CMaterial::PrecacheVars: error loading vmt file for %s\n", "vmt_patches"
@@ -59,7 +62,7 @@
 // better to use live debugger to find it by easier way
 #define BUILD_TRANSFORMATIONS		XOR("55 8B EC 83 E4 F0 81 EC ? ? ? ? 56 57 8B F9 8B 0D ? ? ? ? 89 7C 24 28 8B")
 // #STR: "view angles", "Pitch: %6.1f   Yaw: %6.1f %38s", "ideal angles", "Pitch: %6.1f   Yaw: %6.1f   Dist: %6.1f %19s", "camera offset", "Pitch: %6.1f   Yaw: %6.1f   Dist: %6.1f %16s", "sv_cheats"
-#define CAM_THINK					XOR("85 C0 75 30 38 86")
+#define CAM_THINK					XOR("85 C0 75 30 38 87")
 // "#empty#", "#int#"
 // also easy to find as 'KeyValuesSystem' should be generated in ida as externs
 #define KEY_VALUES_FROM_STR			XOR("55 8B EC 81 EC ? ? ? ? 85 D2 53")
@@ -136,7 +139,7 @@ ParticleEffect
 // no STR
 #define GAME_RULES					XOR("A1 ? ? ? ? 85 C0 0F 84 ? ? ? ? 80 B8 ? ? ? ? ? 74 7A")
 // STR: "CNetChan_TransmitBits->send", "CNetChan::SendDatagram
-#define SEND_DATAGRAM				XOR("55 8B EC 83 E4 F0 B8 ? ? ? ? E8 ? ? ? ? 56 57 8B F9 89 7C 24 18")
+#define SEND_DATAGRAM				XOR("55 8B EC 83 E4 F0 B8 ? ? ? ? E8 ? ? ? ? 56 57 8B F9 89 7C 24 14")
 // STR: const CTraceFilterSimple
 #define CTRACE_FILTER_SIMPLE		XOR("55 8B EC 83 E4 F0 83 EC 7C 56 52")
 // #STR: "CHudWeaponSelection"

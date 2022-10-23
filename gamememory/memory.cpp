@@ -49,7 +49,7 @@ std::pair<uintptr_t, bool> Memory::scan(const std::string& mod, const std::strin
 	std::vector<std::string> parts{ std::istream_iterator<std::string>{ iss }, std::istream_iterator<std::string>{} };
 	std::vector<std::optional<std::byte>> actualPattern = {};
 
-	std::for_each(parts.cbegin(), parts.cend(), [&](const std::string& str)
+	std::ranges::for_each(parts, [&](const std::string& str)
 		{
 			if (str == "?" || str == "??")
 				actualPattern.emplace_back(std::nullopt);
@@ -167,7 +167,7 @@ void Memory::init()
 	m_enginevalidAddr			= m_enginevalidAddr.initAddr(ENGINE_DLL, NEW_CHECK);
 	m_studioRenderValidAddr		= m_studioRenderValidAddr.initAddr(STUDIORENDER_DLL, NEW_CHECK);
 	m_materialSysValidAddr		= m_materialSysValidAddr.initAddr(MATERIAL_DLL, NEW_CHECK);
-	m_isUsingPropDebug			= m_isUsingPropDebug.initAddr(ENGINE_DLL, IS_USING_PROP_DEBUG);
+	m_isUsingPropDebug			= m_isUsingPropDebug.initAddr(ENGINE_DLL, IS_USING_PROP_DEBUG).rel(0x1);
 	m_getColorModulation		= m_getColorModulation.initAddr(MATERIAL_DLL, GET_COLOR_MODULATION);
 	m_extraBonesProcessing		= m_extraBonesProcessing.initAddr(CLIENT_DLL, EXTRA_BONES_PROCCESSING);
 	m_buildTransformations		= m_buildTransformations.initAddr(CLIENT_DLL, BUILD_TRANSFORMATIONS);
