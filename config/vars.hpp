@@ -553,6 +553,10 @@ struct VarMisc
 };
 USE_NAMESPACE_VARS(VarMisc, misc);
 
+struct ImGuiStyle;
+
+#include <utilities/utilities.hpp>
+
 struct VarStyling
 {
 	int index = 0;
@@ -563,6 +567,9 @@ struct VarStyling
 	CfgColor color1 = Color{ 220, 10, 100, 255 };
 	CfgColor color2 = Color{ 65, 75, 105, 255 };
 	CfgColor color3 = Color{ 220, 240, 240, 255 };
+	ImGuiStyle imStyle;
+	std::array<CfgColor, 4> groupPanelBackground = utilities::getFilledArray<CfgColor, 4>(Color{ 0, 140, 250, 0 });
+	CfgColor groupPanelLines = Colors::White;
 };
 USE_NAMESPACE_VARS(VarStyling, styling);
 

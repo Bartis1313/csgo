@@ -2,6 +2,8 @@
 
 #include <string>
 #include <vector>
+#include <array>
+#include <ranges>
 
 namespace utilities
 {
@@ -9,13 +11,12 @@ namespace utilities
     [[nodiscard]] std::string getKeyName(const uint32_t virtualKey);
     [[nodiscard]] std::string toLowerCase(const std::string& str);
     [[nodiscard]] std::string toUpperCase(const std::string& str);
-    // return filled array, this should run span<T>, but there were some problems with vector<bool> due to its special magic
-    template<typename T, size_t howMany>
-    [[nodiscard]] std::vector<T> getFilledVec(T toFill) // cref not really needed here
+    template<typename T, size_t SIZE>
+    [[nodiscard]] constexpr std::array<T, SIZE> getFilledArray(const T& val)
     {
-        std::vector<T> toReturn(howMany);
-        std::fill(toReturn.begin(), toReturn.begin() + howMany, toFill);
-        return toReturn;
+        std::array<T, SIZE> arr;
+        std::ranges::fill(arr, val);
+        return arr;
     }
     // deprecated, https://www.youtube.com/watch?v=V14xGZAyVKI
     [[deprecated("use std::views::split")]]

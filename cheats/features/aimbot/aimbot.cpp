@@ -47,7 +47,7 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
 	case E2T(SmoothMode::NON_LINEAR):
 		const float length = delta.length();
 		const float deltaSmooth = 1.0f - smooth;
-		// results in constant adding, value will not be slightly different each time
+		// slightly different each frame
 		acceleration = (deltaSmooth) / length * std::exp(deltaSmooth);
 
 		// values higher than 1.0 are invalid

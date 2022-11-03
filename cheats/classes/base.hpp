@@ -12,10 +12,12 @@ public:
 
 	static void initAll();
 	static void resetAll();
+	static void loadAll();
 	static void shutdownAll();
 protected:
 	virtual void init() = 0;
 	virtual void reset() = 0;
+	virtual void load() = 0;
 	virtual void shutdown() = 0;
 private:
 	inline static std::vector<BaseHack*> m_hacks;

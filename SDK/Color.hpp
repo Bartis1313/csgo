@@ -43,6 +43,7 @@ public:
 
 	constexpr auto get() const { return m_color; }
 	constexpr auto& getRef() { return m_color; }
+	constexpr auto data() { return m_color.data(); }
 
 	[[nodiscard]] constexpr float r() const { return m_color.at(0); }
 	[[nodiscard]] constexpr float g() const { return m_color.at(1); }

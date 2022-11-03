@@ -1,8 +1,14 @@
 #pragma once
 
+#include <dependencies/ImGui/imgui.h>
+
 #include "vars.hpp"
 
 #include <dependencies/json.hpp>
+
+struct ImVec2;
+struct ImVec4;
+struct ImGuiStyle;
 
 using json = nlohmann::json;
 
@@ -13,9 +19,9 @@ void from_json(const json& j, const std::string& key, float& val);
 void from_json(const json& j, const std::string& key, std::string& val);
 
 void to_json(json& j, const CfgWeapon& val);
-void to_json(json& j, const std::string key, const CfgColor& val);
-void to_json(json& j, const std::string key, const CfgBeam& val);
-void to_json(json& j, const std::string key, const Key& val);
+void to_json(json& j, const CfgColor& val);
+void to_json(json& j, const CfgBeam& val);
+void to_json(json& j, const Key& val);
 
 void to_json(json& j, const VarAim& val);
 void to_json(json& j, const VarAimPaint& val);
@@ -78,11 +84,14 @@ void to_json(json& j, const VarMisc::VarMirrorCam& val);
 void to_json(json& j, const VarMisc::VarFreeCam& val);
 void to_json(json& j, const VarMisc::VarFlashlight& val);
 void to_json(json& j, const VarStyling& val);
+void to_json(json& j, const ImVec2& val);
+void to_json(json& j, const ImVec4& val);
+void to_json(json& j, const ImGuiStyle& val);
 
 void from_json(const json& j, CfgWeapon& val);
-void from_json(const json& j, const std::string& key, CfgColor& val);
-void from_json(const json& j, const std::string& key, CfgBeam& val);
-void from_json(const json& j, const std::string& key, Key& val);
+void from_json(const json& j, CfgColor& val);
+void from_json(const json& j, CfgBeam& val);
+void from_json(const json& j, Key& val);
 
 void from_json(const json& j, VarAim& val);
 void from_json(const json& j, VarAimPaint& val);
@@ -145,3 +154,6 @@ void from_json(const json& j, VarMisc::VarMirrorCam& val);
 void from_json(const json& j, VarMisc::VarFreeCam& val);
 void from_json(const json& j, VarMisc::VarFlashlight& val);
 void from_json(const json& j, VarStyling& val);
+void from_json(const json& j, ImVec2& val);
+void from_json(const json& j, ImVec4& val);
+void from_json(const json& j, ImGuiStyle& val);

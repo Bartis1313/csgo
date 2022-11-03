@@ -21,3 +21,9 @@ void BaseHack::resetAll()
 	for (auto el : m_hacks)
 		el->reset();
 }
+
+void BaseHack::loadAll()
+{
+	for (auto el : m_hacks)
+		el->load();
+}

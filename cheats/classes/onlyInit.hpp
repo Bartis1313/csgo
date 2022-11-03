@@ -13,5 +13,6 @@ public:
 	// mostly we don't need all of them
 protected:
 	virtual void reset() override {};
+	virtual void load() override {};
 	virtual void shutdown() override {};
 };

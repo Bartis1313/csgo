@@ -1,12 +1,10 @@
 # Csgo
-Very short and commented source aimed for visual aspects of the game.
+Source aimed for visual aspects of the game.
 
 ![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/179428634-adf44410-4002-4e5d-9ac5-b794dcb1c35f.png)
 
 # Information
 Features marked ``(rebuild needed)`` need recode or better version.
-<br />
-Menu key is insert, panic key is delete, you can change it in config if it matters.
 <br />
 This is a trianing software. No further actions taken by people are heeded.
 <br />
@@ -30,28 +28,28 @@ This is a trianing software. No further actions taken by people are heeded.
  * Fps plot - collect fps and represent it in graphical resizable plot.
  * Velocity plot - collect local player speed and represent it in graphical resizable plot.
  * Hitmarker - ability to draw hitmarkers 2D/3D with dmg output.
- * No scope - removes scope black overlay.
+ * No scope - removes scope black overlay (rebuild needed - think of better blur removal)
  * Bullet tracer - draw bullets directions by line beams.
- * Flashlight - just example, not used.
+ * Flashlight
  * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic.
- * Engine prediction - useful to never skip tick and get correct server time.
+ * Engine prediction - useful to never skip tick and get correct server time (rebuild needed - use it 1:1 as game does)
  * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records.
- * Glow - highlight player ents.
- * Sound Esp
+ * Glow - highlight player ents. (rebuild needed - think of removing this or creating glow texture on own (game provides such materials), client.dll checks it and it in general has performance issues)
+ * Sound Esp (rebuild needed - there is no need to do it with events)
  * Esp - name, flags, boxes, health, armor, ammo, skeleton.
  * DLight - highlights player by dlight
  * Enemy aiming at you warn
  * 2D radar - overlay showing where enemy is, with background of the map texture.
  * Custom skybox - listed from game
  * Remove sky - removes props
- * Edit world colors - props/walls/sky
+ * Edit world colors - props/walls/sky (rebuild needed - transparency should be done in different way)
  * Movement trails - collect line frame by frame and draw from container
  * Bullet impacts - where the bullet has hit
  * Custom smoke/molotov - color/remove/timer
  * Draw dropped weapons - box/icon/name/ammo
- * Bomb overlay with info
+ * Bomb overlay with info (rebuild needed - cleanup, this is now very ugly in code)
  * Mirrorcam - show what is behind you on extra window (contains fixing setupbones occlusion problems)
- * Freecam - view any place without moving your model (dormant ents won't render)
+ * Freecam - view any place without moving your model (dormant ents won't render) (rebuild needed - should generally work better)
  * Freelook - a copy of how it looks like in PUBG
  </details>
 
@@ -130,6 +128,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.6.4 - Config fix again, added magic_enum to not repat same names in the selections namespace.
 * 1.6.5 - Bit of clean up with memory, interfaces and valid entity cache that will work for any frame. And maybe crash fixes?
 * 1.6.6 - Cleanup, base classes for features are now more abstract. Fixed crash due to wrong allocation for vector. Rebuild hook structs to be defined with macros.
+* 1.6.7 - Wip menu.
 </details>
 
 # Dependencies

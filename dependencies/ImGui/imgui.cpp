@@ -2889,6 +2889,7 @@ const char* ImGui::GetStyleColorName(ImGuiCol idx)
     switch (idx)
     {
     case ImGuiCol_Text: return "Text";
+    case ImGuiCol_TextSelectable: return "TextSelectable";
     case ImGuiCol_TextDisabled: return "TextDisabled";
     case ImGuiCol_WindowBg: return "WindowBg";
     case ImGuiCol_ChildBg: return "ChildBg";

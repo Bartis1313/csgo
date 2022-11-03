@@ -21,6 +21,7 @@ protected:
 	// keep those methods to be nothing as default
 	// mostly we don't need all of them
 	virtual void init() override {};
+	virtual void load() override {};
 	virtual void reset() override {};
 	virtual void shutdown() override {};
 private:
