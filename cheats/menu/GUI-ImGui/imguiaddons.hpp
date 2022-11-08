@@ -16,17 +16,11 @@ using ImGuiColorEditFlags = int;
 
 namespace ImGui
 {
-	// basic hotkey function, that behaves like button.
-	void Hotkey(const char* label, Key* key, bool useExtended = true, const ImVec2& size = { 0.0f, 0.0f });
 	// from demo
 	void HelpMarker(const char* desc);
-	// heavily based on code from demo, look "palette" in imgui demo file
-	bool ColorPicker(const char* label, CfgColor* clr);
 	// from widgets, https://github.com/ocornut/imgui/issues/1496#issuecomment-569892444
 	void BeginGroupPanel(const char* name, const ImVec2& size = { 0.0f, 0.0f });
 	void EndGroupPanel();
-	
-	bool PopupButton(const char* label, const std::function<void()>& fun);
 
 	// from demo, slight edit, usage same as normal console.log
 	struct ExampleAppLog
@@ -46,9 +40,8 @@ namespace ImGui
 	// from demo with slight changes
 	void ShowStyleEditorCfg(ImGuiStyle* ref);
 
-	namespace Animated // https://github.com/ocornut/imgui/issues/1857 WIP
-	{
-		
+	namespace Animated // https://github.com/ocornut/imgui/issues/1857
+	{		
 		struct CheckboxAnim
 		{
 			float alpha = 0.0f; // handle by clamping min/max with deltatime
@@ -105,6 +98,8 @@ namespace ImGui
 			{}
 		};
 
+		// basic hotkey function, that behaves like button.
+		void Hotkey(const char* label, Key* key, bool useExtended = true, const ImVec2& size = { 0.0f, 0.0f });
 		bool Checkbox(const char* label, bool* v);
 		bool BeginCombo(const char* label, const char* preview_value, ImGuiComboFlags flags = 0);
 		bool Combo(const char* label, int* current_item, const char* const items[], int items_count, int height_in_items);
@@ -114,6 +109,7 @@ namespace ImGui
 		template<typename T>
 		bool ListBox(const char* label, int* item, std::span<T> arr, int height_in_items = -1);
 		template<typename T, size_t SIZE>
+		requires (SIZE > 0U)
 		void MultiCombo(const char* label, const std::array<T, SIZE>& names, std::array<bool, SIZE>* options);
 		bool SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);     // adjust format to decorate the value with a prefix or a suffix for in-slider labels or unit display.
 		bool SliderFloat2(const char* label, float v[2], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
@@ -127,8 +123,11 @@ namespace ImGui
 		bool SliderScalar(const char* label, ImGuiDataType data_type, void* p_data, const void* p_min, const void* p_max, const char* format = NULL, ImGuiSliderFlags flags = 0);
 		bool ButtonEx(const char* label, const ImVec2& size_arg, ImGuiButtonFlags flags);
 		bool Button(const char* label, const ImVec2& size_arg = ImVec2(0, 0));
-		//bool ColorButton(const char* desc_id, const ImVec4& col, ImGuiColorEditFlags flags = 0, ImVec2 size = ImVec2(0, 0));
+		bool ColorButton(const char* desc_id, const ImVec4& col, ImGuiColorEditFlags flags = 0, ImVec2 size = ImVec2(0, 0));
 		bool ListBox(const char* label, int* current_item, bool (*items_getter)(void*, int, const char**), void* data, int items_count, int height_in_items);
+		// heavily based on code from demo, look "palette" in imgui demo file
+		bool ColorPicker(const char* label, CfgColor* clr);
+		bool PopupButton(const char* label, const std::function<void()>& fun);
 
 		bool Selectable(const char* label, bool selected, ImGuiSelectableFlags flags = 0, const ImVec2& size_arg = ImVec2(0, 0));
 		void RenderTextAlpha(ImVec2 pos, const char* text, const char* text_end, bool hide_text_after_hash, float alpha);
@@ -136,7 +135,7 @@ namespace ImGui
 		void RenderFrameAlpha(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool border, float rounding, float alpha);
 		void RenderFrameAlphaOutline(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool border, float rounding, float alpha, float outline);
 		void RenderFrameOutlineKeepFill(ImVec2 p_min, ImVec2 p_max, ImU32 fill_col, bool border, float rounding, float outline);
-		void RenderFrameBorderAlpha(ImVec2 p_min, ImVec2 p_max, float rounding, float alpha);	
+		void RenderFrameBorderAlpha(ImVec2 p_min, ImVec2 p_max, float rounding, float alpha);
 	}
 }
 
@@ -144,13 +143,9 @@ IMGUI_IMPL_API void* ImGui_CreateTexture(const void* data, int width, int height
 IMGUI_IMPL_API void	ImGui_DestroyTexture(void* texture);
 
 template<typename T, size_t SIZE>
+requires (SIZE > 0U)
 void ImGui::Animated::MultiCombo(const char* label, const std::array<T, SIZE>& names, std::array<bool, SIZE>* options)
 {
-	bool check = names.size() != options->size() || !names.empty() || !options->empty();
-	assert(check && "given size of arrays args was not equal or one of them was empty");
-
-	size_t size = names.size(); // does not matter if you pass options size here
-
 	ImVector<T> actives = {};
 	for (size_t i = 0; const auto el : *options)
 	{
@@ -173,7 +168,7 @@ void ImGui::Animated::MultiCombo(const char* label, const std::array<T, SIZE>& n
 
 	if (ImGui::Animated::BeginCombo(label, previewName.c_str()))
 	{
-		for (size_t i = 0; i < size; i++) // creating view to make it "forced" to detect it as valid function args
+		for (size_t i = 0; i < SIZE; i++) // creating view to make it "forced" to detect it as valid function args
 		{
 			if (ImGui::Animated::Selectable(std::string_view{ names[i] }.data(), options->at(i), ImGuiSelectableFlags_DontClosePopups))
 				options->at(i) = !options->at(i);

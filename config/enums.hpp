@@ -24,7 +24,7 @@ enum class AimbotHitboxes
 enum class SmoothMode
 {
 	LINEAR,
-	NON_LINEAR
+	AIM_LENGTH
 };
 
 enum class CrossHairTypes

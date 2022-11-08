@@ -40,24 +40,12 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
 	switch (m_config.smoothMode)
 	{
 	case E2T(SmoothMode::LINEAR):
-	{
 		ret = angle * cfgSmooth;
 		acceleration = cfgSmooth;
-	}
-	case E2T(SmoothMode::NON_LINEAR):
-		const float length = delta.length();
-		const float deltaSmooth = 1.0f - smooth;
-		// slightly different each frame
-		acceleration = (deltaSmooth) / length * std::exp(deltaSmooth);
-
-		// values higher than 1.0 are invalid
-		// because we want to slow it down
-		acceleration = std::min(1.0f, acceleration);
-
-		if (acceleration == 1.0f) // smoothing ended, return original
-			return angle;
-
-		ret = delta * acceleration; // apply changes
+		break;
+	case E2T(SmoothMode::AIM_LENGTH):
+		ret = delta - (delta * smooth);
+		break;
 	}
 
 	if (m_config.curveAim)

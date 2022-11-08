@@ -12,8 +12,6 @@
 
 void X88Menu::draw()
 {
-	Vec2 man;
-
 	if (!vars::keys->enabledX88Menu)
 		return;
 

@@ -4,7 +4,7 @@
 #include <utilities/utilities.hpp>
 #include <game/globals.hpp>
 
-void ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& size)
+void ImGui::Animated::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& size)
 {
 	ImGui::PushID(label);
 	if (std::strncmp(label, "##", 2))
@@ -14,7 +14,7 @@ void ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& 
 
 	if (const auto id = ImGui::GetID(label); ImGui::GetActiveID() == id)
 	{
-		ImGui::Button("...", size);
+		ImGui::Animated::Button("...", size);
 		ImGui::GetCurrentContext()->ActiveIdAllowOverlap = true;
 
 		if ((!ImGui::IsItemHovered() && ImGui::GetIO().MouseClicked[0]) || key->checkKey())
@@ -24,7 +24,7 @@ void ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& 
 		}
 
 	}
-	else if (ImGui::Button(utilities::getKeyName(key->getKeyCode()).c_str(), size))
+	else if (ImGui::Animated::Button(utilities::getKeyName(key->getKeyCode()).c_str(), size))
 	{
 		globals::isInHotkey = true;
 		ImGui::SetActiveID(id, GetCurrentWindow());
@@ -38,7 +38,7 @@ void ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& 
 				for (const auto [mode, name] : Key::getKeyPairs())
 				{
 					bool selected = key->getKeyMode() == mode;
-					if (ImGui::Selectable(name, &selected))
+					if (ImGui::Animated::Selectable(name, &selected))
 					{
 						if (selected)
 							key->setKeyMode(mode);
@@ -75,7 +75,7 @@ void ImGui::HelpMarker(const char* desc)
 
 #include <config/cfgcolor.hpp>
 
-bool ImGui::ColorPicker(const char* label, CfgColor* clr)
+bool ImGui::Animated::ColorPicker(const char* label, CfgColor* clr)
 {
 	constexpr auto pickerFlags = ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaBar;
 	constexpr auto pickerButtonFlags = ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_AlphaPreview;
@@ -99,7 +99,7 @@ bool ImGui::ColorPicker(const char* label, CfgColor* clr)
 
 	ImGui::PushID(label);
 
-	bool openPopup = ImGui::ColorButton("##colbut", ImVec4{ clr->getColor().r(), clr->getColor().g(), clr->getColor().b(), clr->getColor().a() }, pickerButtonFlags);
+	bool openPopup = ImGui::Animated::ColorButton("##colbut", ImVec4{ clr->getColor().r(), clr->getColor().g(), clr->getColor().b(), clr->getColor().a() }, pickerButtonFlags);
 
 	if (std::strncmp(label, "##", 2))
 	{
@@ -129,7 +129,7 @@ bool ImGui::ColorPicker(const char* label, CfgColor* clr)
 				if ((i % seperateLimit) != 0)
 					ImGui::SameLine(0.0f, ImGui::GetStyle().ItemSpacing.y);
 
-				if (ImGui::ColorButton("##palette", ImVec4{ el.r(), el.g(), el.b(), el.a() }, paletteButoonFlags, paletteButtonSize))
+				if (ImGui::Animated::ColorButton("##palette", ImVec4{ el.r(), el.g(), el.b(), el.a() }, paletteButoonFlags, paletteButtonSize))
 				{
 					*clr = CfgColor{ Color{ el, clr->getColor().a() }, clr->getRainbow(), clr->getSpeed() };
 					toReturn = true;
@@ -163,6 +163,7 @@ bool ImGui::ColorPicker(const char* label, CfgColor* clr)
 
 #include <config/vars.hpp>
 #include <unordered_map>
+#include <utilities/renderer/renderer.hpp>
 
 static std::unordered_map<ImGuiID, std::pair<ImVec2, ImVec2>> m_mapSizes = {};
 static const char* g_GroupPanelName = nullptr;
@@ -180,7 +181,8 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
 		Color::U32(vars::styling->groupPanelBackground[0]()),
 		Color::U32(vars::styling->groupPanelBackground[1]()),
 		Color::U32(vars::styling->groupPanelBackground[2]()),
-		Color::U32(vars::styling->groupPanelBackground[3]())
+		Color::U32(vars::styling->groupPanelBackground[3]()),
+		ImGui::GetStyle().FrameRounding
 	);
 
 	ImGui::BeginGroup();
@@ -205,7 +207,9 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
 	ImGui::BeginGroup();
 	ImGui::Dummy(ImVec2(frameHeight * 0.5f, 0.0f));
 	ImGui::SameLine(0.0f, 0.0f);
+	ImGui::PushFont(ImFonts::tahoma20);
 	ImGui::TextUnformatted(name);
+	ImGui::PopFont();
 	auto labelMin = ImGui::GetItemRectMin();
 	auto labelMax = ImGui::GetItemRectMax();
 	ImGui::SameLine(0.0f, 0.0f);
@@ -227,8 +231,6 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
 
 	s_GroupPanelLabelStack.push_back(ImRect(labelMin, labelMax));
 }
-
-#include <utilities/renderer/renderer.hpp>
 
 void ImGui::EndGroupPanel()
 {
@@ -282,7 +284,7 @@ void ImGui::EndGroupPanel()
 		ImGui::GetWindowDrawList()->AddRect(
 			frameRect.Min, frameRect.Max,
 			colorLine,
-			halfFrame.x);
+			ImGui::GetStyle().FrameRounding);
 
 		ImGui::PopClipRect();
 	}
@@ -306,11 +308,11 @@ void ImGui::EndGroupPanel()
 	ImGui::EndGroup();
 }
 
-bool ImGui::PopupButton(const char* label, const std::function<void()>& fun)
+bool ImGui::Animated::PopupButton(const char* label, const std::function<void()>& fun)
 {
 	ImGui::PushID(label);
 
-	if (ImGui::Button("Options"))
+	if (ImGui::Animated::Button("Options"))
 		ImGui::OpenPopup("");
 
 	bool ret = false;
@@ -357,12 +359,12 @@ void ImGui::ExampleAppLog::Draw(const char* title, bool* p_open)
 	}
 
 	// Main window
-	if (ImGui::Button("Options"))
+	if (ImGui::Animated::Button("Options"))
 		ImGui::OpenPopup("Options");
 	ImGui::SameLine();
-	bool clear = ImGui::Button("Clear");
+	bool clear = ImGui::Animated::Button("Clear");
 	ImGui::SameLine();
-	bool copy = ImGui::Button("Copy");
+	bool copy = ImGui::Animated::Button("Copy");
 	ImGui::SameLine();
 	Filter.Draw("Filter", -100.0f);
 
@@ -1499,7 +1501,8 @@ bool ImGui::Animated::SliderScalar(const char* label, ImGuiDataType data_type, v
 
 	// Render grab
 	if (grab_bb.Max.x > grab_bb.Min.x)
-		window->DrawList->AddCircleFilled(grab_bb.GetCenter(), (grab_bb.Max.y - grab_bb.Min.y) / 2.0f, GetColorU32(hovered ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab, outline), 32);
+		window->DrawList->AddRectFilled(grab_bb.Min, grab_bb.Max, GetColorU32(hovered ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab, outline), style.GrabRounding);
+		/*window->DrawList->AddCircleFilled(grab_bb.GetCenter(), (grab_bb.Max.y - grab_bb.Min.y) / 2.0f, GetColorU32(hovered ? ImGuiCol_SliderGrabActive : ImGuiCol_SliderGrab, outline), 32);*/
 
 	// Display value using user-provided display format so user can add prefix/suffix/decorations to the value.
 	char value_buf[64];
@@ -1638,12 +1641,10 @@ bool ImGui::Animated::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiB
 	else
 		anim.emplace(std::make_pair(id, ButtonAnim{ alpha, thickness, lastTime, outline }));
 
-	const float size_frame_extra = size.x / 25.0f * thickness; // magic number, looks okay-ish
-	const float half_size_extra = size_frame_extra / 2.0f;
-	const float sizes_ratio = size.y / size.x;
+	const float size_frame_extra = 3.f * thickness;
+	ImVec2 extra_size = ImVec2(size_frame_extra, size_frame_extra);
 
-	const ImRect frame_bb = ImRect(ImVec2(pos.x + half_size_extra, pos.y + (half_size_extra * sizes_ratio)),
-		ImVec2(pos.x + (size.x - size_frame_extra), pos.y + (size.y - (size_frame_extra * sizes_ratio))));
+	const ImRect frame_bb(ImVec2(pos + extra_size), pos + size - extra_size);
 
 	// Render
 	const ImU32 col = GetColorU32((held && hovered) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
@@ -1652,7 +1653,11 @@ bool ImGui::Animated::ButtonEx(const char* label, const ImVec2& size_arg, ImGuiB
 
 	if (g.LogEnabled)
 		LogSetNextTextDecoration("[", "]");
-	RenderTextClipped(frame_bb.Min + style.FramePadding, frame_bb.Max - style.FramePadding, label, NULL, &label_size, style.ButtonTextAlign, &frame_bb);
+	const ImVec2 pos_min = frame_bb.Min + style.FramePadding - (frame_bb.Min - bb.Min);
+	const ImVec2 pos_max = frame_bb.Max - style.FramePadding - (frame_bb.Max - bb.Max);
+	// I tried changing font size dynamically just for this text to use raw frame_bb.Min + style.FramePadding
+	// for good effect it requires font reset, this thing wont be very friendly for cpu
+	RenderTextClipped(pos_min, pos_max, label, NULL, &label_size, style.ButtonTextAlign, &frame_bb);
 
 	IMGUI_TEST_ENGINE_ITEM_INFO(id, label, g.LastItemData.StatusFlags);
 	return pressed;
@@ -1705,4 +1710,137 @@ bool ImGui::Animated::ListBox(const char* label, int* current_item, bool (*items
 		MarkItemEdited(g.LastItemData.ID);
 
 	return value_changed;
+}
+
+bool ImGui::Animated::ColorButton(const char* desc_id, const ImVec4& col, ImGuiColorEditFlags flags, ImVec2 size)
+{
+	ImGuiWindow* window = GetCurrentWindow();
+	if (window->SkipItems)
+		return false;
+
+	ImGuiContext& g = *GImGui;
+	const ImGuiID id = window->GetID(desc_id);
+	float default_size = GetFrameHeight();
+	if (size.x == 0.0f)
+		size.x = default_size;
+	if (size.y == 0.0f)
+		size.y = default_size;
+	const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
+	ItemSize(bb, (size.y >= default_size) ? g.Style.FramePadding.y : 0.0f);
+	if (!ItemAdd(bb, id))
+		return false;
+
+	bool hovered, held;
+	bool pressed = ButtonBehavior(bb, id, &hovered, &held);
+
+	if (flags & ImGuiColorEditFlags_NoAlpha)
+		flags &= ~(ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaPreviewHalf);
+
+	ImVec4 col_rgb = col;
+	if (flags & ImGuiColorEditFlags_InputHSV)
+		ColorConvertHSVtoRGB(col_rgb.x, col_rgb.y, col_rgb.z, col_rgb.x, col_rgb.y, col_rgb.z);
+
+	ImVec4 col_rgb_without_alpha(col_rgb.x, col_rgb.y, col_rgb.z, 1.0f);
+	float grid_step = ImMin(size.x, size.y) / 2.99f;
+	float rounding = ImMin(g.Style.FrameRounding, grid_step * 0.5f);
+	ImRect bb_inner = bb;
+	float off = 0.0f;
+
+	static std::unordered_map<ImGuiID, ButtonAnim> anim;
+	auto map_itr = anim.find(id);
+
+	auto pair = (map_itr != anim.end()) ? map_itr->second : ButtonAnim{};
+	auto alpha = pair.alpha;
+	auto outline = pair.alpha_outline;
+	auto thickness = pair.thickness;
+	auto lastTime = pair.lastTime;
+
+	const float ANIM_SPEED = 1.0f; // bigger values mean faster change
+	const float ANIM_SPEED_CHECKBOX = 10.0f; // same as ^
+	const float deltatime = g.IO.DeltaTime * ANIM_SPEED;
+
+	// don't use global timers, they exist and may work well
+	// however very slow animation while changing active ID will reset the timer, while animation didnt end
+	// so we handle it on own in ID map
+	if (held || pressed)
+		lastTime = 0.0f;
+
+	if (lastTime == 0.f && !pressed)
+		lastTime = g.LastActiveIdTimer; // use global timer, this time it won't matter
+
+	lastTime += g.IO.DeltaTime;
+
+	const float temp_thickness = ImSaturate(lastTime * ANIM_SPEED_CHECKBOX); // magic number, looks nice
+	thickness = held ? temp_thickness : (1.0f - temp_thickness);
+
+	const ImU32 frame_col = GetColorU32(g.ActiveId == id ? ImGuiCol_FrameBgActive : hovered ? ImGuiCol_FrameBgHovered : ImGuiCol_FrameBg);
+	const float limitAlpha = ImColor(frame_col).Value.w;
+	const float limitAlphaOutline = hovered ? 1.0f : 0.4f; // breaking on lower alphas...
+
+	if (alpha < limitAlpha)
+		alpha = ImMin(alpha + deltatime, limitAlpha);
+	else if (alpha > limitAlpha)
+		alpha = ImMax(alpha - deltatime, limitAlpha);
+
+	if (outline < limitAlphaOutline)
+		outline = ImMin(outline + deltatime, limitAlphaOutline);
+	else if (outline > limitAlphaOutline)
+		outline = ImMax(outline - deltatime, limitAlphaOutline);
+
+	if (map_itr != anim.end())
+		map_itr->second = ButtonAnim{ alpha, thickness, lastTime, outline };
+	else
+		anim.emplace(std::make_pair(id, ButtonAnim{ alpha, thickness, lastTime, outline }));
+
+	const float size_frame_extra = 3.f * thickness;
+	ImVec2 extra_size = ImVec2(size_frame_extra, size_frame_extra);
+
+	if ((flags & ImGuiColorEditFlags_NoBorder) == 0)
+	{
+		off = -0.75f; // The border (using Col_FrameBg) tends to look off when color is near-opaque and rounding is enabled. This offset seemed like a good middle ground to reduce those artifacts.
+		bb_inner.Expand(off);
+	}
+	if ((flags & ImGuiColorEditFlags_AlphaPreviewHalf) && col_rgb.w < 1.0f)
+	{
+		float mid_x = IM_ROUND((bb_inner.Min.x + bb_inner.Max.x) * 0.5f);
+		RenderColorRectWithAlphaCheckerboard(window->DrawList, ImVec2(bb_inner.Min.x + grid_step, bb_inner.Min.y) + extra_size, bb_inner.Max - extra_size, GetColorU32(col_rgb), grid_step, ImVec2(-grid_step + off, off), rounding, ImDrawFlags_RoundCornersRight);
+		window->DrawList->AddRectFilled(ImVec2(bb_inner.Min.x + grid_step, bb_inner.Min.y) + extra_size, bb_inner.Max - extra_size, GetColorU32(col_rgb), rounding, ImDrawFlags_RoundCornersLeft);
+	}
+	else
+	{
+		// Because GetColorU32() multiplies by the global style Alpha and we don't want to display a checkerboard if the source code had no alpha
+		ImVec4 col_source = (flags & ImGuiColorEditFlags_AlphaPreview) ? col_rgb : col_rgb_without_alpha;
+		if (col_source.w < 1.0f)
+			RenderColorRectWithAlphaCheckerboard(window->DrawList, bb_inner.Min + extra_size, bb_inner.Max - extra_size, GetColorU32(col_source), grid_step, ImVec2(off, off), rounding);
+		else
+			window->DrawList->AddRectFilled(bb_inner.Min + extra_size, bb_inner.Max - extra_size, GetColorU32(col_source), rounding);
+	}
+	RenderNavHighlight(bb, id);
+	if ((flags & ImGuiColorEditFlags_NoBorder) == 0)
+	{
+		if (g.Style.FrameBorderSize > 0.0f)
+			RenderFrameBorderAlpha(bb.Min + extra_size, bb.Max - extra_size, rounding, outline);
+		else
+			window->DrawList->AddRect(bb.Min + extra_size, bb.Max - extra_size, GetColorU32(ImGuiCol_FrameBg, outline), rounding); // Color button are often in need of some sort of border
+	}
+
+	// Drag and Drop Source
+	// NB: The ActiveId test is merely an optional micro-optimization, BeginDragDropSource() does the same test.
+	if (g.ActiveId == id && !(flags & ImGuiColorEditFlags_NoDragDrop) && BeginDragDropSource())
+	{
+		if (flags & ImGuiColorEditFlags_NoAlpha)
+			SetDragDropPayload(IMGUI_PAYLOAD_TYPE_COLOR_3F, &col_rgb, sizeof(float) * 3, ImGuiCond_Once);
+		else
+			SetDragDropPayload(IMGUI_PAYLOAD_TYPE_COLOR_4F, &col_rgb, sizeof(float) * 4, ImGuiCond_Once);
+		ColorButton(desc_id, col, flags);
+		SameLine();
+		TextEx("Color");
+		EndDragDropSource();
+	}
+
+	// Tooltip
+	if (!(flags & ImGuiColorEditFlags_NoTooltip) && hovered)
+		ColorTooltip(desc_id, &col.x, flags & (ImGuiColorEditFlags_InputMask_ | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaPreviewHalf));
+
+	return pressed;
 }

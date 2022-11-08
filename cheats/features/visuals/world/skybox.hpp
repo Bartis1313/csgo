@@ -24,6 +24,10 @@ private:
 
 	std::filesystem::path m_pathCustomSkybox;
 	std::vector<std::string> m_allCustomSkyboxes;
+
+	bool m_changed = false;
+public:
+	void handleButtonState(bool state) { m_changed = state; }
 };
 
 GLOBAL_FEATURE(SkyboxEdit);

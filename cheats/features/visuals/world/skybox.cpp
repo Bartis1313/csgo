@@ -22,6 +22,9 @@ void SkyboxEdit::run(int frame)
 	if (frame != FRAME_RENDER_START)
 		return;
 
+	if (!m_changed)
+		return;
+
 	if (!game::isAvailable())
 		return;
 
