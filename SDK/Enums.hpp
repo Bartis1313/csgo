@@ -745,3 +745,17 @@ enum PrecipitationType_t
 	NUM_PRECIPITATION_TYPES
 };
 #pragma endregion
+
+#pragma region team_ids
+enum TeamID
+{
+	/*TEAM_UNASSIGNED,
+	TEAM_SPECTATOR,
+	TEAM_TERRORIST,
+	TEAM_COUNTER_TERRORIST,*/
+	None,
+	Spectactor,
+	Terrorist,
+	Counter_Terrorist
+};
+#pragma endregion

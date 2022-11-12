@@ -156,8 +156,8 @@ private:
 	void clearData();
 	// add to surface
 	void swapData();
-	std::deque<std::shared_ptr<drawing::Draw>> m_drawData;
-	std::deque<std::shared_ptr<drawing::Draw>> m_drawDataSafe;
+	std::deque<std::unique_ptr<drawing::Draw>> m_drawData;
+	std::deque<std::unique_ptr<drawing::Draw>> m_drawDataSafe;
 	std::shared_mutex m_mutex;
 };
 

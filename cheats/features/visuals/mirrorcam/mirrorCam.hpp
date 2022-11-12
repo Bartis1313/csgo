@@ -19,7 +19,6 @@ public:
 
 protected:
 	virtual void run(const CViewSetup& view) override;
-	virtual void load() override;
 private:
 	constexpr void setSize(const Vec2& size) { m_size = size; }
 	IDirect3DTexture9* getTexture() const;

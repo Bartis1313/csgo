@@ -550,6 +550,16 @@ static void renderMisc()
 					ImGui::Animated::Checkbox(XOR("Velocity Custom"), &vars::misc->plots->velocityCustom);
 				}
 				ImGui::Animated::Checkbox(XOR("Draw misc info"), &vars::misc->info->enabled);
+				ImGui::Animated::Checkbox(XOR("Playerlist##checkbox"), &vars::misc->playerList->enabled);
+				ImGui::SameLine();
+				ImGui::Animated::PopupButton(XOR("##Playerlist pop"), []()
+					{
+						ImGui::Animated::Checkbox(XOR("Health##playerlist"), &vars::misc->playerList->health);
+						ImGui::Animated::Checkbox(XOR("Money##playerlist"), &vars::misc->playerList->money);
+						ImGui::Animated::Checkbox(XOR("Team##playerlist"), &vars::misc->playerList->teamID);
+						ImGui::Animated::Checkbox(XOR("Place##playerlist"), &vars::misc->playerList->lastPlace);
+					}
+				);
 				ImGui::Animated::Checkbox(XOR("Hat on local"), &vars::misc->hat->enabled);
 				ImGui::SameLine();
 				ImGui::Animated::PopupButton(XOR("##Hat pop"), []()

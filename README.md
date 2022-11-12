@@ -130,6 +130,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.6.6 - Cleanup, base classes for features are now more abstract. Fixed crash due to wrong allocation for vector. Rebuild hook structs to be defined with macros.
 * 1.6.7 - Wip menu.
 * 1.6.8 - Finished menu animations/movelikes.
+* 1.6.9 - Playerlist added (blacklist not done yet), changed render to take unique ptr.
 </details>
 
 # Dependencies

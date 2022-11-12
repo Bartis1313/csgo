@@ -27,13 +27,14 @@ public:
 	// we need to call this once
 	// manual init is a thing due to unload during the round
 	static void init();
-private:
+
 	struct HolderData
 	{
 		Entity_t* ent;
 		size_t idx;
 		size_t classID;
 	};
+private:
 	static void fill(const HolderData& data);
 	static bool checkRepeatable(Entity_t* ent);
 	static std::optional<std::pair<size_t, size_t>> getIndexes(Entity_t* ent);

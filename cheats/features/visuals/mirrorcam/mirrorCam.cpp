@@ -18,25 +18,13 @@
 #include <game/game.hpp>
 #include <config/vars.hpp>
 
-
-void MirrorCam::load()
-{
-	interfaces::matSys->forceBeginRenderTargetAllocation();
-	m_texture = interfaces::matSys->createFullFrameRenderTarget(XOR("mirrorCam"));
-	interfaces::matSys->forceEndRenderTargetAllocation();
-
-	m_inited = true;
-
-	LOG_INFO(XOR("Inited mirrorcam texture!"));
-}
-
 void MirrorCam::run(const CViewSetup& view)
 {
 	// this might eat some FPS, if enabled
 	if (!vars::misc->mirrorCam->enabled)
 		return;
 
-	CViewSetup v = std::move(view);
+	CViewSetup v = view;
 
 	v.m_angles[Coord::Y] = v.m_angles[Coord::Y] + 180.0f; // back
 	v.x = v.xOld = 0;
@@ -64,11 +52,19 @@ IDirect3DTexture9* MirrorCam::getTexture() const
 
 void MirrorCamDraw::draw()
 {
-	if (!g_MirrorCam->m_inited)
-		return;
-
 	if (!game::isAvailable())
 		return;
+
+	if (!g_MirrorCam->m_inited)
+	{
+		interfaces::matSys->forceBeginRenderTargetAllocation();
+		g_MirrorCam->m_texture = interfaces::matSys->createFullFrameRenderTarget(XOR("mirrorCam"));
+		interfaces::matSys->forceEndRenderTargetAllocation();
+
+		g_MirrorCam->m_inited = true;
+
+		LOG_INFO(XOR("Inited mirrorcam texture!"));
+	}
 
 	if (!vars::misc->mirrorCam->enabled)
 		return;

@@ -827,6 +827,7 @@ void from_json(const json& j, VarMisc& val)
 	from_json(j["Scope"], *val.scope);
 	from_json(j["Plots"], *val.plots);
 	from_json(j["Info"], *val.info);
+	from_json(j["Playerlist"], *val.playerList);
 	from_json(j["AimWarn"], *val.aimWarn);
 	from_json(j["Radar"], *val.radar);
 	from_json(j["Trail"], *val.trail);
@@ -852,6 +853,7 @@ void to_json(json& j, const VarMisc& val)
 	to_json(j["Scope"], *val.scope);
 	to_json(j["Plots"], *val.plots);
 	to_json(j["Info"], *val.info);
+	to_json(j["Playerlist"], *val.playerList);
 	to_json(j["AimWarn"], *val.aimWarn);
 	to_json(j["Radar"], *val.radar);
 	to_json(j["Trail"], *val.trail);
@@ -1005,6 +1007,24 @@ void from_json(const json& j, VarMisc::VarInfo& val)
 void to_json(json& j, const VarMisc::VarInfo& val)
 {
 	j["Enabled"] = val.enabled;
+}
+
+void from_json(const json& j, VarMisc::VarPlayerList& val)
+{
+	from_json(j, "Enabled", val.enabled);
+	from_json(j, "Health", val.health);
+	from_json(j, "Team", val.teamID);
+	from_json(j, "Money", val.money);
+	from_json(j, "LastPlace", val.lastPlace);
+}
+
+void to_json(json& j, const VarMisc::VarPlayerList& val)
+{
+	j["Enabled"] = val.enabled;
+	j["Health"] = val.health;
+	j["Team"] = val.teamID;
+	j["Money"] = val.money;
+	j["LastPlace"] = val.lastPlace;
 }
 
 void from_json(const json& j, VarMisc::VarAimWarn& val)

@@ -445,6 +445,16 @@ struct VarMisc
 	};
 	std::unique_ptr<VarInfo> info{ new VarInfo };
 
+	struct VarPlayerList
+	{
+		bool enabled = false;
+		bool health = false;
+		bool teamID = false;
+		bool money = false;
+		bool lastPlace = false;
+	};
+	std::unique_ptr<VarPlayerList> playerList{ new VarPlayerList };
+
 	struct VarAimWarn
 	{
 		bool enabled = false;
