@@ -166,7 +166,7 @@ void PlayerList::draw()
 
 					// maybe add here isEnemy check,
 					// or leave it, so some annoying teammate can be stored in blacklist file
-					ImGui::Animated::Button(XOR("Test"), ImVec2(-std::numeric_limits<float>::min(), 0.0f));
+					ImGui::Animated::Button(XOR("Test"), ImVec2{ -std::numeric_limits<float>::min(), 0.0f });
 				}
 
 				ImGui::PopID();
