@@ -2,8 +2,6 @@
 
 #include <classes/renderableToPresent.hpp>
 
-#include <vector>
-
 class PlayerList : protected RenderablePresentType
 {
 public:

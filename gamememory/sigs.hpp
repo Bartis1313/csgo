@@ -194,3 +194,8 @@ ParticleEffect
 // #STR: "$MotionBlurViewportInternal", "$MotionBlurInternal"
 // you can see there is an offset with pointer that is pushed below, "push 4" is helpful, this is the part of editing vector
 #define BLUR_MATERIAL_ARR_1			XOR("68 ? ? ? ? FF 50 34 8B 4E 08 5E 85 C9 74 0C")
+// old was in VClientEntityList0 exactly like
+// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/cliententitylist.h#L130
+// now can't get addr by index, they are placed exactly in same place tho
+#define ADD_ENT						XOR("55 8B EC 51 8B 45 0C 53 56 8B F1 57")
+#define REMOVE_ENT					XOR("55 8B EC 51 8B 45 0C 53 8B D9 56 57 83 F8 FF 75 07")

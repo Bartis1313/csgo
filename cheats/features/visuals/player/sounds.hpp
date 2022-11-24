@@ -29,7 +29,7 @@ private:
 			: m_player{ player }, m_pos{ pos }, m_expire{ expire }
 		{}
 
-		Player_t* m_player;
+		Player_t* m_player = nullptr;
 		Vec3 m_pos;
 		float m_expire;
 		float m_maxPixels;

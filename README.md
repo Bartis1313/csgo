@@ -131,6 +131,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.6.7 - Wip menu.
 * 1.6.8 - Finished menu animations/movelikes.
 * 1.6.9 - Playerlist added (blacklist not done yet), changed render to take unique ptr.
+* 1.7.0 - Blacklist finished, including crash fixes.
 </details>
 
 # Dependencies

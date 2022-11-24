@@ -40,6 +40,8 @@ hookHelper::tryHook(target, &hookStructName::hooked, \
 	HOOK_SAFE_SIG(g_Memory.m_unkOverviewMap(), unknownOverViewFun);
 	HOOK_SAFE_SIG(g_Memory.m_isDepth(), isDepthOfField);
 	HOOK_SAFE_SIG(g_Memory.m_fxBlood(), fxBlood);
+	HOOK_SAFE_SIG(g_Memory.m_addEnt(), addEnt);
+	HOOK_SAFE_SIG(g_Memory.m_removeEnt(), removeEnt);
 
 	HOOK_SAFE_VFUNC(interfaces::dx9Device, reset);
 	HOOK_SAFE_VFUNC(interfaces::dx9Device, present);
@@ -61,8 +63,6 @@ hookHelper::tryHook(target, &hookStructName::hooked, \
 	HOOK_SAFE_VFUNC(interfaces::viewRender, renderView);
 	HOOK_SAFE_VFUNC(interfaces::viewRender, screen2DEffect);
 	HOOK_SAFE_VFUNC(interfaces::engine, isHltv);
-	HOOK_SAFE_VFUNC(interfaces::entList, addEnt);
-	HOOK_SAFE_VFUNC(interfaces::entList, removeEnt);
 
 #undef HOOK_SAFE_VFUNC
 #undef HOOK_SAFE_SIG

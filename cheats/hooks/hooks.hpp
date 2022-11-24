@@ -26,8 +26,6 @@ enum hookIndexes
 	RENDER_VIEW = 6,
 	IS_HLTV = 93,
 	SCREEN_2D_EFFECT = 39,
-	ADD_ENT = 11,
-	REMOVE_ENT = 12,
 	LEVEL_INIT_PREENT = 5,
 	LEVEL_INIT_POSTENT = 6,
 	LEVEL_SHUTDOWN = 7,
@@ -95,8 +93,6 @@ namespace hooks
 	HOOK_STRUCT_VFUNC(renderView, void, RENDER_VIEW, const CViewSetup&, const CViewSetup&, int, int);
 	HOOK_STRUCT_VFUNC(isHltv, bool, IS_HLTV);
 	HOOK_STRUCT_VFUNC(screen2DEffect, void, SCREEN_2D_EFFECT, CViewSetup*);
-	HOOK_STRUCT_VFUNC(addEnt, void, ADD_ENT, void*, int);
-	HOOK_STRUCT_VFUNC(removeEnt, void, REMOVE_ENT, void*, int);
 	// reset everything
 	HOOK_STRUCT_VFUNC(levelInitPreEntity, void, LEVEL_INIT_PREENT, const char*);
 	// map loads - use any visual change
@@ -116,6 +112,8 @@ namespace hooks
 	HOOK_STRUCT_FUNC(studioRenderValidAddr, char, const char*);
 	HOOK_STRUCT_FUNC(materialSystemValidAddr, char, const char*);
 	HOOK_STRUCT_FUNC(isUsingStaticPropDebugModes, bool);
+	HOOK_STRUCT_FUNC(addEnt, void, void*, int);
+	HOOK_STRUCT_FUNC(removeEnt, void, void*, int);
 
 	HOOK_STRUCT_API_VFUNC(reset, long, RESETDX, IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 	HOOK_STRUCT_API_VFUNC(present, long, PRESENTDX, IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);

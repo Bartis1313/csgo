@@ -1,51 +1,10 @@
 #include "jsonExtended.hpp"
 
-#define CHECK_JSON if(!j.contains(key)) return;
-
-void from_json(const json& j, const std::string& key, bool& val)
-{
-	CHECK_JSON;
-
-	if (auto jval = j.at(key); jval.is_boolean())
-		jval.get_to(val);
-}
-
-void from_json(const json& j, const std::string& key, int& val)
-{
-	CHECK_JSON;
-
-	if (auto jval = j.at(key); jval.is_number_integer())
-		jval.get_to(val);
-}
-
-void from_json(const json& j, const std::string& key, size_t& val)
-{
-	CHECK_JSON;
-
-	if (auto jval = j.at(key); jval.is_number_unsigned())
-		jval.get_to(val);
-}
-
-void from_json(const json& j, const std::string& key, float& val)
-{
-	CHECK_JSON;
-
-	if (auto jval = j.at(key); jval.is_number_float())
-		jval.get_to(val);
-}
-
-void from_json(const json& j, const std::string& key, std::string& val)
-{
-	CHECK_JSON;
-
-	if (auto jval = j.at(key); jval.is_string())
-		jval.get_to(val);
-}
-
 template<typename T, size_t SIZE>
 void from_json(const json& j, const std::string& key, std::array<T, SIZE>& val)
 {
-	CHECK_JSON;
+	if (!j.contains(key))
+		return;
 
 	if (auto jval = j.at(key); jval.is_array())
 	{
@@ -1281,7 +1240,8 @@ void to_json(json& j, const ImVec4& val)
 template<typename T, size_t SIZE>
 void from_json(const json& j, const std::string& key, T val[SIZE])
 {
-	CHECK_JSON;
+	if (!j.contains(key))
+		return;
 
 	if (auto jval = j.at(key); jval.is_array())
 	{
@@ -1377,5 +1337,5 @@ void to_json(json& j, const ImGuiStyle& val)
 	j["AntiAliasedFill"] = val.AntiAliasedFill;
 	j["CurveTessellationTol"] = val.CurveTessellationTol;
 	j["CircleTessellationMaxError"] = val.CircleTessellationMaxError;
-	j["Colors"] = std::to_array(val.Colors);
+	j["Colors"] = val.Colors;
 }

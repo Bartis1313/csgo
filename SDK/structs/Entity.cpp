@@ -486,6 +486,14 @@ std::string Player_t::getName()
 	return name;
 }
 
+std::string_view Player_t::getRawName()
+{
+	PlayerInfo_t info;
+	interfaces::engine->getPlayerInfo(this->getIndex(), &info);
+
+	return info.m_name;
+}
+
 int Player_t::getKills()
 {
 	const static auto res = *interfaces::resource;

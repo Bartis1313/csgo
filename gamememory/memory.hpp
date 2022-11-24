@@ -176,6 +176,8 @@ public:
 	Address<void*> m_unkOverviewMap;
 	Address<void*> m_isDepth;
 	Address<void*> m_fxBlood;
+	Address<void*> m_addEnt;
+	Address<void*> m_removeEnt;
 
 	Address<teslaCreate_t> m_tesla;
 	Address<dispatchEffect_t> m_dispatchEffect;

@@ -5,7 +5,10 @@
 #include <config/vars.hpp>
 #include <SDK/structs/Entity.hpp>
 #include <SDK/Enums.hpp>
+#include <SDK/IVEngineClient.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/imguiaddons.hpp>
+#include <features/blacklist/blacklist.hpp>
 
 #include <dependencies/ImGui/imgui.h>
 #include <dependencies/magic_enum.hpp>
@@ -13,6 +16,7 @@
 #include <utilities/tools/wrappers.hpp>
 
 #include <ranges>
+#include <iostream>
 
 struct TableStruct
 {
@@ -36,21 +40,19 @@ void PlayerList::draw()
 	// ImGui demo: Tables/Borders
 	if (ImGui::Begin(XOR("PlayerList"), &vars::misc->playerList->enabled))
 	{
-		constexpr size_t columnsCount = 6;
+		static std::array tableNames
+		{
+			TableStruct{ XOR("Name"), ImGuiTableColumnFlags_NoHide },
+			TableStruct{ XOR("Health"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->health },
+			TableStruct{ XOR("Money"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->money },
+			TableStruct{ XOR("Team"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->teamID },
+			TableStruct{ XOR("Place"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->lastPlace },
+			TableStruct{ XOR("Blacklist"), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize }
+		};
 
-		if (ImGui::BeginTable(XOR("PlayerList Table"), columnsCount,
+		if (ImGui::BeginTable(XOR("PlayerList Table"), tableNames.size(),
 			ImGuiTableFlags_Borders | ImGuiTableFlags_Hideable | ImGuiTableFlags_Resizable /*| ImGuiTableFlags_Sortable*/))
 		{
-			static std::array tableNames
-			{
-				TableStruct{ XOR("Name"), ImGuiTableColumnFlags_NoHide },
-				TableStruct{ XOR("Health"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->health },
-				TableStruct{ XOR("Money"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->money },
-				TableStruct{ XOR("Team"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->teamID },
-				TableStruct{ XOR("Place"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->lastPlace },
-				TableStruct{ XOR("Blacklist"), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize }
-			};
-
 			for (size_t i = 0; const auto [name, flags, cfg] : tableNames)
 			{
 				ImGui::TableSetupColumn(name.data(), flags);
@@ -96,7 +98,7 @@ void PlayerList::draw()
 				{
 					ImVec4 color = isEnemy ? ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f } : ImVec4{ 0.0f, 1.0f, 0.0f, 1.0f };
 					ImGui::PushStyleColor(ImGuiCol_Text, color);
-					ImGui::TextUnformatted(ent->getName().c_str());
+					ImGui::TextUnformatted(ent->getRawName().data());
 					ImGui::PopStyleColor();
 				}
 
@@ -143,30 +145,20 @@ void PlayerList::draw()
 
 				if (ImGui::TableNextColumn())
 				{
-					// TODO: finish when blacklist done, pseudo
-					/*enum class BlacklistAction { ADD, REMOVE };
+					enum class BlacklistAction { ADD, REMOVE };
 
-					std::pair<const char*, BlacklistAction> blacklist = g_Blacklist->isBlacklisted(guid)
-						? std::make_pair(XOR("Add"), BlacklistAction::ADD)
-						: std::make_pair(XOR("Delete"), BlacklistAction::REMOVE);
+					const auto blacklist = !g_Blacklist->isBlacklisted(ent)
+						? std::make_pair(FORMAT(XOR("Add##{}"), idx), BlacklistAction::ADD)
+						: std::make_pair(FORMAT(XOR("Delete##{}"), idx), BlacklistAction::REMOVE);
 
 					const auto [title, isOn] = blacklist;
 
-					if (ImGui::Animated::Button(title))
-					{
+					if (ImGui::Animated::Button(title.c_str(), ImVec2{ -std::numeric_limits<float>::min(), 0.0f }))
+					{	
 						isOn == BlacklistAction::ADD
-							? g_Blacklist->add(guid)
-							: g_Blacklist->remove(guid);
-					}*/
-
-					// lazy method
-					//const float goodWidth = ImGui::CalcTextSize(XOR("Blacklist")).x;
-
-					//ImGui::Button()
-
-					// maybe add here isEnemy check,
-					// or leave it, so some annoying teammate can be stored in blacklist file
-					ImGui::Animated::Button(XOR("Test"), ImVec2{ -std::numeric_limits<float>::min(), 0.0f });
+							? g_Blacklist->add(ent)
+							: g_Blacklist->remove(ent);
+					}
 				}
 
 				ImGui::PopID();

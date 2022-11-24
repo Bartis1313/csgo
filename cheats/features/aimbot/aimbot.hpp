@@ -19,8 +19,6 @@ struct AimbotTarget_t
 	size_t m_index;
 	size_t m_bestHitboxID;
 	Vec3 m_pos;
-
-	bool isBlackListed() const;
 };
 
 class Aimbot : protected CreateMoveInPredictionType

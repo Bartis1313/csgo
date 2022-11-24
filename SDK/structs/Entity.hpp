@@ -217,6 +217,7 @@ public:
 	[[nodiscard]] Vec3 getHitgroupPos(const int hitgroup);
 	[[nodiscard]] bool isC4Owner();
 	[[nodiscard]] std::string getName();
+	[[nodiscard]] std::string_view getRawName();
 	[[nodiscard]] int getKills();
 	[[nodiscard]] int getDeaths();
 	[[nodiscard]] int getPing();

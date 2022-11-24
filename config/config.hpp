@@ -1,7 +1,6 @@
 #pragma once
 
 #include <filesystem>
-#include <variant>
 #include <vector>
 #include <iostream>
 #include <string>
@@ -42,6 +41,8 @@ public:
 	[[nodiscard]] std::string getCfgToLoad() const { return loadedCfgName; }
 	// get DEFAULT name, returns the field m_defaultConfig which never change
 	[[nodiscard]] std::string getDefaultConfigName() const { return m_defaultConfig; }
+	// extra folder for utilities
+	[[nodiscard]] std::filesystem::path getExtraLoadPath() const { return m_loadExtraPath; }
 private:
 	[[nodiscard]] std::filesystem::path getPathForConfig(const std::string& file);
 

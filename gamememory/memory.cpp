@@ -176,6 +176,8 @@ void Memory::init()
 	m_unkOverviewMap			= m_unkOverviewMap.initAddr(CLIENT_DLL, UNK_OVERVIEWMAP);
 	m_isDepth					= m_isDepth.initAddr(CLIENT_DLL, IS_DEPTH);
 	m_fxBlood					= m_fxBlood.initAddr(CLIENT_DLL, FX_BLOOD);
+	m_addEnt					= m_addEnt.initAddr(CLIENT_DLL, ADD_ENT);
+	m_removeEnt					= m_removeEnt.initAddr(CLIENT_DLL, REMOVE_ENT);
 
 	// REST
 

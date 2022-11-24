@@ -57,9 +57,9 @@ void MirrorCamDraw::draw()
 
 	if (!g_MirrorCam->m_inited)
 	{
-		interfaces::matSys->forceBeginRenderTargetAllocation();
+		//interfaces::matSys->forceBeginRenderTargetAllocation();
 		g_MirrorCam->m_texture = interfaces::matSys->createFullFrameRenderTarget(XOR("mirrorCam"));
-		interfaces::matSys->forceEndRenderTargetAllocation();
+		//interfaces::matSys->forceEndRenderTargetAllocation();
 
 		g_MirrorCam->m_inited = true;
 

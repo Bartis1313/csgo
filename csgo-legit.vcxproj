@@ -160,6 +160,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\features\aimbot\aimbotDraw.cpp" />
+    <ClCompile Include="cheats\features\blacklist\blacklist.cpp" />
     <ClCompile Include="cheats\features\cache\cache.cpp" />
     <ClCompile Include="cheats\features\fakelatency\fakelatency.cpp" />
     <ClCompile Include="cheats\features\misc\counters\counters.cpp" />
@@ -394,6 +395,7 @@
     <ClInclude Include="cheats\classes\screen2dEffects.hpp" />
     <ClInclude Include="cheats\features\aimbot\aimbot.hpp" />
     <ClInclude Include="cheats\features\aimbot\aimbotDraw.hpp" />
+    <ClInclude Include="cheats\features\blacklist\blacklist.hpp" />
     <ClInclude Include="cheats\features\cache\cache.hpp" />
     <ClInclude Include="cheats\features\fakelatency\fakelatency.hpp" />
     <ClInclude Include="cheats\features\misc\counters\counters.hpp" />

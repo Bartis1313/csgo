@@ -21,6 +21,7 @@
 #include <utilities/math/math.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/rand.hpp>
+#include <features/blacklist/blacklist.hpp>
 
 void Aimbot::init()
 {
@@ -35,13 +36,11 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
 	Vec3 delta = angle;
 	Vec3 ret;
 	const float smooth = std::min(0.99f, cfgSmooth); // allow 1.0 value to be max
-	float acceleration;
 
 	switch (m_config.smoothMode)
 	{
 	case E2T(SmoothMode::LINEAR):
 		ret = angle * cfgSmooth;
-		acceleration = cfgSmooth;
 		break;
 	case E2T(SmoothMode::AIM_LENGTH):
 		ret = delta - (delta * smooth);
@@ -51,16 +50,10 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
 	if (m_config.curveAim)
 	{
 		Vec3 curved = angle + Vec3(angle[1] * m_config.curveX, angle[0] * m_config.curveY, 0.0f);
-		ret = curved * acceleration;
+		ret = curved * smooth;
 	}
 
 	return ret;
-}
-
-bool AimbotTarget_t::isBlackListed() const
-{
-	// wip
-	return true;
 }
 
 void Aimbot::run(CUserCmd* cmd)
@@ -113,11 +106,11 @@ void Aimbot::run(CUserCmd* cmd)
 
 	// everything sorted by fov. Blacklists go on top + they ofc are sorted
 	// we always want front() as current target
-	std::sort(m_targets.begin(), m_targets.end(),
+	std::ranges::sort(m_targets,
 		[this](const AimbotTarget_t& lhs, const AimbotTarget_t& rhs) // std::tie won't work in that case
 		{
-			if (lhs.isBlackListed() ^ rhs.isBlackListed())
-				return lhs.isBlackListed();
+			if (g_Blacklist->isBlacklisted(lhs.m_player) ^ g_Blacklist->isBlacklisted(rhs.m_player))
+				return g_Blacklist->isBlacklisted(lhs.m_player);
 
 			return lhs.m_fov < rhs.m_fov;
 		});

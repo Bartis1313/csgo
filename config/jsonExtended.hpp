@@ -12,11 +12,8 @@ struct ImGuiStyle;
 
 using json = nlohmann::json;
 
-void from_json(const json& j, const std::string& key, bool& val);
-void from_json(const json& j, const std::string& key, int& val);
-void from_json(const json& j, const std::string& key, size_t& val);
-void from_json(const json& j, const std::string& key, float& val);
-void from_json(const json& j, const std::string& key, std::string& val);
+template<typename T>
+void from_json(const json& j, const std::string& key, T& val);
 
 void to_json(json& j, const CfgWeapon& val);
 void to_json(json& j, const CfgColor& val);
@@ -159,3 +156,13 @@ void from_json(const json& j, VarStyling& val);
 void from_json(const json& j, ImVec2& val);
 void from_json(const json& j, ImVec4& val);
 void from_json(const json& j, ImGuiStyle& val);
+
+template<typename T>
+void from_json(const json& j, const std::string& key, T& val)
+{
+	if (!j.contains(key))
+		return;
+
+	auto jval = j.at(key);
+	jval.get_to<T>(val);
+}

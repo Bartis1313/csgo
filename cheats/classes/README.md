@@ -24,8 +24,9 @@ public:
 		PaintBaseType{} // adding the object to the buffer with what to run
 	{}
 
-	virtual void init() override; // optonal to declare it here and later define
+	virtual void init() override;
 	virtual void reset() override; // optional, resets what you need when levelInitPostEntity is called
+	virtual void load() override; // optional, levelInitPreEntity is called
 	virtual void draw() override; // put all stuff that draws anything related with "player render" keyword
 private:
 	void renderBox(...);
