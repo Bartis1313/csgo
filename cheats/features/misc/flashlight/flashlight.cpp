@@ -18,34 +18,24 @@
 CFlashlightEffect* Flashlight::createFlashlight(float fov, Entity_t* ent, const char* effectName,
 	float farZ, float linearAtten)
 {
-	auto flashlightMemory = reinterpret_cast<CFlashlightEffect*>(interfaces::memAlloc->_alloc(sizeof(CFlashlightEffect)));
+	auto flashlightMemory = reinterpret_cast<CFlashlightEffect*>(memory::interfaces::memAlloc->_alloc(sizeof(CFlashlightEffect)));
 	if (!flashlightMemory)
 		return nullptr;
 
-	int idx = ent->getIndex(); // allow asm passing this arg
-	void* callAddr = g_Memory.m_flashlightCreate();
-	__asm
-	{
-		mov eax, fov
-		mov ecx, flashlightMemory
-		push linearAtten
-		push farZ
-		push effectName
-		push idx
-		call callAddr
-	}
-
+	memory::flashlightCreate()(flashlightMemory, nullptr, 0.0f, 0.0f, 0.0f, fov, ent->getIndex(), effectName, farZ, linearAtten);
+	
 	return flashlightMemory;
 }
 
 void Flashlight::destroyFlashLight(CFlashlightEffect* flashlight)
 {
-	g_Memory.m_flashlightDestroy()(flashlight, nullptr); // second arg is not even used there
+	memory::flashlightDestroy()(flashlight, nullptr); // second arg is not even used there
 }
 
 void Flashlight::updateFlashlight(CFlashlightEffect* flashlight, const Vec3& pos, const Vec3& forward, const Vec3& right, const Vec3& up)
 {
-	g_Memory.m_flashlightUpdate()(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov, flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
+	memory::flashlightUpdate()(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov,
+		flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
 }
 
 void Flashlight::run(int frame)
@@ -76,7 +66,7 @@ void Flashlight::run(int frame)
 		{
 			if (!done)
 			{
-				interfaces::surface->playSound(XOR("items\\flashlight1.wav"));
+				memory::interfaces::surface->playSound(XOR("items\\flashlight1.wav"));
 				m_flashlight = createFlashlight(vars::misc->flashLight->fov, game::localPlayer());
 				done = true;
 			}
@@ -97,7 +87,7 @@ void Flashlight::run(int frame)
 	{
 		if (key.isPressed())
 		{
-			interfaces::surface->playSound(XOR("items\\flashlight1.wav"));
+			memory::interfaces::surface->playSound(XOR("items\\flashlight1.wav"));
 
 			if (m_flashlight)
 			{
@@ -116,7 +106,7 @@ void Flashlight::run(int frame)
 		return;
 
 	Vec3 angle;
-	interfaces::engine->getViewAngles(angle);
+	memory::interfaces::engine->getViewAngles(angle);
 	auto [forward, right, up] = math::angleVectors(angle);
 
 	m_flashlight->m_isOn = true;

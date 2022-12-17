@@ -8,6 +8,7 @@
 #include "../IVEngineClient.hpp"
 #include "../CPlayerResource.hpp"
 #include "../IEngineTrace.hpp"
+#include "../IMDLCache.hpp"
 #include "../IWeapon.hpp"
 #include "../math/matrix.hpp"
 #include "../math/Vector.hpp"
@@ -30,17 +31,17 @@ Vec3 Entity_t::getAimPunch()
 
 AnimationLayer* Entity_t::getAnimOverlays()
 {
-	auto offset = g_Memory.m_animOverlays();
+	auto offset = memory::animOverlays();
 	return *reinterpret_cast<AnimationLayer**>(uintptr_t(this) + offset);
 }
 
 size_t Entity_t::getSequenceActivity(size_t sequence)
 {
-	auto studio = interfaces::modelInfo->getStudioModel(this->getModel());
+	auto studio = memory::interfaces::modelInfo->getStudioModel(this->getModel());
 	if (!studio)
 		return 0;
 
-	return g_Memory.m_sequenceActivity()(this, studio, sequence);
+	return memory::sequenceActivity()(this, studio, sequence);
 }
 
 bool Entity_t::isBreakable()
@@ -51,7 +52,7 @@ bool Entity_t::isBreakable()
 	if (!this->getIndex())
 		return false;
 
-	if (bool res = g_Memory.m_isBreakable()(this); !res)
+	if (bool res = memory::isBreakable()(this); !res)
 		return false;
 
 	auto cl = this->clientClass();
@@ -93,7 +94,7 @@ bool Entity_t::setupBonesShort(Matrix3x4* _out, int maxBones, int mask, float ti
 
 CUtlVector<Matrix3x4> Entity_t::m_CachedBoneData()
 {
-	auto offset = g_Memory.m_cachedBones();
+	auto offset = memory::cachedBones();
 	return *reinterpret_cast<CUtlVector<Matrix3x4>*>(uintptr_t(this) + offset);
 }
 
@@ -379,14 +380,60 @@ size_t Weapon_t::getNadeRadius()
 
 /////////////////////////////////////////////////////////////////////////////////
 
+CUserCmd& Player_t::m_LastCmd()
+{
+	return *reinterpret_cast<CUserCmd*>((uintptr_t)this + memory::lastCommand());
+}
+
+// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/c_baseplayer.cpp#L2667
+void Player_t::postThink()
+{
+//#if !defined( NO_ENTITY_PREDICTION )
+	MDLCACHE_CRITICAL_SECTION(memory::interfaces::mdlCache());
+
+	if (isAlive())
+	{
+		updateCollisionBounds();
+
+		//if (!CommentaryModeShouldSwallowInput(this))
+		//{
+		//	// do weapon stuff
+		//	ItemPostFrame();
+		//}
+
+		if (m_fFlags() & FL_ONGROUND)
+		{
+			m_flFallVelocity() = 0;
+		}
+
+		// Don't allow bogus sequence on player
+		if (m_nSequence() == -1)
+		{
+			setSequence(0);
+		}
+
+		studioFrameAdvance();
+		memory::postThinkPhysics()(this);
+	}
+
+	// Even if dead simulate entities
+	memory::simulateEntities()(this);
+//#endif
+}
+
+bool Player_t::physicsRunThink(thinkmethods_t think)
+{
+	return memory::physicsRunThink()(this, think);
+}
+
 void Player_t::setAbsOrigin(const Vec3& origin)
 {
-	g_Memory.m_setAbsOrigin()(this, std::cref(origin));
+	memory::setAbsOrigin()(this, std::cref(origin));
 }
 
 Weapon_t* Player_t::getActiveWeapon()
 {
-	return reinterpret_cast<Weapon_t*>(interfaces::entList->getClientFromHandle(this->m_hActiveWeapon()));
+	return reinterpret_cast<Weapon_t*>(memory::interfaces::entList->getClientFromHandle(this->m_hActiveWeapon()));
 }
 
 Vec3 Player_t::getHitboxPos(const int id)
@@ -405,7 +452,7 @@ Vec3 Player_t::getHitboxPos(const int id)
 		}
 	}*/
 
-	if (auto modelStudio = interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
+	if (auto modelStudio = memory::interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
 	{
 		if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(id); hitbox != nullptr)
 		{
@@ -437,19 +484,19 @@ Vec3 Player_t::getHitgroupPos(const int hitgroup)
 		case HITGROUP_STOMACH:
 			return HITBOX_BELLY;
 		case HITGROUP_LEFTARM:
-			return HITBOX_RIGHT_HAND;
-		case HITGROUP_RIGHTARM:
 			return HITBOX_LEFT_HAND;
+		case HITGROUP_RIGHTARM:
+			return HITBOX_RIGHT_HAND;
 		case HITGROUP_LEFTLEG:
-			return HITBOX_RIGHT_CALF;
-		case HITGROUP_RIGHTLEG:
 			return HITBOX_LEFT_CALF;
+		case HITGROUP_RIGHTLEG:
+			return HITBOX_RIGHT_CALF;
 		default:
 			return HITBOX_PELVIS;
 		}
 	};
 
-	if (auto modelStudio = interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
+	if (auto modelStudio = memory::interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
 	{
 		if (auto hitbox = modelStudio->getHitboxSet(this->m_nHitboxSet())->getHitbox(fixHitgroupIndex()); hitbox != nullptr)
 		{
@@ -463,13 +510,13 @@ Vec3 Player_t::getHitgroupPos(const int hitgroup)
 
 bool Player_t::isC4Owner()
 {
-	return g_Memory.m_isC4Owner()(this);
+	return memory::isC4Owner()(this);
 }
 
 std::string Player_t::getName()
 {
 	PlayerInfo_t info;
-	interfaces::engine->getPlayerInfo(this->getIndex(), &info);
+	memory::interfaces::engine->getPlayerInfo(this->getIndex(), &info);
 
 	std::string name = info.m_name;
 
@@ -489,54 +536,34 @@ std::string Player_t::getName()
 std::string_view Player_t::getRawName()
 {
 	PlayerInfo_t info;
-	interfaces::engine->getPlayerInfo(this->getIndex(), &info);
+	memory::interfaces::engine->getPlayerInfo(this->getIndex(), &info);
 
 	return info.m_name;
 }
 
 int Player_t::getKills()
 {
-	const static auto res = *interfaces::resource;
-	if (res)
-		return res->getKills(this->getIndex());
-
-	return -1;
+	return memory::interfaces::resourceInterface->getKills(this->getIndex());
 }
 
 int Player_t::getDeaths()
 {
-	const static auto res = *interfaces::resource;
-	if (res)
-		return res->getDeaths(this->getIndex());
-
-	return -1;
+	return memory::interfaces::resourceInterface->getDeaths(this->getIndex());
 }
 
 int Player_t::getPing()
 {
-	const static auto res = *interfaces::resource;
-	if (res)
-		return res->getPing(this->getIndex());
-
-	return -1;
+	return memory::interfaces::resourceInterface->getPing(this->getIndex());
 }
 
 std::string Player_t::getRank(bool useShortName)
 {
-	const static auto res = *interfaces::resource;
-	if (res)
-		return res->getRank(this->getIndex(), useShortName);
-
-	return "unk";
+	return memory::interfaces::resourceInterface->getRank(this->getIndex());
 }
 
 int Player_t::getWins()
 {
-	const static auto res = *interfaces::resource;
-	if (res)
-		return res->getWins(this->getIndex());
-
-	return -1;
+	return memory::interfaces::resourceInterface->getWins(this->getIndex());
 }
 
 bool Player_t::isPossibleToSee(Player_t* player, const Vec3& pos)
@@ -544,14 +571,14 @@ bool Player_t::isPossibleToSee(Player_t* player, const Vec3& pos)
 	Trace_t tr;
 	TraceFilter filter;
 	filter.m_skip = this;
-	interfaces::trace->traceRay({ this->getEyePos(), pos }, MASK_PLAYER, &filter, &tr);
+	memory::interfaces::trace->traceRay({ this->getEyePos(), pos }, MASK_PLAYER, &filter, &tr);
 
 	return tr.m_entity == player || tr.m_fraction > 0.97f;
 }
 
 bool Player_t::isViewInSmoke(const Vec3& pos)
 {
-	return g_Memory.m_throughSmoke()(this->getEyePos(), pos);
+	return memory::throughSmoke()(this->getEyePos(), pos);
 }
 
 uintptr_t Player_t::getLiteralAddress()
@@ -592,8 +619,8 @@ AABB_t Player_t::getOcclusionBounds()
 
 AABB_t Player_t::getCameraBounds()
 {
-	const static auto occlusion_test_camera_margins = interfaces::cvar->findVar(XOR("occlusion_test_camera_margins"));
-	const static auto occlusion_test_jump_margin = interfaces::cvar->findVar(XOR("occlusion_test_jump_margin"));
+	const static auto occlusion_test_camera_margins = memory::interfaces::cvar->findVar(XOR("occlusion_test_camera_margins"));
+	const static auto occlusion_test_jump_margin = memory::interfaces::cvar->findVar(XOR("occlusion_test_jump_margin"));
 
 	const auto& pos = this->m_vecOrigin();
 	float cameraMargins = occlusion_test_camera_margins->getFloat();
@@ -607,7 +634,7 @@ AABB_t Player_t::getCameraBounds()
 
 bool Player_t::isOtherTeam(Player_t* player)
 {
-	const static auto mp_teammates_are_enemies = interfaces::cvar->findVar(XOR("mp_teammates_are_enemies"));
+	const static auto mp_teammates_are_enemies = memory::interfaces::cvar->findVar(XOR("mp_teammates_are_enemies"));
 	bool isDM = false;
 	if (mp_teammates_are_enemies && mp_teammates_are_enemies->getInt())
 		isDM = true;

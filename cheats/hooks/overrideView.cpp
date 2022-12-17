@@ -9,7 +9,7 @@
 #include <game/game.hpp>
 #include <config/vars.hpp>
 
-void __fastcall hooks::overrideView::hooked(FAST_ARGS, CViewSetup* view)
+void FASTCALL hooks::overrideView::hooked(FAST_ARGS, CViewSetup* view)
 {	
 	if(!game::isAvailable())
 		return original(thisptr, view);

@@ -560,6 +560,12 @@ struct VarMisc
 		float fov = 30.0f;
 	};
 	std::unique_ptr<VarFlashlight> flashLight{ new VarFlashlight };
+
+	struct DisableItems
+	{
+		bool interpolate = false;
+	};
+	std::unique_ptr<DisableItems> disableItems{ new DisableItems };
 };
 USE_NAMESPACE_VARS(VarMisc, misc);
 

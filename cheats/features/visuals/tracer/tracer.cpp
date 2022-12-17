@@ -11,6 +11,7 @@
 #include <SDK/IViewRenderBeams.hpp>
 #include <SDK/math/Vector.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <config/vars.hpp>
@@ -20,15 +21,14 @@
 
 #include <ranges>
 
-
 void BulletTracer::init()
 {
-	g_Events->add(XOR("bullet_impact"), std::bind(&BulletTracer::draw, this, std::placeholders::_1));
+	events::add(XOR("bullet_impact"), std::bind(&BulletTracer::draw, this, std::placeholders::_1));
 }
 
 void BulletTracer::draw(IGameEvent* event)
 {
-	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
+	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
 	if (!attacker)
 		return;
 
@@ -53,7 +53,7 @@ void BulletTracer::draw(IGameEvent* event)
 	Trace_t tr;
 	TraceFilter filter;
 	filter.m_skip = game::localPlayer();
-	interfaces::trace->traceRay({ src, dst }, MASK_PLAYER, &filter, &tr);
+	memory::interfaces::trace->traceRay({ src, dst }, MASK_PLAYER, &filter, &tr);
 
 	auto convertToFlag = [](const std::string& flag)
 	{
@@ -96,5 +96,5 @@ void BulletTracer::draw(IGameEvent* event)
 	info.m_segments = cfgbeam.segments;
 	info.m_renderable = true;
 
-	interfaces::beams->createBeamPoints(info);
+	memory::interfaces::beams->createBeamPoints(info);
 }

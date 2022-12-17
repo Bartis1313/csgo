@@ -252,7 +252,7 @@ namespace magic_enum {
                 (name[0]) & 0x80) ||
 #endif
                 (name[0] == '_'))) {
-                return name;
+                    return name;
   }
 
   return {}; // Invalid name.

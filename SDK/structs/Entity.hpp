@@ -19,6 +19,8 @@ class ICollideable;
 class AnimationLayer;
 struct Model_t;
 class WeaponInfo;
+struct DataMap_t;
+class CUserCmd;
 
 /*
 * This file is so far probably the easiest when it comes to netvar usage
@@ -39,6 +41,7 @@ public:
 	NETVAR(int, m_iTeamNum, "DT_CSPlayer", "m_iTeamNum");
 	NETVAR(Vec3, m_vecOrigin, "DT_BasePlayer", "m_vecOrigin");
 	NETVAR(int, m_hOwnerEntity, "DT_BaseEntity", "m_hOwnerEntity");
+	NETVAR(int, m_hVehicle, "DT_BaseEntity", "m_hVehicle");
 	NETVAR(int, m_CollisionGroup, "DT_BasePlayer", "m_CollisionGroup");
 	NETVAR(Vec3, m_ViewOffset, "DT_BasePlayer", "m_vecViewOffset[0]");
 	NETVAR(bool, m_bSpotted, "DT_BaseEntity", "m_bSpotted");
@@ -51,6 +54,7 @@ public:
 	NETVAR(int, m_fEffects, "DT_BaseEntity", "m_fEffects");
 	NETVAR(int, m_nModelIndex, "DT_BaseEntity", "m_nModelIndex");
 	NETVAR(PrecipitationType_t, m_nPrecipType, "DT_Precipitation", "m_nPrecipType");
+	NETVAR(int, m_nNextThinkTick, "DT_BasePlayer", "m_nNextThinkTick");
 
 	VFUNC(Vec3&, absOrigin, ABS_ORIGIN, (), (this));
 	VFUNC(Vec3&, absAngles, ABS_ANGLE, (), (this));
@@ -71,6 +75,7 @@ public:
 	VFUNC(void, onDataChanged, DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(void, preDataUpdate, PRE_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
+
 
 	[[nodiscard]] CUtlVector<Matrix3x4> m_CachedBoneData();
 	[[nodiscard]] Vec3 getAimPunch();
@@ -98,10 +103,13 @@ public:
 	NETVAR(float, m_fThrowTime, "DT_BaseCSGrenade", "m_fThrowTime");
 	NETVAR(float, m_flThrowStrength, "DT_BaseCSGrenade", "m_flThrowStrength");
 	NETVAR(int, m_nExplodeEffectTickBegin, "DT_BaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin");
+	NETVAR(float, m_fAccuracyPenalty, "DT_WeaponCSBase", "m_fAccuracyPenalty");
+	NETVAR(float, m_flRecoilIndex, "DT_WeaponCSBaseGun", "m_flRecoilIndex");
 
 	VFUNC(float, getInaccuracy, INACCURACY, (), (this));
 	VFUNC(float, getSpread, SPREAD, (), (this));
 	VFUNC(WeaponInfo*, getWpnInfo, WEAPONINFO, (), (this));
+	VFUNC(void, updateAccuracyPenalty, UPDATE_WEAPON_PENALTY, (), (this));
 
 	[[nodiscard]] std::string getWpnName();
 	[[nodiscard]] std::u8string getIcon(int correctIndex = -1);
@@ -203,8 +211,27 @@ public:
 	NETVAR(int, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
 	NETVAR(int, m_iAccount, "DT_CSPlayer", "m_iAccount");
 	PTRNETVAR(const char, m_szLastPlaceName, "DT_BasePlayer", "m_szLastPlaceName");
-	//FRAME_NET_UPDATE_POSTDATAUPDATE_END
+	NETVAR(float, m_flFallVelocity, "DT_BasePlayer", "m_flFallVelocity");
+	NETVAR(int, m_nSequence, "DT_BaseAnimating", "m_nSequence");
 	PTROFFSET(VarMapping_t, getVarMap, 0x24);
+	DATAMAP_FIELD(int, m_afButtonLast, getPredictionDataMap(), "m_afButtonLast");
+	DATAMAP_FIELD(int, m_afButtonPressed, getPredictionDataMap(), "m_afButtonPressed");
+	DATAMAP_FIELD(int, m_afButtonReleased, getPredictionDataMap(), "m_afButtonReleased");
+	NETVAR_ADDR(int, m_afButtonForced, "DT_BasePlayer", "m_iDefaultFOV", 0x8);
+	NETVAR_ADDR(int, m_afButtonDisabled, "DT_BasePlayer", "m_iDefaultFOV", 0x4);
+	PTRNETVAR_ADDR(CUserCmd*, m_pCurrentCommand, "DT_BasePlayer", "m_iDefaultFOV", 0xC);
+	[[nodiscard]] CUserCmd& m_LastCmd();
+	PTRDATAMAP_FIELD(int, m_nButtons, getPredictionDataMap(), "m_nButtons");
+	PTRDATAMAP_FIELD(int, m_nImpulse, getPredictionDataMap(), "m_nImpulse");
+	VFUNC(DataMap_t*, getPredictionDataMap, DATAMAP_PREDICTION, (), (this));
+	VFUNC(void, preThink, PRE_THINK, (), (this));
+	VFUNC(void, think, THINK, (), (this));
+	void postThink();
+	VFUNC(void, updateCollisionBounds, UPDATE_COLLISION_BOUNDS, (), (this));
+	VFUNC(void, setSequence, SET_SEQUENCE, (int seq), (this, seq));
+	VFUNC(void, studioFrameAdvance, STUDIO_FRAME_ADVANCE, (), (this));
+	[[nodiscard]] bool physicsRunThink(thinkmethods_t think);
+
 
 	void setAbsOrigin(const Vec3& origin);
 	[[nodiscard]] Weapon_t* getActiveWeapon();

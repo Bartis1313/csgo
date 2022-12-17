@@ -11,6 +11,7 @@
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/ClientClass.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 
@@ -33,15 +34,15 @@
 //}
 
 // to get the sendPacket correctly and no need to define it anywhere in headers
-void __fastcall createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool active, bool& sendPacket)
+void FASTCALL createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool active, bool& sendPacket)
 {
 	hooks::proxyCreateMove::original(thisptr, sequence, inputTime, active);
 
-	CUserCmd* cmd = interfaces::input->getUserCmd(0, sequence);
+	CUserCmd* cmd = memory::interfaces::input->getUserCmd(0, sequence);
 	if (!cmd || !cmd->m_commandNumber)
 		return;
 
-	CVerifiedUserCmd* verifiedCmd = interfaces::input->getVerifiedUserCmd(sequence);
+	CVerifiedUserCmd* verifiedCmd = memory::interfaces::input->getVerifiedUserCmd(sequence);
 	if (!verifiedCmd)
 		return;
 
@@ -57,7 +58,6 @@ void __fastcall createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool a
 	game::serverTime(cmd);
 	CreateMovePrePredictionType::runAll(cmd);
 
-	g_Prediction->update();
 	g_Prediction->addToPrediction(cmd, [=]()
 		{
 			CreateMoveInPredictionType::runAll(cmd);
@@ -84,9 +84,6 @@ __declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(FAST_ARGS, int 
 		mov ebp, esp
 		push ebx
 		push esp
-		/*push dword ptr[active]
-		push dword ptr[inputFrame]
-		push dword ptr[sequence]*/
 		push active
 		push inputFrame
 		push sequence

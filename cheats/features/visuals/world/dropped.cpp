@@ -22,7 +22,7 @@ void DroppedWeapons::draw()
 
 	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::WEAPON))
 	{
-		auto handle = interfaces::entList->getClientFromHandle(entity->m_hOwnerEntity());
+		auto handle = memory::interfaces::entList->getClientFromHandle(entity->m_hOwnerEntity());
 		if (handle)
 			continue;
 
@@ -40,6 +40,9 @@ void DroppedWeapons::draw()
 
 		constexpr float maxDist = 25.0f;
 		float alpha = (maxDist - entity->absOrigin().distToMeters(game::localPlayer->absOrigin())) / (maxDist / 1.5f);
+
+		if (alpha < 0.0f)
+			continue;
 
 		auto getTextSize = [=](const std::string& text, ImFont* font = ImFonts::verdana12)
 		{
@@ -67,7 +70,7 @@ void DroppedWeapons::draw()
 		if (flags.at(E2T(DroppedFlags::TEXT)))
 		{
 			auto name = vars::visuals->esp->weaponBar->translate
-				? interfaces::localize->findAsUTF8(wpn->getWpnInfo()->m_WeaponName)
+				? memory::interfaces::localize->findAsUTF8(wpn->getWpnInfo()->m_WeaponName)
 				: wpn->getWpnName();
 			imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::verdana12,
 				name, true, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));

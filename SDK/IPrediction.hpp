@@ -12,6 +12,7 @@ class IMoveHelper
 {
 public:
 	VFUNC(void, setHost, 1, (Player_t* host), (this, host));
+	VFUNC(void, processImpacts, 4, (), (this));
 };
 
 class CMoveData
@@ -51,6 +52,12 @@ public:
 		(this, startframe, validframe, incomingAcknowledged, outgoingCommand));
 	VFUNC(void, setLocalViewangles, 13, (Vec3& angle), (this, std::ref(angle)));
 	VFUNC(bool, inPrediction, 14, (), (this));
+	VFUNC(bool, checkMovingGround, 18, (Player_t* player, double frameTime), (this, player, frameTime));
 	VFUNC(void, setupMove, 20, (Player_t* localPlayer, CUserCmd* cmd, IMoveHelper* moveHelper, CMoveData* moveData), (this, localPlayer, cmd, moveHelper, moveData));
-	VFUNC(void, finishMove, 21, (Player_t* localPlayer, CUserCmd* cmd, CMoveData* moveData), (this, localPlayer, cmd, moveData))
+	VFUNC(void, finishMove, 21, (Player_t* localPlayer, CUserCmd* cmd, CMoveData* moveData), (this, localPlayer, cmd, moveData));
+
+	PAD(8);
+	bool m_inPrediction;
+	bool m_firstTimePredicted;
+	bool m_enginePaused;
 };

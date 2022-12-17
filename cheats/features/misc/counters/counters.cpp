@@ -12,14 +12,14 @@
 
 void Counters::init()
 {
-	g_Events->add(XOR("weapon_fire"), std::bind(&Counters::addShots, this, std::placeholders::_1));
-	g_Events->add(XOR("player_hurt"), std::bind(&Counters::addHits, this, std::placeholders::_1));
-	g_Events->add(XOR("round_start"), std::bind(&Counters::resetShots, this, std::placeholders::_1));
+	events::add(XOR("weapon_fire"), std::bind(&Counters::addShots, this, std::placeholders::_1));
+	events::add(XOR("player_hurt"), std::bind(&Counters::addHits, this, std::placeholders::_1));
+	events::add(XOR("round_end"), std::bind(&Counters::resetShots, this, std::placeholders::_1));
 }
 
 void Counters::addShots(IGameEvent* event)
 {
-	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
+	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
 	if (!attacker)
 		return;
 
@@ -29,7 +29,7 @@ void Counters::addShots(IGameEvent* event)
 
 void Counters::addHits(IGameEvent* event)
 {
-	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
+	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
 	if (!attacker)
 		return;
 
@@ -37,7 +37,7 @@ void Counters::addHits(IGameEvent* event)
 	if (attacker != game::localPlayer)
 		return;
 
-	auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
 	if (!ent) // should never happen
 		return;
 

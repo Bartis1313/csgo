@@ -16,7 +16,7 @@
 static void getScreen()
 {
 	int x, y;
-	interfaces::engine->getScreenSize(x, y);
+	memory::interfaces::engine->getScreenSize(x, y);
 	globals::screenX = x;
 	globals::screenY = y;
 }
@@ -24,20 +24,20 @@ static void getScreen()
 static void getMouse()
 {
 	int x, y;
-	interfaces::surface->getCursor(x, y);
+	memory::interfaces::surface->getCursor(x, y);
 	globals::mouseX = x;
 	globals::mouseY = y;
 }
 
-void __fastcall hooks::paintTraverse::hooked(FAST_ARGS, unsigned int panel, bool forceRepaint, bool allowForce)
+void FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, unsigned int panel, bool forceRepaint, bool allowForce)
 {
 	getScreen();
 	getMouse();
 
-	if (interfaces::engine->isTakingScreenshot())
+	if (memory::interfaces::engine->isTakingScreenshot())
 		return;
 
-	const std::string_view panelName = interfaces::panel->getName(panel);
+	const std::string_view panelName = memory::interfaces::panel->getName(panel);
 
 	static unsigned int panelScope = 0;
 	static unsigned int panelID = 0;
@@ -49,7 +49,7 @@ void __fastcall hooks::paintTraverse::hooked(FAST_ARGS, unsigned int panel, bool
 	}
 	else if (panelScope == panel)
 	{
-		if (interfaces::engine->isInGame() && vars::misc->scope->enabled)
+		if (memory::interfaces::engine->isInGame() && vars::misc->scope->enabled)
 			return;
 	}
 

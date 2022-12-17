@@ -19,7 +19,7 @@ enum movetypes
 
 void Movement::init()
 {
-	m_sideSpeed = interfaces::cvar->findVar(XOR("cl_sidespeed"));
+	m_sideSpeed = memory::interfaces::cvar->findVar(XOR("cl_sidespeed"));
 }
 
 void Movement::run(CUserCmd* cmd)
@@ -129,7 +129,7 @@ void Movement::strafe(CUserCmd* cmd)
 			{
 				const static float maxSpeed = game::localPlayer->m_flMaxspeed(); // this does not change, or it does? correct me
 				//printf("maxspee %f\n", maxSpeed);
-				const static auto sv_airaccelerate = interfaces::cvar->findVar(XOR("sv_airaccelerate"));
+				const static auto sv_airaccelerate = memory::interfaces::cvar->findVar(XOR("sv_airaccelerate"));
 				const float term = 30.0f / sv_airaccelerate->getFloat() / maxSpeed * 100.0f / speed;
 
 				if (term < 1.0f && term > -1.0f)
@@ -150,17 +150,17 @@ void Movement::strafe(CUserCmd* cmd)
 				auto deltaAngle = [](float first, float second) // used to point out angle to finally calculate, detection of dir
 				{
 					const float delta = first - second;
-					float res = std::isfinite(delta) ? std::remainder(delta, math::PI * 2.0f) : 0.0f;
+					float res = std::isfinite(delta) ? std::remainder(delta, math::PI_2) : 0.0f;
 
 					if (first > second)
 					{
 						if (res >= math::PI)
-							res -= math::PI * 2.0f;
+							res -= math::PI_2;
 					}
 					else
 					{
 						if (res <= -math::PI)
-							res += math::PI * 2.0f;
+							res += math::PI_2;
 					}
 
 					return res;

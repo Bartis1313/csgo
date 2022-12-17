@@ -4,7 +4,6 @@
 #include <classes/overViewMap.hpp>
 
 class Entity_t;
-class ClientClass;
 class WeatherReset;
 struct MapStruct;
 
@@ -19,11 +18,11 @@ public:
 	void implMenu();
 protected:
 	virtual void run(int frame) override;
+	virtual void reset() override;
 private:
 	struct WeatherFields_t
 	{
 		Entity_t* m_ent = nullptr;
-		ClientClass* m_preciptation = nullptr;
 		bool m_created = false;
 	} m_weather;
 
@@ -31,16 +30,3 @@ private:
 };
 
 GLOBAL_FEATURE(WeatherController);
-
-class WeatherReset : protected OverViewMapType
-{
-public:
-	constexpr WeatherReset() :
-		OverViewMapType{}
-	{}
-
-protected:
-	virtual void run([[maybe_unused]] MapStruct* map) override;
-};
-
-GLOBAL_FEATURE(WeatherReset);

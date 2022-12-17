@@ -5,9 +5,9 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <features/cache/cache.hpp>
 
-void __fastcall hooks::removeEnt::hooked(FAST_ARGS, void* handleEnt, int handle)
+void FASTCALL hooks::removeEnt::hooked(FAST_ARGS, void* handleEnt, int handle)
 {
-	Entity_t* ent = reinterpret_cast<Entity_t*>(interfaces::entList->getClientFromHandle(handle));
+	Entity_t* ent = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientFromHandle(handle));
 	EntityCache::erase(ent);
 
 	original(thisptr, handleEnt, handle);

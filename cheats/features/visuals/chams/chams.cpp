@@ -17,69 +17,76 @@
 #include <config/vars.hpp>
 #include <game/game.hpp>
 
+Chams::Mat_t::Mat_t(IMaterial* mat, Chams::Mat_t::ExtraType type)
+	: mat{ mat }, type{ type }
+{
+	if (mat)
+		mat->addRef();
+}
+
 void Chams::init()
-{	
-	m_flat = interfaces::matSys->createMaterial(XOR("Flat"), KeyValues::fromString(XOR("UnlitGeneric")));
-	m_generic = interfaces::matSys->createMaterial(XOR("Generic"), KeyValues::fromString(XOR("VertexLitGeneric")));
-	m_glow =
-	{
-		interfaces::matSys->createMaterial(XOR("Glow"), KeyValues::fromString(XOR("VertexLitGeneric"),
-		XOR("$additive 1 $envmap models/effects/cube_white $envmapfresnel 1"))), true
+{
+	m_flat = 
+	{ 
+		memory::interfaces::matSys->createMaterial(XOR("Flat"), KeyValues::fromString(XOR("UnlitGeneric")))
 	};
-	m_metalic = interfaces::matSys->createMaterial(XOR("Metalic"), KeyValues::fromString(XOR("VertexLitGeneric"),
-		XOR("$basetexture white $envmap env_cubemap $normalmapalphaenvmapmask 1 $envmapcontrast 1 $nofog 1 $model 1 $nocull 0 $selfillum 1 $halfambert 1 $znearer 0 $flat 1")));
-	m_pearlescent = interfaces::matSys->createMaterial(XOR("Pearlscent"), KeyValues::fromString(XOR("VertexLitGeneric"),
-		XOR("$ambientonly 1 $phong 1 $pearlescent 3 $basemapalphaphongmask 1")));
+	m_generic =
+	{ 
+		memory::interfaces::matSys->createMaterial(XOR("Generic"), KeyValues::fromString(XOR("VertexLitGeneric"))) 
+	};
+	m_glow =
+	{ 
+		memory::interfaces::matSys->createMaterial(XOR("Glow"), KeyValues::fromString(XOR("VertexLitGeneric"),
+		XOR("$additive 1 $envmap models/effects/cube_white $envmapfresnel 1"))),
+		Mat_t::ExtraType::GLOW
+	};
+	m_metalic = 
+	{
+		memory::interfaces::matSys->createMaterial(XOR("Metalic"), KeyValues::fromString(XOR("VertexLitGeneric"),
+		XOR("$basetexture white $envmap env_cubemap $normalmapalphaenvmapmask 1 $envmapcontrast 1 $nofog 1 $model 1 $nocull 0 $selfillum 1 $halfambert 1 $znearer 0 $flat 1")))
+	};
+	m_pearlescent =
+	{
+		memory::interfaces::matSys->createMaterial(XOR("Pearlscent"), KeyValues::fromString(XOR("VertexLitGeneric"),
+		XOR("$ambientonly 1 $phong 1 $pearlescent 3 $basemapalphaphongmask 1")))
+	};
 }
 
 void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& color, bool force, bool call)
 {
-	// have to somehow get correct material
-	Mat_t mat;
-	switch (styles)
+	static std::unordered_map<ChamsType, Mat_t> materials
 	{
-	case E2T(ChamsType::FLAT):
-		mat = m_flat;
-		break;
-	case E2T(ChamsType::GENERIC):
-		mat = m_generic;
-		break;
-	case E2T(ChamsType::GLOW):
-		mat = m_glow;
-		break;
-	case E2T(ChamsType::METALIC):
-		mat = m_metalic;
-		break;
-	case E2T(ChamsType::PEARLSCENT):
-		mat = m_pearlescent;
-		break;
-	default:
-		return;
-	}
+		{ ChamsType::FLAT, m_flat },
+		{ ChamsType::GENERIC, m_generic },
+		{ ChamsType::METALIC, m_glow },
+		{ ChamsType::FLAT, m_metalic },
+		{ ChamsType::PEARLSCENT, m_pearlescent },
+	};
 
-	if (!mat.getMat())
+	Mat_t mat = materials.at(static_cast<ChamsType>(styles));
+	
+	if (!mat())
 		return;
 
-	if (mat.getMat()->isError())
+	if (mat->isError())
 		return;
 
-	if (mat.isGlow())
+	if (mat.type == Mat_t::ExtraType::GLOW)
 	{
 		static bool found = false;
-		auto matColor = mat.getMat()->findVar(XOR("$envmaptint"), &found);
+		auto matColor = mat->findVar(XOR("$envmaptint"), &found);
 		if (found)
 			matColor->setValues(color);
 	}
 
-	mat.getMat()->modulateAllColor(color);
-	if (mat.isGlow())
-		mat.getMat()->setMaterialVarFlag(MATERIAL_VAR_ADDITIVE, true);
-	mat.getMat()->setMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
-	mat.getMat()->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignore);
-	mat.getMat()->addRef();
+	mat->modulateAllColor(color);
+	if (mat())
+		mat->setMaterialVarFlag(MATERIAL_VAR_ADDITIVE, true);
+	mat->setMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
+	mat->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignore);
 
 	if (force)
-		interfaces::studioRender->forcedMaterialOverride(mat.getMat());
+		memory::interfaces::studioRender->forcedMaterialOverride(mat.mat);
 	if (call)
 		CALL(m_result, m_state, m_info, m_matrix);
 }
@@ -88,7 +95,7 @@ void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& 
 
 void Chams::CALL(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
 {
-	hooks::drawModel::original(interfaces::modelRender, result, state, info, matrix);
+	hooks::drawModel::original(memory::interfaces::modelRender(), result, state, info, matrix);
 }
 
 void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
@@ -104,7 +111,7 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 	if (!game::localPlayer->isAlive())
 		return;
 
-	auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(info.m_entIndex));
+	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(info.m_entIndex));
 	drawBackTrack(ent);
 
 	if (ent && ent->isPlayer() && ent->isAlive() && ent->isOtherTeam(game::localPlayer()))
@@ -130,14 +137,14 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 			if (!vars::visuals->chams->enabledArms)
 				return;
 
-			auto mat = interfaces::matSys->findMaterial(name.data(), XOR(TEXTURE_GROUP_MODEL));
+			auto mat = memory::interfaces::matSys->findMaterial(name.data(), XOR(TEXTURE_GROUP_MODEL));
 			if (!mat)
 				return;
 
 			if (vars::visuals->chams->armsHide)
 			{
 				mat->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
-				interfaces::studioRender->forcedMaterialOverride(mat);
+				memory::interfaces::studioRender->forcedMaterialOverride(mat);
 				return;
 			}
 
@@ -152,14 +159,14 @@ void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 			if (!vars::visuals->chams->enabledWeapons)
 				return;
 
-			auto mat = interfaces::matSys->findMaterial(name.data(), XOR(TEXTURE_GROUP_MODEL));
+			auto mat = memory::interfaces::matSys->findMaterial(name.data(), XOR(TEXTURE_GROUP_MODEL));
 			if (!mat)
 				return;
 
 			if (vars::visuals->chams->weaponHide)
 			{
 				mat->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
-				interfaces::studioRender->forcedMaterialOverride(mat);
+				memory::interfaces::studioRender->forcedMaterialOverride(mat);
 				return;
 			}
 
@@ -200,11 +207,11 @@ void Chams::drawBackTrack(Player_t* ent)
 		for (size_t i = 0; i < record->size(); i++)
 		{
 			if (!g_Backtrack->isValid(record->at(i).m_simtime))
-				continue;
+				break;
 
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false, vars::visuals->chams->colorBacktrack(), true, false);
 			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
-			interfaces::studioRender->forcedMaterialOverride(nullptr);
+			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
 	}
@@ -214,7 +221,7 @@ void Chams::drawBackTrack(Player_t* ent)
 		{
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false, vars::visuals->chams->colorBacktrack(), true, false);
 			CALL(m_result, m_state, m_info, record->back().m_matrix.data());
-			interfaces::studioRender->forcedMaterialOverride(nullptr);
+			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
 	}
@@ -223,30 +230,30 @@ void Chams::drawBackTrack(Player_t* ent)
 		for (size_t i = 0; i < record->size(); i++)
 		{
 			if (!g_Backtrack->isValid(record->at(i).m_simtime))
-				continue;
+				break;
 
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false,
-				Color::rainbowColor(interfaces::globalVars->m_curtime + (i / 3.0f), vars::visuals->chams->rainbowBacktrackSpeed), true, false);
+				Color::rainbowColor(memory::interfaces::globalVars->m_curtime + (i / 3.0f), vars::visuals->chams->rainbowBacktrackSpeed), true, false);
 			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
-			interfaces::studioRender->forcedMaterialOverride(nullptr);
+			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
 	}
 	case E2T(BTChamsType::COLOR_CHANGE):
 	{
 		Color fromCfg = vars::visuals->chams->colorBacktrack();
-		
+
 		for (size_t i = 0; i < record->size(); i++)
 		{
 			if (!g_Backtrack->isValid(record->at(i).m_simtime))
-				continue;
-			
+				break;
+
 			Color color(fromCfg.r() - (i * (1.0f / record->size())),
 				i * (fromCfg.g() / record->size()), fromCfg.b(), fromCfg.a());
-			
+
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false, color, true, false);
 			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
-			interfaces::studioRender->forcedMaterialOverride(nullptr);
+			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
 	}

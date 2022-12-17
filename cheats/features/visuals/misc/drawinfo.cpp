@@ -15,10 +15,7 @@ void MiscInfo::draw()
 	if (!vars::misc->info->enabled)
 		return;
 
-	if (!game::localPlayer)
-		return;
-
-	if (!interfaces::engine->isInGame())
+	if (!game::isAvailable())
 		return;
 
 	const auto weapon = game::localPlayer->getActiveWeapon();
@@ -36,7 +33,7 @@ void MiscInfo::draw()
 	if (ImGui::Begin(XOR("##info"), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar
 		| ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar))
 	{
-		text(FORMAT(XOR("Map: {}"), interfaces::engine->getLevelName()), Colors::Green);
+		text(FORMAT(XOR("Map: {}"), memory::interfaces::engine->getLevelName()), Colors::Green);
 		text(FORMAT(XOR("Weapon {}"), weapon->getWpnInfo()->m_WeaponName), Colors::Yellow);
 		text(FORMAT(XOR("[{} / {}] DMG [{}HP]"), weapon->m_iClip1(), weapon->m_iPrimaryReserveAmmoCount(), weapon->getWpnInfo()->m_damage), Colors::Yellow);
 		text(FORMAT(XOR("Current In-accuracy {:.2f}%"), weapon->getInaccuracy() * 100.0f), Colors::Yellow);

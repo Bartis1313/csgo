@@ -93,7 +93,7 @@ void Resource::destroyAll()
 		if (el.getTexture() && el.getTextureID())
 		{
 			ImGui_DestroyTexture(el.getTexture());
-			interfaces::surface->deleteTextureID(el.getTextureID());
+			memory::interfaces::surface->deleteTextureID(el.getTextureID());
 		}
 	}
 }

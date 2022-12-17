@@ -1,48 +1,39 @@
 #include "events.hpp"
 
 #include <SDK/interfaces/interfaces.hpp>
+#include <game/globals.hpp>
 
-void Events::add(const std::string& eventName, const std::function<void(IGameEvent*)>& fun)
+void EventCallback::addToCallback(const std::string_view eventName, const std::function<void(IGameEvent*)>& callback)
 {
 	if (auto itr = m_map.find(eventName); itr != m_map.end())
 	{
 		// if found, then only push to vector with functions
-		itr->second.push_back(fun);
+		itr->second.push_back(callback);
 	}
 	else // create new
 	{
+		memory::interfaces::eventManager->addListener(this, eventName.data());
 		m_map.emplace(std::make_pair
 		(
 			eventName,
-			std::vector<std::function<void(IGameEvent*)>>{ fun }
+			std::vector<std::function<void(IGameEvent*)>>{ callback }
 		));
 	}
 }
 
-void Events::init()
+void EventCallback::FireGameEvent(IGameEvent* event)
 {
-	// go through all map elements with making sure that there is always unique event name
-	for (const auto& [name, functions] : m_map)
-		interfaces::eventManager->addListener(this, name.c_str());
-}
-
-void Events::FireGameEvent(IGameEvent* event)
-{
-	if (auto itr = m_map.find(event->getName()); itr != m_map.end())
+	for (const auto [name, funcs] : m_map)
 	{
-		// if name is found go through all funcs
-		for (const auto& el : itr->second)
-			el(event);
+		if (const std::string_view ename{ event->getName() }; ename == name)
+		{
+			for (const auto& func : funcs)
+				func(event);
+		}
 	}
 }
 
-void Events::shutdown()
+void EventCallback::shutdown()
 {
-	interfaces::eventManager->removeListener(this);
-}
-
-void Events::shutdownAllEvents()
-{
-	for (auto el : m_allEvents)
-		el->shutdown();
+	memory::interfaces::eventManager->removeListener(this);
 }

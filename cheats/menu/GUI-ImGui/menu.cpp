@@ -121,9 +121,8 @@ static void renderAimbot()
 
 				ImGui::EndGroupPanel();
 			}
-
-			ImGui::EndChild();
 		}
+		ImGui::EndChild();
 	}
 
 	ImGui::NextColumn();
@@ -172,14 +171,11 @@ static void renderAimbot()
 
 			ImGui::EndGroupPanel();
 		}
-
-		ImGui::EndChild();
 	}
+	ImGui::EndChild();
 
 	ImGui::Columns();
 }
-
-CfgColor zjeb = Colors::LightBlue;
 
 static void renderVisuals()
 {
@@ -295,8 +291,8 @@ static void renderVisuals()
 
 				ImGui::EndGroupPanel();
 			}
-			ImGui::EndChild();
 		}
+		ImGui::EndChild();
 	}
 	ImGui::NextColumn();
 	{
@@ -387,9 +383,8 @@ static void renderVisuals()
 
 				ImGui::EndGroupPanel();
 			}
-
-			ImGui::EndChild();
 		}
+		ImGui::EndChild();
 	}
 	ImGui::Columns();
 }
@@ -484,9 +479,8 @@ static void renderMisc()
 				ImGui::HelpMarker(XOR("Will not for workshop maps\nYou can try forcing the engine to re-render by pressing escape few times"));
 			}
 			ImGui::EndGroupPanel();
-
-			ImGui::EndChild();
 		}
+		ImGui::EndChild();
 	}
 	ImGui::NextColumn();
 	{
@@ -675,14 +669,7 @@ static void renderMisc()
 					}
 				);
 				ImGui::Animated::Checkbox(XOR("Enable local bullets"), &vars::visuals->world->impacts->enabledLocal);
-				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##local bullets pop"), []()
-					{
-						ImGui::Animated::ColorPicker(XOR("Outline##Local bullets"), &vars::visuals->world->impacts->colorLocal);
-						ImGui::Animated::ColorPicker(XOR("Fill##Local bullets"), &vars::visuals->world->impacts->colorLocalFill);
-						ImGui::Animated::SliderFloat(XOR("Time##Local bullets"), &vars::visuals->world->impacts->timeLocal, 0.0f, 5.0f);
-					}
-				);				
+				ImGui::SameLine();			
 				ImGui::Animated::Checkbox(XOR("Enable client bullets"), &vars::visuals->world->impacts->enabledClient);
 				ImGui::SameLine();
 				ImGui::Animated::PopupButton(XOR("##client bullets pop"), []()
@@ -698,6 +685,9 @@ static void renderMisc()
 
 			ImGui::BeginGroupPanel(XOR("Misc other"), availRegion());
 			{
+				ImGui::Animated::Checkbox(XOR("Game logs"), &vars::misc->logs->enabled);
+				ImGui::SameLine();
+				ImGui::Animated::SliderFloat(XOR("Time##Gamelogs"), &vars::misc->logs->time, 1.0f, 10.0f);
 				ImGui::Animated::Checkbox(XOR("Freelook"), &vars::misc->freeLook->enabled);
 				ImGui::SameLine();
 				ImGui::Animated::Hotkey(XOR("##fl"), &vars::keys->freeLook);
@@ -780,13 +770,12 @@ static void renderMisc()
 				bool changed = false;
 				changed |= ImGui::Animated::ColorPicker(XOR("Color##ambient col"), &vars::visuals->world->ambient->color);
 				g_AmbientLight->setPickerState(changed);
-				ImGui::SameLine();
+				ImGui::Animated::Checkbox(XOR("Disable Interpolation"), &vars::misc->disableItems->interpolate);
 				
 				ImGui::EndGroupPanel();
 			}
-
-			ImGui::EndChild();
 		}
+		ImGui::EndChild();
 	}
 	ImGui::Columns();
 }
@@ -830,7 +819,7 @@ static void renderConfig()
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Press enter to create new config"));
-				ImGui::Animated::ListBox<const std::string>(XOR("All configs"), &currentcfg, allcfg);
+				ImGui::Animated::ListBox(XOR("All configs"), &currentcfg, std::span(allcfg.data(), allcfg.size()));
 
 				static bool dontAskMe = false;
 				static bool delayedClose = false; // not instant close for modal 
@@ -910,9 +899,8 @@ static void renderConfig()
 				ImGui::HelpMarker(XOR("This config will load on the start"));
 			}
 			ImGui::EndGroupPanel();
-
-			ImGui::EndChild();
 		}
+		ImGui::EndChild();
 	}
 	ImGui::NextColumn();
 	if (ImGui::BeginChild(XOR("cfgkeys"), {}, true))
@@ -925,9 +913,10 @@ static void renderConfig()
 			ImGui::Animated::Checkbox(XOR("Enable x88 menu"), &vars::keys->enabledX88Menu);
 		}
 		ImGui::EndGroupPanel();
-
-		ImGui::EndChild();
 	}
+	ImGui::EndChild();
+
+	ImGui::Columns();
 }
 
 #include "background.hpp"
@@ -957,10 +946,9 @@ static void renderStyles()
 				ImGui::Animated::Checkbox(XOR("Discord RPC"), &vars::misc->discord->enabled);
 				ImGui::Animated::Checkbox(XOR("Show editor"), &editorOpened);			
 			}
-			ImGui::EndGroupPanel();
-
-			ImGui::EndChild();
+			ImGui::EndGroupPanel();	
 		}
+		ImGui::EndChild();
 	}
 }
 
@@ -978,10 +966,8 @@ std::array tabs =
 
 void ImGuiMenu::renderAll()
 {
-	if (ImGui::Begin(XOR("csgo legit"), &m_active, ImGuiWindowFlags_NoCollapse))
+	if(ImGui::Begin(XOR("csgo legit"), &m_active, ImGuiWindowFlags_NoCollapse))
 	{
-		ImGuiContext& g = *GImGui;
-		ImGuiWindow* window = g.CurrentWindow;
 		ImGuiStyle& style = ImGui::GetStyle();
 		ImVec2 backupPadding = style.FramePadding;
 		float width = ImGui::GetContentRegionAvail().x;
@@ -990,7 +976,7 @@ void ImGuiMenu::renderAll()
 		ImGui::PushStyleColor(ImGuiCol_TabActive, Color::U32(Colors::Blank));
 		ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, Color::U32(Colors::Blank));
 
-		if (ImGui::BeginTabBar(XOR("tabbar")))
+		if (ImGui::BeginTabBar(XOR("tabbar"), ImGuiTabBarFlags_Reorderable))
 		{
 			style.FramePadding = { width / tabs.size(), backupPadding.y }; // still this is clamped by imgui in tabs
 			ImGui::PopStyleColor(2);
@@ -1007,31 +993,29 @@ void ImGuiMenu::renderAll()
 			}
 			ImGui::EndTabBar();
 		}
-		ImGui::End();
 	}
+	ImGui::End();
+}
+
+bool ImGuiMenu::inTransmission()
+{
+	constexpr float ratio = 1.0f / 0.5f;
+	float step = ratio * ImGui::GetIO().DeltaTime;
+	const auto bgAlpha = ImGui::ColorConvertU32ToFloat4(ImGui::GetColorU32(ImGuiCol_WindowBg)).w;
+
+	sharedAlpha = std::clamp(sharedAlpha + (m_active ? step : -step), 0.0f, bgAlpha);
+
+	if (sharedAlpha == bgAlpha)
+		return false;
+
+	if (sharedAlpha == 0.0f)
+		return false;
+
+	return true;
 }
 
 void ImGuiMenu::draw()
 {
-	/*constexpr float ratio = 1.0f / 0.5f;
-	float step = ratio * ImGui::GetIO().DeltaTime;
-
-	static float alpha = 0.0f;
-	
-	if (!m_active && alpha > 0.0f)
-		alpha = std::clamp(alpha - step, 0.0f, 1.0f);
-
-	if (m_active && alpha < 1.0f)
-		alpha = std::clamp(alpha + step, 0.0f, 1.0f);
-
-	if (!m_active && alpha == 0.0f)
-		return;
-
-	ImGui::PushStyleVar(ImGuiStyleVar_Alpha, alpha);*/
-	if(m_active)
-		renderAll();
-	//ImGui::PopStyleVar();
-
 	if (editorOpened)
 	{
 		if (ImGui::Begin(XOR("Style editor"), &editorOpened))
@@ -1041,4 +1025,22 @@ void ImGuiMenu::draw()
 			ImGui::End();
 		}
 	}
+
+	ImVec2 size{};
+
+	if (inTransmission())
+	{
+		ImGui::PushStyleColor(ImGuiStyleVar_Alpha, ImGui::GetColorU32(ImGuiStyleVar_Alpha, sharedAlpha));
+		ImGui::SetNextWindowBgAlpha(sharedAlpha);
+		renderAll();
+		ImGui::PopStyleColor();
+
+		return;
+	}
+	if (m_active)
+	{
+		renderAll();
+		size = ImGui::GetWindowSize();
+	}
+
 }

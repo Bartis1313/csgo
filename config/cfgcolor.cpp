@@ -12,7 +12,7 @@
 #include <numbers>
 
 #include <SDK/CGlobalVars.hpp>
-#include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 
 void CfgColor::updateCol(float gameTime, float multiply)
 {
@@ -23,9 +23,9 @@ void CfgColor::updateCol(float gameTime, float multiply)
 
 void CfgColor::refresh()
 {
-	if (interfaces::globalVars)
+	if (memory::interfaces::globalVars())
 	{
 		if (this->getRainbow())
-			this->updateCol(interfaces::globalVars->m_realtime, this->getSpeed());
+			this->updateCol(memory::interfaces::globalVars->m_realtime, this->getSpeed());
 	}
 }

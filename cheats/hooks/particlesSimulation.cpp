@@ -34,7 +34,7 @@ constexpr std::array bloodnames =
 	"blood_impact_light_headshot"
 };
 
-void __fastcall hooks::particlesSimulations::hooked(FAST_ARGS)
+void FASTCALL hooks::particlesSimulations::hooked(FAST_ARGS)
 {
 	original(thisptr);
 

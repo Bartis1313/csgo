@@ -63,14 +63,14 @@ void DiscordPresence::run()
 
 	static std::pair<std::string, std::string> image;
 
-	if (!interfaces::engine->isInGame())
+	if (!memory::interfaces::engine->isInGame())
 	{
 		state = XOR("In menu");
 		image = getImage("");
 	}
 	else if (game::isAvailable())
 	{
-		auto map = interfaces::engine->getLevelName();
+		auto map = memory::interfaces::engine->getLevelName();
 
 		state = FORMAT(XOR("On map: {}"), map);
 		image = getImage(map);

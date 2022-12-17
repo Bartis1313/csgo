@@ -22,6 +22,7 @@
 #include <SDK/structs/Entity.hpp>
 #include <SDK/Color.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 #include <game/game.hpp>
 #include <utilities/renderer/renderer.hpp>
@@ -32,7 +33,7 @@
 
 void PlayerVisuals::init()
 {
-	g_Events->add(XOR("round_prestart"), std::bind(&PlayerVisuals::resetDormacy, this, std::placeholders::_1));
+	events::add(XOR("round_prestart"), std::bind(&PlayerVisuals::resetDormacy, this, std::placeholders::_1));
 }
 
 void PlayerVisuals::draw()
@@ -121,7 +122,7 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 	auto& health = m_health.at(ent->getIndex());
 
 	if (auto realHealth = ent->m_iHealth(); health > realHealth)
-		health -= static_cast<int>(2.0f * interfaces::globalVars->m_frametime);
+		health -= static_cast<int>(2.0f * memory::interfaces::globalVars->m_frametime);
 	else
 		health = realHealth;
 
@@ -160,7 +161,7 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 	auto& armor = m_armor.at(ent->getIndex());
 
 	if (auto realArmor = ent->m_ArmorValue(); armor > realArmor)
-		armor -= static_cast<int>(2.0f * interfaces::globalVars->m_frametime);
+		armor -= static_cast<int>(2.0f * memory::interfaces::globalVars->m_frametime);
 	else
 		armor = realArmor;
 
@@ -205,7 +206,7 @@ void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 	int currentAmmo = weapon->m_iClip1();
 
 	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, FORMAT(XOR("{} {}/{}"),
-		vars::visuals->esp->weaponBar->translate ? interfaces::localize->findAsUTF8(weapon->getWpnInfo()->m_WeaponName) : ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo),
+		vars::visuals->esp->weaponBar->translate ? memory::interfaces::localize->findAsUTF8(weapon->getWpnInfo()->m_WeaponName) : ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo),
 		true, tex.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 
 	// skip useless trash for calculations
@@ -243,7 +244,7 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 	using cont = std::vector<bool>; // container
 
 	PlayerInfo_t info = {};
-	if (!interfaces::engine->getPlayerInfo(ent->getIndex(), &info))
+	if (!memory::interfaces::engine->getPlayerInfo(ent->getIndex(), &info))
 		return;
 
 	auto cfgflags = vars::visuals->esp->flags->flags;
@@ -322,7 +323,7 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 	if (!model)
 		return;
 
-	auto studio = interfaces::modelInfo->getStudioModel(model);
+	auto studio = memory::interfaces::modelInfo->getStudioModel(model);
 	if (!studio)
 		return;
 
@@ -419,11 +420,11 @@ void PlayerVisuals::runDLight(Player_t* ent)
 	if (!vars::visuals->esp->dlight->enabled)
 		return;
 
-	auto dLight = interfaces::efx->clAllocDLight(ent->getIndex());
+	auto dLight = memory::interfaces::efx->clAllocDLight(ent->getIndex());
 	dLight->m_color = vars::visuals->esp->dlight->color();
 	dLight->m_origin = ent->m_vecOrigin();
 	dLight->m_radius = vars::visuals->esp->dlight->radius;
-	dLight->m_die = interfaces::globalVars->m_curtime + 0.1f;
+	dLight->m_die = memory::interfaces::globalVars->m_curtime + 0.1f;
 	dLight->m_exponent = static_cast<char>(vars::visuals->esp->dlight->exponent);
 	dLight->m_decay = vars::visuals->esp->dlight->decay;
 	dLight->m_key = ent->getIndex();
@@ -450,7 +451,7 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 	else // if not, use distance fade logic
 	{
 		float ratioDormant = 1.0f / (1.0f / vars::visuals->dormacy->time);
-		float step = ratioDormant * interfaces::globalVars->m_frametime;
+		float step = ratioDormant * memory::interfaces::globalVars->m_frametime;
 
 		m_boxAlpha.at(ent->getIndex()) += step;
 		m_boxAlpha.at(ent->getIndex()) = std::clamp(m_boxAlpha.at(ent->getIndex()), 0.0f, ratio);
@@ -494,7 +495,7 @@ void PlayerVisuals::updateDormacy(Player_t* ent)
 	auto& dormacy = m_dormant.at(ent->getIndex());
 
 	float ratio = 1.0f / vars::visuals->dormacy->time;
-	float step = ratio * interfaces::globalVars->m_frametime;
+	float step = ratio * memory::interfaces::globalVars->m_frametime;
 
 	if (ent->isDormant())
 	{
@@ -506,7 +507,7 @@ void PlayerVisuals::updateDormacy(Player_t* ent)
 		m_calledEvent = false; // to remove problems on round restarts
 		dormacy.m_lastPos = ent->absOrigin();
 		dormacy.m_alpha += step;
-		dormacy.m_lastUpdate = interfaces::globalVars->m_curtime;
+		dormacy.m_lastUpdate = memory::interfaces::globalVars->m_curtime;
 	}
 
 	dormacy.m_alpha = std::clamp(dormacy.m_alpha, 0.0f, 1.0f);
@@ -514,7 +515,7 @@ void PlayerVisuals::updateDormacy(Player_t* ent)
 
 bool PlayerVisuals::DormacyInfo_t::isValid() const
 {
-	return interfaces::globalVars->m_curtime - m_lastUpdate < vars::visuals->dormacy->limit;
+	return memory::interfaces::globalVars->m_curtime - m_lastUpdate < vars::visuals->dormacy->limit;
 }
 
 void PlayerVisuals::resetDormacy(IGameEvent* event)

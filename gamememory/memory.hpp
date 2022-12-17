@@ -2,6 +2,9 @@
 
 #include <SDK/math/Vector.hpp>
 #include <SDK/math/matrix.hpp>
+#include <SDK/interfaces/ifc.hpp>
+#include <SDK/CPlayerResource.hpp>
+#include <utilities/tools/tools.hpp>
 
 #include <cstdint>
 #include <string>
@@ -26,6 +29,16 @@ class CGameRules;
 class IViewRender;
 class CTeslaInfo;
 class CEffectData;
+class KeyValuesSys;
+class IMemAlloc;
+class CGlobalVarsBase;
+class Input;
+class CFlashlightEffect;
+class ClientClass;
+
+enum ClassID;
+
+using retaddr_t = uintptr_t;
 
 class Memory
 {
@@ -37,18 +50,18 @@ public:
 		THREE
 	};
 
-	virtual void init();
+	void init();
+	void postInit();
 
 	template<typename T>
 	struct Address
 	{
-	public:
 		constexpr Address() = default;
 		// pass by offset
 		constexpr Address(uintptr_t addr) :
 			m_addr{ addr }
 		{}
-		constexpr Address(uintptr_t* addr) :
+		constexpr Address(uintptr_t * addr) :
 			m_addr{ reinterpret_cast<uintptr_t>(addr) }
 		{}
 		constexpr Address(void* addr) :
@@ -60,19 +73,15 @@ public:
 		// cast to anything
 		template<typename K>
 		constexpr auto cast() const { return Address<K>{ m_addr }; }
-		// wrapper for sig scan, when error it throws one
-		Address<T> initAddr(const std::string& mod, const std::string& sig, uintptr_t offset = 0);
-		// add bytes, useful for creating "chains" with ref(), depends on use case.
 		constexpr auto add(uintptr_t extraOffset) const { return Address{ m_addr + extraOffset }; }
+		constexpr auto sub(uintptr_t extraOffset) const { return Address{ m_addr - extraOffset }; }
 		// dereference x times. Possible args are: 1, 2, 3. There will for sure won't be a case for 4 level dereference. 3rd is very rare.
-		constexpr auto ref(Dereference times = Dereference::ONCE) const
+		constexpr auto deRef(Dereference times = Dereference::ONCE)
 		{
-			auto addr = m_addr;
-
 			for ([[maybe_unused]] auto i : std::views::iota(0U, E2T(times)))
-				addr = *reinterpret_cast<uintptr_t*>(addr);
+				m_addr = *reinterpret_cast<uintptr_t*>(m_addr);
 
-			return Address<T>{ addr };
+			return Address<T>{ m_addr };
 		}
 		// get as rel32
 		constexpr auto rel(uintptr_t relOffset = 0x1, uintptr_t absOffset = 0x0) const
@@ -89,17 +98,45 @@ public:
 			else
 				return (T)(m_addr);
 		}
-	private:
+
+		constexpr T operator->() const
+		{
+			if constexpr (std::is_class_v<T>)
+				return *reinterpret_cast<T*>(m_addr);
+			else
+				return (T)(m_addr);
+		}
+
+		Address<T> scan(const std::string_view mod, const std::string_view sig, uintptr_t offset = 0);
+		template<li::detail::hash_t::value_type hash>
+		Address<T> byExport(const std::string_view module);
+		template<typename TT>
+		Address<T> byVFunc(const Interface<TT>& ifc, size_t index);
+		// static pointer
+		Address<T> findFromGame(ClassID id);
+		// anything that changes every round
+		Address<T> findFromGameLoop(ClassID id);
+
+		using value = T;
 		uintptr_t m_addr;
+		std::string_view m_module;
 	};
 private:
+	std::unordered_map<std::string_view, HMODULE> m_ModulesAddr;
+public:
+	HMODULE getModule(const std::string_view str) { return m_ModulesAddr.at(str); }
+};
+
+namespace memory
+{
 	using loadSky_t = void(__fastcall*)(const char*);
-	using findHud_t = uintptr_t*(__thiscall*)(void* /*uintptr_t*/, const char*);
+	using findHud_t = uintptr_t * (__thiscall*)(void* /*uintptr_t*/, const char*);
 	using sequenceActivity_t = int(__fastcall*)(void*, void*, int);
 	using inSmoke_t = bool(__cdecl*)(Vec3, Vec3);
 	using isBreakable_t = bool(__thiscall*)(void*);
 	using flashlightDestroy_t = void(__thiscall*)(void*, void*);
-	using flashlightUpdate_t =  void(__thiscall*)(void*, int, const Vec3&, const Vec3&, const Vec3&, const Vec3&, float, float, float, bool, const char*);
+	using flashlightCreate_t = void*(__thiscall*)(void*, void*, float, float, float, float, int, const char*, float, float);
+	using flashlightUpdate_t = void(__thiscall*)(void*, int, const Vec3&, const Vec3&, const Vec3&, const Vec3&, float, float, float, bool, const char*);
 	using setAbsOrigin_t = void(__thiscall*)(void*, const Vec3&);
 	using isC4Owner_t = bool(__thiscall*)(void*);
 	using teslaCreate_t = void(__thiscall*)(CTeslaInfo&);
@@ -107,80 +144,93 @@ private:
 	using particleCached_t = bool(__thiscall*)(void*, const char*);
 	using particleFindString_t = void(__thiscall*)(void*, int*, const char*);
 	using setParticleControlPoint_t = void(__thiscall*)(void*, int, Vec3*);
+	using physicsRunThink_t = bool(__thiscall*)(void*, int);
+	using postThinkPhysics_t = bool(__thiscall*)(Player_t*);
+	using simulateEntities_t = void(__thiscall*)(Player_t*);
 
+	inline Memory::Address<uintptr_t> traceFilterSimple;
+	inline Memory::Address<uintptr_t*> returnAddrRadarImage;
+	inline Memory::Address<Matrix4x4> viewMatrixAddr;
+	inline Memory::Address<uintptr_t> drawSpacedRectangle;
+	inline Memory::Address<float*> motionBlurVec;
+	inline Memory::Address<uintptr_t> disableTargetAlloc;
+	inline Memory::Address<inSmoke_t> throughSmoke;
+	inline Memory::Address<uintptr_t> smokeCount;
+	inline Memory::Address<loadSky_t> loadSky;
+	inline Memory::Address<CClientEffectRegistration*> callbacksHead;
+	inline Memory::Address<void*> camThink;
+	inline Memory::Address<void*> renderDrawPoints;
+	inline Memory::Address<Player_t**> localPlayer;
+	inline Memory::Address<void*> csgoHud;
+	inline Memory::Address<findHud_t> hudfindElement;
+	inline Memory::Address<uintptr_t> keyValuesFromString;
+	inline Memory::Address<uintptr_t> animOverlays;
+	inline Memory::Address<sequenceActivity_t> sequenceActivity;
+	inline Memory::Address<uintptr_t> cachedBones;
+	inline Memory::Address<setAbsOrigin_t> setAbsOrigin;
+	inline Memory::Address<isC4Owner_t> isC4Owner;
+	inline Memory::Address<isBreakable_t> isBreakable;
+	inline Memory::Address<CMoveData*> predictionData;
+	inline Memory::Address<uintptr_t*> predictionSeed;
+	inline Memory::Address<flashlightCreate_t> flashlightCreate;
+	inline Memory::Address<flashlightUpdate_t> flashlightUpdate;
+	inline Memory::Address<flashlightDestroy_t> flashlightDestroy;
+	inline Memory::Address<uintptr_t> occlusion;
+	inline Memory::Address<uintptr_t> velocity;
+	inline Memory::Address<uintptr_t> accumulate;
+	inline Memory::Address<particleCached_t> particleIsCached;
+	inline Memory::Address<void**> particleSystem;
+	inline Memory::Address<particleFindString_t> particleFindStringIndex;
+	inline Memory::Address<void*> particleCall;
+	inline Memory::Address<setParticleControlPoint_t> particleSetControlPoint;
+	inline Memory::Address<Player_t**> predictedPlayer;
+	inline Memory::Address<physicsRunThink_t> physicsRunThink;
+	inline Memory::Address<uintptr_t> lastCommand;
+	inline Memory::Address<uintptr_t> retAddrToInterpolation;
+	inline Memory::Address<postThinkPhysics_t> postThinkPhysics;
+	inline Memory::Address<simulateEntities_t> simulateEntities;
+	inline Memory::Address<uintptr_t> vecClientImpacts; // offset
 
-	std::pair<uintptr_t, bool> scan(const std::string& mod, const std::string& sig, const uintptr_t offsetToAdd = 0);
+	inline Memory::Address<void*> clientValidAddr;
+	inline Memory::Address<void*> enginevalidAddr;
+	inline Memory::Address<void*> studioRenderValidAddr;
+	inline Memory::Address<void*> materialSysValidAddr;
+	inline Memory::Address<void*> isUsingPropDebug;
+	inline Memory::Address<void*> getColorModulation;
+	inline Memory::Address<void*> extraBonesProcessing;
+	inline Memory::Address<void*> buildTransformations;
+	inline Memory::Address<void*> particleSimulate;
+	inline Memory::Address<void*> sendDataGram;
+	inline Memory::Address<void*> unkOverviewMap;
+	inline Memory::Address<void*> isDepth;
+	inline Memory::Address<void*> fxBlood;
+	inline Memory::Address<void*> addEnt;
+	inline Memory::Address<void*> removeEnt;
+	inline Memory::Address<void*> isFollowedEntity;
+	inline Memory::Address<void*> spottedEntityUpdate;
+	inline Memory::Address<void*> fireInternfn;
 
-	std::unordered_map<std::string_view, HMODULE> m_ModulesAddr;
-	// for info
-	size_t m_countedPatterns = 0;
-public:
-	HMODULE getModule(const std::string_view str) { return m_ModulesAddr.at(str); }
+	inline Memory::Address<teslaCreate_t> tesla;
+	inline Memory::Address<dispatchEffect_t> dispatchEffect;
 
-	Address<uintptr_t> m_traceFilterSimple;
-	Address<uintptr_t*> m_returnAddrRadarImage;
-	Address<Matrix4x4> m_viewMatrixAddr;
-	Address<uintptr_t> m_drawSpacedRectangle;
-	Address<float*> m_motionBlurVec;
-	Address<uintptr_t> m_disableTargetAlloc;
-	Address<inSmoke_t> m_throughSmoke;
-	Address<uintptr_t> m_smokeCount;
-	Address<loadSky_t> m_loadSky;
-	Address<CClientEffectRegistration*> m_callbacksHead;
-	Address<void*> m_camThink;
-	Address<void*> m_renderDrawPoints;
-	Address<Player_t**> m_localPlayer;
-	Address<void*> m_csgoHud;
-	Address<findHud_t> m_hudfindElement;
-	Address<uintptr_t> m_keyValuesFromString;
-	Address<uintptr_t> m_animOverlays;
-	Address<sequenceActivity_t> m_sequenceActivity;
-	Address<uintptr_t> m_cachedBones;
-	Address<setAbsOrigin_t> m_setAbsOrigin;
-	Address<isC4Owner_t> m_isC4Owner;
-	Address<isBreakable_t> m_isBreakable;
-	Address<CMoveData*> m_predictionData;
-	Address<uintptr_t*> m_predictionSeed;
-	Address<void*> m_flashlightCreate;
-	Address<flashlightUpdate_t> m_flashlightUpdate;
-	Address<flashlightDestroy_t> m_flashlightDestroy;
-	Address<uintptr_t> m_occlusion;
-	Address<uintptr_t> m_velocity;
-	Address<uintptr_t> m_accumulate;
-	Address<particleCached_t> m_particleIsCached;
-	Address<void**> m_particleSystem;
-	Address<particleFindString_t> m_particleFindStringIndex;
-	Address<void*> m_particleCall;
-	Address<setParticleControlPoint_t> m_particleSetControlPoint;
-
-	Address<IViewRenderBeams*> m_beams;
-	Address<CGlowManager*> m_glowManager;
-	Address<IWeapon*> m_weaponInterface;
-	Address<IMoveHelper*> m_moveHelper;
-	Address<PlayerResource**> m_resourceInterface;
-	Address<IDirect3DDevice9*> m_dx9Device;
-	Address<IClientState*> m_clientState;
-	Address<CGameRules*> m_gameRules;
-	Address<IViewRender*> m_viewRender;
-
-	Address<void*> m_clientValidAddr;
-	Address<void*> m_enginevalidAddr;
-	Address<void*> m_studioRenderValidAddr;
-	Address<void*> m_materialSysValidAddr;
-	Address<void*> m_isUsingPropDebug;
-	Address<void*> m_getColorModulation;
-	Address<void*> m_extraBonesProcessing;
-	Address<void*> m_buildTransformations;
-	Address<void*> m_particleSimulate;
-	Address<void*> m_sendDataGram;
-	Address<void*> m_unkOverviewMap;
-	Address<void*> m_isDepth;
-	Address<void*> m_fxBlood;
-	Address<void*> m_addEnt;
-	Address<void*> m_removeEnt;
-
-	Address<teslaCreate_t> m_tesla;
-	Address<dispatchEffect_t> m_dispatchEffect;
-};
+	namespace interfaces
+	{
+		inline Memory::Address<CGlowManager*> glowManager;
+		inline Memory::Address<IWeapon*> weaponInterface;
+		inline Memory::Address<PlayerResource*> resourceInterface;
+		inline Memory::Address<IDirect3DDevice9*> dx9Device;
+		inline Memory::Address<IClientState*> clientState;
+		inline Memory::Address<IViewRender*> viewRender;
+		inline Memory::Address<IMoveHelper*> moveHelper;
+		inline Memory::Address<IViewRenderBeams*> beams;
+		inline Memory::Address<KeyValuesSys*> keyValuesSys;
+		inline Memory::Address<IMemAlloc*> memAlloc;
+		inline Memory::Address<CGameRules*> gameRules;
+		inline Memory::Address<CGlobalVarsBase*> globalVars;
+		inline Memory::Address<ClientMode*> clientMode;
+		inline Memory::Address<Input*> input;
+		inline Memory::Address<ClientClass*> preciptation;
+	}
+}
 
 [[maybe_unused]] inline auto g_Memory = Memory{};

@@ -10,7 +10,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	if (globals::isInHotkey)
 		return;
 
-	if (game::isChatOpen() || interfaces::engine->isConsoleVisible())
+	if (game::isChatOpen() || memory::interfaces::engine->isConsoleVisible())
 		return;
 
 	// init starting keys, undefined

@@ -62,7 +62,7 @@ void NadeTrace_t::addGravityMove(Vec3& move, Vec3& vel, float frametime)
 	move[Coord::X] = vel[Coord::X] * frametime;
 	move[Coord::Y] = vel[Coord::Y] * frametime;
 
-	const static float svgrav = interfaces::cvar->findVar(XOR("sv_gravity"))->getFloat();
+	const static float svgrav = memory::interfaces::cvar->findVar(XOR("sv_gravity"))->getFloat();
 	float gravity = svgrav * 0.4f;
 	float z = vel[Coord::Z] - (gravity * frametime);
 	move[Coord::Z] = ((vel[Coord::Z] + z) / 2.0f) * frametime;
@@ -74,13 +74,13 @@ void NadeTrace_t::traceHull(const Vec3& src, const Vec3& end, Entity_t* entity, 
 {
 	uintptr_t filter[] =
 	{
-		*reinterpret_cast<uintptr_t*>(g_Memory.m_traceFilterSimple()),
+		*reinterpret_cast<uintptr_t*>(memory::traceFilterSimple()),
 		reinterpret_cast<uintptr_t>(entity),
 		0,
 		0
 	};
 
-	interfaces::trace->traceRay({ src, end, Vec3{ -2.0f, -2.0f, -2.0f }, Vec3{ 2.f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), tr);
+	memory::interfaces::trace->traceRay({ src, end, Vec3{ -2.0f, -2.0f, -2.0f }, Vec3{ 2.f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), tr);
 }
 
 void NadeTrace_t::pushEntity(const Vec3& src, Trace_t& tr)
@@ -90,7 +90,7 @@ void NadeTrace_t::pushEntity(const Vec3& src, Trace_t& tr)
 	// lazy attempt... see nadepred check code
 	if (m_index == WEAPON_MOLOTOV || m_index == WEAPON_INCGRENADE)
 	{
-		const static float weapon_molotov_maxdetonateslope = interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
+		const static float weapon_molotov_maxdetonateslope = memory::interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
 
 		if (bool res = tr.didHit() && tr.m_plane.m_normal[Coord::Z] >= std::cos(math::DEG2RAD(weapon_molotov_maxdetonateslope)); res)
 			destroyTrace();
@@ -189,7 +189,7 @@ void NadeTrace_t::handleDetonates()
 	case WEAPON_MOLOTOV:
 	case WEAPON_INCGRENADE:
 	{
-		const static auto molotov_throw_detonate_time = interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"));
+		const static auto molotov_throw_detonate_time = memory::interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"));
 		m_nadeDetonateTime = molotov_throw_detonate_time->getFloat();
 		break;
 	}
@@ -206,7 +206,7 @@ void NadeTrace_t::simulate(const Vec3& pos, const Vec3& velocity, float nadeThro
 
 	handleDetonates();
 
-	float interval = interfaces::globalVars->m_intervalPerTick;
+	float interval = memory::interfaces::globalVars->m_intervalPerTick;
 	for (; m_tick < game::timeToTicks(500.0f); m_tick++) // 500 = 500 * 2 about 1000+
 	{
 		if (m_nextTick <= m_tick)
@@ -259,7 +259,7 @@ bool NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 		return fontSize;
 	};
 
-	float scale = ((m_nadeEndTime - interfaces::globalVars->m_curtime) / game::ticksToTime(m_tick));
+	float scale = ((m_nadeEndTime - memory::interfaces::globalVars->m_curtime) / game::ticksToTime(m_tick));
 	float rad = scaledFont();
 
 	imRender.drawCircleFilled(start.x, start.y, rad, 32, Colors::Black);
@@ -288,7 +288,7 @@ bool NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 		const auto centre = Vec2{ globals::screenX / 2.0f, globals::screenY / 2.0f };
 
 		Vec3 localViewAngle;
-		interfaces::engine->getViewAngles(localViewAngle);
+		memory::interfaces::engine->getViewAngles(localViewAngle);
 		const auto& localPos = game::localPlayer->absOrigin();
 		const auto angleToNade = math::calcAngleRelative(localPos, m_pos, localViewAngle);
 
@@ -329,7 +329,7 @@ void GrenadeWarningPaint::draw()
 		if (!model)
 			return;
 
-		auto studio = interfaces::modelInfo->getStudioModel(model);
+		auto studio = memory::interfaces::modelInfo->getStudioModel(model);
 		if (!studio)
 			return;
 
@@ -341,7 +341,7 @@ void GrenadeWarningPaint::draw()
 			idx,
 			NadeTrace_t
 			{
-				reinterpret_cast<Player_t*>(interfaces::entList->getClientFromHandle(ent->m_hThrower())),
+				reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientFromHandle(ent->m_hThrower())),
 				wpnIdx
 			}));
 

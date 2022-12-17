@@ -13,7 +13,7 @@
 
 #include <d3d9.h>
 
-long __stdcall hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
+long D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {
 	// check if there is any context, needed when shutdown
 	if (!ImGui::GetCurrentContext())

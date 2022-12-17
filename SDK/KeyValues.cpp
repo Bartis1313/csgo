@@ -7,8 +7,8 @@
 
 KeyValues* KeyValues::fromString(const char* name, const char* value)
 {
-	const static auto fromstring = g_Memory.m_keyValuesFromString();
-	KeyValues* res;
+	const static auto fromstring = memory::keyValuesFromString();
+	KeyValues* res{};
 
 	__asm
 	{

@@ -15,7 +15,7 @@
 
 void EnemyWarning::init()
 {
-	m_scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
 }
 
 std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
@@ -48,7 +48,7 @@ std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
 	const auto eye = ent->getEyePos();
 	constexpr float range = 8192.0f; // because we need max range possible
 	const auto end = eye + (math::angleVec(ent->m_angEyeAngles()) * range);
-	interfaces::trace->traceRay({ eye, end }, MASK_PLAYER, &filter, &trace);
+	memory::interfaces::trace->traceRay({ eye, end }, MASK_PLAYER, &filter, &trace);
 
 	bool checkAim = trace.m_hitgroup != 0;
 

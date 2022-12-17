@@ -4,11 +4,11 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
 
-void __fastcall hooks::lockCursor::hooked(FAST_ARGS)
+void FASTCALL hooks::lockCursor::hooked(FAST_ARGS)
 {
 	if (menu.isMenuActive())
 	{
-		interfaces::surface->unlockCursor();
+		memory::interfaces::surface->unlockCursor();
 		return;
 	}
 

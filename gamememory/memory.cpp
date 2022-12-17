@@ -1,6 +1,8 @@
 #include "memory.hpp"
 
 #include "sigs.hpp"
+#include "modules.hpp"
+#include "pattern.hpp"
 
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
@@ -8,55 +10,21 @@
 #include <SDK/math/matrix.hpp>
 #include <SDK/CTeslaInfo.hpp>
 #include <SDK/CEffectData.hpp>
+#include <SDK/IPrediction.hpp>
+#include <SDK/CGameRules.hpp>
+#include <SDK/Input.hpp>
+#include <SDK/IViewRenderBeams.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <game/game.hpp>
 
 #include <sstream>
 #include <algorithm>
 #include <optional>
 #include <ranges>
 
-#pragma region modules_names
-
-#define ENGINE_DLL					XOR("engine.dll")
-#define CLIENT_DLL					XOR("client.dll")
-#define VSTD_DLL					XOR("vstdlib.dll")
-#define VGUI_DLL					XOR("vgui2.dll")
-#define VGUIMAT_DLL					XOR("vguimatsurface.dll")
-#define MATERIAL_DLL				XOR("materialsystem.dll")
-#define LOCALIZE_DLL				XOR("localize.dll")
-#define STUDIORENDER_DLL			XOR("studiorender.dll")
-#define INPUTSYSTEM_DLL				XOR("inputsystem.dll")
-#define SHARED_API					XOR("shaderapidx9.dll")
-#define TIER_DLL					XOR("tier0.dll")
-#define PANORAMA_DLL				XOR("panorama.dll")
-#define FILESYS_DLL					XOR("filesystem_stdio.dll")
-
-#pragma endregion
-
-
 template<typename T>
-Memory::Address<T> Memory::Address<T>::initAddr(const std::string& mod, const std::string& sig, uintptr_t offset)
+Memory::Address<T> Memory::Address<T>::scan(const std::string_view mod, const std::string_view sig, uintptr_t offset)
 {
-	auto [addr, scanned] = g_Memory.scan(mod, sig, offset);
-	if (!scanned)
-		throw std::runtime_error(FORMAT(XOR("Pattern in {} with sig {} (0x{:X}) was not found"), mod, sig, offset));
-
-	return Address<T>{ addr };
-}
-
-std::pair<uintptr_t, bool> Memory::scan(const std::string& mod, const std::string& sig, const uintptr_t offsetToAdd)
-{
-	std::istringstream iss{ sig };
-	std::vector<std::string> parts{ std::istream_iterator<std::string>{ iss }, std::istream_iterator<std::string>{} };
-	std::vector<std::optional<std::byte>> actualPattern = {};
-
-	std::ranges::for_each(parts, [&](const std::string& str)
-		{
-			if (str == "?" || str == "??")
-				actualPattern.emplace_back(std::nullopt);
-			else
-				actualPattern.emplace_back(static_cast<std::byte>(std::stoi(str, nullptr, 16)));
-		});
-
 	const auto _module = g_Memory.getModule(mod);
 	const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(_module);
 	const auto ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<uint8_t*>(_module) + dosHeader->e_lfanew);
@@ -74,26 +42,79 @@ std::pair<uintptr_t, bool> Memory::scan(const std::string& mod, const std::strin
 		return true;
 	};
 
-	std::pair<uintptr_t, bool> ret = { 0U, false };
+	const auto converted = SigConvert<std::byte>::get(sig);
 
-	for (auto i : std::views::iota(0U, static_cast<size_t>(sizeOfImage)))
-	{
-		if (check(reinterpret_cast<std::byte*>(rangeStart + i), actualPattern))
+	for (auto i : std::views::iota(reinterpret_cast<size_t>(_module), static_cast<size_t>(sizeOfImage + reinterpret_cast<size_t>(_module))))
+	{		
+		if (check(reinterpret_cast<std::byte*>(i), converted))
 		{
-			ret = { rangeStart + i + offsetToAdd, true };
+			m_addr = i + offset;
 			break;
 		}
 	}
 
-	m_countedPatterns++;
-
-	return ret;
+	assert(m_addr);
+	m_module = mod;
+	return Address<T>{ m_addr };
 }
+
+template<typename T>
+template<li::detail::hash_t::value_type hash>
+Memory::Address<T> Memory::Address<T>::byExport(const std::string_view _module)
+{
+	EXPORT(m_addr, hash, _module);
+
+	return Address<T>{ m_addr };
+}
+
+template<typename T>
+template<typename TT>
+Memory::Address<T> Memory::Address<T>::byVFunc(const Interface<TT>& ifc, size_t index)
+{
+	m_addr = reinterpret_cast<uintptr_t>(vfunc::getVFunc(reinterpret_cast<void*>(ifc.base), index));
+
+	return Address<T>{ m_addr };
+}
+
+#include <SDK/IBaseClientDll.hpp>
+#include <SDK/ClientClass.hpp>
+
+template<typename T>
+Memory::Address<T> Memory::Address<T>::findFromGame(ClassID id)
+{
+	for (auto _class = memory::interfaces::client->getAllClasses(); _class; _class = _class->m_next)
+	{
+		if (_class->m_classID == id)
+			return Address<T>{ _class };
+	}
+
+	return Address<T>{ 0U };
+}
+
+#include <SDK/IVEngineClient.hpp>
+
+template<typename T>
+Memory::Address<T> Memory::Address<T>::findFromGameLoop(ClassID id)
+{
+	for (auto i : std::views::iota(memory::interfaces::engine->getMaxClients(), memory::interfaces::entList->getHighestIndex() + 1))
+	{
+		auto entity = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientEntity(i));
+		if (!entity)
+			continue;
+
+		auto idx = entity->clientClass()->m_classID;
+		if (idx == id)
+			return Address<T>{ entity };
+	}
+
+	return Address<T>{ 0U };
+}
+
 
 void Memory::init()
 {
 #define ADD_TO_MAP(name) \
-	m_ModulesAddr[name] = (HMODULE)(::li::detail::lazy_module<name##_hash>().cached()); \
+	m_ModulesAddr[name] =  reinterpret_cast<HMODULE>(::li::detail::lazy_module<name##_hash>().cached()); \
 
 	ADD_TO_MAP("engine.dll");
 	ADD_TO_MAP("client.dll");
@@ -108,81 +129,114 @@ void Memory::init()
 	ADD_TO_MAP("tier0.dll");
 	ADD_TO_MAP("panorama.dll");
 	ADD_TO_MAP("filesystem_stdio.dll");
+	ADD_TO_MAP("datacache.dll");
 
 #undef ADD_TO_MAP
 
-	// GENERAL
+	using namespace memory;
+	using namespace memory::interfaces;
 
-	m_traceFilterSimple			= m_traceFilterSimple.initAddr(CLIENT_DLL, CTRACE_FILTER_SIMPLE, 0x3D);
-	m_returnAddrRadarImage		= m_returnAddrRadarImage.initAddr(PANORAMA_DLL, UNK_FILESYS);
-	m_viewMatrixAddr			= m_viewMatrixAddr.initAddr(CLIENT_DLL, VIEW_MATRIX_CLIENT, 0x3).ref().add(0xB0);
-	m_drawSpacedRectangle		= m_drawSpacedRectangle.initAddr(CLIENT_DLL, DRAW_SPACE_RECTANGLE_CALL);
-	m_motionBlurVec				= m_motionBlurVec.initAddr(CLIENT_DLL, BLUR_MATERIAL_ARR_1, 0x1).ref();
-	m_disableTargetAlloc		= m_disableTargetAlloc.initAddr(MATERIAL_DLL, DISABLE_RENDER_TARGET_ALLOC, 0x2);
-	m_throughSmoke				= m_throughSmoke.initAddr(CLIENT_DLL, GOES_THROUGH_SMOKE);
-	m_smokeCount				= m_throughSmoke.add(0x8).ref().cast<uintptr_t>();
-	m_loadSky					= m_loadSky.initAddr(ENGINE_DLL, LOAD_SKY);
-	m_callbacksHead				= m_callbacksHead.initAddr(CLIENT_DLL, HEAD_OF_EFFECTS, 0x2).ref(Dereference::TWICE);
-	m_camThink					= m_camThink.initAddr(CLIENT_DLL, CAM_THINK);
-	m_renderDrawPoints			= m_renderDrawPoints.initAddr(STUDIORENDER_DLL, R_STUDIODRAWPOINTS);
-	m_localPlayer				= m_localPlayer.initAddr(CLIENT_DLL, LOCAL_PLAYER, 0x2).ref();
-	m_csgoHud					= m_csgoHud.initAddr(CLIENT_DLL, CSGO_HUD, 0x1).ref();
-	m_hudfindElement			= m_hudfindElement.initAddr(CLIENT_DLL, FIND_ELEMENT);
-	m_keyValuesFromString		= m_keyValuesFromString.initAddr(CLIENT_DLL, KEY_VALUES_FROM_STR);
-	m_animOverlays				= m_animOverlays.initAddr(CLIENT_DLL, ANIMATION_LAYER, 0x2).ref();
-	m_sequenceActivity			= m_sequenceActivity.initAddr(CLIENT_DLL, SEQUENCE_ACTIVITY);
-	m_cachedBones				= m_cachedBones.initAddr(CLIENT_DLL, CACHED_BONE, 0x2).ref().add(0x4);
-	m_setAbsOrigin				= m_setAbsOrigin.initAddr(CLIENT_DLL, SETABSORIGIN);
-	m_isC4Owner					= m_isC4Owner.initAddr(CLIENT_DLL, HASC4);
-	m_isBreakable				= m_isBreakable.initAddr(CLIENT_DLL, IS_BREAKBLE);
-	m_predictionData			= m_predictionData.initAddr(CLIENT_DLL, PREDICTION_MOVE_DATA, 0x1).ref(Dereference::TWICE);
-	m_predictionSeed			= m_predictionSeed.initAddr(CLIENT_DLL, PREDICTIONRANDOMSEED, 0x2).ref();
-	m_flashlightCreate			= m_flashlightCreate.initAddr(CLIENT_DLL, FLASHLIGHT_CREATE);
-	m_flashlightUpdate			= m_flashlightUpdate.initAddr(CLIENT_DLL, FLASHLIGHT_UPDATE);
-	m_flashlightDestroy			= m_flashlightDestroy.initAddr(CLIENT_DLL, FLASHLIGHT_DESTROY);
-	m_occlusion					= m_occlusion.initAddr(CLIENT_DLL, SETUP_OCCLUSION);
-	m_velocity					= m_velocity.initAddr(CLIENT_DLL, SETUP_VELOCITY);
-	m_accumulate				= m_accumulate.initAddr(CLIENT_DLL, SETUP_VELOCITY);
-	m_particleIsCached			= m_particleIsCached.initAddr(CLIENT_DLL, IS_EFFECT_CACHED);
-	m_particleSystem			= m_particleSystem.initAddr(CLIENT_DLL, PARTICLE_SYSTEM, 0x7).ref(Dereference::TWICE);
-	m_particleFindStringIndex	= m_particleFindStringIndex.initAddr(CLIENT_DLL, FIND_STRING_INDEX);
-	m_particleCall				= m_particleCall.initAddr(CLIENT_DLL, PARTICLE_CALL);
-	m_particleSetControlPoint	= m_particleSetControlPoint.initAddr(CLIENT_DLL, SET_PARTICLE_POINT);
-
-	// SDK INTERFACES
-
-	m_beams						= m_beams.initAddr(CLIENT_DLL, BEAMS, 0x1).ref();
-	m_glowManager				= m_glowManager.initAddr(CLIENT_DLL, GLOWMANAGER, 0x3).ref();
-	m_weaponInterface			= m_weaponInterface.initAddr(CLIENT_DLL, WEAPONDATA, 0x2).ref();
-	m_moveHelper				= m_moveHelper.initAddr(CLIENT_DLL, MOVEHELPER, 0x2).ref(Dereference::TWICE);
-	m_resourceInterface			= m_resourceInterface.initAddr(CLIENT_DLL, PLAYER_RESOURCE, 0x4).ref();
-	m_dx9Device					= m_dx9Device.initAddr(SHARED_API, DX9_DEVICE, 0x1).ref(Dereference::TWICE);
-	m_clientState				= m_clientState.initAddr(ENGINE_DLL, CLIENT_STATE, 0x1).ref(Dereference::TWICE);
-	m_gameRules					= m_gameRules.initAddr(CLIENT_DLL, GAME_RULES, 0x1).ref();
-	m_viewRender				= m_viewRender.initAddr(CLIENT_DLL, VIEW_RENDER, 0x2).ref(Dereference::TWICE);
+	traceFilterSimple = traceFilterSimple.scan(CLIENT_DLL, CTRACE_FILTER_SIMPLE, 0x3D);
+	returnAddrRadarImage = returnAddrRadarImage.scan(PANORAMA_DLL, UNK_FILESYS);
+	viewMatrixAddr = viewMatrixAddr.scan(CLIENT_DLL, VIEW_MATRIX_CLIENT, 0x3).deRef().add(0xB0);
+	drawSpacedRectangle = drawSpacedRectangle.scan(CLIENT_DLL, DRAW_SPACE_RECTANGLE_CALL);
+	motionBlurVec = motionBlurVec.scan(CLIENT_DLL, BLUR_MATERIAL_ARR_1, 0x1).deRef();
+	disableTargetAlloc = disableTargetAlloc.scan(MATERIAL_DLL, DISABLE_RENDER_TARGET_ALLOC, 0x2);
+	throughSmoke = throughSmoke.scan(CLIENT_DLL, GOES_THROUGH_SMOKE);
+	smokeCount = throughSmoke.add(0x8).deRef().cast<uintptr_t>();
+	loadSky = loadSky.scan(ENGINE_DLL, LOAD_SKY);
+	callbacksHead = callbacksHead.scan(CLIENT_DLL, HEAD_OF_EFFECTS, 0x2).deRef(Dereference::TWICE);
+	camThink = camThink.scan(CLIENT_DLL, CAM_THINK);
+	renderDrawPoints = renderDrawPoints.scan(STUDIORENDER_DLL, R_STUDIODRAWPOINTS);
+	localPlayer = localPlayer.scan(CLIENT_DLL, LOCAL_PLAYER, 0x2).deRef();
+	csgoHud = csgoHud.scan(CLIENT_DLL, CSGO_HUD, 0x1).deRef();
+	hudfindElement = hudfindElement.scan(CLIENT_DLL, FIND_ELEMENT);
+	keyValuesFromString = keyValuesFromString.scan(CLIENT_DLL, KEY_VALUES_FROM_STR);
+	animOverlays = animOverlays.scan(CLIENT_DLL, ANIMATION_LAYER, 0x2).deRef();
+	sequenceActivity = sequenceActivity.scan(CLIENT_DLL, SEQUENCE_ACTIVITY);
+	cachedBones = cachedBones.scan(CLIENT_DLL, CACHED_BONE, 0x2).deRef().add(0x4);
+	setAbsOrigin = setAbsOrigin.scan(CLIENT_DLL, SETABSORIGIN);
+	isC4Owner = isC4Owner.scan(CLIENT_DLL, HASC4);
+	isBreakable = isBreakable.scan(CLIENT_DLL, IS_BREAKBLE);
+	predictionData = predictionData.scan(CLIENT_DLL, PREDICTION_MOVE_DATA, 0x1).deRef(Dereference::TWICE);
+	predictionSeed = predictionSeed.scan(CLIENT_DLL, PREDICTIONRANDOMSEED, 0x2).deRef();
+	flashlightCreate = flashlightCreate.scan(CLIENT_DLL, FLASHLIGHT_CREATE);
+	flashlightUpdate = flashlightUpdate.scan(CLIENT_DLL, FLASHLIGHT_UPDATE);
+	flashlightDestroy = flashlightDestroy.scan(CLIENT_DLL, FLASHLIGHT_DESTROY);
+	occlusion = occlusion.scan(CLIENT_DLL, SETUP_OCCLUSION);
+	velocity = velocity.scan(CLIENT_DLL, SETUP_VELOCITY);
+	accumulate = accumulate.scan(CLIENT_DLL, SETUP_VELOCITY);
+	particleIsCached = particleIsCached.scan(CLIENT_DLL, IS_EFFECT_CACHED);
+	particleSystem = particleSystem.scan(CLIENT_DLL, PARTICLE_SYSTEM, 0x7).deRef(Dereference::TWICE);
+	particleFindStringIndex = particleFindStringIndex.scan(CLIENT_DLL, FIND_STRING_INDEX);
+	particleCall = particleCall.scan(CLIENT_DLL, PARTICLE_CALL);
+	particleSetControlPoint = particleSetControlPoint.scan(CLIENT_DLL, SET_PARTICLE_POINT);
+	predictedPlayer = predictedPlayer.scan(CLIENT_DLL, PREDICTED_PLAYER).add(0x2).deRef();
+	physicsRunThink = physicsRunThink.scan(CLIENT_DLL, PHYSICS_RUN_THINK);
+	lastCommand = lastCommand.scan(CLIENT_DLL, LAST_COMMAND).add(0x2).deRef();
+	retAddrToInterpolation = retAddrToInterpolation.scan(CLIENT_DLL, RET_ADDR_INTERPOLATION);
+	postThinkPhysics = postThinkPhysics.scan(CLIENT_DLL, POST_THINK_PHYSICS);
+	simulateEntities = simulateEntities.scan(CLIENT_DLL, SIMULATE_ENTITIES);
+	vecClientImpacts = vecClientImpacts.scan(CLIENT_DLL, VEC_CLIENT_IPACT_LIST);
 
 	// HOOKS
 
-	m_clientValidAddr			= m_clientValidAddr.initAddr(CLIENT_DLL, NEW_CHECK);
-	m_enginevalidAddr			= m_enginevalidAddr.initAddr(ENGINE_DLL, NEW_CHECK);
-	m_studioRenderValidAddr		= m_studioRenderValidAddr.initAddr(STUDIORENDER_DLL, NEW_CHECK);
-	m_materialSysValidAddr		= m_materialSysValidAddr.initAddr(MATERIAL_DLL, NEW_CHECK);
-	m_isUsingPropDebug			= m_isUsingPropDebug.initAddr(ENGINE_DLL, IS_USING_PROP_DEBUG).rel(0x1);
-	m_getColorModulation		= m_getColorModulation.initAddr(MATERIAL_DLL, GET_COLOR_MODULATION);
-	m_extraBonesProcessing		= m_extraBonesProcessing.initAddr(CLIENT_DLL, EXTRA_BONES_PROCCESSING);
-	m_buildTransformations		= m_buildTransformations.initAddr(CLIENT_DLL, BUILD_TRANSFORMATIONS);
-	m_particleSimulate			= m_particleSimulate.initAddr(CLIENT_DLL, PARTICLE_SIMULATE);
-	m_sendDataGram				= m_sendDataGram.initAddr(ENGINE_DLL, SEND_DATAGRAM);
-	m_unkOverviewMap			= m_unkOverviewMap.initAddr(CLIENT_DLL, UNK_OVERVIEWMAP);
-	m_isDepth					= m_isDepth.initAddr(CLIENT_DLL, IS_DEPTH);
-	m_fxBlood					= m_fxBlood.initAddr(CLIENT_DLL, FX_BLOOD);
-	m_addEnt					= m_addEnt.initAddr(CLIENT_DLL, ADD_ENT);
-	m_removeEnt					= m_removeEnt.initAddr(CLIENT_DLL, REMOVE_ENT);
+	clientValidAddr = clientValidAddr.scan(CLIENT_DLL, NEW_CHECK);
+	enginevalidAddr = enginevalidAddr.scan(ENGINE_DLL, NEW_CHECK);
+	studioRenderValidAddr = studioRenderValidAddr.scan(STUDIORENDER_DLL, NEW_CHECK);
+	materialSysValidAddr = materialSysValidAddr.scan(MATERIAL_DLL, NEW_CHECK);
+	isUsingPropDebug = isUsingPropDebug.scan(ENGINE_DLL, IS_USING_PROP_DEBUG).rel(0x1);
+	getColorModulation = getColorModulation.scan(MATERIAL_DLL, GET_COLOR_MODULATION);
+	extraBonesProcessing = extraBonesProcessing.scan(CLIENT_DLL, EXTRA_BONES_PROCCESSING);
+	buildTransformations = buildTransformations.scan(CLIENT_DLL, BUILD_TRANSFORMATIONS);
+	particleSimulate = particleSimulate.scan(CLIENT_DLL, PARTICLE_SIMULATE);
+	sendDataGram = sendDataGram.scan(ENGINE_DLL, SEND_DATAGRAM);
+	unkOverviewMap = unkOverviewMap.scan(CLIENT_DLL, UNK_OVERVIEWMAP);
+	isDepth = isDepth.scan(CLIENT_DLL, IS_DEPTH);
+	fxBlood = fxBlood.scan(CLIENT_DLL, FX_BLOOD);
+	addEnt = addEnt.scan(CLIENT_DLL, ADD_ENT);
+	removeEnt = removeEnt.scan(CLIENT_DLL, REMOVE_ENT);
+	isFollowedEntity = isFollowedEntity.scan(CLIENT_DLL, IS_FOLLOWED_ENT);
+	spottedEntityUpdate = spottedEntityUpdate.scan(CLIENT_DLL, SPOTTED_ENTITIY_UPDATE);
+	fireInternfn = fireInternfn.scan(ENGINE_DLL, FIRE_INTERN);
 
 	// REST
 
-	m_tesla						= m_tesla.initAddr(CLIENT_DLL, FX_TESLA);
-	m_dispatchEffect			= m_dispatchEffect.initAddr(CLIENT_DLL, DISPATCH_EFFECT);
+	tesla = tesla.scan(CLIENT_DLL, FX_TESLA);
+	dispatchEffect = dispatchEffect.scan(CLIENT_DLL, DISPATCH_EFFECT);
 
-	LOG_INFO(XOR("memory init success, {} sigs done"), m_countedPatterns);
+	// SDK INTERFACES
+
+	game::localPlayer.init();
+	memory::interfaces::init();
+
+	beams = beams.scan(CLIENT_DLL, BEAMS, 0x1).deRef();
+	glowManager = glowManager.scan(CLIENT_DLL, GLOWMANAGER, 0x3).deRef();
+	weaponInterface = weaponInterface.scan(CLIENT_DLL, WEAPONDATA, 0x2).deRef();
+	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER, 0x2).deRef(Dereference::TWICE);
+	dx9Device = dx9Device.scan(SHARED_API, DX9_DEVICE, 0x1).deRef(Dereference::TWICE);
+	clientState = clientState.scan(ENGINE_DLL, CLIENT_STATE, 0x1).deRef(Dereference::TWICE);
+	viewRender = viewRender.scan(CLIENT_DLL, VIEW_RENDER, 0x2).deRef(Dereference::TWICE);
+	keyValuesSys = keyValuesSys.byExport<"KeyValuesSystem"_hash>(VSTD_DLL);
+	memAlloc = memAlloc.byExport<"g_pMemAlloc"_hash>(TIER_DLL).deRef();
+	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER, 0x2).deRef(Dereference::TWICE);
+	beams = beams.scan(CLIENT_DLL, BEAMS, 0x1).deRef();
+	
+	globalVars = globalVars.byVFunc(memory::interfaces::client, 0).add(0x1F).deRef(Memory::Dereference::TWICE);
+	clientMode = clientMode.byVFunc(memory::interfaces::client, 10).add(0x5).deRef(Memory::Dereference::TWICE);
+	input = input.byVFunc(memory::interfaces::client, 16).add(0x1).deRef();
+
+	postInit();
+
+	LOG_INFO(XOR("memory init success"));
+}
+
+void Memory::postInit()
+{
+	using namespace memory;
+	using namespace memory::interfaces;
+
+	preciptation = preciptation.findFromGame(CPrecipitation);
+	resourceInterface = resourceInterface.findFromGameLoop(CCSPlayerResource);
+	gameRules = gameRules.findFromGameLoop(CCSGameRulesProxy);
 }

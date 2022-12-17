@@ -7,6 +7,7 @@
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <SDK/structs/Entity.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
@@ -17,7 +18,7 @@
 
 void SoundDraw::init()
 {
-	g_Events->add(XOR("player_footstep"), std::bind(&SoundDraw::pushSteps, this, std::placeholders::_1));
+	events::add(XOR("player_footstep"), std::bind(&SoundDraw::pushSteps, this, std::placeholders::_1));
 }
 
 void SoundDraw::findBest(Player_t* ent)
@@ -34,7 +35,7 @@ void SoundDraw::findBest(Player_t* ent)
 
 	for (size_t i = 0; const auto & el : m_steps.at(index))
 	{
-		float diff = el.m_expire - interfaces::globalVars->m_curtime;
+		float diff = el.m_expire - memory::interfaces::globalVars->m_curtime;
 
 		if (diff < 0.0f)
 		{
@@ -124,7 +125,7 @@ void SoundDraw::pushSteps(IGameEvent* event)
 	if (!vars::visuals->sound->enabled)
 		return;
 
-	auto who = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+	auto who = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
 	if (!who)
 		return;
 
@@ -134,6 +135,6 @@ void SoundDraw::pushSteps(IGameEvent* event)
 	if (who->isDormant())
 		return;
 
-	StepData_t step{ who, who->absOrigin(), interfaces::globalVars->m_curtime + vars::visuals->sound->time };
+	StepData_t step{ who, who->absOrigin(), memory::interfaces::globalVars->m_curtime + vars::visuals->sound->time };
 	m_steps.at(step.m_player->getIndex()).push_back(step);
 }

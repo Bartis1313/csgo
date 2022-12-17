@@ -7,7 +7,9 @@
 #include <SDK/IGameEvent.hpp>
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/IVEngineClient.hpp>
+#include <SDK/clientHitVerify.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <config/vars.hpp>
@@ -30,7 +32,7 @@ void BulletImpactsClient::draw()
 		m_hitsClientSide.emplace_back(HitStruct_t
 			{
 				m_vecBulletVerifyListClient[i - 1].m_pos,
-				interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeClient
+				memory::interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeClient
 			});
 
 	if (m_vecBulletVerifyListClient.m_size != gameBulletCount)
@@ -41,7 +43,7 @@ void BulletImpactsClient::draw()
 
 	for (size_t i = 0; const auto & el : m_hitsClientSide)
 	{
-		float diff = el.m_expire - interfaces::globalVars->m_curtime;
+		float diff = el.m_expire - memory::interfaces::globalVars->m_curtime;
 
 		if (diff < 0.0f)
 		{
@@ -53,63 +55,4 @@ void BulletImpactsClient::draw()
 
 		i++;
 	}
-}
-
-void BulletImpactsLocal::init()
-{
-	g_Events->add(XOR("bullet_impact"), std::bind(&BulletImpactsLocal::pushBullet, this, std::placeholders::_1));
-}
-
-void BulletImpactsLocal::draw()
-{
-	if (!vars::visuals->world->impacts->enabledLocal)
-		return;
-
-	Color outline = vars::visuals->world->impacts->colorLocal();
-	Color fill = vars::visuals->world->impacts->colorLocalFill();
-
-	for (size_t i = 0; const auto & el : m_hitsLocal)
-	{
-		float diff = el.m_expire - interfaces::globalVars->m_curtime;
-
-		if (diff < 0.0f)
-		{
-			m_hitsLocal.erase(m_hitsLocal.begin() + i);
-			continue;
-		}
-
-		Trace_t tr;
-		TraceFilter filter;
-		filter.m_skip = game::localPlayer();
-		interfaces::trace->traceRay({ el.m_start, el.m_end }, MASK_PLAYER, &filter, &tr);
-
-		imRender.drawBox3DFilled(tr.m_end, 4.0f, 4.0f, outline, fill);
-
-		i++;
-	}
-}
-
-void BulletImpactsLocal::pushBullet(IGameEvent* event)
-{
-	if (!vars::visuals->world->impacts->enabledLocal)
-		return;
-
-	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid"))));
-	if (!attacker)
-		return;
-
-	if (attacker != game::localPlayer)
-		return;
-
-	auto local = reinterpret_cast<Player_t*>(attacker);
-
-	float x = event->getFloat(XOR("x"));
-	float y = event->getFloat(XOR("y"));
-	float z = event->getFloat(XOR("z"));
-
-	Vec3 src = local->getEyePos();
-	Vec3 dst = Vec3{ x, y, z };
-
-	HitStructLocal_t hit = { src, dst, interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeLocal };
-	m_hitsLocal.push_back(hit);
 }

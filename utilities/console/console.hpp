@@ -14,6 +14,7 @@
 #include <fstream>
 #include <mutex>
 #include <cassert>
+#include "consoleDraw.hpp"
 
 struct SDKColor;
 
@@ -27,7 +28,7 @@ public:
 public:
 	// logs into console + draw + file
 	template<typename... Args_t>
-	void log(const char* loc, TypeLogs type, const std::string_view fmt, Args_t&&... args);
+	void log(TypeLogs type, const std::string_view fmt, Args_t&&... args);
 private:
 	std::unordered_map<TypeLogs, ColorsConsole> colorsForConsole;
 	std::unordered_map<TypeLogs, std::string_view> consoleStrings;
@@ -38,7 +39,6 @@ private:
 	void reset();
 
 	std::string m_logName;
-	ImGui::ExampleAppLog m_log;
 	bool m_activeLog = false;
 	std::mutex mutex;
 };
@@ -48,7 +48,7 @@ private:
 // :D
 
 template<typename... Args_t>
-void Console::log(const char* loc, TypeLogs type, const std::string_view fmt, Args_t&&... args)
+void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 {
 	std::scoped_lock lock{ mutex };
 
@@ -64,7 +64,7 @@ void Console::log(const char* loc, TypeLogs type, const std::string_view fmt, Ar
 #ifdef _DEBUG
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(colorsForConsole[type]));
 	if (type != TypeLogs::LOG_NO)
-		std::cout << FORMAT(XOR("{}{} {} "), signs[type], consoleStrings[type], loc);
+		std::cout << FORMAT(XOR("{} {}"), signs[type], consoleStrings[type]);
 
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(ColorsConsole::CONSOLE_WHITE));
 #endif
@@ -83,14 +83,14 @@ void Console::log(const char* loc, TypeLogs type, const std::string_view fmt, Ar
 #endif
 
 	log << buffer;
-	m_log.AddLog(buffer);
+	g_LogDrawer->log.add(type, buffer);
 
 	log.close();
 }
 
 inline Console console;
 
-#define LOG_INFO(fmt, ...) console.log(XOR(__FUNCTION__), TypeLogs::LOG_INFO, fmt, __VA_ARGS__)
-#define LOG_ERR(fmt, ...) console.log(XOR(__FUNCTION__), TypeLogs::LOG_ERR, fmt, __VA_ARGS__)
-#define LOG_WARN(fmt, ...) console.log(XOR(__FUNCTION__), TypeLogs::LOG_WARN, fmt, __VA_ARGS__)
-#define LOG_EMPTY(fmt, ...) console.log(XOR(__FUNCTION__), TypeLogs::LOG_NO, fmt, __VA_ARGS__)
+#define LOG_INFO(fmt, ...) console.log(TypeLogs::LOG_INFO, fmt, __VA_ARGS__)
+#define LOG_ERR(fmt, ...) console.log(TypeLogs::LOG_ERR, fmt, __VA_ARGS__)
+#define LOG_WARN(fmt, ...) console.log(TypeLogs::LOG_WARN, fmt, __VA_ARGS__)
+#define LOG_EMPTY(fmt, ...) console.log(TypeLogs::LOG_NO, fmt, __VA_ARGS__)

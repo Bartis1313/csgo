@@ -14,7 +14,7 @@ static void* getStack(void** data)
 
 	void** next = *reinterpret_cast<void***>(data);
 
-	const static auto retAddr = g_Memory.m_renderDrawPoints();
+	const static auto retAddr = memory::renderDrawPoints();
 	if (data[1] == retAddr)
 		return next[4];
 
@@ -28,7 +28,7 @@ static Player_t* getPlayer()
 	return reinterpret_cast<Player_t*>(getStack(data));
 }
 
-long __stdcall hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex,
+long D3DAPI hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex,
 	UINT numVertices, UINT startIndex, UINT primCount)
 {
 	auto res = original(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);
@@ -36,7 +36,6 @@ long __stdcall hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3D
 	auto ent = getPlayer();
 	if (!ent)
 		return res;
-
 	
 	if (!game::localPlayer)
 		return res;

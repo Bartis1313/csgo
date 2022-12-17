@@ -25,7 +25,7 @@ void Projectiles::draw()
 		if (!model)
 			continue;
 
-		auto studio = interfaces::modelInfo->getStudioModel(model);
+		auto studio = memory::interfaces::modelInfo->getStudioModel(model);
 		if (!studio)
 			continue;
 

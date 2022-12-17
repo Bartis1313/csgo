@@ -15,6 +15,7 @@
 #include <SDK/ConVar.hpp>
 #include <SDK/math/Vector.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 
 #include <game/game.hpp>
 #include <game/globals.hpp>
@@ -26,11 +27,11 @@
 
 void BombOverlay::init()
 {
-	m_timer = interfaces::cvar->findVar(XOR("mp_c4timer"));
+	m_timer = memory::interfaces::cvar->findVar(XOR("mp_c4timer"));
 
-	g_Events->add(XOR("bomb_planted"), std::bind(&BombOverlay::handleWhoPlanted, this, std::placeholders::_1));
-	g_Events->add(XOR("bomb_exploded"), std::bind(&BombOverlay::handleBombExplode, this, std::placeholders::_1));
-	g_Events->add(XOR("round_prestart"), std::bind(&BombOverlay::handleResetBomb, this, std::placeholders::_1));
+	events::add(XOR("bomb_planted"), std::bind(&BombOverlay::handleWhoPlanted, this, std::placeholders::_1));
+	events::add(XOR("bomb_exploded"), std::bind(&BombOverlay::handleBombExplode, this, std::placeholders::_1));
+	events::add(XOR("round_prestart"), std::bind(&BombOverlay::handleResetBomb, this, std::placeholders::_1));
 }
 
 void BombOverlay::draw()
@@ -45,9 +46,9 @@ void BombOverlay::draw()
 		return;
 
 	const auto bombent = reinterpret_cast<Bomb_t*>(m_bombEnt);
-	const auto bombtime = bombent->m_flC4Blow() - interfaces::globalVars->m_curtime;
-	const auto defusetime = m_bombEnt->m_flDefuseCountDown() - interfaces::globalVars->m_curtime;
-	auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientFromHandle(m_bombEnt->m_hBombDefuser()));
+	const auto bombtime = bombent->m_flC4Blow() - memory::interfaces::globalVars->m_curtime;
+	const auto defusetime = m_bombEnt->m_flDefuseCountDown() - memory::interfaces::globalVars->m_curtime;
+	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientFromHandle(m_bombEnt->m_hBombDefuser()));
 	const auto defuseMaxTime = ent && ent->m_bHasDefuser() ? 5.0f : 10.0f; // check ent too
 
 	if (bombtime < 0.0f || bombent->m_bBombDefused())
@@ -115,7 +116,7 @@ void BombOverlay::handleBombExplode(IGameEvent* event)
 
 void BombOverlay::handleWhoPlanted(IGameEvent* event)
 {
-	auto who = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+	auto who = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
 	if (!who)
 		return;
 

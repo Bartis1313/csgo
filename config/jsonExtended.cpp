@@ -798,6 +798,7 @@ void from_json(const json& j, VarMisc& val)
 	from_json(j["MirrorCam"], *val.mirrorCam);
 	from_json(j["FreeCam"], *val.freeCam);
 	from_json(j["Flashlight"], *val.flashLight);
+	from_json(j["DisableItems"], *val.disableItems);
 }
 
 void to_json(json& j, const VarMisc& val)
@@ -824,6 +825,7 @@ void to_json(json& j, const VarMisc& val)
 	to_json(j["MirrorCam"], *val.mirrorCam);
 	to_json(j["FreeCam"], *val.freeCam);
 	to_json(j["Flashlight"], *val.flashLight);
+	to_json(j["DisableItems"], *val.disableItems);
 }
 
 void from_json(const json& j, VarMisc::VarLogs& val)
@@ -1174,6 +1176,16 @@ void to_json(json& j, const VarMisc::VarFlashlight& val)
 	j["Enable"] = val.enabled;
 	j["Big mode"] = val.bigMode;
 	j["Fov"] = val.fov;
+}
+
+void from_json(const json& j, VarMisc::DisableItems& val)
+{
+	from_json(j, "Interpolate", val.interpolate);
+}
+
+void to_json(json& j, const VarMisc::DisableItems& val)
+{
+	j["Interpolate"] = val.interpolate;
 }
 
 #include <dependencies/ImGui/imgui.h>

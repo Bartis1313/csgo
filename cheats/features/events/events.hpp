@@ -1,32 +1,40 @@
 #pragma once
 
 #include <SDK/IGameEvent.hpp>
-#include <classes/base.hpp>
 
 #include <string>
 #include <functional>
 #include <vector>
 #include <unordered_map>
 
-// control init yourself
-class Events : public IGameEventListener
+class EventsWrapper : public IGameEventListener
 {
 public:
-	Events()
-	{
-		m_allEvents.push_back(this);
-	}
-
-	void init();
-	void shutdown();
-	// place in virtual init() method of class using this
-	void add(const std::string& eventName, const std::function<void(IGameEvent*)>& fun);
-	static void shutdownAllEvents();
-private:
-	virtual void FireGameEvent(IGameEvent* event) override;
-
-	inline static std::vector<Events*> m_allEvents;
-	std::unordered_map<std::string, std::vector<std::function<void(IGameEvent*)>>> m_map;
+	constexpr std::string_view getName() const { return m_name; }
+protected:
+	std::string_view m_name;
+	virtual void FireGameEvent(IGameEvent* event) override {};
 };
 
-GLOBAL_FEATURE(Events);
+class EventCallback : public EventsWrapper
+{
+public:
+	void addToCallback(const std::string_view eventName, const std::function<void(IGameEvent*)>& callback);
+	void shutdown();
+private:
+	virtual void FireGameEvent(IGameEvent* event) override;
+	std::unordered_map<std::string_view, std::vector<std::function<void(IGameEvent*)>>> m_map;
+};
+
+namespace events
+{
+	inline EventCallback globalEvent;
+	inline void shutdown()
+	{
+		globalEvent.shutdown();
+	}
+	inline void add(const std::string_view eventName, const std::function<void(IGameEvent*)>& callback)
+	{
+		globalEvent.addToCallback(eventName, callback);
+	}
+}

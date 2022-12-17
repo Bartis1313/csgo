@@ -4,6 +4,7 @@
 #include <SDK/IViewRenderBeams.hpp>
 #include <SDK/IEffects.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <config/vars.hpp>
@@ -64,7 +65,7 @@ void Trails::draw()
 		info.m_segments = 2;
 		info.m_renderable = true;
 
-		auto myBeam = interfaces::beams->createBeamPoints(info);
+		auto myBeam = memory::interfaces::beams->createBeamPoints(info);
 
 		// change to pos after beam is drawn, since it's static it's possible
 		end = start;
@@ -73,7 +74,7 @@ void Trails::draw()
 	}
 	case E2T(MovementTrail::LINE):
 	{
-		float curtime = interfaces::globalVars->m_curtime;
+		float curtime = memory::interfaces::globalVars->m_curtime;
 
 		if (game::localPlayer->isMoving())
 			m_trails.push_back(Trail_t{ game::localPlayer->m_vecOrigin(), curtime + vars::misc->trail->time, color });
@@ -103,7 +104,7 @@ void Trails::draw()
 	case E2T(MovementTrail::SPLASH):
 	{
 		if (game::localPlayer->isMoving())
-			interfaces::effects->energySplash(game::localPlayer->m_vecOrigin(), {}, true);
+			memory::interfaces::effects->energySplash(game::localPlayer->m_vecOrigin(), {}, true);
 
 		break;
 	}

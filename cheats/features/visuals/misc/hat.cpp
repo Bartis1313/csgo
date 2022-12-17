@@ -4,6 +4,7 @@
 #include <SDK/Input.hpp>
 #include <SDK/math/Vector.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <config/vars.hpp>
@@ -18,7 +19,7 @@ void Hat::draw()
 	if (!game::isAvailable())
 		return;
 
-	if (!interfaces::input->m_cameraInThirdPerson)
+	if (!memory::interfaces::input->m_cameraInThirdPerson)
 		return;
 
 	auto pos = game::localPlayer->getBonePos(8); // you can play around with vec.z
@@ -53,9 +54,9 @@ void Hat::drawConeEditedRainbow(const Vec3& pos, const float radius, const int p
 		if (ImVec2 start, end; imRender.worldToScreen(startWorld, start) && imRender.worldToScreen(endWorld, end))
 		{
 			imRender.drawLine(start, end,
-				Color::rainbowColor(interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(linesAlpha), thickness);
+				Color::rainbowColor(memory::interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(linesAlpha), thickness);
 			imRender.drawTrianglePoly({ orignalW2S.x, orignalW2S.y + size }, start, end,
-				Color::rainbowColor(interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(trianglesAlpha));
+				Color::rainbowColor(memory::interfaces::globalVars->m_curtime + angle, speed).getColorEditAlphaInt(trianglesAlpha));
 		}
 	}
 }

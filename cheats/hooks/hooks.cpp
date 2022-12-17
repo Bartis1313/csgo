@@ -1,133 +1,74 @@
 #include "hooks.hpp"
 #include "helpers/helper.hpp"
+#include "wndproc.hpp"
 
-#include <SDK/structs/indexes.hpp>
 #include <SDK/ConVar.hpp>
 #include <SDK/ICvar.hpp>
 #include <SDK/interfaces/interfaces.hpp>
-#include <dependencies/minhook/Minhook.h>
-#include <dependencies/ImGui/imgui.h>
-#include <dependencies/ImGui/imgui_impl_win32.h>
-#include <menu/GUI-ImGui/menu.hpp>
-#include <config/vars.hpp>
-#include <utilities/renderer/renderer.hpp>
 #include <utilities/console/console.hpp>
 #include <utilities/tools/tools.hpp>
 #include <gamememory/memory.hpp>
 
 void hooks::init()
 {
-#define HOOK_SAFE_VFUNC(thisptr, hookStructName) \
-hookHelper::tryHook(vfunc::getVFunc(thisptr, hookStructName::index), &hookStructName::hooked, \
-	hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName))
-
-#define HOOK_SAFE_SIG(target, hookStructName) \
-hookHelper::tryHook(target, &hookStructName::hooked, \
-	hookHelper::ORIGINAL(hookStructName::original), XOR(#hookStructName))
-
+#define HOOK(target, name) \
+if constexpr (name::index != hooks::indexNone) { \
+hookHelper::tryHook(vfunc::getVFunc(target, name::index), &name::hooked, \
+	hookHelper::ORIGINAL(name::original), XOR(#name)); \
+} \
+else { \
+	hookHelper::tryHook(target, &name::hooked, \
+	hookHelper::ORIGINAL(name::original), XOR(#name)); \
+}
 	hookHelper::initMinhook();
 
-	HOOK_SAFE_SIG(g_Memory.m_clientValidAddr(), clientValidAddr);
-	HOOK_SAFE_SIG(g_Memory.m_enginevalidAddr(), engineValidAddr);
-	HOOK_SAFE_SIG(g_Memory.m_studioRenderValidAddr(), studioRenderValidAddr);
-	HOOK_SAFE_SIG(g_Memory.m_materialSysValidAddr(), materialSystemValidAddr);
-	HOOK_SAFE_SIG(g_Memory.m_isUsingPropDebug(), isUsingStaticPropDebugModes);
-	HOOK_SAFE_SIG(g_Memory.m_getColorModulation(), getColorModulation);
-	HOOK_SAFE_SIG(g_Memory.m_extraBonesProcessing(), doExtraBonesProcessing);
-	HOOK_SAFE_SIG(g_Memory.m_buildTransformations(), buildTransformations);
-	HOOK_SAFE_SIG(g_Memory.m_particleSimulate(), particlesSimulations);
-	HOOK_SAFE_SIG(g_Memory.m_sendDataGram(), sendDatagram);
-	HOOK_SAFE_SIG(g_Memory.m_unkOverviewMap(), unknownOverViewFun);
-	HOOK_SAFE_SIG(g_Memory.m_isDepth(), isDepthOfField);
-	HOOK_SAFE_SIG(g_Memory.m_fxBlood(), fxBlood);
-	HOOK_SAFE_SIG(g_Memory.m_addEnt(), addEnt);
-	HOOK_SAFE_SIG(g_Memory.m_removeEnt(), removeEnt);
+	HOOK(memory::clientValidAddr(), hooks::clientValidAddr);
+	HOOK(memory::enginevalidAddr(), hooks::engineValidAddr);
+	HOOK(memory::studioRenderValidAddr(), hooks::studioRenderValidAddr);
+	HOOK(memory::materialSysValidAddr(), hooks::materialSystemValidAddr);
+	HOOK(memory::isUsingPropDebug(), hooks::isUsingStaticPropDebugModes);
+	HOOK(memory::getColorModulation(), hooks::getColorModulation);
+	HOOK(memory::extraBonesProcessing(), hooks::doExtraBonesProcessing);
+	HOOK(memory::buildTransformations(), hooks::buildTransformations);
+	HOOK(memory::particleSimulate(), hooks::particlesSimulations);
+	HOOK(memory::sendDataGram(), hooks::sendDatagram);
+	HOOK(memory::unkOverviewMap(), hooks::unknownOverViewFun);
+	HOOK(memory::isDepth(), hooks::isDepthOfField);
+	HOOK(memory::fxBlood(), hooks::fxBlood);
+	HOOK(memory::addEnt(), hooks::addEnt);
+	HOOK(memory::removeEnt(), hooks::removeEnt);
+	HOOK(memory::interfaces::dx9Device(), hooks::reset);
+	HOOK(memory::interfaces::dx9Device(), hooks::present);
+	HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
+	HOOK(memory::interfaces::client(), hooks::proxyCreateMove);
+	HOOK(memory::interfaces::client(), hooks::frameStageNotify);
+	HOOK(memory::interfaces::client(), hooks::levelInitPreEntity);
+	HOOK(memory::interfaces::client(), hooks::levelInitPostEntity);
+	HOOK(memory::interfaces::client(), hooks::levelShutdown);
+	HOOK(memory::interfaces::panel(), hooks::paintTraverse);
+	HOOK(memory::interfaces::modelRender(), hooks::drawModel);
+	HOOK(memory::interfaces::clientMode(), hooks::overrideView);
+	HOOK(memory::interfaces::clientMode(), hooks::doPostScreenEffects);
+	HOOK(memory::interfaces::surface(), hooks::lockCursor);
+	HOOK(memory::interfaces::cvar->findVar(XOR("sv_cheats")), hooks::sv_cheats);
+	HOOK(memory::interfaces::fileSystem(), hooks::unknownFileSystem);
+	HOOK(memory::interfaces::fileSystem(), hooks::unkFileCheck);
+	HOOK(memory::interfaces::fileSystem(), hooks::getUnverifiedFileHashes);
+	HOOK(memory::interfaces::viewRender(), hooks::renderView);
+	HOOK(memory::interfaces::viewRender(), hooks::screen2DEffect);
+	HOOK(memory::interfaces::engine(), hooks::isHltv);
+	HOOK(memory::isFollowedEntity(), hooks::isFollowingEntity);
+	HOOK(memory::spottedEntityUpdate(), hooks::processSpottedEntityUpdate);
+	HOOK(memory::interfaces::sound(), hooks::emitSound);
+	HOOK(memory::interfaces::eventManager(), hooks::createEvent);
+	HOOK(memory::fireInternfn(), hooks::fireIntern);
 
-	HOOK_SAFE_VFUNC(interfaces::dx9Device, reset);
-	HOOK_SAFE_VFUNC(interfaces::dx9Device, present);
-	HOOK_SAFE_VFUNC(interfaces::dx9Device, drawIndexedPrimitive);
-	HOOK_SAFE_VFUNC(interfaces::client, proxyCreateMove);
-	HOOK_SAFE_VFUNC(interfaces::client, frameStageNotify);
-	HOOK_SAFE_VFUNC(interfaces::client, levelInitPreEntity);
-	HOOK_SAFE_VFUNC(interfaces::client, levelInitPostEntity);
-	HOOK_SAFE_VFUNC(interfaces::client, levelShutdown);
-	HOOK_SAFE_VFUNC(interfaces::panel, paintTraverse);
-	HOOK_SAFE_VFUNC(interfaces::modelRender, drawModel);
-	HOOK_SAFE_VFUNC(interfaces::clientMode, overrideView);
-	HOOK_SAFE_VFUNC(interfaces::clientMode, doPostScreenEffects);
-	HOOK_SAFE_VFUNC(interfaces::surface, lockCursor);
-	HOOK_SAFE_VFUNC(interfaces::cvar->findVar(XOR("sv_cheats")), sv_cheats);
-	HOOK_SAFE_VFUNC(interfaces::fileSystem, unknownFileSystem);
-	HOOK_SAFE_VFUNC(interfaces::fileSystem, unkFileCheck);
-	HOOK_SAFE_VFUNC(interfaces::fileSystem, getUnverifiedFileHashes);
-	HOOK_SAFE_VFUNC(interfaces::viewRender, renderView);
-	HOOK_SAFE_VFUNC(interfaces::viewRender, screen2DEffect);
-	HOOK_SAFE_VFUNC(interfaces::engine, isHltv);
-
-#undef HOOK_SAFE_VFUNC
-#undef HOOK_SAFE_SIG
+#undef HOOK
 
 	hookHelper::checkAllHooks();
 
 	LOG_INFO(XOR("hooks success"));
 }
-
-#pragma region wndproc
-LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
-
-void hooks::wndProcSys::init()
-{
-	currentWindow = LI_FN_CACHED(FindWindowA)(XOR("Valve001"), NULL);
-	wndProcOriginal = reinterpret_cast<WNDPROC>(LI_FN(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndproc)));
-}
-
-#include <SDK/InputSystem.hpp>
-#include <config/key.hpp>
-#include <utilities/inputSystem.hpp>
-#include <menu/x88Menu/x88menu.hpp>
-
-void hooks::wndProcSys::shutdown()
-{
-	LI_FN(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(hooks::wndProcSys::wndProcOriginal));
-	interfaces::iSystem->enableInput(true);
-}
-
-LRESULT __stdcall hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
-{
-	// init content for imgui, once
-	static auto bOnce = [=]()
-	{
-		ImGui::CreateContext();
-		ImGui_ImplWin32_Init(hwnd);
-
-		LOG_INFO(XOR("init for wndProc success"));
-
-		return true;
-	} ();
-
-	inputHandler.run(message, wparam);
-	x88menu.handleKeys();
-
-	vars::keys->aimbot.update();
-	vars::keys->thirdP.update();
-	vars::keys->freeLook.update();
-	vars::keys->freeCam.update();
-	vars::keys->mirrorCam.update();
-
-	if(vars::keys->menu.isPressed())
-		menu.changeActive();
-
-	if (vars::keys->console.isPressed())
-		console.changeActiveLog();
-
-	interfaces::iSystem->enableInput(!menu.isMenuActive());
-
-	if (menu.isMenuActive() && ImGui_ImplWin32_WndProcHandler(hwnd, message, wparam, lparam))
-		return TRUE;
-
-	return LI_FN_CACHED(CallWindowProcA)(wndProcOriginal, hwnd, message, wparam, lparam);
-}
-#pragma endregion
 
 void hooks::shutdown()
 {

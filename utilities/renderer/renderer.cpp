@@ -33,8 +33,8 @@ enum FontFlags
 
 unsigned long SurfaceRender::__createFont(const char* fontName, const int size, const int weight, const unsigned long flags)
 {
-	auto result = interfaces::surface->fontCreate();
-	interfaces::surface->setFontGlyph(result, fontName, size, weight, 0, 0, flags);
+	auto result = memory::interfaces::surface->fontCreate();
+	memory::interfaces::surface->setFontGlyph(result, fontName, size, weight, 0, 0, flags);
 	return result;
 }
 
@@ -49,8 +49,8 @@ void SurfaceRender::init()
 
 void SurfaceRender::drawLine(const int x, const int y, const int x2, const int y2, const Color& color)
 {
-	interfaces::surface->drawSetColor(color);
-	interfaces::surface->drawLine(x, y, x2, y2);
+	memory::interfaces::surface->drawSetColor(color);
+	memory::interfaces::surface->drawLine(x, y, x2, y2);
 }
 
 void SurfaceRender::drawLine(const Vec2& start, const Vec2& end, const Color& color)
@@ -61,8 +61,8 @@ void SurfaceRender::drawLine(const Vec2& start, const Vec2& end, const Color& co
 
 void SurfaceRender::drawRect(const int x, const int y, const int w, const int h, const Color& color)
 {
-	interfaces::surface->drawSetColor(color);
-	interfaces::surface->drawOutlinedRect(x, y, w, h);
+	memory::interfaces::surface->drawSetColor(color);
+	memory::interfaces::surface->drawOutlinedRect(x, y, w, h);
 }
 
 void SurfaceRender::drawRect(const Vec2& start, const Vec2& end, const Color& color)
@@ -73,8 +73,8 @@ void SurfaceRender::drawRect(const Vec2& start, const Vec2& end, const Color& co
 
 void SurfaceRender::drawRectFilled(const int x, const int y, const int w, const int h, const Color& color)
 {
-	interfaces::surface->drawSetColor(color);
-	interfaces::surface->drawFilledRectangle(x, y, w, h);
+	memory::interfaces::surface->drawSetColor(color);
+	memory::interfaces::surface->drawFilledRectangle(x, y, w, h);
 }
 
 void SurfaceRender::drawRoundedRect(const int x, const int y, const int w, const int h, const int radius, const int numberOfVertices, const Color& color)
@@ -125,8 +125,8 @@ void SurfaceRender::drawRoundedRectFilled(const int x, const int y, const int w,
 
 void SurfaceRender::drawCircle(const int x, const int y, const int radius, const int points, const Color& color)
 {
-	interfaces::surface->drawSetColor(color);
-	interfaces::surface->drawOutlinedCircle(x, y, radius, points);
+	memory::interfaces::surface->drawSetColor(color);
+	memory::interfaces::surface->drawOutlinedCircle(x, y, radius, points);
 }
 
 void SurfaceRender::drawCircleFilled(const int x, const int y, const int radius, const int points, const Color& color)
@@ -227,8 +227,8 @@ void SurfaceRender::drawQuad(const Vec2& p1, const Vec2& p2, const Vec2& p3, con
 
 void SurfaceRender::drawPolyLine(int* x, int* y, const int count, const Color& color)
 {
-	interfaces::surface->drawSetColor(color);
-	interfaces::surface->drawPolyLine(x, y, count);
+	memory::interfaces::surface->drawSetColor(color);
+	memory::interfaces::surface->drawPolyLine(x, y, count);
 }
 
 void SurfaceRender::drawPolyLine(const int count, Vertex_t* verts, const Color& color)
@@ -247,8 +247,8 @@ void SurfaceRender::drawPolyLine(const int count, Vertex_t* verts, const Color& 
 
 void SurfaceRender::drawPolyGon(const int count, Vertex_t* verts, const Color& color, const bool clipped)
 {
-	interfaces::surface->drawSetColor(color);
-	interfaces::surface->drawTexturedPolygon(count, verts, clipped);
+	memory::interfaces::surface->drawSetColor(color);
+	memory::interfaces::surface->drawTexturedPolygon(count, verts, clipped);
 }
 
 // https://www.unknowncheats.me/forum/counterstrike-global-offensive/189418-medical-attention-gradients-surface.html got fixed gradient blend from there
@@ -256,8 +256,8 @@ void SurfaceRender::drawGradient(const int x, const int y, const int w, const in
 {
 	auto gradient = [=](const Color& clr, bool reversed)
 	{
-		interfaces::surface->drawSetColor(clr);
-		interfaces::surface->drawFilledFadeRect(
+		memory::interfaces::surface->drawSetColor(clr);
+		memory::interfaces::surface->drawFilledFadeRect(
 			x, y, w, h,
 			reversed ? clr.aMultiplied() : 0,
 			reversed ? 0 : clr.aMultiplied(),
@@ -283,8 +283,8 @@ void SurfaceRender::drawGradient(const int x, const int y, const int w, const in
 {
 	auto gradient = [=](const Color& clr, bool reversed)
 	{
-		interfaces::surface->drawSetColor(clr);
-		interfaces::surface->drawFilledFadeRect(
+		memory::interfaces::surface->drawSetColor(clr);
+		memory::interfaces::surface->drawFilledFadeRect(
 			x, y, w, h,
 			reversed ? clr.aMultiplied() : 0,
 			reversed ? 0 : clr.aMultiplied(),
@@ -309,13 +309,13 @@ void SurfaceRender::drawGradient(const int x, const int y, const int w, const in
 
 void SurfaceRender::text(const int x, const int y, const unsigned long font, const wchar_t* text, const bool centered, const Color& color)
 {
-	interfaces::surface->drawTextFont(font);
+	memory::interfaces::surface->drawTextFont(font);
 	int width, height;
 
-	interfaces::surface->getTextSize(font, text, width, height);
-	interfaces::surface->setTextColor(color);
-	interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
-	interfaces::surface->drawRenderText(text, std::char_traits<wchar_t>::length(text));
+	memory::interfaces::surface->getTextSize(font, text, width, height);
+	memory::interfaces::surface->setTextColor(color);
+	memory::interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
+	memory::interfaces::surface->drawRenderText(text, std::char_traits<wchar_t>::length(text));
 }
 
 void SurfaceRender::text(const int x, const int y, const unsigned long font, const std::string& text, const bool centered, const Color& color)
@@ -326,11 +326,11 @@ void SurfaceRender::text(const int x, const int y, const unsigned long font, con
 	const auto converted = std::wstring(text.cbegin(), text.cend());
 	int width, height;
 
-	interfaces::surface->drawTextFont(font);
-	interfaces::surface->getTextSize(font, converted.c_str(), width, height);
-	interfaces::surface->setTextColor(color);
-	interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
-	interfaces::surface->drawRenderText(converted.c_str(), converted.size());
+	memory::interfaces::surface->drawTextFont(font);
+	memory::interfaces::surface->getTextSize(font, converted.c_str(), width, height);
+	memory::interfaces::surface->setTextColor(color);
+	memory::interfaces::surface->drawTextPos(centered ? (x - (width / 2)) : x, y);
+	memory::interfaces::surface->drawRenderText(converted.c_str(), converted.size());
 }
 
 void SurfaceRender::textf(const int x, const int y, const unsigned long font, const bool centered, const Color& color, const char* fmt, ...)
@@ -362,7 +362,7 @@ int SurfaceRender::getTextSize(const unsigned long font, const std::string& text
 	std::wstring wtext(text.begin(), text.end());
 
 	int width, height;
-	interfaces::surface->getTextSize(font, wtext.c_str(), width, height);
+	memory::interfaces::surface->getTextSize(font, wtext.c_str(), width, height);
 
 	return width;
 }
@@ -372,7 +372,7 @@ Vec2 SurfaceRender::getTextSizeXY(const unsigned long font, const std::string& t
 	std::wstring wtext(text.begin(), text.end());
 
 	int width, height;
-	interfaces::surface->getTextSize(font, wtext.c_str(), width, height);
+	memory::interfaces::surface->getTextSize(font, wtext.c_str(), width, height);
 
 	return Vec2{ (float)width, (float)height };
 }
@@ -382,7 +382,7 @@ Vec2 SurfaceRender::getTextSizeXY(const unsigned long font, const std::string& t
 
 bool SurfaceRender::worldToScreen(const Vec3& in, Vec2& out)
 {
-	auto screenMatrix = g_Memory.m_viewMatrixAddr();
+	auto screenMatrix = memory::viewMatrixAddr();
 
 	float w = screenMatrix[3][0] * in[Coord::X] + screenMatrix[3][1] * in[Coord::Y] + screenMatrix[3][2] * in[Coord::Z] + screenMatrix[3][3];
 
@@ -442,29 +442,29 @@ void SurfaceRender::drawBox3D(const std::array<Vec3, 8>& box, const Color& color
 
 void SurfaceRender::initNewTexture(int& id, Color* RGBA, const int w, const int h)
 {
-	id = interfaces::surface->createNewTextureID(true);
+	id = memory::interfaces::surface->createNewTextureID(true);
 	if (id)
-		interfaces::surface->setTextureRGBA(id, RGBA, w, h);
+		memory::interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
 		throw std::runtime_error(FORMAT(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
 }
 void SurfaceRender::initNewTexture(int& id, unsigned char* RGBA, const int w, const int h)
 {
-	id = interfaces::surface->createNewTextureID(true);
+	id = memory::interfaces::surface->createNewTextureID(true);
 	if (id)
-		interfaces::surface->setTextureRGBA(id, RGBA, w, h);
+		memory::interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
 		throw std::runtime_error(FORMAT(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
 }
 
 void SurfaceRender::drawImage(const Resource& res, const int x, const int y, const int w, const int h, const Color& color)
 {
-	if (!interfaces::surface->isTextureValid(res.getTextureID()))
+	if (!memory::interfaces::surface->isTextureValid(res.getTextureID()))
 		return;
 
-	interfaces::surface->drawSetColor(color);
-	interfaces::surface->drawSetTexture(res.getTextureID());
-	interfaces::surface->drawTexturedRect(x, y, x + w, y + h);
+	memory::interfaces::surface->drawSetColor(color);
+	memory::interfaces::surface->drawSetTexture(res.getTextureID());
+	memory::interfaces::surface->drawTexturedRect(x, y, x + w, y + h);
 }
 
 void SurfaceRender::drawProgressRing(const int x, const int y, float radius, const int points, float percent, const float thickness, const Color& color)
@@ -769,7 +769,7 @@ void ImGuiRender::drawCircle3DTraced(const Vec3& pos, const float radius, const 
 		TraceFilter filter;
 		filter.m_skip = skip;
 
-		interfaces::trace->traceRay({ pos, worldStart }, MASK_SHOT_BRUSHONLY, &filter, &trace);
+		memory::interfaces::trace->traceRay({ pos, worldStart }, MASK_SHOT_BRUSHONLY, &filter, &trace);
 
 		if (ImVec2 screenStart; worldToScreen(trace.m_end, screenStart))
 			pointsVec.push_back(screenStart);
@@ -807,7 +807,7 @@ void ImGuiRender::drawCircle3DFilledTraced(const Vec3& pos, const float radius, 
 		TraceFilter filter;
 		filter.m_skip = skip;
 
-		interfaces::trace->traceRay({ pos, worldStart }, MASK_SHOT_BRUSHONLY, &filter, &trace);
+		memory::interfaces::trace->traceRay({ pos, worldStart }, MASK_SHOT_BRUSHONLY, &filter, &trace);
 
 		if (ImVec2 screenStart; worldToScreen(trace.m_end, screenStart))
 			pointsVec.push_back(screenStart);
@@ -942,7 +942,7 @@ ImVec2 ImGuiRender::getTextSize(ImFont* font, const std::string& text)
 
 bool ImGuiRender::worldToScreen(const Vec3& in, ImVec2& out)
 {
-	auto screenMatrix = g_Memory.m_viewMatrixAddr();
+	auto screenMatrix = memory::viewMatrixAddr();
 
 	float w = screenMatrix[3][0] * in[Coord::X] + screenMatrix[3][1] * in[Coord::Y] + screenMatrix[3][2] * in[Coord::Z] + screenMatrix[3][3];
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <classes/onlyInit.hpp>
+#include <features/events/events.hpp>
 
 class IGameEvent;
 

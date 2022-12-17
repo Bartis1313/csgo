@@ -15,7 +15,7 @@ void NetvarManager::init()
 {
 	m_Tables.clear();
 
-	auto clientClass = interfaces::client->getAllClasses();
+	auto clientClass = memory::interfaces::client->getAllClasses();
 	if (!clientClass)
 		return;
 
@@ -25,7 +25,9 @@ void NetvarManager::init()
 		m_Tables.emplace(std::string{ recvTable->m_netTableName }, recvTable);
 
 		clientClass = clientClass->m_next;
-	}	
+	}
+
+	dump();
 }
 
 uintptr_t NetvarManager::getNetvar(const char* tableName, const char* propName) const
@@ -93,26 +95,27 @@ RecvTable* NetvarManager::getTable(const char* tableName) const
 	return nullptr;
 }
 
-static std::string propToStr(SendPropType type)
-{
-	// not needed, just for always being sure
-	if (type >= DPT_NUMSendPropTypes)
-		return "";
-
-	static std::array<std::string, DPT_NUMSendPropTypes> arr =
-	{
-		XOR("int"), XOR("float"),
-		XOR("Vector"), XOR("Vector2D"),
-		XOR("string*"), XOR("array"),
-		XOR("datatable (void*)"), XOR("__int64")
-	};
-
-	return arr.at(type);
-}
-
 std::string NetvarManager::getType(RecvProp* recvTable) const
 {
-	return propToStr(recvTable->m_recvType);
+	static std::unordered_map<SendPropType, std::string> props =
+	{
+		{ SendPropType::DPT_INT, XOR("int")},
+		{ SendPropType::DPT_FLOAT, XOR("float")},
+		{ SendPropType::DPT_VECTOR, XOR("Vec3")},
+		{ SendPropType::DPT_VECTOR2D, XOR("Vec2")},
+		{ SendPropType::DPT_STRING, XOR("char")},
+		{ SendPropType::DPT_ARRAY, XOR("array")},
+		{ SendPropType::DPT_DATATABLE, XOR("datatable (void*)")},
+		{ SendPropType::DPT_INT64, XOR("__int64")},
+	};
+
+	// buffers
+	if (auto type = recvTable->m_recvType; type == DPT_STRING)
+		return FORMAT(XOR("{}[{}]"), props.at(recvTable->m_recvType), recvTable->m_stringBufferSize);
+	else if(type == DPT_ARRAY)
+		return FORMAT(XOR("{}[{}]"), props.at(recvTable->m_recvType), recvTable->m_elements);
+
+	return props.at(recvTable->m_recvType);
 }
 
 void NetvarManager::dump(RecvTable* recvTable)
@@ -124,7 +127,7 @@ void NetvarManager::dump(RecvTable* recvTable)
 		if (!recvProp)
 			continue;
 
-		std::string recvName = recvProp->m_varName;
+		std::string_view recvName = recvProp->m_varName;
 
 		if (recvName.find(XOR("baseclass")) != std::string::npos)
 			continue;
@@ -143,6 +146,38 @@ void NetvarManager::dump(RecvTable* recvTable)
 	}
 }
 
+#include <SDK/datamap.hpp>
+
+uintptr_t NetvarManager::getDataMap(DataMap_t* map, const std::string_view name) const
+{
+	while (map)
+	{
+		for (auto i : std::views::iota(0, map->m_dataFields))
+		{
+			const auto descriptor = map->m_dataDescription[i];
+			const std::string_view nameDesc = map->m_dataDescription[i].m_name;
+
+			if (nameDesc.empty())
+				continue;
+
+			if (nameDesc == name)
+				return descriptor.m_offset[TD_OFFSET_NORMAL];
+
+			if (descriptor.m_type == FIELD_EMBEDDED)
+			{
+				if (descriptor.m_dataMap)
+				{
+					if (const auto offset = getDataMap(descriptor.m_dataMap, name); offset)
+						return offset;
+				}
+			}
+		}
+		map = map->m_baseMap;
+	}
+
+	return 0U;
+}
+
 #include "../simpleTimer.hpp"
 
 void NetvarManager::dump()
@@ -151,7 +186,7 @@ void NetvarManager::dump()
 	file << FORMAT(XOR("Netvars from: {}"), utilities::getTime()) << "\n\n";
 
 	TimeCount timer{};
-	auto client = interfaces::client->getAllClasses();
+	auto client = memory::interfaces::client->getAllClasses();
 	do {
 		const auto recvTable = client->m_recvTable;
 		dump(recvTable);

@@ -35,6 +35,9 @@ void Blacklist::init()
 
 void Blacklist::reset()
 {
+	if (m_allGuids.empty())
+		return;
+
 	m_allGuids.erase(std::remove_if(m_allGuids.begin(), m_allGuids.end(), [this](const BlacklistedPlayer& player)
 		{
 			if (player.m_bot)
@@ -161,10 +164,10 @@ std::string Blacklist::getCorrectKey(const BlacklistedPlayer& player) const
 Blacklist::BlacklistedPlayer Blacklist::getGuid(Player_t* ent) const
 {
 	PlayerInfo_t info;
-	interfaces::engine->getPlayerInfo(ent->getIndex(), &info);
+	memory::interfaces::engine->getPlayerInfo(ent->getIndex(), &info);
 	auto guid = info.m_fakePlayer
-		? BlacklistedPlayer{ static_cast<uint64_t>(info.m_userID), true, std::string{ info.m_name } }
-	: BlacklistedPlayer{ info.m_steamID64, false, std::string{ info.m_name } };
+		? BlacklistedPlayer{ .m_guid = static_cast<uint64_t>(info.m_userID), .m_bot = true, .m_playerName = std::string{ info.m_name } }
+	: BlacklistedPlayer{ .m_guid = info.m_steamID64, .m_bot = false, .m_playerName = std::string{ info.m_name } };
 
 	return guid;
 }

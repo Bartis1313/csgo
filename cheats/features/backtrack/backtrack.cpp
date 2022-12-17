@@ -12,6 +12,7 @@
 #include <SDK/ICvar.hpp>
 #include <SDK/ConVar.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <config/vars.hpp>
 #include <utilities/math/math.hpp>
@@ -19,14 +20,14 @@
 
 void Backtrack::init()
 {
-	cvars.updateRate = interfaces::cvar->findVar(XOR("cl_updaterate"));
-	cvars.maxUpdateRate = interfaces::cvar->findVar(XOR("sv_maxupdaterate"));
+	cvars.updateRate = memory::interfaces::cvar->findVar(XOR("cl_updaterate"));
+	cvars.maxUpdateRate = memory::interfaces::cvar->findVar(XOR("sv_maxupdaterate"));
 
-	cvarsRatios.interp = interfaces::cvar->findVar(XOR("cl_interp"))->getFloat();
-	cvarsRatios.interpRatio = interfaces::cvar->findVar(XOR("cl_interp_ratio"))->getFloat();
-	cvarsRatios.minInterpRatio = interfaces::cvar->findVar(XOR("sv_client_min_interp_ratio"))->getFloat();
-	cvarsRatios.maxInterpRatio = interfaces::cvar->findVar(XOR("sv_client_max_interp_ratio"))->getFloat();
-	cvarsRatios.maxUnlag = interfaces::cvar->findVar(XOR("sv_maxunlag"))->getFloat();
+	cvarsRatios.interp = memory::interfaces::cvar->findVar(XOR("cl_interp"))->getFloat();
+	cvarsRatios.interpRatio = memory::interfaces::cvar->findVar(XOR("cl_interp_ratio"))->getFloat();
+	cvarsRatios.minInterpRatio = memory::interfaces::cvar->findVar(XOR("sv_client_min_interp_ratio"))->getFloat();
+	cvarsRatios.maxInterpRatio = memory::interfaces::cvar->findVar(XOR("sv_client_max_interp_ratio"))->getFloat();
+	cvarsRatios.maxUnlag = memory::interfaces::cvar->findVar(XOR("sv_maxunlag"))->getFloat();
 };
 
 float Backtrack::getLerp() const
@@ -40,7 +41,7 @@ float Backtrack::getLerp() const
 
 bool Backtrack::isValid(float simtime) const
 {
-	auto network = interfaces::engine->getNameNetChannel();
+	auto network = memory::interfaces::engine->getNameNetChannel();
 	if (!network)
 		return false;
 
@@ -149,8 +150,8 @@ void Backtrack::run(CUserCmd* cmd)
 		const auto& record = m_records.at(bestPlayerIdx).at(bestRecordIdx);
 
 		auto simTimeCorrected = record.m_simtime;
-		if (auto deltaLerp = getLerp() - interfaces::globalVars->m_intervalPerTick; deltaLerp > 0.0f)
-			simTimeCorrected += interfaces::globalVars->m_intervalPerTick - deltaLerp;
+		if (auto deltaLerp = getLerp() - memory::interfaces::globalVars->m_intervalPerTick; deltaLerp > 0.0f)
+			simTimeCorrected += memory::interfaces::globalVars->m_intervalPerTick - deltaLerp;
 
 		cmd->m_tickcount = game::timeToTicks(simTimeCorrected + getLerp());
 	}
@@ -211,7 +212,7 @@ void BackTrackUpdater::run(int frame)
 		record.m_origin = ent->absOrigin();
 		record.m_simtime = ent->m_flSimulationTime();
 		if (!ent->setupBonesShort(record.m_matrix.data(), ent->m_CachedBoneData().m_size,
-			BONE_USED_MASK, interfaces::globalVars->m_curtime))
+			BONE_USED_MASK, memory::interfaces::globalVars->m_curtime))
 			continue;
 		record.m_head = record.m_matrix[8].origin();
 

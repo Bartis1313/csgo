@@ -4,6 +4,7 @@
 
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <config/vars.hpp>
@@ -32,7 +33,7 @@ void MolotovDraw::draw()
 		//imRender.drawCircle3DFilled(molotov->absOrigin(), 0.5f * Vector(max - min).length2D(), 32, config.get<Color>(vars.cMolotovRange));
 
 		//imRender.text(screen.x, screen.y, ImFonts::tahoma, XOR("Molotov"), false, config.get<Color>(vars.cMolotovRangeText));
-		float time = molotov->spawnTime() + molotov->expireTime() - interfaces::globalVars->m_curtime;
+		float time = molotov->spawnTime() + molotov->expireTime() - memory::interfaces::globalVars->m_curtime;
 		float scale = time / molotov->expireTime();
 
 		const auto& origin = molotov->absOrigin();

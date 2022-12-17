@@ -24,7 +24,7 @@ void FreeLook::run(CUserCmd* cmd)
 		m_lastAngleLook += (cmd->m_viewangles - m_lastAngle);
 		m_lastAngleLook.normalize().clamp();
 
-		interfaces::engine->setViewAngles(m_lastAngle);
+		memory::interfaces::engine->setViewAngles(m_lastAngle);
 	}
 }
 

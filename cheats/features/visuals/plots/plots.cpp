@@ -5,6 +5,7 @@
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <menu/GUI-ImGui/imguiaddons.hpp>
 #include <config/vars.hpp>
@@ -33,7 +34,7 @@ void Plots::drawFps()
 	auto getfps = []() -> float // this is how they do it
 	{
 		static float realfps = 0.0f;
-		realfps = 0.9f * realfps + (1.0f - 0.9f) * interfaces::globalVars->m_absoluteframetime;
+		realfps = 0.9f * realfps + (1.0f - 0.9f) * memory::interfaces::globalVars->m_absoluteframetime;
 
 		return 1.0f / realfps;
 	};
@@ -53,13 +54,13 @@ void Plots::drawFps()
 	while (records.size() > static_cast<size_t>(RECORDS_SIZE / acceptanceCustom))
 		records.pop_front();
 
-	static float MAX_FPS = interfaces::engine->isInGame() ? 350.0f : 120.0f;
+	static float MAX_FPS = memory::interfaces::engine->isInGame() ? 350.0f : 120.0f;
 
 	if (vars::misc->plots->fpsCustom)
 	{
 		if (ImGui::Begin(XOR("Sliders for plot"), &vars::misc->plots->fpsCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
-			if (interfaces::engine->isInGame()) // not enaled in menu
+			if (memory::interfaces::engine->isInGame()) // not enaled in menu
 				ImGui::Animated::SliderFloat(XOR("Set max FPS"), &MAX_FPS, 30.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // hardcoded ranges, we should maybe run some avg fps getter
 			ImGui::Animated::SliderFloat(XOR("Acceptance multiply fps"), &acceptanceCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
 			ImGui::Animated::ColorPicker(XOR("Color lines plot fps"), &vars::misc->plots->colorFPS);
@@ -102,10 +103,10 @@ void Plots::drawVelocity()
 	if (!vars::misc->plots->enabledVelocity)
 		return;
 
-	if (!interfaces::engine->isInGame() || !game::localPlayer->isAlive())
+	if (!memory::interfaces::engine->isInGame() || !game::localPlayer->isAlive())
 		return;
 
-	static float MAX_SPEEED_MOVE = interfaces::cvar->findVar(XOR("sv_maxspeed"))->getFloat(); // should be accurate
+	static float MAX_SPEEED_MOVE = memory::interfaces::cvar->findVar(XOR("sv_maxspeed"))->getFloat(); // should be accurate
 	static bool transparent = false;
 
 	if (vars::misc->plots->velocityCustom)
@@ -195,7 +196,7 @@ void VelocityGather::run(CUserCmd* cmd)
 	if (!game::localPlayer)
 		return;
 
-	if (!interfaces::engine->isInGame() || !game::localPlayer->isAlive())
+	if (!memory::interfaces::engine->isInGame() || !game::localPlayer->isAlive())
 	{
 		g_Plots->m_VelocityRecords.clear();
 		return;

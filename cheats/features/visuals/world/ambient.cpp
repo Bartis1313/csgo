@@ -10,9 +10,9 @@
 
 void AmbientLight::init()
 {
-	m_ambientR = interfaces::cvar->findVar(XOR("mat_ambient_light_r"));
-	m_ambientG = interfaces::cvar->findVar(XOR("mat_ambient_light_g"));
-	m_ambientB = interfaces::cvar->findVar(XOR("mat_ambient_light_b"));
+	m_ambientR = memory::interfaces::cvar->findVar(XOR("mat_ambient_light_r"));
+	m_ambientG = memory::interfaces::cvar->findVar(XOR("mat_ambient_light_g"));
+	m_ambientB = memory::interfaces::cvar->findVar(XOR("mat_ambient_light_b"));
 }
 
 void AmbientLight::run(int frame)

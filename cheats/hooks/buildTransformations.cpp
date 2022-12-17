@@ -9,7 +9,7 @@
 //#include "../../SDK/interfaces/interfaces.hpp"
 
 // prevent spoofing convar for jiggle bones
-void __fastcall hooks::buildTransformations::hooked(FAST_ARGS, CStudioHdr* hdr, void* pos, void* q, const Matrix3x4& matrix, int boneMask, void* computed)
+void FASTCALL hooks::buildTransformations::hooked(FAST_ARGS, CStudioHdr* hdr, void* pos, void* q, const Matrix3x4& matrix, int boneMask, void* computed)
 {
 	//for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
 	//{

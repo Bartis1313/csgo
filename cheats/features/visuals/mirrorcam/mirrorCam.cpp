@@ -35,11 +35,11 @@ void MirrorCam::run(const CViewSetup& view)
 	v.m_nearZ = v.m_nearViewModelZ = 7.0f;
 	v.m_fov = 50.0f;
 
-	auto ctx = interfaces::matSys->getRenderContext();
+	auto ctx = memory::interfaces::matSys->getRenderContext();
 	ctx->pushRenderTargetAndViewport();
 	ctx->setRenderTarget(m_texture);
 
-	hooks::renderView::original(interfaces::viewRender, v, v, VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH | VIEW_CLEAR_STENCIL, 0);
+	hooks::renderView::original(memory::interfaces::viewRender(), v, v, VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH | VIEW_CLEAR_STENCIL, 0);
 
 	ctx->popRenderTargetAndViewport();
 	ctx->release();
@@ -58,7 +58,7 @@ void MirrorCamDraw::draw()
 	if (!g_MirrorCam->m_inited)
 	{
 		//interfaces::matSys->forceBeginRenderTargetAllocation();
-		g_MirrorCam->m_texture = interfaces::matSys->createFullFrameRenderTarget(XOR("mirrorCam"));
+		g_MirrorCam->m_texture = memory::interfaces::matSys->createFullFrameRenderTarget(XOR("mirrorCam"));
 		//interfaces::matSys->forceEndRenderTargetAllocation();
 
 		g_MirrorCam->m_inited = true;

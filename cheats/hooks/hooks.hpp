@@ -29,6 +29,8 @@ enum hookIndexes
 	LEVEL_INIT_PREENT = 5,
 	LEVEL_INIT_POSTENT = 6,
 	LEVEL_SHUTDOWN = 7,
+	EMIT_SOUND = 5,
+	CREATE_EVENT = 7,
 };
 
 class IPanel;
@@ -40,9 +42,12 @@ class CParticleCollection;
 class INetChannel;
 struct MapStruct;
 class IMaterialSystem;
+class IGameEvent;
 
 #define FAST_ARGS [[maybe_unused]] void* thisptr, [[maybe_unused]] void* edx
 #define FASTCALL __fastcall
+// for easier macro in cpp
+#define EMPTY_INDEX	0xFFF
 
 #define HOOK_STRUCT_VFUNC(name, type, idx, ...) \
 struct name { \
@@ -57,6 +62,7 @@ struct name { \
 	using fn = type(__thiscall*)(void*, __VA_ARGS__); \
 	static type __fastcall hooked(FAST_ARGS, __VA_ARGS__); \
 	inline static fn original = nullptr; \
+	static constexpr int index = EMPTY_INDEX; \
 };
 
 #define HOOK_STRUCT_API_VFUNC(name, type, idx, ...) \
@@ -72,6 +78,7 @@ struct name { \
 	using fn = type(__stdcall*)(__VA_ARGS__); \
 	static type __stdcall hooked(__VA_ARGS__); \
 	inline static fn original = nullptr; \
+	static constexpr int index = EMPTY_INDEX; \
 };
 
 namespace hooks
@@ -79,7 +86,9 @@ namespace hooks
 	void init();
 	void shutdown();
 
-	HOOK_STRUCT_VFUNC(paintTraverse, void, PAINTTRAVERSE, unsigned int, bool, bool);
+	inline static constexpr auto indexNone = EMPTY_INDEX;
+
+	HOOK_STRUCT_VFUNC(paintTraverse, void, PAINTTRAVERSE, uint32_t, bool, bool);
 	HOOK_STRUCT_VFUNC(drawModel, void, DRAWMODEL, void*, const DrawModelState_t&, const ModelRenderInfo_t&, Matrix3x4*);
 	HOOK_STRUCT_VFUNC(overrideView, void, OVERRIDE, CViewSetup*);
 	HOOK_STRUCT_VFUNC(doPostScreenEffects, int, POSTSCREENEFFECT, int);
@@ -98,10 +107,12 @@ namespace hooks
 	// map loads - use any visual change
 	HOOK_STRUCT_VFUNC(levelInitPostEntity, void, LEVEL_INIT_POSTENT);
 	HOOK_STRUCT_VFUNC(levelShutdown, void, LEVEL_SHUTDOWN);
+	HOOK_STRUCT_VFUNC(emitSound, void, EMIT_SOUND, void*, int, int, const char*, uint32_t, const char*, float, int, int, int, int, const Vec3&, const Vec3&, void*, bool, float, int, void*);
+	HOOK_STRUCT_VFUNC(createEvent, IGameEvent*, CREATE_EVENT, const char*, bool, uint32_t);
 
-	HOOK_STRUCT_FUNC(getColorModulation, void, float* r, float* g, float* b);
+	HOOK_STRUCT_FUNC(getColorModulation, void, float*, float*, float*);
 	HOOK_STRUCT_FUNC(buildTransformations, void, CStudioHdr*, void*, void*, const Matrix3x4&, int, void*);
-	HOOK_STRUCT_FUNC(doExtraBonesProcessing, void, void* hdr, void* pos, void* q, const Matrix3x4& matrix, void* computed, void* contex);
+	HOOK_STRUCT_FUNC(doExtraBonesProcessing, void, void*, void*, void* q, const Matrix3x4&, void*, void*);
 	HOOK_STRUCT_FUNC(particlesSimulations, void);
 	HOOK_STRUCT_FUNC(sendDatagram, int, void*);
 	HOOK_STRUCT_FUNC(unknownOverViewFun, int, int);
@@ -114,23 +125,17 @@ namespace hooks
 	HOOK_STRUCT_FUNC(isUsingStaticPropDebugModes, bool);
 	HOOK_STRUCT_FUNC(addEnt, void, void*, int);
 	HOOK_STRUCT_FUNC(removeEnt, void, void*, int);
+	HOOK_STRUCT_FUNC(isFollowingEntity, bool);
+	HOOK_STRUCT_FUNC(processSpottedEntityUpdate, bool, void*);
+	HOOK_STRUCT_FUNC(fireIntern, void, IGameEvent*, bool, bool);
 
 	HOOK_STRUCT_API_VFUNC(reset, long, RESETDX, IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 	HOOK_STRUCT_API_VFUNC(present, long, PRESENTDX, IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
 	HOOK_STRUCT_API_VFUNC(drawIndexedPrimitive, long, DRAW_IDX_PRIMITIVE, IDirect3DDevice9*, D3DPRIMITIVETYPE, INT, UINT, UINT, UINT, UINT);
-	// move this somewhere?
-	struct wndProcSys
-	{
-		inline static WNDPROC wndProcOriginal = nullptr;
-		inline static HWND currentWindow = nullptr;
-		inline static LRESULT __stdcall wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
-
-		static void init();
-		static void shutdown();
-	};
 }
 
 #undef HOOK_STRUCT_VFUNC
 #undef HOOK_STRUCT_FUNC
 #undef HOOK_STRUCT_API_VFUNC
 #undef HOOK_STRUCT_API
+#undef EMPTY_INDEX

@@ -16,7 +16,7 @@
 
 void RCS::init()
 {
-	m_scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
 }
 
 void RCS::run(CUserCmd* cmd)
@@ -58,7 +58,7 @@ void RCS::prepare(CUserCmd* cmd)
 		auto toMove = cmd->m_viewangles += (oldPunch - punch);
 		toMove.clamp();
 
-		interfaces::engine->setViewAngles(toMove);
+		memory::interfaces::engine->setViewAngles(toMove);
 
 		oldPunch = punch;
 	}

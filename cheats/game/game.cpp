@@ -4,17 +4,16 @@
 #include <SDK/CUserCmd.hpp>
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
-#include <gamememory/memory.hpp>
 
 bool game::isAvailable()
 {
 	if (!localPlayer)
 		return false;
 
-	if (!interfaces::engine->isConnected())
+	if (!memory::interfaces::engine->isConnected())
 		return false;
 
-	if (!interfaces::engine->isInGame())
+	if (!memory::interfaces::engine->isInGame())
 		return false;
 
 	return true;
@@ -33,22 +32,22 @@ float game::serverTime(CUserCmd* cmd)
 			tick++;
 		lastCmd = cmd;
 	}
-	return tick * interfaces::globalVars->m_intervalPerTick;
+	return tick * memory::interfaces::globalVars->m_intervalPerTick;
 }
 
 void LocalPlayer::init()
 {
-	m_local = g_Memory.m_localPlayer();
+	m_local = memory::localPlayer();
 }
 
 uint32_t game::timeToTicks(float time)
 {
-	return static_cast<uint32_t>(0.5f + time / interfaces::globalVars->m_intervalPerTick);
+	return static_cast<uint32_t>(0.5f + time / memory::interfaces::globalVars->m_intervalPerTick);
 }
 
 float game::ticksToTime(uint32_t ticks)
 {
-	return interfaces::globalVars->m_intervalPerTick * static_cast<float>(ticks);
+	return memory::interfaces::globalVars->m_intervalPerTick * static_cast<float>(ticks);
 }
 
 // https://www.unknowncheats.me/forum/counterstrike-global-offensive/183347-bomb-damage-indicator.html
@@ -70,16 +69,11 @@ float game::scaleDamageArmor(float dmg, const float armor)
 	return dmg;
 }
 
-uintptr_t* game::findHudElement(const std::string_view name)
-{
-	return g_Memory.m_hudfindElement()(g_Memory.m_csgoHud(), name.data());
-}
-
 #include <SDK/CHudChat.hpp>
 
 bool game::isChatOpen()
 {
-	const auto chat = reinterpret_cast<CHudChat*>(findHudElement(XOR("CCSGO_HudChat")));
+	const auto chat = findHudElement<CHudChat*>(XOR("CCSGO_HudChat"));
 	return chat->m_isOpen;
 }
 
@@ -124,7 +118,7 @@ WeaponIndex game::getNadeByClass(int idx, Studiohdr_t* studio)
 Vec3 game::getViewAngles()
 {
 	Vec3 ret;
-	interfaces::engine->getViewAngles(ret);
+	memory::interfaces::engine->getViewAngles(ret);
 
 	return ret;
 }

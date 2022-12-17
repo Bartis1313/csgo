@@ -62,7 +62,7 @@ public:
 
 	bool& disableRenderTargetAllocationForever()
 	{
-		const static auto disableTargetAlloc = g_Memory.m_disableTargetAlloc();
+		const static auto disableTargetAlloc = memory::disableTargetAlloc();
 		return *reinterpret_cast<bool*>(uintptr_t(this) + disableTargetAlloc);
 	}
 };

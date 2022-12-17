@@ -12,13 +12,13 @@
 
 void EntityCache::init()
 {
-	const int maxIdx = interfaces::entList->getHighestIndex();
+	const int maxIdx = memory::interfaces::entList->getHighestIndex();
 	if (maxIdx <= 1)
 		return;
 
 	for (auto i : std::views::iota(1, maxIdx))
 	{
-		auto entity = reinterpret_cast<Entity_t*>(interfaces::entList->getClientEntity(i));
+		auto entity = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientEntity(i));
 		if (!entity)
 			continue;
 
@@ -29,7 +29,7 @@ void EntityCache::init()
 		size_t index = i;
 		size_t classID = cl->m_classID;
 
-		const auto data = HolderData{ entity, index, classID };
+		const auto data = HolderData{ .ent = entity, .idx = index, .classID = classID };
 		fill(data);
 	}
 }
@@ -45,7 +45,7 @@ void EntityCache::add(Entity_t* ent)
 
 	auto [index, classID] = possibleIndexes.value();
 
-	const auto data = HolderData{ ent, index, classID };
+	const auto data = HolderData{ .ent = ent, .idx = index, .classID = classID };
 	fill(data);
 }
 
@@ -88,33 +88,31 @@ bool EntityCache::checkRepeatable(Entity_t* ent)
 
 void EntityCache::fill(const HolderData& data)
 {
-	auto [ent, index, classID] = data;
-
-	if (classID >= CWeaponAug && classID <= CWeaponXM1014
-		|| classID == CAK47 || classID == CDEagle)
+	if (auto id = data.classID; id >= CWeaponAug && id <= CWeaponXM1014
+		|| id == CAK47 || id == CDEagle)
 	{
-		m_entCache[EntCacheType::WEAPON].emplace_back(HolderData{ ent, index, classID });
+		m_entCache[EntCacheType::WEAPON].push_back(data);
 	}
 
-	switch (classID)
+	switch (data.classID)
 	{
 	case CCSPlayer:
-		m_entCache[EntCacheType::PLAYER].emplace_back(HolderData{ ent, index, classID });
+		m_entCache[EntCacheType::PLAYER].push_back(data);
 		break;
 	case CBaseCSGrenadeProjectile:
 	case CDecoyProjectile:
 	case CMolotovProjectile:
 	case CSmokeGrenadeProjectile:
 	case CInferno:
-		m_entCache[EntCacheType::GRENADE_PROJECTILES].emplace_back(HolderData{ ent, index, classID });
+		m_entCache[EntCacheType::GRENADE_PROJECTILES].push_back(data);
 		break;
 	case CFogController:
 	case CEnvTonemapController:
 	case CPostProcessController:
-		m_entCache[EntCacheType::CONTROLLERS].emplace_back(HolderData{ ent, index, classID });
+		m_entCache[EntCacheType::CONTROLLERS].push_back(data);
 		break;
 	case CPlantedC4:
-		m_entCache[EntCacheType::WORLD_ENTS].emplace_back(HolderData{ ent, index, classID });
+		m_entCache[EntCacheType::WORLD_ENTS].push_back(data);
 		break;
 	default:
 		break;
@@ -141,4 +139,27 @@ void EntityCache::clear()
 {
 	for ([[maybe_unused]] auto& [type, vec] : m_entCache)
 		vec.clear();
+}
+
+#include <gamememory/memory.hpp>
+
+void CacheFields::update()
+{
+	const auto hud = Memory::Address<CCSGO_HudRadar*>{ game::findHudElement("CCSGO_HudRadar") };
+	if (!hud())
+		return;
+
+	const auto radar = hud.sub(0x14).cast<CSRadar*>()();
+
+	for (int i = 1; i <= hud->m_sizeOfPlayers + 1; i++)
+	{
+		const auto& player = radar->m_players[i];
+
+		//player.write();
+
+		if (const auto idx = player.m_index; !idx)
+			continue;
+		else
+			m_players.at(player.m_index) = player;
+	}
 }

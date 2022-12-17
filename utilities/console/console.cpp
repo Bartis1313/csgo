@@ -84,6 +84,5 @@ void Console::shutdown()
 
 void Console::drawLog()
 {
-	if(m_activeLog)
-		m_log.Draw(XOR("Logging Console"), &m_activeLog);
+	
 }

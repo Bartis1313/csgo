@@ -15,8 +15,8 @@
 
 void Crosshair::init()
 {
-	m_crosshairRecoil = interfaces::cvar->findVar(XOR("cl_crosshair_recoil"));
-	m_scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+	m_crosshairRecoil = memory::interfaces::cvar->findVar(XOR("cl_crosshair_recoil"));
+	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
 }
 
 void Crosshair::draw()
@@ -31,7 +31,7 @@ void Crosshair::draw()
 	if (!game::localPlayer)
 		return;
 
-	if (!interfaces::engine->isConnected())
+	if (!memory::interfaces::engine->isConnected())
 		return;
 
 	if (!game::localPlayer->isAlive())
@@ -47,7 +47,7 @@ void Crosshair::draw()
 	auto getPunchPos = [=]()
 	{
 		Vec3 angle;
-		interfaces::engine->getViewAngles(angle);
+		memory::interfaces::engine->getViewAngles(angle);
 		angle += game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
 
 		auto start = game::localPlayer->getEyePos();

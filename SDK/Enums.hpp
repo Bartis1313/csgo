@@ -759,3 +759,12 @@ enum TeamID
 	Counter_Terrorist
 };
 #pragma endregion
+
+#pragma region think_methods
+enum thinkmethods_t
+{
+	THINK_FIRE_ALL_FUNCTIONS,
+	THINK_FIRE_BASE_ONLY,
+	THINK_FIRE_ALL_BUT_BASE,
+};
+#pragma endregion

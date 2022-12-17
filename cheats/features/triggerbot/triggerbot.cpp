@@ -11,6 +11,7 @@
 #include <SDK/IWeapon.hpp>
 #include <SDK/IEngineTrace.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 #include <game/game.hpp>
 #include <utilities/math/math.hpp>
@@ -38,7 +39,6 @@ void Triggerbot::run(CUserCmd* cmd)
 	if (weapon->isSniper() && !game::localPlayer->m_bIsScoped())
 		return;
 
-
 	const auto myEye = game::localPlayer->getEyePos();
 	const auto range = weapon->getWpnInfo()->m_range;
 	// punch is needed to not fallback with bad constant shooting
@@ -47,8 +47,8 @@ void Triggerbot::run(CUserCmd* cmd)
 	// initialize delays, timer api is not needed since game shares this information
 	/*static auto delay = std::chrono::high_resolution_clock::now();
 	const auto current = std::chrono::high_resolution_clock::now();*/
-	static auto delay = interfaces::globalVars->m_realtime;
-	const auto current = interfaces::globalVars->m_realtime;
+	static auto delay = memory::interfaces::globalVars->m_realtime;
+	const auto current = memory::interfaces::globalVars->m_realtime;
 
 	// because this time is in seconds, so delay must be /1000 (s->ms), when using chrono, you can cast to ms so it's more flexible
 	if ((current - delay) < cfg.triggerbotDelay / 1000.0f)
@@ -67,7 +67,7 @@ void Triggerbot::run(CUserCmd* cmd)
 	TraceFilter filter;
 
 	filter.m_skip = game::localPlayer();
-	interfaces::trace->traceRay({ myEye, end }, MASK_PLAYER, &filter, &trace);
+	memory::interfaces::trace->traceRay({ myEye, end }, MASK_PLAYER, &filter, &trace);
 
 	// so this way we skip time of trace
 	delay = current;

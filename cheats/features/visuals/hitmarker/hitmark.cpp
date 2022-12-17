@@ -6,6 +6,7 @@
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/ISurface.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <config/vars.hpp>
@@ -18,7 +19,7 @@
 
 void Hitmarker::init()
 {
-	g_Events->add(XOR("player_hurt"), std::bind(&Hitmarker::handleHits, this, std::placeholders::_1));
+	events::add(XOR("player_hurt"), std::bind(&Hitmarker::handleHits, this, std::placeholders::_1));
 }
 
 void Hitmarker::draw()
@@ -43,7 +44,7 @@ void Hitmarker::draw()
 	float currentAlpha = 0.0f;
 	for (size_t i = 0; const auto & el : m_hitmarkers)
 	{
-		float diff = el.m_expire - interfaces::globalVars->m_curtime;
+		float diff = el.m_expire - memory::interfaces::globalVars->m_curtime;
 
 		if (diff < 0.0f)
 		{
@@ -112,7 +113,7 @@ void Hitmarker::handleHits(IGameEvent* event)
 	if (!vars::misc->hitmarker->enabled)
 		return;
 
-	auto attacker = interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
+	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
 	if (!attacker)
 		return;
 
@@ -120,7 +121,7 @@ void Hitmarker::handleHits(IGameEvent* event)
 	if (attacker != game::localPlayer)
 		return;
 
-	auto ent = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
 	if (!ent) // should never happen
 		return;
 
@@ -130,7 +131,7 @@ void Hitmarker::handleHits(IGameEvent* event)
 
 	Hitmark_t hit =
 	{
-		interfaces::globalVars->m_curtime + vars::misc->hitmarker->time,
+		memory::interfaces::globalVars->m_curtime + vars::misc->hitmarker->time,
 		dmg_health,
 		ent->m_iHealth() - dmg_health,
 		hitgroup == 1, // head
@@ -139,5 +140,5 @@ void Hitmarker::handleHits(IGameEvent* event)
 	m_hitmarkers.push_back(hit);
 
 	if (vars::misc->hitmarker->play)
-		interfaces::surface->playSound(XOR("buttons\\arena_switch_press_02.wav"));
+		memory::interfaces::surface->playSound(XOR("buttons\\arena_switch_press_02.wav"));
 }

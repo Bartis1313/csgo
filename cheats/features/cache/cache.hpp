@@ -8,6 +8,7 @@
 #include <optional>
 
 class Entity_t;
+struct RadarEntity;
 
 enum class EntCacheType // add more if needed, each group should contain many idx's, player is the exception
 {
@@ -18,7 +19,7 @@ enum class EntCacheType // add more if needed, each group should contain many id
 	WEAPON,
 };
 
-class EntityCache
+class EntityCache final
 {
 public:
 	static void add(Entity_t* ent);
@@ -45,4 +46,19 @@ public:
 	}
 private:
 	inline static std::unordered_map<EntCacheType, std::vector<HolderData>> m_entCache;
+};
+
+#include <SDK/CCSGO_HudRadar.hpp>
+
+// for playerlist for better access to dormant fields
+class CacheFields final
+{
+public:
+	static void update();
+	inline static auto getCachedFields()
+	{
+		return m_players;
+	}
+private:
+	inline static std::array<RadarEntity, 65> m_players;
 };

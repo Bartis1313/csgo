@@ -14,7 +14,6 @@ class IConVar;
 struct AimbotTarget_t
 {
 	Player_t* m_player;
-	uint64_t m_playerGuid;
 	float m_fov;
 	size_t m_index;
 	size_t m_bestHitboxID;

@@ -1,9 +1,11 @@
 #include "hooks.hpp"
 
 #include <classes/base.hpp>
+#include <gamememory/memory.hpp>
 
-void __fastcall hooks::levelInitPostEntity::hooked(FAST_ARGS)
+void FASTCALL hooks::levelInitPostEntity::hooked(FAST_ARGS)
 {
+	g_Memory.postInit();
 	BaseHack::loadAll();
 
 	original(thisptr);

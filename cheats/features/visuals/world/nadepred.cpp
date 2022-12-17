@@ -235,10 +235,10 @@ void GrenadePrediction::setup(Vec3& src, Vec3& vecThrow, const Vec3& viewangles)
 void GrenadePrediction::simulate()
 {
 	Vec3 vecSrc, vecThrow;
-	Vec3 angles; interfaces::engine->getViewAngles(angles);
+	Vec3 angles; memory::interfaces::engine->getViewAngles(angles);
 	setup(vecSrc, vecThrow, angles);
 
-	float interval = interfaces::globalVars->m_intervalPerTick;
+	float interval = memory::interfaces::globalVars->m_intervalPerTick;
 	size_t logstep = static_cast<size_t>(0.05f / interval);
 	size_t logtimer = 0;
 
@@ -316,8 +316,8 @@ bool GrenadePrediction::checkDetonate(const Vec3& vecThrow, const Trace_t& tr, i
 	case WEAPON_MOLOTOV:
 	case WEAPON_INCGRENADE:
 	{
-		const static float molotov_throw_detonate_time = interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"))->getFloat();
-		const static float weapon_molotov_maxdetonateslope = interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
+		const static float molotov_throw_detonate_time = memory::interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"))->getFloat();
+		const static float weapon_molotov_maxdetonateslope = memory::interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
 
 		if (tr.didHit() && tr.m_plane.m_normal[Coord::Z] >= std::cos(math::DEG2RAD(weapon_molotov_maxdetonateslope)))
 			return true;
@@ -339,13 +339,13 @@ void GrenadePrediction::traceHull(Vec3& src, Vec3& end, Trace_t& tr)
 {
 	uintptr_t filter[] =
 	{
-		*reinterpret_cast<uintptr_t*>(g_Memory.m_traceFilterSimple()),
+		*reinterpret_cast<uintptr_t*>(memory::traceFilterSimple()),
 		reinterpret_cast<uintptr_t>(game::localPlayer()),
 		0,
 		0
 	};
 
-	interfaces::trace->traceRay({ src, end, Vec3{ -2.0f, -2.0f, -2.0f }, Vec3{ 2.0f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), &tr);
+	memory::interfaces::trace->traceRay({ src, end, Vec3{ -2.0f, -2.0f, -2.0f }, Vec3{ 2.0f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), &tr);
 }
 
 void GrenadePrediction::addGravityMove(Vec3& move, Vec3& vel, float frametime)
@@ -353,7 +353,7 @@ void GrenadePrediction::addGravityMove(Vec3& move, Vec3& vel, float frametime)
 	move[Coord::X] = vel[Coord::X] * frametime;
 	move[Coord::Y] = vel[Coord::Y] * frametime;
 
-	const static float svgrav = interfaces::cvar->findVar(XOR("sv_gravity"))->getFloat();
+	const static float svgrav = memory::interfaces::cvar->findVar(XOR("sv_gravity"))->getFloat();
 	float gravity = svgrav * 0.4f;
 	float z = vel[Coord::Z] - (gravity * frametime);
 	move[Coord::Z] = ((vel[Coord::Z] + z) / 2.0f) * frametime;

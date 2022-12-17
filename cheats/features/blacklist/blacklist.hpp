@@ -16,11 +16,6 @@ public:
 
 	struct BlacklistedPlayer
 	{
-		constexpr BlacklistedPlayer() = default;
-		constexpr BlacklistedPlayer(uint64_t guid, bool bot, const std::string& name)
-			: m_guid{ guid }, m_bot{ bot }, m_playerName{ name }
-		{}
-
 		[[nodiscard]] constexpr bool operator==(const BlacklistedPlayer& rhs) const
 		{
 			return this->m_guid == rhs.m_guid && this->m_bot == rhs.m_bot;

@@ -40,7 +40,7 @@ void Callbacks::init()
 	this->addCallBack({ XOR("Impact"), &example, nullptr });
 	this->addCallBack({ XOR("Impact"), &example2, nullptr });
 
-	m_head = g_Memory.m_callbacksHead();
+	m_head = memory::callbacksHead();
 
 	for (auto head = m_head; head; head = head->m_next)
 	{

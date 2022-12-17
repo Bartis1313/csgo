@@ -39,18 +39,6 @@ struct BeamInfo_t
 	Vec3 m_vecCenter;
 	float m_startRadius;
 	float m_endRadius;
-
-	BeamInfo_t()
-	{
-		m_type = TE_BEAMPOINTS;
-		m_segments = -1;
-		m_modelName = nullptr;
-		m_haloName = nullptr;
-		m_modelIndex = -1;
-		m_haloIndex = -1;
-		m_renderable = true;
-		m_flags = 0;
-	}
 };
 
 class Beam_t;

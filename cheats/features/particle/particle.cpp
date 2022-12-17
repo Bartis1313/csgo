@@ -13,13 +13,13 @@ void Particle::init()
 void* Particle::getCallAddr(const std::string& name)
 {
 	int ret = -1;
-	if (g_Memory.m_particleIsCached()(g_Memory.m_particleSystem(), name.c_str()))
-		g_Memory.m_particleFindStringIndex()(reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(g_Memory.m_particleSystem()) + 0x14), &ret, name.c_str()); // esi+14h
+	if (memory::particleIsCached()(memory::particleSystem(), name.c_str()))
+		memory::particleFindStringIndex()(reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(memory::particleSystem()) + 0x14), &ret, name.c_str()); // esi+14h
 
 	if (ret == -1)
 		return nullptr;
 	// *v3 + 4 * v5 - > v5 is casted unsigned __int16
-	return *reinterpret_cast<void**>(*reinterpret_cast<uintptr_t*>(g_Memory.m_particleSystem()) + (0x4 * static_cast<uint16_t>(ret)));
+	return *reinterpret_cast<void**>(*reinterpret_cast<uintptr_t*>(memory::particleSystem()) + (0x4 * static_cast<uint16_t>(ret)));
 }
 
 void Particle::dispatchParticle(const std::string& name, const Vec3& pos)
@@ -27,7 +27,7 @@ void Particle::dispatchParticle(const std::string& name, const Vec3& pos)
 	Vec3 copyPos = pos;
 
 	void* addr = getCallAddr(name);
-	const static auto _call = g_Memory.m_particleCall();
+	const static auto _call = memory::particleCall();
 	void* created = createParticle(_call, addr, &copyPos);
 
 	// update pos, you can see bytes in set control point
@@ -35,8 +35,8 @@ void Particle::dispatchParticle(const std::string& name, const Vec3& pos)
 	*reinterpret_cast<Vec3*>(reinterpret_cast<uintptr_t>(created) + 0x3B4) = copyPos;
 
 
-	g_Memory.m_particleSetControlPoint()(created, 0, &copyPos);
-	g_Memory.m_particleSetControlPoint()(created, 1, &copyPos);
+	memory::particleSetControlPoint()(created, 0, &copyPos);
+	memory::particleSetControlPoint()(created, 1, &copyPos);
 }
 
 // because calling ParticleStart or doing this by DispatchEvent did not work

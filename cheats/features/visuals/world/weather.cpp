@@ -11,6 +11,7 @@
 #include <SDK/ConVar.hpp>
 #include <SDK/math/Vector.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <config/vars.hpp>
@@ -42,13 +43,7 @@ void WeatherController::run(int frame)
 
 	auto getNetworkable = [this]() -> Entity_t*
 	{
-		for (auto _class = interfaces::client->getAllClasses(); _class && !m_weather.m_preciptation; _class = _class->m_next)
-		{
-			if (_class->m_classID == CPrecipitation)
-				m_weather.m_preciptation = _class;
-		}
-
-		auto ent = reinterpret_cast<Entity_t*>(m_weather.m_preciptation->m_createFn(MAX_EDICTS - 1, Random::getRandom<int>(0x0, 0xFFF)));
+		auto ent = reinterpret_cast<Entity_t*>(memory::interfaces::preciptation->m_createFn(MAX_EDICTS - 1, Random::getRandom<int>(0x0, 0xFFF)));
 		if (!ent)
 			return nullptr;
 
@@ -68,7 +63,7 @@ void WeatherController::run(int frame)
 		if (!getNetworkable())
 			return;
 
-		m_weather.m_ent = reinterpret_cast<Entity_t*>(interfaces::entList->getClientEntity(MAX_EDICTS - 1));
+		m_weather.m_ent = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientEntity(MAX_EDICTS - 1));
 		if (!m_weather.m_ent)
 			return;
 
@@ -92,13 +87,13 @@ void WeatherController::run(int frame)
 
 void WeatherController::implMenu()
 {
-	const static auto cvarLenght = interfaces::cvar->findVar(XOR("r_rainlength"));
-	const static auto cvarRainSpeed = interfaces::cvar->findVar(XOR("r_rainspeed"));
-	const static auto cvarRadius = interfaces::cvar->findVar(XOR("r_rainradius"));
-	const static auto cvarWidth = interfaces::cvar->findVar(XOR("r_rainwidth"));
-	const static auto cvarSidevel = interfaces::cvar->findVar(XOR("r_RainSideVel"));
-	const static auto cvarAlpha = interfaces::cvar->findVar(XOR("r_rainalpha"));
-	const static auto cvarWindSpeed = interfaces::cvar->findVar(XOR("cl_windspeed"));
+	const static auto cvarLenght = memory::interfaces::cvar->findVar(XOR("r_rainlength"));
+	const static auto cvarRainSpeed = memory::interfaces::cvar->findVar(XOR("r_rainspeed"));
+	const static auto cvarRadius = memory::interfaces::cvar->findVar(XOR("r_rainradius"));
+	const static auto cvarWidth = memory::interfaces::cvar->findVar(XOR("r_rainwidth"));
+	const static auto cvarSidevel = memory::interfaces::cvar->findVar(XOR("r_RainSideVel"));
+	const static auto cvarAlpha = memory::interfaces::cvar->findVar(XOR("r_rainalpha"));
+	const static auto cvarWindSpeed = memory::interfaces::cvar->findVar(XOR("cl_windspeed"));
 
 	const static std::array defaults =
 	{
@@ -110,6 +105,12 @@ void WeatherController::implMenu()
 		std::make_pair(cvarAlpha, cvarAlpha->getFloat()),
 		std::make_pair(cvarWindSpeed, cvarWindSpeed->getFloat()),
 	};
+
+	static std::once_flag onceFlag;
+	std::call_once(onceFlag, [&]()
+		{
+			
+		});
 
 	if (ImGui::SliderFloat(XOR("r_rainlength"), &vars::visuals->world->weather->length, 0.0f, 1.0f))
 	{
@@ -146,7 +147,7 @@ void WeatherController::implMenu()
 	}
 }
 
-void WeatherReset::run(MapStruct* map)
+void WeatherController::reset()
 {
-	g_WeatherController->m_weather.m_created = false;
+	m_weather.m_created = false;
 }

@@ -239,3 +239,8 @@
 // Max # of networkable server classes
 #define MAX_SERVER_CLASSES			(1<<MAX_SERVER_CLASS_BITS)
 #pragma endregion
+
+// no idea how to call it
+#pragma region defs_unknown_name
+#define TICK_NEVER_THINK		( -1 )
+#pragma endregion

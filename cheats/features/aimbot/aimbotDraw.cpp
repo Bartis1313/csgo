@@ -61,7 +61,7 @@ void AimbotDraw::drawFov()
 		constexpr float range = 8192.0f; // because we need max range possible
 		const auto view = g_Aimbot->getCachedView();
 		const auto end = myEye + (math::angleVec(view) * range);
-		interfaces::trace->traceRay({ myEye, end }, MASK_SHOT, &filter, &trace);
+		memory::interfaces::trace->traceRay({ myEye, end }, MASK_SHOT, &filter, &trace);
 		// 3d end
 		const auto destination = trace.m_end;
 

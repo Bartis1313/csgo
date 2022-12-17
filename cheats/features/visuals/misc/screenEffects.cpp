@@ -18,7 +18,7 @@ void ScreenEffects::init()
 		if (el == "effects/nightvision") // this looks bad, dunno
 			mark = true;
 
-		m_materials.emplace_back(std::make_pair(interfaces::matSys->findMaterial(
+		m_materials.emplace_back(std::make_pair(memory::interfaces::matSys->findMaterial(
 			el.data(), TEXTURE_GROUP_CLIENT_EFFECTS), mark));
 	}
 }
@@ -45,9 +45,7 @@ void ScreenEffects::run()
 	if (m_materials.at(cfg).second) //nightvisioson
 		game::localPlayer->m_flNightVisionAlpha() = color.a();
 
-	// now there should be if for motion blur as it needs much more than just drawing this material
-
-	auto ctx = interfaces::matSys->getRenderContext();
+	auto ctx = memory::interfaces::matSys->getRenderContext();
 	ctx->drawScreenSpaceRectangle(material, 0, 0, globals::screenX, globals::screenY, 0, 0,
 	 static_cast<float>(globals::screenX), static_cast<float>(globals::screenY), globals::screenX, globals::screenY);
 	ctx->release();

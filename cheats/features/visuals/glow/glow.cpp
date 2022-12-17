@@ -5,7 +5,7 @@
 #include <SDK/CGlowManager.hpp>
 #include <SDK/ClientClass.hpp>
 #include <SDK/Enums.hpp>
-#include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <config/vars.hpp>
 
@@ -17,9 +17,9 @@ void Glow::run()
 	if (!game::isAvailable())
 		return;
 
-	for (int i = 0; i < interfaces::glowManager->m_size; i++)
+	for (int i = 0; i < memory::interfaces::glowManager->m_size; i++)
 	{
-		auto& glow = interfaces::glowManager->m_objects[i];
+		auto& glow = memory::interfaces::glowManager->m_objects[i];
 
 		if (glow.unused())
 			continue;

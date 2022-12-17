@@ -11,7 +11,7 @@
 
 void ZeusDraw::init()
 {
-	m_party = interfaces::cvar->findVar(XOR("sv_party_mode"));
+	m_party = memory::interfaces::cvar->findVar(XOR("sv_party_mode"));
 }
 
 void ZeusDraw::draw()

@@ -21,22 +21,6 @@ namespace ImGui
 	// from widgets, https://github.com/ocornut/imgui/issues/1496#issuecomment-569892444
 	void BeginGroupPanel(const char* name, const ImVec2& size = { 0.0f, 0.0f });
 	void EndGroupPanel();
-
-	// from demo, slight edit, usage same as normal console.log
-	struct ExampleAppLog
-	{
-		ImGuiTextBuffer     Buf;
-		ImGuiTextFilter     Filter;
-		ImVector<int>       LineOffsets; // Index to lines offset. We maintain this with AddLog() calls.
-		bool                AutoScroll;  // Keep scrolling if already at the bottom.
-
-		ExampleAppLog();
-		void Clear();
-
-		void AddLog(const std::string& buffer);
-		void Draw(const char* title, bool* p_open = NULL);
-	};
-
 	// from demo with slight changes
 	void ShowStyleEditorCfg(ImGuiStyle* ref);
 
@@ -110,7 +94,7 @@ namespace ImGui
 		bool ListBox(const char* label, int* item, std::span<T> arr, int height_in_items = -1);
 		template<typename T, size_t SIZE>
 		requires (SIZE > 0U)
-		void MultiCombo(const char* label, const std::array<T, SIZE>& names, std::array<bool, SIZE>* options);
+			void MultiCombo(const char* label, const std::array<T, SIZE>& names, std::array<bool, SIZE>* options);
 		bool SliderFloat(const char* label, float* v, float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);     // adjust format to decorate the value with a prefix or a suffix for in-slider labels or unit display.
 		bool SliderFloat2(const char* label, float v[2], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
 		bool SliderFloat3(const char* label, float v[3], float v_min, float v_max, const char* format = "%.3f", ImGuiSliderFlags flags = 0);
@@ -140,7 +124,7 @@ namespace ImGui
 }
 
 IMGUI_IMPL_API void* ImGui_CreateTexture(const void* data, int width, int height);
-IMGUI_IMPL_API void	ImGui_DestroyTexture(void* texture);
+IMGUI_IMPL_API void ImGui_DestroyTexture(void* texture);
 
 template<typename T, size_t SIZE>
 requires (SIZE > 0U)

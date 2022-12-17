@@ -44,14 +44,14 @@ void SkyboxEdit::run(int frame)
 	else
 	{
 		// restore the sky
-		const static auto oldSky = interfaces::cvar->findVar(XOR("sv_skyname"));
+		const static auto oldSky = memory::interfaces::cvar->findVar(XOR("sv_skyname"));
 		loadSkybox(oldSky->m_string);
 	}
 }
 
 void SkyboxEdit::loadSkybox(const std::string& name)
 {
-	g_Memory.m_loadSky()(name.c_str());
+	memory::loadSky()(name.c_str());
 }
 
 void SkyboxEdit::checkCustomSkybox()
@@ -75,7 +75,7 @@ void SkyboxEdit::reloadCustomSkyboxes()
 	for (const auto& entry : iterator)
 	{
 		if (std::string name = entry.path().filename().string();
-			(entry.path().extension() == XOR(".vmt") || entry.path().extension() == XOR(".vtf")) && !name.empty())
+			entry.path().extension() == XOR(".vtf") && !name.empty())
 		{
 			m_allCustomSkyboxes.push_back(name);
 		}

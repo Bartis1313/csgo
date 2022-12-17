@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ifc.hpp"
+
 #pragma region declarations
 class IPanel;
 class ClientMode;
@@ -42,47 +44,35 @@ class IClientState;
 class Entity_t;
 class IFileSystem;
 class CGameRules;
+class CEngineSoundClient;
+class IMDLCache;
 #pragma endregion
 
-namespace interfaces
+namespace memory::interfaces
 {
-	inline ClientMode* clientMode = nullptr;
-	inline IPanel* panel = nullptr;
-	inline ISurface* surface = nullptr;
-	inline IVEngineClient* engine = nullptr;
-	inline IBaseClientDLL* client = nullptr;
-	inline IWeapon* weapon = nullptr;
-	inline IClientEntityList* entList = nullptr;
-	inline Input* input = nullptr;
-	inline CGlobalVarsBase* globalVars = nullptr;
-	inline IEngineTrace* trace = nullptr;
-	inline IMaterialSystem* matSys = nullptr;
-	inline IVModelInfo* modelInfo = nullptr;
-	inline IVDebugOverlay* debugOverlay = nullptr;
-	inline IGameEventManager* eventManager = nullptr;
-	inline IVRenderView* renderView = nullptr;
-	inline IViewRender* viewRender = nullptr;
-	inline CGlowManager* glowManager = nullptr;
-	inline CGameMovement* gameMovement = nullptr;
-	inline IPrediction* prediction = nullptr;
-	inline IMoveHelper* moveHelper = nullptr;
-	inline ILocalize* localize = nullptr;
-	inline ICvar* cvar = nullptr;
-	inline IConVar* convar = nullptr;
-	inline IViewRenderBeams* beams = nullptr;
-	inline IVModelRender* modelRender = nullptr;
-	inline IVStudioRender* studioRender = nullptr;
-	// remember to dereference!
-	inline PlayerResource** resource = nullptr;
-	inline IVEfx* efx = nullptr;
-	inline InputSystem* iSystem = nullptr;
-	inline IDirect3DDevice9* dx9Device = nullptr;
-	inline IEffects* effects = nullptr;
-	inline KeyValuesSys* keyValuesSys = nullptr;
-	inline IMemAlloc* memAlloc = nullptr;
-	inline IClientState* clientState = nullptr;
-	inline CGameRules* gameRules = nullptr;
-	inline IFileSystem* fileSystem = nullptr;
+	inline Interface<IVEngineClient*> engine;
+	inline Interface<IPanel*> panel;
+	inline Interface<ISurface*> surface;
+	inline Interface<IBaseClientDLL*> client;
+	inline Interface<IClientEntityList*> entList;
+	inline Interface<ICvar*> cvar;
+	inline Interface<IEngineTrace*> trace;
+	inline Interface<IVRenderView*> renderView;
+	inline Interface<IMaterialSystem*> matSys;
+	inline Interface<IVModelInfo*> modelInfo;
+	inline Interface<IPrediction*> prediction;
+	inline Interface<CGameMovement*> gameMovement;
+	inline Interface<IVDebugOverlay*> debugOverlay;
+	inline Interface<ILocalize*> localize;
+	inline Interface<IVModelRender*> modelRender;
+	inline Interface<IVStudioRender*> studioRender;
+	inline Interface<IGameEventManager*> eventManager;
+	inline Interface<IVEfx*> efx;
+	inline Interface<InputSystem*> iSystem;
+	inline Interface<IEffects*> effects;
+	inline Interface<IFileSystem*> fileSystem;
+	inline Interface<CEngineSoundClient*> sound;
+	inline Interface<IMDLCache*> mdlCache;
 
-	bool init();
+	void init();
 }

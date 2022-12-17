@@ -1,6 +1,8 @@
 #include "interfaces.hpp"
 
+#include "ifc.hpp"
 #include "../interfaceNode.hpp"
+#include <gamememory/modules.hpp>
 
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
@@ -13,33 +15,26 @@
 #include <string>
 #include <optional>
 
-#define EXPORT(var, hash, _module) \
-	var = ::li::detail::lazy_function<hash, decltype(var)>().in(g_Memory.getModule(_module));
-
-#define EXPORT_LOG(var, hash, _module) \
-	var = ::li::detail::lazy_function<hash, decltype(var)>().in(g_Memory.getModule(_module)); \
-	LOG_INFO(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var));
-
 template <typename T>
-static std::optional<T> getInterface(const std::string_view moduleName, const std::string_view interfaceName)
+static std::optional<Interface<T>> getInterface(const std::string_view moduleName, const std::string_view interfaceName)
 {
 	using fun = void* (*)(const char*, int*);
 	fun capture;
 	EXPORT(capture, "CreateInterface"_hash, moduleName);
 
 	const auto addr = Memory::Address<InterfacesNode*>{ reinterpret_cast<uintptr_t>(capture) };
-	const auto esi = addr.rel(0x5, 0x6).ref(Memory::Dereference::TWICE);
+	const auto esi = addr.rel(0x5, 0x6).deRef(Memory::Dereference::TWICE);
 
 	for (auto el = esi(); el; el = el->m_next)
 	{
 		if (std::string_view{ el->m_name }.starts_with(interfaceName))
-			return static_cast<T>(el->m_createFn());
+		{
+			return Interface<T>{ .base = static_cast<T>(el->m_createFn()), .module = moduleName };
+		}
 	}
 
 	return std::nullopt;
 }
-
-#undef EXPORT
 
 // capture and log
 // var - var you want to init
@@ -47,35 +42,13 @@ static std::optional<T> getInterface(const std::string_view moduleName, const st
 // _module - module name from the game, eg: engine.dll
 // _interface - interface' name
 #define CAP(var, _module, _interface) \
-	if(auto val = getInterface<decltype(var)>(_module, XOR(_interface)); val.has_value()) \
+	if(auto val = getInterface<decltype(var)::value>(_module, XOR(_interface)); val.has_value()) \
 		var = val.value(); \
 	else \
 		throw std::runtime_error(FORMAT(XOR("Interface {} was nullptr"), _interface)); \
-	LOG_INFO(XOR("found {} at addr: 0x{:X}"), _interface, reinterpret_cast<uintptr_t>(var));
+	LOG_INFO(XOR("found {} at addr: 0x{:X}"), _interface, reinterpret_cast<uintptr_t>(var.base));
 
-#define ADD(var, mem) \
-	var = mem; \
-	LOG_INFO(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var));
-
-#define FROM_VFUNC(var, expression) \
-	var = expression; \
-	LOG_INFO(XOR("found {} at addr: 0x{:X}"), #var, reinterpret_cast<uintptr_t>(var));
-
-#define ENGINE_DLL					XOR("engine.dll")
-#define CLIENT_DLL					XOR("client.dll")
-#define VSTD_DLL					XOR("vstdlib.dll")
-#define VGUI_DLL					XOR("vgui2.dll")
-#define VGUIMAT_DLL					XOR("vguimatsurface.dll")
-#define MATERIAL_DLL				XOR("materialsystem.dll")
-#define LOCALIZE_DLL				XOR("localize.dll")
-#define STUDIORENDER_DLL			XOR("studiorender.dll")
-#define INPUTSYSTEM_DLL				XOR("inputsystem.dll")
-#define SHARED_API					XOR("shaderapidx9.dll")
-#define TIER_DLL					XOR("tier0.dll")
-#define PANORAMA_DLL				XOR("panorama.dll")
-#define FILESYS_DLL					XOR("filesystem_stdio.dll")
-	
-bool interfaces::init()
+void memory::interfaces::init()
 {
 	CAP(engine, ENGINE_DLL, "VEngineClient0");
 	CAP(panel, VGUI_DLL, "VGUI_Panel0");
@@ -98,32 +71,8 @@ bool interfaces::init()
 	CAP(iSystem, INPUTSYSTEM_DLL, "InputSystemVersion0");
 	CAP(effects, CLIENT_DLL, "IEffects0");
 	CAP(fileSystem, FILESYS_DLL, "VFileSystem0");
-
-#undef CAP
-
-	EXPORT_LOG(keyValuesSys, "KeyValuesSystem"_hash, VSTD_DLL);
-	EXPORT_LOG(memAlloc, "g_pMemAlloc"_hash, TIER_DLL);
-
-#undef EXPORT_LOG
-
-	FROM_VFUNC(globalVars, Memory::Address<CGlobalVarsBase*>{ vfunc::getVFunc(client, 0) }.add(0x1F).ref(Memory::Dereference::TWICE)());
-	FROM_VFUNC(clientMode, Memory::Address<ClientMode*>{ vfunc::getVFunc(client, 10) }.add(0x5).ref(Memory::Dereference::TWICE)());
-	FROM_VFUNC(input, Memory::Address<Input*>{ vfunc::getVFunc(client, 16) }.add(0x1).ref()());
-
-#undef FROM_VFUNC
-
-	ADD(beams, g_Memory.m_beams());
-	ADD(glowManager, g_Memory.m_glowManager());
-	ADD(weapon, g_Memory.m_weaponInterface());
-	ADD(moveHelper, g_Memory.m_moveHelper());
-	ADD(resource, g_Memory.m_resourceInterface());
-	ADD(dx9Device, g_Memory.m_dx9Device());
-	ADD(clientState, g_Memory.m_clientState());
-	ADD(gameRules, g_Memory.m_gameRules());
-	ADD(viewRender, g_Memory.m_viewRender());
-
-#undef ADD
+	CAP(sound, ENGINE_DLL, "IEngineSoundClient0");
+	CAP(mdlCache, DATACACHE_DLL, "MDLCache0");
 
 	LOG_INFO(XOR("interfaces success"));
-	return true;
 }

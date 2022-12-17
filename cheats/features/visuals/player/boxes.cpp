@@ -2,6 +2,7 @@
 
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 #include <utilities/renderer/renderer.hpp>
 #include <utilities/math/math.hpp>
@@ -38,7 +39,7 @@ void BoxesDraw::drawBox2DFilled(const Box& box, bool isDormant, float dormacyAlp
 	else
 	{
 		float speed = vars::visuals->esp->boxes->multiColorSpeed;
-		float time = interfaces::globalVars->m_curtime;
+		float time = memory::interfaces::globalVars->m_curtime;
 
 		float alpha = fill.a();
 
@@ -90,7 +91,7 @@ void BoxesDraw::drawBox3DFilledMultiColor(const Box& box, bool isDormant, float 
 	bool outlined = /*config.get<bool>(vars.bBoxOutlined)*/ false;
 
 	float speed = vars::visuals->esp->boxes->multiColorSpeed;
-	float time = interfaces::globalVars->m_curtime;
+	float time = memory::interfaces::globalVars->m_curtime;
 
 	float alpha = fill.a();
 

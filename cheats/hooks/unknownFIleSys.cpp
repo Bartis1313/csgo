@@ -10,9 +10,10 @@
 #include <utilities/tools/tools.hpp>
 #include <gamememory/memory.hpp>
 
-#define DDS_HEADER 542327876
+// A DWORD (magic number) containing the four character code value 'DDS ' (0x20534444).
+#define DDS_HEADER 0x20534444
 
-int __fastcall hooks::unknownFileSystem::hooked(FAST_ARGS, void* image)
+int FASTCALL hooks::unknownFileSystem::hooked(FAST_ARGS, void* image)
 {
 	uintptr_t thisptrStack;
 	__asm mov thisptrStack, ebx;
@@ -20,14 +21,14 @@ int __fastcall hooks::unknownFileSystem::hooked(FAST_ARGS, void* image)
 	//const static auto ret = utilities::patternScan(PANORAMA_DLL, UNK_FILESYS);
 
 	// dunno, this had to be inited before (retAddr)
-	if (image && _ReturnAddress() == g_Memory.m_returnAddrRadarImage() && *reinterpret_cast<uintptr_t*>(image) == DDS_HEADER)
+	if (image && _ReturnAddress() == memory::returnAddrRadarImage() && *reinterpret_cast<uintptr_t*>(image) == DDS_HEADER)
 	{
 		size_t size = *reinterpret_cast<size_t*>(thisptrStack + 0x50);
 		// again broken
 		/*Resource res{ image, size };
 		radar.m_mapTexture = res.getTexture();*/
 
-		if (auto hr = D3DXCreateTextureFromFileInMemory(interfaces::dx9Device, image, size, &g_Radar->getTexture()); hr == D3D_OK)
+		if (auto hr = D3DXCreateTextureFromFileInMemory(memory::interfaces::dx9Device(), image, size, &g_Radar->getTexture()); hr == D3D_OK)
 			LOG_INFO(XOR("Created map texture, size: {}"), size);
 		else
 			LOG_ERR(XOR("Creating map texture failed, code: {}"), hr);

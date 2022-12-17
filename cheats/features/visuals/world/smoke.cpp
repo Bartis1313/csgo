@@ -32,7 +32,7 @@ void SmokeDraw::draw()
 			continue;
 		}
 
-		float time = game::ticksToTime(ent->m_nSmokeEffectTickBegin()) + ent->expireTime() - interfaces::globalVars->m_curtime;
+		float time = game::ticksToTime(ent->m_nSmokeEffectTickBegin()) + ent->expireTime() - memory::interfaces::globalVars->m_curtime;
 		float scale = time / ent->expireTime();
 
 		const auto& origin = ent->absOrigin();
@@ -55,12 +55,12 @@ void SmokeDraw::drawCustomSmokeEffect(const Vec3& pos, float radius)
 	// clockwise for better effect
 	Vec3 end = Vec3
 	{
-		radius * std::sin(interfaces::globalVars->m_curtime) + pos[Coord::X],
-		radius * std::cos(interfaces::globalVars->m_curtime) + pos[Coord::Y],
+		radius * std::sin(memory::interfaces::globalVars->m_curtime) + pos[Coord::X],
+		radius * std::cos(memory::interfaces::globalVars->m_curtime) + pos[Coord::Y],
 		pos[Coord::Z]
 	};
 
-	interfaces::effects->smoke(end, -1, 5.0f, 1.0f);
+	memory::interfaces::effects->smoke(end, -1, 5.0f, 1.0f);
 }
 
 void SmokeRemoval::run(int frame)
@@ -72,5 +72,5 @@ void SmokeRemoval::run(int frame)
 		return;
 
 	if (vars::visuals->world->smoke->enabled) // remove effects from inside, this is why we nulling smoke count
-		*reinterpret_cast<uintptr_t*>(g_Memory.m_smokeCount()) = 0;
+		*reinterpret_cast<uintptr_t*>(memory::smokeCount()) = 0;
 }

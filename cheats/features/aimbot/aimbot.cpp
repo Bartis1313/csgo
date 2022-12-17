@@ -15,6 +15,7 @@
 #include <SDK/structs/Entity.hpp>
 #include <SDK/math/Vector.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 #include <game/globals.hpp>
 #include <game/game.hpp>
@@ -25,7 +26,7 @@
 
 void Aimbot::init()
 {
-	m_scale = interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
 }
 
 Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
@@ -40,7 +41,7 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
 	switch (m_config.smoothMode)
 	{
 	case E2T(SmoothMode::LINEAR):
-		ret = angle * cfgSmooth;
+		ret = angle * smooth;
 		break;
 	case E2T(SmoothMode::AIM_LENGTH):
 		ret = delta - (delta * smooth);
@@ -49,7 +50,7 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
 
 	if (m_config.curveAim)
 	{
-		Vec3 curved = angle + Vec3(angle[1] * m_config.curveX, angle[0] * m_config.curveY, 0.0f);
+		Vec3 curved = ret + Vec3(ret[1] * m_config.curveX, ret[0] * m_config.curveY, 0.0f);
 		ret = curved * smooth;
 	}
 
@@ -115,12 +116,12 @@ void Aimbot::run(CUserCmd* cmd)
 			return lhs.m_fov < rhs.m_fov;
 		});
 
-	auto [player, guid, fov, index, bestHitbox, bestpos] = m_targets.front();
+	auto [player, fov, index, bestHitbox, bestpos] = m_targets.front();
 
 	if (m_config.aimBacktrack)
 	{
 		int boneID = 8; // HEAD start
-		if (auto modelStudio = interfaces::modelInfo->getStudioModel(player->getModel()); modelStudio != nullptr)
+		if (auto modelStudio = memory::interfaces::modelInfo->getStudioModel(player->getModel()); modelStudio != nullptr)
 		{
 			if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(bestHitbox); hitbox != nullptr)
 			{
@@ -137,7 +138,7 @@ void Aimbot::run(CUserCmd* cmd)
 	angle = smoothAim(angle, m_config.smooth);
 
 	cmd->m_viewangles += angle;
-	interfaces::engine->setViewAngles(cmd->m_viewangles);
+	memory::interfaces::engine->setViewAngles(cmd->m_viewangles);
 
 }
 
@@ -159,11 +160,11 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const 
 		if (m_targets.size() && !m_delay && !m_targets.front().m_player->isAlive()) // if ent is found and dead, then set field to delay and wait curr time + cfgtime
 		{
 			m_delay = true;
-			delay = interfaces::globalVars->m_curtime + (m_config.aimDelayVal / 1000.0f);
+			delay = memory::interfaces::globalVars->m_curtime + (m_config.aimDelayVal / 1000.0f);
 		}
 		if (m_delay) // if the delay is hit, check time, so when ent died
 		{
-			if (delay <= interfaces::globalVars->m_curtime)
+			if (delay <= memory::interfaces::globalVars->m_curtime)
 				m_delay = false;
 			else // need reset fields here and stop the method
 			{
@@ -223,12 +224,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const 
 				: math::calcFovReal(eye, hitPos, angles);
 
 			if (fov <= m_config.fov)
-			{
-				PlayerInfo_t info;
-				interfaces::engine->getPlayerInfo(idx, &info);
-
-				m_targets.emplace_back(AimbotTarget_t{ ent, info.m_steamID64, fov, idx, pos, hitPos });
-			}
+				m_targets.emplace_back(AimbotTarget_t{ ent, fov, idx, pos, hitPos });
 		}
 	}
 

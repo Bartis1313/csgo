@@ -8,6 +8,7 @@
 #include <SDK/math/Vector.hpp>
 #include <SDK/MapStruct.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <config/vars.hpp>
@@ -99,7 +100,7 @@ bool Radar::manuallyInitTexture()
 	if (!game::isAvailable())
 		return false;
 
-	std::string levelName = interfaces::engine->getLevelName();
+	std::string levelName = memory::interfaces::engine->getLevelName();
 
 	// not really working for workshops
 	if (auto place = levelName.rfind('/'); place != std::string::npos)
@@ -114,7 +115,7 @@ bool Radar::manuallyInitTexture()
 	else
 		return false;*/
 
-	if (auto hr = D3DXCreateTextureFromFileA(interfaces::dx9Device, path.c_str(), &m_mapTexture); hr == D3D_OK)
+	if (auto hr = D3DXCreateTextureFromFileA(memory::interfaces::dx9Device(), path.c_str(), &m_mapTexture); hr == D3D_OK)
 		LOG_INFO(XOR("Created map texture from path: {}"), path);
 	else
 	{
@@ -149,7 +150,7 @@ void Radar::drawMap()
 
 	const auto myEye = game::localPlayer->getEyePos();
 	Vec3 ang = {};
-	interfaces::engine->getViewAngles(ang);
+	memory::interfaces::engine->getViewAngles(ang);
 	float scale = vars::misc->radar->scale;
 
 	auto p1 = entToRadar(myEye, ang, poses.at(0), m_drawPos, m_drawSize, scale, false).toImVec();
@@ -168,7 +169,7 @@ void Radar::draw()
 	if (!game::localPlayer)
 		return;
 
-	if (!interfaces::engine->isInGame())
+	if (!memory::interfaces::engine->isInGame())
 		return;
 
 	float size = vars::misc->radar->size;
@@ -182,7 +183,7 @@ void Radar::draw()
 
 		const auto myEye = game::localPlayer->getEyePos();
 		Vec3 ang = {};
-		interfaces::engine->getViewAngles(ang);
+		memory::interfaces::engine->getViewAngles(ang);
 
 		auto rect = imRenderWindow.getRect();
 		float scaledFov = globals::FOV / 5.0f;

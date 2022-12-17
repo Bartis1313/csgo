@@ -21,12 +21,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>DynamicLibrary</ConfigurationType>
-    <PlatformToolset>v142</PlatformToolset>
+    <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
@@ -66,7 +66,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpplatest</LanguageStandard>
@@ -164,6 +164,7 @@
     <ClCompile Include="cheats\features\cache\cache.cpp" />
     <ClCompile Include="cheats\features\fakelatency\fakelatency.cpp" />
     <ClCompile Include="cheats\features\misc\counters\counters.cpp" />
+    <ClCompile Include="cheats\features\misc\disable\interpolate.cpp" />
     <ClCompile Include="cheats\features\misc\flashlight\flashlight.cpp" />
     <ClCompile Include="cheats\features\misc\thirdperson\thirdperson.cpp" />
     <ClCompile Include="cheats\features\triggerbot\triggerbot.cpp">
@@ -219,21 +220,27 @@
     <ClCompile Include="cheats\features\visuals\world\zeus.cpp" />
     <ClCompile Include="cheats\hooks\addEntity.cpp" />
     <ClCompile Include="cheats\hooks\buildTransformations.cpp" />
+    <ClCompile Include="cheats\hooks\createEvent.cpp" />
     <ClCompile Include="cheats\hooks\drawIndexPrimitive.cpp" />
+    <ClCompile Include="cheats\hooks\emitSound.cpp" />
     <ClCompile Include="cheats\hooks\eraseEntity.cpp" />
+    <ClCompile Include="cheats\hooks\fireIntern.cpp" />
     <ClCompile Include="cheats\hooks\fxBlood.cpp" />
     <ClCompile Include="cheats\hooks\getColorModulation.cpp" />
     <ClCompile Include="cheats\hooks\isDepth.cpp" />
+    <ClCompile Include="cheats\hooks\isFollowingEntity.cpp" />
     <ClCompile Include="cheats\hooks\isHltv.cpp" />
     <ClCompile Include="cheats\hooks\levelInitPostEntity.cpp" />
     <ClCompile Include="cheats\hooks\levelInitPreEntity.cpp" />
     <ClCompile Include="cheats\hooks\levelShutdown.cpp" />
+    <ClCompile Include="cheats\hooks\processSpottedEntityUpdate.cpp" />
     <ClCompile Include="cheats\hooks\renderView.cpp" />
     <ClCompile Include="cheats\hooks\screen2deffect.cpp" />
     <ClCompile Include="cheats\hooks\sendDatagram.cpp" />
     <ClCompile Include="cheats\hooks\particlesSimulation.cpp" />
     <ClCompile Include="cheats\hooks\unknownFIleSys.cpp" />
     <ClCompile Include="cheats\hooks\unknownOverviewMap.cpp" />
+    <ClCompile Include="cheats\hooks\wndproc.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
     <ClCompile Include="cheats\menu\x88Menu\x88menu.cpp" />
     <ClCompile Include="config\cfgcolor.cpp" />
@@ -361,6 +368,7 @@
     <ClCompile Include="utilities\console\console.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="utilities\console\consoleDraw.cpp" />
     <ClCompile Include="utilities\inputSystem.cpp" />
     <ClCompile Include="utilities\math\math.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -374,6 +382,7 @@
     </ClCompile>
     <ClCompile Include="utilities\renderer\structures.cpp" />
     <ClCompile Include="utilities\res.cpp" />
+    <ClCompile Include="utilities\tools\tools.cpp" />
     <ClCompile Include="utilities\utilities.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
@@ -399,6 +408,7 @@
     <ClInclude Include="cheats\features\cache\cache.hpp" />
     <ClInclude Include="cheats\features\fakelatency\fakelatency.hpp" />
     <ClInclude Include="cheats\features\misc\counters\counters.hpp" />
+    <ClInclude Include="cheats\features\misc\disable\interpolate.hpp" />
     <ClInclude Include="cheats\features\misc\flashlight\flashlight.hpp" />
     <ClInclude Include="cheats\features\misc\thirdperson\thirdperson.hpp" />
     <ClInclude Include="cheats\features\triggerbot\triggerbot.hpp" />
@@ -425,6 +435,7 @@
     <ClInclude Include="cheats\features\visuals\misc\screenEffects.hpp" />
     <ClInclude Include="cheats\features\visuals\misc\trails.hpp" />
     <ClInclude Include="cheats\features\visuals\player\boxes.hpp" />
+    <ClInclude Include="cheats\features\visuals\player\dormacy.hpp" />
     <ClInclude Include="cheats\features\visuals\player\enemyWarn.hpp" />
     <ClInclude Include="cheats\features\visuals\player\sounds.hpp" />
     <ClInclude Include="cheats\features\visuals\plots\plots.hpp" />
@@ -445,6 +456,7 @@
     <ClInclude Include="cheats\features\visuals\world\tone.hpp" />
     <ClInclude Include="cheats\features\visuals\world\weather.hpp" />
     <ClInclude Include="cheats\features\visuals\world\zeus.hpp" />
+    <ClInclude Include="cheats\hooks\wndproc.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />
@@ -502,24 +514,32 @@
     <ClInclude Include="dependencies\magic_enum.hpp" />
     <ClInclude Include="dependencies\stb_image.h" />
     <ClInclude Include="gamememory\memory.hpp" />
+    <ClInclude Include="gamememory\modules.hpp" />
+    <ClInclude Include="gamememory\pattern.hpp" />
     <ClInclude Include="gamememory\sigs.hpp" />
     <ClInclude Include="resources\resource.h" />
     <ClInclude Include="SDK\CClientEffectRegistration.hpp" />
+    <ClInclude Include="SDK\CCSGO_HudRadar.hpp" />
     <ClInclude Include="SDK\CEffectData.hpp" />
+    <ClInclude Include="SDK\CEngineSoundClient.hpp" />
     <ClInclude Include="SDK\CFlashlightEffect.hpp" />
     <ClInclude Include="SDK\CGameRules.hpp" />
     <ClInclude Include="SDK\CHudChat.hpp" />
+    <ClInclude Include="SDK\clientHitVerify.hpp" />
     <ClInclude Include="SDK\CParticelCollection.hpp" />
     <ClInclude Include="SDK\CStudioHdr.hpp" />
     <ClInclude Include="SDK\CTeslaInfo.hpp" />
     <ClInclude Include="SDK\CUtlReference.hpp" />
     <ClInclude Include="SDK\CUtlString.hpp" />
     <ClInclude Include="SDK\CViewSetup.hpp" />
+    <ClInclude Include="SDK\datamap.hpp" />
     <ClInclude Include="SDK\IClientState.hpp" />
     <ClInclude Include="SDK\IMatRenderContext.hpp" />
+    <ClInclude Include="SDK\IMDLCache.hpp" />
     <ClInclude Include="SDK\IMemAlloc.hpp" />
     <ClInclude Include="SDK\interfaceNode.hpp" />
     <ClInclude Include="SDK\interfaces\interfaces.hpp" />
+    <ClInclude Include="SDK\interfaces\ifc.hpp" />
     <ClInclude Include="SDK\ITexture.hpp" />
     <ClInclude Include="SDK\IViewRender.hpp" />
     <ClInclude Include="SDK\KeyValues.hpp" />
@@ -684,6 +704,7 @@
     <ClInclude Include="SDK\structs\indexes.hpp" />
     <ClInclude Include="setup\setup.hpp" />
     <ClInclude Include="utilities\console\console.hpp" />
+    <ClInclude Include="utilities\console\consoleDraw.hpp" />
     <ClInclude Include="utilities\console\consoleUtils.hpp" />
     <ClInclude Include="utilities\inputSystem.hpp" />
     <ClInclude Include="utilities\math\math.hpp" />

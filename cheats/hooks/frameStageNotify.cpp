@@ -2,7 +2,7 @@
 
 #include "../classes/frameStage.hpp"
 
-void __fastcall hooks::frameStageNotify::hooked(FAST_ARGS, int frame)
+void FASTCALL hooks::frameStageNotify::hooked(FAST_ARGS, int frame)
 {
 	FrameStageType::runAll(frame);
 

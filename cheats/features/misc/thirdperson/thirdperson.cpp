@@ -5,6 +5,7 @@
 #include <SDK/Input.hpp>
 #include <SDK/vars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <gamememory/memory.hpp>
 #include <game/game.hpp>
 #include <game/globals.hpp>
 #include <utilities/math/math.hpp>
@@ -36,14 +37,14 @@ void Thirdperson::run(CViewSetup* view)
 		Vec3 eyePos = game::localPlayer->getEyePos();
 		TraceFilter filter;
 		filter.m_skip = game::localPlayer();
-		interfaces::trace->traceRay({ eyePos, (eyePos - camera) }, MASK_SOLID, &filter, &trace);
+		memory::interfaces::trace->traceRay({ eyePos, (eyePos - camera) }, MASK_SOLID, &filter, &trace);
 
-		interfaces::input->m_cameraInThirdPerson = state;
-		interfaces::input->m_cameraOffset = Vec3{ fixedX, fixedY, vars::misc->thirdp->distance * ((trace.m_fraction < 1.0f) ? trace.m_fraction : 1.0f) };
+		memory::interfaces::input->m_cameraInThirdPerson = state;
+		memory::interfaces::input->m_cameraOffset = Vec3{ fixedX, fixedY, vars::misc->thirdp->distance * ((trace.m_fraction < 1.0f) ? trace.m_fraction : 1.0f) };
 	}
 	else if (globals::isShutdown || !state)
 	{
-		interfaces::input->m_cameraInThirdPerson = false;
-		interfaces::input->m_cameraOffset = {};
+		memory::interfaces::input->m_cameraInThirdPerson = false;
+		memory::interfaces::input->m_cameraOffset = {};
 	}
 }

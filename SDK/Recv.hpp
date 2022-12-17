@@ -4,15 +4,15 @@
 
 enum SendPropType
 {
-	DPT_Int = 0,
-	DPT_Float,
-	DPT_Vector,
-	DPT_VectorXY,
-	DPT_String,
-	DPT_Array,
-	DPT_DataTable,
-	DPT_Int64,
-	DPT_NUMSendPropTypes
+	DPT_INT = 0,
+	DPT_FLOAT,
+	DPT_VECTOR,
+	DPT_VECTOR2D,
+	DPT_STRING,
+	DPT_ARRAY,
+	DPT_DATATABLE,
+	DPT_INT64,
+	DPT_SENDPROPTYPEMAX
 };
 
 class DVariant

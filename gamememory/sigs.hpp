@@ -2,7 +2,8 @@
 
 #include <utilities/tools/tools.hpp>
 
-// should be close to EntityGlowEffects str
+// I found by strictly setting glow color in console and finding what exactly changed in reclass
+// or go EntityGlowEffects, list up xrefs. https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/glow_outline_effect.cpp#L34
 #define GLOWMANAGER					XOR("0F 11 05 ? ? ? ? 83 C8 01")
 // const CViewRenderBeams::`vftable should be pushed in:
 // #STR #STR: "r_drawbrushmodels", "engine/writez", "debug/debugtranslucentsinglecolor", "engine/modulatesinglecolor", "vgui/white", "r_drawentities", "Other textures"
@@ -14,6 +15,7 @@
 #define PREDICTIONRANDOMSEED		XOR("8B 0D ? ? ? ? BA ? ? ? ? E8 ? ? ? ? 83 C4 04")
 // no STR
 // it will be easier to find by live debugger
+// or just find it below setabs one which is easier to find
 #define SETABSANGLES				XOR("55 8B EC 83 E4 F8 83 EC 64 53 56 57 8B F1 E8")
 // Ignoring unreasonable position (%f,%f,%"... is a hint
 #define SETABSORIGIN				XOR("55 8B EC 83 E4 F8 51 53 56 57 8B F1 E8")
@@ -24,9 +26,6 @@
 #define HASC4						XOR("56 8B F1 85 F6 74 31")
 // #STR: (mod_studio)
 #define INVALIDATE_BONE_CACHE		XOR("80 3D ? ? ? ? ? 74 16 A1 ? ? ? ? 48 C7 81")
-// #STR: "unknown" - well wow
-// resource should also call steamworks thing. Search by this too.
-#define PLAYER_RESOURCE				XOR("74 30 8B 35 ? ? ? ? 85 F6")
 // useless since in here you can read it can be forced, but it's safer
 // https://www.unknowncheats.me/forum/counterstrike-global-offensive/213556-changing-sky-spoofing-cvar.html
 #define LOAD_SKY					XOR("55 8B EC 81 EC ? ? ? ? 56 57 8B F9 C7 45")
@@ -47,7 +46,7 @@
 #define IS_BREAKBLE					XOR("55 8B EC 51 56 8B F1 85 F6 74 68")
 // this is needed because this convar will rely on many things, the r_drawspecificstaticprop and forcing isn't enough
 // #STR: "CStaticProp::DrawModel", "Static_Prop_Rendering"
-// just like in engine source, before Static_Prop_Rendering there will be a jump to that function
+// just like in engine source, before Static_Prop_Rendering there will be a check before to that function
 // first call is that function
 // now, normal sig from selection points to many other functions so use a relative one
 #define IS_USING_PROP_DEBUG			XOR("E8 ? ? ? ? 84 C0 8B 45 08")
@@ -65,9 +64,10 @@
 #define CAM_THINK					XOR("85 C0 75 30 38 87")
 // "#empty#", "#int#"
 // also easy to find as 'KeyValuesSystem' should be generated in ida as externs
-#define KEY_VALUES_FROM_STR			XOR("55 8B EC 81 EC ? ? ? ? 85 D2 53")
+#define KEY_VALUES_FROM_STR			XOR("55 8B EC 83 E4 F8 81 EC 0C 05")
 // found by checking what's inside bone threads
 // str anything like bone access
+// allocation done here? direct reference: 55 8B EC 83 EC 08 56 8B F1 8A 86
 #define CACHED_BONE					XOR("FF B7 ? ? ? ? 52")
 // #STR: "CParticleCollection::Simulate", "Particle Simulation"
 #define PARTICLE_SIMULATE			XOR("55 8B EC 83 E4 F8 83 EC 30 56 57 8B F9 0F 28 E1 8B 0D ? ? ? ? F3 0F 11 64 24 ? 89 7C 24 18 8B 81")
@@ -134,10 +134,14 @@ ParticleEffect
 #define FLASHLIGHT_DESTROY			XOR("56 8B F1 E8 ? ? ? ? 8B 4E 28")
 // #STR: "CFlashlightEffect::UpdateLight", "FlashlightState", "entindex", "flashlightHandle", "flashlightState", "Flashlight Shadows"
 #define FLASHLIGHT_UPDATE			XOR("55 8B EC 81 EC ? ? ? ? 53 56 8B F1 8B 0D ? ? ? ? 57 8B 81")
-// possible to not sig it probably
+// my method is to first lookup the const CClientState::`vftable'
+// we can see this function: direct reference: [actual address in first opcode] E8 ? ? ? ? EB 02 33 F6 85 FF
+// a lot of initialization going on here, but most importantly we must find the pointer to clientstate
+// skip reading to the last memset operation, see mov eax, edi -> this copies to the result
+// first operation below is the offset to add. This although is very stupid method, better is this:
+// "CEngineClient::SetViewAngles:  rejecting invalid value [%f %f %f]\n" see what is called under
+// currently dword_1059F194, now to get it, there are many functions containing it. This sig needs small opcode add.
 #define CLIENT_STATE				XOR("A1 ? ? ? ? 8B 88 ? ? ? ? 85 C9 75 07")
-// no STR
-#define GAME_RULES					XOR("A1 ? ? ? ? 85 C0 0F 84 ? ? ? ? 80 B8 ? ? ? ? ? 74 7A")
 // STR: "CNetChan_TransmitBits->send", "CNetChan::SendDatagram
 #define SEND_DATAGRAM				XOR("55 8B EC 83 E4 F0 B8 ? ? ? ? E8 ? ? ? ? 56 57 8B F9 89 7C 24 14")
 // STR: const CTraceFilterSimple
@@ -199,3 +203,30 @@ ParticleEffect
 // now can't get addr by index, they are placed exactly in same place tho
 #define ADD_ENT						XOR("55 8B EC 51 8B 45 0C 53 56 8B F1 57")
 #define REMOVE_ENT					XOR("55 8B EC 51 8B 45 0C 53 8B D9 56 57 83 F8 FF 75 07")
+// #STR: "CPrediction::ProcessMovement", and see what calls random seed by 0FFFFFFFF, at the bottom the jump is predicted player
+#define PREDICTED_PLAYER			XOR("89 35 ? ? ? ? F3 0F 10 48 20")
+// #STR: "CLIENT:  %s(%s) thinking for %.02f ms!!!\n", ".PAVC_BaseEntity@@"
+#define PHYSICS_RUN_THINK			XOR("55 8B EC 83 EC 10 53 56 57 8B F9 8B 87")
+// #STR: CPrediction::ProcessMovement
+// and leak RunCommand
+#define BUTTONS_FORCED				XOR("8B 86 44 33 ? ? 09 47 30")
+// #STR: "CPrediction::ProcessMovement"
+// and leak RunCommand
+#define LAST_COMMAND				XOR("8D 8E ? ? ? ? 89 5C 24 3C")
+// found by looking around in C_BaseEntity, I looked in mac binaries and compared current one
+#define IS_FOLLOWED_ENT				XOR("F6 ? ? ? ? ? ? 74 31 80")
+// #STR: "cl_updaterate"
+#define RET_ADDR_INTERPOLATION		XOR("84 C0 0F 85 ? ? ? ? 38 05 ? ? ? ? 0F 84 ? ? ? ? 53")
+// #STR: CPrediction::ProcessMovement
+// and leak RunCommand
+#define POST_THINK_PHYSICS			XOR("55 8B EC 83 E4 F8 81 EC ? ? ? ? 53 8B D9 56 57 83 BB")
+// #STR: CPrediction::ProcessMovement
+// and leak RunCommand
+#define SIMULATE_ENTITIES			XOR("56 8B F1 57 8B BE ? ? ? ? 83 EF 01 78 74")
+// #STR: "CCSPlayer", "CPlantedC4", "CHostage", "Unknown entity update received by ProcessSpottedEntityUpda, "Unknown entity class received in ProcessSpottedEntityUpdat
+#define SPOTTED_ENTITIY_UPDATE		XOR("55 8B EC 83 EC 18 8B 45 08 53 56 57")
+// "\ntime\tbullet\trange\trecovery\tinaccu"
+// xref addtoTail() function or follow player stack direct reference: [actual address in first opcode] E8 ? ? ? ? 46 3B B3 ? ? ? ? 7C 8C 
+#define VEC_CLIENT_IPACT_LIST		XOR("8D 8F ? ? ? ? F3 0F 10 84 24")
+// #STR: "Server event \"%s\", Tick %i:\n", "GameEventListener2 callback in list that should NOT be - %, "Callback for event \"%s\" is NULL!!!\n", "portal2", "FireEvent: event '%s' not registered.\n", "Game event \"%s\", Tick %i:\n"
+#define FIRE_INTERN					XOR("55 8B EC 83 E4 F8 83 EC 0C 8B C1 53 56")

@@ -4,7 +4,7 @@
 
 #include <SDK/MapStruct.hpp>
 
-int __fastcall hooks::unknownOverViewFun::hooked(FAST_ARGS, int unk)
+int FASTCALL hooks::unknownOverViewFun::hooked(FAST_ARGS, int unk)
 {
 	OverViewMapType::runAll(reinterpret_cast<MapStruct*>(thisptr));
 

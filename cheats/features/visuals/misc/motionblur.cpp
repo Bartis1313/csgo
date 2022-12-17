@@ -41,7 +41,7 @@ void MotionBlur::run(CViewSetup* view)
 
 	if (view)
 	{
-		float timeElapsed = interfaces::globalVars->m_realtime - m_motionHistory.m_lastTimeUpdate;
+		float timeElapsed = memory::interfaces::globalVars->m_realtime - m_motionHistory.m_lastTimeUpdate;
 
 		float currentPitch = view->m_angles[Coord::X];
 		while (currentPitch > 180.0f)
@@ -70,7 +70,7 @@ void MotionBlur::run(CViewSetup* view)
 		}
 		else if (positionChange.length() > 50.0f)
 		{
-			m_motionHistory.m_noRotationalMotionBlurUntil = interfaces::globalVars->m_realtime + 1.0f;
+			m_motionHistory.m_noRotationalMotionBlurUntil = memory::interfaces::globalVars->m_realtime + 1.0f;
 		}
 		else
 		{
@@ -122,7 +122,8 @@ void MotionBlur::run(CViewSetup* view)
 			else
 				m_motionBlurValues[2] = 0.0f;
 
-			m_motionBlurValues[2] = std::clamp((std::abs(m_motionBlurValues[2]) - vars::misc->motionBlur->fallingMin) / (vars::misc->motionBlur->fallingMax - vars::misc->motionBlur->fallingMin), 0.0f, 1.0f) * (m_motionBlurValues[2] >= 0.0f ? 1.0f : -1.0f);
+			m_motionBlurValues[2] = std::clamp((std::abs(m_motionBlurValues[2]) - vars::misc->motionBlur->fallingMin) / (vars::misc->motionBlur->fallingMax - vars::misc->motionBlur->fallingMin),
+				0.0f, 1.0f) * (m_motionBlurValues[2] >= 0.0f ? 1.0f : -1.0f);
 			m_motionBlurValues[2] /= 30.0f;
 			m_motionBlurValues[0] *= vars::misc->motionBlur->rotationIntensity * vars::misc->motionBlur->strength;
 			m_motionBlurValues[1] *= vars::misc->motionBlur->rotationIntensity * vars::misc->motionBlur->strength;
@@ -140,7 +141,7 @@ void MotionBlur::run(CViewSetup* view)
 			m_motionBlurValues[3] *= dumpenFactor;
 		}
 
-		if (interfaces::globalVars->m_realtime < m_motionHistory.m_noRotationalMotionBlurUntil)
+		if (memory::interfaces::globalVars->m_realtime < m_motionHistory.m_noRotationalMotionBlurUntil)
 		{
 			resetArr(m_motionBlurValues, 3);
 		}
@@ -152,9 +153,9 @@ void MotionBlur::run(CViewSetup* view)
 		m_motionHistory.m_previousPositon = currentPosition;
 		m_motionHistory.m_previousPitch = currentPitch;
 		m_motionHistory.m_previousYaw = currentYaw;
-		m_motionHistory.m_lastTimeUpdate = interfaces::globalVars->m_realtime;
+		m_motionHistory.m_lastTimeUpdate = memory::interfaces::globalVars->m_realtime;
 
-		static ITexture* _rt_FullFrameFB = interfaces::matSys->findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
+		static ITexture* _rt_FullFrameFB = memory::interfaces::matSys->findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
 
 		int x = view->x;
 		int y = view->y;
@@ -197,7 +198,7 @@ void MotionBlur::render()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	static IMaterial* motion_blur = interfaces::matSys->findMaterial(XOR("dev/motion_blur"), XOR(TEXTURE_GROUP_RENDER_TARGET), false);
+	static IMaterial* motion_blur = memory::interfaces::matSys->findMaterial(XOR("dev/motion_blur"), XOR(TEXTURE_GROUP_RENDER_TARGET), false);
 
 	static IMaterialVar* MotionBlurInternal = motion_blur->findVar(XOR("$MotionBlurInternal"), nullptr, false);
 
@@ -227,7 +228,7 @@ void MotionBlur::render()
 	ctx->release();*/
 
 	// so we have to wrap it and call directly in isdepth hook to prevent problems like weapon being blurred
-	const static auto _call = g_Memory.m_drawSpacedRectangle();
+	const static auto _call = memory::drawSpacedRectangle();
 	__asm
 	{
 		push globals::screenY

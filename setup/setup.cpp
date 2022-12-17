@@ -21,6 +21,7 @@
 #include <game/game.hpp>
 #include <gamememory/memory.hpp>
 #include <utilities/res.hpp>
+#include <hooks/wndProc.hpp>
 
 #include <discord_register.h>
 
@@ -47,15 +48,11 @@ bool Setup::init(void* instance)
 			std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"),
 			XOR("utility"));
 		g_Memory.init();
-		game::localPlayer.init();
-		interfaces::init();
 		netvarMan.init();
-		netvarMan.dump();
-		hooks::wndProcSys::init();
+		wndProcSys::init();
 		BaseHack::initAll();
 		surfaceRender.init();
 		x88menu.init();
-		g_Events->init();
 		hooks::init();
 		EntityCache::init();
 	}
@@ -67,7 +64,7 @@ bool Setup::init(void* instance)
 	}
 
 	initTimer.end();
-	LOG_INFO(XOR("main thread took {:.5f}s"), initTimer.getSec());
+	LOG_INFO(XOR("main thread took {:.5f}s"), initTimer.getTime());
 	m_inited = true;
 
 	return true;
@@ -78,10 +75,10 @@ void Setup::shutdown(void* instance)
 	globals::isShutdown = true;
 
 	//RemoveVectoredExceptionHandler(globals::instance);
-	hooks::wndProcSys::shutdown();
+	wndProcSys::shutdown();
 	BaseHack::shutdownAll();
-	Events::shutdownAllEvents();
 	Resource::destroyAll();
+	events::shutdown();
 	hooks::shutdown();
 	menu.shutdown();
 	LOG_INFO(XOR("Hack shutdown"));

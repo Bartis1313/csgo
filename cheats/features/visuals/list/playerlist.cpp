@@ -50,7 +50,7 @@ void PlayerList::draw()
 			TableStruct{ XOR("Blacklist"), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize }
 		};
 
-		if (ImGui::BeginTable(XOR("PlayerList Table"), tableNames.size(),
+		if (ImGui::BeginTable("", tableNames.size(),
 			ImGuiTableFlags_Borders | ImGuiTableFlags_Hideable | ImGuiTableFlags_Resizable /*| ImGuiTableFlags_Sortable*/))
 		{
 			for (size_t i = 0; const auto [name, flags, cfg] : tableNames)
@@ -104,26 +104,21 @@ void PlayerList::draw()
 
 				if (ImGui::TableNextColumn())
 				{
-					if (!ent->isDormant())
-					{
-						auto health = ent->m_iHealth();
-						ImVec4 color;
-						std::memcpy(&color, Color::healthBased(health).data(), 4 * sizeof(float));
+					const auto health = ent->isDormant()
+						? CacheFields::getCachedFields().at(idx).m_health
+						: ent->m_iHealth();
+					ImVec4 color;
+					std::memcpy(&color, Color::healthBased(health).data(), 4 * sizeof(float));
 
-						ImGui::PushStyleColor(ImGuiCol_Text, color);
-						std::string text = health == 0 ? XOR("DEAD") : FORMAT(XOR("{}"), ent->m_iHealth());
-						ImGui::TextUnformatted(text.c_str());
-						ImGui::PopStyleColor();
+					ImGui::PushStyleColor(ImGuiCol_Text, color);
+					std::string text = health == 0 ? XOR("DEAD") : FORMAT(XOR("{}"), health);
+					ImGui::TextUnformatted(text.c_str());
+					ImGui::PopStyleColor();
 
-						if (health)
-						{
-							ImGui::SameLine();
-							ImGui::TextUnformatted(XOR("HP"));
-						}
-					}
-					else
+					if (health)
 					{
-						ImGui::TextUnformatted(XOR("UNK")); // or maybe cache this?
+						ImGui::SameLine();
+						ImGui::TextUnformatted(XOR("HP"));
 					}
 				}
 
