@@ -159,7 +159,7 @@ void NetvarManager::dump()
 	} while (client);
 	timer.end();
 
-	file << '\n' << FORMAT(XOR("Finished in {:.4f} secs"), timer.getSec());
+	file << '\n' << FORMAT(XOR("Finished in {:.2f} secs"), timer.getTime());
 
 	file.close();
 }
