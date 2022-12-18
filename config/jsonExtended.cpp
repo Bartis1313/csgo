@@ -44,7 +44,8 @@ void to_json(json& j, const CfgWeapon& val)
 	j["Fov"] = val.fov;
 	j["Smooth"] = val.smooth;
 	j["Smooth mode"] = val.smoothMode;
-	j["Extra speed"] = val.useExtraSpeed;
+	j["Randomization"] = val.randomization;
+	j["Randomization Ratio"] = val.randomizationRatio;
 	j["Curve"] = val.curveAim;
 	j["Curve X"] = val.curveX;
 	j["Curve Y"] = val.curveY;
