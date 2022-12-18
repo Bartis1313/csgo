@@ -241,6 +241,7 @@
     <ClCompile Include="cheats\hooks\unknownFIleSys.cpp" />
     <ClCompile Include="cheats\hooks\unknownOverviewMap.cpp" />
     <ClCompile Include="cheats\hooks\wndproc.cpp" />
+    <ClCompile Include="cheats\menu\GUI-ImGui\animations.cpp" />
     <ClCompile Include="cheats\menu\GUI-ImGui\background.cpp" />
     <ClCompile Include="cheats\menu\x88Menu\x88menu.cpp" />
     <ClCompile Include="config\cfgcolor.cpp" />
@@ -457,6 +458,7 @@
     <ClInclude Include="cheats\features\visuals\world\weather.hpp" />
     <ClInclude Include="cheats\features\visuals\world\zeus.hpp" />
     <ClInclude Include="cheats\hooks\wndproc.hpp" />
+    <ClInclude Include="cheats\menu\GUI-ImGui\animations.hpp" />
     <ClInclude Include="cheats\menu\GUI-ImGui\background.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="cheats\menu\x88Menu\x88types.hpp" />

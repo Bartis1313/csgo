@@ -22,7 +22,7 @@ void NetvarManager::init()
 	while (clientClass)
 	{
 		auto recvTable = clientClass->m_recvTable;
-		m_Tables.emplace(std::string{ recvTable->m_netTableName }, recvTable);
+		m_Tables.emplace(recvTable->m_netTableName, recvTable);
 
 		clientClass = clientClass->m_next;
 	}
@@ -30,7 +30,7 @@ void NetvarManager::init()
 	dump();
 }
 
-uintptr_t NetvarManager::getNetvar(const char* tableName, const char* propName) const
+uintptr_t NetvarManager::getNetvar(const std::string_view tableName, const std::string_view propName) const
 {
 	auto offset = getProp(tableName, propName);
 	if (!offset)
@@ -39,7 +39,7 @@ uintptr_t NetvarManager::getNetvar(const char* tableName, const char* propName) 
 	return offset;
 }
 
-uintptr_t NetvarManager::getProp(const char* tableName, const char* propName, RecvProp** prop) const
+uintptr_t NetvarManager::getProp(const std::string_view tableName, const std::string_view propName, RecvProp** prop) const
 {
 	auto recvTable = getTable(tableName);
 	if (!recvTable)
@@ -52,7 +52,7 @@ uintptr_t NetvarManager::getProp(const char* tableName, const char* propName, Re
 	return offset;
 }
 
-uintptr_t NetvarManager::getProp(RecvTable* recvTable, const char* propName, RecvProp** prop) const
+uintptr_t NetvarManager::getProp(RecvTable* recvTable, const std::string_view propName, RecvProp** prop) const
 {
 	uintptr_t extraOffset = 0;
 
@@ -81,7 +81,7 @@ uintptr_t NetvarManager::getProp(RecvTable* recvTable, const char* propName, Rec
 	return extraOffset;
 }
 
-RecvTable* NetvarManager::getTable(const char* tableName) const
+RecvTable* NetvarManager::getTable(const std::string_view tableName) const
 {
 	if (m_Tables.empty())
 		return nullptr;

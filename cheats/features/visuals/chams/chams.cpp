@@ -20,7 +20,7 @@
 Chams::Mat_t::Mat_t(IMaterial* mat, Chams::Mat_t::ExtraType type)
 	: mat{ mat }, type{ type }
 {
-	if (mat)
+	if (mat && !mat->isError())
 		mat->addRef();
 }
 
@@ -58,8 +58,8 @@ void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& 
 	{
 		{ ChamsType::FLAT, m_flat },
 		{ ChamsType::GENERIC, m_generic },
-		{ ChamsType::METALIC, m_glow },
-		{ ChamsType::FLAT, m_metalic },
+		{ ChamsType::GLOW, m_glow },
+		{ ChamsType::METALIC, m_metalic },
 		{ ChamsType::PEARLSCENT, m_pearlescent },
 	};
 
@@ -71,19 +71,21 @@ void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& 
 	if (mat->isError())
 		return;
 
+	mat->setMaterialVarFlag(MATERIAL_VAR_ADDITIVE, false);
+	mat->setMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
+	mat->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignore);
+
 	if (mat.type == Mat_t::ExtraType::GLOW)
 	{
 		static bool found = false;
 		auto matColor = mat->findVar(XOR("$envmaptint"), &found);
 		if (found)
 			matColor->setValues(color);
+
+		mat->setMaterialVarFlag(MATERIAL_VAR_ADDITIVE, true);
 	}
 
 	mat->modulateAllColor(color);
-	if (mat())
-		mat->setMaterialVarFlag(MATERIAL_VAR_ADDITIVE, true);
-	mat->setMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
-	mat->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignore);
 
 	if (force)
 		memory::interfaces::studioRender->forcedMaterialOverride(mat.mat);

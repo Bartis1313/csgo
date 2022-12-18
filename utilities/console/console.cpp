@@ -38,12 +38,6 @@ bool Console::init(const std::string& title, const std::string& logName)
 		{ TypeLogs::LOG_WARN, '*' }
 	};
 
-	using typeVeh = std::string;
-
-	std::map<std::string, std::map<typeVeh, size_t>> mappedLimits;
-
-	auto KILLS = mappedLimits["Siege"]["Tank"];
-
 	if (!logName.empty())
 		m_logName = logName;
 
@@ -80,9 +74,4 @@ void Console::shutdown()
 	FreeConsole();
 #endif
 	return;
-}
-
-void Console::drawLog()
-{
-	
 }

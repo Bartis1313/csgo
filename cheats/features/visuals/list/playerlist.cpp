@@ -7,7 +7,7 @@
 #include <SDK/Enums.hpp>
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/interfaces/interfaces.hpp>
-#include <menu/GUI-ImGui/imguiaddons.hpp>
+#include <menu/GUI-ImGui/animations.hpp>
 #include <features/blacklist/blacklist.hpp>
 
 #include <dependencies/ImGui/imgui.h>
@@ -148,7 +148,7 @@ void PlayerList::draw()
 
 					const auto [title, isOn] = blacklist;
 
-					if (ImGui::Animated::Button(title.c_str(), ImVec2{ -std::numeric_limits<float>::min(), 0.0f }))
+					if (ImGui::Animations::Button(title.c_str(), ImVec2{ -std::numeric_limits<float>::min(), 0.0f }))
 					{	
 						isOn == BlacklistAction::ADD
 							? g_Blacklist->add(ent)

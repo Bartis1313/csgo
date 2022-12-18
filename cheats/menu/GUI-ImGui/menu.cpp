@@ -1,6 +1,7 @@
 #include "menu.hpp"
 
 #include "styles.hpp"
+#include "animations.hpp"
 
 #include <dependencies/ImGui/imgui.h>
 #include <dependencies/ImGui/imgui_impl_win32.h>
@@ -91,33 +92,33 @@ static void renderAimbot()
 		{
 			ImGui::BeginGroupPanel(XOR("Aimbot"), availRegion());
 			{
-				ImGui::Animated::ListBox<const std::string>(XOR("Weapon selection"), &index, magic_enum::enum_names_pretty<AimbotWeapon>());
-				ImGui::Animated::Checkbox(XOR("Enabled##aim"), &cfg.enabled);
+				ImGui::Animations::ListBox<const std::string>(XOR("Weapon selection"), &index, magic_enum::enum_names_pretty<AimbotWeapon>());
+				ImGui::Animations::Checkbox(XOR("Enabled##aim"), &cfg.enabled);
 				ImGui::SameLine();
-				ImGui::Animated::Checkbox(XOR("Use key##aimbot"), &vars::aim->useKey);
+				ImGui::Animations::Checkbox(XOR("Use key##aimbot"), &vars::aim->useKey);
 				ImGui::SameLine();
-				ImGui::Animated::Hotkey("", &vars::keys->aimbot);
-				ImGui::Animated::SliderFloat(XOR("Fov##aim"), &cfg.fov, 0.0f, 50.0f);
-				ImGui::Animated::Combo<const std::string>(XOR("Method##Aim"), &cfg.methodAim, magic_enum::enum_names_pretty<AimbotMethod>());
-				ImGui::Animated::Combo<const std::string>(XOR("Hitboxes##aim"), &cfg.aimSelection, magic_enum::enum_names_pretty<AimbotHitboxes>());
-				ImGui::Animated::SliderFloat(XOR("Smooth##aim"), &cfg.smooth, 0.0f, 1.0f);
-				ImGui::Animated::Combo<const std::string>(XOR("Smooth method##aim"), &cfg.smoothMode, magic_enum::enum_names_pretty<SmoothMode>());
+				ImGui::Animations::Hotkey("", &vars::keys->aimbot);
+				ImGui::Animations::SliderFloat(XOR("Fov##aim"), &cfg.fov, 0.0f, 50.0f);
+				ImGui::Animations::Combo<const std::string>(XOR("Method##Aim"), &cfg.methodAim, magic_enum::enum_names_pretty<AimbotMethod>());
+				ImGui::Animations::Combo<const std::string>(XOR("Hitboxes##aim"), &cfg.aimSelection, magic_enum::enum_names_pretty<AimbotHitboxes>());
+				ImGui::Animations::SliderFloat(XOR("Smooth##aim"), &cfg.smooth, 0.0f, 1.0f);
+				ImGui::Animations::Combo<const std::string>(XOR("Smooth method##aim"), &cfg.smoothMode, magic_enum::enum_names_pretty<SmoothMode>());
 				/*if (cfg.smoothMode == E2T(SmoothMode::HUMANIZED))
 				{
-					ImGui::Animated::Checkbox(XOR("Extra speed#aim"), &cfg.useExtraSpeed);
+					ImGui::Animations::Checkbox(XOR("Extra speed#aim"), &cfg.useExtraSpeed);
 					ImGui::SameLine();
 					ImGui::HelpMarker(XOR("Works good on high smoothing values"));
 				}*/
-				ImGui::Animated::Checkbox(XOR("Curved##aim"), &cfg.curveAim);
-				ImGui::Animated::SliderFloat(XOR("Curve X##aim"), &cfg.curveX, 0.0f, 1.0f);
-				ImGui::Animated::SliderFloat(XOR("Curve Y##aim"), &cfg.curveY, 0.0f, 1.0f);
-				ImGui::Animated::Checkbox(XOR("Delay##aim"), &cfg.aimDelay);
-				ImGui::Animated::SliderFloat(XOR("Delay ms##aim"), &cfg.aimDelayVal, 0.0f, 800.0f);
-				ImGui::Animated::Checkbox(XOR("Aim at Backtrack"), &cfg.aimBacktrack);
+				ImGui::Animations::Checkbox(XOR("Curved##aim"), &cfg.curveAim);
+				ImGui::Animations::SliderFloat(XOR("Curve X##aim"), &cfg.curveX, 0.0f, 1.0f);
+				ImGui::Animations::SliderFloat(XOR("Curve Y##aim"), &cfg.curveY, 0.0f, 1.0f);
+				ImGui::Animations::Checkbox(XOR("Delay##aim"), &cfg.aimDelay);
+				ImGui::Animations::SliderFloat(XOR("Delay ms##aim"), &cfg.aimDelayVal, 0.0f, 800.0f);
+				ImGui::Animations::Checkbox(XOR("Aim at Backtrack"), &cfg.aimBacktrack);
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Will aim at middle of records!"));
-				ImGui::Animated::Checkbox(XOR("Smoke check##Aimbot"), &cfg.smokeCheck);
-				ImGui::Animated::SliderFloat(XOR("Flash limit##Aimbot"), &cfg.flashLimit, 0.0f, 255.0f);
+				ImGui::Animations::Checkbox(XOR("Smoke check##Aimbot"), &cfg.smokeCheck);
+				ImGui::Animations::SliderFloat(XOR("Flash limit##Aimbot"), &cfg.flashLimit, 0.0f, 255.0f);
 
 				ImGui::EndGroupPanel();
 			}
@@ -131,43 +132,43 @@ static void renderAimbot()
 	{
 		ImGui::BeginGroupPanel(XOR("Backtracking & Latency"), availRegion());
 		{
-			ImGui::Animated::Checkbox(XOR("Backtrack##enabled"), &vars::backtrack->enabled);
-			ImGui::Animated::SliderFloat(XOR("Backtrack ms"), &vars::backtrack->time, 0.0f, 200.0f);
-			ImGui::Animated::Checkbox(XOR("Smoke check##Backtrack"), &vars::backtrack->smoke);
-			ImGui::Animated::SliderFloat(XOR("Flash limit##Backtrack"), &vars::backtrack->flashLimit, 0.0f, 255.0f);
-			ImGui::Animated::Checkbox(XOR("Latency##enabled"), &vars::misc->fakeLatency->enabled);
-			ImGui::Animated::SliderFloat(XOR("Fake latency ms"), &vars::misc->fakeLatency->amount, 0.0f, 200.0f);
+			ImGui::Animations::Checkbox(XOR("Backtrack##enabled"), &vars::backtrack->enabled);
+			ImGui::Animations::SliderFloat(XOR("Backtrack ms"), &vars::backtrack->time, 0.0f, 200.0f);
+			ImGui::Animations::Checkbox(XOR("Smoke check##Backtrack"), &vars::backtrack->smoke);
+			ImGui::Animations::SliderFloat(XOR("Flash limit##Backtrack"), &vars::backtrack->flashLimit, 0.0f, 255.0f);
+			ImGui::Animations::Checkbox(XOR("Latency##enabled"), &vars::misc->fakeLatency->enabled);
+			ImGui::Animations::SliderFloat(XOR("Fake latency ms"), &vars::misc->fakeLatency->amount, 0.0f, 200.0f);
 
 			ImGui::EndGroupPanel();
 		}
 
 		ImGui::BeginGroupPanel(XOR("Triggerbot"), availRegion());
 		{
-			ImGui::Animated::Checkbox(XOR("Triggerbot enabled"), &cfg.triggerbot);
-			ImGui::Animated::SliderFloat(XOR("Triggerbot ms"), &cfg.triggerbotDelay, 0.0f, 200.0f);
+			ImGui::Animations::Checkbox(XOR("Triggerbot enabled"), &cfg.triggerbot);
+			ImGui::Animations::SliderFloat(XOR("Triggerbot ms"), &cfg.triggerbotDelay, 0.0f, 200.0f);
 
 			ImGui::EndGroupPanel();
 		}
 
 		ImGui::BeginGroupPanel(XOR("RCS"), availRegion());
 		{
-			ImGui::Animated::Checkbox(XOR("Enabled##RCS"), &cfg.rcs);
-			ImGui::Animated::SliderFloat(XOR("X%##Rcsx"), &cfg.rcsX, 0.0f, 1.0f);
-			ImGui::Animated::SliderFloat(XOR("Y%##Rcsy"), &cfg.rcsY, 0.0f, 1.0f);
+			ImGui::Animations::Checkbox(XOR("Enabled##RCS"), &cfg.rcs);
+			ImGui::Animations::SliderFloat(XOR("X%##Rcsx"), &cfg.rcsX, 0.0f, 1.0f);
+			ImGui::Animations::SliderFloat(XOR("Y%##Rcsy"), &cfg.rcsY, 0.0f, 1.0f);
 
 			ImGui::EndGroupPanel();
 		}
 
 		ImGui::BeginGroupPanel(XOR("Drawing"), availRegion());
 		{
-			ImGui::Animated::Checkbox(XOR("Draw fov"), &vars::aimPaint->enabledFov);
+			ImGui::Animations::Checkbox(XOR("Draw fov"), &vars::aimPaint->enabledFov);
 			ImGui::SameLine();
-			ImGui::Animated::ColorPicker(XOR("Fov circle color"), &vars::aimPaint->colorFov);
+			ImGui::Animations::ColorPicker(XOR("Fov circle color"), &vars::aimPaint->colorFov);
 			ImGui::SameLine();
 			ImGui::HelpMarker(XOR("Draws a circle representing your aimbot FOV"));
-			ImGui::Animated::Checkbox(XOR("Draw aimbot point"), &vars::aimPaint->enabledPoint);
+			ImGui::Animations::Checkbox(XOR("Draw aimbot point"), &vars::aimPaint->enabledPoint);
 			ImGui::SameLine();
-			ImGui::Animated::ColorPicker(XOR("Color##bestpoint"), &vars::aimPaint->colorPoint);
+			ImGui::Animations::ColorPicker(XOR("Color##bestpoint"), &vars::aimPaint->colorPoint);
 
 			ImGui::EndGroupPanel();
 		}
@@ -185,108 +186,108 @@ static void renderVisuals()
 		{
 			ImGui::BeginGroupPanel(XOR("Players"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Enabled"), &vars::visuals->esp->boxes->enabled);
+				ImGui::Animations::Checkbox(XOR("Enabled"), &vars::visuals->esp->boxes->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Player boxes"), []()
+				ImGui::Animations::PopupButton(XOR("##Player boxes"), []()
 					{
-						ImGui::Animated::Combo<const std::string>(XOR("Boxes mode"), &vars::visuals->esp->boxes->mode, magic_enum::enum_names_pretty<BoxTypes>(), 40);
-						ImGui::Animated::ColorPicker(XOR("color##box"), &vars::visuals->esp->boxes->color);
-						ImGui::Animated::ColorPicker(XOR("filled##box"), &vars::visuals->esp->boxes->fill);
-						ImGui::Animated::Checkbox(XOR("Outlined"), &vars::visuals->esp->boxes->outline);
+						ImGui::Animations::Combo<const std::string>(XOR("Boxes mode"), &vars::visuals->esp->boxes->mode, magic_enum::enum_names_pretty<BoxTypes>(), 40);
+						ImGui::Animations::ColorPicker(XOR("color##box"), &vars::visuals->esp->boxes->color);
+						ImGui::Animations::ColorPicker(XOR("filled##box"), &vars::visuals->esp->boxes->fill);
+						ImGui::Animations::Checkbox(XOR("Outlined"), &vars::visuals->esp->boxes->outline);
 						if (auto type = vars::visuals->esp->boxes->mode; type == E2T(BoxTypes::FILLED2D) || type == E2T(BoxTypes::FILLED3D))
 						{
-							ImGui::Animated::Checkbox(XOR("Multi color rect fill"), &vars::visuals->esp->boxes->multiColor);
-							ImGui::Animated::SliderFloat(XOR("Rect fill multigradient speed"), &vars::visuals->esp->boxes->multiColorSpeed, 0.0f, 15.0f);
+							ImGui::Animations::Checkbox(XOR("Multi color rect fill"), &vars::visuals->esp->boxes->multiColor);
+							ImGui::Animations::SliderFloat(XOR("Rect fill multigradient speed"), &vars::visuals->esp->boxes->multiColorSpeed, 0.0f, 15.0f);
 						}
 					}
 				);
 
-				ImGui::Animated::Checkbox(XOR("Health"), &vars::visuals->esp->healthBar->enabled);
-				ImGui::Animated::Checkbox(XOR("Armor"), &vars::visuals->esp->armorBar->enabled);
-				ImGui::Animated::Checkbox(XOR("Name"), &vars::visuals->esp->nameBar->enabled);
-				ImGui::Animated::Checkbox(XOR("Enemy aiming warn"), &vars::misc->aimWarn->enabled);
-				ImGui::Animated::Checkbox(XOR("Skeleton"), &vars::visuals->esp->skeleton->enabled);
+				ImGui::Animations::Checkbox(XOR("Health"), &vars::visuals->esp->healthBar->enabled);
+				ImGui::Animations::Checkbox(XOR("Armor"), &vars::visuals->esp->armorBar->enabled);
+				ImGui::Animations::Checkbox(XOR("Name"), &vars::visuals->esp->nameBar->enabled);
+				ImGui::Animations::Checkbox(XOR("Enemy aiming warn"), &vars::misc->aimWarn->enabled);
+				ImGui::Animations::Checkbox(XOR("Skeleton"), &vars::visuals->esp->skeleton->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Skeleton ESP options"), []()
+				ImGui::Animations::PopupButton(XOR("##Skeleton ESP options"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("Skeleton color"), &vars::visuals->esp->skeleton->color);
-						ImGui::Animated::Checkbox(XOR("Draw debug points##skelet"), &vars::visuals->esp->skeleton->showDebug);
+						ImGui::Animations::ColorPicker(XOR("Skeleton color"), &vars::visuals->esp->skeleton->color);
+						ImGui::Animations::Checkbox(XOR("Draw debug points##skelet"), &vars::visuals->esp->skeleton->showDebug);
 					}
 				);
 
-				ImGui::Animated::Checkbox(XOR("Sound ESP"), &vars::visuals->sound->enabled);
+				ImGui::Animations::Checkbox(XOR("Sound ESP"), &vars::visuals->sound->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Sound ESP options"), []()
+				ImGui::Animations::PopupButton(XOR("##Sound ESP options"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("Circles color"), &vars::visuals->sound->color);
-						ImGui::Animated::SliderFloat(XOR("Step time"), &vars::visuals->sound->time, 1.0f, 20.0f);
-						ImGui::Animated::SliderFloat(XOR("Step max distance"), &vars::visuals->sound->maxDist, 5.0f, 500.0f);
-						ImGui::Animated::SliderFloat(XOR("Lines info distance"), &vars::visuals->sound->maxDistLine, 2.0f, 200.0f);
+						ImGui::Animations::ColorPicker(XOR("Circles color"), &vars::visuals->sound->color);
+						ImGui::Animations::SliderFloat(XOR("Step time"), &vars::visuals->sound->time, 1.0f, 20.0f);
+						ImGui::Animations::SliderFloat(XOR("Step max distance"), &vars::visuals->sound->maxDist, 5.0f, 500.0f);
+						ImGui::Animations::SliderFloat(XOR("Lines info distance"), &vars::visuals->sound->maxDistLine, 2.0f, 200.0f);
 						ImGui::HelpMarker(XOR("Max pixels to decide to draw info from centre of screen to the best point"));
-						ImGui::Animated::ColorPicker(XOR("Lines info color"), &vars::visuals->sound->colorLine);
+						ImGui::Animations::ColorPicker(XOR("Lines info color"), &vars::visuals->sound->colorLine);
 					}
 				);
-				ImGui::Animated::Checkbox(XOR("Dlight"), &vars::visuals->esp->dlight->enabled);
+				ImGui::Animations::Checkbox(XOR("Dlight"), &vars::visuals->esp->dlight->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Dlight options"), []()
+				ImGui::Animations::PopupButton(XOR("##Dlight options"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("Dlight color"), &vars::visuals->esp->dlight->color);
-						ImGui::Animated::SliderFloat(XOR("Dlight radius"), &vars::visuals->esp->dlight->radius, 0.0f, 300.0f);
-						ImGui::Animated::SliderFloat(XOR("Dlight exponent"), &vars::visuals->esp->dlight->exponent, 0.0f, 12.0f);
-						ImGui::Animated::SliderFloat(XOR("Dlight decay"), &vars::visuals->esp->dlight->decay, 0.0f, 100.0f);
+						ImGui::Animations::ColorPicker(XOR("Dlight color"), &vars::visuals->esp->dlight->color);
+						ImGui::Animations::SliderFloat(XOR("Dlight radius"), &vars::visuals->esp->dlight->radius, 0.0f, 300.0f);
+						ImGui::Animations::SliderFloat(XOR("Dlight exponent"), &vars::visuals->esp->dlight->exponent, 0.0f, 12.0f);
+						ImGui::Animations::SliderFloat(XOR("Dlight decay"), &vars::visuals->esp->dlight->decay, 0.0f, 100.0f);
 					}
 				);
-				ImGui::Animated::MultiCombo(XOR("Esp flags"), magic_enum::enum_names_pretty<EspFlags>(), &vars::visuals->esp->flags->flags);
-				ImGui::Animated::Checkbox(XOR("Visible only##Visuals"), &vars::visuals->esp->checks->visible);
-				ImGui::Animated::Checkbox(XOR("Dead only ##Visuals"), &vars::visuals->esp->checks->dead);
-				ImGui::Animated::Checkbox(XOR("Smoke check##Visuals"), &vars::visuals->esp->checks->smoke);
-				ImGui::Animated::SliderFloat(XOR("Flash limit##Visuals"), &vars::visuals->esp->checks->flashLimit, 0.0f, 255.0f);
-				ImGui::Animated::SliderFloat(XOR("Dormacy time##Visuals"), &vars::visuals->dormacy->time, 0.0f, 15.0f);
-				ImGui::Animated::SliderFloat(XOR("Dormacy time box##Visuals"), &vars::visuals->dormacy->limit, 0.0f, 15.0f);
+				ImGui::Animations::MultiCombo(XOR("Esp flags"), magic_enum::enum_names_pretty<EspFlags>(), &vars::visuals->esp->flags->flags);
+				ImGui::Animations::Checkbox(XOR("Visible only##Visuals"), &vars::visuals->esp->checks->visible);
+				ImGui::Animations::Checkbox(XOR("Dead only ##Visuals"), &vars::visuals->esp->checks->dead);
+				ImGui::Animations::Checkbox(XOR("Smoke check##Visuals"), &vars::visuals->esp->checks->smoke);
+				ImGui::Animations::SliderFloat(XOR("Flash limit##Visuals"), &vars::visuals->esp->checks->flashLimit, 0.0f, 255.0f);
+				ImGui::Animations::SliderFloat(XOR("Dormacy time##Visuals"), &vars::visuals->dormacy->time, 0.0f, 15.0f);
+				ImGui::Animations::SliderFloat(XOR("Dormacy time box##Visuals"), &vars::visuals->dormacy->limit, 0.0f, 15.0f);
 
 				ImGui::EndGroupPanel();
 			}
 
 			ImGui::BeginGroupPanel(XOR("Chams"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Chams enabled Players"), &vars::visuals->chams->players);
+				ImGui::Animations::Checkbox(XOR("Chams enabled Players"), &vars::visuals->chams->players);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Chams options players"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options players"), []()
 					{
-						ImGui::Animated::Combo<const std::string>(XOR("Chams type Players"), &vars::visuals->chams->indexPlayers, magic_enum::enum_names_pretty<ChamsType>());
-						ImGui::Animated::ColorPicker(XOR("Chams color Players"), &vars::visuals->chams->colorPlayers);
-						ImGui::Animated::Checkbox(XOR("Chams XQZ"), &vars::visuals->chams->enabledXQZPlayers);
-						ImGui::Animated::ColorPicker(XOR("Chams XQZ color"), &vars::visuals->chams->colorXQZPlayers);
+						ImGui::Animations::Combo<const std::string>(XOR("Chams type Players"), &vars::visuals->chams->indexPlayers, magic_enum::enum_names_pretty<ChamsType>());
+						ImGui::Animations::ColorPicker(XOR("Chams color Players"), &vars::visuals->chams->colorPlayers);
+						ImGui::Animations::Checkbox(XOR("Chams XQZ"), &vars::visuals->chams->enabledXQZPlayers);
+						ImGui::Animations::ColorPicker(XOR("Chams XQZ color"), &vars::visuals->chams->colorXQZPlayers);
 					});
-				ImGui::Animated::Checkbox(XOR("Chams enabled Weapons"), &vars::visuals->chams->enabledWeapons);
+				ImGui::Animations::Checkbox(XOR("Chams enabled Weapons"), &vars::visuals->chams->enabledWeapons);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Chams options weapons"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options weapons"), []()
 					{
-						ImGui::Animated::Combo<const std::string>(XOR("Chams type Weapons"), &vars::visuals->chams->indexWeapons, magic_enum::enum_names_pretty<ChamsType>());
-						ImGui::Animated::ColorPicker(XOR("Chams color Weapons"), &vars::visuals->chams->colorWeapons);
-						ImGui::Animated::Checkbox(XOR("Disable weapon"), &vars::visuals->chams->weaponHide);
+						ImGui::Animations::Combo<const std::string>(XOR("Chams type Weapons"), &vars::visuals->chams->indexWeapons, magic_enum::enum_names_pretty<ChamsType>());
+						ImGui::Animations::ColorPicker(XOR("Chams color Weapons"), &vars::visuals->chams->colorWeapons);
+						ImGui::Animations::Checkbox(XOR("Disable weapon"), &vars::visuals->chams->weaponHide);
 					});
-				ImGui::Animated::Checkbox(XOR("Chams enabled Arms"), &vars::visuals->chams->enabledArms);
+				ImGui::Animations::Checkbox(XOR("Chams enabled Arms"), &vars::visuals->chams->enabledArms);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Chams options arms"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options arms"), []()
 					{
-						ImGui::Animated::Combo<const std::string>(XOR("Chams type Arms"), &vars::visuals->chams->indexArms, magic_enum::enum_names_pretty<ChamsType>());
-						ImGui::Animated::ColorPicker(XOR("Chams color Arms"), &vars::visuals->chams->colorArms);
-						ImGui::Animated::Checkbox(XOR("Disable arms"), &vars::visuals->chams->armsHide);
+						ImGui::Animations::Combo<const std::string>(XOR("Chams type Arms"), &vars::visuals->chams->indexArms, magic_enum::enum_names_pretty<ChamsType>());
+						ImGui::Animations::ColorPicker(XOR("Chams color Arms"), &vars::visuals->chams->colorArms);
+						ImGui::Animations::Checkbox(XOR("Disable arms"), &vars::visuals->chams->armsHide);
 					});
-				ImGui::Animated::Checkbox(XOR("Chams enabled Backtrack"), &vars::visuals->chams->enabledBacktrack);
+				ImGui::Animations::Checkbox(XOR("Chams enabled Backtrack"), &vars::visuals->chams->enabledBacktrack);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Chams options backtrack"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options backtrack"), []()
 					{
-						ImGui::Animated::Combo<const std::string>(XOR("Chams type Backtrack"), &vars::visuals->chams->modeBacktrack, magic_enum::enum_names_pretty<ChamsType>());
-						ImGui::Animated::ColorPicker(XOR("Backtrack chams col"), &vars::visuals->chams->colorBacktrack);
-						ImGui::Animated::Combo<const std::string>(XOR("Chams style Backtrack"), &vars::visuals->chams->indexBacktrack, magic_enum::enum_names_pretty<BTChamsType>());
+						ImGui::Animations::Combo<const std::string>(XOR("Chams type Backtrack"), &vars::visuals->chams->modeBacktrack, magic_enum::enum_names_pretty<ChamsType>());
+						ImGui::Animations::ColorPicker(XOR("Backtrack chams col"), &vars::visuals->chams->colorBacktrack);
+						ImGui::Animations::Combo<const std::string>(XOR("Chams style Backtrack"), &vars::visuals->chams->indexBacktrack, magic_enum::enum_names_pretty<BTChamsType>());
 					});
-				ImGui::Animated::Checkbox(XOR("Enabled glow"), &vars::visuals->glow->enabled);
+				ImGui::Animations::Checkbox(XOR("Enabled glow"), &vars::visuals->glow->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Chams options"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("Glow color"), &vars::visuals->glow->colorPlayer);
+						ImGui::Animations::ColorPicker(XOR("Glow color"), &vars::visuals->glow->colorPlayer);
 					});
 
 				ImGui::EndGroupPanel();
@@ -300,13 +301,13 @@ static void renderVisuals()
 		{
 			ImGui::BeginGroupPanel(XOR("Weapons"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Enabled##weapons"), &vars::visuals->esp->weaponBar->enabled);
+				ImGui::Animations::Checkbox(XOR("Enabled##weapons"), &vars::visuals->esp->weaponBar->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Weapons text and bar"), []()
+				ImGui::Animations::PopupButton(XOR("##Weapons text and bar"), []()
 					{
-						ImGui::Animated::Checkbox(XOR("Translate name"), &vars::visuals->esp->weaponBar->translate);
-						ImGui::Animated::ColorPicker(XOR("Color for text"), &vars::visuals->esp->weaponBar->text);
-						ImGui::Animated::ColorPicker(XOR("Reload bar color"), &vars::visuals->esp->weaponBar->bar);
+						ImGui::Animations::Checkbox(XOR("Translate name"), &vars::visuals->esp->weaponBar->translate);
+						ImGui::Animations::ColorPicker(XOR("Color for text"), &vars::visuals->esp->weaponBar->text);
+						ImGui::Animations::ColorPicker(XOR("Reload bar color"), &vars::visuals->esp->weaponBar->bar);
 					}
 				);
 
@@ -315,11 +316,11 @@ static void renderVisuals()
 
 			ImGui::BeginGroupPanel(XOR("Bomb"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Bomb info"), &vars::visuals->world->bomb->enabled);
+				ImGui::Animations::Checkbox(XOR("Bomb info"), &vars::visuals->world->bomb->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Bomb info draw"), []()
+				ImGui::Animations::PopupButton(XOR("##Bomb info draw"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("C4 info"), &vars::visuals->world->bomb->background);
+						ImGui::Animations::ColorPicker(XOR("C4 info"), &vars::visuals->world->bomb->background);
 					}
 				);
 
@@ -328,15 +329,15 @@ static void renderVisuals()
 
 			ImGui::BeginGroupPanel(XOR("Nades"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Enabled##nades"), &vars::visuals->world->projectiles->enabled);
+				ImGui::Animations::Checkbox(XOR("Enabled##nades"), &vars::visuals->world->projectiles->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Nades drawing"), []()
+				ImGui::Animations::PopupButton(XOR("##Nades drawing"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("Flashbang color"), &vars::visuals->world->projectiles->flash);
-						ImGui::Animated::ColorPicker(XOR("Granede color"), &vars::visuals->world->projectiles->nade);
-						ImGui::Animated::ColorPicker(XOR("Molotov color"), &vars::visuals->world->projectiles->molotov);
-						ImGui::Animated::ColorPicker(XOR("Smoke color"), &vars::visuals->world->projectiles->smoke);
-						ImGui::Animated::ColorPicker(XOR("Decoy color"), &vars::visuals->world->projectiles->decoy);
+						ImGui::Animations::ColorPicker(XOR("Flashbang color"), &vars::visuals->world->projectiles->flash);
+						ImGui::Animations::ColorPicker(XOR("Granede color"), &vars::visuals->world->projectiles->nade);
+						ImGui::Animations::ColorPicker(XOR("Molotov color"), &vars::visuals->world->projectiles->molotov);
+						ImGui::Animations::ColorPicker(XOR("Smoke color"), &vars::visuals->world->projectiles->smoke);
+						ImGui::Animations::ColorPicker(XOR("Decoy color"), &vars::visuals->world->projectiles->decoy);
 					}
 				);
 
@@ -345,12 +346,12 @@ static void renderVisuals()
 
 			ImGui::BeginGroupPanel(XOR("Dropped"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Enabled##dropped"), &vars::visuals->esp->dropped->enabled);
+				ImGui::Animations::Checkbox(XOR("Enabled##dropped"), &vars::visuals->esp->dropped->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Dropped weapons draw"), []()
+				ImGui::Animations::PopupButton(XOR("##Dropped weapons draw"), []()
 					{
-						ImGui::Animated::MultiCombo(XOR("Dropped flags"), magic_enum::enum_names_pretty<DroppedFlags>(), &vars::visuals->esp->dropped->flags);
-						ImGui::Animated::ColorPicker(XOR("Dropped color"), &vars::visuals->esp->dropped->color);
+						ImGui::Animations::MultiCombo(XOR("Dropped flags"), magic_enum::enum_names_pretty<DroppedFlags>(), &vars::visuals->esp->dropped->flags);
+						ImGui::Animations::ColorPicker(XOR("Dropped color"), &vars::visuals->esp->dropped->color);
 					}
 				);
 
@@ -359,27 +360,27 @@ static void renderVisuals()
 
 			ImGui::BeginGroupPanel(XOR("Particles edit"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("##Edit molotov"), &vars::visuals->world->particles->enabledMolotov);
+				ImGui::Animations::Checkbox(XOR("##Edit molotov"), &vars::visuals->world->particles->enabledMolotov);
 				ImGui::SameLine();
-				ImGui::Animated::ColorPicker(XOR("Molotov##edited"), &vars::visuals->world->particles->colorMolotov);
-				ImGui::Animated::Checkbox(XOR("##Edit blood"), &vars::visuals->world->particles->enabledBlood);
+				ImGui::Animations::ColorPicker(XOR("Molotov##edited"), &vars::visuals->world->particles->colorMolotov);
+				ImGui::Animations::Checkbox(XOR("##Edit blood"), &vars::visuals->world->particles->enabledBlood);
 				ImGui::SameLine();
-				ImGui::Animated::ColorPicker(XOR("Blood##edited"), &vars::visuals->world->particles->colorBlood);
-				ImGui::Animated::Checkbox(XOR("##Edit smoke"), &vars::visuals->world->particles->enabledSmoke);
+				ImGui::Animations::ColorPicker(XOR("Blood##edited"), &vars::visuals->world->particles->colorBlood);
+				ImGui::Animations::Checkbox(XOR("##Edit smoke"), &vars::visuals->world->particles->enabledSmoke);
 				ImGui::SameLine();
-				ImGui::Animated::ColorPicker(XOR("Smoke##edited"), &vars::visuals->world->particles->colorSmoke);
+				ImGui::Animations::ColorPicker(XOR("Smoke##edited"), &vars::visuals->world->particles->colorSmoke);
 
 				ImGui::EndGroupPanel();
 			}
 
 			ImGui::BeginGroupPanel(XOR("Molotov & Smoke circles"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("##Enabled molotov circle"), &vars::visuals->world->molotov->enabled);
+				ImGui::Animations::Checkbox(XOR("##Enabled molotov circle"), &vars::visuals->world->molotov->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::ColorPicker(XOR("Draw molotov circle"), &vars::visuals->world->molotov->color);
-				ImGui::Animated::Checkbox(XOR("##Enabled smoke circle"), &vars::visuals->world->smoke->enabled);
+				ImGui::Animations::ColorPicker(XOR("Draw molotov circle"), &vars::visuals->world->molotov->color);
+				ImGui::Animations::Checkbox(XOR("##Enabled smoke circle"), &vars::visuals->world->smoke->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::ColorPicker(XOR("Draw smoke circle"), &vars::visuals->world->smoke->color);
+				ImGui::Animations::ColorPicker(XOR("Draw smoke circle"), &vars::visuals->world->smoke->color);
 
 				ImGui::EndGroupPanel();
 			}
@@ -405,10 +406,10 @@ static void renderMisc()
 			{
 				const auto customsky = g_SkyboxEdit->getAllCustomSkyBoxes();
 				bool state;
-				state |= ImGui::Animated::Combo<const char*>(XOR("Normal"), &vars::visuals->world->sky->indexNormal, selections::skyboxes);
-				state |= ImGui::Animated::Combo<const std::string>(XOR("Custom##Skybox"), &vars::visuals->world->sky->indexCustom, customsky);
+				state |= ImGui::Animations::Combo<const char*>(XOR("Normal"), &vars::visuals->world->sky->indexNormal, selections::skyboxes);
+				state |= ImGui::Animations::Combo<const std::string>(XOR("Custom##Skybox"), &vars::visuals->world->sky->indexCustom, customsky);
 				g_SkyboxEdit->handleButtonState(state);
-				if (ImGui::Animated::Button(XOR("Reload Custom Skybox")))
+				if (ImGui::Animations::Button(XOR("Reload Custom Skybox")))
 				{
 					g_SkyboxEdit->reloadCustomSkyboxes();
 				}
@@ -417,61 +418,61 @@ static void renderMisc()
 			}
 			ImGui::BeginGroupPanel(XOR("World Modulation"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Modulate world"), &vars::visuals->world->modulate->enabled);
-				ImGui::Animated::Checkbox(XOR("Remove sky"), &vars::visuals->world->sky->removeSky);
-				ImGui::Animated::ColorPicker(XOR("Modulate world texture"), &vars::visuals->world->modulate->texture);
-				ImGui::Animated::ColorPicker(XOR("Modulate world prop"), &vars::visuals->world->modulate->prop);
-				ImGui::Animated::ColorPicker(XOR("Modulate world sky"), &vars::visuals->world->modulate->sky);
-				ImGui::Animated::SliderFloat(XOR("Shader value"), &vars::visuals->world->modulate->shader, 0.0f, 100.0f);
+				ImGui::Animations::Checkbox(XOR("Modulate world"), &vars::visuals->world->modulate->enabled);
+				ImGui::Animations::Checkbox(XOR("Remove sky"), &vars::visuals->world->sky->removeSky);
+				ImGui::Animations::ColorPicker(XOR("Modulate world texture"), &vars::visuals->world->modulate->texture);
+				ImGui::Animations::ColorPicker(XOR("Modulate world prop"), &vars::visuals->world->modulate->prop);
+				ImGui::Animations::ColorPicker(XOR("Modulate world sky"), &vars::visuals->world->modulate->sky);
+				ImGui::Animations::SliderFloat(XOR("Shader value"), &vars::visuals->world->modulate->shader, 0.0f, 100.0f);
 
 				ImGui::EndGroupPanel();
 			}
 
 
-			/*ImGui::Animated::Checkbox(XOR("Zeus range"), &config.getRef<bool>(vars.bDrawZeusRange));
+			/*ImGui::Animations::Checkbox(XOR("Zeus range"), &config.getRef<bool>(vars.bDrawZeusRange));
 			ImGui::SameLine();
-			ImGui::Animated::ColorPicker(XOR("Zeus color"), &config.getRef<CfgColor>(vars.cZeusRange));
-			ImGui::Animated::Checkbox(XOR("Zeus party"), &config.getRef<bool>(vars.bZeusPartyMode));
+			ImGui::Animations::ColorPicker(XOR("Zeus color"), &config.getRef<CfgColor>(vars.cZeusRange));
+			ImGui::Animations::Checkbox(XOR("Zeus party"), &config.getRef<bool>(vars.bZeusPartyMode));
 			ImGui::SameLine();
-			ImGui::Animated::Checkbox(XOR("Zeus tracing"), &config.getRef<bool>(vars.bZeusUseTracing));*/
+			ImGui::Animations::Checkbox(XOR("Zeus tracing"), &config.getRef<bool>(vars.bZeusUseTracing));*/
 
 			ImGui::BeginGroupPanel(XOR("View"), availRegion());
 			{
-				ImGui::Animated::SliderFloat(XOR("FOV local"), &vars::misc->fov->value, -50.0f, 50.0f);
-				ImGui::Animated::Checkbox(XOR("Third Person"), &vars::misc->thirdp->enabled);
+				ImGui::Animations::SliderFloat(XOR("FOV local"), &vars::misc->fov->value, -50.0f, 50.0f);
+				ImGui::Animations::Checkbox(XOR("Third Person"), &vars::misc->thirdp->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::Hotkey(XOR(""), &vars::keys->thirdP);
+				ImGui::Animations::Hotkey(XOR(""), &vars::keys->thirdP);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Third person pop"), []()
+				ImGui::Animations::PopupButton(XOR("##Third person pop"), []()
 					{
-						ImGui::Animated::SliderFloat(XOR("Distance##thirdp"), &vars::misc->thirdp->distance, 1.0f, 500.0f);
-						ImGui::Animated::SliderFloat(XOR("Extra X##thirdp"), &vars::misc->thirdp->x, -180.0f, 180.0f);
-						ImGui::Animated::SliderFloat(XOR("Extra Y##thirdp"), &vars::misc->thirdp->y, -180.0f, 180.0f);
+						ImGui::Animations::SliderFloat(XOR("Distance##thirdp"), &vars::misc->thirdp->distance, 1.0f, 500.0f);
+						ImGui::Animations::SliderFloat(XOR("Extra X##thirdp"), &vars::misc->thirdp->x, -180.0f, 180.0f);
+						ImGui::Animations::SliderFloat(XOR("Extra Y##thirdp"), &vars::misc->thirdp->y, -180.0f, 180.0f);
 					}
 				);
-				ImGui::Animated::Combo<const std::string>(XOR("Crosshair type"), &vars::misc->crosshair->index, magic_enum::enum_names_pretty<CrossHairTypes>());
+				ImGui::Animations::Combo<const std::string>(XOR("Crosshair type"), &vars::misc->crosshair->index, magic_enum::enum_names_pretty<CrossHairTypes>());
 
 				ImGui::EndGroupPanel();
 			}
 
 			ImGui::BeginGroupPanel(XOR("Radar"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("2D Radar enabled"), &vars::misc->radar->enabled);
+				ImGui::Animations::Checkbox(XOR("2D Radar enabled"), &vars::misc->radar->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##2D Radar pop"), []()
+				ImGui::Animations::PopupButton(XOR("##2D Radar pop"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("Angle view line"), &vars::misc->radar->colorLine);
-						ImGui::Animated::ColorPicker(XOR("Players color"), &vars::misc->radar->colorPlayer);
-						ImGui::Animated::SliderFloat(XOR("Thickness"), &vars::misc->radar->thickness, 0.0f, 20.0f);
-						ImGui::Animated::SliderFloat(XOR("Length"), &vars::misc->radar->length, 0.0f, 40.0f);
-						ImGui::Animated::SliderFloat(XOR("Scale"), &vars::misc->radar->scale, 0.0f, 10.0f);
-						ImGui::Animated::SliderFloat(XOR("Radar size"), &vars::misc->radar->size, 10.0f, 500.0f);
-						ImGui::Animated::Checkbox(XOR("Draw out of radar"), &vars::misc->radar->ranges);
+						ImGui::Animations::ColorPicker(XOR("Angle view line"), &vars::misc->radar->colorLine);
+						ImGui::Animations::ColorPicker(XOR("Players color"), &vars::misc->radar->colorPlayer);
+						ImGui::Animations::SliderFloat(XOR("Thickness"), &vars::misc->radar->thickness, 0.0f, 20.0f);
+						ImGui::Animations::SliderFloat(XOR("Length"), &vars::misc->radar->length, 0.0f, 40.0f);
+						ImGui::Animations::SliderFloat(XOR("Scale"), &vars::misc->radar->scale, 0.0f, 10.0f);
+						ImGui::Animations::SliderFloat(XOR("Radar size"), &vars::misc->radar->size, 10.0f, 500.0f);
+						ImGui::Animations::Checkbox(XOR("Draw out of radar"), &vars::misc->radar->ranges);
 						ImGui::SameLine();
 						ImGui::HelpMarker(XOR("If enemy is out of the radar\nThen icons will still appear but clamped"));
 					}
 				);
-				if (ImGui::Animated::Button(XOR("Refresh texture manually")))
+				if (ImGui::Animations::Button(XOR("Refresh texture manually")))
 				{
 					g_Radar->manuallyInitTexture();
 				}
@@ -488,37 +489,37 @@ static void renderMisc()
 		{
 			ImGui::BeginGroupPanel(XOR("Movement"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Bunnyhop"), &vars::misc->bunnyHop->enabled);
+				ImGui::Animations::Checkbox(XOR("Bunnyhop"), &vars::misc->bunnyHop->enabled);
 				if(vars::misc->bunnyHop->enabled)
 				{
 					ImGui::SliderInt(XOR("Bunnyhop hitchance"), &vars::misc->bunnyHop->chance, 0, 100, "%i%%");
 				}
-				ImGui::Animated::Combo<const std::string>(XOR("Autostrafe"), &vars::misc->bunnyHop->indexStrafe, magic_enum::enum_names_pretty<MovementStraferMode>());
+				ImGui::Animations::Combo<const std::string>(XOR("Autostrafe"), &vars::misc->bunnyHop->indexStrafe, magic_enum::enum_names_pretty<MovementStraferMode>());
 
 				ImGui::EndGroupPanel();
 			}
 			/*bool& logRef = config.getRef<bool>(vars.bLogEnabled);
-			ImGui::Animated::Checkbox(XOR("Log events"), &logRef);
+			ImGui::Animations::Checkbox(XOR("Log events"), &logRef);
 			if (logRef)
 			{
-				ImGui::Animated::SliderFloat(XOR("Log time"), &config.getRef<float>(vars.fLogMaxTime), 1.0f, 8.0f);
+				ImGui::Animations::SliderFloat(XOR("Log time"), &config.getRef<float>(vars.fLogMaxTime), 1.0f, 8.0f);
 			}*/
 			ImGui::BeginGroupPanel(XOR("Hitmarker"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Hitmarker"), &vars::misc->hitmarker->enabled);
+				ImGui::Animations::Checkbox(XOR("Hitmarker"), &vars::misc->hitmarker->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##hitmarker pop"), []()
+				ImGui::Animations::PopupButton(XOR("##hitmarker pop"), []()
 					{
-						ImGui::Animated::Checkbox(XOR("3D##Hitm"), &vars::misc->hitmarker->enabled3D);
+						ImGui::Animations::Checkbox(XOR("3D##Hitm"), &vars::misc->hitmarker->enabled3D);
 						ImGui::SameLine();
-						ImGui::Animated::Checkbox(XOR("Resize##Hitm"), &vars::misc->hitmarker->enabledResize);
-						ImGui::Animated::ColorPicker(XOR("Hitmarker normal"), &vars::misc->hitmarker->colorNormal);
-						ImGui::Animated::ColorPicker(XOR("Hitmarker hs"), &vars::misc->hitmarker->colorHead);
+						ImGui::Animations::Checkbox(XOR("Resize##Hitm"), &vars::misc->hitmarker->enabledResize);
+						ImGui::Animations::ColorPicker(XOR("Hitmarker normal"), &vars::misc->hitmarker->colorNormal);
+						ImGui::Animations::ColorPicker(XOR("Hitmarker hs"), &vars::misc->hitmarker->colorHead);
 						ImGui::SameLine();
 						ImGui::Text(XOR("Hitmarker hs"));
-						ImGui::Animated::ColorPicker(XOR("Hitmarker dead"), &vars::misc->hitmarker->colorDead);
-						ImGui::Animated::SliderFloat(XOR("Hitmarker time"), &vars::misc->hitmarker->time, 0.0f, 2.0f);
-						ImGui::Animated::Checkbox(XOR("Play hitmarker"), &vars::misc->hitmarker->play);
+						ImGui::Animations::ColorPicker(XOR("Hitmarker dead"), &vars::misc->hitmarker->colorDead);
+						ImGui::Animations::SliderFloat(XOR("Hitmarker time"), &vars::misc->hitmarker->time, 0.0f, 2.0f);
+						ImGui::Animations::Checkbox(XOR("Play hitmarker"), &vars::misc->hitmarker->play);
 						ImGui::SameLine();
 						ImGui::HelpMarker(XOR("Will play the sound after every kill"));
 					}
@@ -528,48 +529,48 @@ static void renderMisc()
 			}
 			ImGui::BeginGroupPanel(XOR("Misc"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("No scope"), &vars::misc->scope->enabled);
+				ImGui::Animations::Checkbox(XOR("No scope"), &vars::misc->scope->enabled);
 				
-				ImGui::Animated::Checkbox(XOR("FPS Plot"), &vars::misc->plots->enabledFps);
+				ImGui::Animations::Checkbox(XOR("FPS Plot"), &vars::misc->plots->enabledFps);
 				if (vars::misc->plots->enabledFps)
 				{
 					ImGui::SameLine();
-					ImGui::Animated::Checkbox(XOR("FPS Custom"), &vars::misc->plots->fpsCustom);
+					ImGui::Animations::Checkbox(XOR("FPS Custom"), &vars::misc->plots->fpsCustom);
 				}
 				
-				ImGui::Animated::Checkbox(XOR("Velocity Plot"), &vars::misc->plots->enabledVelocity);
+				ImGui::Animations::Checkbox(XOR("Velocity Plot"), &vars::misc->plots->enabledVelocity);
 				if (vars::misc->plots->enabledVelocity)
 				{
 					ImGui::SameLine();
-					ImGui::Animated::Checkbox(XOR("Velocity Custom"), &vars::misc->plots->velocityCustom);
+					ImGui::Animations::Checkbox(XOR("Velocity Custom"), &vars::misc->plots->velocityCustom);
 				}
-				ImGui::Animated::Checkbox(XOR("Draw misc info"), &vars::misc->info->enabled);
-				ImGui::Animated::Checkbox(XOR("Playerlist##checkbox"), &vars::misc->playerList->enabled);
+				ImGui::Animations::Checkbox(XOR("Draw misc info"), &vars::misc->info->enabled);
+				ImGui::Animations::Checkbox(XOR("Playerlist##checkbox"), &vars::misc->playerList->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Playerlist pop"), []()
+				ImGui::Animations::PopupButton(XOR("##Playerlist pop"), []()
 					{
-						ImGui::Animated::Checkbox(XOR("Health##playerlist"), &vars::misc->playerList->health);
-						ImGui::Animated::Checkbox(XOR("Money##playerlist"), &vars::misc->playerList->money);
-						ImGui::Animated::Checkbox(XOR("Team##playerlist"), &vars::misc->playerList->teamID);
-						ImGui::Animated::Checkbox(XOR("Place##playerlist"), &vars::misc->playerList->lastPlace);
+						ImGui::Animations::Checkbox(XOR("Health##playerlist"), &vars::misc->playerList->health);
+						ImGui::Animations::Checkbox(XOR("Money##playerlist"), &vars::misc->playerList->money);
+						ImGui::Animations::Checkbox(XOR("Team##playerlist"), &vars::misc->playerList->teamID);
+						ImGui::Animations::Checkbox(XOR("Place##playerlist"), &vars::misc->playerList->lastPlace);
 					}
 				);
-				ImGui::Animated::Checkbox(XOR("Hat on local"), &vars::misc->hat->enabled);
+				ImGui::Animations::Checkbox(XOR("Hat on local"), &vars::misc->hat->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Hat pop"), []()
+				ImGui::Animations::PopupButton(XOR("##Hat pop"), []()
 					{
-						ImGui::Animated::Checkbox(XOR("Rainbow hat"), &vars::misc->hat->rainbow);
+						ImGui::Animations::Checkbox(XOR("Rainbow hat"), &vars::misc->hat->rainbow);
 						if (!vars::misc->hat->rainbow)
 						{
-							ImGui::Animated::ColorPicker(XOR("Hat triangle color"), &vars::misc->hat->colorTriangle);
-							ImGui::Animated::ColorPicker(XOR("Hat lines color"), &vars::misc->hat->colorLine);
+							ImGui::Animations::ColorPicker(XOR("Hat triangle color"), &vars::misc->hat->colorTriangle);
+							ImGui::Animations::ColorPicker(XOR("Hat lines color"), &vars::misc->hat->colorLine);
 						}
 						else
 						{
-							ImGui::Animated::SliderFloat(XOR("Hat rainbow speed"), &vars::misc->hat->rainbowSpeed, 0.2f, 10.0f);
+							ImGui::Animations::SliderFloat(XOR("Hat rainbow speed"), &vars::misc->hat->rainbowSpeed, 0.2f, 10.0f);
 						}
-						ImGui::Animated::SliderFloat(XOR("Hat size"), &vars::misc->hat->size, -100.0f, 100.0f);
-						ImGui::Animated::SliderFloat(XOR("Hat radius"), &vars::misc->hat->radius, 1.0f, 100.0f);
+						ImGui::Animations::SliderFloat(XOR("Hat size"), &vars::misc->hat->size, -100.0f, 100.0f);
+						ImGui::Animations::SliderFloat(XOR("Hat radius"), &vars::misc->hat->radius, 1.0f, 100.0f);
 					}
 				);
 
@@ -577,23 +578,23 @@ static void renderMisc()
 			}
 			ImGui::BeginGroupPanel(XOR("Nade prediction"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Nade pred"), &vars::misc->nade->enabledPred);
+				ImGui::Animations::Checkbox(XOR("Nade pred"), &vars::misc->nade->enabledPred);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##nade pred pop"), []()
+				ImGui::Animations::PopupButton(XOR("##nade pred pop"), []()
 					{
-						ImGui::Animated::Checkbox(XOR("Show always"), &vars::misc->nade->predAlways);
-						ImGui::Animated::ColorPicker(XOR("Nade pred color"), &vars::misc->nade->colorPredLine);
-						ImGui::Animated::ColorPicker(XOR("Nade pred color box fill"), &vars::misc->nade->colorPredBoxFill);
-						ImGui::Animated::ColorPicker(XOR("Nade pred color box outline"), &vars::misc->nade->colorPredBox);
+						ImGui::Animations::Checkbox(XOR("Show always"), &vars::misc->nade->predAlways);
+						ImGui::Animations::ColorPicker(XOR("Nade pred color"), &vars::misc->nade->colorPredLine);
+						ImGui::Animations::ColorPicker(XOR("Nade pred color box fill"), &vars::misc->nade->colorPredBoxFill);
+						ImGui::Animations::ColorPicker(XOR("Nade pred color box outline"), &vars::misc->nade->colorPredBox);
 					}
 				);
-				ImGui::Animated::Checkbox(XOR("Nade trails"), &vars::misc->nade->enabledTracer);
+				ImGui::Animations::Checkbox(XOR("Nade trails"), &vars::misc->nade->enabledTracer);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##nade trails pop"), []()
+				ImGui::Animations::PopupButton(XOR("##nade trails pop"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("Nade trail color"), &vars::misc->nade->colorTracer);
-						ImGui::Animated::SliderFloat(XOR("Nade trail max dist"), &vars::misc->nade->tracerDist, 1.0f, 100.0f);
-						ImGui::Animated::Checkbox(XOR("Nade trail warn"), &vars::misc->nade->tracerWarn);
+						ImGui::Animations::ColorPicker(XOR("Nade trail color"), &vars::misc->nade->colorTracer);
+						ImGui::Animations::SliderFloat(XOR("Nade trail max dist"), &vars::misc->nade->tracerDist, 1.0f, 100.0f);
+						ImGui::Animations::Checkbox(XOR("Nade trail warn"), &vars::misc->nade->tracerWarn);
 						ImGui::SameLine();
 						ImGui::HelpMarker(XOR("Draws scaled circles behind you where nade is"));
 					}
@@ -604,24 +605,24 @@ static void renderMisc()
 
 			ImGui::BeginGroupPanel(XOR("Bullets and trails"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Movement trail"), &vars::misc->trail->enabled);
+				ImGui::Animations::Checkbox(XOR("Movement trail"), &vars::misc->trail->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Movement trails pop"), []()
+				ImGui::Animations::PopupButton(XOR("##Movement trails pop"), []()
 					{
-						ImGui::Animated::Combo<const std::string>(XOR("Trail type"), &vars::misc->trail->mode, magic_enum::enum_names_pretty<MovementTrail>());
-						ImGui::Animated::ColorPicker(XOR("Movement trail color"), &vars::misc->trail->color);
-						ImGui::Animated::SliderFloat(XOR("Trail speed"), &vars::misc->trail->beamSpeed, 1.0f, 10.0f);
-						ImGui::Animated::SliderFloat(XOR("Trail life"), &vars::misc->trail->time, 1.0f, 10.0f);
+						ImGui::Animations::Combo<const std::string>(XOR("Trail type"), &vars::misc->trail->mode, magic_enum::enum_names_pretty<MovementTrail>());
+						ImGui::Animations::ColorPicker(XOR("Movement trail color"), &vars::misc->trail->color);
+						ImGui::Animations::SliderFloat(XOR("Trail speed"), &vars::misc->trail->beamSpeed, 1.0f, 10.0f);
+						ImGui::Animations::SliderFloat(XOR("Trail life"), &vars::misc->trail->time, 1.0f, 10.0f);
 					}
 				);
 
 
-				//ImGui::Animated::Checkbox(XOR("Remove blood spray"), &config.getRef<bool>(vars.bRemoveBloodSpray));
-				ImGui::Animated::Checkbox(XOR("Enable tracers"), &vars::visuals->world->tracer->enabled);
+				//ImGui::Animations::Checkbox(XOR("Remove blood spray"), &config.getRef<bool>(vars.bRemoveBloodSpray));
+				ImGui::Animations::Checkbox(XOR("Enable tracers"), &vars::visuals->world->tracer->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Bullet tracers"), []()
+				ImGui::Animations::PopupButton(XOR("##Bullet tracers"), []()
 					{
-						ImGui::Animated::Combo<const char*>(XOR("Beam sprite"), &vars::visuals->world->tracer->beamTracer.index, selections::beamNames);
+						ImGui::Animations::Combo<const char*>(XOR("Beam sprite"), &vars::visuals->world->tracer->beamTracer.index, selections::beamNames);
 						/*ImGui::InputTextWithHint(XOR("Beam type"), XOR("Add without spaces! eg: 4|8"), &config.getRef<std::string>(vars.sBulletTracerType));*/
 						/*ImGui::SameLine();
 						ImGui::HelpMarker(XOR("Types list\n"
@@ -657,26 +658,26 @@ static void renderMisc()
 							"FBEAM_HALOBEAM 32768\n"
 							"FBEAM_REVERSED 65536\n"
 						));
-						ImGui::Animated::ColorPicker(XOR("Tracers color"), &vars::visuals->world->tracer->beamTracer.color);
-						ImGui::Animated::SliderFloat(XOR("Tracers life"), &vars::visuals->world->tracer->beamTracer.life, 0.0f, 10.0f);
-						ImGui::Animated::SliderFloat(XOR("Tracers width"), &vars::visuals->world->tracer->beamTracer.width, 0.0f, 20.0f);
-						ImGui::Animated::SliderFloat(XOR("Tracers fadeLenght"), &vars::visuals->world->tracer->beamTracer.fadeLength, 0.0f, 20.0f);
-						ImGui::Animated::SliderFloat(XOR("Tracers amplitude"), &vars::visuals->world->tracer->beamTracer.amplitude, 0.0f, 20.0f);
-						ImGui::Animated::SliderFloat(XOR("Tracers speed"), &vars::visuals->world->tracer->beamTracer.speed, 0.0f, 200.0f);
-						ImGui::Animated::SliderFloat(XOR("Tracers startFrame"), &vars::visuals->world->tracer->beamTracer.startFrame, 0.0f, 300.0f);
-						ImGui::Animated::SliderFloat(XOR("Tracers frameRate"), &vars::visuals->world->tracer->beamTracer.frameRate, 0.0f, 200.0f);
+						ImGui::Animations::ColorPicker(XOR("Tracers color"), &vars::visuals->world->tracer->beamTracer.color);
+						ImGui::Animations::SliderFloat(XOR("Tracers life"), &vars::visuals->world->tracer->beamTracer.life, 0.0f, 10.0f);
+						ImGui::Animations::SliderFloat(XOR("Tracers width"), &vars::visuals->world->tracer->beamTracer.width, 0.0f, 20.0f);
+						ImGui::Animations::SliderFloat(XOR("Tracers fadeLenght"), &vars::visuals->world->tracer->beamTracer.fadeLength, 0.0f, 20.0f);
+						ImGui::Animations::SliderFloat(XOR("Tracers amplitude"), &vars::visuals->world->tracer->beamTracer.amplitude, 0.0f, 20.0f);
+						ImGui::Animations::SliderFloat(XOR("Tracers speed"), &vars::visuals->world->tracer->beamTracer.speed, 0.0f, 200.0f);
+						ImGui::Animations::SliderFloat(XOR("Tracers startFrame"), &vars::visuals->world->tracer->beamTracer.startFrame, 0.0f, 300.0f);
+						ImGui::Animations::SliderFloat(XOR("Tracers frameRate"), &vars::visuals->world->tracer->beamTracer.frameRate, 0.0f, 200.0f);
 						ImGui::SliderInt(XOR("Tracers segmnets"), &vars::visuals->world->tracer->beamTracer.segments, 0, 30);
 					}
 				);
-				ImGui::Animated::Checkbox(XOR("Enable local bullets"), &vars::visuals->world->impacts->enabledLocal);
+				ImGui::Animations::Checkbox(XOR("Enable local bullets"), &vars::visuals->world->impacts->enabledLocal);
 				ImGui::SameLine();			
-				ImGui::Animated::Checkbox(XOR("Enable client bullets"), &vars::visuals->world->impacts->enabledClient);
+				ImGui::Animations::Checkbox(XOR("Enable client bullets"), &vars::visuals->world->impacts->enabledClient);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##client bullets pop"), []()
+				ImGui::Animations::PopupButton(XOR("##client bullets pop"), []()
 					{
-						ImGui::Animated::ColorPicker(XOR("Outline##Client bullets"), &vars::visuals->world->impacts->colorClient);
-						ImGui::Animated::ColorPicker(XOR("Fill##Client bullets"), &vars::visuals->world->impacts->colorClientFill);
-						ImGui::Animated::SliderFloat(XOR("Time##Client bullets"), &vars::visuals->world->impacts->timeClient, 0.0f, 5.0f);
+						ImGui::Animations::ColorPicker(XOR("Outline##Client bullets"), &vars::visuals->world->impacts->colorClient);
+						ImGui::Animations::ColorPicker(XOR("Fill##Client bullets"), &vars::visuals->world->impacts->colorClientFill);
+						ImGui::Animations::SliderFloat(XOR("Time##Client bullets"), &vars::visuals->world->impacts->timeClient, 0.0f, 5.0f);
 					}
 				);			
 
@@ -685,92 +686,92 @@ static void renderMisc()
 
 			ImGui::BeginGroupPanel(XOR("Misc other"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Game logs"), &vars::misc->logs->enabled);
+				ImGui::Animations::Checkbox(XOR("Game logs"), &vars::misc->logs->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::SliderFloat(XOR("Time##Gamelogs"), &vars::misc->logs->time, 1.0f, 10.0f);
-				ImGui::Animated::Checkbox(XOR("Freelook"), &vars::misc->freeLook->enabled);
+				ImGui::Animations::SliderFloat(XOR("Time##Gamelogs"), &vars::misc->logs->time, 1.0f, 10.0f);
+				ImGui::Animations::Checkbox(XOR("Freelook"), &vars::misc->freeLook->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::Hotkey(XOR("##fl"), &vars::keys->freeLook);
-				ImGui::Animated::Checkbox(XOR("FreeCam"), &vars::misc->freeCam->enabled);
+				ImGui::Animations::Hotkey(XOR("##fl"), &vars::keys->freeLook);
+				ImGui::Animations::Checkbox(XOR("FreeCam"), &vars::misc->freeCam->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::Hotkey("##fc", &vars::keys->freeCam);
+				ImGui::Animations::Hotkey("##fc", &vars::keys->freeCam);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##freecam pop"), []()
+				ImGui::Animations::PopupButton(XOR("##freecam pop"), []()
 					{
-						ImGui::Animated::SliderFloat(XOR("Speed##fc"), &vars::misc->freeCam->speed, 1.0f, 20.0f);
+						ImGui::Animations::SliderFloat(XOR("Speed##fc"), &vars::misc->freeCam->speed, 1.0f, 20.0f);
 					}
 				);
-				ImGui::Animated::Checkbox(XOR("MirrorCam"), &vars::misc->mirrorCam->enabled);
+				ImGui::Animations::Checkbox(XOR("MirrorCam"), &vars::misc->mirrorCam->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::Checkbox(XOR("On key##mcam"), &vars::misc->mirrorCam->onKey);
+				ImGui::Animations::Checkbox(XOR("On key##mcam"), &vars::misc->mirrorCam->onKey);
 				ImGui::SameLine();
-				ImGui::Animated::Hotkey(XOR("##mcam"), &vars::keys->mirrorCam);
-				ImGui::Animated::Checkbox(XOR("Flashlight"), &vars::misc->flashLight->enabled);
+				ImGui::Animations::Hotkey(XOR("##mcam"), &vars::keys->mirrorCam);
+				ImGui::Animations::Checkbox(XOR("Flashlight"), &vars::misc->flashLight->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::Hotkey(XOR("##flashl key"), &vars::keys->flashLight);
+				ImGui::Animations::Hotkey(XOR("##flashl key"), &vars::keys->flashLight);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##flashlight pop"), []()
+				ImGui::Animations::PopupButton(XOR("##flashlight pop"), []()
 					{
-						ImGui::Animated::Checkbox(XOR("Big mode"), &vars::misc->flashLight->bigMode);
-						ImGui::Animated::SliderFloat(XOR("Flashlight FOV"), &vars::misc->flashLight->fov, 1.0f, 100.0f);
+						ImGui::Animations::Checkbox(XOR("Big mode"), &vars::misc->flashLight->bigMode);
+						ImGui::Animations::SliderFloat(XOR("Flashlight FOV"), &vars::misc->flashLight->fov, 1.0f, 100.0f);
 					}
 				);
-				ImGui::Animated::Checkbox(XOR("Fog enabled"), &vars::visuals->world->fog->enabled);
+				ImGui::Animations::Checkbox(XOR("Fog enabled"), &vars::visuals->world->fog->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##fog pop"), []()
+				ImGui::Animations::PopupButton(XOR("##fog pop"), []()
 					{
-						ImGui::Animated::SliderFloat(XOR("Fog distance"), &vars::visuals->world->fog->distance, 1.0f, 1000.0f);
-						ImGui::Animated::ColorPicker(XOR("Fog color"), &vars::visuals->world->fog->color);
+						ImGui::Animations::SliderFloat(XOR("Fog distance"), &vars::visuals->world->fog->distance, 1.0f, 1000.0f);
+						ImGui::Animations::ColorPicker(XOR("Fog color"), &vars::visuals->world->fog->color);
 					}
 				);
-				ImGui::Animated::Combo<const char*>(XOR("Screen effect"), &vars::visuals->world->screenEffect->index, selections::screenEffects);
+				ImGui::Animations::Combo<const char*>(XOR("Screen effect"), &vars::visuals->world->screenEffect->index, selections::screenEffects);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##screneffect pop"), []()
+				ImGui::Animations::PopupButton(XOR("##screneffect pop"), []()
 					{
-						ImGui::Animated::SliderFloat(XOR("Param##Screen effect"), &vars::visuals->world->screenEffect->param, 0.0f, 1.0f);
-						ImGui::Animated::ColorPicker(XOR("Color##Screen effect"), &vars::visuals->world->screenEffect->color);
+						ImGui::Animations::SliderFloat(XOR("Param##Screen effect"), &vars::visuals->world->screenEffect->param, 0.0f, 1.0f);
+						ImGui::Animations::ColorPicker(XOR("Color##Screen effect"), &vars::visuals->world->screenEffect->color);
 					}
 				);
 				bool changedbut = false;
-				changedbut |= ImGui::Animated::Checkbox(XOR("ControlTone enabled"), &vars::visuals->world->tone->enabled);
+				changedbut |= ImGui::Animations::Checkbox(XOR("ControlTone enabled"), &vars::visuals->world->tone->enabled);
 				g_ToneController->setStateButton(changedbut);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Tone control pop"), []()
+				ImGui::Animations::PopupButton(XOR("##Tone control pop"), []()
 					{
 						bool changed = false;
-						changed |= ImGui::Animated::SliderFloat(XOR("Tone min"), &vars::visuals->world->tone->min, 0.0f, 1.0f);
-						changed |= ImGui::Animated::SliderFloat(XOR("Tone max"), &vars::visuals->world->tone->max, 0.0f, 1.0f);
-						changed |= ImGui::Animated::SliderFloat(XOR("Tone bloom scale"), &vars::visuals->world->tone->bloom, 0.0f, 16.0f);
+						changed |= ImGui::Animations::SliderFloat(XOR("Tone min"), &vars::visuals->world->tone->min, 0.0f, 1.0f);
+						changed |= ImGui::Animations::SliderFloat(XOR("Tone max"), &vars::visuals->world->tone->max, 0.0f, 1.0f);
+						changed |= ImGui::Animations::SliderFloat(XOR("Tone bloom scale"), &vars::visuals->world->tone->bloom, 0.0f, 16.0f);
 						g_ToneController->setStateSlider(changed);
 					}
 				);
-				ImGui::Animated::Checkbox(XOR("Weather"), &vars::visuals->world->weather->enabled);
+				ImGui::Animations::Checkbox(XOR("Weather"), &vars::visuals->world->weather->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Weather control pop"), []()
+				ImGui::Animations::PopupButton(XOR("##Weather control pop"), []()
 					{
 						g_WeatherController->implMenu();
 					}
 				);				
-				ImGui::Animated::Checkbox(XOR("Motion blur"), &vars::misc->motionBlur->enabled);
+				ImGui::Animations::Checkbox(XOR("Motion blur"), &vars::misc->motionBlur->enabled);
 				ImGui::SameLine();
-				ImGui::Animated::PopupButton(XOR("##Motion blur pop"), []()
+				ImGui::Animations::PopupButton(XOR("##Motion blur pop"), []()
 					{
-						ImGui::Animated::Checkbox(XOR("Forward##Motion Blur"), &vars::misc->motionBlur->forward);
-						ImGui::Animated::SliderFloat(XOR("Failling intensity##Motion Blur"), &vars::misc->motionBlur->fallingIntensity, 0.0f, 5.0f);
-						ImGui::Animated::SliderFloat(XOR("Falling max##Motion Blur"), &vars::misc->motionBlur->fallingMax, 0.0f, 30.0f);
-						ImGui::Animated::SliderFloat(XOR("Falling min##Motion Blur"), &vars::misc->motionBlur->fallingMin, 0.0f, 30.0f);
-						ImGui::Animated::SliderFloat(XOR("Strength##Motion Blur"), &vars::misc->motionBlur->strength, 0.0f, 20.0f);
-						ImGui::Animated::SliderFloat(XOR("Roll intensity##Motion Blur"), &vars::misc->motionBlur->rollIntensity, 0.0f, 1.0f);
+						ImGui::Animations::Checkbox(XOR("Forward##Motion Blur"), &vars::misc->motionBlur->forward);
+						ImGui::Animations::SliderFloat(XOR("Failling intensity##Motion Blur"), &vars::misc->motionBlur->fallingIntensity, 0.0f, 5.0f);
+						ImGui::Animations::SliderFloat(XOR("Falling max##Motion Blur"), &vars::misc->motionBlur->fallingMax, 0.0f, 30.0f);
+						ImGui::Animations::SliderFloat(XOR("Falling min##Motion Blur"), &vars::misc->motionBlur->fallingMin, 0.0f, 30.0f);
+						ImGui::Animations::SliderFloat(XOR("Strength##Motion Blur"), &vars::misc->motionBlur->strength, 0.0f, 20.0f);
+						ImGui::Animations::SliderFloat(XOR("Roll intensity##Motion Blur"), &vars::misc->motionBlur->rollIntensity, 0.0f, 1.0f);
 					}
 				);
 				bool changedbut2 = false;
-				changedbut2 |= ImGui::Animated::Checkbox(XOR("Ambient"), &vars::visuals->world->ambient->enabled);
+				changedbut2 |= ImGui::Animations::Checkbox(XOR("Ambient"), &vars::visuals->world->ambient->enabled);
 				g_AmbientLight->setButtonState(changedbut2);
 				ImGui::SameLine();
 				bool changed = false;
-				changed |= ImGui::Animated::ColorPicker(XOR("Color##ambient col"), &vars::visuals->world->ambient->color);
+				changed |= ImGui::Animations::ColorPicker(XOR("Color##ambient col"), &vars::visuals->world->ambient->color);
 				g_AmbientLight->setPickerState(changed);
-				ImGui::Animated::Checkbox(XOR("Disable Interpolation"), &vars::misc->disableItems->interpolate);
+				ImGui::Animations::Checkbox(XOR("Disable Interpolation"), &vars::misc->disableItems->interpolate);
 				
 				ImGui::EndGroupPanel();
 			}
@@ -819,11 +820,11 @@ static void renderConfig()
 				}
 				ImGui::SameLine();
 				ImGui::HelpMarker(XOR("Press enter to create new config"));
-				ImGui::Animated::ListBox(XOR("All configs"), &currentcfg, std::span(allcfg.data(), allcfg.size()));
+				ImGui::Animations::ListBox(XOR("All configs"), &currentcfg, std::span(allcfg.data(), allcfg.size()));
 
 				static bool dontAskMe = false;
 				static bool delayedClose = false; // not instant close for modal 
-				if (ImGui::Animated::Button(XOR("Delete")))
+				if (ImGui::Animations::Button(XOR("Delete")))
 				{
 					if (dontAskMe && delayedClose)
 					{
@@ -836,7 +837,7 @@ static void renderConfig()
 
 				if (ImGui::BeginPopupContextItem())
 				{
-					if (ImGui::Animated::Button(XOR("Reset asking")))
+					if (ImGui::Animations::Button(XOR("Reset asking")))
 					{
 						dontAskMe = false;
 						delayedClose = false;
@@ -851,10 +852,10 @@ static void renderConfig()
 					ImGui::TextUnformatted(FORMAT(XOR("Are you sure you want to delete {} file?"), allcfg.at(currentcfg)).c_str());
 					ImGui::Separator();
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, { 0.0f, 0.0f });
-					ImGui::Animated::Checkbox(XOR("Don't ask again"), &dontAskMe);
+					ImGui::Animations::Checkbox(XOR("Don't ask again"), &dontAskMe);
 					ImGui::PopStyleVar();
 
-					if (ImGui::Animated::Button(XOR("OK"), { 120.0f, 0.0f }))
+					if (ImGui::Animations::Button(XOR("OK"), { 120.0f, 0.0f }))
 					{
 						config.deleteCfg(allcfg.at(currentcfg));
 						config.reload();
@@ -866,7 +867,7 @@ static void renderConfig()
 							delayedClose = false;
 					}
 					ImGui::SameLine();
-					if (ImGui::Animated::Button(XOR("Cancel"), { 120.0f, 0.0f }))
+					if (ImGui::Animations::Button(XOR("Cancel"), { 120.0f, 0.0f }))
 					{
 						ImGui::CloseCurrentPopup();
 
@@ -880,16 +881,16 @@ static void renderConfig()
 				}
 
 				ImGui::SameLine();
-				if (ImGui::Animated::Button(XOR("Save")))
+				if (ImGui::Animations::Button(XOR("Save")))
 				{
 					config.save(allcfg.at(currentcfg));
 				}
 				ImGui::SameLine();
-				if (ImGui::Animated::Button(XOR("Load")))
+				if (ImGui::Animations::Button(XOR("Load")))
 				{
 					config.load(allcfg.at(currentcfg));
 				}
-				if (ImGui::Animated::Button(XOR("Load on start")))
+				if (ImGui::Animations::Button(XOR("Load on start")))
 				{
 					// this is only saving the load name, nothing more
 					config.startSave(allcfg.at(currentcfg));
@@ -907,10 +908,10 @@ static void renderConfig()
 	{
 		ImGui::BeginGroupPanel(XOR("Config keys"), availRegion());
 		{
-			ImGui::Animated::Hotkey(XOR("Menu key"), &vars::keys->menu, false);
-			ImGui::Animated::Hotkey(XOR("Console key"), &vars::keys->console, false);
-			ImGui::Animated::Hotkey(XOR("Panic key"), &vars::keys->panic, false);
-			ImGui::Animated::Checkbox(XOR("Enable x88 menu"), &vars::keys->enabledX88Menu);
+			ImGui::Animations::Hotkey(XOR("Menu key"), &vars::keys->menu, false);
+			ImGui::Animations::Hotkey(XOR("Console key"), &vars::keys->console, false);
+			ImGui::Animations::Hotkey(XOR("Panic key"), &vars::keys->panic, false);
+			ImGui::Animations::Checkbox(XOR("Enable x88 menu"), &vars::keys->enabledX88Menu);
 		}
 		ImGui::EndGroupPanel();
 	}
@@ -931,20 +932,20 @@ static void renderStyles()
 		{
 			ImGui::BeginGroupPanel(XOR("Style"), availRegion());
 			{
-				ImGui::Animated::Checkbox(XOR("Background"), &vars::styling->background);
-				ImGui::Animated::SliderFloat(XOR("Background speed"), &vars::styling->speed, 1.0f, 8.0f);
-				ImGui::Animated::SliderFloat(XOR("Background max dist"), &vars::styling->distance, 10.0f, 400.0f);
+				ImGui::Animations::Checkbox(XOR("Background"), &vars::styling->background);
+				ImGui::Animations::SliderFloat(XOR("Background speed"), &vars::styling->speed, 1.0f, 8.0f);
+				ImGui::Animations::SliderFloat(XOR("Background max dist"), &vars::styling->distance, 10.0f, 400.0f);
 				ImGui::SliderInt(XOR("Background amount of records"), &vars::styling->size, 20, 400);
 				ImGui::Text(XOR("They are temp limited with dynamic size + saving!"));
-				ImGui::Animated::ColorPicker(XOR("Background color1"), &vars::styling->color1);
+				ImGui::Animations::ColorPicker(XOR("Background color1"), &vars::styling->color1);
 				ImGui::SameLine();
-				ImGui::Animated::ColorPicker(XOR("Background color2"), &vars::styling->color2);
+				ImGui::Animations::ColorPicker(XOR("Background color2"), &vars::styling->color2);
 				ImGui::SameLine();
-				ImGui::Animated::ColorPicker(XOR("Background color3"), &vars::styling->color3);
-				if (ImGui::Animated::Button(XOR("Refresh background")))
+				ImGui::Animations::ColorPicker(XOR("Background color3"), &vars::styling->color3);
+				if (ImGui::Animations::Button(XOR("Refresh background")))
 					background.init();
-				ImGui::Animated::Checkbox(XOR("Discord RPC"), &vars::misc->discord->enabled);
-				ImGui::Animated::Checkbox(XOR("Show editor"), &editorOpened);			
+				ImGui::Animations::Checkbox(XOR("Discord RPC"), &vars::misc->discord->enabled);
+				ImGui::Animations::Checkbox(XOR("Show editor"), &editorOpened);
 			}
 			ImGui::EndGroupPanel();	
 		}
@@ -1016,6 +1017,8 @@ bool ImGuiMenu::inTransmission()
 
 void ImGuiMenu::draw()
 {
+	ImGui::Animations::setAnimationSpeeds();
+
 	if (editorOpened)
 	{
 		if (ImGui::Begin(XOR("Style editor"), &editorOpened))
@@ -1025,8 +1028,6 @@ void ImGuiMenu::draw()
 			ImGui::End();
 		}
 	}
-
-	ImVec2 size{};
 
 	if (inTransmission())
 	{
@@ -1038,9 +1039,5 @@ void ImGuiMenu::draw()
 		return;
 	}
 	if (m_active)
-	{
 		renderAll();
-		size = ImGui::GetWindowSize();
-	}
-
 }

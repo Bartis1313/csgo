@@ -7,7 +7,7 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <gamememory/memory.hpp>
 #include <game/game.hpp>
-#include <menu/GUI-ImGui/imguiaddons.hpp>
+#include <menu/GUI-ImGui/animations.hpp>
 #include <config/vars.hpp>
 #include <utilities/utilities.hpp>
 #include <utilities/renderer/renderer.hpp>
@@ -61,9 +61,9 @@ void Plots::drawFps()
 		if (ImGui::Begin(XOR("Sliders for plot"), &vars::misc->plots->fpsCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			if (memory::interfaces::engine->isInGame()) // not enaled in menu
-				ImGui::Animated::SliderFloat(XOR("Set max FPS"), &MAX_FPS, 30.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // hardcoded ranges, we should maybe run some avg fps getter
-			ImGui::Animated::SliderFloat(XOR("Acceptance multiply fps"), &acceptanceCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
-			ImGui::Animated::ColorPicker(XOR("Color lines plot fps"), &vars::misc->plots->colorFPS);
+				ImGui::Animations::SliderFloat(XOR("Set max FPS"), &MAX_FPS, 30.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // hardcoded ranges, we should maybe run some avg fps getter
+			ImGui::Animations::SliderFloat(XOR("Acceptance multiply fps"), &acceptanceCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
+			ImGui::Animations::ColorPicker(XOR("Color lines plot fps"), &vars::misc->plots->colorFPS);
 
 			ImGui::End();
 		}
@@ -114,9 +114,9 @@ void Plots::drawVelocity()
 		if (ImGui::Begin(XOR("Sliders for velocity plot"), &vars::misc->plots->velocityCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			//ImGui::Animated::SliderFloat(XOR("Set max velocity"), &MAX_SPEEED_MOVE, 450.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // who will ever get this velocity? adjust if needed
-			ImGui::Animated::SliderFloat(XOR("Acceptance multiply vel"), &m_acceptanceVelocity, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
-			ImGui::Animated::ColorPicker(XOR("Color lines plot vel"), &vars::misc->plots->colorVelocity);
-			ImGui::Animated::Checkbox(XOR("Run transparent"), &transparent);
+			ImGui::Animations::SliderFloat(XOR("Acceptance multiply vel"), &m_acceptanceVelocity, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
+			ImGui::Animations::ColorPicker(XOR("Color lines plot vel"), &vars::misc->plots->colorVelocity);
+			ImGui::Animations::Checkbox(XOR("Run transparent"), &transparent);
 			ImGui::SameLine();
 			ImGui::HelpMarker(XOR("Will add some flags!\nEg: no resize"));
 

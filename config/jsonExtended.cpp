@@ -1203,6 +1203,10 @@ void from_json(const json& j, VarStyling& val)
 	from_json(j["ImGuiStyling"], val.imStyle);
 	from_json(j["GroupPanel Colors"], val.groupPanelBackground);
 	from_json(j["GroupPanel Line"], val.groupPanelLines);
+	from_json(j["SmoothAlpha"], val.smoothAlpha);
+	from_json(j["SmoothOutline"], val.smoothOutline);
+	from_json(j["SmoothPop"], val.smoothPop);
+	from_json(j["SmoothMove"], val.speedMove);
 }
 
 void to_json(json& j, const VarStyling& val)
@@ -1218,6 +1222,10 @@ void to_json(json& j, const VarStyling& val)
 	j["ImGuiStyling"] = val.imStyle;
 	j["GroupPanel Colors"] = val.groupPanelBackground;
 	j["GroupPanel Line"] = val.groupPanelLines;
+	j["SmoothAlpha"] = val.smoothAlpha;
+	j["SmoothOutline"] = val.smoothOutline;
+	j["SmoothPop"] = val.smoothPop;
+	j["SmoothMove"] = val.speedMove;
 }
 
 void from_json(const json& j, ImVec2& val)

@@ -23,8 +23,6 @@ class Console
 public:
 	bool init(const std::string& title, const std::string& logName);
 	void shutdown();
-	void drawLog();
-	constexpr void changeActiveLog() { m_activeLog = !m_activeLog; }
 public:
 	// logs into console + draw + file
 	template<typename... Args_t>
@@ -39,7 +37,6 @@ private:
 	void reset();
 
 	std::string m_logName;
-	bool m_activeLog = false;
 	std::mutex mutex;
 };
 

@@ -39,7 +39,6 @@ long D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT
 	// anything that is responsible by imgui to be drawn, not including the game's w2s
 	{
 		menu.draw();
-		console.drawLog();
 		const auto imdraw = ImGui::GetBackgroundDrawList();
 		imRender.renderPresent(imdraw);
 		background.draw(imdraw);

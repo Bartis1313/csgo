@@ -133,6 +133,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.6.9 - Playerlist added (blacklist not done yet), changed render to take unique ptr.
 * 1.7.0 - Blacklist finished, including crash fixes.
 * 1.7.1 - Refactor of code. Fixes, and some addons, especially hooks. Deatailed in commit.
+* 1.7.2 - Cleanup for lerping animation.
 </details>
 
 # Dependencies

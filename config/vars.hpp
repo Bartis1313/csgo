@@ -586,6 +586,10 @@ struct VarStyling
 	ImGuiStyle imStyle;
 	std::array<CfgColor, 4> groupPanelBackground = utilities::getFilledArray<CfgColor, 4>(Color{ 0, 140, 250, 0 });
 	CfgColor groupPanelLines = Colors::White;
+	float smoothAlpha = 0.1f;
+	float smoothOutline = 0.1f;
+	float smoothPop = 0.0f;
+	float speedMove = 10.0f;
 };
 USE_NAMESPACE_VARS(VarStyling, styling);
 

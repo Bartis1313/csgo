@@ -2,6 +2,7 @@
 
 #include <SDK/Color.hpp>
 #include <utilities/tools/tools.hpp>
+#include <menu/GUI-ImGui/animations.hpp>
 
 #include <unordered_map>
 
@@ -27,11 +28,11 @@ void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 	filter.Draw("Filter");
 
 	ImGui::SameLine();
-	bool clear = ImGui::Animated::Button("Clear");
+	bool clear = ImGui::Animations::Button("Clear");
 	ImGui::SameLine();
-	bool copy = ImGui::Animated::Button("Copy");
+	bool copy = ImGui::Animations::Button("Copy");
 	ImGui::SameLine();
-	if (ImGui::Animated::Button("Wrap"))
+	if (ImGui::Animations::Button("Wrap"))
 		wrap = !wrap;
 
 	ImGui::Spacing();

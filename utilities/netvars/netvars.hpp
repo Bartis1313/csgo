@@ -86,14 +86,14 @@ class NetvarManager
 {
 public:
 	void init();
-	[[nodiscard]] uintptr_t getNetvar(const char* tableName, const char* propName) const;
+	[[nodiscard]] uintptr_t getNetvar(const std::string_view tableName, const std::string_view propName) const;
 	[[nodiscard]] uintptr_t getDataMap(DataMap_t* map, const std::string_view name) const;
 	void dump();
 private:
-	std::unordered_map<std::string, RecvTable*> m_Tables;
-	[[nodiscard]] uintptr_t getProp(const char* tableName, const char* propName, RecvProp** prop = nullptr) const;
-	[[nodiscard]] uintptr_t getProp(RecvTable* recvTable, const char* propName, RecvProp** prop = nullptr) const;
-	[[nodiscard]] RecvTable* getTable(const char* tableName) const;
+	std::unordered_map<std::string_view, RecvTable*> m_Tables;
+	[[nodiscard]] uintptr_t getProp(const std::string_view tableName, const std::string_view propName, RecvProp** prop = nullptr) const;
+	[[nodiscard]] uintptr_t getProp(RecvTable* recvTable, const std::string_view propName, RecvProp** prop = nullptr) const;
+	[[nodiscard]] RecvTable* getTable(const std::string_view tableName) const;
 	[[nodiscard]] std::string getType(RecvProp* recvTable) const;
 	void dump(RecvTable* recvTable);
 	std::ofstream file;

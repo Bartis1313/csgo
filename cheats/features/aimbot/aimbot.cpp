@@ -46,6 +46,13 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
 	case E2T(SmoothMode::AIM_LENGTH):
 		ret = delta - (delta * smooth);
 		break;
+	case E2T(SmoothMode::AIM_CUBIC):
+	{
+		const float t = 1.0f - smooth;
+		const float cubic = t * t * (3.0f - 2.0f * t);
+		ret = delta * cubic;
+		break;
+	}
 	}
 
 	if (m_config.curveAim)
