@@ -103,12 +103,9 @@ static void renderAimbot()
 				ImGui::Animations::Combo<const std::string>(XOR("Hitboxes##aim"), &cfg.aimSelection, magic_enum::enum_names_pretty<AimbotHitboxes>());
 				ImGui::Animations::SliderFloat(XOR("Smooth##aim"), &cfg.smooth, 0.0f, 1.0f);
 				ImGui::Animations::Combo<const std::string>(XOR("Smooth method##aim"), &cfg.smoothMode, magic_enum::enum_names_pretty<SmoothMode>());
-				/*if (cfg.smoothMode == E2T(SmoothMode::HUMANIZED))
-				{
-					ImGui::Animations::Checkbox(XOR("Extra speed#aim"), &cfg.useExtraSpeed);
-					ImGui::SameLine();
-					ImGui::HelpMarker(XOR("Works good on high smoothing values"));
-				}*/
+				ImGui::Animations::Checkbox(XOR("Randomization##aim"), &cfg.randomization);
+				if (cfg.randomization)
+					ImGui::Animations::SliderFloat(XOR("Ratio##aim"), &cfg.randomizationRatio, 0.0f, cfg.smooth / 5.0f);
 				ImGui::Animations::Checkbox(XOR("Curved##aim"), &cfg.curveAim);
 				ImGui::Animations::SliderFloat(XOR("Curve X##aim"), &cfg.curveX, 0.0f, 1.0f);
 				ImGui::Animations::SliderFloat(XOR("Curve Y##aim"), &cfg.curveY, 0.0f, 1.0f);

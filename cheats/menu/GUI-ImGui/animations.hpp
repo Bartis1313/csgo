@@ -52,14 +52,13 @@ namespace ImGui
 		inline std::unordered_map<ImGuiID, float> timeStack; // fixed widget time based on their id. Not using it globally
 
 		// functions seperated, don't return Animation as object. Instead contruct it on own in widget
-		// alpha
-		AlphaAnimation getAlpha(ImGuiID id, const AlphaLimits& limits);
-		MoveAnimation getMove(ImGuiID id, float lastTime, bool held, bool pressed);
-		SingleAnimation getSingleAnimation(ImGuiID id, float max, float duration, float extraSpped = 1.0f);
-		SingleField getAndUpdateSingleField(ImGuiID id, float value);
-		float getLastTime(ImGuiID id, bool held, bool pressed);
+		[[nodiscard]] AlphaAnimation getAlpha(ImGuiID id, const AlphaLimits& limits);
+		[[nodiscard]] MoveAnimation getMove(ImGuiID id, float lastTime, bool held, bool pressed);
+		[[nodiscard]] SingleAnimation getSingleAnimation(ImGuiID id, float max, float duration, float extraSpped = 1.0f);
+		[[nodiscard]] SingleField getAndUpdateSingleField(ImGuiID id, float value);
+		[[nodiscard]] float getLastTime(ImGuiID id, bool held, bool pressed);
 		template<typename T>
-		static inline T ImLerpSmooth(T a, T b, float t, float smoothness);
+		[[nodiscard]] static inline T ImLerpSmooth(T a, T b, float t, float smoothness);
 
 		void Hotkey(const char* label, Key* key, bool useExtended = true, const ImVec2& size = { 0.0f, 0.0f });
 		bool Checkbox(const char* label, bool* v);

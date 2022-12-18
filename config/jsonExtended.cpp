@@ -21,7 +21,8 @@ void from_json(const json& j, CfgWeapon& val)
 	from_json(j, "Fov", val.fov);
 	from_json(j, "Smooth", val.smooth);
 	from_json(j, "Smooth mode", val.smoothMode);
-	from_json(j, "Extra speed", val.useExtraSpeed);
+	from_json(j, "Randomization", val.randomization);
+	from_json(j, "Randomization Ratio", val.randomizationRatio);
 	from_json(j, "Curve", val.curveAim);
 	from_json(j, "Curve X", val.curveX);
 	from_json(j, "Curve Y", val.curveY);

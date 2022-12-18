@@ -36,9 +36,10 @@ public:
 	CfgWeapon getCachedConfig() const;
 private:
 	void resetFields();
-	[[nodiscard]] Vec3 smoothAim(const Vec3& angle, float cfgSmooth);
+	[[nodiscard]] Vec3 smoothAim(const Vec3& angle, Player_t* target, float cfgSmooth);
 	[[nodiscard]] bool isClicked(CUserCmd* cmd);
 	[[nodiscard]] bool getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const Vec3& punch);
+	[[nodiscard]] float getRandomizedSmooth(float currentSmooth);
 
 	[[nodiscard]] std::vector<size_t> getHitboxes();
 

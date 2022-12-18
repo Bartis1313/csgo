@@ -29,26 +29,33 @@ void Aimbot::init()
 	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
 }
 
-Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
+Vec3 Aimbot::smoothAim(const Vec3& angle, Player_t* target, float cfgSmooth)
 {
 	if (cfgSmooth == 0.0f)
 		return angle;
 
+	float smooth = std::min(0.99f, cfgSmooth); // allow 1.0 value to be max
+	if (m_config.randomization)
+		smooth = getRandomizedSmooth(smooth);
+
+	const float maxVel = target->m_flMaxspeed();
+	const float targetVel = target->m_vecVelocity().length();
+	const float velScaled = std::clamp(targetVel / maxVel, 0.0f, 1.0f);
+	const float smoothFactor = std::min(std::lerp(smooth, 1.0f, velScaled * 0.2f), 1.0f); // small scale-up to cfg smooth
+
 	Vec3 delta = angle;
 	Vec3 ret;
-	const float smooth = std::min(0.99f, cfgSmooth); // allow 1.0 value to be max
-
 	switch (m_config.smoothMode)
 	{
 	case E2T(SmoothMode::LINEAR):
-		ret = angle * smooth;
+		ret = angle * (1.0f - smoothFactor);
 		break;
 	case E2T(SmoothMode::AIM_LENGTH):
-		ret = delta - (delta * smooth);
+		ret = delta - (delta * smoothFactor);
 		break;
 	case E2T(SmoothMode::AIM_CUBIC):
 	{
-		const float t = 1.0f - smooth;
+		const float t = 1.0f - smoothFactor;
 		const float cubic = t * t * (3.0f - 2.0f * t);
 		ret = delta * cubic;
 		break;
@@ -58,10 +65,18 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, float cfgSmooth)
 	if (m_config.curveAim)
 	{
 		Vec3 curved = ret + Vec3(ret[1] * m_config.curveX, ret[0] * m_config.curveY, 0.0f);
-		ret = curved * smooth;
+		ret = curved * smoothFactor;
 	}
 
 	return ret;
+}
+
+float Aimbot::getRandomizedSmooth(float currentSmooth)
+{
+	const float sineWave = std::sin(static_cast<float>(memory::interfaces::globalVars->m_tickCount));
+	const float factor = sineWave * m_config.randomizationRatio;
+	const float smoothness = currentSmooth + factor;
+	return currentSmooth *= smoothness;
 }
 
 void Aimbot::run(CUserCmd* cmd)
@@ -142,7 +157,7 @@ void Aimbot::run(CUserCmd* cmd)
 	auto angle = math::calcAngleRelative(myEye, bestpos, Vec3{ m_view + punch });
 	angle.clamp();
 
-	angle = smoothAim(angle, m_config.smooth);
+	angle = smoothAim(angle, player, m_config.smooth);
 
 	cmd->m_viewangles += angle;
 	memory::interfaces::engine->setViewAngles(cmd->m_viewangles);
