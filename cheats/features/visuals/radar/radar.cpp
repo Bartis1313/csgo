@@ -24,7 +24,7 @@
 
 #include <d3dx9.h>
 
-Vec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const Vec2& pos, const Vec2& size, const float scale, bool clipRanges)
+ImVec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const float scale, bool clipRanges)
 {
 	float dotThickness = vars::misc->radar->thickness;
 
@@ -39,48 +39,25 @@ Vec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, 
 	// return correct scale, it zooms in/out depends what value is thrown
 	dotX *= scale;
 	dotY *= scale;
+
+	const auto size = ImGui::GetWindowSize();
+
 	// correct it for our center screen of rectangle radar
-	dotX += size[Coord::X] / 2.0f;
-	dotY += size[Coord::Y] / 2.0f;
+	dotX += size.x / 2.0f;
+	dotY += size.y / 2.0f;
 
 	// do not draw out of range, added pos, even we pass 0, but for clarity
-	if (clipRanges)
+	if (clipRanges && vars::misc->radar->ranges)
 	{
-		if (!vars::misc->radar->ranges)
-		{
-			if (dotX < pos[Coord::X])
-				return {}; // this is zero vector
-
-			if (dotX > pos[Coord::Y] + size[Coord::X] - dotThickness)
-				return {};
-
-			if (dotY < pos[Coord::Y])
-				return {};
-
-			if (dotY > pos[Coord::Y] + size[Coord::Y] - dotThickness)
-				return {};
-		}
-		else
-		{
-			if (dotX < pos[Coord::X])
-				dotX = pos[Coord::X];
-
-			if (dotX > pos[Coord::Y] + size[Coord::X] - dotThickness)
-				dotX = pos[Coord::Y] + size[Coord::X] - dotThickness;
-
-			if (dotY < pos[Coord::Y])
-				dotY = pos[Coord::Y];
-
-			if (dotY > pos[Coord::Y] + size[Coord::Y] - dotThickness)
-				dotY = pos[Coord::Y] + size[Coord::Y] - dotThickness;
-		}
+		dotX = std::clamp(dotX, dotThickness, size.x - dotThickness);
+		dotY = std::clamp(dotY, dotThickness, size.y - dotThickness);
 	}
 
-	// again correct for out center...
-	dotX += pos[Coord::X];
-	dotY += pos[Coord::Y];
+	const auto pos = ImGui::GetWindowPos();
+	dotX += pos.x;
+	dotY += pos.y;
 
-	return Vec2{ dotX, dotY };
+	return ImVec2{ dotX, dotY };
 }
 
 void Radar::manuallyInitPos()
@@ -153,12 +130,12 @@ void Radar::drawMap()
 	memory::interfaces::engine->getViewAngles(ang);
 	float scale = vars::misc->radar->scale;
 
-	auto p1 = entToRadar(myEye, ang, poses.at(0), m_drawPos, m_drawSize, scale, false).toImVec();
-	auto p2 = entToRadar(myEye, ang, poses.at(1), m_drawPos, m_drawSize, scale, false).toImVec();
-	auto p3 = entToRadar(myEye, ang, poses.at(2), m_drawPos, m_drawSize, scale, false).toImVec();
-	auto p4 = entToRadar(myEye, ang, poses.at(3), m_drawPos, m_drawSize, scale, false).toImVec();
+	auto p1 = entToRadar(myEye, ang, poses.at(0), scale, false);
+	auto p2 = entToRadar(myEye, ang, poses.at(1), scale, false);
+	auto p3 = entToRadar(myEye, ang, poses.at(2), scale, false);
+	auto p4 = entToRadar(myEye, ang, poses.at(3), scale, false);
 
-	imRenderWindow.getDrawList()->AddImageQuad(m_mapTexture, p1, p2, p3, p4);
+	ImGui::GetWindowDrawList()->AddImageQuad(m_mapTexture, p1, p2, p3, p4);
 }
 
 void Radar::draw()
@@ -176,39 +153,59 @@ void Radar::draw()
 	ImGui::SetNextWindowSize({ size, size });
 	if (ImGui::Begin(XOR("Radar"), &vars::misc->radar->enabled, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
-		imRenderWindow.addList();
+		const auto windowList = ImGui::GetWindowDrawList();
+		const auto windowPos = ImGui::GetWindowPos();
+		const auto windowSize = ImGui::GetWindowSize();
 
-		m_drawSize = Vec2{ imRenderWindow.getRect().x, imRenderWindow.getRect().y };
-		m_drawPos = Vec2{ imRenderWindow.getPos().x, imRenderWindow.getPos().y };
-
-		const auto myEye = game::localPlayer->getEyePos();
-		Vec3 ang = {};
-		memory::interfaces::engine->getViewAngles(ang);
-
-		auto rect = imRenderWindow.getRect();
-		float scaledFov = globals::FOV / 5.0f;
+		const float scaledFov = globals::FOV / 5.0f;
 		// assume calculation is only in straight line representing 2D, so max = 180 deg, and this is not correct in 100%, idk better solution
-		float fovAddon = rect.y / std::tan(math::DEG2RAD((180.0f - (globals::FOV + scaledFov)) / 2.0f));
+		const float fovAddon = windowSize.y / std::tan(math::DEG2RAD((180.0f - (globals::FOV + scaledFov)) / 2.0f));
 
-		float middleX = rect.x / 2.0f;
-		float middleY = rect.y / 2.0f;
+		const float middleX = windowSize.x / 2.0f;
+		const float middleY = windowSize.y / 2.0f;
 
 		drawMap();
 
-		// triangles representing fov view
-		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX + fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
-		imRenderWindow.drawTriangleFilled({ middleX, middleY }, { middleX, 0.0f }, { middleX - fovAddon / 2.0f, 0.0f }, Colors::White.getColorEditAlpha(0.4f));
+		drawing::TriangleFilled{
+			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
+			ImVec2{ windowPos.x + middleX, windowPos.y },
+			ImVec2{ windowPos.x + middleX + fovAddon / 2.0f, windowPos.y },
+			Color::U32(Colors::White.getColorEditAlpha(0.4f)) }.draw(windowList);
 
-		// fov lines
-		imRenderWindow.drawLine({ middleX + fovAddon / 2.0f, 0.0f }, { middleX, middleY }, Colors::White);
-		imRenderWindow.drawLine({ middleX - fovAddon / 2.0f, 0.0f }, { middleX, middleY }, Colors::White);
+		drawing::TriangleFilled{
+			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
+			ImVec2{ windowPos.x + middleX, windowPos.y },
+			ImVec2{ windowPos.x + middleX - fovAddon / 2.0f, windowPos.y },
+			Color::U32(Colors::White.getColorEditAlpha(0.4f)) }.draw(windowList);
 
-		// normal cross lines
-		imRenderWindow.drawLine({ 0.0f, middleY }, { rect.x, middleY }, Colors::White);
-		imRenderWindow.drawLine({ middleX, 0.0f }, { middleX, rect.y }, Colors::White);
+		drawing::Line{
+			ImVec2{ windowPos.x + middleX + fovAddon / 2.0f, windowPos.y },
+			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
+			Color::U32(Colors::White), 1.0f }.draw(windowList);
+
+		drawing::Line{
+			ImVec2{ windowPos.x + middleX - fovAddon / 2.0f, windowPos.y },
+			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
+			Color::U32(Colors::White), 1.0f }.draw(windowList);
+
+		drawing::Line{
+			ImVec2{ windowPos.x + 0.0f, windowPos.y + middleY },
+			ImVec2{ windowPos.x + windowSize.x, windowPos.y + middleY },
+			Color::U32(Colors::White), 1.0f }.draw(windowList);
+
+		drawing::Line{
+			ImVec2{ windowPos.x + middleX, windowPos.y + 0.0f },
+			ImVec2{ windowPos.x + middleX, windowPos.y + windowSize.y },
+			Color::U32(Colors::White), 1.0f }.draw(windowList);
 
 		// draw small circle where are we
-		imRenderWindow.drawCircleFilled(middleX, middleY, 5.0f, 12, Colors::Green);
+		drawing::CircleFilled{ 
+			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
+			5.0f, 12, Color::U32(Colors::Green) }.draw(windowList);
+
+		const auto myEye = game::localPlayer->getEyePos();
+		Vec3 viewAngle = {};
+		memory::interfaces::engine->getViewAngles(viewAngle);
 
 		for(auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 		{
@@ -229,7 +226,7 @@ void Radar::draw()
 			if (!ent->isOtherTeam(game::localPlayer()))
 				continue;
 
-			const auto entRotatedPos = entToRadar(myEye, ang, ent->absOrigin(), Vec2{}, Vec2{ imRenderWindow.getWidth(), imRenderWindow.getHeight() },
+			const auto entRotatedPos = entToRadar(myEye, viewAngle, ent->absOrigin(),
 				vars::misc->radar->scale, true);
 
 			// or use calcangle, this will be faster though
@@ -238,29 +235,29 @@ void Radar::draw()
 			if (entYaw < 0.0f)
 				entYaw = 360.0f + entYaw;
 
-			const auto rotated = 270.0f - entYaw + ang[Coord::Y];
+			const auto rotated = 270.0f - entYaw + viewAngle[Coord::Y];
 
 			auto dotRad = vars::misc->radar->length;
 
 			const auto finalX = dotRad * std::cos(math::DEG2RAD(rotated));
 			const auto finalY = dotRad * std::sin(math::DEG2RAD(rotated));
 
-			if (vars::misc->radar->ranges ? true : !entRotatedPos.isZero())
+			if (vars::misc->radar->ranges ? true : entRotatedPos.x != 0.0f && entRotatedPos.y != 0.0f)
 			{
 				auto dotThickness = vars::misc->radar->thickness;
 
-				imRenderWindow.drawLine(entRotatedPos[Coord::X] - 1, entRotatedPos[Coord::Y] - 1, entRotatedPos[Coord::X] + finalX,
-					entRotatedPos[Coord::Y] + finalY, vars::misc->radar->colorLine());
+				/*imRenderWindow.drawLine(entRotatedPos[Coord::X] - 1, entRotatedPos[Coord::Y] - 1, entRotatedPos[Coord::X] + finalX,
+					entRotatedPos[Coord::Y] + finalY, vars::misc->radar->colorLine());*/
+				drawing::CircleFilled{ entRotatedPos, dotThickness, 32,
+					Color::U32(vars::misc->radar->colorPlayer()) }.draw(windowList);
 				
-				imRenderWindow.drawCircleFilled(entRotatedPos[Coord::X], entRotatedPos[Coord::Y], dotThickness, 32,
-					vars::misc->radar->colorPlayer());
 
 				//imRenderWindow.drawTriangleFilled(entRotatedPos[Coord::X], entRotatedPos[Coord::Y], dotThickness,
 				//	dotThickness, rotated, vars::misc->radar->colorPlayer());
 
 			}
 		}
-		imRenderWindow.end();
+		
 		ImGui::End();
 	}
 }

@@ -37,7 +37,7 @@ bool Setup::init(void* instance)
 	// they handle it somehow to prevent such crash, but exception pointers report it
 	//AddVectoredExceptionHandler(TRUE, SEHcatch::memErrorCatch);
 
-	console.init(XOR("CSGO DEBUG"), XOR("hack.log"));
+	console::setLogger(XOR("CSGO DEBUG"), XOR("hack.log"));
 
 	TimeCount initTimer{};
 
@@ -82,7 +82,7 @@ void Setup::shutdown(void* instance)
 	hooks::shutdown();
 	menu.shutdown();
 	LOG_INFO(XOR("Hack shutdown"));
-	console.shutdown();
+	console::shutdown();
 	m_dc.shutdown();
 
 	LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);

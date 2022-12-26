@@ -9,6 +9,7 @@
 
 class RadarSizeHelper;
 struct IDirect3DTexture9;
+struct ImVec2;
 
 // texture - https://www.unknowncheats.me/forum/counterstrike-global-offensive/317765-getting-map-overview-information-textured-radar.html
 class Radar : protected RenderablePresentType
@@ -25,7 +26,7 @@ public:
 protected:
 	virtual void draw() override;
 private:
-	[[nodiscard]] Vec2 entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const Vec2& pos, const Vec2& size, const float scale, bool clipRanges);
+	[[nodiscard]] ImVec2 entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const float scale, bool clipRanges);
 	struct MapPos
 	{
 		Vec2 m_pos;

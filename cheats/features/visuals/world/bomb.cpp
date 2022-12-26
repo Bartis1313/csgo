@@ -80,7 +80,7 @@ void BombOverlay::draw()
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, Color::U32(vars::visuals->world->bomb->background()));
 	if (ImGui::Begin(XOR("Bomb c4"), &vars::visuals->world->bomb->enabled, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
-		imRenderWindow.addList();
+		/*imRenderWindow.addList();
 
 		constexpr float width = size.x;
 		constexpr float height = size.y;
@@ -103,7 +103,7 @@ void BombOverlay::draw()
 		imRenderWindow.drawText(width / 2.0f, 2.0f, 15, ImFonts::franklinGothic30, FORMAT(XOR("Site {}"), m_bombEnt->getBombSiteName()), true, Colors::White, false);
 		imRenderWindow.drawText(width / 2.0f, 20.0f, 15, ImFonts::franklinGothic30, FORMAT(XOR("Damage {:.2f}"), dmg), true, isSafe ? Colors::Green : Colors::Red, false);
 
-		imRenderWindow.end();
+		imRenderWindow.end();*/
 		ImGui::End();
 	}
 	ImGui::PopStyleColor();

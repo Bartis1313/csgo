@@ -51,8 +51,10 @@ void FASTCALL createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool act
 	// otherwise we moving
 	if (g_Freecam->isInCam())
 	{
+		cmd->m_buttons = 0;
 		cmd->m_forwardmove = 0;
 		cmd->m_sidemove = 0;
+		cmd->m_upmove = 0;
 	}
 
 	game::serverTime(cmd);

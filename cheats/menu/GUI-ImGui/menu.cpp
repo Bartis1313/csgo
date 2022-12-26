@@ -13,6 +13,7 @@
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/renderer/renderer.hpp>
 #include <utilities/console/console.hpp>
+#include <features/visuals/chams/chams.hpp>
 #include <config/vars.hpp>
 
 // see the code of dear imgui lib or demo window to change it.
@@ -247,36 +248,42 @@ static void renderVisuals()
 
 			ImGui::BeginGroupPanel(XOR("Chams"), availRegion());
 			{
+				const auto materials = g_Chams->getMaterials();
+				std::vector<std::string> names;
+				std::vector<std::string> matNames(materials.size());
+				for (size_t i = 0; const auto& mat : materials)
+					matNames[i++] = mat.data.name;
+
 				ImGui::Animations::Checkbox(XOR("Chams enabled Players"), &vars::visuals->chams->players);
 				ImGui::SameLine();
-				ImGui::Animations::PopupButton(XOR("##Chams options players"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options players"), [matNames]()
 					{
-						ImGui::Animations::Combo<const std::string>(XOR("Chams type Players"), &vars::visuals->chams->indexPlayers, magic_enum::enum_names_pretty<ChamsType>());
+						ImGui::Animations::Combo<const std::string>(XOR("Chams type Players"), &vars::visuals->chams->indexPlayers, matNames);
 						ImGui::Animations::ColorPicker(XOR("Chams color Players"), &vars::visuals->chams->colorPlayers);
 						ImGui::Animations::Checkbox(XOR("Chams XQZ"), &vars::visuals->chams->enabledXQZPlayers);
 						ImGui::Animations::ColorPicker(XOR("Chams XQZ color"), &vars::visuals->chams->colorXQZPlayers);
 					});
 				ImGui::Animations::Checkbox(XOR("Chams enabled Weapons"), &vars::visuals->chams->enabledWeapons);
 				ImGui::SameLine();
-				ImGui::Animations::PopupButton(XOR("##Chams options weapons"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options weapons"), [matNames]()
 					{
-						ImGui::Animations::Combo<const std::string>(XOR("Chams type Weapons"), &vars::visuals->chams->indexWeapons, magic_enum::enum_names_pretty<ChamsType>());
+						ImGui::Animations::Combo<const std::string>(XOR("Chams type Weapons"), &vars::visuals->chams->indexWeapons, matNames);
 						ImGui::Animations::ColorPicker(XOR("Chams color Weapons"), &vars::visuals->chams->colorWeapons);
 						ImGui::Animations::Checkbox(XOR("Disable weapon"), &vars::visuals->chams->weaponHide);
 					});
 				ImGui::Animations::Checkbox(XOR("Chams enabled Arms"), &vars::visuals->chams->enabledArms);
 				ImGui::SameLine();
-				ImGui::Animations::PopupButton(XOR("##Chams options arms"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options arms"), [matNames]()
 					{
-						ImGui::Animations::Combo<const std::string>(XOR("Chams type Arms"), &vars::visuals->chams->indexArms, magic_enum::enum_names_pretty<ChamsType>());
+						ImGui::Animations::Combo<const std::string>(XOR("Chams type Arms"), &vars::visuals->chams->indexArms, matNames);
 						ImGui::Animations::ColorPicker(XOR("Chams color Arms"), &vars::visuals->chams->colorArms);
 						ImGui::Animations::Checkbox(XOR("Disable arms"), &vars::visuals->chams->armsHide);
 					});
 				ImGui::Animations::Checkbox(XOR("Chams enabled Backtrack"), &vars::visuals->chams->enabledBacktrack);
 				ImGui::SameLine();
-				ImGui::Animations::PopupButton(XOR("##Chams options backtrack"), []()
+				ImGui::Animations::PopupButton(XOR("##Chams options backtrack"), [matNames]()
 					{
-						ImGui::Animations::Combo<const std::string>(XOR("Chams type Backtrack"), &vars::visuals->chams->modeBacktrack, magic_enum::enum_names_pretty<ChamsType>());
+						ImGui::Animations::Combo<const std::string>(XOR("Chams type Backtrack"), &vars::visuals->chams->modeBacktrack, matNames);
 						ImGui::Animations::ColorPicker(XOR("Backtrack chams col"), &vars::visuals->chams->colorBacktrack);
 						ImGui::Animations::Combo<const std::string>(XOR("Chams style Backtrack"), &vars::visuals->chams->indexBacktrack, magic_enum::enum_names_pretty<BTChamsType>());
 					});
@@ -286,6 +293,10 @@ static void renderVisuals()
 					{
 						ImGui::Animations::ColorPicker(XOR("Glow color"), &vars::visuals->glow->colorPlayer);
 					});
+				if (ImGui::Animations::Button(XOR("Open editor##mat")))
+				{
+					g_MaterialEditor->changeState();
+				}
 
 				ImGui::EndGroupPanel();
 			}

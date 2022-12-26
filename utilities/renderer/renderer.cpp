@@ -133,8 +133,8 @@ void SurfaceRender::drawCircleFilled(const int x, const int y, const int radius,
 {
 	std::vector<Vertex_t> verts = {};
 
-	float step = math::PI *2.0f / points;
-	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
+	float step = math::PI_2 / points;
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		verts.emplace_back(Vec2{ x + (radius * std::cos(angle)), y + (radius * std::sin(angle)) });
 	}
@@ -144,8 +144,8 @@ void SurfaceRender::drawCircleFilled(const int x, const int y, const int radius,
 
 void SurfaceRender::drawCircle3D(const Vec3& pos, const int radius, const int points, const Color& color)
 {
-	float step = math::PI *2.0f / points;
-	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
+	float step = math::PI_2 / points;
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 		Vec3 worldEnd = Vec3{ radius * std::cos(angle + step) + pos[Coord::X], radius * std::sin(angle + step) + pos[Coord::Y], pos[Coord::Z] };
@@ -161,8 +161,8 @@ void SurfaceRender::drawFilledCircle3D(const Vec3& pos, const int radius, const 
 	if (!worldToScreen(pos, orignalW2S))
 		return;
 
-	float step = math::PI *2.0f / points;
-	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
+	float step = math::PI_2 / points;
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 		Vec3 worldEnd = Vec3{ radius * std::cos(angle + step) + pos[Coord::X], radius * std::sin(angle + step) + pos[Coord::Y], pos[Coord::Z] };
@@ -470,10 +470,10 @@ void SurfaceRender::drawImage(const Resource& res, const int x, const int y, con
 void SurfaceRender::drawProgressRing(const int x, const int y, float radius, const int points, float percent, const float thickness, const Color& color)
 {
 	// basically telling how precision will be
-	float step = math::PI *2.0f / points;
+	float step = math::PI_2 / points;
 
 	// limit angle, based on percentage passed
-	float maxAngle = math::PI *2.0f * percent;
+	float maxAngle = math::PI_2 * percent;
 
 	for (float angle = 0.0f; angle < maxAngle; angle += step)
 	{
@@ -740,10 +740,10 @@ void ImGuiRender::drawCircleFilled(const float x, const float y, const float rad
 
 void ImGuiRender::drawCircle3D(const Vec3& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	float step = math::PI * 2.0f / points;
+	float step = math::PI_2 / points;
 
 	std::vector<ImVec2> pointsVec = {};
-	for (float angle = 0.0f; angle < (math::PI * 2.0f); angle += step)
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 		if (ImVec2 screenStart; worldToScreen(worldStart, screenStart))
@@ -758,10 +758,10 @@ void ImGuiRender::drawCircle3D(const Vec3& pos, const float radius, const int po
 
 void ImGuiRender::drawCircle3DTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	float step = math::PI *2.0f / points;
+	float step = math::PI_2 / points;
 
 	std::vector<ImVec2> pointsVec = {};
-	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 
@@ -780,10 +780,10 @@ void ImGuiRender::drawCircle3DTraced(const Vec3& pos, const float radius, const 
 
 void ImGuiRender::drawCircle3DFilled(const Vec3& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
-	float step = math::PI *2.0f / points;
+	float step = math::PI_2 / points;
 
 	std::vector<ImVec2> pointsVec = {};
-	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 		if (ImVec2 screenStart; worldToScreen(worldStart, screenStart))
@@ -799,7 +799,7 @@ void ImGuiRender::drawCircle3DFilledTraced(const Vec3& pos, const float radius, 
 	float step = math::PI *2.0f / points;
 
 	std::vector<ImVec2> pointsVec = {};
-	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 
@@ -979,7 +979,7 @@ void ImGuiRender::drawSphere(const Vec3& pos, float radius, float angleSphere, c
 	for (float angle = 0.0f; angle < math::PI; angle += step)
 	{
 		verts.clear();
-		for (float angleBetween = 0.0f; angleBetween < math::PI * 2; angleBetween += step)
+		for (float angleBetween = 0.0f; angleBetween < math::PI_2; angleBetween += step)
 		{
 			Vec3 worldStart = Vec3
 			{
@@ -1005,9 +1005,9 @@ void ImGuiRender::drawCone(const Vec3& pos, const float radius, const int points
 	if (!worldToScreen(pos, orignalW2S))
 		return;
 
-	float step = math::PI *2.0f / points;
+	float step = math::PI_2 / points;
 
-	for (float angle = 0.0f; angle < (math::PI *2.0f); angle += step)
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		Vec3 worldStart = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 		Vec3 worldEnd = Vec3{ radius * std::cos(angle + step) + pos[Coord::X], radius * std::sin(angle + step) + pos[Coord::Y], pos[Coord::Z] };
@@ -1051,127 +1051,4 @@ void ImGuiRender::addToRender(const std::function<void()>& fun)
 	swapData();
 }
 
-// DRAWING HELPER WRAPPER
-
-#define RUNTIME_CHECK_RENDER_WINDOW assert(m_drawing && "Did you call ImGuiRenderWindow::addList() ?")
-
-void ImGuiRenderWindow::addList()
-{
-	m_drawing = ImGui::GetWindowDrawList();
-	m_pos = ImGui::GetCursorScreenPos();
-	auto limits = ImGui::GetContentRegionAvail(); // limits for width & height
-	m_rect = { limits.x, limits.y };
-}
-
-void ImGuiRenderWindow::end()
-{
-	m_drawing = {};
-	m_pos = {};
-	m_rect = {};
-}
-
-void ImGuiRenderWindow::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddLine({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x2, m_pos.y + y2 }, Color::U32(color), thickness);
-}
-
-void ImGuiRenderWindow::drawLine(const ImVec2& start, const ImVec2& end, const Color& color, const float thickness)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddLine({ m_pos.x + start.x, m_pos.y + start.y }, { m_pos.x + end.x, m_pos.y + end.y }, Color::U32(color), thickness);
-}
-
-void ImGuiRenderWindow::drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags, const float thickness)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddRect({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x + w, m_pos.y + y + h }, Color::U32(color), 0.0f, flags, thickness);
-}
-
-void ImGuiRenderWindow::drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddRectFilled({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x + w, m_pos.y + y + h }, Color::U32(color), 0.0f, flags);
-}
-
-void ImGuiRenderWindow::drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags, const float thickness)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddRect({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x + w, m_pos.y + y + h }, Color::U32(color), rounding, flags, thickness);
-}
-
-void ImGuiRenderWindow::drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddRectFilled({ m_pos.x + x, m_pos.y + y }, { m_pos.x + x + w, m_pos.y + y + h }, Color::U32(color), rounding, flags);
-}
-
-void ImGuiRenderWindow::drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddCircle({ m_pos.x + x, m_pos.y + y }, radius, Color::U32(color), points, thickness);
-}
-
-void ImGuiRenderWindow::drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddCircleFilled({ m_pos.x + x, m_pos.y + y }, radius, Color::U32(color), points);
-}
-
-void ImGuiRenderWindow::drawPolyLine(const int count, ImVec2* verts, const Color& color, ImDrawFlags flags, float thickness)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddPolyline(verts, count, Color::U32(color), flags, thickness);
-}
-
-void ImGuiRenderWindow::drawText(const float x, const float y, const float size, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	ImVec2 pos = { m_pos.x + x, m_pos.y + y };
-
-	ImGui::PushFont(font);
-
-	if (auto tsize = font->CalcTextSizeA(size, std::numeric_limits<float>::max(), 0.0f, text.c_str()); centered)
-		pos.x -= tsize.x / 2.0f;
-
-	if (dropShadow)
-	{
-		const auto alpha = ImGui::ColorConvertU32ToFloat4(Color::U32(color)).z;
-		m_drawing->AddText(font, size, { m_pos.x + pos.x + 1.0f, m_pos.y + pos.y + 1.0f }, Color::U32(Colors::Black.getColorEditAlpha(alpha)), text.c_str());
-	}
-	m_drawing->AddText(font, size, pos, Color::U32(color), text.c_str());
-
-	ImGui::PopFont();
-}
-
-void ImGuiRenderWindow::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	m_drawing->AddTriangleFilled({ m_pos.x + p1.x,m_pos.y + p1.y }, { m_pos.x + p2.x, m_pos.y + p2.y }, { m_pos.x + p3.x, m_pos.y + p3.y }, Color::U32(color));
-}
-
-void ImGuiRenderWindow::drawTriangleFilled(const float x, const float y, const float w, const float h, const float angle, const Color& color)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-
-	float radian = math::DEG2RAD(angle);
-	float radian90 = math::DEG2RAD(angle + 90);
-
-	const ImVec2 p1 = ImVec2{ (w / 2.0f) * std::cos(radian90) + x, (w / 2.0f) * std::sin(radian90) + y };
-	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian90) + x, (-w / 2.0f) * std::sin(radian90) + y };
-	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian) + y };
-
-	m_drawing->AddTriangleFilled({ m_pos.x + p1.x,m_pos.y + p1.y }, { m_pos.x + p2.x, m_pos.y + p2.y }, { m_pos.x + p3.x, m_pos.y + p3.y }, Color::U32(color));
-}
-
-void ImGuiRenderWindow::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
-{
-	RUNTIME_CHECK_RENDER_WINDOW;
-	float maxAngle = math::RAD2DEG(math::PI *2.0f * percent) + angleMin;
-
-	m_drawing->PathArcTo(ImVec2{m_pos.x + x, m_pos.y + y }, radius, math::DEG2RAD(angleMin), math::DEG2RAD(maxAngle), points);
-	m_drawing->PathStroke(Color::U32(color), flags, thickness);
-}
-
-#undef RUNTIME_CHECK_RENDER_WINDOW
 #undef BUFFER_SIZE

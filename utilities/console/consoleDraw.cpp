@@ -1,21 +1,9 @@
 #include "consoleDraw.hpp"
+#include "console.hpp"
 
 #include <SDK/Color.hpp>
 #include <utilities/tools/tools.hpp>
 #include <menu/GUI-ImGui/animations.hpp>
-
-#include <unordered_map>
-
-namespace strategy
-{
-	std::unordered_map<TypeLogs, Color> colors =
-	{
-		{ TypeLogs::LOG_NO, Colors::White },
-		{ TypeLogs::LOG_INFO, Colors::Green },
-		{ TypeLogs::LOG_ERR, Colors::Red },
-		{ TypeLogs::LOG_WARN, Colors::Yellow }
-	};
-}
 
 void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 {
@@ -53,7 +41,7 @@ void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 			{
 				if (wrap)
 					ImGui::PushTextWrapPos();
-				ImGui::PushStyleColor(ImGuiCol_Text, Color::U32(strategy::colors.at(color)));
+				ImGui::PushStyleColor(ImGuiCol_Text, Color::U32(console::detail::colorsForView.at(color)));
 				ImGui::TextUnformatted(text.data());
 				ImGui::PopStyleColor();
 				if (wrap)
@@ -73,7 +61,7 @@ void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 
 				if (wrap)
 					ImGui::PushTextWrapPos();
-				ImGui::PushStyleColor(ImGuiCol_Text, Color::U32(strategy::colors.at(color)));
+				ImGui::PushStyleColor(ImGuiCol_Text, Color::U32(console::detail::colorsForView.at(color)));
 				ImGui::TextUnformatted(text.data());
 				ImGui::PopStyleColor();
 				if (wrap)

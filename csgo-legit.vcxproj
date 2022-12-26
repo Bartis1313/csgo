@@ -253,6 +253,7 @@
     <ClCompile Include="dependencies\discord\src\discord_rpc.cpp" />
     <ClCompile Include="dependencies\discord\src\rpc_connection.cpp" />
     <ClCompile Include="dependencies\discord\src\serialization.cpp" />
+    <ClCompile Include="dependencies\ImGui\TextEditor.cpp" />
     <ClCompile Include="gamememory\memory.cpp" />
     <ClCompile Include="SDK\interfaces\interfaces.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
@@ -512,6 +513,7 @@
     <ClInclude Include="dependencies\discord\src\rapidjson\writer.h" />
     <ClInclude Include="dependencies\discord\src\rpc_connection.h" />
     <ClInclude Include="dependencies\discord\src\serialization.h" />
+    <ClInclude Include="dependencies\ImGui\TextEditor.h" />
     <ClInclude Include="dependencies\json_fwd.hpp" />
     <ClInclude Include="dependencies\magic_enum.hpp" />
     <ClInclude Include="dependencies\stb_image.h" />

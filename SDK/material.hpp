@@ -66,7 +66,7 @@ public:
     VFUNC(void, setMaterialVarFlag, 29, (MaterialVarFlags_t flag, bool on), (this, flag, on));
     VFUNC(IMaterialVar**, getShaderParams, 41, (), (this));
     VFUNC(bool, isError, 42, (), (this));
-    VFUNC(void, addRef, 12, (), (this));
+    VFUNC(void, addRefCount, 10, (), (this));
 
     // goes for rgba
     void modulateAllColor(const Color& color)

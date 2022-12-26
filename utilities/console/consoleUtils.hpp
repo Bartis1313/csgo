@@ -4,10 +4,10 @@
 
 enum class TypeLogs
 {
-	LOG_NO,
-	LOG_INFO,
 	LOG_ERR,
-	LOG_WARN
+	LOG_WARN,
+	LOG_INFO,
+	LOG_DEBUG
 };
 
 enum class ColorsConsole

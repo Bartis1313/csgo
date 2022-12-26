@@ -2,10 +2,6 @@
 
 #include "consoleUtils.hpp"
 
-#include <menu/GUI-ImGui/imguiaddons.hpp>
-#include <utilities/utilities.hpp>
-#include <utilities/tools/tools.hpp>
-#include <utilities/tools/wrappers.hpp>
 #include <config/config.hpp>
 
 #include <string>
@@ -18,26 +14,55 @@
 
 struct SDKColor;
 
-class Console
+namespace console
 {
-public:
-	bool init(const std::string& title, const std::string& logName);
+	void setLogger(const std::string_view title, const std::string_view logName);
 	void shutdown();
-public:
-	// logs into console + draw + file
 	template<typename... Args_t>
-	void log(TypeLogs type, const std::string_view fmt, Args_t&&... args);
-private:
-	std::unordered_map<TypeLogs, ColorsConsole> colorsForConsole;
-	std::unordered_map<TypeLogs, std::string_view> consoleStrings;
-	std::unordered_map<TypeLogs, Color> colorsForView;
-	std::unordered_map<TypeLogs, char> signs;
+	inline void log(TypeLogs type, const std::string_view fmt, Args_t&&... args);
 
-	void setColor(ColorsConsole color);
-	void reset();
+	namespace detail
+	{
+		void setColor(ColorsConsole color);
+		void reset();
+		void addSigns(TypeLogs type);
+		void addLogToStream(TypeLogs type, const std::string& buf);
+		bool isPossibleToLog(TypeLogs type);
+		std::string generateTimeLog();
 
-	std::string m_logName;
-	std::mutex mutex;
+		inline std::ofstream m_fileStream;
+		inline std::string m_logName;
+		inline std::mutex m_mutex;
+
+		inline std::unordered_map<TypeLogs, ColorsConsole> colorsForConsole
+		{
+			{ TypeLogs::LOG_ERR, ColorsConsole::CONSOLE_DARKRED },
+			{ TypeLogs::LOG_WARN, ColorsConsole::CONSOLE_YELLOW },
+			{ TypeLogs::LOG_INFO, ColorsConsole::CONSOLE_WHITE },
+			{ TypeLogs::LOG_DEBUG, ColorsConsole::CONSOLE_CYAN },
+		};
+		inline std::unordered_map<TypeLogs, std::string_view> consoleStrings
+		{
+			{ TypeLogs::LOG_ERR, "[err]"},
+			{ TypeLogs::LOG_WARN, "[warn]"},
+			{ TypeLogs::LOG_INFO, "[info]"},
+			{ TypeLogs::LOG_DEBUG, "[debug]"},
+		};
+		inline std::unordered_map<TypeLogs, Color> colorsForView
+		{
+			{ TypeLogs::LOG_ERR, Colors::Red },
+			{ TypeLogs::LOG_WARN, Colors::Yellow },
+			{ TypeLogs::LOG_INFO, Colors::White },
+			{ TypeLogs::LOG_DEBUG, Colors::Cyan },
+		};
+		inline std::unordered_map<TypeLogs, char> signs
+		{
+			{ TypeLogs::LOG_ERR, '!'},
+			{ TypeLogs::LOG_WARN, '^'},
+			{ TypeLogs::LOG_INFO, '+'},
+			{ TypeLogs::LOG_DEBUG, '*'},
+		};
+	}
 };
 
 // sorry for using cout
@@ -45,29 +70,18 @@ private:
 // :D
 
 template<typename... Args_t>
-void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
+inline void console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 {
-	std::scoped_lock lock{ mutex };
+	std::scoped_lock lock{ detail::m_mutex };
 
-	if (m_logName.empty())
-		assert("Did you call Console::init ?");
+	if (!detail::isPossibleToLog(type))
+		return;
 
 	if (fmt.empty())
 		return;
 
-	std::ofstream log{ config.getHackPath() / m_logName, std::ofstream::out | std::ofstream::app };
-	std::string buffer{};
-
-#ifdef _DEBUG
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(colorsForConsole[type]));
-	if (type != TypeLogs::LOG_NO)
-		std::cout << FORMAT(XOR("{} {}"), signs[type], consoleStrings[type]);
-
-	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(ColorsConsole::CONSOLE_WHITE));
-#endif
-
-	buffer += FORMAT(XOR("[{}] "), utilities::getTime());
-
+	detail::addSigns(type);
+	std::string buffer = detail::generateTimeLog();
 	if constexpr (sizeof...(args) > 0)
 		buffer += std::vformat(fmt, std::make_format_args(args...));
 	else
@@ -75,19 +89,10 @@ void Console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 
 	buffer += '\n';
 
-#ifdef _DEBUG
-	std::cout << buffer;
-#endif
-
-	log << buffer;
-	g_LogDrawer->log.add(type, buffer);
-
-	log.close();
+	detail::addLogToStream(type, buffer);
 }
 
-inline Console console;
-
-#define LOG_INFO(fmt, ...) console.log(TypeLogs::LOG_INFO, fmt, __VA_ARGS__)
-#define LOG_ERR(fmt, ...) console.log(TypeLogs::LOG_ERR, fmt, __VA_ARGS__)
-#define LOG_WARN(fmt, ...) console.log(TypeLogs::LOG_WARN, fmt, __VA_ARGS__)
-#define LOG_EMPTY(fmt, ...) console.log(TypeLogs::LOG_NO, fmt, __VA_ARGS__)
+#define LOG_INFO(fmt, ...) console::log(TypeLogs::LOG_INFO, fmt, __VA_ARGS__)
+#define LOG_ERR(fmt, ...) console::log(TypeLogs::LOG_ERR, fmt, __VA_ARGS__)
+#define LOG_WARN(fmt, ...) console::log(TypeLogs::LOG_WARN, fmt, __VA_ARGS__)
+#define LOG_DEBUG(fmt, ...) console::log(TypeLogs::LOG_DEBUG, fmt, __VA_ARGS__)

@@ -135,7 +135,7 @@ namespace memory
 	using inSmoke_t = bool(__cdecl*)(Vec3, Vec3);
 	using isBreakable_t = bool(__thiscall*)(void*);
 	using flashlightDestroy_t = void(__thiscall*)(void*, void*);
-	using flashlightCreate_t = void*(__thiscall*)(void*, void*, float, float, float, float, int, const char*, float, float);
+	using flashlightCreate_t = void* (__thiscall*)(void*, void*, float, float, float, float, int, const char*, float, float);
 	using flashlightUpdate_t = void(__thiscall*)(void*, int, const Vec3&, const Vec3&, const Vec3&, const Vec3&, float, float, float, bool, const char*);
 	using setAbsOrigin_t = void(__thiscall*)(void*, const Vec3&);
 	using isC4Owner_t = bool(__thiscall*)(void*);
@@ -147,6 +147,10 @@ namespace memory
 	using physicsRunThink_t = bool(__thiscall*)(void*, int);
 	using postThinkPhysics_t = bool(__thiscall*)(Player_t*);
 	using simulateEntities_t = void(__thiscall*)(Player_t*);
+	using loadFromBuffer_t = void(__thiscall*)(void*, const char*, const char*, void*, const char*, void*, int);
+	using keyValuesConstruct_t = void(__thiscall*)(void*, const char*, const char*, int); // or 3rd (2nd without thisptr) arg is int, not sure
+	using keyValuesDestruct_t = void(__thiscall*)(void*, int);
+	using keyValuesSystem_t = KeyValuesSys * (__cdecl*)();
 
 	inline Memory::Address<uintptr_t> traceFilterSimple;
 	inline Memory::Address<uintptr_t*> returnAddrRadarImage;
@@ -189,7 +193,10 @@ namespace memory
 	inline Memory::Address<uintptr_t> retAddrToInterpolation;
 	inline Memory::Address<postThinkPhysics_t> postThinkPhysics;
 	inline Memory::Address<simulateEntities_t> simulateEntities;
-	inline Memory::Address<uintptr_t> vecClientImpacts; // offset
+	inline Memory::Address<uintptr_t> vecClientImpacts;
+	inline Memory::Address<loadFromBuffer_t> loadFromBuffer;
+	inline Memory::Address<keyValuesConstruct_t> keyValuesConstruct;
+	inline Memory::Address<keyValuesDestruct_t> keyValuesDestruct;
 
 	inline Memory::Address<void*> clientValidAddr;
 	inline Memory::Address<void*> enginevalidAddr;

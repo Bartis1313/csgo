@@ -10,12 +10,21 @@
 
 #include <ranges>
 
+const auto predictor = [](const EntityCache::HolderData& lhs, const EntityCache::HolderData& rhs)
+{
+	// do comparison by length to our location
+	const auto lhsToLocal = lhs.ent->absOrigin() - game::localPlayer->absOrigin();
+	const auto rhsToLocal = rhs.ent->absOrigin() - game::localPlayer->absOrigin();
+	return lhsToLocal.length() > rhsToLocal.length();
+};
+
 void EntityCache::init()
 {
 	const int maxIdx = memory::interfaces::entList->getHighestIndex();
 	if (maxIdx <= 1)
 		return;
 
+	HolderData data{};
 	for (auto i : std::views::iota(1, maxIdx))
 	{
 		auto entity = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientEntity(i));
@@ -29,9 +38,13 @@ void EntityCache::init()
 		size_t index = i;
 		size_t classID = cl->m_classID;
 
-		const auto data = HolderData{ .ent = entity, .idx = index, .classID = classID };
+		data = HolderData{ .ent = entity, .idx = index, .classID = classID };
 		fill(data);
 	}
+
+	// not really useful on add since positions are nulled exactly at this frame, use sort in loop
+	if (data.classID == CCSPlayer)
+		std::ranges::sort(m_entCache.at(EntCacheType::PLAYER), predictor);
 }
 
 void EntityCache::add(Entity_t* ent)
@@ -47,6 +60,15 @@ void EntityCache::add(Entity_t* ent)
 
 	const auto data = HolderData{ .ent = ent, .idx = index, .classID = classID };
 	fill(data);
+
+	// not really useful on add since positions are nulled exactly at this frame, use sort in loop
+	if (data.classID == CCSPlayer)
+	{
+		// don't use any sort on already sorted list
+		auto it = std::ranges::upper_bound(m_entCache.at(EntCacheType::PLAYER), data, predictor);
+		if (it != m_entCache.at(EntCacheType::PLAYER).end())
+			m_entCache.at(EntCacheType::PLAYER).insert(it, data);
+	}
 }
 
 std::optional<std::pair<size_t, size_t>> EntityCache::getIndexes(Entity_t* ent)

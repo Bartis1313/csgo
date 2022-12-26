@@ -69,7 +69,7 @@ void Prediction::start(CUserCmd* cmd)
 	game::localPlayer()->m_afButtonLast() = *buttons;
 	*buttons = cmdButtons;
 	game::localPlayer->m_afButtonPressed() = buttonChanged & cmdButtons;
-	game::localPlayer->m_afButtonPressed() = buttonChanged & (~cmdButtons);
+	game::localPlayer->m_afButtonReleased() = buttonChanged & (~cmdButtons);
 
 	memory::interfaces::prediction->checkMovingGround(game::localPlayer(), memory::interfaces::globalVars->m_frametime);
 	memory::interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
@@ -77,10 +77,10 @@ void Prediction::start(CUserCmd* cmd)
 	if (game::localPlayer->physicsRunThink(THINK_FIRE_ALL_FUNCTIONS))
 		game::localPlayer->preThink();
 
-	if (const auto tick = game::localPlayer->m_nNextThinkTick();
+	if (auto& tick = game::localPlayer->m_nNextThinkTick();
 		tick > 0 && tick <= getCorrectTick(cmd))
 	{
-		game::localPlayer->m_nNextThinkTick() = TICK_NEVER_THINK;
+		tick = TICK_NEVER_THINK;
 		game::localPlayer->think();
 	}
 

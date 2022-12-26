@@ -7,7 +7,6 @@
 #include <config/vars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
-
 #include <game/game.hpp>
 
 void Freecam::run(CViewSetup* view)
@@ -17,71 +16,43 @@ void Freecam::run(CViewSetup* view)
 
 	if (!game::isAvailable())
 		return;
-
-	if (!vars::misc->freeCam->enabled)
-	{
-		m_inCam = false;
-		return;
-	}
-
-	// OR get center from map info?
+	
 	static Vec3 v = view->m_angles;
 
-	if (vars::keys->freeCam.isEnabled())
+	if (vars::misc->freeCam->enabled && vars::keys->freeCam.isEnabled())
 	{
 		m_inCam = true;
-
-		float speed = vars::misc->freeCam->speed;
-		Vec3 ang = view->m_angles;
-
-		float sinYaw = std::sin(math::DEG2RAD(ang[1]));
-		float sinPitch = std::sin(math::DEG2RAD(ang[0]));
-		float cosYaw = std::cos(math::DEG2RAD(ang[1]));
-		float cosPitch = std::cos(math::DEG2RAD(ang[0]));
-
-		// to make this ideal we also can do cases like W+A
-		// pseudo: correct.x = (-sin(view.x) + cos(view.x)) / 2.0f; ...something like this
-
 		if (inputHandler.isKeyPressed(VK_SHIFT))
-			speed += 0.1f;
+			vars::misc->freeCam->speed += 0.1f;
 		else if (inputHandler.isKeyPressed(VK_CONTROL))
-			speed -= 0.1f;
+			vars::misc->freeCam->speed -= 0.1f;
 
-		speed = std::clamp(speed, 1.0f, 20.0f);
+		Vec3 ang = view->m_angles;
+		const float speed = std::clamp(vars::misc->freeCam->speed, 1.0f, 20.0f);
 
+		const auto [forward, right, up] = math::angleVectors(ang);
 		if (inputHandler.isKeyDown(VK_SPACE))
 		{
-			v[0] += cosYaw * cosPitch;
-			v[1] += sinYaw * cosPitch;
-			v[2] += std::sin(math::DEG2RAD(-(ang[0] - 90.0f)));
+			v += up * speed;
 		}
-		if(inputHandler.isKeyDown(0x57)) // w
+		if (inputHandler.isKeyDown(0x57)) // w
 		{
-			v[0] += cosYaw * cosPitch;
-			v[1] += sinYaw * cosPitch;
-			v[2] += -sinPitch;
+			v += forward * speed;
 		}
 		if (inputHandler.isKeyDown(0x41)) // a
 		{
-			v[0] += std::cos(math::DEG2RAD(ang[1] + 90.0f)) * cosPitch;
-			v[1] += std::sin(math::DEG2RAD(ang[1] + 90.0f)) * cosPitch;
-			v[2] += -sinPitch;
+			v -= right * speed;
 		}
 		if (inputHandler.isKeyDown(0x53)) // s
 		{
-			v[0] -= cosYaw * cosPitch;
-			v[1] -= sinYaw * cosPitch;
-			v[2] -= -sinPitch;
+			v -= forward * speed;
 		}
 		if (inputHandler.isKeyDown(0x44)) // d
 		{
-			v[0] -= std::cos(math::DEG2RAD(ang[1] + 90.0f)) * cosPitch;
-			v[1] -= std::sin(math::DEG2RAD(ang[1] + 90.0f)) * cosPitch;
-			v[2] += -sinPitch;
+			v += right * speed;
 		}
-		view->m_origin = v * speed;
+		view->m_origin += v;
 	}
-	// reset should be done by some key or button
 	else
 	{
 		v = view->m_angles;

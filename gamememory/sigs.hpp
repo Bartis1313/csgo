@@ -230,3 +230,9 @@ ParticleEffect
 #define VEC_CLIENT_IPACT_LIST		XOR("8D 8F ? ? ? ? F3 0F 10 84 24")
 // #STR: "Server event \"%s\", Tick %i:\n", "GameEventListener2 callback in list that should NOT be - %, "Callback for event \"%s\" is NULL!!!\n", "portal2", "FireEvent: event '%s' not registered.\n", "Game event \"%s\", Tick %i:\n"
 #define FIRE_INTERN					XOR("55 8B EC 83 E4 F8 83 EC 0C 8B C1 53 56")
+// #STR: "KeyValues::LoadFromBuffer(%s%s%s): Begin"
+#define LOAD_FROM_BUFFER			XOR("55 8B EC 83 E4 F8 83 EC 34 53 8B 5D 0C 89")
+// #STR: "KeyValues::ParseIncludedKeys: Couldn't load included keyva
+#define KEYVALUES_CONSTRUCT			XOR("55 8B EC 56 8B F1 33 C0 8B 4D 0C 81")
+// #STR: "KeyValues::ParseIncludedKeys: Couldn't load included keyva
+#define KEYVALUES_DESTRUCT			XOR("56 8B F1 E8 ? ? ? ? 8B 4E 14")

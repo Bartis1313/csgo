@@ -178,6 +178,9 @@ void Memory::init()
 	postThinkPhysics = postThinkPhysics.scan(CLIENT_DLL, POST_THINK_PHYSICS);
 	simulateEntities = simulateEntities.scan(CLIENT_DLL, SIMULATE_ENTITIES);
 	vecClientImpacts = vecClientImpacts.scan(CLIENT_DLL, VEC_CLIENT_IPACT_LIST);
+	loadFromBuffer = loadFromBuffer.scan(CLIENT_DLL, LOAD_FROM_BUFFER);
+	keyValuesConstruct = keyValuesConstruct.scan(CLIENT_DLL, KEYVALUES_CONSTRUCT);
+	keyValuesDestruct = keyValuesDestruct.scan(CLIENT_DLL, KEYVALUES_DESTRUCT);
 
 	// HOOKS
 
@@ -217,7 +220,7 @@ void Memory::init()
 	dx9Device = dx9Device.scan(SHARED_API, DX9_DEVICE, 0x1).deRef(Dereference::TWICE);
 	clientState = clientState.scan(ENGINE_DLL, CLIENT_STATE, 0x1).deRef(Dereference::TWICE);
 	viewRender = viewRender.scan(CLIENT_DLL, VIEW_RENDER, 0x2).deRef(Dereference::TWICE);
-	keyValuesSys = keyValuesSys.byExport<"KeyValuesSystem"_hash>(VSTD_DLL);
+	keyValuesSys = keyValuesSys.byExport<"KeyValuesSystem"_hash>(VSTD_DLL).cast<keyValuesSystem_t>()()();
 	memAlloc = memAlloc.byExport<"g_pMemAlloc"_hash>(TIER_DLL).deRef();
 	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER, 0x2).deRef(Dereference::TWICE);
 	beams = beams.scan(CLIENT_DLL, BEAMS, 0x1).deRef();

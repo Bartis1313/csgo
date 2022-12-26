@@ -53,7 +53,7 @@ void Blacklist::reset()
 
 bool Blacklist::loadCfg()
 {
-	if (auto path = config.getHackPath() / config.getExtraLoadPath() / m_folderName; std::filesystem::exists(path))
+	if (auto path = config.getHackPath() / config.getExtraLoadPath() / m_folderName; !std::filesystem::exists(path))
 		std::filesystem::create_directories(path);
 
 	std::ifstream input{ m_saveDir };

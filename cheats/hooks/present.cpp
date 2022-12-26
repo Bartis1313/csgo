@@ -10,6 +10,7 @@
 #include <utilities/renderer/renderer.hpp>
 #include <utilities/console/console.hpp>
 #include <utilities/res.hpp>
+#include <utilities/tools/tools.hpp>
 
 #include <d3d9.h>
 
@@ -25,7 +26,7 @@ long D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT
 		// style, colors, ini file etc.
 		menu.init();
 
-		LOG_INFO(XOR("init for present success"));
+		LOG_DEBUG(XOR("init for present success"));
 
 		return true;
 	} ();

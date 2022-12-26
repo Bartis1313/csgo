@@ -1,13 +1,14 @@
 #include "base.hpp"
 
 #include <utilities/console/console.hpp>
+#include <utilities/tools/tools.hpp>
 
 void BaseHack::initAll()
 {
 	for (auto el : m_hacks)
 		el->init();
 
-	LOG_INFO(XOR("Inited {} functions!"), m_hacks.size());
+	LOG_DEBUG(XOR("Inited {} functions!"), m_hacks.size());
 }
 
 void BaseHack::shutdownAll()

@@ -58,6 +58,7 @@ public:
 
 	PAD(8);
 	bool m_inPrediction;
+	bool m_oldCLPredictValue;
 	bool m_firstTimePredicted;
 	bool m_enginePaused;
 };

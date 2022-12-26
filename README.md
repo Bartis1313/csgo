@@ -25,21 +25,21 @@ This is a trianing software. No further actions taken by people are heeded.
  * Thirdperson - 3rd person on key.
  * Crosshairs - custom crosshairs, 5 types.
  * Local info - ammo, pos etc...
- * Fps plot - collect fps and represent it in graphical resizable plot.
- * Velocity plot - collect local player speed and represent it in graphical resizable plot.
+ * Fps plot - collect fps and represent it in graphical resizable plot. (rebuild needed - cleanup from ex-render)
+ * Velocity plot - collect local player speed and represent it in graphical resizable plot. (rebuild needed - cleanup from ex-render)
  * Hitmarker - ability to draw hitmarkers 2D/3D with dmg output.
- * No scope - removes scope black overlay (rebuild needed - think of better blur removal)
+ * No scope - removes scope black overlay
  * Bullet tracer - draw bullets directions by line beams.
  * Flashlight
  * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic.
- * Engine prediction - useful to never skip tick and get correct server time (rebuild needed - use it 1:1 as game does)
- * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records.
+ * Engine prediction - useful to never skip tick and get correct server time.
+ * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records. Also possible to create your own.
  * Glow - highlight player ents. (rebuild needed - think of removing this or creating glow texture on own (game provides such materials), client.dll checks it and it in general has performance issues)
  * Sound Esp (rebuild needed - there is no need to do it with events)
  * Esp - name, flags, boxes, health, armor, ammo, skeleton.
  * DLight - highlights player by dlight
  * Enemy aiming at you warn
- * 2D radar - overlay showing where enemy is, with background of the map texture.
+ * 2D radar - overlay showing where enemy is, with background of the map texture. (rebuild needed - cleanup from ex-render)
  * Custom skybox - listed from game
  * Remove sky - removes props
  * Edit world colors - props/walls/sky (rebuild needed - transparency should be done in different way)
@@ -49,7 +49,7 @@ This is a trianing software. No further actions taken by people are heeded.
  * Draw dropped weapons - box/icon/name/ammo
  * Bomb overlay with info (rebuild needed - cleanup, this is now very ugly in code)
  * Mirrorcam - show what is behind you on extra window (contains fixing setupbones occlusion problems)
- * Freecam - view any place without moving your model (dormant ents won't render) (rebuild needed - should generally work better)
+ * Freecam - view any place without moving your model (dormant ents won't render)
  * Freelook - a copy of how it looks like in PUBG
  </details>
 
