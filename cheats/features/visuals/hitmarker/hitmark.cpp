@@ -17,6 +17,9 @@
 
 #include <functional>
 
+// TODO: try if this is okay-ish https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/takedamageinfo.h#L24
+// and then: https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/server/player.cpp#L1725
+// server.dll 55 8B EC 83 EC 08 53 8B D9 80 BB ? ? ? ? ? 74 09
 void Hitmarker::init()
 {
 	events::add(XOR("player_hurt"), std::bind(&Hitmarker::handleHits, this, std::placeholders::_1));

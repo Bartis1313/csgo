@@ -16,3 +16,4 @@
 #define PANORAMA_DLL				XOR("panorama.dll")
 #define FILESYS_DLL					XOR("filesystem_stdio.dll")
 #define DATACACHE_DLL				XOR("datacache.dll")
+#define SERVER_DLL					XOR("server.dll")

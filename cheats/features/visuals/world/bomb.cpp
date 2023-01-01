@@ -64,12 +64,12 @@ void BombOverlay::draw()
 	const float dmg = game::scaleDamageArmor((bombRadius * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), static_cast<float>(game::localPlayer->m_ArmorValue()));
 	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 
-	float scaled = m_bombEnt->m_hBombDefuser() > 0 ? (defusetime / defuseMaxTime) : (bombtime / m_timer->getFloat());
+	float scaled = m_bombEnt->m_hBombDefuser().handle > 0 ? (defusetime / defuseMaxTime) : (bombtime / m_timer->getFloat());
 
 	float fdef = defusetime / defuseMaxTime;
 	float fbomb = bombtime / m_timer->getFloat();
-	float forRed = m_bombEnt->m_hBombDefuser() > 0 ? fdef : fbomb;
-	float forGreen = m_bombEnt->m_hBombDefuser() > 0 ? fdef : fbomb;
+	float forRed = m_bombEnt->m_hBombDefuser().handle > 0 ? fdef : fbomb;
+	float forGreen = m_bombEnt->m_hBombDefuser().handle > 0 ? fdef : fbomb;
 
 	float r = (255.0f - forRed * 255.0f);
 	float g = (forGreen * 255.0f);

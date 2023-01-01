@@ -2,7 +2,7 @@
 
 #include <features/events/events.hpp>
 
-void FASTCALL hooks::fireIntern::hooked(FAST_ARGS, IGameEvent* event, bool server, bool client)
+hooks::fireIntern::value FASTCALL hooks::fireIntern::hooked(FAST_ARGS, IGameEvent* event, bool server, bool client)
 {
 	/*for (const auto [name, funcs] : EventCallback::getCallbacks())
 	{

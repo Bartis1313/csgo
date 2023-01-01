@@ -236,3 +236,22 @@ ParticleEffect
 #define KEYVALUES_CONSTRUCT			XOR("55 8B EC 56 8B F1 33 C0 8B 4D 0C 81")
 // #STR: "KeyValues::ParseIncludedKeys: Couldn't load included keyva
 #define KEYVALUES_DESTRUCT			XOR("56 8B F1 E8 ? ? ? ? 8B 4E 14")
+// #STR: CPrediction::ProcessMovement
+#define USING_STANDARD_WEAPONS_VEH	XOR("56 57 8B F9 8B 97 ? ? ? ? 83 FA FF 74 43 0F")
+// #STR: C_BasePlayer::`vftable
+#define SELECT_ITEM					XOR("55 8B EC 56 8B F1 ? ? ? 85 C9 74 71 8B 06")
+// #STR: CPrediction::ProcessMovement
+#define CHECK_HAS_THINK_FN			XOR("55 8B EC 56 57 8B F9 8B B7 ? ? ? ? 8B")
+// #STR: "C_BaseEntity::SaveData"
+// just after first offset has been pushed with "SaveData", there is a copy
+#define TRANSFER_DATA				XOR("55 8B EC 8B 45 10 53 56 8B F1 57")
+// #STR: "Shutdown %i predictable entities and %i client-created ent
+#define SHUTDOWN_PREDICTABLES		XOR("53 56 8B 35 ? ? ? ? 33 DB 57 33 FF")
+// #STR: "%d:  Reinitialized %i predictable entities\n"
+#define REINIT_PREDICTABLES			XOR("A1 ? ? ? ? B9 ? ? ? ? 53 56 FF 50 18")
+// #STR: "userid", "gg_halftime"
+#define SERVER_PREROUND				XOR("55 8B EC 83 EC 0C 53 8B D9 56 57 8B 03")
+// #STR: "Can't find specific footstep sound! (%s) - Using the defau, "Heavy.Step", "T_Default.Suit", "CT_Default.Suit", "ct_%s"
+#define PLAY_STEP_SOUND				XOR("55 8B EC 8B 45 18 81 EC")
+// #STR: "player_hurt", "userid", "health", "armor", "dmg_health", "dmg_armor", "hitgroup", "envgunfire", "dangerzone", "attacker"
+#define ON_TAKE_DMFG_ALIVE			XOR("55 8B EC 83 EC 08 53 8B D9 80 BB ? ? ? ? ? 74 09")

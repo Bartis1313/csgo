@@ -16,11 +16,7 @@
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 
-void SoundDraw::init()
-{
-	events::add(XOR("player_footstep"), std::bind(&SoundDraw::pushSteps, this, std::placeholders::_1));
-}
-
+// https://www.unknowncheats.me/forum/counterstrike-global-offensive/333825-bloodhound-inspired-legit-csgo-esp.html
 void SoundDraw::findBest(Player_t* ent)
 {
 	if (!vars::visuals->sound->enabled)
@@ -120,21 +116,11 @@ void SoundDraw::draw()
 	}
 }
 
-void SoundDraw::pushSteps(IGameEvent* event)
+void SoundDraw::pushSteps(Player_t* ent)
 {
-	if (!vars::visuals->sound->enabled)
+	if (!ent->isOtherTeam(game::localPlayer()))
 		return;
 
-	auto who = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
-	if (!who)
-		return;
-
-	if (!who->isPlayer())
-		return;
-
-	if (who->isDormant())
-		return;
-
-	StepData_t step{ who, who->absOrigin(), memory::interfaces::globalVars->m_curtime + vars::visuals->sound->time };
+	StepData_t step{ ent, ent->absOrigin(), memory::interfaces::globalVars->m_curtime + vars::visuals->sound->time };
 	m_steps.at(step.m_player->getIndex()).push_back(step);
 }

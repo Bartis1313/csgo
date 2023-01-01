@@ -130,6 +130,7 @@ void Memory::init()
 	ADD_TO_MAP("panorama.dll");
 	ADD_TO_MAP("filesystem_stdio.dll");
 	ADD_TO_MAP("datacache.dll");
+	ADD_TO_MAP("server.dll");
 
 #undef ADD_TO_MAP
 
@@ -177,10 +178,16 @@ void Memory::init()
 	retAddrToInterpolation = retAddrToInterpolation.scan(CLIENT_DLL, RET_ADDR_INTERPOLATION);
 	postThinkPhysics = postThinkPhysics.scan(CLIENT_DLL, POST_THINK_PHYSICS);
 	simulateEntities = simulateEntities.scan(CLIENT_DLL, SIMULATE_ENTITIES);
-	vecClientImpacts = vecClientImpacts.scan(CLIENT_DLL, VEC_CLIENT_IPACT_LIST);
+	vecClientImpacts = vecClientImpacts.scan(CLIENT_DLL, VEC_CLIENT_IPACT_LIST).add(0x2).deRef();
 	loadFromBuffer = loadFromBuffer.scan(CLIENT_DLL, LOAD_FROM_BUFFER);
 	keyValuesConstruct = keyValuesConstruct.scan(CLIENT_DLL, KEYVALUES_CONSTRUCT);
 	keyValuesDestruct = keyValuesDestruct.scan(CLIENT_DLL, KEYVALUES_DESTRUCT);
+	checkThinkFunction = checkThinkFunction.scan(CLIENT_DLL, CHECK_HAS_THINK_FN);
+	usingStandardWeaponsVehicle = usingStandardWeaponsVehicle.scan(CLIENT_DLL, USING_STANDARD_WEAPONS_VEH);
+	selectItem = selectItem.scan(CLIENT_DLL, SELECT_ITEM);
+	transferData = transferData.scan(CLIENT_DLL, TRANSFER_DATA);
+	reinitPredicatbles = reinitPredicatbles.scan(CLIENT_DLL, REINIT_PREDICTABLES);
+	shutdownPredicatbles = shutdownPredicatbles.scan(CLIENT_DLL, SHUTDOWN_PREDICTABLES);
 
 	// HOOKS
 
@@ -202,6 +209,8 @@ void Memory::init()
 	isFollowedEntity = isFollowedEntity.scan(CLIENT_DLL, IS_FOLLOWED_ENT);
 	spottedEntityUpdate = spottedEntityUpdate.scan(CLIENT_DLL, SPOTTED_ENTITIY_UPDATE);
 	fireInternfn = fireInternfn.scan(ENGINE_DLL, FIRE_INTERN);
+	preRound = preRound.scan(SERVER_DLL, SERVER_PREROUND);
+	playSoundStep = playSoundStep.scan(CLIENT_DLL, PLAY_STEP_SOUND);
 
 	// REST
 

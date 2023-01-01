@@ -31,6 +31,7 @@ enum hookIndexes
 	LEVEL_SHUTDOWN = 7,
 	EMIT_SOUND = 5,
 	CREATE_EVENT = 7,
+	RUN_COMMAND = 19,
 };
 
 class IPanel;
@@ -43,6 +44,10 @@ class INetChannel;
 struct MapStruct;
 class IMaterialSystem;
 class IGameEvent;
+class CUserCmd;
+class Player_t;
+class IMoveHelper;
+struct EHandle_t;
 
 #define FAST_ARGS [[maybe_unused]] void* thisptr, [[maybe_unused]] void* edx
 #define FASTCALL __fastcall
@@ -51,6 +56,7 @@ class IGameEvent;
 
 #define HOOK_STRUCT_VFUNC(name, type, idx, ...) \
 struct name { \
+	using value = type; \
 	using fn = type(__thiscall*)(void*, __VA_ARGS__); \
 	static type __fastcall hooked(FAST_ARGS, __VA_ARGS__); \
 	inline static fn original = nullptr; \
@@ -59,6 +65,7 @@ struct name { \
 
 #define HOOK_STRUCT_FUNC(name, type, ...) \
 struct name { \
+	using value = type; \
 	using fn = type(__thiscall*)(void*, __VA_ARGS__); \
 	static type __fastcall hooked(FAST_ARGS, __VA_ARGS__); \
 	inline static fn original = nullptr; \
@@ -67,6 +74,7 @@ struct name { \
 
 #define HOOK_STRUCT_API_VFUNC(name, type, idx, ...) \
 struct name { \
+	using value = type; \
 	using fn = type(__stdcall*)(__VA_ARGS__); \
 	static type __stdcall hooked(__VA_ARGS__); \
 	inline static fn original = nullptr; \
@@ -75,6 +83,7 @@ struct name { \
 
 #define HOOK_STRUCT_API(name, type, ...) \
 struct name { \
+	using value = type; \
 	using fn = type(__stdcall*)(__VA_ARGS__); \
 	static type __stdcall hooked(__VA_ARGS__); \
 	inline static fn original = nullptr; \
@@ -109,6 +118,7 @@ namespace hooks
 	HOOK_STRUCT_VFUNC(levelShutdown, void, LEVEL_SHUTDOWN);
 	HOOK_STRUCT_VFUNC(emitSound, void, EMIT_SOUND, void*, int, int, const char*, uint32_t, const char*, float, int, int, int, int, const Vec3&, const Vec3&, void*, bool, float, int, void*);
 	HOOK_STRUCT_VFUNC(createEvent, IGameEvent*, CREATE_EVENT, const char*, bool, uint32_t);
+	HOOK_STRUCT_VFUNC(runCommand, void, RUN_COMMAND, Player_t*, CUserCmd*, IMoveHelper*);
 
 	HOOK_STRUCT_FUNC(getColorModulation, void, float*, float*, float*);
 	HOOK_STRUCT_FUNC(buildTransformations, void, CStudioHdr*, void*, void*, const Matrix3x4&, int, void*);
@@ -123,11 +133,13 @@ namespace hooks
 	HOOK_STRUCT_FUNC(studioRenderValidAddr, char, const char*);
 	HOOK_STRUCT_FUNC(materialSystemValidAddr, char, const char*);
 	HOOK_STRUCT_FUNC(isUsingStaticPropDebugModes, bool);
-	HOOK_STRUCT_FUNC(addEnt, void, void*, int);
-	HOOK_STRUCT_FUNC(removeEnt, void, void*, int);
+	HOOK_STRUCT_FUNC(addEnt, void, void*, EHandle_t);
+	HOOK_STRUCT_FUNC(removeEnt, void, void*, EHandle_t);
 	HOOK_STRUCT_FUNC(isFollowingEntity, bool);
 	HOOK_STRUCT_FUNC(processSpottedEntityUpdate, bool, void*);
 	HOOK_STRUCT_FUNC(fireIntern, void, IGameEvent*, bool, bool);
+	HOOK_STRUCT_FUNC(preRestartRound, void);
+	HOOK_STRUCT_FUNC(playStepSound, int, Vec3&, void*, float, bool, void*);
 
 	HOOK_STRUCT_API_VFUNC(reset, long, RESETDX, IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 	HOOK_STRUCT_API_VFUNC(present, long, PRESENTDX, IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);

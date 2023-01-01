@@ -7,6 +7,7 @@
 #include "../math/matrix.hpp"
 #include "../math/AABB.hpp"
 #include "../varMapping.hpp"
+#include "../EHandle.hpp"
 #include "indexes.hpp"
 
 #include <utilities/netvars/netvars.hpp>
@@ -21,6 +22,8 @@ struct Model_t;
 class WeaponInfo;
 struct DataMap_t;
 class CUserCmd;
+class CMoveData;
+struct ClientHitVerify_t;
 
 /*
 * This file is so far probably the easiest when it comes to netvar usage
@@ -40,8 +43,8 @@ class Entity_t
 public:
 	NETVAR(int, m_iTeamNum, "DT_CSPlayer", "m_iTeamNum");
 	NETVAR(Vec3, m_vecOrigin, "DT_BasePlayer", "m_vecOrigin");
-	NETVAR(int, m_hOwnerEntity, "DT_BaseEntity", "m_hOwnerEntity");
-	NETVAR(int, m_hVehicle, "DT_BaseEntity", "m_hVehicle");
+	NETVAR(EHandle_t, m_hOwnerEntity, "DT_BaseEntity", "m_hOwnerEntity");
+	NETVAR(EHandle_t, m_hVehicle, "DT_BaseEntity", "m_hVehicle");
 	NETVAR(int, m_CollisionGroup, "DT_BasePlayer", "m_CollisionGroup");
 	NETVAR(Vec3, m_ViewOffset, "DT_BasePlayer", "m_vecViewOffset[0]");
 	NETVAR(bool, m_bSpotted, "DT_BaseEntity", "m_bSpotted");
@@ -54,7 +57,8 @@ public:
 	NETVAR(int, m_fEffects, "DT_BaseEntity", "m_fEffects");
 	NETVAR(int, m_nModelIndex, "DT_BaseEntity", "m_nModelIndex");
 	NETVAR(PrecipitationType_t, m_nPrecipType, "DT_Precipitation", "m_nPrecipType");
-	NETVAR(int, m_nNextThinkTick, "DT_BasePlayer", "m_nNextThinkTick");
+	PTRNETVAR(int, m_nNextThinkTick, "DT_BasePlayer", "m_nNextThinkTick");
+	NETVAR_ADDR(int, m_nCreationTick, "DT_BaseEntity", "m_hEffectEntity", 0xC);
 
 	VFUNC(Vec3&, absOrigin, ABS_ORIGIN, (), (this));
 	VFUNC(Vec3&, absAngles, ABS_ANGLE, (), (this));
@@ -148,7 +152,7 @@ class Nade_t : public Entity_t
 {
 public:
 	NETVAR_ADDR(float, m_flSpawnTime, "DT_BaseCSGrenadeProjectile", "m_vecExplodeEffectOrigin", 0xC);
-	NETVAR(int, m_hThrower, "DT_BaseCSGrenadeProjectile", "m_hThrower");
+	NETVAR(EHandle_t, m_hThrower, "DT_BaseCSGrenadeProjectile", "m_hThrower");
 	NETVAR(int, m_nExplodeEffectTickBegin, "DT_BaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin");
 	NETVAR(Vec3, m_vecVelocity, "DT_BaseCSGrenadeProjectile", "m_vecVelocity");
 	NETVAR(Vec3, m_vecOrigin, "DT_BaseCSGrenadeProjectile", "m_vecOrigin");
@@ -169,7 +173,7 @@ class Bomb_t : public Entity_t
 {
 public:
 	NETVAR(float, m_flDefuseCountDown, "DT_PlantedC4", "m_flDefuseCountDown");
-	NETVAR(int, m_hBombDefuser, "DT_PlantedC4", "m_hBombDefuser");
+	NETVAR(EHandle_t, m_hBombDefuser, "DT_PlantedC4", "m_hBombDefuser");
 	NETVAR(float, m_flC4Blow, "DT_PlantedC4", "m_flC4Blow");
 	NETVAR(bool, m_bBombDefused, "DT_PlantedC4", "m_bBombDefused");
 	NETVAR(bool, m_nBombSite, "DT_PlantedC4", "m_nBombSite");
@@ -193,7 +197,7 @@ public:
 	NETVAR(bool, m_bGunGameImmunity, "DT_CSPlayer", "m_bGunGameImmunity");
 	NETVAR(float, m_flNextAttack, "DT_CSPlayer", "m_flNextAttack");
 	NETVAR(bool, m_bHasDefuser, "DT_CSPlayer", "m_bHasDefuser");
-	NETVAR(int, m_hViewModel, "DT_BasePlayer", "m_hViewModel[0]");
+	NETVAR(EHandle_t, m_hViewModel, "DT_BasePlayer", "m_hViewModel[0]");
 	NETVAR(float, m_flLowerBodyYawTarget, "DT_CSPlayer", "m_flLowerBodyYawTarget");
 	NETVAR(float, m_flFlashDuration, "DT_CSPlayer", "m_flFlashDuration");
 	NETVAR_ADDR(float, m_flFlashBangTime, "DT_CSPlayer", "m_flFlashDuration", -0x10);
@@ -207,12 +211,15 @@ public:
 	NETVAR(bool, m_bDucked, "DT_CSPlayer", "m_bDucked");
 	NETVAR(bool, m_bDucking, "DT_CSPlayer", "m_bDucking");
 	NETVAR(float, m_flHealthShotBoostExpirationTime, "DT_CSPlayer", "m_flHealthShotBoostExpirationTime");
-	NETVAR(unsigned long, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget");
-	NETVAR(int, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
+	NETVAR(EHandle_t, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget");
+	NETVAR(EHandle_t, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
 	NETVAR(int, m_iAccount, "DT_CSPlayer", "m_iAccount");
 	PTRNETVAR(const char, m_szLastPlaceName, "DT_BasePlayer", "m_szLastPlaceName");
 	NETVAR(float, m_flFallVelocity, "DT_BasePlayer", "m_flFallVelocity");
 	NETVAR(int, m_nSequence, "DT_BaseAnimating", "m_nSequence");
+	NETVAR(float, m_flVelocityModifier, "DT_CSPlayer", "m_flVelocityModifier");	
+	NETVAR(int, m_iNumRoundKillsHeadshots, "DT_CSPlayer", "m_iNumRoundKillsHeadshots");
+	NETVAR(int, m_totalHitsOnServer, "DT_CSPlayer", "m_totalHitsOnServer");
 	PTROFFSET(VarMapping_t, getVarMap, 0x24);
 	DATAMAP_FIELD(int, m_afButtonLast, getPredictionDataMap(), "m_afButtonLast");
 	DATAMAP_FIELD(int, m_afButtonPressed, getPredictionDataMap(), "m_afButtonPressed");
@@ -220,18 +227,28 @@ public:
 	NETVAR_ADDR(int, m_afButtonForced, "DT_BasePlayer", "m_iDefaultFOV", 0x8);
 	NETVAR_ADDR(int, m_afButtonDisabled, "DT_BasePlayer", "m_iDefaultFOV", 0x4);
 	PTRNETVAR_ADDR(CUserCmd*, m_pCurrentCommand, "DT_BasePlayer", "m_iDefaultFOV", 0xC);
+	NETVAR_ADDR(float, m_flSpawnTime, "DT_CSPlayer", "m_iAddonBits", -0x4);
 	[[nodiscard]] CUserCmd& m_LastCmd();
 	PTRDATAMAP_FIELD(int, m_nButtons, getPredictionDataMap(), "m_nButtons");
 	PTRDATAMAP_FIELD(int, m_nImpulse, getPredictionDataMap(), "m_nImpulse");
+	DATAMAP_FIELD(Vec3, m_vecAbsVelocity, getPredictionDataMap(), "m_vecAbsVelocity");
+	DATAMAP_FIELD(Vec3, m_vecNetworkOrigin, getPredictionDataMap(), "m_vecNetworkOrigin");
+	DATAMAP_FIELD(int, m_iEFlags, getPredictionDataMap(), "m_iEFlags");
 	VFUNC(DataMap_t*, getPredictionDataMap, DATAMAP_PREDICTION, (), (this));
 	VFUNC(void, preThink, PRE_THINK, (), (this));
 	VFUNC(void, think, THINK, (), (this));
+	void runThink();
 	void postThink();
+	void checkHasThinkFunction(bool isThinkingHint = false);
+	VFUNC(void, selectItem, SELECTITEM, (const char* string, int subType = 0), (this, string, subType));
+	bool usingStandardWeaponsInVehicle();
 	VFUNC(void, updateCollisionBounds, UPDATE_COLLISION_BOUNDS, (), (this));
 	VFUNC(void, setSequence, SET_SEQUENCE, (int seq), (this, seq));
 	VFUNC(void, studioFrameAdvance, STUDIO_FRAME_ADVANCE, (), (this));
+	// VEHICLES ONLY
+	VFUNC(void, processMovement, PROCESS_MOVEMENT, (Entity_t* veh, Player_t* player, CMoveData* data), (this, veh, player, data));
 	[[nodiscard]] bool physicsRunThink(thinkmethods_t think);
-
+	[[nodiscard]] CUtlVector<ClientHitVerify_t> m_vecBulletVerifyListClient();
 
 	void setAbsOrigin(const Vec3& origin);
 	[[nodiscard]] Weapon_t* getActiveWeapon();

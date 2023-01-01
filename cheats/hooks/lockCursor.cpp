@@ -4,7 +4,7 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
 
-void FASTCALL hooks::lockCursor::hooked(FAST_ARGS)
+hooks::lockCursor::value FASTCALL hooks::lockCursor::hooked(FAST_ARGS)
 {
 	if (menu.isMenuActive())
 	{

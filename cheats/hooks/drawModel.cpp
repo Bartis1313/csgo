@@ -6,7 +6,7 @@
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 
-void FASTCALL hooks::drawModel::hooked(FAST_ARGS, void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
+hooks::drawModel::value FASTCALL hooks::drawModel::hooked(FAST_ARGS, void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
 {
 	if(!memory::interfaces::engine->isInGame() || memory::interfaces::modelRender->isForcedMaterial())
 		return original(memory::interfaces::modelRender(), result, state, info, matrix);

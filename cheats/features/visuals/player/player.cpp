@@ -97,7 +97,7 @@ void PlayerVisuals::draw()
 			drawSkeleton(ent);
 			runDLight(ent);
 			drawLaser(ent);
-			g_SoundDraw->findBest(ent);
+			SoundDraw::findBest(ent);
 		};
 
 		if (drawDead)
@@ -110,7 +110,7 @@ void PlayerVisuals::draw()
 
 		warnChecks = g_EnemyWarning->check(ent);
 	}
-	g_SoundDraw->draw();
+	SoundDraw::draw();
 	g_EnemyWarning->draw(warnChecks);
 }
 
@@ -119,15 +119,18 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 	if (!vars::visuals->esp->healthBar->enabled)
 		return;
 
+	constexpr int maxHealth = 100;
+	constexpr float frequency = maxHealth * (1.0f / 0.5f);
+
 	auto& health = m_health.at(ent->getIndex());
-
-	if (auto realHealth = ent->m_iHealth(); health > realHealth)
-		health -= static_cast<int>(2.0f * memory::interfaces::globalVars->m_frametime);
+	const auto realHealth = ent->m_iHealth();
+	if (health > realHealth)
+		health -= frequency * memory::interfaces::globalVars->m_frametime;
 	else
-		health = realHealth;
+		health = static_cast<float>(realHealth);
 
-	auto offset = health * box.h / 100.0f;
-	auto pad = box.h - offset;
+	const auto offset = health * box.h / maxHealth;
+	const auto pad = box.h - offset;
 
 	Box newBox =
 	{
@@ -144,7 +147,7 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 	// if the player has health below max, then draw HP info
 	if (health < 100)
 	{
-		auto text = FORMAT(XOR("{}"), health);
+		auto text = FORMAT(XOR("{}"), realHealth);
 		float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer->absOrigin(), 100.0f, 10.0f, 14.0f);
 		auto size = ImFonts::franklinGothic12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
 
@@ -157,16 +160,19 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 {
 	if (!vars::visuals->esp->armorBar->enabled)
 		return;
-
+	
+	constexpr int maxArmor = 100;
+	constexpr float frequency = maxArmor * (1.0f / 0.5f);
 	auto& armor = m_armor.at(ent->getIndex());
+	const auto realArmor = ent->m_ArmorValue();
 
-	if (auto realArmor = ent->m_ArmorValue(); armor > realArmor)
-		armor -= static_cast<int>(2.0f * memory::interfaces::globalVars->m_frametime);
+	if (armor > realArmor)
+		armor -= frequency * memory::interfaces::globalVars->m_frametime;
 	else
-		armor = realArmor;
+		armor = static_cast<float>(realArmor);
 
-	auto offset = armor * box.h / 100.0f;
-	auto pad = box.h - offset;
+	const auto offset = armor * box.h / maxArmor;
+	const auto pad = box.h - offset;
 
 	Box newBox =
 	{
@@ -186,7 +192,7 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 
 	/*if (armor < 100 && armor != 0)
 		imRender.text(newBox.x - 2.0f, newBox.y + pad - 4.0f,
-			ImFonts::franklinGothic, std::format(XOR("{}"), armor), false, Colors::White);*/
+			ImFonts::franklinGothic, std::format(XOR("{}"), realArmor), false, Colors::White);*/
 }
 
 #include <SDK/ILocalize.hpp>

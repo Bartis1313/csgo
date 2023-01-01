@@ -60,10 +60,10 @@ void FASTCALL createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool act
 	game::serverTime(cmd);
 	CreateMovePrePredictionType::runAll(cmd);
 
-	g_Prediction->addToPrediction(cmd, [=]()
-		{
+	//g_Prediction->addToPrediction(cmd, [=]()
+	//	{
 			CreateMoveInPredictionType::runAll(cmd);
-		});
+	//	});
 
 	CreateMovePostPredictionType::runAll(cmd);
 
@@ -78,7 +78,7 @@ void FASTCALL createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool act
 }
 
 // wrapper for function
-__declspec(naked) void __fastcall hooks::proxyCreateMove::hooked(FAST_ARGS, int sequence, float inputFrame, bool active)
+__declspec(naked) hooks::proxyCreateMove::value FASTCALL hooks::proxyCreateMove::hooked(FAST_ARGS, int sequence, float inputFrame, bool active)
 {
 	__asm
 	{

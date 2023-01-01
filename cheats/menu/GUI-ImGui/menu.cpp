@@ -13,7 +13,7 @@
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/renderer/renderer.hpp>
 #include <utilities/console/console.hpp>
-#include <features/visuals/chams/chams.hpp>
+#include <features/visuals/chams/editor.hpp>
 #include <config/vars.hpp>
 
 // see the code of dear imgui lib or demo window to change it.
@@ -676,9 +676,7 @@ static void renderMisc()
 						ImGui::Animations::SliderFloat(XOR("Tracers frameRate"), &vars::visuals->world->tracer->beamTracer.frameRate, 0.0f, 200.0f);
 						ImGui::SliderInt(XOR("Tracers segmnets"), &vars::visuals->world->tracer->beamTracer.segments, 0, 30);
 					}
-				);
-				ImGui::Animations::Checkbox(XOR("Enable local bullets"), &vars::visuals->world->impacts->enabledLocal);
-				ImGui::SameLine();			
+				);	
 				ImGui::Animations::Checkbox(XOR("Enable client bullets"), &vars::visuals->world->impacts->enabledClient);
 				ImGui::SameLine();
 				ImGui::Animations::PopupButton(XOR("##client bullets pop"), []()

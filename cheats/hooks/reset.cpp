@@ -4,7 +4,7 @@
 
 #include <d3d9.h>
 
-long D3DAPI hooks::reset::hooked(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
+hooks::reset::value D3DAPI hooks::reset::hooked(IDirect3DDevice9* device, D3DPRESENT_PARAMETERS* params)
 {
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 

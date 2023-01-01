@@ -2,7 +2,7 @@
 
 #include "../features/visuals/misc/motionblur.hpp"
 
-bool FASTCALL hooks::isDepthOfField::hooked(FAST_ARGS)
+hooks::isDepthOfField::value FASTCALL hooks::isDepthOfField::hooked(FAST_ARGS)
 {
 	MotionBlur::render();
 

@@ -47,14 +47,15 @@ void MiscInfo::draw()
 		float kpm = game::localPlayer->getKills() / (game::serverTime() / 60.0f);
 		text(FORMAT(XOR("KD {:.2f} KPM: {:.2f}"), kd, kpm), Colors::Yellow);
 		text(FORMAT(XOR("Ping {}"), game::localPlayer->getPing()), Colors::Yellow);
-		float accuracy = globals::shotsFired
-			? (static_cast<float>(globals::shotsHit) / static_cast<float>(globals::shotsFired)) * 100.0f
+		float accuracy = game::localPlayer->m_vecBulletVerifyListClient().m_size
+			? (static_cast<float>(game::localPlayer->m_totalHitsOnServer()) / static_cast<float>(game::localPlayer->m_vecBulletVerifyListClient().m_size)) * 100.0f
 			: 0.0f;
 		float fixedKills = game::localPlayer->getKills() ? game::localPlayer->getKills() : 1.0f;
-		float hs = globals::shotsHead
-			? (static_cast<float>(globals::shotsHead) / fixedKills) * 100.0f
+		float hs = game::localPlayer->m_iNumRoundKillsHeadshots()
+			? (static_cast<float>(game::localPlayer->m_iNumRoundKillsHeadshots()) / fixedKills) * 100.0f
 			: 0.0f;
-		text(FORMAT(XOR("Accuracy [{} / {}] {:.2f}% HS {:.2f}%"), globals::shotsHit, globals::shotsFired, accuracy, hs), Colors::Yellow);
+		text(FORMAT(XOR("Accuracy [{} / {}] {:.2f}% HS {:.2f}%"),
+			game::localPlayer->m_totalHitsOnServer(), game::localPlayer->m_vecBulletVerifyListClient().m_size, accuracy, hs), Colors::Yellow);
 
 		ImGui::End();
 	}

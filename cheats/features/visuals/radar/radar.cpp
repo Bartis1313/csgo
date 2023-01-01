@@ -34,8 +34,10 @@ ImVec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos
 	auto yawDeg = angles[Coord::Y] - 90.0f;
 	// calculate dots of radian and return correct view
 	const auto yawToRadian = math::DEG2RAD(yawDeg);
-	float dotX = (directionX * std::cos(yawToRadian) - directionY * std::sin(yawToRadian)) / 20.0f;
-	float dotY = (directionX * std::sin(yawToRadian) + directionY * std::cos(yawToRadian)) / 20.0f;
+	const auto cosine = std::cos(yawToRadian);
+	const auto sine = std::sin(yawToRadian);
+	float dotX = (directionX * cosine - directionY * sine) / 20.0f;
+	float dotY = (directionX * sine + directionY * cosine) / 20.0f;
 	// return correct scale, it zooms in/out depends what value is thrown
 	dotX *= scale;
 	dotY *= scale;
@@ -65,7 +67,7 @@ void Radar::manuallyInitPos()
 	if (!game::isAvailable())
 		return;
 
-	const auto map = reinterpret_cast<MapStruct*>(game::findHudElement(XOR("CCSGO_MapOverview")));
+	const auto map = Memory::Address<MapStruct*>{ game::findHudElement(XOR("CCSGO_MapOverview")) }.sub(0x14);
 	m_pos = map->m_origin;
 	m_scale = map->m_scale;
 
@@ -128,7 +130,7 @@ void Radar::drawMap()
 	const auto myEye = game::localPlayer->getEyePos();
 	Vec3 ang = {};
 	memory::interfaces::engine->getViewAngles(ang);
-	float scale = vars::misc->radar->scale;
+	const float scale = vars::misc->radar->scale;
 
 	auto p1 = entToRadar(myEye, ang, poses.at(0), scale, false);
 	auto p2 = entToRadar(myEye, ang, poses.at(1), scale, false);
@@ -229,31 +231,26 @@ void Radar::draw()
 			const auto entRotatedPos = entToRadar(myEye, viewAngle, ent->absOrigin(),
 				vars::misc->radar->scale, true);
 
-			// or use calcangle, this will be faster though
-			auto entYaw = ent->m_angEyeAngles()[Coord::Y];
+			const auto entYaw = math::normalizeYaw(ent->m_angEyeAngles()[Coord::Y]);
 
-			if (entYaw < 0.0f)
-				entYaw = 360.0f + entYaw;
-
+			// or use atan2 if 270 is magic for you
 			const auto rotated = 270.0f - entYaw + viewAngle[Coord::Y];
-
-			auto dotRad = vars::misc->radar->length;
+			const auto dotRad = vars::misc->radar->length;
 
 			const auto finalX = dotRad * std::cos(math::DEG2RAD(rotated));
 			const auto finalY = dotRad * std::sin(math::DEG2RAD(rotated));
 
 			if (vars::misc->radar->ranges ? true : entRotatedPos.x != 0.0f && entRotatedPos.y != 0.0f)
 			{
-				auto dotThickness = vars::misc->radar->thickness;
+				const auto dotThickness = vars::misc->radar->thickness;
+				const float radian = math::DEG2RAD(rotated);
+				const float radian90 = math::DEG2RAD(rotated + 90);
 
-				/*imRenderWindow.drawLine(entRotatedPos[Coord::X] - 1, entRotatedPos[Coord::Y] - 1, entRotatedPos[Coord::X] + finalX,
-					entRotatedPos[Coord::Y] + finalY, vars::misc->radar->colorLine());*/
-				drawing::CircleFilled{ entRotatedPos, dotThickness, 32,
-					Color::U32(vars::misc->radar->colorPlayer()) }.draw(windowList);
-				
-
-				//imRenderWindow.drawTriangleFilled(entRotatedPos[Coord::X], entRotatedPos[Coord::Y], dotThickness,
-				//	dotThickness, rotated, vars::misc->radar->colorPlayer());
+				const ImVec2 p1 = ImVec2{ (dotThickness / 2.0f) * std::cos(radian90) + entRotatedPos.x, (dotThickness / 2.0f) * std::sin(radian90) + entRotatedPos.y };
+				const ImVec2 p2 = ImVec2{ (-dotThickness / 2.0f) * std::cos(radian90) + entRotatedPos.x, (-dotThickness / 2.0f) * std::sin(radian90) + entRotatedPos.y };
+				const ImVec2 p3 = ImVec2{ dotThickness * std::cos(radian) + entRotatedPos.x, dotThickness * std::sin(radian) + entRotatedPos.y };
+				drawing::TriangleFilled{ p1, p2, p3, Color::U32(vars::misc->radar->colorPlayer()) }.draw(windowList);
+				drawing::Line{ p3, { p3.x + finalX, p3.y + finalY }, Color::U32(vars::misc->radar->colorLine()), 1.0f }.draw(windowList);
 
 			}
 		}
@@ -262,19 +259,11 @@ void Radar::draw()
 	}
 }
 
-void RadarSizeHelper::init()
-{
-
-}
-
+// important to call this after hook return
 void RadarSizeHelper::run(MapStruct* map)
 {
-	/*g_Radar.m_pos = map->m_origin;
-	g_Radar.m_scale = map->m_scale;*/
+	g_Radar->m_pos = map->m_origin;
+	g_Radar->m_scale = map->m_scale;
 
-	// something weird, the mapstruct for hook now has a 276 pad but it still responds with wrong values here
-	// although by CCSGO_MapOverview it has 256 still...
-	// so we trick it to load manually on new map
-
-	g_Radar->m_inited = false;
+	g_Radar->m_inited = true;
 }

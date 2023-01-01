@@ -29,7 +29,7 @@ static void getMouse()
 	globals::mouseY = y;
 }
 
-void FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, unsigned int panel, bool forceRepaint, bool allowForce)
+hooks::paintTraverse::value FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, unsigned int panel, bool forceRepaint, bool allowForce)
 {
 	getScreen();
 	getMouse();

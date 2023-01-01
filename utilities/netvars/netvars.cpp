@@ -155,12 +155,12 @@ uintptr_t NetvarManager::getDataMap(DataMap_t* map, const std::string_view name)
 		for (auto i : std::views::iota(0, map->m_dataFields))
 		{
 			const auto descriptor = map->m_dataDescription[i];
-			const std::string_view nameDesc = map->m_dataDescription[i].m_name;
 
-			if (nameDesc.empty())
+			if (map->m_dataDescription[i].m_name == nullptr)
 				continue;
 
-			if (nameDesc == name)
+			// string_view as map->m_dataDescription[i].m_name sometimes crashes on this, UB
+			if(std::strcmp(name.data(), map->m_dataDescription[i].m_name) == 0)
 				return descriptor.m_offset[TD_OFFSET_NORMAL];
 
 			if (descriptor.m_type == FIELD_EMBEDDED)

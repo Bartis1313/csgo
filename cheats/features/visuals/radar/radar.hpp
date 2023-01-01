@@ -56,7 +56,6 @@ public:
 	{}
 
 protected:
-	virtual void init();
 	virtual void run(MapStruct* map);
 };
 

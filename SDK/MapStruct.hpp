@@ -5,9 +5,10 @@
 
 struct MapStruct
 {
-	PAD(256);
+	PAD(276);
 	Vec2 m_origin;
 	PAD(12);
 	float m_scale;
-	PAD(800);
+	PAD(200);
+	int m_numberRadarPlayers;
 };

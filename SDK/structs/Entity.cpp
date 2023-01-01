@@ -385,6 +385,12 @@ CUserCmd& Player_t::m_LastCmd()
 	return *reinterpret_cast<CUserCmd*>((uintptr_t)this + memory::lastCommand());
 }
 
+void Player_t::runThink()
+{
+	checkHasThinkFunction();
+	think();
+}
+
 // https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/c_baseplayer.cpp#L2667
 void Player_t::postThink()
 {
@@ -419,6 +425,21 @@ void Player_t::postThink()
 	// Even if dead simulate entities
 	memory::simulateEntities()(this);
 //#endif
+}
+
+void Player_t::checkHasThinkFunction(bool isThinkingHint)
+{
+	memory::checkThinkFunction()(this, isThinkingHint);
+}
+
+//void Player_t::selectItem(const char* string, int subType)
+//{
+//	memory::selectItem()(this, string, subType);
+//}
+
+bool Player_t::usingStandardWeaponsInVehicle()
+{
+	return memory::usingStandardWeaponsVehicle()(this);
 }
 
 bool Player_t::physicsRunThink(thinkmethods_t think)
@@ -584,6 +605,11 @@ bool Player_t::isViewInSmoke(const Vec3& pos)
 uintptr_t Player_t::getLiteralAddress()
 {
 	return *reinterpret_cast<uintptr_t*>(this);
+}
+
+CUtlVector<ClientHitVerify_t> Player_t::m_vecBulletVerifyListClient()
+{
+	return *reinterpret_cast<CUtlVector<ClientHitVerify_t>*>((uintptr_t)this + memory::vecClientImpacts());
 }
 
 AABB_t Player_t::getOcclusionBounds()

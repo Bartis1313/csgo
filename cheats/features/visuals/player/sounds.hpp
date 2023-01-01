@@ -10,17 +10,12 @@ class IGameEvent;
 class Entity_t;
 class Player_t;
 
-class SoundDraw : protected OnlyInitType
+class SoundDraw
 {
 public:
-	SoundDraw() :
-		OnlyInitType{}
-	{}
-
-	void draw();
-	void findBest(Player_t* ent);
-protected:
-	virtual void init() override;
+	static void draw();
+	static void findBest(Player_t* ent);
+	static void pushSteps(Player_t* ent);
 private:
 	struct StepData_t
 	{
@@ -36,10 +31,7 @@ private:
 		float m_timeToPrint;
 		float m_fontSize;
 	};
-	void pushSteps(IGameEvent* event);
 
-	std::array<std::deque<StepData_t>, 65> m_steps;
-	StepData_t m_bestStep;
+	inline static std::array<std::deque<StepData_t>, 65> m_steps;
+	inline static StepData_t m_bestStep;
 };
-
-GLOBAL_FEATURE(SoundDraw);

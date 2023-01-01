@@ -29,9 +29,9 @@ public:
 	{
 		struct Data
 		{
-			std::string name;
-			std::string key;
-			std::string buf;
+			std::string name{};
+			std::string key{};
+			std::string buf{};
 		};
 
 		enum class ExtraType
@@ -40,9 +40,10 @@ public:
 			GLOW = 1
 		};
 
-		Data data;
-		IMaterial* mat = nullptr;
-		ExtraType type = ExtraType::NONE;
+		bool isFromEditor{ false };
+		Data data{};
+		IMaterial* mat{};
+		ExtraType type{ ExtraType::NONE };
 
 		constexpr IMaterial* operator->() const { return mat; }
 		constexpr bool operator!() const { return mat == nullptr; }
@@ -56,8 +57,8 @@ private:
 	void drawBackTrack(Player_t* ent);
 	void CALL(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 
-	std::optional<Mat_t> addMaterialByBuffer(const Mat_t& material);
-	std::optional<Mat_t> addMaterialByString(const Mat_t& material);
+	std::optional<Mat_t> addMaterialByBuffer(const Mat_t& material, bool suppress = false);
+	std::optional<Mat_t> addMaterialByString(const Mat_t& material, bool suppress = false);
 
 	std::vector<Mat_t> m_materials;
 
@@ -66,42 +67,7 @@ private:
 	ModelRenderInfo_t m_info;
 	Matrix3x4* m_matrix;
 
-	// pimpl is more problematic here than useful
-	/*class MaterialEditor;
-	std::unique_ptr<MaterialEditor> editor;*/
 	friend MaterialEditor;
 };
 
 GLOBAL_FEATURE(Chams);
-
-#include <classes/renderableToPresent.hpp>
-#include <dependencies/json.hpp>
-#include <dependencies/ImGui/TextEditor.h>
-
-class MaterialEditor : protected RenderablePresentType
-{
-public:
-	MaterialEditor()
-		: RenderablePresentType{}
-	{}
-
-protected:
-	virtual void draw() override;
-public:
-	void initEditor();
-	void changeState() { m_open = !m_open; }
-private:
-
-	bool loadCfg();
-	bool saveCfg();
-	std::filesystem::path getPathForConfig() const;
-
-	bool m_open{ false };
-	std::string_view m_folderName;
-	std::filesystem::path m_saveDir;
-	std::vector<Chams::Mat_t> m_materialsEdit;
-	TextEditor m_ImEditor;
-	nlohmann::json m_json;
-};
-
-GLOBAL_FEATURE(MaterialEditor);

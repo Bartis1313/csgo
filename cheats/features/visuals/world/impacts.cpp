@@ -24,8 +24,7 @@ void BulletImpactsClient::draw()
 	if (!game::isAvailable())
 		return;
 
-	// [8D 8F ? ? ? ? F3 0F 10 84 24 + 0x2]
-	auto m_vecBulletVerifyListClient = *reinterpret_cast<CUtlVector<ClientHitVerify_t>*>((uintptr_t)game::localPlayer() + 0x11C50);
+	auto m_vecBulletVerifyListClient = game::localPlayer->m_vecBulletVerifyListClient();
 	static int gameBulletCount = m_vecBulletVerifyListClient.m_size; // init current count
 
 	for (int i = m_vecBulletVerifyListClient.m_size; i > gameBulletCount; i--) // get current bullets, NOT all

@@ -4,7 +4,7 @@
 
 #include <game/globals.hpp>
 
-void FASTCALL hooks::getColorModulation::hooked(FAST_ARGS, float* r, float* g, float* b)
+hooks::getColorModulation::value FASTCALL hooks::getColorModulation::hooked(FAST_ARGS, float* r, float* g, float* b)
 {
 	original(thisptr, r, g, b);
 

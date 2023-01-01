@@ -32,14 +32,17 @@ private:
 		float recoilIndex;
 	} cache;
 
-	int& getCorrectTick(CUserCmd* cmd = nullptr);
 	void start(CUserCmd* cmd);
 	void end();
+	void patchDatamap();
 	float m_curTime;
 	float m_frameTime;
 	uintptr_t* m_predicionRandomSeed;
 	CMoveData* m_data;
 	Player_t** m_player;
+	std::unique_ptr<byte[]> m_startData;
+	std::unique_ptr<byte[]> m_endData;
+	size_t m_allocSize;
 };
 
 GLOBAL_FEATURE(Prediction);

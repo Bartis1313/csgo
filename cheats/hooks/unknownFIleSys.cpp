@@ -13,7 +13,7 @@
 // A DWORD (magic number) containing the four character code value 'DDS ' (0x20534444).
 #define DDS_HEADER 0x20534444
 
-int FASTCALL hooks::unknownFileSystem::hooked(FAST_ARGS, void* image)
+hooks::unknownFileSystem::value FASTCALL hooks::unknownFileSystem::hooked(FAST_ARGS, void* image)
 {
 	uintptr_t thisptrStack;
 	__asm mov thisptrStack, ebx;

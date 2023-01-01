@@ -55,10 +55,16 @@ public:
 	VFUNC(bool, checkMovingGround, 18, (Player_t* player, double frameTime), (this, player, frameTime));
 	VFUNC(void, setupMove, 20, (Player_t* localPlayer, CUserCmd* cmd, IMoveHelper* moveHelper, CMoveData* moveData), (this, localPlayer, cmd, moveHelper, moveData));
 	VFUNC(void, finishMove, 21, (Player_t* localPlayer, CUserCmd* cmd, CMoveData* moveData), (this, localPlayer, cmd, moveData));
+	void shutdownPredictables();
+	int reinitPredictables();
 
 	PAD(8);
 	bool m_inPrediction;
 	bool m_oldCLPredictValue;
 	bool m_firstTimePredicted;
 	bool m_enginePaused;
+	PAD(13);
+	int m_commandsPredicted;
+	PAD(4);
+	int m_previousAckHadErrors;
 };

@@ -3,7 +3,7 @@
 #include <classes/base.hpp>
 #include <gamememory/memory.hpp>
 
-void FASTCALL hooks::levelInitPostEntity::hooked(FAST_ARGS)
+hooks::levelInitPostEntity::value FASTCALL hooks::levelInitPostEntity::hooked(FAST_ARGS)
 {
 	g_Memory.postInit();
 	BaseHack::loadAll();

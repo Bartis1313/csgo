@@ -72,29 +72,27 @@ void Plots::drawFps()
 	if (ImGui::Begin(FORMAT(XOR("Plot FPS AVG {:.2f}###Plot FPS"),
 		std::reduce(records.begin(), records.end()) / records.size()).c_str(), &vars::misc->plots->enabledFps, ImGuiWindowFlags_NoCollapse))
 	{
-		const auto windowSize = ImGui::GetWindowSize();
-		const auto& io = ImGui::GetIO();
+		auto& style = ImGui::GetStyle();
+		const bool backupLines = style.AntiAliasedLines;
+		style.AntiAliasedLines = false;
+		const auto windowSize = ImGui::GetContentRegionAvail();
+		const auto windowPos = ImGui::GetCursorScreenPos();
 		const auto windowList = ImGui::GetWindowDrawList();
 
-		float acceptance = windowSize.x / static_cast<float>(RECORDS_SIZE / acceptanceCustom);
-		float prevX = 0.0f, prevY = 0.0f;
-		float scaledavg = MAX_FPS / windowSize.y; // might run some better logic...s
+		const float acceptance = windowSize.x / static_cast<float>(RECORDS_SIZE / acceptanceCustom);
+		const float scaledavg = MAX_FPS / windowSize.y;
 		std::vector<ImVec2> points;
-		for (size_t i = 0; const auto & currentFPS : records)
+		for (size_t i = 0; const auto currentFPS : records)
 		{
-			float currentX = i * acceptance; // no need for clamping
-
-			float currentY = windowSize.y - (currentFPS / scaledavg); // is there any better way for this?
-			if (currentY < 1.0f)
-				currentY = 1.0f; // stay on top to clamp
-
-			points.emplace_back(currentX, currentY);
+			const float currentX = i * acceptance;
+			const float currentY = std::max(windowSize.y - (currentFPS / scaledavg), 1.0f);
+			points.emplace_back(windowPos.x + currentX, windowPos.y + currentY);
 
 			i++;
 		}
-
 		drawing::Polyline{ points, Color::U32(vars::misc->plots->colorFPS()), 0, 1.0f }.draw(windowList);
-
+		
+		style.AntiAliasedLines = backupLines;
 		ImGui::End();
 	}
 }
@@ -125,66 +123,34 @@ void Plots::drawVelocity()
 		}
 	}
 
-	int flags = transparent
+	const int flags = transparent
 		? ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
 		: ImGuiWindowFlags_NoCollapse;
 
 	if (ImGui::Begin(FORMAT(XOR("Plot Velocity AVG {:.2f}###Plot Velocity"),
 		std::reduce(m_VelocityRecords.begin(), m_VelocityRecords.end()) / m_VelocityRecords.size()).c_str(), &vars::misc->plots->enabledVelocity, flags))
 	{
-		//imRenderWindow.addList(); // correct pos, so we start from x = 0 y = 0	
-		//float acceptance = imRenderWindow.getWidth() / static_cast<float>(RECORDS_SIZE / m_acceptanceVelocity);
-		//float prevX = 0.0f, prevY = 0.0f;
-		//float prevVel = 0.0f;
-		//float scaledavg = MAX_SPEEED_MOVE / imRenderWindow.getHeight(); // might run some better logic...
-		//float scaledFontSize = imRenderWindow.getWidth() / 25.0f;
-		//float width = imRenderWindow.getWidth();
-		//float height = imRenderWindow.getHeight();
+		auto& style = ImGui::GetStyle();
+		const bool backupLines = style.AntiAliasedLines;
+		style.AntiAliasedLines = false;
+		const auto windowSize = ImGui::GetContentRegionAvail();
+		const auto windowPos = ImGui::GetCursorScreenPos();
+		const auto windowList = ImGui::GetWindowDrawList();
 
-		//for (size_t i = 0; const auto currentVel : m_VelocityRecords)
-		//{
-		//	float deltaVel = std::abs(currentVel - prevVel);
+		const float acceptance = windowSize.x / static_cast<float>(RECORDS_SIZE / m_acceptanceVelocity);
+		const float scaledavg = MAX_SPEEED_MOVE / windowSize.y;
+		std::vector<ImVec2> points;
+		for (size_t i = 0; const auto currentVel : m_VelocityRecords)
+		{
+			const float currentX = i * acceptance;
+			const float currentY = std::max(windowSize.y - (currentVel / scaledavg), 1.0f);
+			points.emplace_back(windowPos.x + currentX, windowPos.y + currentY);
 
-		//	float currentX = i * acceptance; // no need for clamping
-
-		//	float currentY = imRenderWindow.getHeight() - (currentVel / scaledavg); // is there any better way for this?
-		//	if (currentY < 1.0f)
-		//		currentY = 1.0f; // stay on top to clamp
-
-		//	// start drawing after there is any change, we could use polylines here
-		//	if (i > 0)
-		//	{
-		//		imRenderWindow.drawLine(currentX, currentY, prevX, prevY, vars::misc->plots->colorVelocity());
-		//		if (deltaVel > 20) // would need proper edge detection
-		//			imRenderWindow.drawText(currentX + 10.0f, currentY - 10.0f, scaledFontSize, ImFonts::franklinGothic30,
-		//				std::format("{}", std::round(currentVel)), true, Colors::Pink, false);
-		//	}
-		//	prevX = currentX; prevY = currentY;
-		//	prevVel = currentVel;
-
-		//	i++;
-		//}
-
-		//auto text = [drawing = ImGui::GetBackgroundDrawList()]
-		//(const float x, const float y, const float size, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
-		//{
-		//	ImVec2 pos = { x, y };
-
-		//	if (auto tsize = ImGui::CalcTextSize(text.c_str()); centered)
-		//		pos.x -= tsize.x / 2.0f;
-
-		//	if (dropShadow)
-		//	{
-		//		const auto alpha = ImGui::ColorConvertU32ToFloat4(Color::U32(color)).z;
-		//		drawing->AddText(font, size, { pos.x + 1.0f, pos.y + 1.0f }, Color::U32(Colors::Black.getColorEditAlpha(alpha)), text.c_str());
-		//	}
-		//	drawing->AddText(font, size, pos, Color::U32(color), text.c_str());
-		//};
-
-		//text(imRenderWindow.getPos().x + width / 2.0f, imRenderWindow.getPos().y + 20.0f + height, 30.0f, ImFonts::franklinGothic30,
-		//	FORMAT(XOR("{}"), std::round(game::localPlayer->m_vecVelocity().toVecPrev().length())), true, Colors::Pink, false);
-
-		//imRenderWindow.end();
+			i++;
+		}
+		drawing::Polyline{ points, Color::U32(vars::misc->plots->colorVelocity()), 0, 1.0f }.draw(windowList);
+		
+		style.AntiAliasedLines = backupLines;
 		ImGui::End();
 	}
 }

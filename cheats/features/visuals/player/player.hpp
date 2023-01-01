@@ -38,8 +38,8 @@ private:
 	void resetDormacy([[maybe_unused]] IGameEvent* event);
 	void updateDormacy(Player_t* ent);
 
-	std::array<int, 65> m_health;
-	std::array<int, 65> m_armor;
+	std::array<float, 65> m_health;
+	std::array<float, 65> m_armor;
 
 	struct DormacyInfo_t
 	{

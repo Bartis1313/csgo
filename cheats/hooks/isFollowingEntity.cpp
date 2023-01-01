@@ -3,7 +3,7 @@
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
-bool FASTCALL hooks::isFollowingEntity::hooked(FAST_ARGS)
+hooks::isFollowingEntity::value FASTCALL hooks::isFollowingEntity::hooked(FAST_ARGS)
 {
 	if (vars::misc->disableItems->interpolate && _ReturnAddress() == memory::retAddrToInterpolation.cast<void*>()())
 	{

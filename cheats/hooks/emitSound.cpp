@@ -1,6 +1,6 @@
 #include "hooks.hpp"
 
-void FASTCALL hooks::emitSound::hooked(FAST_ARGS, void* filter, int index, int channel,
+hooks::emitSound::value FASTCALL hooks::emitSound::hooked(FAST_ARGS, void* filter, int index, int channel,
 	const char* name, uint32_t shash, const char* sample, float volume, int seed, int level,
 	int flags, int pitch, const Vec3& origin, const Vec3& direction, void* vec, bool updatePos, float soundTime, int speakerEntity, void* soundParams)
 {

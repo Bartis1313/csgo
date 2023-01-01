@@ -6,7 +6,7 @@
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
-bool FASTCALL hooks::isHltv::hooked(FAST_ARGS)
+hooks::isHltv::value FASTCALL hooks::isHltv::hooked(FAST_ARGS)
 {
 	uintptr_t ent;
 	__asm mov ent, edi

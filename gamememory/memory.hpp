@@ -61,9 +61,6 @@ public:
 		constexpr Address(uintptr_t addr) :
 			m_addr{ addr }
 		{}
-		constexpr Address(uintptr_t * addr) :
-			m_addr{ reinterpret_cast<uintptr_t>(addr) }
-		{}
 		constexpr Address(void* addr) :
 			m_addr{ reinterpret_cast<uintptr_t>(addr) }
 		{}
@@ -151,6 +148,12 @@ namespace memory
 	using keyValuesConstruct_t = void(__thiscall*)(void*, const char*, const char*, int); // or 3rd (2nd without thisptr) arg is int, not sure
 	using keyValuesDestruct_t = void(__thiscall*)(void*, int);
 	using keyValuesSystem_t = KeyValuesSys * (__cdecl*)();
+	using checkThinkFunction_t = void(__thiscall*)(void*, bool);
+	using usingStandardWeaponsInVehicle_t = bool(__thiscall*)(void*);
+	using selectItem_t = void(__thiscall*)(void*, const char*, int);
+	using transferData_t = int(__thiscall*)(void*, const char*, int, void*);
+	using reinitPredictables_t = int(__stdcall*)();
+	using shutdownPredictables_t = void(__stdcall*)();
 
 	inline Memory::Address<uintptr_t> traceFilterSimple;
 	inline Memory::Address<uintptr_t*> returnAddrRadarImage;
@@ -197,6 +200,12 @@ namespace memory
 	inline Memory::Address<loadFromBuffer_t> loadFromBuffer;
 	inline Memory::Address<keyValuesConstruct_t> keyValuesConstruct;
 	inline Memory::Address<keyValuesDestruct_t> keyValuesDestruct;
+	inline Memory::Address<checkThinkFunction_t> checkThinkFunction;
+	inline Memory::Address<usingStandardWeaponsInVehicle_t> usingStandardWeaponsVehicle;
+	inline Memory::Address<selectItem_t> selectItem;
+	inline Memory::Address<transferData_t> transferData;
+	inline Memory::Address<reinitPredictables_t> reinitPredicatbles;
+	inline Memory::Address<shutdownPredictables_t> shutdownPredicatbles;
 
 	inline Memory::Address<void*> clientValidAddr;
 	inline Memory::Address<void*> enginevalidAddr;
@@ -216,6 +225,8 @@ namespace memory
 	inline Memory::Address<void*> isFollowedEntity;
 	inline Memory::Address<void*> spottedEntityUpdate;
 	inline Memory::Address<void*> fireInternfn;
+	inline Memory::Address<void*> preRound;
+	inline Memory::Address<void*> playSoundStep;
 
 	inline Memory::Address<teslaCreate_t> tesla;
 	inline Memory::Address<dispatchEffect_t> dispatchEffect;

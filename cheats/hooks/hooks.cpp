@@ -62,6 +62,9 @@ else { \
 	HOOK(memory::interfaces::sound(), hooks::emitSound);
 	HOOK(memory::interfaces::eventManager(), hooks::createEvent);
 	HOOK(memory::fireInternfn(), hooks::fireIntern);
+	HOOK(memory::interfaces::prediction(), hooks::runCommand);
+	HOOK(memory::preRound(), hooks::preRestartRound);
+	HOOK(memory::playSoundStep(), hooks::playStepSound);
 
 #undef HOOK
 

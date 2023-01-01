@@ -28,7 +28,7 @@ static Player_t* getPlayer()
 	return reinterpret_cast<Player_t*>(getStack(data));
 }
 
-long D3DAPI hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex,
+hooks::drawIndexedPrimitive::value D3DAPI hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex,
 	UINT numVertices, UINT startIndex, UINT primCount)
 {
 	auto res = original(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);

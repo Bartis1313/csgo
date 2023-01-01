@@ -163,7 +163,6 @@
     <ClCompile Include="cheats\features\blacklist\blacklist.cpp" />
     <ClCompile Include="cheats\features\cache\cache.cpp" />
     <ClCompile Include="cheats\features\fakelatency\fakelatency.cpp" />
-    <ClCompile Include="cheats\features\misc\counters\counters.cpp" />
     <ClCompile Include="cheats\features\misc\disable\interpolate.cpp" />
     <ClCompile Include="cheats\features\misc\flashlight\flashlight.cpp" />
     <ClCompile Include="cheats\features\misc\thirdperson\thirdperson.cpp" />
@@ -186,6 +185,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="cheats\features\RCS\RCS.cpp" />
+    <ClCompile Include="cheats\features\visuals\chams\editor.cpp" />
     <ClCompile Include="cheats\features\visuals\hitmarker\hitmark.cpp" />
     <ClCompile Include="cheats\features\visuals\list\playerlist.cpp" />
     <ClCompile Include="cheats\features\visuals\mirrorcam\mirrorCam.cpp" />
@@ -233,8 +233,11 @@
     <ClCompile Include="cheats\hooks\levelInitPostEntity.cpp" />
     <ClCompile Include="cheats\hooks\levelInitPreEntity.cpp" />
     <ClCompile Include="cheats\hooks\levelShutdown.cpp" />
+    <ClCompile Include="cheats\hooks\playStepSound.cpp" />
+    <ClCompile Include="cheats\hooks\preRoundRestart.cpp" />
     <ClCompile Include="cheats\hooks\processSpottedEntityUpdate.cpp" />
     <ClCompile Include="cheats\hooks\renderView.cpp" />
+    <ClCompile Include="cheats\hooks\runCommand.cpp" />
     <ClCompile Include="cheats\hooks\screen2deffect.cpp" />
     <ClCompile Include="cheats\hooks\sendDatagram.cpp" />
     <ClCompile Include="cheats\hooks\particlesSimulation.cpp" />
@@ -255,8 +258,10 @@
     <ClCompile Include="dependencies\discord\src\serialization.cpp" />
     <ClCompile Include="dependencies\ImGui\TextEditor.cpp" />
     <ClCompile Include="gamememory\memory.cpp" />
+    <ClCompile Include="SDK\CPredictionCopy.cpp" />
     <ClCompile Include="SDK\interfaces\interfaces.cpp" />
     <ClCompile Include="SDK\KeyValues.cpp" />
+    <ClCompile Include="SDK\IPrediction.cpp" />
     <ClCompile Include="setup\SEHcatch.cpp" />
     <ClCompile Include="cheats\features\visuals\chams\chams.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -409,7 +414,6 @@
     <ClInclude Include="cheats\features\blacklist\blacklist.hpp" />
     <ClInclude Include="cheats\features\cache\cache.hpp" />
     <ClInclude Include="cheats\features\fakelatency\fakelatency.hpp" />
-    <ClInclude Include="cheats\features\misc\counters\counters.hpp" />
     <ClInclude Include="cheats\features\misc\disable\interpolate.hpp" />
     <ClInclude Include="cheats\features\misc\flashlight\flashlight.hpp" />
     <ClInclude Include="cheats\features\misc\thirdperson\thirdperson.hpp" />
@@ -425,6 +429,7 @@
     <ClInclude Include="cheats\features\logger\logger.hpp" />
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
     <ClInclude Include="cheats\features\RCS\RCS.hpp" />
+    <ClInclude Include="cheats\features\visuals\chams\editor.hpp" />
     <ClInclude Include="cheats\features\visuals\hitmarker\hitmark.hpp" />
     <ClInclude Include="cheats\features\visuals\list\playerlist.hpp" />
     <ClInclude Include="cheats\features\visuals\mirrorcam\mirrorCam.hpp" />
@@ -531,12 +536,14 @@
     <ClInclude Include="SDK\CHudChat.hpp" />
     <ClInclude Include="SDK\clientHitVerify.hpp" />
     <ClInclude Include="SDK\CParticelCollection.hpp" />
+    <ClInclude Include="SDK\CPredictionCopy.hpp" />
     <ClInclude Include="SDK\CStudioHdr.hpp" />
     <ClInclude Include="SDK\CTeslaInfo.hpp" />
     <ClInclude Include="SDK\CUtlReference.hpp" />
     <ClInclude Include="SDK\CUtlString.hpp" />
     <ClInclude Include="SDK\CViewSetup.hpp" />
     <ClInclude Include="SDK\datamap.hpp" />
+    <ClInclude Include="SDK\EHandle.hpp" />
     <ClInclude Include="SDK\IClientState.hpp" />
     <ClInclude Include="SDK\IMatRenderContext.hpp" />
     <ClInclude Include="SDK\IMDLCache.hpp" />

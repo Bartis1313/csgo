@@ -1,6 +1,6 @@
 #include "chams.hpp"
 
-#include <format>
+#include "editor.hpp"
 
 #include <SDK/material.hpp>
 #include <SDK/IMaterialSystem.hpp>
@@ -18,11 +18,11 @@
 #include <config/vars.hpp>
 #include <game/game.hpp>
 
-std::optional<Chams::Mat_t> Chams::addMaterialByBuffer(const Mat_t& material)
+std::optional<Chams::Mat_t> Chams::addMaterialByBuffer(const Mat_t& material, bool suppress)
 {
-	if (const auto itr = std::ranges::find_if(m_materials, [material](const auto& m)
+	if (const auto itr = std::ranges::find_if(m_materials, [suppress, material](const auto& m)
 		{
-			if (material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
+			if (suppress && material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
 			{
 				return true;
 			}
@@ -57,11 +57,11 @@ std::optional<Chams::Mat_t> Chams::addMaterialByBuffer(const Mat_t& material)
 	return matToPush;
 }
 
-std::optional<Chams::Mat_t> Chams::addMaterialByString(const Mat_t& material)
+std::optional<Chams::Mat_t> Chams::addMaterialByString(const Mat_t& material, bool suppress)
 {
-	if (const auto itr = std::ranges::find_if(m_materials, [material](const auto& m)
+	if (const auto itr = std::ranges::find_if(m_materials, [suppress, material](const auto& m)
 		{
-			if (material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
+			if (suppress && material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
 			{
 				return true;
 			}
@@ -310,235 +310,4 @@ void Chams::drawBackTrack(Player_t* ent)
 	default:
 		break;
 	}
-}
-
-//////////////////////////////////////////////////////////////////////////////////////
-// EDITOR
-/////////////////////////////////////////////////////////////////////////////////////
-
-#include <classes/renderableToPresent.hpp>
-#include <menu/GUI-ImGui/animations.hpp>
-#include <dependencies/ImGui/imgui_stdlib.h>
-#include <dependencies/magic_enum.hpp>
-#include <config/jsonExtended.hpp>
-
-using json = nlohmann::json;
-
-void from_json(const json& j, Chams::Mat_t::Data& val)
-{
-	from_json(j, "Name", val.name);
-	from_json(j, "Key", val.key);
-	from_json(j, "Buf", val.buf);
-}
-
-void to_json(json& j, const Chams::Mat_t::Data& val)
-{
-	j["Name"] = val.name;
-	j["Key"] =  val.key;
-	j["Buf"] = val.buf;
-}
-
-void from_json(const json& j, Chams::Mat_t& val)
-{
-	from_json(j, "Data", val.data);
-	from_json(j, "Type", val.type);
-}
-
-void to_json(json& j, const Chams::Mat_t& val)
-{
-	j["Data"] = val.data;
-	j["Type"] = val.type;
-}
-
-// use this correctly
-// read: https://developer.valvesoftware.com/wiki/Category:Shaders
-// and lists, in this case you unortunately have to copy key 
-// WIPPPPPP, ugly code
-void MaterialEditor::draw()
-{
-	if (m_open)
-	{
-		// [SECTION] Example App: Simple Layout / ShowExampleAppLayout() demo ref
-		ImGui::SetNextWindowSize(ImVec2(500, 440), ImGuiCond_FirstUseEver);
-		if (ImGui::Begin("Material editor", &m_open))
-		{
-			static size_t index = 0;
-
-			// fields to update on index change!
-			static std::string name;
-			static std::string key;
-			static int style;
-			{
-				ImGui::BeginChild(XOR("left pane"), ImVec2{ 150.0f, 0.0f }, true);
-				for (size_t i = 0; const auto & el : m_materialsEdit)
-				{
-					if (ImGui::Animations::Selectable(el.data.name.data(), index == i))
-					{
-						index = i;
-						name = m_materialsEdit.at(index).data.name;
-						key = m_materialsEdit.at(index).data.key;
-						style = static_cast<int>(m_materialsEdit.at(index).type);
-						m_ImEditor.SetText(m_materialsEdit.at(index).data.buf);
-					}
-
-					i++;
-				}
-				ImGui::EndChild();
-			}
-			ImGui::SameLine();
-
-			
-			{
-				ImGui::BeginGroup();
-				ImGui::BeginChild(XOR("Materials view"));
-				if (!m_materialsEdit.empty())
-					ImGui::TextUnformatted(FORMAT(XOR("{}"), m_materialsEdit.at(index).data.name).c_str());
-				else
-					ImGui::TextUnformatted(XOR("No materials yet, add one!"));
-				ImGui::Separator();
-
-		
-				ImGui::InputText(XOR("Name"), &name);
-				ImGui::InputText(XOR("Key"), &key);
-				ImGui::Animations::ListBox<const std::string>(XOR("Style"), &style, magic_enum::enum_names_pretty<Chams::Mat_t::ExtraType>());
-
-				m_ImEditor.Render(XOR("Editor##mat"));
-
-				ImGui::EndChild();
-				if (ImGui::Animations::Button(XOR("Delete")))
-				{
-					// rewrite this someday...
-					index -= std::erase_if(g_Chams->m_materials,
-						[this](const auto& m)
-						{
-							if (m.data.name == name)
-							{
-								return true;
-							}
-							else
-							{
-								return false;
-							}
-						});
-					std::erase_if(m_materialsEdit,
-						[this](const auto& m)
-						{
-							if (m.data.name == name)
-							{
-								return true;
-							}
-							else
-							{
-								return false;
-							}
-						});
-					
-					name = m_materialsEdit.at(index).data.name;
-					key = m_materialsEdit.at(index).data.key;
-					style = static_cast<int>(m_materialsEdit.at(index).type);
-					m_ImEditor.SetText({ m_materialsEdit.at(index).data.buf.begin(), m_materialsEdit.at(index).data.buf.end() - 1 });
-					m_json.erase(m_json.find(name));
-					saveCfg();
-				}
-				ImGui::SameLine();
-				if (ImGui::Animations::Button(XOR("Add")))
-				{
-					const auto material = g_Chams->addMaterialByBuffer(Chams::Mat_t{ .data = Chams::Mat_t::Data{.name = name, .key = key, 
-						.buf = m_materialsEdit.at(index).data.buf } });
-					if (material.has_value())
-					{
-						m_materialsEdit.emplace_back(material.value());
-						g_Chams->m_materials.emplace_back(material.value());
-						saveCfg();
-					}
-				}
-				ImGui::SameLine();
-				if (ImGui::Animations::Button(XOR("Update")))
-				{
-					if (const auto itr = std::ranges::find_if(m_materialsEdit,
-						[=](const auto& m)
-						{
-							if (m.data.name == name)
-							{
-								return true;
-							}
-							else
-							{
-								return false;
-							}
-						}); itr != m_materialsEdit.end())
-					{
-						*itr = Chams::Mat_t{ .data = Chams::Mat_t::Data{.name = name, .key = key, .buf = m_ImEditor.GetText() } };
-					}
-				}
-				ImGui::EndGroup();
-			}
-			ImGui::End();
-		}
-		
-	}
-}
-
-void MaterialEditor::initEditor()
-{
-	m_folderName = XOR("materials");
-	m_saveDir = config.getHackPath() / config.getExtraLoadPath() / m_folderName / getPathForConfig();
-
-	loadCfg();
-
-	for (const auto& el : m_materialsEdit)
-		g_Chams->addMaterialByBuffer(el);
-}
-
-bool MaterialEditor::loadCfg()
-{
-	if (auto path = config.getHackPath() / config.getExtraLoadPath() / m_folderName; !std::filesystem::exists(path))
-		std::filesystem::create_directories(path);
-
-	std::ifstream input{ m_saveDir };
-	if (!input)
-		return false;
-
-	if (!std::filesystem::is_empty(m_saveDir))
-	{
-		m_json = json::parse(input);
-
-		for (const auto& [key, value] : m_json.items())
-		{
-			Chams::Mat_t material;
-			from_json(value, material);
-
-			m_materialsEdit.push_back(material);
-			g_Chams->m_materials.push_back(material);
-		}
-	}
-
-	return true;
-}
-
-bool MaterialEditor::saveCfg()
-{
-	std::ofstream out{ m_saveDir };
-	if (!out)
-		return false;
-
-	json j;
-	for (const auto& el : m_materialsEdit)
-		to_json(j[el.data.name], el);
-
-	if (!j.empty())
-		m_json.update(j);
-
-	out << std::setw(4) << m_json;
-
-	return true;
-}
-
-std::filesystem::path MaterialEditor::getPathForConfig() const
-{
-	std::filesystem::path path(m_folderName);
-	if (path.extension() != XOR(".json"))
-		path.replace_extension(XOR(".json"));
-
-	return path;
 }

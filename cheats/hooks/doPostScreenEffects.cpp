@@ -4,7 +4,7 @@
 
 #include <gamememory/memory.hpp>
 
-int FASTCALL hooks::doPostScreenEffects::hooked(FAST_ARGS, int val)
+hooks::doPostScreenEffects::value FASTCALL hooks::doPostScreenEffects::hooked(FAST_ARGS, int val)
 {
 	DoPostScreenType::runAll();
 

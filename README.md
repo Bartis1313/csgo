@@ -134,6 +134,7 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.7.0 - Blacklist finished, including crash fixes.
 * 1.7.1 - Refactor of code. Fixes, and some addons, especially hooks. Deatailed in commit.
 * 1.7.2 - Cleanup for lerping animation.
+* 1.7.3 - visuals health/armor bug fix, more "clear" hooked functions definitions, accurate info gathered directly from the game about shots, not using events to count them manually (awful!). Prediction last edits. SDK cleanup and addons. Sound is finally not using events, wip to remove other events. Editor still not finished, almost... Plots reworked to work for last rendering change. Fixes to radar, eg: MapStruct, triangle enemies.
 </details>
 
 # Dependencies
