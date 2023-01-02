@@ -108,7 +108,7 @@ namespace hooks
 	HOOK_STRUCT_VFUNC(getUnverifiedFileHashes, int, UNVERIFIED_FILE_HASHES, int);
 	HOOK_STRUCT_VFUNC(unkFileCheck, int, UNK_FILE_CHECK);
 	HOOK_STRUCT_VFUNC(sv_cheats, bool, SV_CHEATS);
-	HOOK_STRUCT_VFUNC(renderView, void, RENDER_VIEW, const CViewSetup&, const CViewSetup&, int, int);
+	HOOK_STRUCT_VFUNC(viewRender, void, RENDER_VIEW, const CViewSetup&, const CViewSetup&, int, int);
 	HOOK_STRUCT_VFUNC(isHltv, bool, IS_HLTV);
 	HOOK_STRUCT_VFUNC(screen2DEffect, void, SCREEN_2D_EFFECT, CViewSetup*);
 	// reset everything

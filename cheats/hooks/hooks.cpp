@@ -54,7 +54,7 @@ else { \
 	HOOK(memory::interfaces::fileSystem(), hooks::unknownFileSystem);
 	HOOK(memory::interfaces::fileSystem(), hooks::unkFileCheck);
 	HOOK(memory::interfaces::fileSystem(), hooks::getUnverifiedFileHashes);
-	HOOK(memory::interfaces::viewRender(), hooks::renderView);
+	HOOK(memory::interfaces::viewRender(), hooks::viewRender);
 	HOOK(memory::interfaces::viewRender(), hooks::screen2DEffect);
 	HOOK(memory::interfaces::engine(), hooks::isHltv);
 	HOOK(memory::isFollowedEntity(), hooks::isFollowingEntity);

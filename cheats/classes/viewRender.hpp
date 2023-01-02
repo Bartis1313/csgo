@@ -6,10 +6,10 @@
 
 class CViewSetup;
 
-class RenderViewType : protected BaseHack
+class ViewRenderType : protected BaseHack
 {
 public:
-	constexpr RenderViewType() :
+	constexpr ViewRenderType() :
 		BaseHack{}
 	{
 		m_hacksRun.push_back(this);
@@ -25,5 +25,5 @@ protected:
 	virtual void reset() override {};
 	virtual void shutdown() override {};
 private:
-	inline static std::vector<RenderViewType*> m_hacksRun;
+	inline static std::vector<ViewRenderType*> m_hacksRun;
 };

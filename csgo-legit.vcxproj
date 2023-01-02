@@ -154,7 +154,7 @@
     <ClCompile Include="cheats\classes\overViewMap.cpp" />
     <ClCompile Include="cheats\classes\renderableToPresent.cpp" />
     <ClCompile Include="cheats\classes\renderableToSurface.cpp" />
-    <ClCompile Include="cheats\classes\RV.cpp" />
+    <ClCompile Include="cheats\classes\VR.cpp" />
     <ClCompile Include="cheats\classes\screen2dEffects.cpp" />
     <ClCompile Include="cheats\features\aimbot\aimbot.cpp">
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">pch.h</PrecompiledHeaderFile>
@@ -407,7 +407,7 @@
     <ClInclude Include="cheats\classes\overViewMap.hpp" />
     <ClInclude Include="cheats\classes\renderableToPresent.hpp" />
     <ClInclude Include="cheats\classes\renderableToSurface.hpp" />
-    <ClInclude Include="cheats\classes\renderView.hpp" />
+    <ClInclude Include="cheats\classes\viewRender.hpp" />
     <ClInclude Include="cheats\classes\screen2dEffects.hpp" />
     <ClInclude Include="cheats\features\aimbot\aimbot.hpp" />
     <ClInclude Include="cheats\features\aimbot\aimbotDraw.hpp" />

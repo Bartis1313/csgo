@@ -1,12 +1,12 @@
 #include "hooks.hpp"
 
-#include "../classes/renderView.hpp"
+#include "../classes/viewRender.hpp"
 
 #include <SDK/CViewSetup.hpp>
 
-hooks::renderView::value FASTCALL hooks::renderView::hooked(FAST_ARGS, const CViewSetup& view, const CViewSetup& hud, int clearFlags, int whatToDraw)
+hooks::viewRender::value FASTCALL hooks::viewRender::hooked(FAST_ARGS, const CViewSetup& view, const CViewSetup& hud, int clearFlags, int whatToDraw)
 {
-	RenderViewType::runAll(view);
+	ViewRenderType::runAll(view);
 
 	original(thisptr, view, hud, clearFlags, whatToDraw);
 }

@@ -39,7 +39,7 @@ void MirrorCam::run(const CViewSetup& view)
 	ctx->pushRenderTargetAndViewport();
 	ctx->setRenderTarget(m_texture);
 
-	hooks::renderView::original(memory::interfaces::viewRender(), v, v, VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH | VIEW_CLEAR_STENCIL, 0);
+	hooks::viewRender::original(memory::interfaces::viewRender(), v, v, VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH | VIEW_CLEAR_STENCIL, 0);
 
 	ctx->popRenderTargetAndViewport();
 	ctx->release();
