@@ -1,5 +1,7 @@
 #pragma once
 
+#include "mat.hpp"
+
 #include <classes/drawModel.hpp>
 #include <SDK/IVModelRender.hpp>
 #include <SDK/IVModelRender.hpp>
@@ -25,29 +27,6 @@ public:
 		DrawModelType{}
 	{}
 
-	struct Mat_t
-	{
-		struct Data
-		{
-			std::string name{};
-			std::string key{};
-			std::string buf{};
-		};
-
-		enum class ExtraType
-		{
-			NONE,
-			GLOW = 1
-		};
-
-		bool isFromEditor{ false };
-		Data data{};
-		IMaterial* mat{};
-		ExtraType type{ ExtraType::NONE };
-
-		constexpr IMaterial* operator->() const { return mat; }
-		constexpr bool operator!() const { return mat == nullptr; }
-	};
 	std::vector<Mat_t> getMaterials() const { return m_materials;  }
 protected:
 	virtual void run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix) override;

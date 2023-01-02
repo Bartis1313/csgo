@@ -23,7 +23,7 @@ private:
 	bool loadCfg();
 	bool saveCfg();
 	std::filesystem::path getPathForConfig() const;
-	std::optional<Chams::Mat_t> getMaterialIndexed(size_t index) const;
+	std::optional<Mat_t> getMaterialIndexed(size_t index) const;
 
 	bool m_open{ false };
 	size_t m_oldIndex; // before custom

@@ -430,6 +430,7 @@
     <ClInclude Include="cheats\features\prediction\prediction.hpp" />
     <ClInclude Include="cheats\features\RCS\RCS.hpp" />
     <ClInclude Include="cheats\features\visuals\chams\editor.hpp" />
+    <ClInclude Include="cheats\features\visuals\chams\mat.hpp" />
     <ClInclude Include="cheats\features\visuals\hitmarker\hitmark.hpp" />
     <ClInclude Include="cheats\features\visuals\list\playerlist.hpp" />
     <ClInclude Include="cheats\features\visuals\mirrorcam\mirrorCam.hpp" />

@@ -158,6 +158,8 @@ ParticleEffect
 #define UNK_FILESYS					XOR("C7 43 ? ? ? ? ? 83 7C 24 ? ? 7C 25 8B 54 24 48")
 // #STR: "Error! CMapOverview::SetMap: couldn't load file %s.\n", "file://{images_overviews}/%s_radar_spectate.dds", "pos_x", "pos_y", "scale", "resource/overviews/%s.txt"
 #define UNK_OVERVIEWMAP				XOR("55 8B EC 81 EC ? ? ? ? 53 8B 5D 08 8B D3")
+// #STR: "ClientScheme", "resource/ClientScheme.res", "VPhysics031", "VPhysicsSurfaceProps001", "VPhysicsCollision007", "ClientDLL"
+// get this ptr https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/cdll_client_int.cpp#L1323
 #define VIEW_RENDER					XOR("8B 0D ? ? ? ? FF 75 0C 8B 45 08")
 // #STR: "Client_Animation", "C_BaseAnimating::SetupBones", "*** ERROR: Bone access not allowed (entity %i:%s)\n", "%d:%s", "SetupBones: invalid bone array size (%d - needs %d)\n", "Client_Animation_Threaded"
 #define ACCUMULATE_LAYERS			XOR("84 C0 75 0D F6 87")
@@ -253,5 +255,5 @@ ParticleEffect
 #define SERVER_PREROUND				XOR("55 8B EC 83 EC 0C 53 8B D9 56 57 8B 03")
 // #STR: "Can't find specific footstep sound! (%s) - Using the defau, "Heavy.Step", "T_Default.Suit", "CT_Default.Suit", "ct_%s"
 #define PLAY_STEP_SOUND				XOR("55 8B EC 8B 45 18 81 EC")
-// #STR: "player_hurt", "userid", "health", "armor", "dmg_health", "dmg_armor", "hitgroup", "envgunfire", "dangerzone", "attacker"
-#define ON_TAKE_DMFG_ALIVE			XOR("55 8B EC 83 EC 08 53 8B D9 80 BB ? ? ? ? ? 74 09")
+// #STR: "userid", "health", "priority", "player_hurt", "attacker"
+#define ON_TAKE_DMFG_ALIVE			XOR("55 8B EC 83 EC 18 56 57 8B 7D 08 8B F1 57")

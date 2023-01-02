@@ -82,12 +82,10 @@ std::filesystem::path Config::getPathForConfig(const std::string& file)
 	return path;
 }
 
-bool Config::init(const std::string& defName, const std::string& defLoadFileName,
-	const std::filesystem::path& hackPath, const std::filesystem::path& loadPath)
+bool Config::init(const std::string& defName, const std::string& defLoadFileName, const std::filesystem::path& loadPath)
 {
 	m_defaultConfig = defName;
 	m_defaultFileNameLoad = defLoadFileName;
-	m_path = hackPath;
 	m_loadExtraPath = loadPath;
 
 	// check if the path to where save files is even a directory

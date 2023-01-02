@@ -14,30 +14,32 @@
 
 using json = nlohmann::json;
 
-void from_json(const json& j, Chams::Mat_t::Data& val)
+void from_json(const json& j, Mat_t::Data& val)
 {
 	from_json(j, "Name", val.name);
 	from_json(j, "Key", val.key);
 	from_json(j, "Buf", val.buf);
 }
 
-void to_json(json& j, const Chams::Mat_t::Data& val)
+void to_json(json& j, const Mat_t::Data& val)
 {
 	j["Name"] = val.name;
 	j["Key"] = val.key;
 	j["Buf"] = val.buf;
 }
 
-void from_json(const json& j, Chams::Mat_t& val)
+void from_json(const json& j, Mat_t& val)
 {
 	from_json(j, "Data", val.data);
 	from_json(j, "Type", val.type);
+	from_json(j, "Strategy", val.strategy);
 }
 
-void to_json(json& j, const Chams::Mat_t& val)
+void to_json(json& j, const Mat_t& val)
 {
 	j["Data"] = val.data;
 	j["Type"] = val.type;
+	j["Strategy"] = val.strategy;
 }
 
 // use this correctly
@@ -53,7 +55,7 @@ void MaterialEditor::draw()
 	if (ImGui::Begin("Material editor", &m_open, ImGuiWindowFlags_NoCollapse))
 	{
 		static size_t index = m_oldIndex;
-		static Chams::Mat_t material = getMaterialIndexed(index).value_or(Chams::Mat_t{});
+		static Mat_t material = getMaterialIndexed(index).value_or(Mat_t{});
 		{
 			ImGui::BeginChild(XOR("left pane"), ImVec2{ 150.0f, 0.0f }, true);
 
@@ -81,9 +83,13 @@ void MaterialEditor::draw()
 			ImGui::TextUnformatted(XOR("No materials yet, add one!"));
 		ImGui::Separator();
 
+		ImGui::TextUnformatted(XOR("Strategy"));
+		ImGui::RadioButton(XOR("Buffer"), reinterpret_cast<int*>(material.strategy), 0);
+		ImGui::SameLine();
+		ImGui::RadioButton(XOR("From String"), reinterpret_cast<int*>(material.strategy), 1);
 		ImGui::InputText(XOR("Name"), &material.data.name);
 		ImGui::InputText(XOR("Key"), &material.data.key);
-		ImGui::Animations::Combo<const std::string>(XOR("Style"), reinterpret_cast<int*>(&material.type), magic_enum::enum_names_pretty<Chams::Mat_t::ExtraType>());
+		ImGui::Animations::Combo<const std::string>(XOR("Style"), reinterpret_cast<int*>(&material.type), magic_enum::enum_names_pretty<Mat_t::ExtraType>());
 
 		if (ImGui::Animations::Button(XOR("Delete")))
 		{
@@ -92,6 +98,7 @@ void MaterialEditor::draw()
 				{
 					if (m.isFromEditor && m.data.name == material.data.name)
 					{
+						m_json.erase(m_json.find(material.data.name));
 						return true;
 					}
 					else
@@ -101,19 +108,36 @@ void MaterialEditor::draw()
 				});
 			if (elementsRemoved > 0)
 			{
-				index--;
-				size_t correctIndex = g_Chams->m_materials.size() - elementsRemoved;
-				material = getMaterialIndexed(index).value_or(Chams::Mat_t{});
-				m_json.erase(m_json.find(material.data.name));
 				saveCfg();
-				m_ImEditor.SetText(material.data.name);
+				index -= elementsRemoved;
+				size_t correctIndex = g_Chams->m_materials.size() - elementsRemoved;
+				material = getMaterialIndexed(index).value_or(Mat_t{});
+				m_ImEditor.SetText(material.data.buf);
 			}
 		}
 		ImGui::SameLine();
 		if (ImGui::Animations::Button(XOR("Add")))
 		{
-			const auto mat = g_Chams->addMaterialByBuffer(Chams::Mat_t{ .isFromEditor = true, .data = Chams::Mat_t::Data{.name = material.data.name, .key = material.data.key,
-				.buf = m_ImEditor.GetText() } });
+			std::optional<Mat_t> mat;
+
+			if (material.strategy == Mat_t::StrategyType::FROM_STRING) // not from buffer
+			{
+				// prob good to split the \n 's here ?
+				mat = g_Chams->addMaterialByString(Mat_t
+					{
+						.isFromEditor = true, .type = material.type, .strategy = material.strategy,
+						.data = Mat_t::Data{ .name = material.data.name, .key = material.data.key, .buf = m_ImEditor.GetText() }
+					});
+			}
+			else
+			{
+				mat = g_Chams->addMaterialByBuffer(Mat_t
+					{
+						.isFromEditor = true, .type = material.type, .strategy = material.strategy,
+						.data = Mat_t::Data{ .name = material.data.name, .key = material.data.key, .buf = m_ImEditor.GetText() }
+					});
+			}
+
 			if (mat.has_value())
 			{
 				g_Chams->m_materials.emplace_back(mat.value());
@@ -136,7 +160,11 @@ void MaterialEditor::draw()
 					}
 				}); itr != g_Chams->m_materials.end())
 			{
-				*itr = Chams::Mat_t{ .data = Chams::Mat_t::Data{.name = material.data.name, .key = material.data.key, .buf = m_ImEditor.GetText() } };
+				*itr = Mat_t
+				{
+					.isFromEditor = true, .type = material.type, .strategy = material.strategy,
+					.data = Mat_t::Data{ .name = material.data.name, .key = material.data.key, .buf = m_ImEditor.GetText() } 
+				};
 			}
 		}
 
@@ -157,7 +185,7 @@ void MaterialEditor::initEditor()
 	loadCfg();
 
 	for (auto i : std::views::iota(m_oldIndex, g_Chams->m_materials.size()))
-		g_Chams->m_materials.at(i) = g_Chams->addMaterialByBuffer(g_Chams->m_materials.at(i), false).value();
+		g_Chams->m_materials.at(i) = g_Chams->addMaterialByBuffer(g_Chams->m_materials.at(i), true).value();
 }
 
 bool MaterialEditor::loadCfg()
@@ -175,7 +203,7 @@ bool MaterialEditor::loadCfg()
 
 		for (const auto& [key, value] : m_json.items())
 		{
-			Chams::Mat_t material;
+			Mat_t material;
 			from_json(value, material);
 			material.isFromEditor = true;
 
@@ -193,11 +221,8 @@ bool MaterialEditor::saveCfg()
 		return false;
 
 	json j;
-	for (const auto& el : g_Chams->m_materials)
-	{
-		if(el.isFromEditor)
-			to_json(j[el.data.name], el);
-	}
+	for (auto i : std::views::iota(m_oldIndex, g_Chams->m_materials.size()))
+		to_json(j[g_Chams->m_materials.at(i).data.name], g_Chams->m_materials.at(i));
 
 	if (!j.empty())
 		m_json.update(j);
@@ -216,7 +241,7 @@ std::filesystem::path MaterialEditor::getPathForConfig() const
 	return path;
 }
 
-std::optional<Chams::Mat_t> MaterialEditor::getMaterialIndexed(size_t index) const
+std::optional<Mat_t> MaterialEditor::getMaterialIndexed(size_t index) const
 {
 	if (index < m_oldIndex)
 		return std::nullopt;
@@ -224,6 +249,10 @@ std::optional<Chams::Mat_t> MaterialEditor::getMaterialIndexed(size_t index) con
 	if (index >= g_Chams->m_materials.size())
 		return std::nullopt;
 
-	const auto material = g_Chams->m_materials.at(index);
-	return Chams::Mat_t{ .data = Chams::Mat_t::Data{.name = material.data.name, .key = material.data.key, .buf = material.data.buf }, .type = material.type };
+	const auto& material = g_Chams->m_materials.at(index);
+	return Mat_t
+	{
+		.isFromEditor = true, .type = material.type, .strategy = material.strategy,
+		.data = Mat_t::Data{.name = material.data.name, .key = material.data.key, .buf = material.data.buf }
+	};
 }

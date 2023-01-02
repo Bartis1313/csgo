@@ -18,11 +18,11 @@
 #include <config/vars.hpp>
 #include <game/game.hpp>
 
-std::optional<Chams::Mat_t> Chams::addMaterialByBuffer(const Mat_t& material, bool suppress)
+std::optional<Mat_t> Chams::addMaterialByBuffer(const Mat_t& material, bool suppress)
 {
 	if (const auto itr = std::ranges::find_if(m_materials, [suppress, material](const auto& m)
 		{
-			if (suppress && material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
+			if (!suppress && material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
 			{
 				return true;
 			}
@@ -57,11 +57,11 @@ std::optional<Chams::Mat_t> Chams::addMaterialByBuffer(const Mat_t& material, bo
 	return matToPush;
 }
 
-std::optional<Chams::Mat_t> Chams::addMaterialByString(const Mat_t& material, bool suppress)
+std::optional<Mat_t> Chams::addMaterialByString(const Mat_t& material, bool suppress)
 {
 	if (const auto itr = std::ranges::find_if(m_materials, [suppress, material](const auto& m)
 		{
-			if (suppress && material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
+			if (!suppress && material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
 			{
 				return true;
 			}
@@ -98,9 +98,8 @@ void Chams::init()
 {
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = XOR("Flat"), .key = XOR("UnlitGeneric") } }).value());
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = XOR("Generic"), .key = XOR("VertexLitGeneric") } }).value());
-	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = XOR("Glow"), .key = XOR("VertexLitGeneric"),
-		.buf = XOR("$additive 1 $envmap models/effects/cube_white $envmapfresnel 1") }, .type = Mat_t::ExtraType::GLOW }).value());
-
+	m_materials.emplace_back(addMaterialByString(Mat_t{ .type = Mat_t::ExtraType::GLOW, .data = Mat_t::Data{.name = XOR("Glow"), .key = XOR("VertexLitGeneric"),
+		.buf = XOR("$additive 1 $envmap models/effects/cube_white $envmapfresnel 1") } }).value());
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = XOR("Metalic"), .key = XOR("VertexLitGeneric"),
 		.buf = XOR("$basetexture white $envmap env_cubemap $normalmapalphaenvmapmask 1 $envmapcontrast 1 $nofog 1 $model 1 $nocull 0 $selfillum 1 $halfambert 1 $znearer 0 $flat 1")} }).value());
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = XOR("Pearlescent"), .key = XOR("VertexLitGeneric"),

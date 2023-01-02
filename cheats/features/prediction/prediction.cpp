@@ -115,7 +115,6 @@ void Prediction::start(CUserCmd* cmd)
 	memory::interfaces::prediction->finishMove(game::localPlayer(), cmd, m_data);
 	memory::interfaces::moveHelper->processImpacts();
 
-	// doesn't do anything, even we copy it manually
 	game::localPlayer->m_vecAbsVelocity() = m_data->m_velocity;
 	game::localPlayer->setAbsOrigin(game::localPlayer->m_vecNetworkOrigin());
 	// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/prediction.cpp#L1513
@@ -224,7 +223,6 @@ void Prediction::update()
 		m_startData = std::move(allocated);
 	}
 
-	// doesn't fix those annoying errors, no idea how to prevent compressed values
 	CPredictionCopy copy(PC_EVERYTHING, m_startData.get(), PC_DATA_PACKED, reinterpret_cast<const byte*>(game::localPlayer()), PC_DATA_NORMAL, CPredictionCopy::TRANSFERDATA_COPYONLY);
 	copy.transferData("Prediction::Update-Start", game::localPlayer->getIndex(), map);
 }

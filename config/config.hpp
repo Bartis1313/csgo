@@ -16,6 +16,7 @@ public:
 	bool startLoad();
 	bool startSave(const std::string& name);
 
+	void setFolder(const std::filesystem::path& hackPath) { m_path = hackPath; }
 	bool save(const std::string& file);
 	bool load(const std::string& file);
 	void deleteCfg(const std::string& file);
@@ -28,7 +29,7 @@ public:
 	/// <param name="loadPath">Default utility path for detection which cfg to load
 	/// Full path is hackPath / hackPatch, meaning you are fine with passing folder name only</param>
 	/// <returns>true if success</returns>
-	bool init(const std::string& defName, const std::string& defLoadFileName, const std::filesystem::path& hackPath, const std::filesystem::path& loadPath);
+	bool init(const std::string& defName, const std::string& defLoadFileName, const std::filesystem::path& loadPath);
 	void reload();
 	
 	// get main folder

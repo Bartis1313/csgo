@@ -37,15 +37,14 @@ bool Setup::init(void* instance)
 	// they handle it somehow to prevent such crash, but exception pointers report it
 	//AddVectoredExceptionHandler(TRUE, SEHcatch::memErrorCatch);
 
-	console::setLogger(XOR("CSGO DEBUG"), XOR("hack.log"));
-
 	TimeCount initTimer{};
-
+	// might need to rewrite this later with setting those names
+	config.setFolder(std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"));
+	console::setLogger(XOR("CSGO DEBUG"), XOR("hack.log"));
 	try
 	{
 		config.init(
 			XOR("default.cfg"), XOR("load.LOAD"),
-			std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"),
 			XOR("utility"));
 		g_Memory.init();
 		netvarMan.init();
