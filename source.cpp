@@ -1,6 +1,6 @@
 #include "setup/setup.hpp"
 
-#include <game/globals.hpp>
+#include <cheats/game/globals.hpp>
 #include <utilities/tools/tools.hpp>
 
 BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID reserved)

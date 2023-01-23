@@ -1,0 +1,16 @@
+{
+  "dependencies": [
+    "xorstr",
+    "lazy-importer",
+    "minhook",
+    "nlohmann-json",
+    {
+      "name": "imgui",
+      "features": [ "dx9-binding", "win32-binding", "freetype" ]
+    },
+    "stb",
+    "magic-enum",
+    "discord-rpc",
+    "freetype"
+  ]
+}

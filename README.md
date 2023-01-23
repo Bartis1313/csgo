@@ -3,57 +3,73 @@ Source aimed for visual aspects of the game.
 
 ![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/179428634-adf44410-4002-4e5d-9ac5-b794dcb1c35f.png)
 
+# Instalation
+**BEFORE anything, make sure you have it installed**: [c++ redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170) [directX](https://www.microsoft.com/en-us/download/details.aspx?id=35) [vcpkg](https://vcpkg.io/en/index.html)
+<br />
+
+Dependencies folder IS NOT for dependencies themselves, if they are on vcpkg, do not include them manually! Otherwise add those.
+
 # Information
 Features marked ``(rebuild needed)`` need recode or better version.
 <br />
 This is a trianing software. No further actions taken by people are heeded.
 <br />
-**BEFORE anything, make sure you have it installed**: [c++ redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170) [directX](https://www.microsoft.com/en-us/download/details.aspx?id=35)
+<br />
+As you know or not, this is not going to ensure your safety in 100%. To do that, use any good vac module dumper, and debug outputed files.
+<br />
+Good start is to: use any valid vac modules dumper (that will decode inputs), and understand all [this](https://github.com/danielkrupinski/VAC)
 
-# Features: 
+# Features list: 
 <details>
 
- * Aimbot - aims at enemy using calculated angle, possible to delay in ms and select aimpoints.
- * RCS - control the recoil spray.
+ * Aimbot - smooth, delay, types, (rebuild needed - make it more like aim-assist rather than aim)
+ * RCS - control the recoil spray. Possible to smooth it.
  * Triggerbot - delay in ms.
  * Backtrack - manipulate ticks.
  * Fake latency - manipulate sequences in ms.
- * Bunnyhop
- * Autostrafe
+ * Bunnyhop - with chance%
+ * Autostrafe - with few methods.
  * Callbacks - not really used, good example how to use them.
- * Events - listen game events, needed for some features for info.
- * Thirdperson - 3rd person on key.
+ * Events - listen game events, needed for some features for info. (Should avoid this if possible)
+ * Thirdperson - 3rd person on key. Included with tracing, pretty much exactly what originally game does.
  * Crosshairs - custom crosshairs, 5 types.
- * Local info - ammo, pos etc...
- * Fps plot - collect fps and represent it in graphical resizable plot. (rebuild needed - cleanup from ex-render)
- * Velocity plot - collect local player speed and represent it in graphical resizable plot. (rebuild needed - cleanup from ex-render)
+ * Local info - ammo, pos etc... Bunch of local player informations.
+ * Fps plot - collect fps and represent it in graphical resizable plot.
+ * Velocity plot - collect local player speed and represent it in graphical resizable plot.
  * Hitmarker - ability to draw hitmarkers 2D/3D with dmg output.
- * No scope - removes scope black overlay
- * Bullet tracer - draw bullets directions by line beams.
- * Flashlight
- * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic.
+ * No scope - removes scope black overlay.
+ * Bullet tracer - draw bullets directions by line beams. Possible to also create own bullet tracer type.
+ * Flashlight - use game effect flashlight.
+ * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic. Would need some rework for tracing specific things as water, glass, ents...
  * Engine prediction - useful to never skip tick and get correct server time.
- * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records. Also possible to create your own.
+ * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records. Also possible to create your own (currently editor is not possible on initial 0 material, will fix pretty soon)
  * Glow - highlight player ents. (rebuild needed - think of removing this or creating glow texture on own (game provides such materials), client.dll checks it and it in general has performance issues)
- * Sound Esp (rebuild needed - there is no need to do it with events)
- * Esp - name, flags, boxes, health, armor, ammo, skeleton.
- * DLight - highlights player by dlight
- * Enemy aiming at you warn
- * 2D radar - overlay showing where enemy is, with background of the map texture. (rebuild needed - cleanup from ex-render)
- * Custom skybox - listed from game
- * Remove sky - removes props
+ * Sound Esp - apex legends like sound esp from passive skill of bloodhound character.
+ * Esp - name, flags, boxes, health, armor, ammo, skeleton. 2D/3D.
+ * DLight - highlights player by dlight. (Can't shortly fix the optimazation for them, it's due to overcomplication in how dlights are generated)
+ * Enemy aiming at you warn. (Note that enemies using fov-changer hacks will not always be marked as "see you", it's physically impossible to gather fov from other clients by client)
+ * 2D radar - overlay showing where enemy is, with background of the map texture. Renders rotated triangles that can be clipped with ranges or not.
+ * Custom skybox - listed from game or custom, custom skybox is i 1st hierarchy.
+ * Remove sky - removes props by forcing cvar, (rebuild needed - don't force, check retaddr or find if any function could be hooked for this)
  * Edit world colors - props/walls/sky (rebuild needed - transparency should be done in different way)
  * Movement trails - collect line frame by frame and draw from container
- * Bullet impacts - where the bullet has hit
+ * Bullet impacts - where the bullet has hit. Does not use events, instead gets client information of bullets list.
  * Custom smoke/molotov - color/remove/timer
- * Draw dropped weapons - box/icon/name/ammo
- * Bomb overlay with info (rebuild needed - cleanup, this is now very ugly in code)
+ * Draw dropped weapons - box/icon/name/ammo. Fading alpha with distance
+ * Bomb overlay with info. - draws infomation about bomb, where, what dmg, who planted.
  * Mirrorcam - show what is behind you on extra window (contains fixing setupbones occlusion problems)
  * Freecam - view any place without moving your model (dormant ents won't render)
  * Freelook - a copy of how it looks like in PUBG
+ * Blacklist - blacklist bots and players, forces aimbot to fucus blacklisted players.
+ * Playerlist - a playerlist that will give information of every player on the server, in one window. Does provide information for dormant ents.
+ * Cache - not a feature, just escapes using same loops for(int i; 64)... everywhere.
+ * Logger - log anything to left corner, with animated move + alpha when text duration reaches end.
+ * Ambient - ambient light (think if its possible to directly access rgba of that).
+ * Fog - fog controller, color and intensity.
+ * Weather - change weather, might cost a lot of performance drop, due to fact many particles will render.
  </details>
 
-# Keybinds
+# Default keybinds
  - INSERT (Close/open menu)
  - DELETE (Panic key - shutdowns whole hack thread)
  - HOME (Console key - shows the console window rendered with ImGui)
@@ -135,17 +151,8 @@ This is a trianing software. No further actions taken by people are heeded.
 * 1.7.1 - Refactor of code. Fixes, and some addons, especially hooks. Deatailed in commit.
 * 1.7.2 - Cleanup for lerping animation.
 * 1.7.3 - visuals health/armor bug fix, more "clear" hooked functions definitions, accurate info gathered directly from the game about shots, not using events to count them manually (awful!). Prediction last edits. SDK cleanup and addons. Sound is finally not using events, wip to remove other events. Editor still not finished, almost... Plots reworked to work for last rendering change. Fixes to radar, eg: MapStruct, triangle enemies.
+* 2.0.0 - Made it as a new version since it does change a lot. Provided very simple instruction for people who want to use this at long end. Bunch of very few refactors/renames in functions. 2.0 is now having a friendly folder structure. Replaced render from utils to own folder. As well as other things which were "overnamed" to be in utils. Very soon to finally end that project.
 </details>
-
-# Dependencies
-* [minhook](https://github.com/TsudaKageyu/minhook)
-* [lazy importer](https://github.com/JustasMasiulis/lazy_importer)
-* [xorstr](https://github.com/JustasMasiulis/xorstr)
-* [json](https://github.com/nlohmann/json)
-* [ImGui](https://github.com/ocornut/imgui)
-* [freetype](https://gitlab.freedesktop.org/freetype/freetype)
-* [stb_image](https://github.com/nothings/stb)
-* [magic_enum](https://github.com/Neargye/magic_enum)
 
 # People who helped
 * [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs18 leak which made reversing even easier.
