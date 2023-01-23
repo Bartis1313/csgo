@@ -245,13 +245,6 @@ void Memory::init()
 	clientState = clientState.scan(ENGINE_DLL, CLIENT_STATE, 0x1).deRef(Dereference::TWICE);
 	viewRender = viewRender.scan(CLIENT_DLL, VIEW_RENDER, 0x2).deRef(Dereference::TWICE);
 
-	constexpr auto l = LAZY_IMPORTER_KHASH("Elo0");
-	constexpr auto lol = li::detail::khash_impl("Elo0", 2166136261);
-	//2166136261
-	constexpr auto he = li::detail::get_offset(l);
-	constexpr auto he2 = li::detail::get_hash(l);
-
-
 	keyValuesSys = keyValuesSys.byExport<"KeyValuesSystem"_hasher>(VSTD_DLL).cast<keyValuesSystem_t>()()();
 	memAlloc = memAlloc.byExport<"g_pMemAlloc"_hasher>(TIER_DLL).deRef();
 	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER, 0x2).deRef(Dereference::TWICE);
