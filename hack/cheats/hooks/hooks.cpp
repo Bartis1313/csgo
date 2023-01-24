@@ -40,7 +40,7 @@ else { \
 	HOOK(memory::removeEnt(), hooks::removeEnt);
 	HOOK(memory::interfaces::dx9Device(), hooks::reset);
 	HOOK(memory::interfaces::dx9Device(), hooks::present);
-	HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
+	//HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
 	HOOK(memory::interfaces::client(), hooks::proxyCreateMove);
 	HOOK(memory::interfaces::client(), hooks::frameStageNotify);
 	HOOK(memory::interfaces::client(), hooks::levelInitPreEntity);

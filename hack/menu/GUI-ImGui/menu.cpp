@@ -93,14 +93,6 @@ static void renderAimbot()
 		{
 			ImGui::BeginGroupPanel(XOR("Aimbot"), availRegion());
 			{
-				enum class simpleEnum
-				{
-					CROSSHAIR,
-					DYNAMIC
-				};
-
-				const auto be = magic_enum::enum_names_pretty<AimbotWeapon>();
-
 				ImGui::Animations::ListBox(XOR("Weapon selection"), &index, magic_enum::enum_names_pretty<AimbotWeapon>());
 				ImGui::Animations::Checkbox(XOR("Enabled##aim"), &cfg.enabled);
 				ImGui::SameLine();

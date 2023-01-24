@@ -15,9 +15,6 @@ enum class KeyState
 
 void KeysHandler::run(UINT message, WPARAM wparam)
 {
-	if (globals::isInHotkey)
-		return;
-
 	if (game::isChatOpen() || memory::interfaces::engine->isConsoleVisible())
 		return;
 

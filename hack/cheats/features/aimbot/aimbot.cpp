@@ -29,20 +29,21 @@ void Aimbot::init()
 	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
 }
 
-Vec3 Aimbot::smoothAim(const Vec3& angle, Player_t* target, float cfgSmooth)
+Vec3 Aimbot::smoothAim(CUserCmd* cmd, const Vec3& angle, Player_t* target, float cfgSmooth)
 {
 	if (cfgSmooth == 0.0f)
 		return angle;
 
-	float smooth = std::min(0.99f, cfgSmooth); // allow 1.0 value to be max
-	if (m_config.randomization)
-		smooth = getRandomizedSmooth(smooth);
+	//printf("%i, %i\n", cmd->m_mousedx, cmd->m_mousedy);
 
-	const float maxVel = target->m_flMaxspeed();
+	const float smooth = std::clamp(cfgSmooth, 0.0f, 1.0f);
+	const float skill = 0.5f;
 	const float targetVel = target->m_vecVelocity().length();
+	const float maxVel = target->m_flMaxspeed();
 	const float velScaled = std::clamp(targetVel / maxVel, 0.0f, 1.0f);
-	const float smoothFactor = std::min(std::lerp(smooth, 1.0f, velScaled * 0.2f), 1.0f); // small scale-up to cfg smooth
-
+	const float distance = target->m_vecOrigin().distTo(game::localPlayer->m_vecOrigin());
+	const float distanceScaled = std::clamp(distance / 1000.0f, 0.0f, 1.0f);
+	const float smoothFactor = std::min(std::lerp(smooth, 1.0f, (velScaled * 0.2f + distanceScaled * 0.1f) * skill), 1.0f);
 	Vec3 delta = angle;
 	Vec3 ret;
 	switch (m_config.smoothMode)
@@ -61,13 +62,11 @@ Vec3 Aimbot::smoothAim(const Vec3& angle, Player_t* target, float cfgSmooth)
 		break;
 	}
 	}
-
 	if (m_config.curveAim)
 	{
 		Vec3 curved = ret + Vec3(ret[1] * m_config.curveX, ret[0] * m_config.curveY, 0.0f);
 		ret = curved * smoothFactor;
 	}
-
 	return ret;
 }
 
@@ -157,7 +156,7 @@ void Aimbot::run(CUserCmd* cmd)
 	auto angle = math::calcAngleRelative(myEye, bestpos, Vec3{ m_view + punch });
 	angle.clamp();
 
-	angle = smoothAim(angle, player, m_config.smooth);
+	angle = smoothAim(cmd, angle, player, m_config.smooth);
 
 	cmd->m_viewangles += angle;
 	memory::interfaces::engine->setViewAngles(cmd->m_viewangles);
