@@ -154,7 +154,7 @@ void EntityCache::clear()
 
 void CacheFields::update()
 {
-	const auto hud = Memory::Address<CCSGO_HudRadar*>{ game::findHudElement("CCSGO_HudRadar") };
+	const auto hud = memory::Address<CCSGO_HudRadar*>{ game::findHudElement("CCSGO_HudRadar") };
 	if (!hud())
 		return;
 

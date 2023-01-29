@@ -11,9 +11,9 @@
 // C7 44 24 ? ? ? ? ? 8B 84 24 ? ? ? ? in sdsshader_dx9 looks to be an array of those
 void AmbientLight::init()
 {
-	m_ambientR = memory::interfaces::cvar->findVar(XOR("mat_ambient_light_r"));
-	m_ambientG = memory::interfaces::cvar->findVar(XOR("mat_ambient_light_g"));
-	m_ambientB = memory::interfaces::cvar->findVar(XOR("mat_ambient_light_b"));
+	m_ambientR = memory::interfaces::cvar->findVar("mat_ambient_light_r");
+	m_ambientG = memory::interfaces::cvar->findVar("mat_ambient_light_g");
+	m_ambientB = memory::interfaces::cvar->findVar("mat_ambient_light_b");
 }
 
 void AmbientLight::run(int frame)

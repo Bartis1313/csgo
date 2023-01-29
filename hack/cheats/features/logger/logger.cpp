@@ -13,7 +13,7 @@
 
 void Logger::init()
 {
-	events::add(XOR("player_hurt"), std::bind(&Logger::handleHits, this, std::placeholders::_1));
+	events::add("player_hurt", std::bind(&Logger::handleHits, this, std::placeholders::_1));
 }
 
 void Logger::add(const Log_t& log)
@@ -62,7 +62,7 @@ void Logger::draw()
 
 void Logger::handleHits(IGameEvent* event)
 {
-	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
+	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("attacker")));
 	if (!attacker)
 		return;
 
@@ -70,40 +70,40 @@ void Logger::handleHits(IGameEvent* event)
 	if (attacker != game::localPlayer)
 		return;
 
-	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("userid"))));
 	if (!ent) // should never happen
 		return;
 
-	auto dmg_health = event->getInt(XOR("dmg_health"));
+	auto dmg_health = event->getInt("dmg_health");
 	auto health = ent->m_iHealth() - dmg_health;
-	auto hitgroup = event->getInt(XOR("hitgroup"));
+	auto hitgroup = event->getInt("hitgroup");
 
 	auto hitGroupToStr = [hitgroup]() -> std::string_view
 	{
 		switch (hitgroup)
 		{
 		case HITGROUP_HEAD:
-			return XOR("Head");
+			return "Head";
 		case HITGROUP_CHEST:
-			return XOR("Chest");
+			return "Chest";
 		case HITGROUP_STOMACH:
-			return XOR("Belly");
+			return "Belly";
 		case HITGROUP_LEFTARM:
-			return XOR("Left arm");
+			return "Left arm";
 		case HITGROUP_RIGHTARM:
-			return XOR("right arm");
+			return "right arm";
 		case HITGROUP_LEFTLEG:
-			return XOR("Left leg");
+			return "Left leg";
 		case HITGROUP_RIGHTLEG:
-			return XOR("Right arm");
+			return "Right arm";
 		default:
-			return FORMAT(XOR("Unk {}"), hitgroup);
+			return std::format("Unk {}", hitgroup);
 		}
 	};
 
 	add(Log_t
 		{
-			.m_text = FORMAT(XOR("Hit {} for [{} hp {}hp left] dmg in {}"), ent->getName(), dmg_health, health, hitGroupToStr()),
+			.m_text = std::format("Hit {} for [{} hp {}hp left] dmg in {}", ent->getName(), dmg_health, health, hitGroupToStr()),
 			.m_color = Colors::Cyan,
 			.m_timeLog = memory::interfaces::globalVars->m_curtime,
 			.m_font = ImFonts::tahoma14

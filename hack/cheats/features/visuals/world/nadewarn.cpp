@@ -62,7 +62,7 @@ void NadeTrace_t::addGravityMove(Vec3& move, Vec3& vel, float frametime)
 	move[Coord::X] = vel[Coord::X] * frametime;
 	move[Coord::Y] = vel[Coord::Y] * frametime;
 
-	const static float svgrav = memory::interfaces::cvar->findVar(XOR("sv_gravity"))->getFloat();
+	const static float svgrav = memory::interfaces::cvar->findVar("sv_gravity")->getFloat();
 	float gravity = svgrav * 0.4f;
 	float z = vel[Coord::Z] - (gravity * frametime);
 	move[Coord::Z] = ((vel[Coord::Z] + z) / 2.0f) * frametime;
@@ -90,7 +90,7 @@ void NadeTrace_t::pushEntity(const Vec3& src, Trace_t& tr)
 	// lazy attempt... see nadepred check code
 	if (m_index == WEAPON_MOLOTOV || m_index == WEAPON_INCGRENADE)
 	{
-		const static float weapon_molotov_maxdetonateslope = memory::interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
+		const static float weapon_molotov_maxdetonateslope = memory::interfaces::cvar->findVar("weapon_molotov_maxdetonateslope")->getFloat();
 
 		if (bool res = tr.didHit() && tr.m_plane.m_normal[Coord::Z] >= std::cos(math::DEG2RAD(weapon_molotov_maxdetonateslope)); res)
 			destroyTrace();
@@ -189,7 +189,7 @@ void NadeTrace_t::handleDetonates()
 	case WEAPON_MOLOTOV:
 	case WEAPON_INCGRENADE:
 	{
-		const static auto molotov_throw_detonate_time = memory::interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"));
+		const static auto molotov_throw_detonate_time = memory::interfaces::cvar->findVar("molotov_throw_detonate_time");
 		m_nadeDetonateTime = molotov_throw_detonate_time->getFloat();
 		break;
 	}

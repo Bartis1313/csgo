@@ -5,6 +5,7 @@
 #include <ranges>
 #include <cmath>
 #include <algorithm>
+#include <compare>
 
 #include <utilities/tools/wrappers.hpp>
 #include <imgui.h>
@@ -260,6 +261,8 @@ public:
 		return res;
 	}
 
+	constexpr auto operator<=>(const Vector&) const = default;
+
 	constexpr auto& normalize()
 	{
 		ASSERT_VEC3;
@@ -304,6 +307,12 @@ public:
 	{
 		return ImVec2{ m_arr[0], m_arr[1] };
 	}
+
+	[[nodiscard]] constexpr auto lerp(const Vector& other, float t)
+	{
+		return *this + (other - *this) * t;
+	}
+
 private:
 	[[nodiscard]] constexpr T dotFields(size_t times = SIZE) const
 	{

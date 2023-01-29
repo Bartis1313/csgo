@@ -28,14 +28,14 @@ void X88Menu::draw()
 	// start
 	if (!game::localPlayer)
 	{
-		surfaceRender.text(x, y, font, XOR("Hello undefined :)"), false, Colors::Yellow);
+		surfaceRender.text(x, y, font, "Hello undefined :)", false, Colors::Yellow);
 		// going to hardcode the padding for this
 		y += 15;
 	}
 	else
 	{
 		surfaceRender.text(x, y, font,
-			FORMAT(XOR("Hello {} :) Local Player {:#0x}"), game::localPlayer->getName(), game::localPlayer->getLiteralAddress()),
+			std::format("Hello {} :) Local Player {:#0x}", game::localPlayer->getName(), game::localPlayer->getLiteralAddress()),
 			false, Colors::Yellow);
 		y += 15;
 	}
@@ -66,21 +66,21 @@ void X88Menu::draw()
 
 			surfaceRender.text(x, y, font, name, false, color);
 			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
-				FORMAT(XOR("{}"), val), false, active);
+				std::format("{}", val), false, active);
 			y += vecY;
 		}
 		else if(std::holds_alternative<int*>(value))
 		{
 			surfaceRender.text(x, y, font, name, false, color);
 			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
-				FORMAT(XOR("{}"), *std::get<int*>(value)), false, color);
+				std::format("{}", *std::get<int*>(value)), false, color);
 			y += vecY;
 		}
 		else if (std::holds_alternative<float*>(value))
 		{
 			surfaceRender.text(x, y, font, name, false, color);
 			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
-				FORMAT(XOR("{:.2f}"), *std::get<float*>(value)), false, color);
+				std::format("{:.2f}", *std::get<float*>(value)), false, color);
 			y += vecY;
 		}
 
@@ -91,17 +91,17 @@ void X88Menu::draw()
 
 void X88Menu::init()
 {
-	x88types.push(XOR("Chams"), &vars::visuals->chams->indexPlayers, magic_enum::enum_count<ChamsType>() - 1);
-	x88types.push(XOR("ESP"), &vars::visuals->esp->boxes->enabled);
-	x88types.push(XOR("FOV"), &vars::misc->fov->value, { -50.0f, 50.0f} );
-	x88types.push(XOR("Backtrack"), &vars::backtrack->enabled);
-	x88types.push(XOR("Backtrack MS"), &vars::backtrack->time, { 0.0f, 200.0f });
-	x88types.push(XOR("No Sky"), &vars::visuals->world->sky->removeSky);
-	x88types.push(XOR("2D Radar"), &vars::misc->radar->enabled);
-	x88types.push(XOR("Bunnyhop"), &vars::misc->bunnyHop->enabled);
-	x88types.push(XOR("Autostrafe"), &vars::misc->bunnyHop->indexStrafe, magic_enum::enum_count<MovementStraferMode>() - 1);
-	x88types.push(XOR("ThirdP"), &vars::misc->thirdp->enabled);
-	x88types.push(XOR("Draw Info"), &vars::misc->info->enabled);
+	x88types.push("Chams", &vars::visuals->chams->indexPlayers, magic_enum::enum_count<ChamsType>() - 1);
+	x88types.push("ESP", &vars::visuals->esp->boxes->enabled);
+	x88types.push("FOV", &vars::misc->fov->value, { -50.0f, 50.0f} );
+	x88types.push("Backtrack", &vars::backtrack->enabled);
+	x88types.push("Backtrack MS", &vars::backtrack->time, { 0.0f, 200.0f });
+	x88types.push("No Sky", &vars::visuals->world->sky->removeSky);
+	x88types.push("2D Radar", &vars::misc->radar->enabled);
+	x88types.push("Bunnyhop", &vars::misc->bunnyHop->enabled);
+	x88types.push("Autostrafe", &vars::misc->bunnyHop->indexStrafe, magic_enum::enum_count<MovementStraferMode>() - 1);
+	x88types.push("ThirdP", &vars::misc->thirdp->enabled);
+	x88types.push("Draw Info", &vars::misc->info->enabled);
 
 	size_t longest = 0;
 	for (const auto& [x88p, limits] : x88types.getVars())

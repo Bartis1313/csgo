@@ -32,7 +32,7 @@
 
 void PlayerVisuals::init()
 {
-	events::add(XOR("round_prestart"), std::bind(&PlayerVisuals::resetDormacy, this, std::placeholders::_1));
+	events::add("round_prestart", std::bind(&PlayerVisuals::resetDormacy, this, std::placeholders::_1));
 }
 
 void PlayerVisuals::draw()
@@ -146,7 +146,7 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 	// if the player has health below max, then draw HP info
 	if (health < 100)
 	{
-		auto text = FORMAT(XOR("{}"), realHealth);
+		auto text = std::format("{}", realHealth);
 		float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer->absOrigin(), 100.0f, 10.0f, 14.0f);
 		auto size = ImFonts::franklinGothic12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
 
@@ -188,10 +188,6 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 		imRender.drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 		imRender.drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, armorCol.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 	}
-
-	/*if (armor < 100 && armor != 0)
-		imRender.text(newBox.x - 2.0f, newBox.y + pad - 4.0f,
-			ImFonts::franklinGothic, std::format(XOR("{}"), realArmor), false, Colors::White);*/
 }
 
 #include <SDK/ILocalize.hpp>
@@ -210,7 +206,7 @@ void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
 	int currentAmmo = weapon->m_iClip1();
 
-	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, FORMAT(XOR("{} {}/{}"),
+	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, std::format("{} {}/{}",
 		vars::visuals->esp->weaponBar->translate ? memory::interfaces::localize->findAsUTF8(weapon->getWpnInfo()->m_WeaponName) : ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo),
 		true, tex.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 
@@ -256,35 +252,35 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 
 	if (cfgflags.at(E2T(EspFlags::BOT)))
 		if(info.m_fakePlayer)
-			flags.emplace_back(std::make_pair(XOR("BOT"), Colors::Yellow.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
+			flags.emplace_back(std::make_pair("BOT", Colors::Yellow.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
 	if (cfgflags.at(E2T(EspFlags::MONEY)))
-		flags.emplace_back(std::make_pair(FORMAT(XOR("{}$"), ent->m_iAccount()), Colors::Green.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
+		flags.emplace_back(std::make_pair(std::format("{}$", ent->m_iAccount()), Colors::Green.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
 	if (cfgflags.at(E2T(EspFlags::WINS)))
-		flags.emplace_back(std::make_pair(FORMAT(XOR("Wins {}"), ent->getWins()), Colors::Green.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
+		flags.emplace_back(std::make_pair(std::format("Wins {}", ent->getWins()), Colors::Green.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
 	if (cfgflags.at(E2T(EspFlags::RANK)))
-		flags.emplace_back(std::make_pair(FORMAT(XOR("Rank {}"), ent->getRank()), Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
+		flags.emplace_back(std::make_pair(std::format("Rank {}", ent->getRank()), Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
 	if (cfgflags.at(E2T(EspFlags::ARMOR)))
 	{
 		std::string text = "";
 		if (ent->m_bHasHelmet() && ent->m_ArmorValue())
-			text = XOR("H KEV");
+			text = "H KEV";
 		else if (!ent->m_bHasHelmet() && ent->m_ArmorValue())
-			text = XOR("KEV");
+			text = "KEV";
 
 		flags.emplace_back(std::make_pair(text, Colors::White));
 	}
 
 	if (cfgflags.at(E2T(EspFlags::ZOOM)))
 		if(ent->m_bIsScoped())
-			flags.emplace_back(std::make_pair(XOR("ZOOM"), Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
+			flags.emplace_back(std::make_pair("ZOOM", Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
 	if (cfgflags.at(E2T(EspFlags::C4)))
 		if (ent->isC4Owner())
-			flags.emplace_back(std::make_pair(XOR("C4"), Colors::Orange.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
+			flags.emplace_back(std::make_pair("C4", Colors::Orange.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha)));
 
 	float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
 
@@ -301,7 +297,7 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 		if (i != flags.size() && padding + fontSize > box.h) // when too many flags for long distances
 		{
 			imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana12,
-				FORMAT(XOR("{} more..."), flags.size() - i), false, Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha), false);
+				std::format("{} more...", flags.size() - i), false, Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha), false);
 			break;
 		}
 	}
@@ -382,7 +378,7 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 		if (vars::visuals->esp->skeleton->showDebug)
 		{
 			if (ImVec2 s; imRender.worldToScreen(ent->getBonePos(i), s))
-				imRender.text(s.x, s.y, ImFonts::franklinGothic12, FORMAT(XOR("{}"), i), true, Colors::White, true);
+				imRender.text(s.x, s.y, ImFonts::franklinGothic12, std::format("{}", i), true, Colors::White, true);
 		}
 
 		if (ImVec2 start, end; imRender.worldToScreen(parent, start) && imRender.worldToScreen(child, end))

@@ -28,9 +28,9 @@
 
 void BombOverlay::init()
 {
-	m_timer = memory::interfaces::cvar->findVar(XOR("mp_c4timer"));
+	m_timer = memory::interfaces::cvar->findVar("mp_c4timer");
 
-	events::add(XOR("bomb_planted"), std::bind(&BombOverlay::handleWhoPlanted, this, std::placeholders::_1));
+	events::add("bomb_planted", std::bind(&BombOverlay::handleWhoPlanted, this, std::placeholders::_1));
 }
 
 void BombOverlay::roundRestart()
@@ -80,7 +80,7 @@ void BombOverlay::draw()
 
 	ImGui::SetNextWindowSize({ 300.0f, 150.0f });
 	ImGui::PushStyleColor(ImGuiCol_WindowBg, Color::U32(vars::visuals->world->bomb->background()));
-	if (ImGui::Begin(XOR("Bomb c4"), &vars::visuals->world->bomb->enabled, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+	if (ImGui::Begin("Bomb c4", &vars::visuals->world->bomb->enabled, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
 		const auto size = ImGui::GetWindowSize();
 		const auto pos = ImGui::GetWindowPos();
@@ -94,7 +94,7 @@ void BombOverlay::draw()
 		const auto yCircle = size.y / 2.0f;
 
 		drawing::Arc{ ImVec2{ pos.x + xCircle, pos.y + yCircle }, scaledRadius, math::DEG2RAD(minAngle), math::DEG2RAD(maxAngle), 32, Color::U32(color), 0, 5.0f }.draw(draw);
-		const auto text = defusetime > bombtime ? XOR("Too late") : FORMAT(XOR("{:.2f}"), m_bombEnt->m_hBombDefuser().isValid() ? defusetime : bombtime);
+		const auto text = defusetime > bombtime ? "Too late" : std::format("{:.2f}", m_bombEnt->m_hBombDefuser().isValid() ? defusetime : bombtime);
 		drawing::Text{ ImFonts::tahoma14, ImVec2{ pos.x + xCircle, pos.y + yCircle - ImFonts::tahoma14->FontSize / 2.0f },
 			Color::U32(Colors::White), text, false, true }.draw(draw);
 		constexpr float fontSizeC4 = 40.0f;
@@ -106,20 +106,22 @@ void BombOverlay::draw()
 		if (!m_whoPlanted.empty())
 		{
 			drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + 5.0f, yPosInfo }, Color::U32(Colors::White),
-			FORMAT(XOR("Planted by {}s"), m_whoPlanted), false, false }.draw(draw);
+			std::format("Planted by {}s", m_whoPlanted), false, false }.draw(draw);
 			yPosInfo -= ImFonts::tahoma20->FontSize;
 		}
 		if (m_bombEnt->m_hBombDefuser().isValid())
 		{
 			drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + 5.0f, yPosInfo }, Color::U32(Colors::White),
-			FORMAT(XOR("Defusing {}"), ent->getName()), false, false }.draw(draw);
+			std::format("Defusing {}", ent->getName()), false, false }.draw(draw);
 			yPosInfo -= ImFonts::tahoma20->FontSize;
 		}
 
 		float yCentreInfo = pos.y + 2.0f + ImFonts::tahoma20->FontSize;
-		drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(Colors::White), FORMAT(XOR("Site {}"), m_bombEnt->getBombSiteName()), false, true }.draw(draw);
+		drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(Colors::White), std::format("Site {}",
+			m_bombEnt->getBombSiteName()), false, true }.draw(draw);
 		yCentreInfo += ImFonts::tahoma20->FontSize;
-		drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(isSafe ? Colors::Green : Colors::Red), FORMAT(XOR("Damage {:.2f}"), dmg), false, true }.draw(draw);
+		drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(isSafe ? Colors::Green : Colors::Red),
+			std::format("Damage {:.2f}", dmg), false, true }.draw(draw);
 
 		ImGui::End();
 	}
@@ -128,7 +130,7 @@ void BombOverlay::draw()
 
 void BombOverlay::handleWhoPlanted(IGameEvent* event)
 {
-	auto who = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+	auto who = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("userid"))));
 	if (!who)
 		return;
 

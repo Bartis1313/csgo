@@ -16,12 +16,12 @@
 
 void DiscordPresence::init()
 {
-	Discord_Initialize(XOR("990623614527213578"), NULL, 1, XOR("730")); // GetAppID -> 730
+	Discord_Initialize("990623614527213578", NULL, 1, "730"); // GetAppID -> 730
 }
 
 static std::pair<std::string, std::string> getImage(const std::string& map)
 {
-#define AM(f, s) { XOR(f), XOR(s) }
+#define AM(f, s) { f, s }
 	static std::unordered_map<std::string, std::string> mapNames = // my images under this app I have added
 	{
 		AM("de_dust2", "dust2"),
@@ -46,7 +46,7 @@ static std::pair<std::string, std::string> getImage(const std::string& map)
 #undef AM
 
 	if (auto ok = mapNames.find(map); ok == mapNames.end())
-		return std::make_pair(XOR("unknown"), XOR("unknown"));
+		return std::make_pair("unknown", "unknown");
 	else
 		return std::make_pair(ok->first, ok->second);
 }
@@ -65,14 +65,14 @@ void DiscordPresence::run()
 
 	if (!memory::interfaces::engine->isInGame())
 	{
-		state = XOR("In menu");
+		state = "In menu";
 		image = getImage("");
 	}
 	else if (game::isAvailable())
 	{
 		auto map = memory::interfaces::engine->getLevelName();
 
-		state = FORMAT(XOR("On map: {}"), map);
+		state = std::format("On map: {}", map);
 		image = getImage(map);
 	}
 
@@ -85,12 +85,12 @@ void DiscordPresence::run()
 		{
 			std::string_view pos = game::localPlayer->m_szLastPlaceName();
 			if (pos.empty())
-				pos = XOR("null");
-			details = FORMAT(XOR("Weapon: {} Pos: {}"), wpn->getWpnName(), pos);
+				pos = "null";
+			details = std::format("Weapon: {} Pos: {}", wpn->getWpnName(), pos);
 		}
 	}
 	else
-		details = XOR("Unknown details");
+		details = "Unknown details";
 
 	pres.details = details.c_str();
 	const static auto epoch = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();

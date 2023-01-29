@@ -66,7 +66,7 @@ void Flashlight::run(int frame)
 		{
 			if (!done)
 			{
-				memory::interfaces::surface->playSound(XOR("items\\flashlight1.wav"));
+				memory::interfaces::surface->playSound("items\\flashlight1.wav");
 				m_flashlight = createFlashlight(vars::misc->flashLight->fov, game::localPlayer());
 				done = true;
 			}
@@ -87,7 +87,7 @@ void Flashlight::run(int frame)
 	{
 		if (key.isPressed())
 		{
-			memory::interfaces::surface->playSound(XOR("items\\flashlight1.wav"));
+			memory::interfaces::surface->playSound("items\\flashlight1.wav");
 
 			if (m_flashlight)
 			{

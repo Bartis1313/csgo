@@ -43,7 +43,7 @@ void Plots::drawFps()
 	// when loading, you have a chance of freezing
 	if (std::isinf(fps))
 	{
-		LOG_WARN("record for plot got skipped due to infinity");
+		console::warn("record for plot got skipped due to infinity");
 		return;
 	}
 
@@ -58,18 +58,18 @@ void Plots::drawFps()
 
 	if (vars::misc->plots->fpsCustom)
 	{
-		if (ImGui::Begin(XOR("Sliders for plot"), &vars::misc->plots->fpsCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::Begin("Sliders for plot", &vars::misc->plots->fpsCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
 			if (memory::interfaces::engine->isInGame()) // not enaled in menu
-				ImGui::Animations::SliderFloat(XOR("Set max FPS"), &MAX_FPS, 30.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // hardcoded ranges, we should maybe run some avg fps getter
-			ImGui::Animations::SliderFloat(XOR("Acceptance multiply fps"), &acceptanceCustom, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
-			ImGui::Animations::ColorPicker(XOR("Color lines plot fps"), &vars::misc->plots->colorFPS);
+				ImGui::Animations::SliderFloat("Set max FPS", &MAX_FPS, 30.0f, 1000.0f, "%.2f", ImGuiSliderFlags_Logarithmic); // hardcoded ranges, we should maybe run some avg fps getter
+			ImGui::Animations::SliderFloat("Acceptance multiply fps", &acceptanceCustom, 0.2f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+			ImGui::Animations::ColorPicker("Color lines plot fps", &vars::misc->plots->colorFPS);
 
 			ImGui::End();
 		}
 	}
 
-	if (ImGui::Begin(FORMAT(XOR("Plot FPS AVG {:.2f}###Plot FPS"),
+	if (ImGui::Begin(std::format("Plot FPS AVG {:.2f}###Plot FPS",
 		std::reduce(records.begin(), records.end()) / records.size()).c_str(), &vars::misc->plots->enabledFps, ImGuiWindowFlags_NoCollapse))
 	{
 		auto& style = ImGui::GetStyle();
@@ -105,19 +105,18 @@ void Plots::drawVelocity()
 	if (!memory::interfaces::engine->isInGame() || !game::localPlayer->isAlive())
 		return;
 
-	static float MAX_SPEEED_MOVE = memory::interfaces::cvar->findVar(XOR("sv_maxspeed"))->getFloat(); // should be accurate
+	static float MAX_SPEEED_MOVE = memory::interfaces::cvar->findVar("sv_maxspeed")->getFloat(); // should be accurate
 	static bool transparent = false;
 
 	if (vars::misc->plots->velocityCustom)
 	{
-		if (ImGui::Begin(XOR("Sliders for velocity plot"), &vars::misc->plots->velocityCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::Begin("Sliders for velocity plot", &vars::misc->plots->velocityCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
 		{
-			//ImGui::Animated::SliderFloat(XOR("Set max velocity"), &MAX_SPEEED_MOVE, 450.0f, 1000.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic); // who will ever get this velocity? adjust if needed
-			ImGui::Animations::SliderFloat(XOR("Acceptance multiply vel"), &m_acceptanceVelocity, 0.2f, 20.0f, XOR("%.2f"), ImGuiSliderFlags_Logarithmic);
-			ImGui::Animations::ColorPicker(XOR("Color lines plot vel"), &vars::misc->plots->colorVelocity);
-			ImGui::Animations::Checkbox(XOR("Run transparent"), &transparent);
+			ImGui::Animations::SliderFloat("Acceptance multiply vel", &m_acceptanceVelocity, 0.2f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+			ImGui::Animations::ColorPicker("Color lines plot vel", &vars::misc->plots->colorVelocity);
+			ImGui::Animations::Checkbox("Run transparent", &transparent);
 			ImGui::SameLine();
-			ImGui::HelpMarker(XOR("Will add some flags!\nEg: no resize"));
+			ImGui::HelpMarker("Will add some flags!\nEg: no resize");
 
 			ImGui::End();
 		}
@@ -127,7 +126,7 @@ void Plots::drawVelocity()
 		? ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
 		: ImGuiWindowFlags_NoCollapse;
 
-	if (ImGui::Begin(FORMAT(XOR("Plot Velocity AVG {:.2f}###Plot Velocity"),
+	if (ImGui::Begin(std::format("Plot Velocity AVG {:.2f}###Plot Velocity",
 		std::reduce(m_VelocityRecords.begin(), m_VelocityRecords.end()) / m_VelocityRecords.size()).c_str(), &vars::misc->plots->enabledVelocity, flags))
 	{
 		auto& style = ImGui::GetStyle();
@@ -172,7 +171,7 @@ void VelocityGather::run(CUserCmd* cmd)
 	float vel = game::localPlayer->m_vecVelocity().toVecPrev().length();
 	if (std::isinf(vel))
 	{
-		LOG_WARN("record for plot got skipped due to infinity");
+		console::warn("record for plot got skipped due to infinity");
 		return;
 	}
 

@@ -44,7 +44,7 @@ void Trails::draw()
 		BeamInfo_t info = {};
 
 		info.m_type = TE_BEAMPOINTS;
-		info.m_modelName = XOR("sprites/purplelaser1.vmt");
+		info.m_modelName = "sprites/purplelaser1.vmt";
 		info.m_modelIndex = -1;
 		info.m_vecStart = start;
 		info.m_vecEnd = end;

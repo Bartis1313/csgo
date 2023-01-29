@@ -542,7 +542,7 @@ std::string Player_t::getName()
 	std::string name = info.m_name;
 
 	if (name.length() > 20)
-		name = name.substr(0, 20).append(XOR("..."));
+		name = name.substr(0, 20).append("...");
 
 	// use when surface
 	/*std::for_each(name.begin(), name.end(), [](char& el)
@@ -645,8 +645,8 @@ AABB_t Player_t::getOcclusionBounds()
 
 AABB_t Player_t::getCameraBounds()
 {
-	const static auto occlusion_test_camera_margins = memory::interfaces::cvar->findVar(XOR("occlusion_test_camera_margins"));
-	const static auto occlusion_test_jump_margin = memory::interfaces::cvar->findVar(XOR("occlusion_test_jump_margin"));
+	const static auto occlusion_test_camera_margins = memory::interfaces::cvar->findVar("occlusion_test_camera_margins");
+	const static auto occlusion_test_jump_margin = memory::interfaces::cvar->findVar("occlusion_test_jump_margin");
 
 	const auto& pos = this->m_vecOrigin();
 	float cameraMargins = occlusion_test_camera_margins->getFloat();
@@ -660,7 +660,7 @@ AABB_t Player_t::getCameraBounds()
 
 bool Player_t::isOtherTeam(Player_t* player)
 {
-	const static auto mp_teammates_are_enemies = memory::interfaces::cvar->findVar(XOR("mp_teammates_are_enemies"));
+	const static auto mp_teammates_are_enemies = memory::interfaces::cvar->findVar("mp_teammates_are_enemies");
 	bool isDM = false;
 	if (mp_teammates_are_enemies && mp_teammates_are_enemies->getInt())
 		isDM = true;

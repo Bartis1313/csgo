@@ -34,7 +34,7 @@ void NoScope::draw()
 
 void NoScopeBlur::init()
 {
-	m_blurScope = memory::interfaces::matSys->findMaterial(XOR("dev/scope_bluroverlay"), XOR(TEXTURE_GROUP_OTHER));
+	m_blurScope = memory::interfaces::matSys->findMaterial("dev/scope_bluroverlay", TEXTURE_GROUP_OTHER);
 }
 
 void NoScopeBlur::run()

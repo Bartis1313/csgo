@@ -198,9 +198,9 @@ void MotionBlur::render()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	static IMaterial* motion_blur = memory::interfaces::matSys->findMaterial(XOR("dev/motion_blur"), XOR(TEXTURE_GROUP_RENDER_TARGET), false);
+	static IMaterial* motion_blur = memory::interfaces::matSys->findMaterial("dev/motion_blur", TEXTURE_GROUP_RENDER_TARGET, false);
 
-	static IMaterialVar* MotionBlurInternal = motion_blur->findVar(XOR("$MotionBlurInternal"), nullptr, false);
+	static IMaterialVar* MotionBlurInternal = motion_blur->findVar("$MotionBlurInternal", nullptr, false);
 
 	MotionBlurInternal->setVectorComponent(m_motionBlurValues[0], 0);
 	MotionBlurInternal->setVectorComponent(m_motionBlurValues[1], 1);
@@ -213,7 +213,7 @@ void MotionBlur::render()
 	//float* motionBlurIntervalValues = *reinterpret_cast<float**>(m_motionBlurAddr);
 	//motionBlurIntervalValues = m_motionBlurValues.data();
 
-	static IMaterialVar* MotionBlurViewPortInternal = motion_blur->findVar(XOR("$MotionBlurViewportInternal"), nullptr, false);
+	static IMaterialVar* MotionBlurViewPortInternal = motion_blur->findVar("$MotionBlurViewportInternal", nullptr, false);
 
 	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[0], 0);
 	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[1], 1);

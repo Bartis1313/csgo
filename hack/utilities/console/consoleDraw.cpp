@@ -82,5 +82,5 @@ void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 void LogDrawer::draw()
 {
 	if (m_opened)
-		log.draw(XOR("Logging Console"), &m_opened);
+		log.draw("Logging Console", &m_opened);
 }

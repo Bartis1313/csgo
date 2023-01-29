@@ -40,9 +40,8 @@ enum ClassID;
 
 using retaddr_t = uintptr_t;
 
-class Memory
+namespace memory
 {
-public:
 	enum class Dereference : size_t
 	{
 		ONCE = 1,
@@ -52,6 +51,18 @@ public:
 
 	void init();
 	void postInit();
+
+	namespace detail
+	{
+		inline std::unordered_map<std::string_view, HMODULE> m_ModulesAddr;
+	}
+
+	inline HMODULE getModule(const std::string_view str) { return detail::m_ModulesAddr.at(str); }
+	template<typename T, li::detail::offset_hash_pair __hash>
+	T exportVar(const std::string_view _module)
+	{
+		return static_cast<T>(::li::detail::lazy_function<__hash, T>().in(getModule(_module)));
+	}	
 
 	template<typename T>
 	struct Address
@@ -118,10 +129,6 @@ public:
 		uintptr_t m_addr;
 		std::string_view m_module;
 	};
-private:
-	std::unordered_map<std::string_view, HMODULE> m_ModulesAddr;
-public:
-	HMODULE getModule(const std::string_view str) { return m_ModulesAddr.at(str); }
 };
 
 namespace memory
@@ -155,100 +162,98 @@ namespace memory
 	using reinitPredictables_t = int(__stdcall*)();
 	using shutdownPredictables_t = void(__stdcall*)();
 
-	inline Memory::Address<uintptr_t> traceFilterSimple;
-	inline Memory::Address<uintptr_t*> returnAddrRadarImage;
-	inline Memory::Address<Matrix4x4> viewMatrixAddr;
-	inline Memory::Address<uintptr_t> drawSpacedRectangle;
-	inline Memory::Address<float*> motionBlurVec;
-	inline Memory::Address<uintptr_t> disableTargetAlloc;
-	inline Memory::Address<inSmoke_t> throughSmoke;
-	inline Memory::Address<uintptr_t> smokeCount;
-	inline Memory::Address<loadSky_t> loadSky;
-	inline Memory::Address<CClientEffectRegistration*> callbacksHead;
-	inline Memory::Address<void*> camThink;
-	inline Memory::Address<void*> renderDrawPoints;
-	inline Memory::Address<Player_t**> localPlayer;
-	inline Memory::Address<void*> csgoHud;
-	inline Memory::Address<findHud_t> hudfindElement;
-	inline Memory::Address<uintptr_t> keyValuesFromString;
-	inline Memory::Address<uintptr_t> animOverlays;
-	inline Memory::Address<sequenceActivity_t> sequenceActivity;
-	inline Memory::Address<uintptr_t> cachedBones;
-	inline Memory::Address<setAbsOrigin_t> setAbsOrigin;
-	inline Memory::Address<isC4Owner_t> isC4Owner;
-	inline Memory::Address<isBreakable_t> isBreakable;
-	inline Memory::Address<CMoveData*> predictionData;
-	inline Memory::Address<uintptr_t*> predictionSeed;
-	inline Memory::Address<flashlightCreate_t> flashlightCreate;
-	inline Memory::Address<flashlightUpdate_t> flashlightUpdate;
-	inline Memory::Address<flashlightDestroy_t> flashlightDestroy;
-	inline Memory::Address<uintptr_t> occlusion;
-	inline Memory::Address<uintptr_t> velocity;
-	inline Memory::Address<uintptr_t> accumulate;
-	inline Memory::Address<particleCached_t> particleIsCached;
-	inline Memory::Address<void**> particleSystem;
-	inline Memory::Address<particleFindString_t> particleFindStringIndex;
-	inline Memory::Address<void*> particleCall;
-	inline Memory::Address<setParticleControlPoint_t> particleSetControlPoint;
-	inline Memory::Address<Player_t**> predictedPlayer;
-	inline Memory::Address<physicsRunThink_t> physicsRunThink;
-	inline Memory::Address<uintptr_t> lastCommand;
-	inline Memory::Address<uintptr_t> retAddrToInterpolation;
-	inline Memory::Address<postThinkPhysics_t> postThinkPhysics;
-	inline Memory::Address<simulateEntities_t> simulateEntities;
-	inline Memory::Address<uintptr_t> vecClientImpacts;
-	inline Memory::Address<loadFromBuffer_t> loadFromBuffer;
-	inline Memory::Address<keyValuesConstruct_t> keyValuesConstruct;
-	inline Memory::Address<keyValuesDestruct_t> keyValuesDestruct;
-	inline Memory::Address<checkThinkFunction_t> checkThinkFunction;
-	inline Memory::Address<usingStandardWeaponsInVehicle_t> usingStandardWeaponsVehicle;
-	inline Memory::Address<selectItem_t> selectItem;
-	inline Memory::Address<transferData_t> transferData;
-	inline Memory::Address<reinitPredictables_t> reinitPredicatbles;
-	inline Memory::Address<shutdownPredictables_t> shutdownPredicatbles;
+	inline Address<uintptr_t> traceFilterSimple;
+	inline Address<uintptr_t*> returnAddrRadarImage;
+	inline Address<Matrix4x4> viewMatrixAddr;
+	inline Address<uintptr_t> drawSpacedRectangle;
+	inline Address<float*> motionBlurVec;
+	inline Address<uintptr_t> disableTargetAlloc;
+	inline Address<inSmoke_t> throughSmoke;
+	inline Address<uintptr_t> smokeCount;
+	inline Address<loadSky_t> loadSky;
+	inline Address<CClientEffectRegistration*> callbacksHead;
+	inline Address<void*> camThink;
+	inline Address<void*> renderDrawPoints;
+	inline Address<Player_t**> localPlayer;
+	inline Address<void*> csgoHud;
+	inline Address<findHud_t> hudfindElement;
+	inline Address<uintptr_t> keyValuesFromString;
+	inline Address<uintptr_t> animOverlays;
+	inline Address<sequenceActivity_t> sequenceActivity;
+	inline Address<uintptr_t> cachedBones;
+	inline Address<setAbsOrigin_t> setAbsOrigin;
+	inline Address<isC4Owner_t> isC4Owner;
+	inline Address<isBreakable_t> isBreakable;
+	inline Address<CMoveData*> predictionData;
+	inline Address<uintptr_t*> predictionSeed;
+	inline Address<flashlightCreate_t> flashlightCreate;
+	inline Address<flashlightUpdate_t> flashlightUpdate;
+	inline Address<flashlightDestroy_t> flashlightDestroy;
+	inline Address<uintptr_t> occlusion;
+	inline Address<uintptr_t> velocity;
+	inline Address<uintptr_t> accumulate;
+	inline Address<particleCached_t> particleIsCached;
+	inline Address<void**> particleSystem;
+	inline Address<particleFindString_t> particleFindStringIndex;
+	inline Address<void*> particleCall;
+	inline Address<setParticleControlPoint_t> particleSetControlPoint;
+	inline Address<Player_t**> predictedPlayer;
+	inline Address<physicsRunThink_t> physicsRunThink;
+	inline Address<uintptr_t> lastCommand;
+	inline Address<uintptr_t> retAddrToInterpolation;
+	inline Address<postThinkPhysics_t> postThinkPhysics;
+	inline Address<simulateEntities_t> simulateEntities;
+	inline Address<uintptr_t> vecClientImpacts;
+	inline Address<loadFromBuffer_t> loadFromBuffer;
+	inline Address<keyValuesConstruct_t> keyValuesConstruct;
+	inline Address<keyValuesDestruct_t> keyValuesDestruct;
+	inline Address<checkThinkFunction_t> checkThinkFunction;
+	inline Address<usingStandardWeaponsInVehicle_t> usingStandardWeaponsVehicle;
+	inline Address<selectItem_t> selectItem;
+	inline Address<transferData_t> transferData;
+	inline Address<reinitPredictables_t> reinitPredicatbles;
+	inline Address<shutdownPredictables_t> shutdownPredicatbles;
 
-	inline Memory::Address<void*> clientValidAddr;
-	inline Memory::Address<void*> enginevalidAddr;
-	inline Memory::Address<void*> studioRenderValidAddr;
-	inline Memory::Address<void*> materialSysValidAddr;
-	inline Memory::Address<void*> isUsingPropDebug;
-	inline Memory::Address<void*> getColorModulation;
-	inline Memory::Address<void*> extraBonesProcessing;
-	inline Memory::Address<void*> buildTransformations;
-	inline Memory::Address<void*> particleSimulate;
-	inline Memory::Address<void*> sendDataGram;
-	inline Memory::Address<void*> unkOverviewMap;
-	inline Memory::Address<void*> isDepth;
-	inline Memory::Address<void*> fxBlood;
-	inline Memory::Address<void*> addEnt;
-	inline Memory::Address<void*> removeEnt;
-	inline Memory::Address<void*> isFollowedEntity;
-	inline Memory::Address<void*> spottedEntityUpdate;
-	inline Memory::Address<void*> fireInternfn;
-	inline Memory::Address<void*> preRound;
-	inline Memory::Address<void*> playSoundStep;
+	inline Address<void*> clientValidAddr;
+	inline Address<void*> enginevalidAddr;
+	inline Address<void*> studioRenderValidAddr;
+	inline Address<void*> materialSysValidAddr;
+	inline Address<void*> isUsingPropDebug;
+	inline Address<void*> getColorModulation;
+	inline Address<void*> extraBonesProcessing;
+	inline Address<void*> buildTransformations;
+	inline Address<void*> particleSimulate;
+	inline Address<void*> sendDataGram;
+	inline Address<void*> unkOverviewMap;
+	inline Address<void*> isDepth;
+	inline Address<void*> fxBlood;
+	inline Address<void*> addEnt;
+	inline Address<void*> removeEnt;
+	inline Address<void*> isFollowedEntity;
+	inline Address<void*> spottedEntityUpdate;
+	inline Address<void*> fireInternfn;
+	inline Address<void*> preRound;
+	inline Address<void*> playSoundStep;
 
-	inline Memory::Address<teslaCreate_t> tesla;
-	inline Memory::Address<dispatchEffect_t> dispatchEffect;
+	inline Address<teslaCreate_t> tesla;
+	inline Address<dispatchEffect_t> dispatchEffect;
 
 	namespace interfaces
 	{
-		inline Memory::Address<CGlowManager*> glowManager;
-		inline Memory::Address<IWeapon*> weaponInterface;
-		inline Memory::Address<PlayerResource*> resourceInterface;
-		inline Memory::Address<IDirect3DDevice9*> dx9Device;
-		inline Memory::Address<IClientState*> clientState;
-		inline Memory::Address<IViewRender*> viewRender;
-		inline Memory::Address<IMoveHelper*> moveHelper;
-		inline Memory::Address<IViewRenderBeams*> beams;
-		inline Memory::Address<KeyValuesSys*> keyValuesSys;
-		inline Memory::Address<IMemAlloc*> memAlloc;
-		inline Memory::Address<CGameRules*> gameRules;
-		inline Memory::Address<CGlobalVarsBase*> globalVars;
-		inline Memory::Address<ClientMode*> clientMode;
-		inline Memory::Address<Input*> input;
-		inline Memory::Address<ClientClass*> preciptation;
+		inline Address<CGlowManager*> glowManager;
+		inline Address<IWeapon*> weaponInterface;
+		inline Address<PlayerResource*> resourceInterface;
+		inline Address<IDirect3DDevice9*> dx9Device;
+		inline Address<IClientState*> clientState;
+		inline Address<IViewRender*> viewRender;
+		inline Address<IMoveHelper*> moveHelper;
+		inline Address<IViewRenderBeams*> beams;
+		inline Address<KeyValuesSys*> keyValuesSys;
+		inline Address<IMemAlloc*> memAlloc;
+		inline Address<CGameRules*> gameRules;
+		inline Address<CGlobalVarsBase*> globalVars;
+		inline Address<ClientMode*> clientMode;
+		inline Address<Input*> input;
+		inline Address<ClientClass*> preciptation;
 	}
 }
-
-[[maybe_unused]] inline auto g_Memory = Memory{};

@@ -45,7 +45,7 @@ void SmokeDraw::draw()
 		if (ImVec2 s; imRender.worldToScreen(origin, s))
 		{
 			imRender.drawProgressRing(s.x, s.y, 25, 32, -90, scale, 5.0f, Colors::LightBlue);
-			imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma14, FORMAT(XOR("{:.2f}s"), time), true, Colors::White);
+			imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma14, std::format("{:.2f}s", time), true, Colors::White);
 		}
 	}
 }

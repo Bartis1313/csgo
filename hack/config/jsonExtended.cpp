@@ -2,26 +2,12 @@
 
 using namespace nlohmann::detail;
 
-template<typename T, size_t SIZE>
-void from_json(const json& j, const std::string& key, std::array<T, SIZE>& val)
-{
-	if (!j.contains(key))
-		return;
-
-	if (auto jval = j.at(key); jval.is_array())
-	{
-		// get_to throwing some weird exception to allow only numbers?
-		for (size_t i = 0; i < jval.size(); i++)
-			val[i] = jval[i];
-		/*jval.get_to<T>(val[i]);*/
-	}
-}
-
 void from_json(const json& j, CfgWeapon& val)
 {
 	from_json(j, "Enabled", val.enabled);
 	from_json(j, "Fov", val.fov);
 	from_json(j, "Smooth", val.smooth);
+	from_json(j, "Skill", val.skill);
 	from_json(j, "Smooth mode", val.smoothMode);
 	from_json(j, "Randomization", val.randomization);
 	from_json(j, "Randomization Ratio", val.randomizationRatio);
@@ -46,6 +32,7 @@ void to_json(json& j, const CfgWeapon& val)
 	j["Enabled"] = val.enabled;
 	j["Fov"] = val.fov;
 	j["Smooth"] = val.smooth;
+	j["Skill"] = val.skill;
 	j["Smooth mode"] = val.smoothMode;
 	j["Randomization"] = val.randomization;
 	j["Randomization Ratio"] = val.randomizationRatio;

@@ -27,7 +27,7 @@ Resource::Resource(const std::string& path)
 	m_buffer = stbi_load(path.c_str(), &m_width, &m_height, nullptr, 4);
 	if (!m_buffer)
 	{
-		LOG_ERR(XOR("Creating resource from path failed, reason: {}"), stbi_failure_reason());
+		console::error("Creating resource from path failed, reason: {}", stbi_failure_reason());
 		return;
 	}
 	m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
@@ -36,18 +36,18 @@ Resource::Resource(const std::string& path)
 
 	m_resBuf.push_back(*this);
 
-	LOG_INFO(XOR("Image with path {} loaded!"), path);
+	console::info("Image with path {} loaded!", path);
 }
 
 Resource::Resource(int resID, const std::string_view type)
 {
 	HRSRC hResInfo = LI_FN_CACHED(FindResourceA)(globals::instance, MAKEINTRESOURCEA(resID), type.data());
 	if (!hResInfo)
-		throw std::runtime_error(XOR("Recource could not be found"));
+		throw std::runtime_error("Recource could not be found");
 
 	HGLOBAL hResData = LI_FN_CACHED(LoadResource)(globals::instance, hResInfo);
 	if(!hResData)
-		throw std::runtime_error(XOR("Recource data could not be found"));
+		throw std::runtime_error("Recource data could not be found");
 
 	unsigned char* hResPtr = reinterpret_cast<unsigned char*>(LI_FN_CACHED(LockResource)(hResData));
 	size_t size = LI_FN_CACHED(SizeofResource)(globals::instance, hResInfo);
@@ -56,7 +56,7 @@ Resource::Resource(int resID, const std::string_view type)
 	m_buffer = stbi_load_from_memory(hResPtr, size, &m_width, &m_height, nullptr, 4);
 	if (!m_buffer)
 	{
-		LOG_ERR(XOR("Creating resource from resources file failed, reason: {}"), stbi_failure_reason());
+		console::error("Creating resource from resources file failed, reason: {}", stbi_failure_reason());
 		return;
 	}
 	m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
@@ -66,7 +66,7 @@ Resource::Resource(int resID, const std::string_view type)
 
 	m_resBuf.push_back(*this);
 
-	LOG_INFO(XOR("Resource ID {}:{} image loaded!"), resID, type);
+	console::info("Resource ID {}:{} image loaded!", resID, type);
 }
 
 Resource::Resource(void* data, size_t size)
@@ -75,7 +75,7 @@ Resource::Resource(void* data, size_t size)
 	m_buffer = stbi_load_from_memory(reinterpret_cast<unsigned char*>(data), size, &m_width, &m_height, nullptr, 4);
 	if (!m_buffer)
 	{
-		LOG_ERR(XOR("Creating resource from memory failed, reason: {}"), stbi_failure_reason());
+		console::error("Creating resource from memory failed, reason: {}", stbi_failure_reason());
 		return;
 	}
 	m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
@@ -83,7 +83,7 @@ Resource::Resource(void* data, size_t size)
 
 	m_resBuf.push_back(*this);
 
-	LOG_INFO(XOR("Image from memory loaded!"));
+	console::info("Image from memory loaded!");
 }
 
 void Resource::destroyAll()

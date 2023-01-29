@@ -27,7 +27,7 @@ void to_json(json& j, const Blacklist::BlacklistedPlayer& val)
 
 void Blacklist::init()
 {
-	m_folderName = XOR("blacklist");
+	m_folderName = "blacklist";
 	m_saveDir = config.getHackPath() / config.getExtraLoadPath() / m_folderName / getPathForConfig();
 
 	loadCfg();
@@ -98,7 +98,7 @@ bool Blacklist::saveCfg()
 void Blacklist::shutdown()
 {
 	if (!saveCfg())
-		LOG_ERR(XOR("Saving config has failed"));
+		console::error("Saving config has failed");
 }
 
 bool Blacklist::isBlacklisted(Player_t* ent) const
@@ -124,7 +124,7 @@ void Blacklist::add(Player_t* ent)
 		m_json.update(j);
 	}
 	else
-		LOG_WARN(XOR("Player already blacklisted! guid: {} isBot {}"), guid.m_guid, guid.m_bot);
+		console::warn("Player already blacklisted! guid: {} isBot {}", guid.m_guid, guid.m_bot);
 }
 
 void Blacklist::remove(Player_t* ent)
@@ -146,8 +146,8 @@ void Blacklist::remove(Player_t* ent)
 std::filesystem::path Blacklist::getPathForConfig() const
 {
 	std::filesystem::path path(m_folderName);
-	if (path.extension() != XOR(".json"))
-		path.replace_extension(XOR(".json"));
+	if (path.extension() != ".json")
+		path.replace_extension(".json");
 
 	return path;
 }
@@ -155,8 +155,8 @@ std::filesystem::path Blacklist::getPathForConfig() const
 std::string Blacklist::getCorrectKey(const BlacklistedPlayer& player) const
 {
 	auto key = player.m_bot
-		? FORMAT(XOR("{} BOT"), player.m_guid)
-		: FORMAT(XOR("{}"), player.m_guid);
+		? std::format("{} BOT", player.m_guid)
+		: std::format("{}", player.m_guid);
 
 	return key;
 }

@@ -93,10 +93,10 @@ void SoundDraw::draw()
 		{
 			std::string_view place = m_bestStep.m_player->m_szLastPlaceName();
 			if (place.empty())
-				place = XOR("Unknown");
-			std::string nameText = FORMAT(XOR("{} -> {} [{:.1f}m]"), m_bestStep.m_player->getName(),
+				place = "Unknown";
+			std::string nameText = std::format("{} -> {} [{:.1f}m]", m_bestStep.m_player->getName(),
 				place, game::localPlayer->absOrigin().distToMeters(m_bestStep.m_pos));
-			std::string timeText = FORMAT(XOR("Time left {:.1f}s"), m_bestStep.m_timeToPrint);
+			std::string timeText = std::format("Time left {:.1f}s", m_bestStep.m_timeToPrint);
 
 			x = globals::screenX / 2.5f;
 

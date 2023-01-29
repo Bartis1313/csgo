@@ -43,30 +43,30 @@ void Projectiles::draw()
 		{
 		case WEAPON_FLASHBANG:
 		{
-			nades = { XOR("FLASHBANG"), vars::visuals->world->projectiles->flash() };
+			nades = { "FLASHBANG", vars::visuals->world->projectiles->flash() };
 			break;
 		}
 		case WEAPON_HEGRENADE:
 		{
 			if (wpn->m_nExplodeEffectTickBegin() < 1) // prevent too long time
-				nades = { XOR("GRENADE"), vars::visuals->world->projectiles->nade() };
+				nades = { "GRENADE", vars::visuals->world->projectiles->nade() };
 			break;
 		}
 		case WEAPON_MOLOTOV:
 		case WEAPON_INCGRENADE:
 		{
-			nades = { XOR("FIRE"), vars::visuals->world->projectiles->molotov() };
+			nades = { "FIRE", vars::visuals->world->projectiles->molotov() };
 			break;
 		}
 		case WEAPON_SMOKEGRENADE:
 		{
 			if (!reinterpret_cast<Smoke_t*>(wpn)->m_nSmokeEffectTickBegin()) // prevent too long time
-				nades = { XOR("SMOKE"), vars::visuals->world->projectiles->smoke() };
+				nades = { "SMOKE", vars::visuals->world->projectiles->smoke() };
 			break;
 		}
 		case WEAPON_DECOY:
 		{
-			nades = { XOR("DECOY"), vars::visuals->world->projectiles->decoy() }; // this nade time is also too long, check velocity if it's very low
+			nades = { "DECOY", vars::visuals->world->projectiles->decoy() }; // this nade time is also too long, check velocity if it's very low
 			break;
 		}
 		case WEAPON_NONE: // understand as NADE_NONE

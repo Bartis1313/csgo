@@ -67,7 +67,7 @@ void Radar::manuallyInitPos()
 	if (!game::isAvailable())
 		return;
 
-	const auto map = Memory::Address<MapStruct*>{ game::findHudElement(XOR("CCSGO_MapOverview")) }.sub(0x14);
+	const auto map = memory::Address<MapStruct*>{ game::findHudElement("CCSGO_MapOverview") }.sub(0x14);
 	m_pos = map->m_origin;
 	m_scale = map->m_scale;
 
@@ -85,7 +85,7 @@ bool Radar::manuallyInitTexture()
 	if (auto place = levelName.rfind('/'); place != std::string::npos)
 		levelName = levelName.substr(place + 1, levelName.size());
 
-	std::string path = FORMAT(XOR("csgo\\resource\\overviews\\{}_radar.dds"), levelName);
+	std::string path = std::format("csgo\\resource\\overviews\\{}_radar.dds", levelName);
 
 	// prob not supported format
 	/*Resource res{ path };
@@ -95,10 +95,10 @@ bool Radar::manuallyInitTexture()
 		return false;*/
 
 	if (auto hr = D3DXCreateTextureFromFileA(memory::interfaces::dx9Device(), path.c_str(), &m_mapTexture); hr == D3D_OK)
-		LOG_INFO(XOR("Created map texture from path: {}"), path);
+		console::info("Created map texture from path: {}", path);
 	else
 	{
-		LOG_ERR(XOR("Creating map texture from path failed, code: {}"), hr);
+		console::error("Creating map texture from path failed, code: {}", hr);
 		return false;
 	}
 
@@ -153,7 +153,7 @@ void Radar::draw()
 
 	float size = vars::misc->radar->size;
 	ImGui::SetNextWindowSize({ size, size });
-	if (ImGui::Begin(XOR("Radar"), &vars::misc->radar->enabled, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+	if (ImGui::Begin("Radar", &vars::misc->radar->enabled, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
 	{
 		const auto windowList = ImGui::GetWindowDrawList();
 		const auto windowPos = ImGui::GetWindowPos();

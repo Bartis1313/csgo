@@ -15,7 +15,7 @@ extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT message, WPARAM wp
 
 void wndProcSys::init()
 {
-	currentWindow = LI_FN_CACHED(FindWindowA)(XOR("Valve001"), NULL);
+	currentWindow = LI_FN_CACHED(FindWindowA)("Valve001", NULL);
 	wndProcOriginal = reinterpret_cast<WNDPROC>(LI_FN(SetWindowLongW)(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(wndProcSys::wndproc)));
 }
 
@@ -38,7 +38,7 @@ LRESULT wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpara
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(hwnd);
 
-		LOG_INFO(XOR("init for wndProc success"));
+		console::info("init for wndProc success");
 
 		return true;
 	} ();

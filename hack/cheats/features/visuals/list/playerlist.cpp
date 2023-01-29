@@ -39,16 +39,16 @@ void PlayerList::draw()
 		return;
 
 	// ImGui demo: Tables/Borders
-	if (ImGui::Begin(XOR("PlayerList"), &vars::misc->playerList->enabled))
+	if (ImGui::Begin("PlayerList", &vars::misc->playerList->enabled))
 	{
 		static std::array tableNames
 		{
-			TableStruct{ XOR("Name"), ImGuiTableColumnFlags_NoHide },
-			TableStruct{ XOR("Health"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->health },
-			TableStruct{ XOR("Money"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->money },
-			TableStruct{ XOR("Team"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->teamID },
-			TableStruct{ XOR("Place"), ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->lastPlace },
-			TableStruct{ XOR("Blacklist"), ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize }
+			TableStruct{ "Name", ImGuiTableColumnFlags_NoHide },
+			TableStruct{ "Health", ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->health },
+			TableStruct{ "Money", ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->money },
+			TableStruct{ "Team", ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->teamID },
+			TableStruct{ "Place", ImGuiTableColumnFlags_WidthFixed, &vars::misc->playerList->lastPlace },
+			TableStruct{ "Blacklist", ImGuiTableColumnFlags_WidthFixed | ImGuiTableColumnFlags_NoResize }
 		};
 
 		if (ImGui::BeginTable("", tableNames.size(),
@@ -112,25 +112,25 @@ void PlayerList::draw()
 					std::memcpy(&color, Color::healthBased(health).data(), 4 * sizeof(float));
 
 					ImGui::PushStyleColor(ImGuiCol_Text, color);
-					std::string text = health == 0 ? XOR("DEAD") : FORMAT(XOR("{}"), health);
+					std::string text = health == 0 ? "DEAD" : std::format("{}", health);
 					ImGui::TextUnformatted(text.c_str());
 					ImGui::PopStyleColor();
 
 					if (health)
 					{
 						ImGui::SameLine();
-						ImGui::TextUnformatted(XOR("HP"));
+						ImGui::TextUnformatted("HP");
 					}
 				}
 
 				if (ImGui::TableNextColumn())
 				{
-					ImGui::TextUnformatted(FORMAT(XOR("{}$"), ent->m_iAccount()).c_str());
+					ImGui::TextUnformatted(std::format("{}$", ent->m_iAccount()).c_str());
 				}
 
 				if (ImGui::TableNextColumn())
 				{
-					ImGui::TextUnformatted(FORMAT(XOR("{} ({})"), ent->m_iTeamNum(),
+					ImGui::TextUnformatted(std::format("{} ({})", ent->m_iTeamNum(),
 						magic_enum::enum_names<TeamID>().at(ent->m_iTeamNum())).c_str());
 				}
 
@@ -144,8 +144,8 @@ void PlayerList::draw()
 					enum class BlacklistAction { ADD, REMOVE };
 
 					const auto blacklist = !g_Blacklist->isBlacklisted(ent)
-						? std::make_pair(FORMAT(XOR("Add##{}"), idx), BlacklistAction::ADD)
-						: std::make_pair(FORMAT(XOR("Delete##{}"), idx), BlacklistAction::REMOVE);
+						? std::make_pair(std::format("Add##{}", idx), BlacklistAction::ADD)
+						: std::make_pair(std::format("Delete##{}", idx), BlacklistAction::REMOVE);
 
 					const auto [title, isOn] = blacklist;
 

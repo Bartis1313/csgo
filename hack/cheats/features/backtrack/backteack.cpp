@@ -20,14 +20,14 @@
 
 void Backtrack::init()
 {
-	cvars.updateRate = memory::interfaces::cvar->findVar(XOR("cl_updaterate"));
-	cvars.maxUpdateRate = memory::interfaces::cvar->findVar(XOR("sv_maxupdaterate"));
+	cvars.updateRate = memory::interfaces::cvar->findVar("cl_updaterate");
+	cvars.maxUpdateRate = memory::interfaces::cvar->findVar("sv_maxupdaterate");
 
-	cvarsRatios.interp = memory::interfaces::cvar->findVar(XOR("cl_interp"))->getFloat();
-	cvarsRatios.interpRatio = memory::interfaces::cvar->findVar(XOR("cl_interp_ratio"))->getFloat();
-	cvarsRatios.minInterpRatio = memory::interfaces::cvar->findVar(XOR("sv_client_min_interp_ratio"))->getFloat();
-	cvarsRatios.maxInterpRatio = memory::interfaces::cvar->findVar(XOR("sv_client_max_interp_ratio"))->getFloat();
-	cvarsRatios.maxUnlag = memory::interfaces::cvar->findVar(XOR("sv_maxunlag"))->getFloat();
+	cvarsRatios.interp = memory::interfaces::cvar->findVar("cl_interp")->getFloat();
+	cvarsRatios.interpRatio = memory::interfaces::cvar->findVar("cl_interp_ratio")->getFloat();
+	cvarsRatios.minInterpRatio = memory::interfaces::cvar->findVar("sv_client_min_interp_ratio")->getFloat();
+	cvarsRatios.maxInterpRatio = memory::interfaces::cvar->findVar("sv_client_max_interp_ratio")->getFloat();
+	cvarsRatios.maxUnlag = memory::interfaces::cvar->findVar("sv_maxunlag")->getFloat();
 };
 
 float Backtrack::getLerp() const

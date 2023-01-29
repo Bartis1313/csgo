@@ -1,6 +1,5 @@
 {
   "dependencies": [
-    "xorstr",
     "lazy-importer",
     "minhook",
     "nlohmann-json",

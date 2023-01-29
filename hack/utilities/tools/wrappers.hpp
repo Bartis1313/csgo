@@ -27,10 +27,3 @@ template<typename T>
 {
     return hasher(str);
 }
-
-// format string at runtime
-template<typename... Args_t>
-[[nodiscard]] inline constexpr std::string FORMAT(const std::string_view fmt, Args_t&&... args)
-{
-    return std::vformat(fmt, std::make_format_args(args...));
-}

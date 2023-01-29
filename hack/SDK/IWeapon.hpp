@@ -19,7 +19,10 @@ public:
 	PAD(4);
 	int m_price;
 	int m_priceKKillAward;
-	PAD(20);
+	PAD(4);
+	float m_cycleTime;
+	float m_cycleTimeAlt;
+	PAD(8);
 	bool isFullAuto;
 	PAD(3);
 	int m_damage;

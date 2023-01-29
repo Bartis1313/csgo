@@ -29,9 +29,9 @@ hooks::unknownFileSystem::value FASTCALL hooks::unknownFileSystem::hooked(FAST_A
 		radar.m_mapTexture = res.getTexture();*/
 
 		if (auto hr = D3DXCreateTextureFromFileInMemory(memory::interfaces::dx9Device(), image, size, &g_Radar->getTexture()); hr == D3D_OK)
-			LOG_INFO(XOR("Created map texture, size: {}"), size);
+			console::info("Created map texture, size: {}", size);
 		else
-			LOG_ERR(XOR("Creating map texture failed, code: {}"), hr);
+			console::error("Creating map texture failed, code: {}", hr);
 	}
 
 	return original(thisptr, image);

@@ -78,7 +78,7 @@ hooks::customVirtualQuerry::value WINAPI hooks::customVirtualQuerry::hooked(HAND
 		lpBuffer->Protect &= ~PAGE_EXECUTE;
 		lpBuffer->Protect |= PAGE_NOACCESS;
 
-		LOG_DEBUG(XOR("lpBuffer->Protect = {} now {}"), before, lpBuffer->Protect);
+		console::debug("lpBuffer->Protect = {} now {}", before, lpBuffer->Protect);
 	}
 	return originalRes;
 }

@@ -25,6 +25,7 @@ public:
 	bool enabled = false;
 	float fov = 5.0f;
 	float smooth = 0.5f;
+	float skill = 0.5f;
 	bool randomization = false;
 	float randomizationRatio = smooth / 5.0f;
 	int smoothMode = static_cast<int>(SmoothMode::LINEAR);

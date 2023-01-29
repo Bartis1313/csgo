@@ -39,11 +39,11 @@ unsigned long SurfaceRender::__createFont(const char* fontName, const int size, 
 
 void SurfaceRender::init()
 {
-	fonts::tahoma = __createFont(XOR("Tahoma"), 14, 800, FONTFLAG_OUTLINE);
-	fonts::franklinGothic = __createFont(XOR("Franklin Gothic"), 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
-	fonts::verdana = __createFont(XOR("Verdana"), 12, 350, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+	fonts::tahoma = __createFont("Tahoma", 14, 800, FONTFLAG_OUTLINE);
+	fonts::franklinGothic = __createFont("Franklin Gothic", 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
+	fonts::verdana = __createFont("Verdana", 12, 350, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 
-	LOG_INFO(XOR("render init success"));
+	console::info("render init success");
 }
 
 void SurfaceRender::drawLine(const int x, const int y, const int x2, const int y2, const Color& color)
@@ -445,7 +445,7 @@ void SurfaceRender::initNewTexture(int& id, Color* RGBA, const int w, const int 
 	if (id)
 		memory::interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
-		throw std::runtime_error(FORMAT(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
+		throw std::runtime_error(std::format("setTextureRGBA failed to create new texture, ID was: {}", id));
 }
 void SurfaceRender::initNewTexture(int& id, unsigned char* RGBA, const int w, const int h)
 {
@@ -453,7 +453,7 @@ void SurfaceRender::initNewTexture(int& id, unsigned char* RGBA, const int w, co
 	if (id)
 		memory::interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
-		throw std::runtime_error(FORMAT(XOR("setTextureRGBA failed to create new texture, ID was: {}"), id));
+		throw std::runtime_error(std::format("setTextureRGBA failed to create new texture, ID was: {}", id));
 }
 
 void SurfaceRender::drawImage(const Resource& res, const int x, const int y, const int w, const int h, const Color& color)
@@ -538,11 +538,11 @@ void ImGuiRender::init(ImGuiIO& io)
 		textBuilder.AddRanges(io.Fonts->GetGlyphRangesDefault());
 		textBuilder.BuildRanges(&range);
 
-		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 14.0f, &cfg, textRanges);
-		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("tahoma.ttf") }.string().c_str(), 20.0f, &cfg, textRanges);
-		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 12.0f, &cfg, textRanges);
-		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("framd.ttf") }.string().c_str(), 30.0f, &cfg, textRanges);
-		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / XOR("Verdana.ttf") }.string().c_str(), 12.0f, &cfg, textRanges);
+		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "tahoma.ttf" }.string().c_str(), 14.0f, &cfg, textRanges);
+		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "tahoma.ttf" }.string().c_str(), 20.0f, &cfg, textRanges);
+		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "framd.ttf" }.string().c_str(), 12.0f, &cfg, textRanges);
+		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "framd.ttf" }.string().c_str(), 30.0f, &cfg, textRanges);
+		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "Verdana.ttf" }.string().c_str(), 12.0f, &cfg, textRanges);
 
 		constexpr ImWchar ranges[] =
 		{
@@ -552,12 +552,12 @@ void ImGuiRender::init(ImGuiIO& io)
 		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 80.0f, &cfg, ranges);
 
 		if (!ImGuiFreeType::BuildFontAtlas(io.Fonts))
-			throw std::runtime_error(XOR("ImGuiFreeType::BuildFontAtlas returned false"));
+			throw std::runtime_error("ImGuiFreeType::BuildFontAtlas returned false");
 	}
 	else
-		throw std::runtime_error(XOR("could not reach windows path"));
+		throw std::runtime_error("could not reach windows path");
 
-	LOG_INFO(XOR("init imgui fonts success"));
+	console::info("init imgui fonts success");
 }
 
 void ImGuiRender::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)

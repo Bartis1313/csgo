@@ -10,7 +10,7 @@
 
 void FakeLatency::init()
 {
-	maxUnlag = memory::interfaces::cvar->findVar(XOR("sv_maxunlag"));
+	maxUnlag = memory::interfaces::cvar->findVar("sv_maxunlag");
 }
 
 int FakeLatency::runDatagram(INetChannel* netChannel, void* datagram)

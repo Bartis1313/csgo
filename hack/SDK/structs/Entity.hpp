@@ -50,7 +50,7 @@ public:
 	NETVAR(bool, m_bSpotted, "DT_BaseEntity", "m_bSpotted");
 	NETVAR(float, m_flSimulationTime, "DT_BasePlayer", "m_flSimulationTime");
 	NETVAR(float, m_flMaxspeed, "DT_BasePlayer", "m_flMaxspeed");
-	NETVAR_ADDR(int, m_nRenderMode, "DT_BasePlayer", "m_nRenderMode", 0x1);
+	NETVAR_ADDR(int, m_MoveType, "DT_BasePlayer", "m_nRenderMode", 0x1);
 	NETVAR(Vec3, m_vecMins, "DT_BaseEntity", "m_vecMins");
 	NETVAR(Vec3, m_vecMaxs, "DT_BaseEntity", "m_vecMaxs");
 	NETVAR(int, moveparent, "DT_BaseEntity", "moveparent");

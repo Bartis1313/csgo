@@ -158,7 +158,7 @@ void GrenadePrediction::draw()
 			float dmgDealt = ent->m_iHealth() - resultDmg;
 			if (ImVec2 pos; imRender.worldToScreen(ent->absOrigin(), pos))
 			{
-				std::string text = dmgDealt < 0.0f ? XOR("DIE") : FORMAT(XOR("{:.2f}"), -resultDmg);
+				std::string text = dmgDealt < 0.0f ? "DIE" : std::format("{:.2f}", -resultDmg);
 				nadesDmg.emplace_back(pos, text, Color::healthBased(static_cast<uint8_t>(dmgDealt)));
 			}
 		}
@@ -168,7 +168,7 @@ void GrenadePrediction::draw()
 				continue;
 
 			if (ImVec2 pos; imRender.worldToScreen(ent->absOrigin(), pos))
-				nadesDmg.emplace_back(pos, XOR("In range"), Colors::LightBlue);
+				nadesDmg.emplace_back(pos, "In range", Colors::LightBlue);
 		}
 	}
 
@@ -316,8 +316,8 @@ bool GrenadePrediction::checkDetonate(const Vec3& vecThrow, const Trace_t& tr, i
 	case WEAPON_MOLOTOV:
 	case WEAPON_INCGRENADE:
 	{
-		const static float molotov_throw_detonate_time = memory::interfaces::cvar->findVar(XOR("molotov_throw_detonate_time"))->getFloat();
-		const static float weapon_molotov_maxdetonateslope = memory::interfaces::cvar->findVar(XOR("weapon_molotov_maxdetonateslope"))->getFloat();
+		const static float molotov_throw_detonate_time = memory::interfaces::cvar->findVar("molotov_throw_detonate_time")->getFloat();
+		const static float weapon_molotov_maxdetonateslope = memory::interfaces::cvar->findVar("weapon_molotov_maxdetonateslope")->getFloat();
 
 		if (tr.didHit() && tr.m_plane.m_normal[Coord::Z] >= std::cos(math::DEG2RAD(weapon_molotov_maxdetonateslope)))
 			return true;
@@ -353,7 +353,7 @@ void GrenadePrediction::addGravityMove(Vec3& move, Vec3& vel, float frametime)
 	move[Coord::X] = vel[Coord::X] * frametime;
 	move[Coord::Y] = vel[Coord::Y] * frametime;
 
-	const static float svgrav = memory::interfaces::cvar->findVar(XOR("sv_gravity"))->getFloat();
+	const static float svgrav = memory::interfaces::cvar->findVar("sv_gravity")->getFloat();
 	float gravity = svgrav * 0.4f;
 	float z = vel[Coord::Z] - (gravity * frametime);
 	move[Coord::Z] = ((vel[Coord::Z] + z) / 2.0f) * frametime;

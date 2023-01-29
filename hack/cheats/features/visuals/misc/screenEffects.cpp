@@ -38,7 +38,7 @@ void ScreenEffects::run()
 	material->colorModulate(color); // -> works for night vision
 
 	static bool found = false;
-	auto var = material->findVar(XOR("$c0_x"), &found);
+	auto var = material->findVar("$c0_x", &found);
 	if(found)
 		var->setValue(vars::visuals->world->screenEffect->param);
 

@@ -99,21 +99,21 @@ std::string NetvarManager::getType(RecvProp* recvTable) const
 {
 	static std::unordered_map<SendPropType, std::string> props =
 	{
-		{ SendPropType::DPT_INT, XOR("int")},
-		{ SendPropType::DPT_FLOAT, XOR("float")},
-		{ SendPropType::DPT_VECTOR, XOR("Vec3")},
-		{ SendPropType::DPT_VECTOR2D, XOR("Vec2")},
-		{ SendPropType::DPT_STRING, XOR("char")},
-		{ SendPropType::DPT_ARRAY, XOR("array")},
-		{ SendPropType::DPT_DATATABLE, XOR("datatable (void*)")},
-		{ SendPropType::DPT_INT64, XOR("__int64")},
+		{ SendPropType::DPT_INT, "int"},
+		{ SendPropType::DPT_FLOAT, "float"},
+		{ SendPropType::DPT_VECTOR, "Vec3"},
+		{ SendPropType::DPT_VECTOR2D, "Vec2"},
+		{ SendPropType::DPT_STRING, "char"},
+		{ SendPropType::DPT_ARRAY, "array"},
+		{ SendPropType::DPT_DATATABLE, "datatable (void*)"},
+		{ SendPropType::DPT_INT64, "__int64"},
 	};
 
 	// buffers
 	if (auto type = recvTable->m_recvType; type == DPT_STRING)
-		return FORMAT(XOR("{}[{}]"), props.at(recvTable->m_recvType), recvTable->m_stringBufferSize);
+		return std::format("{}[{}]", props.at(recvTable->m_recvType), recvTable->m_stringBufferSize);
 	else if(type == DPT_ARRAY)
-		return FORMAT(XOR("{}[{}]"), props.at(recvTable->m_recvType), recvTable->m_elements);
+		return std::format("{}[{}]", props.at(recvTable->m_recvType), recvTable->m_elements);
 
 	return props.at(recvTable->m_recvType);
 }
@@ -129,13 +129,13 @@ void NetvarManager::dump(RecvTable* recvTable)
 
 		std::string_view recvName = recvProp->m_varName;
 
-		if (recvName.find(XOR("baseclass")) != std::string::npos)
+		if (recvName.find("baseclass") != std::string::npos)
 			continue;
 
 		if (::isdigit(recvProp->m_varName[0]))
 			continue;
 
-		file << FORMAT(XOR("[{}::{}] -> 0x{:X} -> ({})"),
+		file << std::format("[{}::{}] -> 0x{:X} -> ({})",
 			recvTable->m_netTableName,
 			recvName, recvProp->m_offset,
 			getType(recvProp))
@@ -182,8 +182,8 @@ uintptr_t NetvarManager::getDataMap(DataMap_t* map, const std::string_view name)
 
 void NetvarManager::dump()
 {
-	file = std::ofstream{ config.getHackPath() / XOR("netvarsDump.txt") };
-	file << FORMAT(XOR("Netvars from: {}"), utilities::getTime()) << "\n\n";
+	file = std::ofstream{ config.getHackPath() / "netvarsDump.txt" };
+	file << std::format("Netvars from: {}", utilities::getTime()) << "\n\n";
 
 	TimeCount timer{};
 	auto client = memory::interfaces::client->getAllClasses();
@@ -194,7 +194,7 @@ void NetvarManager::dump()
 	} while (client);
 	timer.end();
 
-	file << '\n' << FORMAT(XOR("Finished in {:.2f} secs"), timer.getTime());
+	file << '\n' << std::format("Finished in {:.2f} secs", timer.getTime());
 
 	file.close();
 }

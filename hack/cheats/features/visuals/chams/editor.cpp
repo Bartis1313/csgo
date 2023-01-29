@@ -57,7 +57,7 @@ void MaterialEditor::draw()
 		static size_t index = m_oldIndex;
 		static Mat_t material = getMaterialIndexed(index).value_or(Mat_t{});
 		{
-			ImGui::BeginChild(XOR("left pane"), ImVec2{ 150.0f, 0.0f }, true);
+			ImGui::BeginChild("left pane", ImVec2{ 150.0f, 0.0f }, true);
 
 			for (auto i : std::views::iota(m_oldIndex, g_Chams->m_materials.size()))
 			{
@@ -75,23 +75,23 @@ void MaterialEditor::draw()
 		ImGui::SameLine();
 
 
-		ImGui::BeginChild(XOR("Materials view"));
+		ImGui::BeginChild("Materials view");
 
 		if (g_Chams->m_materials.size() > m_oldIndex)
-			ImGui::TextUnformatted(FORMAT(XOR("{}"), g_Chams->m_materials.at(index).data.name).c_str());
+			ImGui::TextUnformatted(std::format("{}", g_Chams->m_materials.at(index).data.name).c_str());
 		else
-			ImGui::TextUnformatted(XOR("No materials yet, add one!"));
+			ImGui::TextUnformatted("No materials yet, add one!");
 		ImGui::Separator();
 
-		ImGui::TextUnformatted(XOR("Strategy"));
-		ImGui::RadioButton(XOR("Buffer"), reinterpret_cast<int*>(material.strategy), 0);
+		ImGui::TextUnformatted("Strategy");
+		ImGui::RadioButton("Buffer", reinterpret_cast<int*>(material.strategy), 0);
 		ImGui::SameLine();
-		ImGui::RadioButton(XOR("From String"), reinterpret_cast<int*>(material.strategy), 1);
-		ImGui::InputText(XOR("Name"), &material.data.name);
-		ImGui::InputText(XOR("Key"), &material.data.key);
-		ImGui::Animations::Combo(XOR("Style"), reinterpret_cast<int*>(&material.type), magic_enum::enum_names_pretty<Mat_t::ExtraType>());
+		ImGui::RadioButton("From String", reinterpret_cast<int*>(material.strategy), 1);
+		ImGui::InputText("Name", &material.data.name);
+		ImGui::InputText("Key", &material.data.key);
+		ImGui::Animations::Combo("Style", reinterpret_cast<int*>(&material.type), magic_enum::enum_names_pretty<Mat_t::ExtraType>());
 
-		if (ImGui::Animations::Button(XOR("Delete")))
+		if (ImGui::Animations::Button("Delete"))
 		{
 			size_t elementsRemoved = std::erase_if(g_Chams->m_materials,
 				[this](const auto& m)
@@ -116,7 +116,7 @@ void MaterialEditor::draw()
 			}
 		}
 		ImGui::SameLine();
-		if (ImGui::Animations::Button(XOR("Add")))
+		if (ImGui::Animations::Button("Add"))
 		{
 			std::optional<Mat_t> mat;
 
@@ -145,7 +145,7 @@ void MaterialEditor::draw()
 			}
 		}
 		ImGui::SameLine();
-		if (ImGui::Animations::Button(XOR("Update")))
+		if (ImGui::Animations::Button("Update"))
 		{
 			if (const auto itr = std::ranges::find_if(g_Chams->m_materials,
 				[=](const auto& m)
@@ -168,7 +168,7 @@ void MaterialEditor::draw()
 			}
 		}
 
-		m_ImEditor.Render(XOR("Editor##mat"));
+		m_ImEditor.Render("Editor##mat");
 
 		ImGui::EndChild();
 
@@ -178,7 +178,7 @@ void MaterialEditor::draw()
 
 void MaterialEditor::initEditor()
 {
-	m_folderName = XOR("materials");
+	m_folderName = "materials";
 	m_saveDir = config.getHackPath() / config.getExtraLoadPath() / m_folderName / getPathForConfig();
 
 	m_oldIndex = g_Chams->m_materials.size();
@@ -235,8 +235,8 @@ bool MaterialEditor::saveCfg()
 std::filesystem::path MaterialEditor::getPathForConfig() const
 {
 	std::filesystem::path path(m_folderName);
-	if (path.extension() != XOR(".json"))
-		path.replace_extension(XOR(".json"));
+	if (path.extension() != ".json")
+		path.replace_extension(".json");
 
 	return path;
 }

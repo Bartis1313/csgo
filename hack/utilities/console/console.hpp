@@ -21,6 +21,14 @@ namespace console
 	void shutdown();
 	template<typename... Args_t>
 	inline void log(TypeLogs type, const std::string_view fmt, Args_t&&... args);
+	template<typename... Args_t>
+	inline void error(const std::string_view fmt, Args_t&&... args) { log(TypeLogs::LOG_ERR, fmt, args...); }
+	template<typename... Args_t>
+	inline void warn(const std::string_view fmt, Args_t&&... args) { log(TypeLogs::LOG_WARN, fmt, args...); }
+	template<typename... Args_t>
+	inline void info(const std::string_view fmt, Args_t&&... args) { log(TypeLogs::LOG_INFO, fmt, args...); }
+	template<typename... Args_t>
+	inline void debug(const std::string_view fmt, Args_t&&... args) { log(TypeLogs::LOG_DEBUG, fmt, args...); }
 
 	namespace detail
 	{
@@ -92,8 +100,3 @@ inline void console::log(TypeLogs type, const std::string_view fmt, Args_t&&... 
 
 	detail::addLogToStream(type, buffer);
 }
-
-#define LOG_INFO(fmt, ...) console::log(TypeLogs::LOG_INFO, fmt, __VA_ARGS__)
-#define LOG_ERR(fmt, ...) console::log(TypeLogs::LOG_ERR, fmt, __VA_ARGS__)
-#define LOG_WARN(fmt, ...) console::log(TypeLogs::LOG_WARN, fmt, __VA_ARGS__)
-#define LOG_DEBUG(fmt, ...) console::log(TypeLogs::LOG_DEBUG, fmt, __VA_ARGS__)

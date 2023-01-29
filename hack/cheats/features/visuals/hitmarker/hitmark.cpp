@@ -23,7 +23,7 @@
 // retaddr to check 84 C0 74 34 8B 4D 08 8B 01 
 void Hitmarker::init()
 {
-	events::add(XOR("player_hurt"), std::bind(&Hitmarker::handleHits, this, std::placeholders::_1));
+	events::add("player_hurt", std::bind(&Hitmarker::handleHits, this, std::placeholders::_1));
 }
 
 void Hitmarker::draw()
@@ -106,7 +106,7 @@ void Hitmarker::draw()
 		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
 		float Ycorrection = y - (correction * 4.0f); // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
 
-		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma14, FORMAT(XOR("{}"), el.m_dmg), false, actualColor, false);
+		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma14, std::format("{}", el.m_dmg), false, actualColor, false);
 
 		i++;
 	}
@@ -117,7 +117,7 @@ void Hitmarker::handleHits(IGameEvent* event)
 	if (!vars::misc->hitmarker->enabled)
 		return;
 
-	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("attacker"))));
+	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("attacker")));
 	if (!attacker)
 		return;
 
@@ -125,13 +125,13 @@ void Hitmarker::handleHits(IGameEvent* event)
 	if (attacker != game::localPlayer)
 		return;
 
-	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt(XOR("userid")))));
+	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("userid"))));
 	if (!ent) // should never happen
 		return;
 
-	auto dmg_health = event->getInt(XOR("dmg_health"));
+	auto dmg_health = event->getInt("dmg_health");
 	auto health = ent->m_iHealth() - dmg_health;
-	auto hitgroup = event->getInt(XOR("hitgroup"));
+	auto hitgroup = event->getInt("hitgroup");
 
 	Hitmark_t hit =
 	{
@@ -144,5 +144,5 @@ void Hitmarker::handleHits(IGameEvent* event)
 	m_hitmarkers.push_back(hit);
 
 	if (vars::misc->hitmarker->play)
-		memory::interfaces::surface->playSound(XOR("buttons\\arena_switch_press_02.wav"));
+		memory::interfaces::surface->playSound("buttons\\arena_switch_press_02.wav");
 }

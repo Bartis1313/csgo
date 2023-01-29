@@ -32,9 +32,9 @@ void ModulateColor::run(void* thisptr, float* r, float* g, float* b)
 
 	static std::unordered_map<std::string_view, CfgColor*> mapped =
 	{
-		{ XOR("World textures"), &vars::visuals->world->modulate->texture },
-		{ XOR("StaticProp textures"), &vars::visuals->world->modulate->prop },
-		{ XOR("SkyBox textures"), &vars::visuals->world->modulate->sky },
+		{ "World textures", &vars::visuals->world->modulate->texture },
+		{ "StaticProp textures", &vars::visuals->world->modulate->prop },
+		{ "SkyBox textures", &vars::visuals->world->modulate->sky },
 	};
 
 	bool goodMat = false;

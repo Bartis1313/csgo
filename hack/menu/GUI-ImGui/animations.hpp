@@ -74,7 +74,7 @@ namespace ImGui
 			t.end();
 		};
 
-		void Hotkey(const char* label, Key* key, bool useExtended = true, const ImVec2& size = { 0.0f, 0.0f });
+		bool Hotkey(const char* label, Key* key, bool useExtended = true, const ImVec2& size = { 0.0f, 0.0f });
 		bool Checkbox(const char* label, bool* v);
 		bool BeginCombo(const char* label, const char* preview_value, ImGuiComboFlags flags = 0);
 		bool Combo(const char* label, int* current_item, const char* const items[], int items_count, int height_in_items);

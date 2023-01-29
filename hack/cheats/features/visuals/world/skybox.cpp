@@ -44,7 +44,7 @@ void SkyboxEdit::run(int frame)
 	else
 	{
 		// restore the sky
-		const static auto oldSky = memory::interfaces::cvar->findVar(XOR("sv_skyname"));
+		const static auto oldSky = memory::interfaces::cvar->findVar("sv_skyname");
 		loadSkybox(oldSky->m_string);
 	}
 }
@@ -56,7 +56,7 @@ void SkyboxEdit::loadSkybox(const std::string& name)
 
 void SkyboxEdit::checkCustomSkybox()
 {
-	auto path = std::filesystem::current_path() / XOR("csgo") / XOR("materials") / XOR("skybox");
+	auto path = std::filesystem::current_path() / "csgo" / "materials" / "skybox";
 
 	if (!std::filesystem::exists(path))
 	{
@@ -70,12 +70,12 @@ void SkyboxEdit::checkCustomSkybox()
 void SkyboxEdit::reloadCustomSkyboxes()
 {
 	m_allCustomSkyboxes.clear();
-	m_allCustomSkyboxes.emplace_back(XOR("none"));
+	m_allCustomSkyboxes.emplace_back("none");
 	auto iterator = std::filesystem::directory_iterator(m_pathCustomSkybox);
 	for (const auto& entry : iterator)
 	{
 		if (std::string name = entry.path().filename().string();
-			entry.path().extension() == XOR(".vtf") && !name.empty())
+			entry.path().extension() == ".vtf" && !name.empty())
 		{
 			m_allCustomSkyboxes.push_back(name);
 		}

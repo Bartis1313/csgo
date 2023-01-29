@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cheats/classes/createMove.hpp>
+#include <cheats/classes/renderableToPresent.hpp>
 #include <SDK/math/Vector.hpp>
 #include <config/cfgWeapon.hpp>
 
@@ -19,6 +20,8 @@ struct AimbotTarget_t
 	size_t m_bestHitboxID;
 	Vec3 m_pos;
 };
+
+class AimDraw;
 
 class Aimbot : protected CreateMoveInPredictionType
 {
@@ -52,7 +55,8 @@ private:
 	CfgWeapon m_config;
 	int m_prevMouseDeltaX;
 	int m_prevMouseDeltaY;
-
+	// saving here so later can represent plot of smooth
+	float smoothFactor;
 	IConVar* m_scale = nullptr;
 
 	std::vector<AimbotTarget_t> m_targets;

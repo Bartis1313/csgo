@@ -16,7 +16,7 @@
 
 void RCS::init()
 {
-	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
 }
 
 void RCS::run(CUserCmd* cmd)
@@ -47,10 +47,10 @@ void RCS::prepare(CUserCmd* cmd)
 {
 	auto cfg = g_Aimbot->getCachedConfig();
 
-	static auto oldPunch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
-	if (cmd->m_buttons & IN_ATTACK)
+	static auto oldPunch = game::getFixedPunch() * m_scale->getFloat();
+	if (game::localPlayer()->m_iShotsFired() > 1 && cmd->m_buttons & IN_ATTACK)
 	{
-		auto punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
+		auto punch = game::getFixedPunch() * m_scale->getFloat();
 
 		punch[Coord::X] *= cfg.rcsX;
 		punch[Coord::Y] *= cfg.rcsY;
@@ -64,7 +64,7 @@ void RCS::prepare(CUserCmd* cmd)
 	}
 	else
 	{
-		auto punch = game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
+		auto punch = game::getFixedPunch() * m_scale->getFloat();
 		punch[Coord::X] *= cfg.rcsX;
 		punch[Coord::Y] *= cfg.rcsY;
 

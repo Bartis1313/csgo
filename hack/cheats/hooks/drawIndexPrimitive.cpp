@@ -4,12 +4,7 @@
 #include <SDK/structs/Entity.hpp>
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/IVEngineClient.hpp>
-#include <cheats/game/globals.hpp>
 #include <cheats/game/game.hpp>
-#include <SDK/material.hpp>
-
-#include <intrin.h>
-#include <Psapi.h>
 
 // not placed in SDK, unique use-case
 //struct MaterialEbp
@@ -65,30 +60,5 @@ static Player_t* getPlayer(void** data)
 hooks::drawIndexedPrimitive::value D3DAPI hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex,
 	UINT numVertices, UINT startIndex, UINT primCount)
 {
-	auto res = original(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);
-
-	void** data = nullptr;
-	__asm mov data, ebp
-
-	auto ent = getPlayer(data);
-	if (!ent)
-		return res;
-
-	if (!game::localPlayer)
-		return res;
-
-	if (ent == game::localPlayer)
-		return res;
-
-	if (!ent->isAlive())
-		return res;
-
-	if (ent->isOtherTeam(game::localPlayer()))
-	{
-		// draw here
-
-		// return true;
-	}
-
-	return res;
+	return original(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);
 }

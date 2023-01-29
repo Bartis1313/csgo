@@ -13,7 +13,7 @@
 // prop - prop name
 #define NETVAR(type, name, table, prop) \
 [[nodiscard]] std::add_lvalue_reference_t<type> name() { \
-	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
+	static uintptr_t offset = netvarMan.getNetvar(table, prop); \
 	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset ); \
 	}
 
@@ -24,7 +24,7 @@
 // prop - prop name
 #define PTRNETVAR(type, name, table, prop) \
 [[nodiscard]] std::add_pointer_t<type> name() { \
-	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
+	static uintptr_t offset = netvarMan.getNetvar(table, prop); \
 	return reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset); \
 	}
 
@@ -54,26 +54,26 @@
 // addr - extra offset to add
 #define NETVAR_ADDR(type, name, table, prop, addr) \
 [[nodiscard]] std::add_lvalue_reference_t<type> name() { \
-	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
+	static uintptr_t offset = netvarMan.getNetvar(table, prop); \
 	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset + addr); \
 	}
 
 
 #define PTRNETVAR_ADDR(type, name, table, prop, addr) \
 [[nodiscard]] std::add_pointer_t<type> name() { \
-	static uintptr_t offset = netvarMan.getNetvar(XOR(table), XOR(prop)); \
+	static uintptr_t offset = netvarMan.getNetvar(table, prop); \
 	return reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset + addr); \
 	}
 
 #define DATAMAP_FIELD(type, name, map, prop) \
 [[nodiscard]] std::add_lvalue_reference_t<type> name() { \
-	static uintptr_t offset = netvarMan.getDataMap(map, XOR(prop)); \
+	static uintptr_t offset = netvarMan.getDataMap(map, prop); \
 	return *reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset ); \
 	}
 
 #define PTRDATAMAP_FIELD(type, name, map, prop) \
 [[nodiscard]] std::add_pointer_t<type> name() { \
-	static uintptr_t offset = netvarMan.getDataMap(map, XOR(prop)); \
+	static uintptr_t offset = netvarMan.getDataMap(map, prop); \
 	return reinterpret_cast<std::add_pointer_t<type>>((uintptr_t)this + offset ); \
 	}
 

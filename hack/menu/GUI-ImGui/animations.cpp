@@ -286,22 +286,29 @@ void ImGui::Animations::RenderFrameBorderAlpha(ImVec2 p_min, ImVec2 p_max, float
 	}
 }
 
-void ImGui::Animations::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& size)
+// because some update made stack for those items kinda different, I will use own non api-like solution to solve this
+static std::unordered_map<ImGuiID, bool> stackHotkey;
+
+bool ImGui::Animations::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& size)
 {
 	ImGui::PushID(label);
 	if (std::strncmp(label, "##", 2))
 		ImGui::TextUnformatted(label, std::strstr(label, "##"));
 
 	ImGui::SameLine();
+	const auto id = ImGui::GetID(label);
 
-	if (const auto id = ImGui::GetID(label); ImGui::GetActiveID() == id)
+	bool isInHotkey = stackHotkey[id];
+
+	if (isInHotkey)
 	{
 		ImGui::Animations::Button("...", size);
-		ImGui::GetCurrentContext()->ActiveIdAllowOverlap = true;
+		ImGui::SetItemAllowOverlap();
 
-		if ((!ImGui::IsItemHovered() && ImGui::GetIO().MouseClicked[0]) || key->checkKey())
+		if (key->checkKey())
 		{
 			globals::isInHotkey = false;
+			stackHotkey[id] = false;
 			ImGui::ClearActiveID();
 		}
 
@@ -309,37 +316,38 @@ void ImGui::Animations::Hotkey(const char* label, Key* key, bool useExtended, co
 	else if (ImGui::Animations::Button(utilities::getKeyName(key->getKeyCode()).c_str(), size))
 	{
 		globals::isInHotkey = true;
+		stackHotkey[id] = true;
 		ImGui::SetActiveID(id, GetCurrentWindow());
 	}
-	else
+
+	if (useExtended)
 	{
-		if (useExtended)
+		if (ImGui::BeginPopup("##pop", ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
 		{
-			if (ImGui::BeginPopup("##pop", ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
+			for (const auto [mode, name] : Key::getKeyPairs())
 			{
-				for (const auto [mode, name] : Key::getKeyPairs())
+				bool selected = key->getKeyMode() == mode;
+				if (ImGui::Selectable(name, &selected))
 				{
-					bool selected = key->getKeyMode() == mode;
-					if (ImGui::Animations::Selectable(name, &selected))
-					{
-						if (selected)
-							key->setKeyMode(mode);
-					}
+					if (selected)
+						key->setKeyMode(mode);
 				}
-
-				ImGui::EndPopup();
 			}
-			else if (IsItemHovered())
-			{
-				ImGui::SetTooltip("Key mode");
 
-				if (ImGui::GetIO().MouseClicked[1])
-					ImGui::OpenPopup("##pop");
-			}
+			ImGui::EndPopup();
+		}
+		if (IsItemHovered())
+		{
+			ImGui::SetTooltip("Key mode");
+
+			if (ImGui::GetIO().MouseClicked[1])
+				ImGui::OpenPopup("##pop");
 		}
 	}
 
 	ImGui::PopID();
+
+	return true;
 }
 
 bool ImGui::Animations::Checkbox(const char* label, bool* v)

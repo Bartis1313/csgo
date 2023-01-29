@@ -18,11 +18,10 @@ template <typename T>
 static std::optional<Interface<T>> getInterface(const std::string_view moduleName, const std::string_view interfaceName)
 {
 	using fun = void* (*)(const char*, int*);
-	fun capture;
-	EXPORT(capture, "CreateInterface"_hasher, moduleName);
+	auto capture = memory::exportVar<fun, "CreateInterface"_hasher>(moduleName);
 
-	const auto addr = Memory::Address<InterfacesNode*>{ reinterpret_cast<uintptr_t>(capture) };
-	const auto esi = addr.rel(0x5, 0x6).deRef(Memory::Dereference::TWICE);
+	const auto addr = memory::Address<InterfacesNode*>{ reinterpret_cast<uintptr_t>(capture) };
+	const auto esi = addr.rel(0x5, 0x6).deRef(memory::Dereference::TWICE);
 
 	for (auto el = esi(); el; el = el->m_next)
 	{
@@ -41,11 +40,11 @@ static std::optional<Interface<T>> getInterface(const std::string_view moduleNam
 // _module - module name from the game, eg: engine.dll
 // _interface - interface' name
 #define CAP(var, _module, _interface) \
-	if(auto val = getInterface<decltype(var)::value>(_module, XOR(_interface)); val.has_value()) \
+	if(auto val = getInterface<decltype(var)::value>(_module, _interface); val.has_value()) \
 		var = val.value(); \
 	else \
-		throw std::runtime_error(FORMAT(XOR("Interface {} was nullptr"), _interface)); \
-	LOG_INFO(XOR("found {} at addr: 0x{:X}"), _interface, reinterpret_cast<uintptr_t>(var.base));
+		throw std::runtime_error(std::format("Interface {} was nullptr", _interface)); \
+	console::debug("found {} at addr: 0x{:X}", _interface, reinterpret_cast<uintptr_t>(var.base));
 
 void memory::interfaces::init()
 {
@@ -73,5 +72,5 @@ void memory::interfaces::init()
 	CAP(sound, ENGINE_DLL, "IEngineSoundClient0");
 	CAP(mdlCache, DATACACHE_DLL, "MDLCache0");
 
-	LOG_INFO(XOR("interfaces success"));
+	console::info("interfaces success");
 }

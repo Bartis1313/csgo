@@ -14,11 +14,11 @@ void hooks::init()
 #define HOOK(target, name) \
 if constexpr (name::index != hooks::indexNone) { \
 hookHelper::tryHook(vfunc::getVFunc(target, name::index), &name::hooked, \
-	hookHelper::ORIGINAL(name::original), XOR(#name)); \
+	hookHelper::ORIGINAL(name::original), #name); \
 } \
 else { \
 	hookHelper::tryHook(target, &name::hooked, \
-	hookHelper::ORIGINAL(name::original), XOR(#name)); \
+	hookHelper::ORIGINAL(name::original), #name); \
 }
 	hookHelper::initMinhook();
 
@@ -38,9 +38,10 @@ else { \
 	HOOK(memory::fxBlood(), hooks::fxBlood);
 	HOOK(memory::addEnt(), hooks::addEnt);
 	HOOK(memory::removeEnt(), hooks::removeEnt);
+	
 	HOOK(memory::interfaces::dx9Device(), hooks::reset);
 	HOOK(memory::interfaces::dx9Device(), hooks::present);
-	//HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
+	HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
 	HOOK(memory::interfaces::client(), hooks::proxyCreateMove);
 	HOOK(memory::interfaces::client(), hooks::frameStageNotify);
 	HOOK(memory::interfaces::client(), hooks::levelInitPreEntity);
@@ -51,7 +52,7 @@ else { \
 	HOOK(memory::interfaces::clientMode(), hooks::overrideView);
 	HOOK(memory::interfaces::clientMode(), hooks::doPostScreenEffects);
 	HOOK(memory::interfaces::surface(), hooks::lockCursor);
-	HOOK(memory::interfaces::cvar->findVar(XOR("sv_cheats")), hooks::sv_cheats);
+	HOOK(memory::interfaces::cvar->findVar("sv_cheats"), hooks::sv_cheats);
 	HOOK(memory::interfaces::fileSystem(), hooks::unknownFileSystem);
 	HOOK(memory::interfaces::fileSystem(), hooks::unkFileCheck);
 	HOOK(memory::interfaces::fileSystem(), hooks::getUnverifiedFileHashes);
@@ -72,7 +73,7 @@ else { \
 
 	hookHelper::checkAllHooks();
 
-	LOG_INFO(XOR("hooks success"));
+	console::info("hooks success");
 }
 
 void hooks::shutdown()

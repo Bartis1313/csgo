@@ -22,7 +22,7 @@ public:
     {
         return (!m_material)
             ? m_type == OverrideType_t::OVERRIDE_DEPTH_WRITE || m_type == OverrideType_t::OVERRIDE_SSAO_DEPTH_WRITE
-            : std::string_view(m_material->getName()).starts_with(XOR("dev/glow"))
+            : std::string_view(m_material->getName()).starts_with("dev/glow")
             ;
     }
 };

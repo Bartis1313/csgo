@@ -45,6 +45,8 @@ namespace game
 	// and people who think definition index is ok are wrong, player ents DON'T hold the nade anymore in that case
 	[[nodiscard]] WeaponIndex getNadeByClass(int idx, Studiohdr_t* studio);
 	[[nodiscard]] Vec3 getViewAngles();
+	// lerped and decayed punch
+	[[nodiscard]] Vec3 getFixedPunch();
 }
 
 template<typename T>

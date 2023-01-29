@@ -15,7 +15,7 @@
 
 void EnemyWarning::init()
 {
-	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
 }
 
 std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
@@ -58,7 +58,7 @@ std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
 void EnemyWarning::draw(const std::pair<bool, bool>& checks)
 {
 	if(checks.first) // trace
-		imRender.text(globals::screenX / 2.0f, 60.0f, ImFonts::tahoma14, XOR("Enemy can see you"), true, Colors::Green);
+		imRender.text(globals::screenX / 2.0f, 60.0f, ImFonts::tahoma14, "Enemy can see you", true, Colors::Green);
 	if(checks.second) // dynamic fov
-		imRender.text(globals::screenX / 2.0f, 80.0f, ImFonts::tahoma14, XOR("Enemy is aiming you"), true, Colors::Red);
+		imRender.text(globals::screenX / 2.0f, 80.0f, ImFonts::tahoma14, "Enemy is aiming you", true, Colors::Red);
 }

@@ -16,7 +16,7 @@ void Callbacks::addCallBack(const clbStruct& callb)
 		});
 
 	if (itr != m_callbacks.cend())
-		LOG_WARN(XOR("{} already exists! skipping..."), callb.m_name);
+		console::warn("{} already exists! skipping...", callb.m_name);
 	else
 		m_callbacks.push_back(callb);
 }
@@ -37,8 +37,8 @@ void example2(const CEffectData& data)
 
 void Callbacks::init()
 {
-	this->addCallBack({ XOR("Impact"), &example, nullptr });
-	this->addCallBack({ XOR("Impact"), &example2, nullptr });
+	this->addCallBack({ "Impact", &example, nullptr });
+	this->addCallBack({ "Impact", &example2, nullptr });
 
 	m_head = memory::callbacksHead();
 
@@ -52,7 +52,7 @@ void Callbacks::init()
 				el.m_callback = head->m_function; // own now the original function
 				head->m_function = el.m_function; // point our edited function
 
-				LOG_INFO(XOR("custom function inited, name: {} at addr {:#0x}"),
+				console::info("custom function inited, name: {} at addr {:#0x}",
 					name, reinterpret_cast<uintptr_t>(el.m_function));
 			}
 		}

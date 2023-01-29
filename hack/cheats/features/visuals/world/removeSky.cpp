@@ -8,7 +8,7 @@
 
 void RemoveSky::init()
 {
-	m_sky = memory::interfaces::cvar->findVar(XOR("r_3dsky"));
+	m_sky = memory::interfaces::cvar->findVar("r_3dsky");
 }
 
 void RemoveSky::run()

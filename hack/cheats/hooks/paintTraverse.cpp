@@ -44,7 +44,7 @@ hooks::paintTraverse::value FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, uns
 
 	if (!panelScope)
 	{
-		if (panelName == XOR("HudZoom"))
+		if (panelName == "HudZoom")
 			panelScope = panel;
 	}
 	else if (panelScope == panel)
@@ -59,7 +59,7 @@ hooks::paintTraverse::value FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, uns
 
 	if (!panelID)
 	{
-		if (panelName == XOR("FocusOverlayPanel"))
+		if (panelName == "FocusOverlayPanel")
 			panelID = panel;
 	}
 	else if (panelID == panel)

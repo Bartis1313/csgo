@@ -26,7 +26,7 @@
 
 void Aimbot::init()
 {
-	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
 }
 
 Vec3 Aimbot::smoothAim(CUserCmd* cmd, const Vec3& angle, Player_t* target, float cfgSmooth)
@@ -34,16 +34,23 @@ Vec3 Aimbot::smoothAim(CUserCmd* cmd, const Vec3& angle, Player_t* target, float
 	if (cfgSmooth == 0.0f)
 		return angle;
 
-	//printf("%i, %i\n", cmd->m_mousedx, cmd->m_mousedy);
-
+	// velocity, distance, mouse deltas are scales
+	// skill is taken as global multiply for those values
+	// this isnt perfect. perfect is to record dataset of yourself playing, 30mins of aiming is enough
+	// use this dataset, if possible get dataset of friend that plays very well
+	// compare differences and apply values that match your assist in best way
 	const float smooth = std::clamp(cfgSmooth, 0.0f, 1.0f);
-	const float skill = 0.5f;
+	const float skill = m_config.skill;
 	const float targetVel = target->m_vecVelocity().length();
 	const float maxVel = target->m_flMaxspeed();
 	const float velScaled = std::clamp(targetVel / maxVel, 0.0f, 1.0f);
 	const float distance = target->m_vecOrigin().distTo(game::localPlayer->m_vecOrigin());
 	const float distanceScaled = std::clamp(distance / 1000.0f, 0.0f, 1.0f);
-	const float smoothFactor = std::min(std::lerp(smooth, 1.0f, (velScaled * 0.2f + distanceScaled * 0.1f) * skill), 1.0f);
+	const float mousedx = static_cast<float>(cmd->m_mousedx) / (globals::screenX / 4);
+	const float mousedy = static_cast<float>(cmd->m_mousedy) / (globals::screenY / 4);
+	smoothFactor = std::min(std::lerp(smooth, 1.0f, 
+		(velScaled * 0.2f + distanceScaled * 0.1f + mousedx * 0.5f + mousedy * 0.5f) * skill), 1.0f);
+
 	Vec3 delta = angle;
 	Vec3 ret;
 	switch (m_config.smoothMode)
@@ -62,7 +69,9 @@ Vec3 Aimbot::smoothAim(CUserCmd* cmd, const Vec3& angle, Player_t* target, float
 		break;
 	}
 	}
-	if (m_config.curveAim)
+
+	const bool movingMouse = cmd->m_mousedx > 0 || cmd->m_mousedy > 0;
+	if (m_config.curveAim && !movingMouse)
 	{
 		Vec3 curved = ret + Vec3(ret[1] * m_config.curveX, ret[0] * m_config.curveY, 0.0f);
 		ret = curved * smoothFactor;
@@ -85,6 +94,7 @@ void Aimbot::run(CUserCmd* cmd)
 	auto weapon = game::localPlayer->getActiveWeapon();
 	if (!weapon)
 		return;
+
 
 	auto weaponCfg = CfgWeapon::getWeaponByIndex(weapon->m_iItemDefinitionIndex());
 	if (weaponCfg == WeaponList::WEAPON_UNKNOWN)
@@ -112,7 +122,7 @@ void Aimbot::run(CUserCmd* cmd)
 		return;
 
 	const auto myEye = game::localPlayer->getEyePos();
-	const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::localPlayer->getAimPunch() : Vec3{};
+	const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::getFixedPunch() : Vec3{};
 
 	if (!isClicked(cmd))
 	{

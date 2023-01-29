@@ -19,7 +19,7 @@ bool Config::save(const std::string& file)
 {
 	if (file.empty())
 	{
-		LOG_ERR(XOR("provided config name was empty"));
+		console::error("provided config name was empty");
 		return false;
 	}
 
@@ -43,10 +43,10 @@ bool Config::save(const std::string& file)
 	}
 	catch (const std::ofstream::failure& err)
 	{
-		LOG_ERR(XOR("Saving {} file has failed: {}"), file, err.what());
+		console::error("Saving {} file has failed: {}", file, err.what());
 	}
 
-	LOG_INFO(XOR("Saving file {}"), file);
+	console::info("Saving file {}", file);
 
 	return true;
 }
@@ -67,7 +67,7 @@ bool Config::load(const std::string& file)
 	from_json(j["Misc"], *vars::misc);
 	from_json(j["Styling"], *vars::styling);
 
-	LOG_INFO(XOR("Loading file {}"), file);
+	console::info("Loading file {}", file);
 
 	return true;
 }
@@ -75,8 +75,8 @@ bool Config::load(const std::string& file)
 std::filesystem::path Config::getPathForConfig(const std::string& file)
 {
 	std::filesystem::path path(file);
-	if (path.extension() != XOR(".cfg"))
-		path.replace_extension(XOR(".cfg"));
+	if (path.extension() != ".cfg")
+		path.replace_extension(".cfg");
 
 	return path;
 }
@@ -106,7 +106,7 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 	// default file doesn't exist
 	if (auto path = getHackPath() / m_defaultConfig; !std::filesystem::exists(path))
 	{
-		LOG_WARN(XOR("Creating default file, because it doesn't exist: {}"), path.string());
+		console::warn("Creating default file, because it doesn't exist: {}", path.string());
 
 		if (!save(m_defaultConfig))
 			return false;
@@ -115,7 +115,7 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 	// loading file doesnt exists
 	if (auto path = getHackPath() / m_loadExtraPath / m_defaultFileNameLoad ; !std::filesystem::exists(path))
 	{
-		LOG_WARN(XOR("Creating loading file, because it doesn't exist: {}"), path.string());
+		console::warn("Creating loading file, because it doesn't exist: {}", path.string());
 
 		if (!startSave(m_defaultConfig))
 			return false;
@@ -127,7 +127,7 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 	// loaded file exists but config file is gone, then cleanup
 	if (auto path = getHackPath() / loadedCfgName; !std::filesystem::exists(path))
 	{
-		LOG_WARN(XOR("Creating loaded file, because it doesn't exist: {}"), path.string());
+		console::warn("Creating loaded file, because it doesn't exist: {}", path.string());
 
 		if (!save(loadedCfgName))
 			return false;
@@ -176,7 +176,7 @@ void Config::reload()
 	for (const auto& entry : iterator)
 	{
 		if (std::string name = entry.path().filename().string();
-			entry.path().extension() == XOR(".cfg") && !name.empty())
+			entry.path().extension() == ".cfg" && !name.empty())
 		{
 			m_allFilesInFolder.push_back(name);
 		}
@@ -206,10 +206,10 @@ void Config::deleteCfg(const std::string& file)
 
 	if (path.string() == m_defaultConfig)
 	{
-		LOG_ERR(XOR("Can't delete default config"));
+		console::error("Can't delete default config");
 		return;
 	}
 
 	if (auto toDel = getHackPath() / path; std::filesystem::remove(toDel))
-		LOG_INFO(XOR("Removed config {}"), toDel.filename().string());
+		console::info("Removed config {}", toDel.filename().string());
 }

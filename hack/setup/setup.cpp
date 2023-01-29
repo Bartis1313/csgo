@@ -39,14 +39,12 @@ bool Setup::init(void* instance)
 
 	TimeCount initTimer{};
 	// might need to rewrite this later with setting those names
-	config.setFolder(std::filesystem::path{ XOR("Bartis_internal") } / XOR("csgo"));
-	console::setLogger(XOR("CSGO DEBUG"), XOR("hack.log"));
+	config.setFolder(std::filesystem::path{ "Bartis_internal" } / "csgo");
+	console::setLogger("CSGO DEBUG", "hack.log");
 	try
 	{
-		config.init(
-			XOR("default.cfg"), XOR("load.LOAD"),
-			XOR("utility"));
-		g_Memory.init();
+		config.init("default.cfg", "load.LOAD", "utility");
+		memory::init();
 		netvarMan.init();
 		wndProcSys::init();
 		BaseHack::initAll();
@@ -57,13 +55,13 @@ bool Setup::init(void* instance)
 	}
 	catch (const std::exception& err)
 	{
-		LI_FN(MessageBoxA)(nullptr, err.what(), XOR("Runtime hack error"), MB_OK | MB_ICONERROR);
-		LOG_ERR(XOR("Runtime hack error {}"), err.what());
+		LI_FN(MessageBoxA)(nullptr, err.what(), "Runtime hack error", MB_OK | MB_ICONERROR);
+		console::error("Runtime hack error {}", err.what());
 		LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_FAILURE);
 	}
 
 	initTimer.end();
-	LOG_INFO(XOR("main thread took {:.5f}s"), initTimer.getTime());
+	console::info("main thread took {:.5f}s", initTimer.getTime());
 	m_inited = true;
 
 	return true;
@@ -80,7 +78,7 @@ void Setup::shutdown(void* instance)
 	events::shutdown();
 	hooks::shutdown();
 	menu.shutdown();
-	LOG_INFO(XOR("Hack shutdown"));
+	console::info("Hack shutdown");
 	console::shutdown();
 	m_dc.shutdown();
 

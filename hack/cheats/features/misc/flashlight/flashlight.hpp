@@ -19,7 +19,7 @@ protected:
 	virtual void run(int frame) override;
 	virtual void shutdown() override;
 private:
-	CFlashlightEffect* createFlashlight(float fov, Entity_t* ent, const char* effectName = XOR("effects/flashlight001"),
+	CFlashlightEffect* createFlashlight(float fov, Entity_t* ent, const char* effectName = "effects/flashlight001",
 		float farZ = 1000.0f, float linearAtten = 1000.0f);
 	void destroyFlashLight(CFlashlightEffect* flashlight);
 	void updateFlashlight(CFlashlightEffect* flashlight, const Vec3& pos, const Vec3& forward, const Vec3& right, const Vec3& up);

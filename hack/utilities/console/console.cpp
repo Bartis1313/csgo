@@ -74,14 +74,14 @@ bool console::detail::isPossibleToLog(TypeLogs type)
 
 std::string console::detail::generateTimeLog()
 {
-	return FORMAT(XOR("[{}] "), utilities::getTime());
+	return std::format("[{}] ", utilities::getTime());
 }
 
 void console::detail::addSigns(TypeLogs type)
 {
 #ifdef _DEBUG
 	SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), E2T(colorsForConsole[type]));
-	std::cout << FORMAT(XOR("{} {}"), signs[type], consoleStrings[type]);
+	std::cout << std::format("{} {}", signs[type], consoleStrings[type]);
 	reset();
 #endif
 }

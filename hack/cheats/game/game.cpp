@@ -73,7 +73,7 @@ float game::scaleDamageArmor(float dmg, const float armor)
 
 bool game::isChatOpen()
 {
-	const auto chat = findHudElement<CHudChat*>(XOR("CCSGO_HudChat"));
+	const auto chat = findHudElement<CHudChat*>("CCSGO_HudChat");
 	return chat->m_isOpen;
 }
 
@@ -92,7 +92,7 @@ WeaponIndex game::getNadeByClass(int idx, Studiohdr_t* studio)
 	{
 	case CBaseCSGrenadeProjectile:
 	{
-		if (name.find(XOR("ggrenade")) != std::string::npos)
+		if (name.find("ggrenade") != std::string::npos)
 			return WEAPON_HEGRENADE;
 		else
 			return WEAPON_FLASHBANG;
@@ -101,7 +101,7 @@ WeaponIndex game::getNadeByClass(int idx, Studiohdr_t* studio)
 		return WEAPON_SMOKEGRENADE;
 	case CMolotovProjectile:
 	{
-		if (name.find(XOR("molotov")) != std::string::npos)
+		if (name.find("molotov") != std::string::npos)
 			return WEAPON_MOLOTOV;
 		else
 			return WEAPON_INCGRENADE;
@@ -121,4 +121,40 @@ Vec3 game::getViewAngles()
 	memory::interfaces::engine->getViewAngles(ret);
 
 	return ret;
+}
+
+#include <SDK/CGameMovement.hpp>
+#include <SDK/IWeapon.hpp>
+
+Vec3 game::getFixedPunch()
+{
+	static auto prevPunch = Vec3{};
+	if (!game::localPlayer->getActiveWeapon())
+		return game::localPlayer->m_aimPunchAngle();
+
+	float time = game::localPlayer->getActiveWeapon()->m_flNextPrimaryAttack() - memory::interfaces::globalVars->m_curtime;
+	int ticks = timeToTicks(time);
+
+	const auto& punchNow = game::localPlayer->m_aimPunchAngle();
+
+	if (ticks <= 0)
+		prevPunch = punchNow;
+	else
+	{
+		for (int i = 0; i < ticks; i++)
+		{
+			memory::interfaces::gameMovement->decayAimPunchAngle();
+		}
+	}
+
+	auto& decayed = game::localPlayer->m_aimPunchAngle();
+	game::localPlayer->m_aimPunchAngle() = punchNow;
+
+	if (const auto info = game::localPlayer->getActiveWeapon()->getWpnInfo())
+	{
+		const float lerped = std::clamp(1.0f - (time / info->m_cycleTime), 0.0f, 1.0f);
+		decayed = prevPunch.lerp(decayed, lerped);
+	}
+
+	return decayed;
 }

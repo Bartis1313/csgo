@@ -17,7 +17,7 @@ std::string utilities::getTime()
 	std::tm bt = {};
 	localtime_s(&bt, &time);
 
-	ss << std::put_time(&bt, XOR("%d:%m:%Y-%X")); 
+	ss << std::put_time(&bt, "%d:%m:%Y-%X"); 
 	return ss.str();
 }
 
@@ -39,26 +39,26 @@ std::string utilities::getKeyName(const uint32_t virtualKey)
 		break;
 	}
 	case 1:
-		return XOR("LMB");
+		return "LMB";
 		break;
 	case 2:
-		return XOR("RMB");
+		return "RMB";
 		break;
 	case 4:
-		return XOR("MMB");
+		return "MMB";
 		break;
 	case 5:
-		return XOR("Side 1");
+		return "Side 1";
 		break;
 	case 6:
-		return XOR("Side 2");
+		return "Side 2";
 		break;
 	}
 
 	if (char keyName[50]; LI_FN_CACHED(GetKeyNameTextA)(scanCode << 16, keyName, sizeof(keyName)) != 0)
 		return keyName;
 	else
-		return XOR("[None]");
+		return "[None]";
 }
 
 std::string utilities::toLowerCase(const std::string& str)

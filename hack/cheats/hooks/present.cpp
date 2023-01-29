@@ -26,7 +26,7 @@ hooks::present::value D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RE
 		// style, colors, ini file etc.
 		menu.init();
 
-		LOG_DEBUG(XOR("init for present success"));
+		console::debug("init for present success");
 
 		return true;
 	} ();

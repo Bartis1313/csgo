@@ -19,7 +19,7 @@ enum movetypes
 
 void Movement::init()
 {
-	m_sideSpeed = memory::interfaces::cvar->findVar(XOR("cl_sidespeed"));
+	m_sideSpeed = memory::interfaces::cvar->findVar("cl_sidespeed");
 }
 
 void Movement::run(CUserCmd* cmd)
@@ -39,7 +39,7 @@ void Movement::bunnyhop(CUserCmd* cmd)
 	if (!game::localPlayer)
 		return;
 
-	if (auto renderMode = game::localPlayer->m_nRenderMode(); renderMode == NOCLIP || renderMode == LADDER)
+	if (auto moveType = game::localPlayer->m_MoveType(); moveType == NOCLIP || moveType == LADDER)
 		return;
 
 	if (Random::getRandom<int>(0, 100) > vars::misc->bunnyHop->chance)
@@ -81,7 +81,7 @@ void Movement::strafe(CUserCmd* cmd)
 	if (!game::localPlayer)
 		return;
 
-	if (auto renderMode = game::localPlayer->m_nRenderMode(); renderMode == NOCLIP || renderMode == LADDER)
+	if (auto moveType = game::localPlayer->m_MoveType(); moveType == NOCLIP || moveType == LADDER)
 		return;
 
 	[[maybe_unused]] const bool jump = cmd->m_buttons & IN_JUMP;
@@ -129,7 +129,7 @@ void Movement::strafe(CUserCmd* cmd)
 			{
 				const static float maxSpeed = game::localPlayer->m_flMaxspeed(); // this does not change, or it does? correct me
 				//printf("maxspee %f\n", maxSpeed);
-				const static auto sv_airaccelerate = memory::interfaces::cvar->findVar(XOR("sv_airaccelerate"));
+				const static auto sv_airaccelerate = memory::interfaces::cvar->findVar("sv_airaccelerate");
 				const float term = 30.0f / sv_airaccelerate->getFloat() / maxSpeed * 100.0f / speed;
 
 				if (term < 1.0f && term > -1.0f)

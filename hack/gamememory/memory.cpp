@@ -23,9 +23,9 @@
 #include <ranges>
 
 template<typename T>
-Memory::Address<T> Memory::Address<T>::scan(const std::string_view mod, const std::string_view sig, uintptr_t offset)
+memory::Address<T> memory::Address<T>::scan(const std::string_view mod, const std::string_view sig, uintptr_t offset)
 {
-	const auto _module = g_Memory.getModule(mod);
+	const auto _module = memory::getModule(mod);
 	const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(_module);
 	const auto ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<uint8_t*>(_module) + dosHeader->e_lfanew);
 	const auto sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
@@ -42,8 +42,7 @@ Memory::Address<T> Memory::Address<T>::scan(const std::string_view mod, const st
 		m_module = mod;
 		return *this;
 	}
-	
-	throw std::runtime_error{ FORMAT(XOR("Can't find following sig: {}(0x{}) in module: {}"), sig, offset, mod) };*/
+	*/
 
 	auto check = [](std::byte* data, const std::vector<std::optional<std::byte>>& _mask)
 	{
@@ -74,16 +73,16 @@ Memory::Address<T> Memory::Address<T>::scan(const std::string_view mod, const st
 
 template<typename T>
 template<li::detail::offset_hash_pair hash>
-Memory::Address<T> Memory::Address<T>::byExport(const std::string_view _module)
+memory::Address<T> memory::Address<T>::byExport(const std::string_view _module)
 {
-	EXPORT(m_addr, hash, _module);
+	m_addr = exportVar<decltype(m_addr), hash>(_module);
 
 	return Address<T>{ m_addr };
 }
 
 template<typename T>
 template<typename TT>
-Memory::Address<T> Memory::Address<T>::byVFunc(const Interface<TT>& ifc, size_t index)
+memory::Address<T> memory::Address<T>::byVFunc(const Interface<TT>& ifc, size_t index)
 {
 	m_addr = reinterpret_cast<uintptr_t>(vfunc::getVFunc(reinterpret_cast<void*>(ifc.base), index));
 
@@ -94,7 +93,7 @@ Memory::Address<T> Memory::Address<T>::byVFunc(const Interface<TT>& ifc, size_t 
 #include <SDK/ClientClass.hpp>
 
 template<typename T>
-Memory::Address<T> Memory::Address<T>::findFromGame(ClassID id)
+memory::Address<T> memory::Address<T>::findFromGame(ClassID id)
 {
 	for (auto _class = memory::interfaces::client->getAllClasses(); _class; _class = _class->m_next)
 	{
@@ -108,7 +107,7 @@ Memory::Address<T> Memory::Address<T>::findFromGame(ClassID id)
 #include <SDK/IVEngineClient.hpp>
 
 template<typename T>
-Memory::Address<T> Memory::Address<T>::findFromGameLoop(ClassID id)
+memory::Address<T> memory::Address<T>::findFromGameLoop(ClassID id)
 {
 	for (auto i : std::views::iota(memory::interfaces::engine->getMaxClients(), memory::interfaces::entList->getHighestIndex() + 1))
 	{
@@ -126,10 +125,10 @@ Memory::Address<T> Memory::Address<T>::findFromGameLoop(ClassID id)
 
 //#include <deps/fixed.hpp>
 
-void Memory::init()
+void memory::init()
 {
 #define ADD_TO_MAP(name) \
-	m_ModulesAddr[name] =  reinterpret_cast<HMODULE>(LI_MODULE(name).cached()); \
+	detail::m_ModulesAddr[name] =  reinterpret_cast<HMODULE>(LI_MODULE(name).cached()); \
 
 	ADD_TO_MAP("engine.dll");
 	ADD_TO_MAP("client.dll");
@@ -250,18 +249,17 @@ void Memory::init()
 	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER, 0x2).deRef(Dereference::TWICE);
 	beams = beams.scan(CLIENT_DLL, BEAMS, 0x1).deRef();
 	
-	globalVars = globalVars.byVFunc(memory::interfaces::client, 0).add(0x1F).deRef(Memory::Dereference::TWICE);
-	clientMode = clientMode.byVFunc(memory::interfaces::client, 10).add(0x5).deRef(Memory::Dereference::TWICE);
+	globalVars = globalVars.byVFunc(memory::interfaces::client, 0).add(0x1F).deRef(Dereference::TWICE);
+	clientMode = clientMode.byVFunc(memory::interfaces::client, 10).add(0x5).deRef(Dereference::TWICE);
 	input = input.byVFunc(memory::interfaces::client, 16).add(0x1).deRef();
 
 	postInit();
 
-	LOG_INFO(XOR("memory init success"));
+	console::info("memory init success");
 }
 
-void Memory::postInit()
+void memory::postInit()
 {
-	using namespace memory;
 	using namespace memory::interfaces;
 
 	preciptation = preciptation.findFromGame(CPrecipitation);

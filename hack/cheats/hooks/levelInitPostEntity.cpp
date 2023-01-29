@@ -5,7 +5,7 @@
 
 hooks::levelInitPostEntity::value FASTCALL hooks::levelInitPostEntity::hooked(FAST_ARGS)
 {
-	g_Memory.postInit();
+	memory::postInit();
 	BaseHack::loadAll();
 
 	original(thisptr);

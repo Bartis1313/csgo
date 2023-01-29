@@ -21,7 +21,6 @@ bool Key::checkKey()
 		if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(el)))
 			return true;
 	}
-
 	// imgui has many key handlers, so mouse is not treated like keyboard
 	// 0=left, 1=right, 2=middle + extras (ImGuiMouseButton_COUNT == 5)
 	for (int i = 0; i < IM_ARRAYSIZE(ImGui::GetIO().MouseDown); i++)
@@ -49,14 +48,17 @@ bool Key::checkKey()
 			default:
 				break;
 			}
+
 			return true;
 		}
+
 	}
 
 	for (int i = 0; i < IM_ARRAYSIZE(ImGui::GetIO().KeysDown); i++)
 	{
 		if (ImGui::IsKeyPressed(static_cast<ImGuiKey>(i)))
 		{
+
 			m_keyCode = i;
 			return true;
 		}

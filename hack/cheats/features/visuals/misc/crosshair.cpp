@@ -15,8 +15,8 @@
 
 void Crosshair::init()
 {
-	m_crosshairRecoil = memory::interfaces::cvar->findVar(XOR("cl_crosshair_recoil"));
-	m_scale = memory::interfaces::cvar->findVar(XOR("weapon_recoil_scale"));
+	m_crosshairRecoil = memory::interfaces::cvar->findVar("cl_crosshair_recoil");
+	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
 }
 
 void Crosshair::draw()

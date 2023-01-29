@@ -8,7 +8,7 @@ void BaseHack::initAll()
 	for (auto el : m_hacks)
 		el->init();
 
-	LOG_DEBUG(XOR("Inited {} functions!"), m_hacks.size());
+	console::debug("Inited {} functions!", m_hacks.size());
 }
 
 void BaseHack::shutdownAll()

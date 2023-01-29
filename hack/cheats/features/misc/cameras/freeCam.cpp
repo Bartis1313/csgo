@@ -69,9 +69,9 @@ void FreecamDraw::draw()
 	if (!g_Freecam->isInCam())
 		return;
 
-	if (ImGui::Begin(XOR("Info##cam"), nullptr, ImGuiWindowFlags_AlwaysAutoResize /*| ImGuiWindowFlags_NoResize*/ | ImGuiWindowFlags_NoCollapse))
+	if (ImGui::Begin("Info##cam", nullptr, ImGuiWindowFlags_AlwaysAutoResize /*| ImGuiWindowFlags_NoResize*/ | ImGuiWindowFlags_NoCollapse))
 	{
-		ImGui::TextUnformatted(FORMAT(XOR("Speed: {:.2f}"), vars::misc->freeCam->speed).c_str());
+		ImGui::TextUnformatted(std::format("Speed: {:.2f}", vars::misc->freeCam->speed).c_str());
 
 		ImGui::End();
 	}

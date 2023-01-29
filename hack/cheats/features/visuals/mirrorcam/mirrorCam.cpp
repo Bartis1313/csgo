@@ -58,12 +58,12 @@ void MirrorCamDraw::draw()
 	if (!g_MirrorCam->m_inited)
 	{
 		//interfaces::matSys->forceBeginRenderTargetAllocation();
-		g_MirrorCam->m_texture = memory::interfaces::matSys->createFullFrameRenderTarget(XOR("mirrorCam"));
+		g_MirrorCam->m_texture = memory::interfaces::matSys->createFullFrameRenderTarget("mirrorCam");
 		//interfaces::matSys->forceEndRenderTargetAllocation();
 
 		g_MirrorCam->m_inited = true;
 
-		LOG_INFO(XOR("Inited mirrorcam texture!"));
+		console::info("Inited mirrorcam texture!");
 	}
 
 	if (!vars::misc->mirrorCam->enabled)
@@ -80,7 +80,7 @@ void MirrorCamDraw::draw()
 	/*D3DSURFACE_DESC surfaceDesc;
 	m_texture->m_handle[0]->m_texture->GetLevelDesc(0, &surfaceDesc);*/
 
-	if (ImGui::Begin(XOR("Camera"), nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+	if (ImGui::Begin("Camera", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 	{
 		// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/tier2/renderutils.cpp#L988
 		// ^ is proper scaling what game does
