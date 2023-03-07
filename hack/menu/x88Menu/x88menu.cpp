@@ -10,6 +10,7 @@
 #include <utilities/inputSystem.hpp>
 #include <magic_enum.hpp>
 
+
 void X88Menu::draw()
 {
 	if (!vars::keys->enabledX88Menu)
@@ -53,7 +54,7 @@ void X88Menu::draw()
 		}
 
 		auto value = x88p.second;
-		auto name = x88p.first;
+		const auto& name = x88p.first;
 
 		auto vecSize = surfaceRender.getTextSizeXY(font, name);
 		auto vecX = static_cast<int>(vecSize[Coord::X]);
@@ -121,7 +122,7 @@ size_t X88Menu::addSpaces(const std::string& text)
 	return static_cast<size_t>(size);
 }
 
-void X88Menu::handleKeys()
+void X88Menu::updateKeys()
 {
 	if (!vars::keys->enabledX88Menu)
 		return;
@@ -129,7 +130,7 @@ void X88Menu::handleKeys()
 	if (!m_inited)
 		return;
 
-	if (inputHandler.isKeyPressed(VK_DOWN))
+	if (KeysHandler::isKeyPressed(VK_DOWN))
 	{
 		if (index != x88types.getVars().size() - 1)
 			index++;
@@ -137,7 +138,7 @@ void X88Menu::handleKeys()
 			index = 0;
 	}
 
-	if (inputHandler.isKeyPressed(VK_UP))
+	if (KeysHandler::isKeyPressed(VK_UP))
 	{
 		if (index != 0)
 			index--;
@@ -152,7 +153,7 @@ void X88Menu::handleKeys()
 	if (std::holds_alternative<bool*>(value))
 	{
 		// don't care, bools have 0 or 1
-		if (inputHandler.isKeyPressed(VK_RIGHT) || inputHandler.isKeyPressed(VK_LEFT))
+		if (KeysHandler::isKeyPressed(VK_RIGHT) || KeysHandler::isKeyPressed(VK_LEFT))
 		{
 			*std::get<bool*>(value) = !*std::get<bool*>(value);
 		}
@@ -162,7 +163,7 @@ void X88Menu::handleKeys()
 		// run on stack to make it safe for values changed by
 		auto valNow = *std::get<int*>(value);
 
-		if (inputHandler.isKeyPressed(VK_RIGHT))
+		if (KeysHandler::isKeyPressed(VK_RIGHT))
 		{
 			valNow++;
 			if (valNow > limits.m_intLimtis)
@@ -170,7 +171,7 @@ void X88Menu::handleKeys()
 
 			*std::get<int*>(value) = valNow;
 		}
-		if (inputHandler.isKeyPressed(VK_LEFT))
+		if (KeysHandler::isKeyPressed(VK_LEFT))
 		{
 			valNow--;
 			if (valNow < 0)
@@ -183,7 +184,7 @@ void X88Menu::handleKeys()
 	{
 		auto valNow = *std::get<float*>(value);
 
-		if (inputHandler.isKeyDown(VK_RIGHT))
+		if (KeysHandler::isKeyDown(VK_RIGHT))
 		{
 			valNow += 0.5f;
 			if (valNow > limits.m_floatLimits.second) // max
@@ -191,7 +192,7 @@ void X88Menu::handleKeys()
 
 			*std::get<float*>(value) = valNow;
 		}
-		if (inputHandler.isKeyDown(VK_LEFT))
+		if (KeysHandler::isKeyDown(VK_LEFT))
 		{
 			valNow -= 0.5f;
 			if (valNow < limits.m_floatLimits.first)

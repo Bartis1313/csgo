@@ -1,18 +1,33 @@
 #pragma once
 
-#include <span>
 #include <string>
 #include <vector>
-#include <format>
-#include <functional>
-#include <unordered_map>
 
 #include <imgui.h>
 
 class CfgColor;
 class Color;
 class Key;
-using ImGuiColorEditFlags = int;
+
+struct ImNotify
+{
+    ImNotify() = default;
+    ImNotify(double maxTime, const std::string& title, const std::string& message)
+        : maxTime{ maxTime }, title{ title }, message{ message }
+    {
+        time = ImGui::GetTime();
+    }
+
+    double maxTime;
+    std::string title;
+    std::string message;
+    double time;
+    float alpha;
+
+    static void handle();
+    static void add(const ImNotify& notify);
+    inline static std::vector<ImNotify> m_allNotifies;
+};
 
 namespace ImGui
 {

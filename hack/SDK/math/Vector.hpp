@@ -274,6 +274,21 @@ public:
 		return *this;
 	}
 
+	[[nodiscard]] auto normalizeInPlace() const
+	{
+		const auto n = length();
+		if (n > 1e-4f)
+		{
+			Vector res = {};
+			for (auto i : std::views::iota(0U, SIZE))
+				res[i] = this->m_arr[i] / n;
+
+			return res;
+		}
+		
+		return Vector{};
+	}
+
 	[[nodiscard]] constexpr auto normalized() const
 	{
 		ASSERT_VEC3;
@@ -308,11 +323,10 @@ public:
 		return ImVec2{ m_arr[0], m_arr[1] };
 	}
 
-	[[nodiscard]] constexpr auto lerp(const Vector& other, float t)
+	[[nodiscard]] constexpr auto lerp(const Vector& end, float t) const
 	{
-		return *this + (other - *this) * t;
+		return Vector{ *this + (end - *this) * t };
 	}
-
 private:
 	[[nodiscard]] constexpr T dotFields(size_t times = SIZE) const
 	{

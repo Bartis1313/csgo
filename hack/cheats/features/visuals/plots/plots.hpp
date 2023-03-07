@@ -3,7 +3,8 @@
 #include <cheats/classes/renderableToPresent.hpp>
 #include <cheats/classes/createMove.hpp>
 
-#include <deque>
+#include <vector>
+#include <array>
 
 class VelocityGather;
 class CUserCmd;
@@ -17,15 +18,22 @@ public:
 
 protected:
 	virtual void draw() override;
+	virtual void init() override;
 private:
 	void drawFps();
 	void drawVelocity();
 
-	std::deque<float> m_VelocityRecords;
-	std::deque<float> m_FpsRecords;
+	// prevent issues with dynamic max set
+	inline static constexpr size_t MAX_SIZE_PLOTS = 1000;
 
-	inline static constexpr float RECORDS_SIZE = 300.0f;
-	inline static float m_acceptanceVelocity = 1.0;
+	// using vector, because it's easier to implement in code (emplace_back)
+	// even tho, it has known capacity so no big deal
+	std::vector<double> m_VelocityRecords;
+	std::vector<double> m_FpsRecords;
+
+	// both plots will use it
+	std::array<double, MAX_SIZE_PLOTS> m_sharedXS;
+
 
 	friend VelocityGather;
 };

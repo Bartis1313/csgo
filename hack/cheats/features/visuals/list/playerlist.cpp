@@ -99,7 +99,7 @@ void PlayerList::draw()
 				{
 					ImVec4 color = isEnemy ? ImVec4{ 1.0f, 0.0f, 0.0f, 1.0f } : ImVec4{ 0.0f, 1.0f, 0.0f, 1.0f };
 					ImGui::PushStyleColor(ImGuiCol_Text, color);
-					ImGui::TextUnformatted(ent->getRawName().data());
+					ImGui::TextUnformatted(ent->getName().c_str());
 					ImGui::PopStyleColor();
 				}
 

@@ -177,22 +177,16 @@ std::optional<std::vector<ImVec2>> math::grahamScan(std::span<const ImVec2> poin
 {
 	// case when it's impossible
 	if (points.size() < 3)
-		std::nullopt;
+		return std::nullopt;
 
 	// make a temp copy to allow use swap
 	std::vector<ImVec2> v{ points.begin(), points.end() };
 
 	// now at index 0 we have most left point
-	std::swap(v.at(0), *std::min_element(v.begin(), v.end(),
-		// is left? a lexicographically before b
-		[](const ImVec2& a, const ImVec2& b) constexpr
-		{
-			return (a.x < b.x || (a.x == b.x && a.y < b.y));
-		}
-	));
+	std::ranges::iter_swap(v.begin(), std::ranges::min_element(v, {}, [](const ImVec2& p) { return p.x; }));
 
-	std::sort(v.begin() + 1, v.end(),
-		[p0 = v.at(0)](const ImVec2& a, const ImVec2& b) constexpr
+	std::ranges::sort(v.begin() + 1, v.end(),
+		[p0 = v.at(0)](const ImVec2& a, const ImVec2& b)
 		{
 			auto _orient = orient(p0, a, b);
 			return _orient == 0.0f ? ImLengthSqr(p0 - a) < ImLengthSqr(p0 - b) : _orient < 0.0f;
@@ -208,41 +202,6 @@ std::optional<std::vector<ImVec2>> math::grahamScan(std::span<const ImVec2> poin
 
 		hull.push_back(el);
 	}
-
-	return hull;
-}
-
-std::optional<std::vector<ImVec2>> math::giftWrap(std::span<const ImVec2> points)
-{
-	// case when it's impossible
-	if (points.size() < 3)
-		return std::nullopt;
-
-	// make a temp copy to allow use swap
-	std::vector<ImVec2> v{ points.begin(), points.end() };
-
-	// now at index 0 we have most left point
-	std::swap(v.at(0), *std::min_element(v.begin(), v.end(),
-		// is left? a lexicographically before b
-		[](const ImVec2& a, const ImVec2& b) constexpr
-		{
-			return (a.x < b.x || (a.x == b.x && a.y < b.y));
-		}
-	));
-	
-	std::vector<ImVec2> hull;
-
-	auto p0 = v.at(0);
-	auto h0 = hull.at(0);
-	do {
-		hull.push_back(p0);
-		std::swap(p0, *std::min_element(v.begin() + 1, v.end(),
-			[p0](const ImVec2& a, const ImVec2& b) constexpr
-			{
-				return orient(p0, a, b) < 0.0f;
-			}
-		));
-	} while (p0.x != h0.x && p0.y != h0.y); // when it is point[0]
 
 	return hull;
 }

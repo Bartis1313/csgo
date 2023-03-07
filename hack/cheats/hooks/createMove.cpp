@@ -4,6 +4,7 @@
 #include "../features/prediction/prediction.hpp"
 #include "../features/misc/movement/movement.hpp"
 #include "../features/misc/cameras/freeCam.hpp"
+#include "../features/aimbot/cmdCache.hpp"
 
 #include <SDK/CUserCmd.hpp>
 #include <SDK/Input.hpp>
@@ -57,13 +58,15 @@ void FASTCALL createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool act
 		cmd->m_upmove = 0;
 	}
 
+	CUserCmdCache::run(cmd);
+
 	game::serverTime(cmd);
 	CreateMovePrePredictionType::runAll(cmd);
 
-	//g_Prediction->addToPrediction(cmd, [=]()
-	//	{
+	g_Prediction->addToPrediction(cmd, [=]()
+		{
 			CreateMoveInPredictionType::runAll(cmd);
-	//	});
+		});
 
 	CreateMovePostPredictionType::runAll(cmd);
 

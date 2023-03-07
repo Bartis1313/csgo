@@ -1,9 +1,7 @@
 #pragma once
 
-#include "IEngineTrace.hpp"
-#include "IClientEntityList.hpp"
-#include "Enums.hpp"
 #include "math/Vector.hpp"
+#include "helpers/vfunc.hpp"
 
 class Entity_t;
 

@@ -1,5 +1,6 @@
 #include "aimbot.hpp"
 
+#include "cmdCache.hpp"
 #include "../cache/cache.hpp"
 #include "../backtrack/backtrack.hpp"
 
@@ -27,56 +28,13 @@
 void Aimbot::init()
 {
 	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
+	m_yaw = memory::interfaces::cvar->findVar("m_yaw");
+	m_pitch = memory::interfaces::cvar->findVar("m_pitch");
 }
 
-Vec3 Aimbot::smoothAim(CUserCmd* cmd, const Vec3& angle, Player_t* target, float cfgSmooth)
+void Aimbot::updateKeys()
 {
-	if (cfgSmooth == 0.0f)
-		return angle;
-
-	// velocity, distance, mouse deltas are scales
-	// skill is taken as global multiply for those values
-	// this isnt perfect. perfect is to record dataset of yourself playing, 30mins of aiming is enough
-	// use this dataset, if possible get dataset of friend that plays very well
-	// compare differences and apply values that match your assist in best way
-	const float smooth = std::clamp(cfgSmooth, 0.0f, 1.0f);
-	const float skill = m_config.skill;
-	const float targetVel = target->m_vecVelocity().length();
-	const float maxVel = target->m_flMaxspeed();
-	const float velScaled = std::clamp(targetVel / maxVel, 0.0f, 1.0f);
-	const float distance = target->m_vecOrigin().distTo(game::localPlayer->m_vecOrigin());
-	const float distanceScaled = std::clamp(distance / 1000.0f, 0.0f, 1.0f);
-	const float mousedx = static_cast<float>(cmd->m_mousedx) / (globals::screenX / 4);
-	const float mousedy = static_cast<float>(cmd->m_mousedy) / (globals::screenY / 4);
-	smoothFactor = std::min(std::lerp(smooth, 1.0f, 
-		(velScaled * 0.2f + distanceScaled * 0.1f + mousedx * 0.5f + mousedy * 0.5f) * skill), 1.0f);
-
-	Vec3 delta = angle;
-	Vec3 ret;
-	switch (m_config.smoothMode)
-	{
-	case E2T(SmoothMode::LINEAR):
-		ret = angle * (1.0f - smoothFactor);
-		break;
-	case E2T(SmoothMode::AIM_LENGTH):
-		ret = delta - (delta * smoothFactor);
-		break;
-	case E2T(SmoothMode::AIM_CUBIC):
-	{
-		const float t = 1.0f - smoothFactor;
-		const float cubic = t * t * (3.0f - 2.0f * t);
-		ret = delta * cubic;
-		break;
-	}
-	}
-
-	const bool movingMouse = cmd->m_mousedx > 0 || cmd->m_mousedy > 0;
-	if (m_config.curveAim && !movingMouse)
-	{
-		Vec3 curved = ret + Vec3(ret[1] * m_config.curveX, ret[0] * m_config.curveY, 0.0f);
-		ret = curved * smoothFactor;
-	}
-	return ret;
+	vars::keys->aimbot.update();
 }
 
 float Aimbot::getRandomizedSmooth(float currentSmooth)
@@ -87,14 +45,20 @@ float Aimbot::getRandomizedSmooth(float currentSmooth)
 	return currentSmooth *= smoothness;
 }
 
-void Aimbot::run(CUserCmd* cmd)
+void Aimbot::run(float* x, float* y)
 {
-	m_view = cmd->m_viewangles;
+	if (!game::isAvailable())
+		return;
+
+	const auto cmd = CUserCmdCache::getCmd();
+	if (!cmd)
+		return;
+
+	memory::interfaces::engine->getViewAngles(m_view);
 
 	auto weapon = game::localPlayer->getActiveWeapon();
 	if (!weapon)
 		return;
-
 
 	auto weaponCfg = CfgWeapon::getWeaponByIndex(weapon->m_iItemDefinitionIndex());
 	if (weaponCfg == WeaponList::WEAPON_UNKNOWN)
@@ -130,7 +94,7 @@ void Aimbot::run(CUserCmd* cmd)
 		return;
 	}
 
-	if (!getBestTarget(cmd, weapon, myEye, punch))
+	if (!getBestTarget(weapon, myEye, punch))
 		return;
 
 	if (m_targets.front().m_pos.isZero())
@@ -159,21 +123,30 @@ void Aimbot::run(CUserCmd* cmd)
 				boneID = hitbox->m_bone;
 			}
 		}
-		auto record = g_Backtrack->getAllRecords().at(player->getIndex());
+		const auto& record = g_Backtrack->getAllRecords().at(player->getIndex());
 		bestpos = record.at(record.size() / 2).m_matrix[boneID].origin(); // middle, u can play with this as u want to
 	}
 
-	auto angle = math::calcAngleRelative(myEye, bestpos, Vec3{ m_view + punch });
-	angle.clamp();
+	const auto currentAngle = Vec3{ m_view + punch };
+	const auto& angle = math::calcAngle(myEye, bestpos);
+	const float smoothingFactor = std::min(memory::interfaces::globalVars->m_frametime * m_config.frametimeMulttiply, 1.0f);	
+	const auto& lerpedAngle = currentAngle.lerp(angle, std::clamp(smoothingFactor, 0.0f, 1.0f)).normalize();
 
-	angle = smoothAim(cmd, angle, player, m_config.smooth);
+	auto& toAdd = Vec3{ currentAngle - lerpedAngle }.normalize().clamp();
+	toAdd[0] /= m_pitch->getFloat();
+	toAdd[1] /= m_yaw->getFloat();
 
-	cmd->m_viewangles += angle;
-	memory::interfaces::engine->setViewAngles(cmd->m_viewangles);
+	Vec2 mouse = Vec2{ *x, *y };
+	Vec2 mouseScreen = Vec2{ toAdd[1], -toAdd[0] };
 
+	mouseScreen[0] = (mouseScreen[0] + mouse[0]) / 2.0f;
+	mouseScreen[1] = (mouseScreen[1] + mouse[1]) / 2.0f;
+
+	*x = mouseScreen[0];
+	*y = mouseScreen[1];
 }
 
-bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
+bool Aimbot::getBestTarget(Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
 {
 	/*bool isSame = m_temp == m_bestEnt;
 	console.print("{}\n", isSame);*/
@@ -241,7 +214,7 @@ bool Aimbot::getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const 
 		{
 			Vec3 hitPos = ent->getHitboxPos(pos);
 
-			auto angles = cmd->m_viewangles + punch;
+			auto angles = m_view + punch;
 			angles.clamp();
 
 			if (!game::localPlayer->isPossibleToSee(ent, hitPos))

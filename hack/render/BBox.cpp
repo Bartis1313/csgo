@@ -59,6 +59,52 @@ Box::Box(Entity_t* ent)
 	m_isValid = true;
 }
 
+Box::Box(Entity_t* ent, const Vec3& min, const Vec3& max)
+{
+	const auto& matrixWorld = ent->renderableToWorldTransform();
+
+	float left = std::numeric_limits<float>::max();
+	float top = std::numeric_limits<float>::max();
+	float right = -std::numeric_limits<float>::max();
+	float bottom = -std::numeric_limits<float>::max();
+
+	const auto points = buildAABB(min, max);
+
+	std::array<ImVec2, 8> screen = {};
+	for (size_t i = 0; auto & el : screen)
+	{
+		if (!imRender.worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
+		{
+			m_isValid = false;
+			return;
+		}
+
+		left = std::min(left, el.x);
+		top = std::min(top, el.y);
+		right = std::max(right, el.x);
+		bottom = std::max(bottom, el.y);
+
+		this->points.at(i) = el;
+
+		i++;
+	}
+
+	this->x = left;
+	this->y = top;
+	this->w = right - left;
+	this->h = bottom - top;
+
+	// get important points, eg: if you use 3d box, you want to render health by quads, not rects
+
+	this->topleft = screen.at(7);
+	this->topright = screen.at(6);
+	this->bottomleft = screen.at(3);
+	this->bottomright = screen.at(2);
+
+	m_isValid = true;
+}
+
+
 std::array<Vec3, 8> Box::buildAABB(const Vec3& min, const Vec3& max)
 {
 	std::array points =

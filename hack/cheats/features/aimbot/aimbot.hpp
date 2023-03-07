@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cheats/classes/createMove.hpp>
-#include <cheats/classes/renderableToPresent.hpp>
+#include <cheats/classes/overrideM.hpp>
+#include <cheats/classes/wndProcKeyHandler.hpp>
 #include <SDK/math/Vector.hpp>
 #include <config/cfgWeapon.hpp>
 
@@ -21,27 +22,26 @@ struct AimbotTarget_t
 	Vec3 m_pos;
 };
 
-class AimDraw;
-
-class Aimbot : protected CreateMoveInPredictionType
+class Aimbot : protected OverrideMouseType, protected WndProcKeyHandler
 {
 public:
 	constexpr Aimbot() :
-		CreateMoveInPredictionType{}
+		OverrideMouseType{},
+		WndProcKeyHandler{}
 	{}
-
-	virtual void init() override;
-	virtual void run(CUserCmd* cmd) override;
 
 	Player_t* getTargetted() const;
 	Vec3 getCachedView() const;
 	Vec3 getBestHibox() const;
 	CfgWeapon getCachedConfig() const;
+protected:
+	virtual void init() override;
+	virtual void run(float* x, float* y) override;
+	virtual void updateKeys() override;
 private:
 	void resetFields();
-	[[nodiscard]] Vec3 smoothAim(CUserCmd* cmd, const Vec3& angle, Player_t* target, float cfgSmooth);
 	[[nodiscard]] bool isClicked(CUserCmd* cmd);
-	[[nodiscard]] bool getBestTarget(CUserCmd* cmd, Weapon_t* wpn, const Vec3& eye, const Vec3& punch);
+	[[nodiscard]] bool getBestTarget(Weapon_t* wpn, const Vec3& eye, const Vec3& punch);
 	[[nodiscard]] float getRandomizedSmooth(float currentSmooth);
 
 	[[nodiscard]] std::vector<size_t> getHitboxes();
@@ -53,11 +53,9 @@ private:
 	Vec3 m_view;
 	int m_bestId;
 	CfgWeapon m_config;
-	int m_prevMouseDeltaX;
-	int m_prevMouseDeltaY;
-	// saving here so later can represent plot of smooth
-	float smoothFactor;
 	IConVar* m_scale = nullptr;
+	IConVar* m_yaw = nullptr;
+	IConVar* m_pitch = nullptr;
 
 	std::vector<AimbotTarget_t> m_targets;
 };

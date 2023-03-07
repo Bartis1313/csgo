@@ -12,6 +12,8 @@
 #include <cheats/game/game.hpp>
 #include <gamememory/memory.hpp>
 
+#include <mutex>
+
 void Prediction::init()
 {
 	m_predicionRandomSeed = memory::predictionSeed();

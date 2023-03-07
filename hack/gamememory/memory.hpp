@@ -161,6 +161,7 @@ namespace memory
 	using transferData_t = int(__thiscall*)(void*, const char*, int, void*);
 	using reinitPredictables_t = int(__stdcall*)();
 	using shutdownPredictables_t = void(__stdcall*)();
+	using destroyMaterial_t = void(__thiscall*)(void*);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
@@ -213,6 +214,7 @@ namespace memory
 	inline Address<transferData_t> transferData;
 	inline Address<reinitPredictables_t> reinitPredicatbles;
 	inline Address<shutdownPredictables_t> shutdownPredicatbles;
+	inline Address<destroyMaterial_t> destroyMaterial;
 
 	inline Address<void*> clientValidAddr;
 	inline Address<void*> enginevalidAddr;
@@ -227,6 +229,8 @@ namespace memory
 	inline Address<void*> unkOverviewMap;
 	inline Address<void*> isDepth;
 	inline Address<void*> fxBlood;
+	inline Address<void*> fxBloodSpray;
+	inline Address<void*> bloodCallback;
 	inline Address<void*> addEnt;
 	inline Address<void*> removeEnt;
 	inline Address<void*> isFollowedEntity;

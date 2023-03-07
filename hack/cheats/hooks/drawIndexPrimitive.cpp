@@ -5,6 +5,7 @@
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/IVEngineClient.hpp>
 #include <cheats/game/game.hpp>
+#include <utilities/console/console.hpp>
 
 // not placed in SDK, unique use-case
 //struct MaterialEbp
@@ -32,13 +33,16 @@
 // ... many other heaps that pretty often are copies / post calls results. Don't need this here
 static void* getStack(void** data)
 {
-	if (!data)
+	if (IsBadReadPtr(data, sizeof(void*)))
 		return nullptr;
 
-	void** next = *reinterpret_cast<void***>(data);
+	void** next = data ? *reinterpret_cast<void***>(data) : nullptr;
+
+	if(!next)
+		return nullptr;
 
 	const static auto retAddr = memory::renderDrawPoints();
-	if (data[1] == retAddr)
+	if (next && data[1] == retAddr)
 	{
 		/*auto m = *reinterpret_cast<IMaterial**>((uintptr_t)data[2] + 0xC);
 		if (m)
@@ -52,13 +56,13 @@ static void* getStack(void** data)
 	return getStack(next);
 }
 
-static Player_t* getPlayer(void** data)
-{
-	return reinterpret_cast<Player_t*>(getStack(data));
-}
-
 hooks::drawIndexedPrimitive::value D3DAPI hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex,
 	UINT numVertices, UINT startIndex, UINT primCount)
 {
+	void** data;
+	__asm mov data, ebp
+	
+	auto test = getStack(data);
+
 	return original(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);
 }

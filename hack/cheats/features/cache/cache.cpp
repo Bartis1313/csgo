@@ -52,7 +52,7 @@ void EntityCache::add(Entity_t* ent)
 	if (!possibleIndexes.has_value())
 		return;
 
-	auto [index, classID] = possibleIndexes.value();
+	const auto [index, classID] = possibleIndexes.value();
 
 	const auto data = HolderData{ .ent = ent, .idx = index, .classID = classID };
 	fill(data);
@@ -79,7 +79,7 @@ bool EntityCache::checkRepeatable(Entity_t* ent)
 	if (!ent)
 		return false;
 
-	for (auto [cacheType, ents] : m_entCache)
+	for (const auto& [cacheType, ents] : m_entCache)
 	{
 		if (auto itr = std::ranges::find_if(ents,
 			[ent](const HolderData& el)

@@ -31,19 +31,6 @@ memory::Address<T> memory::Address<T>::scan(const std::string_view mod, const st
 	const auto sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
 	const auto rangeStart = reinterpret_cast<uintptr_t>(_module);
 
-	// tried boyer_moore_horspool_searcher, it would need some big edits to work
-	/*const auto converted = SigConvert<std::byte>::get(sig);
-	const auto searched = std::ranges::search(reinterpret_cast<std::byte*>(_module), reinterpret_cast<std::byte*>(_module) + sizeOfImage, converted.begin(), converted.end());
-
-
-	if (std::ranges::begin(searched) != reinterpret_cast<std::byte*>(_module) + sizeOfImage)
-	{
-		m_addr = reinterpret_cast<uintptr_t>(std::ranges::begin(searched)) + offset;
-		m_module = mod;
-		return *this;
-	}
-	*/
-
 	auto check = [](std::byte* data, const std::vector<std::optional<std::byte>>& _mask)
 	{
 		for (const auto& _byte : _mask)
@@ -70,6 +57,7 @@ memory::Address<T> memory::Address<T>::scan(const std::string_view mod, const st
 	m_module = mod;
 	return Address<T>{ m_addr };
 }
+
 
 template<typename T>
 template<li::detail::offset_hash_pair hash>
@@ -105,6 +93,7 @@ memory::Address<T> memory::Address<T>::findFromGame(ClassID id)
 }
 
 #include <SDK/IVEngineClient.hpp>
+#include <SDK/IClientEntityList.hpp>
 
 template<typename T>
 memory::Address<T> memory::Address<T>::findFromGameLoop(ClassID id)
@@ -123,7 +112,7 @@ memory::Address<T> memory::Address<T>::findFromGameLoop(ClassID id)
 	return Address<T>{ 0U };
 }
 
-//#include <deps/fixed.hpp>
+#include <SDK/IViewRenderBeams.hpp>
 
 void memory::init()
 {
@@ -202,6 +191,7 @@ void memory::init()
 	transferData = transferData.scan(CLIENT_DLL, TRANSFER_DATA);
 	reinitPredicatbles = reinitPredicatbles.scan(CLIENT_DLL, REINIT_PREDICTABLES);
 	shutdownPredicatbles = shutdownPredicatbles.scan(CLIENT_DLL, SHUTDOWN_PREDICTABLES);
+	destroyMaterial = destroyMaterial.scan(MATERIAL_DLL, MATERIAL_DESTRUCT);
 
 	// HOOKS
 
@@ -218,6 +208,8 @@ void memory::init()
 	unkOverviewMap = unkOverviewMap.scan(CLIENT_DLL, UNK_OVERVIEWMAP);
 	isDepth = isDepth.scan(CLIENT_DLL, IS_DEPTH);
 	fxBlood = fxBlood.scan(CLIENT_DLL, FX_BLOOD);
+	fxBloodSpray = fxBloodSpray.scan(CLIENT_DLL, FX_BLOOD_SPRAY);
+	bloodCallback = bloodCallback.scan(CLIENT_DLL, BLOOD_CALLBACK);
 	addEnt = addEnt.scan(CLIENT_DLL, ADD_ENT);
 	removeEnt = removeEnt.scan(CLIENT_DLL, REMOVE_ENT);
 	isFollowedEntity = isFollowedEntity.scan(CLIENT_DLL, IS_FOLLOWED_ENT);
@@ -236,7 +228,6 @@ void memory::init()
 	game::localPlayer.init();
 	memory::interfaces::init();
 
-	beams = beams.scan(CLIENT_DLL, BEAMS, 0x1).deRef();
 	glowManager = glowManager.scan(CLIENT_DLL, GLOWMANAGER, 0x3).deRef();
 	weaponInterface = weaponInterface.scan(CLIENT_DLL, WEAPONDATA, 0x2).deRef();
 	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER, 0x2).deRef(Dereference::TWICE);

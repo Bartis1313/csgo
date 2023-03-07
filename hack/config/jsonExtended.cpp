@@ -6,14 +6,9 @@ void from_json(const json& j, CfgWeapon& val)
 {
 	from_json(j, "Enabled", val.enabled);
 	from_json(j, "Fov", val.fov);
-	from_json(j, "Smooth", val.smooth);
-	from_json(j, "Skill", val.skill);
-	from_json(j, "Smooth mode", val.smoothMode);
+	from_json(j, "Smooth", val.frametimeMulttiply);
 	from_json(j, "Randomization", val.randomization);
 	from_json(j, "Randomization Ratio", val.randomizationRatio);
-	from_json(j, "Curve", val.curveAim);
-	from_json(j, "Curve X", val.curveX);
-	from_json(j, "Curve Y", val.curveY);
 	from_json(j, "Aim method", val.methodAim);
 	from_json(j, "Aim selection", val.aimSelection);
 	from_json(j, "Aim delay enabled", val.aimDelay);
@@ -31,14 +26,9 @@ void to_json(json& j, const CfgWeapon& val)
 {
 	j["Enabled"] = val.enabled;
 	j["Fov"] = val.fov;
-	j["Smooth"] = val.smooth;
-	j["Skill"] = val.skill;
-	j["Smooth mode"] = val.smoothMode;
+	j["Smooth"] = val.frametimeMulttiply;
 	j["Randomization"] = val.randomization;
 	j["Randomization Ratio"] = val.randomizationRatio;
-	j["Curve"] = val.curveAim;
-	j["Curve X"] = val.curveX;
-	j["Curve Y"] = val.curveY;
 	j["Aim method"] = val.methodAim;
 	j["Aim selection"] = val.aimSelection;
 	j["Aim delay enabled"] = val.aimDelay;
@@ -548,6 +538,7 @@ void to_json(json& j, const VarVisuals::VarWorld::VarModulate& val)
 void from_json(const json& j, VarVisuals::VarWorld::VarMolotov& val)
 {
 	from_json(j, "Enabled", val.enabled);
+	from_json(j, "Triangulation", val.triangulation);
 	from_json(j["Molly"], val.color);
 	from_json(j["Text"], val.colorText);
 }
@@ -555,6 +546,7 @@ void from_json(const json& j, VarVisuals::VarWorld::VarMolotov& val)
 void to_json(json& j, const VarVisuals::VarWorld::VarMolotov& val)
 {
 	j["Enabled"] = val.enabled;
+	j["Triangulation"] = val.triangulation;
 	j["Molly"] = val.color;
 	j["Text"] = val.colorText;
 }
@@ -933,10 +925,9 @@ void from_json(const json& j, VarMisc::VarPlots& val)
 	from_json(j, "Enabled Velocity", val.enabledVelocity);
 	from_json(j["Fps"], val.colorFPS);
 	from_json(j["Velocity"], val.colorVelocity);
-	from_json(j, "FPS cap", val.fpsCap);
-	from_json(j, "FPS custom", val.fpsCustom);
-	from_json(j, "Velocity custom", val.velocityCustom);
-	from_json(j, "Velocity cap", val.velocityCap);
+	from_json(j, "FPS size", val.sizeFps);	
+	from_json(j, "Velocity size", val.sizeVelocity);
+	from_json(j, "Velocity transparency", val.transparencyVelocity);
 }
 
 void to_json(json& j, const VarMisc::VarPlots& val)
@@ -945,10 +936,9 @@ void to_json(json& j, const VarMisc::VarPlots& val)
 	j["Enabled Velocity"] = val.enabledVelocity;
 	j["Fps"]= val.colorFPS;
 	j["Velocity"]= val.colorVelocity;
-	j["FPS cap"] = val.fpsCap;
-	j["FPS custom"] = val.fpsCustom;
-	j["Velocity custom"] = val.velocityCustom;
-	j["Velocity cap"] = val.velocityCap;
+	j["FPS size"] = val.sizeFps;
+	j["Velocity size"] = val.sizeVelocity;
+	j["Velocity transparency"] = val.transparencyVelocity;
 }
 
 void from_json(const json& j, VarMisc::VarInfo& val)

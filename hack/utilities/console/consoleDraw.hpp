@@ -4,20 +4,20 @@
 
 #include <menu/GUI-ImGui/imguiaddons.hpp>
 #include <cheats/classes/renderableToPresent.hpp>
+#include <cheats/classes/wndProcKeyHandler.hpp>
 
 #include <vector>
 #include <string>
 
-class LogDrawer : protected  RenderablePresentType
+class LogDrawer : protected RenderablePresentType, protected WndProcKeyHandler
 {
 public:
 	LogDrawer()
 		: RenderablePresentType{}
 	{}
-
-	void handleKeys() { m_opened = !m_opened; };
 protected:
 	virtual void draw() override;
+	virtual void updateKeys() override;
 public:
 	// from demo, slight edit, usage same as normal console.log
 	struct ExampleAppLog

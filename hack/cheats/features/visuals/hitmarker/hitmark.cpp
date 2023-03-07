@@ -37,12 +37,12 @@ void Hitmarker::draw()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	int x, y;
+	float x, y;
 	bool mode3D = vars::misc->hitmarker->enabled3D;
 	if (!mode3D)
 	{
-		x = globals::screenX / 2;
-		y = globals::screenY / 2;
+		x = globals::screenX / 2.0f;
+		y = globals::screenY / 2.0f;
 	}
 
 	float currentAlpha = 0.0f;
@@ -60,11 +60,9 @@ void Hitmarker::draw()
 		{
 			if (ImVec2 s; imRender.worldToScreen(el.m_pos, s))
 			{
-				x = static_cast<int>(s.x);
-				y = static_cast<int>(s.y);
+				x = s.x;
+				y = s.y;
 			}
-			else
-				continue;
 		}
 
 		currentAlpha = diff / vars::misc->hitmarker->time;
@@ -104,7 +102,7 @@ void Hitmarker::draw()
 		constexpr int moveMultiply = 25;
 		float correction = (1.0f - currentAlpha) * moveMultiply; // this maybe should have el.expire ratio to previous one
 		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
-		float Ycorrection = y - (correction * 4.0f); // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
+		float Ycorrection = (1.0f - currentAlpha) * y; // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
 
 		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma14, std::format("{}", el.m_dmg), false, actualColor, false);
 

@@ -36,8 +36,8 @@ private:
 	void drawBackTrack(Player_t* ent);
 	void CALL(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 
-	std::optional<Mat_t> addMaterialByBuffer(const Mat_t& material, bool suppress = false);
-	std::optional<Mat_t> addMaterialByString(const Mat_t& material, bool suppress = false);
+	std::optional<Mat_t> addMaterialByBuffer(const Mat_t& material);
+	std::optional<Mat_t> addMaterialByString(const Mat_t& material);
 
 	std::vector<Mat_t> m_materials;
 

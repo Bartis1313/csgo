@@ -84,3 +84,11 @@ void LogDrawer::draw()
 	if (m_opened)
 		log.draw("Logging Console", &m_opened);
 }
+
+#include <config/vars.hpp>
+
+void LogDrawer::updateKeys()
+{
+	if (vars::keys->console.isPressed())
+		m_opened = !m_opened;
+}

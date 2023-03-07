@@ -9,6 +9,11 @@
 #include <menu/GUI-ImGui/menu.hpp>
 #include <cheats/game/game.hpp>
 
+void Freecam::updateKeys()
+{
+	vars::keys->freeCam.update();
+}
+
 void Freecam::run(CViewSetup* view)
 {
 	if (menu.isMenuActive())
@@ -22,32 +27,32 @@ void Freecam::run(CViewSetup* view)
 	if (vars::misc->freeCam->enabled && vars::keys->freeCam.isEnabled())
 	{
 		m_inCam = true;
-		if (inputHandler.isKeyPressed(VK_SHIFT))
+		if (KeysHandler::isKeyPressed(VK_SHIFT))
 			vars::misc->freeCam->speed += 0.1f;
-		else if (inputHandler.isKeyPressed(VK_CONTROL))
+		else if (KeysHandler::isKeyPressed(VK_CONTROL))
 			vars::misc->freeCam->speed -= 0.1f;
 
 		Vec3 ang = view->m_angles;
 		const float speed = std::clamp(vars::misc->freeCam->speed, 1.0f, 20.0f);
 
 		const auto [forward, right, up] = math::angleVectors(ang);
-		if (inputHandler.isKeyDown(VK_SPACE))
+		if (KeysHandler::isKeyDown(VK_SPACE))
 		{
 			v += up * speed;
 		}
-		if (inputHandler.isKeyDown(0x57)) // w
+		if (KeysHandler::isKeyDown(0x57)) // w
 		{
 			v += forward * speed;
 		}
-		if (inputHandler.isKeyDown(0x41)) // a
+		if (KeysHandler::isKeyDown(0x41)) // a
 		{
 			v -= right * speed;
 		}
-		if (inputHandler.isKeyDown(0x53)) // s
+		if (KeysHandler::isKeyDown(0x53)) // s
 		{
 			v -= forward * speed;
 		}
-		if (inputHandler.isKeyDown(0x44)) // d
+		if (KeysHandler::isKeyDown(0x44)) // d
 		{
 			v += right * speed;
 		}

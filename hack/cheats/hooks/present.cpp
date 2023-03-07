@@ -44,6 +44,7 @@ hooks::present::value D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RE
 		imRender.renderPresent(imdraw);
 		background.draw(imdraw);
 		RenderablePresentType::runAll();
+		ImNotify::handle();
 	}
 
 	// END DRAW

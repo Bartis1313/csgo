@@ -29,7 +29,7 @@ void Particle::dispatchParticle(const std::string& name, const Vec3& pos)
 	__asm add esp, 8
 	*reinterpret_cast<Vec3*>(reinterpret_cast<uintptr_t>(created) + 0x3B4) = copyPos;
 
-
+	// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/c_particle_system.cpp#L339
 	memory::particleSetControlPoint()(created, 0, &copyPos);
 	memory::particleSetControlPoint()(created, 1, &copyPos);
 }

@@ -32,10 +32,7 @@ DiscordPresence Setup::m_dc;
 
 bool Setup::init(void* instance)
 {
-	// pass custom handler
-	// commented due to false-positives thrown by steam server
-	// they handle it somehow to prevent such crash, but exception pointers report it
-	//AddVectoredExceptionHandler(TRUE, SEHcatch::memErrorCatch);
+	//AddVectoredExceptionHandler(0, handler);
 
 	TimeCount initTimer{};
 	// might need to rewrite this later with setting those names

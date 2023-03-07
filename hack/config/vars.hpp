@@ -224,6 +224,7 @@ struct VarVisuals
 		struct VarMolotov
 		{
 			bool enabled = false;
+			bool triangulation = false;
 			CfgColor color = Colors::Red.getColorEditAlpha(0.3f);
 			CfgColor colorText = Colors::White;
 		};
@@ -430,12 +431,11 @@ struct VarMisc
 	{
 		bool enabledFps = false;
 		bool enabledVelocity = false;
+		bool transparencyVelocity = false;
 		CfgColor colorVelocity = Colors::White;
 		CfgColor colorFPS = Colors::White;
-		float fpsCap = false;
-		bool fpsCustom = false;
-		bool velocityCustom = false;
-		bool velocityCap = false;
+		int sizeFps = 300;
+		int sizeVelocity = 300;
 	};
 	std::unique_ptr<VarPlots> plots{ new VarPlots };
 

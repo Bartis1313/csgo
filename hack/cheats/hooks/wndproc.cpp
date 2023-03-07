@@ -7,11 +7,13 @@
 #include <gamememory/memory.hpp>
 #include <utilities/console/console.hpp>
 #include <utilities/console/consoleDraw.hpp>
+#include <cheats/classes/wndProcKeyHandler.hpp>
 
 #include <MinHook.h>
 #include <imgui_impl_win32.h>
+#include <implot.h>
 
-extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+#include <mutex>
 
 void wndProcSys::init()
 {
@@ -30,33 +32,23 @@ void wndProcSys::shutdown()
 	memory::interfaces::iSystem->enableInput(true);
 }
 
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
+
 LRESULT wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	// init content for imgui, once
-	static auto bOnce = [=]()
+	static std::once_flag once;
+	std::call_once(once, [hwnd]() 
 	{
 		ImGui::CreateContext();
+		ImPlot::CreateContext();
 		ImGui_ImplWin32_Init(hwnd);
 
 		console::info("init for wndProc success");
+	});
 
-		return true;
-	} ();
-
-	inputHandler.run(message, wparam);
-	x88menu.handleKeys();
-
-	vars::keys->aimbot.update();
-	vars::keys->thirdP.update();
-	vars::keys->freeLook.update();
-	vars::keys->freeCam.update();
-	vars::keys->mirrorCam.update();
-
-	if (vars::keys->menu.isPressed())
-		menu.changeActive();
-
-	if (vars::keys->console.isPressed())
-		g_LogDrawer->handleKeys();
+	KeysHandler::run(message, wparam);
+	WndProcKeyHandler::updateAllKeys();
 
 	memory::interfaces::iSystem->enableInput(!menu.isMenuActive());
 	

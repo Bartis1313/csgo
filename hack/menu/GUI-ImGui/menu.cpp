@@ -2,11 +2,11 @@
 
 #include "animations.hpp"
 
-#include <imgui.h>
 #include <imgui_impl_win32.h>
 #include <imgui_impl_dx9.h>
 #include <imgui_internal.h>
 #include <imgui_stdlib.h>
+#include <implot.h>
 #include <magic_enum.hpp>
 #include <deps/magic_enum/prettyNames.hpp>
 #include <utilities/tools/tools.hpp>
@@ -16,7 +16,18 @@
 #include <cheats/features/visuals/chams/editor.hpp>
 #include <config/vars.hpp>
 
-// see the code of dear imgui lib or demo window to change it.
+#include <regex>
+#include <fstream>
+
+void ImGuiMenu::updateKeys()
+{
+	if (vars::keys->menu.isPressed())
+	{
+		m_active = !m_active;
+		ImGui::SaveIniSettingsToDisk(m_iniFile.c_str());
+	}
+}
+
 void ImGuiMenu::init()
 {
 	ImGuiIO& io = ImGui::GetIO();
@@ -24,10 +35,15 @@ void ImGuiMenu::init()
 	style = vars::styling->imStyle;
 
 	// NEED static here
-	static auto p = (config.getHackPath() / "window.ini").string();
+	static auto iniLocation = (config.getHackPath() / "window.ini").string();
 
-	io.IniFilename = p.c_str();
+	io.IniFilename = iniLocation.c_str();
+	m_iniFile = iniLocation;
 	io.LogFilename = nullptr;
+
+	auto posAndSize = getPosAndSizeSetting(iniLocation, m_menuTitle);
+	m_targetSize = posAndSize.size;
+	m_windowPos = posAndSize.pos + m_targetSize / 2;
 
 	try
 	{
@@ -39,11 +55,31 @@ void ImGuiMenu::init()
 	}
 }
 
+ImGuiMenu::NamedPair ImGuiMenu::getPosAndSizeSetting(const std::string& fileName, const std::string& windowName)
+{
+	std::ifstream file{ fileName };
+	if (!file)
+		return ImGuiMenu::NamedPair{ ImVec2{ 0, 0 }, ImVec2{ 0, 0 } };
+
+	std::string contents{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
+
+	std::regex sectionRegex{ "\\[Window\\]\\[" + windowName + "\\].*?\\n\\s*Pos=(\\d+),(\\d+).*?\\n\\s*Size=(\\d+),(\\d+)" };
+	std::smatch sectionMatch;
+	if (!std::regex_search(contents, sectionMatch, sectionRegex))
+		return ImGuiMenu::NamedPair{ ImVec2{ 0, 0 }, ImVec2{ 0, 0 } };
+
+	const auto pos = ImVec2{ static_cast<float>(std::stoi(sectionMatch[1])), static_cast<float>(std::stoi(sectionMatch[2])) };
+	const auto size = ImVec2{ static_cast<float>(std::stoi(sectionMatch[3])), static_cast<float>(std::stoi(sectionMatch[4])) };
+
+	return ImGuiMenu::NamedPair{ .pos = pos, .size = size };
+}
+
 void ImGuiMenu::shutdown()
 {
 	ImGui_ImplDX9_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
+	ImPlot::DestroyContext();
 }
 
 void ImGuiMenu::example()
@@ -100,17 +136,13 @@ static void renderAimbot()
 				ImGui::SameLine();
 				ImGui::Animations::Hotkey("Aimkey", &vars::keys->aimbot);
 				ImGui::Animations::SliderFloat("Fov##aim", &cfg.fov, 0.0f, 50.0f);
-				ImGui::Animations::Combo("Method##Aim", &cfg.methodAim, magic_enum::enum_names_pretty<AimbotMethod>());
 				ImGui::Animations::Combo("Hitboxes##aim", &cfg.aimSelection, magic_enum::enum_names_pretty<AimbotHitboxes>());
-				ImGui::Animations::SliderFloat("Smooth##aim", &cfg.smooth, 0.0f, 1.0f);
-				ImGui::Animations::SliderFloat("Skill##aim", &cfg.skill, 0.0f, 1.0f);
-				ImGui::Animations::Combo("Smooth method##aim", &cfg.smoothMode, magic_enum::enum_names_pretty<SmoothMode>());
+				ImGui::Animations::SliderFloat("Multiply##aim", &cfg.frametimeMulttiply, 0.0f, 30.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
+				ImGui::SameLine();
+				ImGui::HelpMarker("Scales with the frametime, more = faster");
 				ImGui::Animations::Checkbox("Randomization##aim", &cfg.randomization);
 				if (cfg.randomization)
-					ImGui::Animations::SliderFloat("Ratio##aim", &cfg.randomizationRatio, 0.0f, cfg.smooth / 5.0f);
-				ImGui::Animations::Checkbox("Curved##aim", &cfg.curveAim);
-				ImGui::Animations::SliderFloat("Curve X##aim", &cfg.curveX, 0.0f, 1.0f);
-				ImGui::Animations::SliderFloat("Curve Y##aim", &cfg.curveY, 0.0f, 1.0f);
+					ImGui::Animations::SliderFloat("Ratio##aim", &cfg.randomizationRatio, 0.0f, cfg.frametimeMulttiply / 5.0f);
 				ImGui::Animations::Checkbox("Delay##aim", &cfg.aimDelay);
 				ImGui::Animations::SliderFloat("Delay ms##aim", &cfg.aimDelayVal, 0.0f, 800.0f);
 				ImGui::Animations::Checkbox("Aim at Backtrack", &cfg.aimBacktrack);
@@ -382,14 +414,16 @@ static void renderVisuals()
 				ImGui::EndGroupPanel();
 			}
 
-			ImGui::BeginGroupPanel("Molotov & Smoke circles", availRegion());
+			ImGui::BeginGroupPanel("Molotov & Smoke range", availRegion());
 			{
-				ImGui::Animations::Checkbox("##Enabled molotov circle", &vars::visuals->world->molotov->enabled);
+				ImGui::Animations::Checkbox("##molotov polygon", &vars::visuals->world->molotov->enabled);
 				ImGui::SameLine();
-				ImGui::Animations::ColorPicker("Draw molotov circle", &vars::visuals->world->molotov->color);
+				ImGui::Animations::ColorPicker("Molotov##molrange", &vars::visuals->world->molotov->color);
+				ImGui::SameLine();
+				ImGui::Animations::Checkbox("Triangulation", &vars::visuals->world->molotov->triangulation);
 				ImGui::Animations::Checkbox("##Enabled smoke circle", &vars::visuals->world->smoke->enabled);
 				ImGui::SameLine();
-				ImGui::Animations::ColorPicker("Draw smoke circle", &vars::visuals->world->smoke->color);
+				ImGui::Animations::ColorPicker("Smoke##smokerange", &vars::visuals->world->smoke->color);
 
 				ImGui::EndGroupPanel();
 			}
@@ -526,19 +560,13 @@ static void renderMisc()
 			{
 				ImGui::Animations::Checkbox("No scope", &vars::misc->scope->enabled);
 				
-				ImGui::Animations::Checkbox("FPS Plot", &vars::misc->plots->enabledFps);
-				if (vars::misc->plots->enabledFps)
-				{
-					ImGui::SameLine();
-					ImGui::Animations::Checkbox("FPS Custom", &vars::misc->plots->fpsCustom);
-				}
-				
+				ImGui::Animations::Checkbox("FPS Plot", &vars::misc->plots->enabledFps);				
 				ImGui::Animations::Checkbox("Velocity Plot", &vars::misc->plots->enabledVelocity);
-				if (vars::misc->plots->enabledVelocity)
-				{
-					ImGui::SameLine();
-					ImGui::Animations::Checkbox("Velocity Custom", &vars::misc->plots->velocityCustom);
-				}
+				ImGui::SameLine();
+				ImGui::Animations::Checkbox("Run transparent", &vars::misc->plots->transparencyVelocity);
+				ImGui::SameLine();
+				ImGui::HelpMarker("Will add some flags!\nEg: no resize");
+
 				ImGui::Animations::Checkbox("Draw misc info", &vars::misc->info->enabled);
 				ImGui::Animations::Checkbox("Playerlist##checkbox", &vars::misc->playerList->enabled);
 				ImGui::SameLine();
@@ -943,10 +971,48 @@ std::array tabs =
 #pragma endregion
 
 
+// custom imgui helpers
+
+bool isResized()
+{
+	if (!ImGui::IsMouseReleased(ImGuiMouseButton_Left))
+		return false;
+
+	static ImVec2 lastSize;
+	const ImVec2& currentSize = ImGui::GetCurrentWindow()->Size;
+	if (lastSize.x != currentSize.x || lastSize.y != currentSize.y)
+	{
+		lastSize = currentSize;
+		return true;
+	}
+
+	return false;
+}
+
+bool isMovedPos()
+{
+	if (GImGui->MovingWindow == nullptr)
+		return false;
+
+	return true;
+}
+
 void ImGuiMenu::renderAll()
 {
-	if(ImGui::Begin("csgo legit", &m_active, ImGuiWindowFlags_NoCollapse))
+	if(ImGui::Begin(m_menuTitle, &m_active, ImGuiWindowFlags_NoCollapse))
 	{
+		m_windowSize = ImLerp(m_windowSize, m_active ? m_targetSize : ImVec2{}, ImGui::GetIO().DeltaTime * 8.0f);
+		m_centrePos = m_windowPos - (m_windowSize / 2);
+
+		const bool sized = isResized();
+		const bool posed = isMovedPos();
+
+		if (sized || posed)
+		{
+			m_targetSize = ImGui::GetWindowSize();
+			m_windowPos = ImGui::GetWindowPos() + m_targetSize / 2;
+		}			
+
 		ImGuiStyle& style = ImGui::GetStyle();
 		ImVec2 backupPadding = style.FramePadding;
 		float width = ImGui::GetContentRegionAvail().x;
@@ -1009,13 +1075,23 @@ void ImGuiMenu::draw()
 
 	if (inTransmission())
 	{
+		// prevents issues with saving very small window size
+		ImGui::GetIO().IniFilename = nullptr;
+
 		ImGui::PushStyleColor(ImGuiStyleVar_Alpha, ImGui::GetColorU32(ImGuiStyleVar_Alpha, sharedAlpha));
 		ImGui::SetNextWindowBgAlpha(sharedAlpha);
+		
+		ImGui::SetNextWindowPos(m_centrePos);
+		ImGui::SetNextWindowSize(m_windowSize);
+
 		renderAll();
 		ImGui::PopStyleColor();
 
 		return;
 	}
 	if (m_active)
+	{
+		ImGui::GetIO().IniFilename = m_iniFile.c_str();
 		renderAll();
+	}
 }

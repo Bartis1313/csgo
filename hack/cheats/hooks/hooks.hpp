@@ -33,6 +33,7 @@ enum hookIndexes
 	CREATE_EVENT = 7,
 	RUN_COMMAND = 19,
 	RENDER_VIEW_SCENE_END = 9,
+	OVERRIDE_MOUSE = 23
 };
 
 class IPanel;
@@ -121,6 +122,7 @@ namespace hooks
 	HOOK_STRUCT_VFUNC(createEvent, IGameEvent*, CREATE_EVENT, const char*, bool, uint32_t);
 	HOOK_STRUCT_VFUNC(runCommand, void, RUN_COMMAND, Player_t*, CUserCmd*, IMoveHelper*);
 	HOOK_STRUCT_VFUNC(sceneEnd, void, RENDER_VIEW_SCENE_END);
+	HOOK_STRUCT_VFUNC(overrideMouse, void, OVERRIDE_MOUSE, float*, float*);
 
 	HOOK_STRUCT_FUNC(getColorModulation, void, float*, float*, float*);
 	HOOK_STRUCT_FUNC(buildTransformations, void, CStudioHdr*, void*, void*, const Matrix3x4&, int, void*);
@@ -130,6 +132,7 @@ namespace hooks
 	HOOK_STRUCT_FUNC(unknownOverViewFun, int, int);
 	HOOK_STRUCT_FUNC(isDepthOfField, bool);
 	HOOK_STRUCT_FUNC(fxBlood, void, Vec3&, Vec3&, float, float, float, float);
+	HOOK_STRUCT_FUNC(fxBloodSpray, void, const Vec3&, const Vec3&, float, float, float, float);
 	HOOK_STRUCT_FUNC(clientValidAddr, char, const char*);
 	HOOK_STRUCT_FUNC(engineValidAddr, char, const char*);
 	HOOK_STRUCT_FUNC(studioRenderValidAddr, char, const char*);

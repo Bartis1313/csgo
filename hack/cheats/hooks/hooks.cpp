@@ -36,6 +36,7 @@ else { \
 	HOOK(memory::unkOverviewMap(), hooks::unknownOverViewFun);
 	HOOK(memory::isDepth(), hooks::isDepthOfField);
 	HOOK(memory::fxBlood(), hooks::fxBlood);
+	HOOK(memory::fxBloodSpray(), hooks::fxBloodSpray);
 	HOOK(memory::addEnt(), hooks::addEnt);
 	HOOK(memory::removeEnt(), hooks::removeEnt);
 	
@@ -50,6 +51,7 @@ else { \
 	HOOK(memory::interfaces::panel(), hooks::paintTraverse);
 	HOOK(memory::interfaces::modelRender(), hooks::drawModel);
 	HOOK(memory::interfaces::clientMode(), hooks::overrideView);
+	HOOK(memory::interfaces::clientMode(), hooks::overrideMouse);
 	HOOK(memory::interfaces::clientMode(), hooks::doPostScreenEffects);
 	HOOK(memory::interfaces::surface(), hooks::lockCursor);
 	HOOK(memory::interfaces::cvar->findVar("sv_cheats"), hooks::sv_cheats);

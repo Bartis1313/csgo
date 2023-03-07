@@ -20,6 +20,8 @@
 
 #include <imgui.h>
 
+#include <mutex>
+
 void WeatherController::run(int frame)
 {
 	if (frame != FRAME_RENDER_START)
@@ -106,12 +108,6 @@ void WeatherController::implMenu()
 		std::make_pair(cvarAlpha, cvarAlpha->getFloat()),
 		std::make_pair(cvarWindSpeed, cvarWindSpeed->getFloat()),
 	};
-
-	static std::once_flag onceFlag;
-	std::call_once(onceFlag, [&]()
-		{
-			
-		});
 
 	if (ImGui::SliderFloat("r_rainlength", &vars::visuals->world->weather->length, 0.0f, 1.0f))
 	{

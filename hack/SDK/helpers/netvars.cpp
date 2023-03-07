@@ -156,11 +156,11 @@ uintptr_t NetvarManager::getDataMap(DataMap_t* map, const std::string_view name)
 		{
 			const auto descriptor = map->m_dataDescription[i];
 
-			if (map->m_dataDescription[i].m_name == nullptr)
+			if (descriptor.m_name == nullptr)
 				continue;
 
 			// string_view as map->m_dataDescription[i].m_name sometimes crashes on this, UB
-			if(std::strcmp(name.data(), map->m_dataDescription[i].m_name) == 0)
+			if(std::strcmp(name.data(), descriptor.m_name) == 0)
 				return descriptor.m_offset[TD_OFFSET_NORMAL];
 
 			if (descriptor.m_type == FIELD_EMBEDDED)

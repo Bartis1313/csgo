@@ -14,8 +14,17 @@
 #include <utilities/console/console.hpp>
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
+#include <implot.h>
 
 #include <numeric>
+
+void Plots::init()
+{
+	m_VelocityRecords.reserve(MAX_SIZE_PLOTS);
+	m_FpsRecords.reserve(MAX_SIZE_PLOTS);
+
+	std::iota(m_sharedXS.begin(), m_sharedXS.end(), 0);
+}
 
 void Plots::draw()
 {
@@ -28,18 +37,15 @@ void Plots::drawFps()
 	if (!vars::misc->plots->enabledFps)
 		return;
 
-	// static so we can get records get saved
-	static std::deque<float> records;
-
-	auto getfps = []() -> float // this is how they do it
+	auto getfps = []() -> double // this is how they do it
 	{
-		static float realfps = 0.0f;
-		realfps = 0.9f * realfps + (1.0f - 0.9f) * memory::interfaces::globalVars->m_absoluteframetime;
+		static double realfps = 0.0;
+		realfps = 0.9 * realfps + (1.0 - 0.9) * memory::interfaces::globalVars->m_absoluteframetime;
 
-		return 1.0f / realfps;
+		return 1.0 / realfps;
 	};
 
-	const float fps = getfps();
+	const double fps = getfps();
 	// when loading, you have a chance of freezing
 	if (std::isinf(fps))
 	{
@@ -47,52 +53,59 @@ void Plots::drawFps()
 		return;
 	}
 
-	static float acceptanceCustom = 1.0f;
+	m_FpsRecords.emplace_back(fps);
 
-	records.push_back(fps);
-
-	while (records.size() > static_cast<size_t>(RECORDS_SIZE / acceptanceCustom))
-		records.pop_front();
+	while (m_FpsRecords.size() > MAX_SIZE_PLOTS)
+		m_FpsRecords.erase(m_FpsRecords.begin());
 
 	static float MAX_FPS = memory::interfaces::engine->isInGame() ? 350.0f : 120.0f;
 
-	if (vars::misc->plots->fpsCustom)
+	if (ImGui::Begin("##DummyFps", &vars::misc->plots->enabledFps, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar))
 	{
-		if (ImGui::Begin("Sliders for plot", &vars::misc->plots->fpsCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
+		if (ImGui::BeginMenuBar())
 		{
-			if (memory::interfaces::engine->isInGame()) // not enaled in menu
-				ImGui::Animations::SliderFloat("Set max FPS", &MAX_FPS, 30.0f, 1000.0f, "%.2f", ImGuiSliderFlags_Logarithmic); // hardcoded ranges, we should maybe run some avg fps getter
-			ImGui::Animations::SliderFloat("Acceptance multiply fps", &acceptanceCustom, 0.2f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-			ImGui::Animations::ColorPicker("Color lines plot fps", &vars::misc->plots->colorFPS);
+			if (ImGui::BeginMenu("Menu"))
+			{
+				ImGui::Animations::SliderFloat("Set max FPS", &MAX_FPS, 30.0f, 1000.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+				ImGui::Animations::SliderInt("Records size", &vars::misc->plots->sizeFps, 10, 1000);
+				ImGui::Animations::ColorPicker("Color lines plot fps", &vars::misc->plots->colorFPS);
+
+				ImGui::EndMenu();
+			}
+	
+			ImGui::EndMenuBar();
+		}
+
+		if (m_FpsRecords.size() != MAX_SIZE_PLOTS)
+		{
+			drawing::TextSize{ 30.0f, ImFonts::franklinGothic30, ImGui::GetCurrentWindow()->DC.CursorPos,
+				Color::U32(Colors::Yellow), "Wait for buffer to load!", false, false }.draw(ImGui::GetWindowDrawList());
 
 			ImGui::End();
+			return;
 		}
-	}
 
-	if (ImGui::Begin(std::format("Plot FPS AVG {:.2f}###Plot FPS",
-		std::reduce(records.begin(), records.end()) / records.size()).c_str(), &vars::misc->plots->enabledFps, ImGuiWindowFlags_NoCollapse))
-	{
-		auto& style = ImGui::GetStyle();
-		const bool backupLines = style.AntiAliasedLines;
-		style.AntiAliasedLines = false;
-		const auto windowSize = ImGui::GetContentRegionAvail();
-		const auto windowPos = ImGui::GetCursorScreenPos();
-		const auto windowList = ImGui::GetWindowDrawList();
+		std::vector<double> xs{ m_sharedXS.begin(), m_sharedXS.begin() + vars::misc->plots->sizeFps };
+		std::vector<double> fps{ m_FpsRecords.end() - vars::misc->plots->sizeFps, m_FpsRecords.end() };
 
-		const float acceptance = windowSize.x / static_cast<float>(RECORDS_SIZE / acceptanceCustom);
-		const float scaledavg = MAX_FPS / windowSize.y;
-		std::vector<ImVec2> points;
-		for (size_t i = 0; const auto currentFPS : records)
+		ImPlot::SetNextAxesLimits(0, vars::misc->plots->sizeFps, 0, MAX_FPS, ImPlotCond_::ImPlotCond_Always);
+		ImPlot::PushStyleColor(ImPlotCol_Fill, Color::getImguiColor(vars::misc->plots->colorFPS().getColorEditAlpha(0.25f)));
+		ImPlot::PushStyleColor(ImPlotCol_Line, Color::getImguiColor(vars::misc->plots->colorFPS()));
+		ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 0,0,0,0 });
+		ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 0,0,0,0 });
+
+		if (ImPlot::BeginPlot("Fps", ImVec2{ -1, -1 }))
 		{
-			const float currentX = i * acceptance;
-			const float currentY = std::max(windowSize.y - (currentFPS / scaledavg), 1.0f);
-			points.emplace_back(windowPos.x + currentX, windowPos.y + currentY);
 
-			i++;
+			ImPlot::SetupAxes("Records", "Fps");		
+			ImPlot::PlotShaded("##plotfps", xs.data(), fps.data(), vars::misc->plots->sizeFps);
+			ImPlot::PlotLine("##plotfps", xs.data(), fps.data(), vars::misc->plots->sizeFps);
+
+			ImPlot::EndPlot();
 		}
-		drawing::Polyline{ points, Color::U32(vars::misc->plots->colorFPS()), 0, 1.0f }.draw(windowList);
-		
-		style.AntiAliasedLines = backupLines;
+
+		ImPlot::PopStyleColor(4);
+
 		ImGui::End();
 	}
 }
@@ -106,50 +119,74 @@ void Plots::drawVelocity()
 		return;
 
 	static float MAX_SPEEED_MOVE = memory::interfaces::cvar->findVar("sv_maxspeed")->getFloat(); // should be accurate
-	static bool transparent = false;
 
-	if (vars::misc->plots->velocityCustom)
+	if (m_VelocityRecords.empty())
+		return;
+
+	std::vector<double> xs(m_VelocityRecords.size());
+	for (size_t i = 0; auto& el : xs)
 	{
-		if (ImGui::Begin("Sliders for velocity plot", &vars::misc->plots->velocityCustom, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize))
-		{
-			ImGui::Animations::SliderFloat("Acceptance multiply vel", &m_acceptanceVelocity, 0.2f, 20.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-			ImGui::Animations::ColorPicker("Color lines plot vel", &vars::misc->plots->colorVelocity);
-			ImGui::Animations::Checkbox("Run transparent", &transparent);
-			ImGui::SameLine();
-			ImGui::HelpMarker("Will add some flags!\nEg: no resize");
-
-			ImGui::End();
-		}
+		el = i;
+		i++;
 	}
 
-	const int flags = transparent
-		? ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize
-		: ImGuiWindowFlags_NoCollapse;
+	const int flags = vars::misc->plots->transparencyVelocity
+		? ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoResize
+		: ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_MenuBar;
 
-	if (ImGui::Begin(std::format("Plot Velocity AVG {:.2f}###Plot Velocity",
-		std::reduce(m_VelocityRecords.begin(), m_VelocityRecords.end()) / m_VelocityRecords.size()).c_str(), &vars::misc->plots->enabledVelocity, flags))
+	if (ImGui::Begin("##DummyVel", &vars::misc->plots->enabledVelocity, flags))
 	{
-		auto& style = ImGui::GetStyle();
-		const bool backupLines = style.AntiAliasedLines;
-		style.AntiAliasedLines = false;
-		const auto windowSize = ImGui::GetContentRegionAvail();
-		const auto windowPos = ImGui::GetCursorScreenPos();
-		const auto windowList = ImGui::GetWindowDrawList();
-
-		const float acceptance = windowSize.x / static_cast<float>(RECORDS_SIZE / m_acceptanceVelocity);
-		const float scaledavg = MAX_SPEEED_MOVE / windowSize.y;
-		std::vector<ImVec2> points;
-		for (size_t i = 0; const auto currentVel : m_VelocityRecords)
+		if (!vars::misc->plots->transparencyVelocity)
 		{
-			const float currentX = i * acceptance;
-			const float currentY = std::max(windowSize.y - (currentVel / scaledavg), 1.0f);
-			points.emplace_back(windowPos.x + currentX, windowPos.y + currentY);
+			if (ImGui::BeginMenuBar())
+			{
+				if (ImGui::BeginMenu("Menu"))
+				{
+					ImGui::Animations::SliderInt("Records size", &vars::misc->plots->sizeVelocity, 10, MAX_SIZE_PLOTS - 1);
+					ImGui::Animations::ColorPicker("Color lines plot vel", &vars::misc->plots->colorVelocity);
 
-			i++;
+					ImGui::EndMenu();
+				}
+
+				ImGui::EndMenuBar();
+			}
 		}
-		drawing::Polyline{ points, Color::U32(vars::misc->plots->colorVelocity()), 0, 1.0f }.draw(windowList);
-		
-		style.AntiAliasedLines = backupLines;
+
+		if (m_VelocityRecords.size() != MAX_SIZE_PLOTS)
+		{
+			drawing::TextSize{ 30.0f, ImFonts::franklinGothic30, ImGui::GetCurrentWindow()->DC.CursorPos,
+				Color::U32(Colors::Yellow), "Wait for buffer to load!", false, false }.draw(ImGui::GetWindowDrawList());
+
+			ImGui::End();
+			return;
+		}
+
+		std::vector<double> xs{ m_sharedXS.begin(), m_sharedXS.begin() + vars::misc->plots->sizeVelocity };
+		std::vector<double> vel{ m_VelocityRecords.end() - vars::misc->plots->sizeVelocity, m_VelocityRecords.end() };
+
+		ImPlot::SetNextAxesLimits(0, vars::misc->plots->sizeVelocity, 0, MAX_SPEEED_MOVE + 20, ImPlotCond_::ImPlotCond_Always);
+		ImPlot::PushStyleColor(ImPlotCol_Fill, Color::getImguiColor(vars::misc->plots->colorVelocity().getColorEditAlpha(0.25f)));
+		ImPlot::PushStyleColor(ImPlotCol_Line, Color::getImguiColor(vars::misc->plots->colorVelocity()));
+		ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 0,0,0,0 });
+		ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 0,0,0,0 });
+
+		const int flags = vars::misc->plots->transparencyVelocity ? ImPlotFlags_NoTitle : ImPlotFlags_None;
+
+		if (ImPlot::BeginPlot("Velocity", ImVec2{ -1, -1 }, flags))
+		{
+			ImPlot::SetupAxes("Records", "Velocity", 
+				vars::misc->plots->transparencyVelocity ? ImPlotAxisFlags_NoDecorations : ImPlotAxisFlags_None,
+				vars::misc->plots->transparencyVelocity ? ImPlotAxisFlags_NoDecorations : ImPlotAxisFlags_None);
+
+			if(!vars::misc->plots->transparencyVelocity)
+				ImPlot::PlotShaded("##plotvel", xs.data(), vel.data(), vars::misc->plots->sizeVelocity);
+			ImPlot::PlotLine("##plotvel", xs.data(), vel.data(), vars::misc->plots->sizeVelocity);
+
+			ImPlot::EndPlot();
+		}
+
+		ImPlot::PopStyleColor(4);
+
 		ImGui::End();
 	}
 }
@@ -162,7 +199,7 @@ void VelocityGather::run(CUserCmd* cmd)
 	if (!game::localPlayer)
 		return;
 
-	if (!memory::interfaces::engine->isInGame() || !game::localPlayer->isAlive())
+	if (!memory::interfaces::engine->isInGame())
 	{
 		g_Plots->m_VelocityRecords.clear();
 		return;
@@ -178,6 +215,6 @@ void VelocityGather::run(CUserCmd* cmd)
 	g_Plots->m_VelocityRecords.emplace_back(game::localPlayer->m_vecVelocity().toVecPrev().length());
 
 	// width
-	while (g_Plots->m_VelocityRecords.size() > static_cast<size_t>(g_Plots->RECORDS_SIZE / g_Plots->m_acceptanceVelocity))
-		g_Plots->m_VelocityRecords.pop_front();
+	while (g_Plots->m_VelocityRecords.size() > g_Plots->MAX_SIZE_PLOTS)
+		g_Plots->m_VelocityRecords.erase(g_Plots->m_VelocityRecords.begin());
 }

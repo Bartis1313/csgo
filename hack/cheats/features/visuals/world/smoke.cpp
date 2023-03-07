@@ -28,7 +28,7 @@ void SmokeDraw::draw()
 
 		if (!ent->m_nSmokeEffectTickBegin())
 		{
-			drawCustomSmokeEffect(ent->absOrigin(), 30.0f);
+			//drawCustomSmokeEffect(ent->absOrigin(), 30.0f);
 			continue;
 		}
 
@@ -39,7 +39,7 @@ void SmokeDraw::draw()
 		constexpr int smokeRadius = 144;
 
 		imRender.drawCircle3DFilled(origin, smokeRadius, 216, Colors::Grey, Colors::Black, true, 2.0f);
-		drawCustomSmokeEffect(origin, smokeRadius);
+		//drawCustomSmokeEffect(origin, smokeRadius);
 
 		static float size = ImFonts::tahoma14->FontSize;
 		if (ImVec2 s; imRender.worldToScreen(origin, s))

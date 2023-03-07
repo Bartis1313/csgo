@@ -35,6 +35,5 @@ namespace math
 	// direction vector based on euler dimension
 	[[nodiscard]] Vec3 vectorToAngle(const Vec3& vec);
 	[[nodiscard]] std::optional<std::vector<ImVec2>> grahamScan(std::span<const ImVec2> points);
-	[[nodiscard]] std::optional<std::vector<ImVec2>> giftWrap(std::span<const ImVec2> points);
 	[[nodiscard]] std::pair<Vec3, Vec3> transformAABB(const Matrix3x4& transform, const Vec3& mins, const Vec3& maxs);
 }

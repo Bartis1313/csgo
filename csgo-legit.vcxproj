@@ -166,6 +166,9 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="hack\cheats\classes\overrideM.cpp" />
+    <ClCompile Include="hack\cheats\classes\wndProcKeyHandler.cpp" />
+    <ClCompile Include="hack\cheats\features\aimbot\cmdCache.cpp" />
     <ClCompile Include="hack\cheats\game\game.cpp" />
     <ClCompile Include="hack\cheats\hooks\addEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\buildTransformations.cpp" />
@@ -188,6 +191,7 @@
     <ClCompile Include="hack\cheats\hooks\levelInitPreEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\levelShutdown.cpp" />
     <ClCompile Include="hack\cheats\hooks\lockCursor.cpp" />
+    <ClCompile Include="hack\cheats\hooks\overrideMouse.cpp" />
     <ClCompile Include="hack\cheats\hooks\overrideView.cpp" />
     <ClCompile Include="hack\cheats\hooks\paintTraverse.cpp" />
     <ClCompile Include="hack\cheats\hooks\particlesSimulation.cpp" />
@@ -272,6 +276,8 @@
     <ClCompile Include="hack\cheats\classes\renderableToSurface.cpp" />
     <ClCompile Include="hack\cheats\classes\screen2dEffects.cpp" />
     <ClCompile Include="hack\cheats\classes\VR.cpp" />
+    <ClCompile Include="hack\deps\ImGui\editor\LanguageDefinitions.cpp" />
+    <ClCompile Include="hack\SDK\material.cpp" />
     <ClCompile Include="hack\utilities\tools\tools.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -284,7 +290,7 @@
     <ClCompile Include="hack\config\jsonExtended.cpp" />
     <ClCompile Include="hack\config\key.cpp" />
     <ClCompile Include="hack\deps\ImGui\extraDraw.cpp" />
-    <ClCompile Include="hack\deps\ImGui\TextEditor.cpp" />
+    <ClCompile Include="hack\deps\ImGui\editor\TextEditor.cpp" />
     <ClCompile Include="hack\gamememory\memory.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\animations.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\background.cpp" />
@@ -321,14 +327,17 @@
     <ClInclude Include="hack\cheats\classes\drawModel.hpp" />
     <ClInclude Include="hack\cheats\classes\frameStage.hpp" />
     <ClInclude Include="hack\cheats\classes\onlyInit.hpp" />
+    <ClInclude Include="hack\cheats\classes\overrideM.hpp" />
     <ClInclude Include="hack\cheats\classes\overrideView.hpp" />
     <ClInclude Include="hack\cheats\classes\overViewMap.hpp" />
     <ClInclude Include="hack\cheats\classes\renderableToPresent.hpp" />
     <ClInclude Include="hack\cheats\classes\renderableToSurface.hpp" />
     <ClInclude Include="hack\cheats\classes\screen2dEffects.hpp" />
     <ClInclude Include="hack\cheats\classes\viewRender.hpp" />
+    <ClInclude Include="hack\cheats\classes\wndProcKeyHandler.hpp" />
     <ClInclude Include="hack\cheats\features\aimbot\aimbot.hpp" />
     <ClInclude Include="hack\cheats\features\aimbot\aimbotDraw.hpp" />
+    <ClInclude Include="hack\cheats\features\aimbot\cmdCache.hpp" />
     <ClInclude Include="hack\cheats\features\backtrack\backtrack.hpp" />
     <ClInclude Include="hack\cheats\features\blacklist\blacklist.hpp" />
     <ClInclude Include="hack\cheats\features\cache\cache.hpp" />
@@ -399,8 +408,10 @@
     <ClInclude Include="hack\config\key.hpp" />
     <ClInclude Include="hack\config\vars.hpp" />
     <ClInclude Include="hack\deps\ImGui\extraDraw.hpp" />
-    <ClInclude Include="hack\deps\ImGui\TextEditor.hpp" />
+    <ClInclude Include="hack\deps\ImGui\editor\TextEditor.hpp" />
+    <ClInclude Include="hack\deps\ImGui\imgui_markdown.h" />
     <ClInclude Include="hack\deps\magic_enum\prettyNames.hpp" />
+    <ClInclude Include="hack\deps\delaunator-cpp\delaunator.hpp" />
     <ClInclude Include="hack\gamememory\memory.hpp" />
     <ClInclude Include="hack\gamememory\modules.hpp" />
     <ClInclude Include="hack\gamememory\pattern.hpp" />
@@ -524,6 +535,12 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="hack\deps\images\fatchad.png" />
+    <Image Include="pictures\editor.png" />
+    <Image Include="pictures\molotov.png" />
+    <Image Include="pictures\nade1.png" />
+    <Image Include="pictures\nade2.png" />
+    <Image Include="pictures\plots.png" />
+    <Image Include="pictures\radar.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

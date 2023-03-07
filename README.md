@@ -3,13 +3,31 @@ Source aimed for visual aspects of the game.
 
 ![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/179428634-adf44410-4002-4e5d-9ac5-b794dcb1c35f.png)
 
-# Instalation
-**BEFORE anything, make sure you have it installed**: [c++ redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170) [directX](https://www.microsoft.com/en-us/download/details.aspx?id=35) [vcpkg](https://vcpkg.io/en/index.html)
+## How to build
+
+Requirements:
+
+ * [git](https://git-scm.com/download/win)
+ * [vs](https://visualstudio.microsoft.com/)
+ * [c++ redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
+ * [directX](https://www.microsoft.com/en-us/download/details.aspx?id=35)
+ * [vcpkg](https://vcpkg.io/en/index.html)
+
+Note that git is very optional, it's suggested option to stay up to date.
 <br />
+After every config change it is required to delete the entry and let it create a new default config.
 
-Dependencies folder IS NOT for dependencies themselves, if they are on vcpkg, do not include them manually! Otherwise add those.
+### About dependencies
 
-# Information
+Dependencies folder IS NOT for dependencies themselves, if they are on vcpkg, do not include them manually! Otherwise add those
+<br />
+Some rare exceptions are edited libraries, but it is prefered to not.
+
+## How to run
+
+Default menu key is ``INSERT`` more options will be self explanained by viewing menu.
+
+## Information
 Features marked ``(rebuild needed)`` need recode or better version.
 <br />
 This is a trianing software. No further actions taken by people are heeded.
@@ -22,8 +40,8 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
 # Features list: 
 <details>
 
- * Aimbot - smooth, delay, types, (rebuild needed - make it more like aim-assist rather than aim)
- * RCS - control the recoil spray. Possible to smooth it.
+ * Aimbot - smooth, delay, types, (mouse override)
+ * RCS - control the recoil spray. Possible to smooth it. (mouse override)
  * Triggerbot - delay in ms.
  * Backtrack - manipulate ticks.
  * Fake latency - manipulate sequences in ms.
@@ -42,7 +60,7 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
  * Flashlight - use game effect flashlight.
  * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic. Would need some rework for tracing specific things as water, glass, ents...
  * Engine prediction - useful to never skip tick and get correct server time.
- * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records. Also possible to create your own (currently editor is not possible on initial 0 material, will fix pretty soon)
+ * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records. Also possible to create your own.
  * Glow - highlight player ents. (rebuild needed - think of removing this or creating glow texture on own (game provides such materials), client.dll checks it and it in general has performance issues)
  * Sound Esp - apex legends like sound esp from passive skill of bloodhound character.
  * Esp - name, flags, boxes, health, armor, ammo, skeleton. 2D/3D.
@@ -64,7 +82,7 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
  * Playerlist - a playerlist that will give information of every player on the server, in one window. Does provide information for dormant ents.
  * Cache - not a feature, just escapes using same loops for(int i; 64)... everywhere.
  * Logger - log anything to left corner, with animated move + alpha when text duration reaches end.
- * Ambient - ambient light (think if its possible to directly access rgba of that).
+ * Ambient - ambient light (colors are hard to set without convar - shaders api).
  * Fog - fog controller, color and intensity.
  * Weather - change weather, might cost a lot of performance drop, due to fact many particles will render.
  </details>
@@ -153,6 +171,7 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
 * 1.7.3 - visuals health/armor bug fix, more "clear" hooked functions definitions, accurate info gathered directly from the game about shots, not using events to count them manually (awful!). Prediction last edits. SDK cleanup and addons. Sound is finally not using events, wip to remove other events. Editor still not finished, almost... Plots reworked to work for last rendering change. Fixes to radar, eg: MapStruct, triangle enemies.
 * 2.0.0 - Made it as a new version since it does change a lot. Provided very simple instruction for people who want to use this at long end. Bunch of very few refactors/renames in functions. 2.0 is now having a friendly folder structure. Replaced render from utils to own folder. As well as other things which were "overnamed" to be in utils. Very soon to finally end that project.
 * 2.0.1 - Removed xorstr from here, it's a public source. Fixed hotkey with id detection, removed FORMAT wrapper since there is now no need. Removed console macros to few wrapping functions, removed macro for EXPORT, replaced in memory namespace as a template function. Added game punch which should be more "smoothed". Wip SEHCatch as well as features cleanup.
+* 2.0.2 - Ending it soon... Finally got some free time. What is worth mentioning is fixing the aimbot smooth as well as RCS, they both now never set angles. Chams editor is finally added, current code is very far from clean, but the generation / updating / deleting / saving work well. Molotov now has a better way of drawing its range, added fancy triangulation with some poor workarounds to make it scaled. 
 </details>
 
 # People who helped

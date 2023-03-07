@@ -200,12 +200,18 @@ ParticleEffect
 #define FIND_STRING_INDEX			"55 8B EC 83 EC ? 53 8B 5D ? 57 8B F9 89 7D ? 85 DB"
 // #STR: "Particle/Effect_Rendering", "FX_Blood"
 #define	FX_BLOOD					"55 8B EC 83 EC 34 53 56 57 8B F9 F3 0F"
+// #STR: "effects/blood_gore", "blooddrops", "effects/blood_drop", "effects/blood_core"
+#define	FX_BLOOD_SPRAY				"55 8B EC 83 EC 48 53 8B DA"
 // #STR: "$MotionBlurViewportInternal", "$MotionBlurInternal"
 // you can see there is an offset with pointer that is pushed below, "push 4" is helpful, this is the part of editing vector
 #define BLUR_MATERIAL_ARR_1			"68 ? ? ? ? FF 50 34 8B 4E 08 5E 85 C9 74 0C"
+// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/cstrike15/fx_cs_blood.cpp#L381
+#define BLOOD_CALLBACK				"55 8B EC 8B 4D 08 F3 0F 10 51 ? 8D 51 18"
 // old was in VClientEntityList0 exactly like
 // https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/cliententitylist.h#L130
 // now can't get addr by index, they are placed exactly in same place tho
+// there is now one class for cache - it only has 2 vfuncs. Same way like apex has and all updated source engine games
+// sig for the new class ptr B9 ? ? ? ? E8 ? ? ? ? 8B C8 E8 ? ? ? ? 8B F0 8B CE
 #define ADD_ENT						"55 8B EC 51 8B 45 0C 53 56 8B F1 57"
 #define REMOVE_ENT					"55 8B EC 51 8B 45 0C 53 8B D9 56 57 83 F8 FF 75 07"
 // #STR: "CPrediction::ProcessMovement", and see what calls random seed by 0FFFFFFFF, at the bottom the jump is predicted player
@@ -260,3 +266,12 @@ ParticleEffect
 #define PLAY_STEP_SOUND				"55 8B EC 8B 45 18 81 EC"
 // #STR: "userid", "health", "priority", "player_hurt", "attacker"
 #define ON_TAKE_DMFG_ALIVE			"55 8B EC 83 EC 18 56 57 8B 7D 08 8B F1 57"
+// #STR: "Rain simulation: %du (%d tracers)"
+#define SIMULATE_PARTICLE			"55 8B EC 83 E4 F8 83 EC 1C 53 8B D9 F3 0F 11 4C 24"
+// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/physics_main_shared.cpp#L1783
+#define SIMULATION_TICK				"8B 86 AC 02"
+// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/c_baseplayer.cpp#L2906
+#define COMMAND_CONTEXT				"C6 86 0C 35"
+// #STR: "Reference Count for Material %s (%d) != 0\n"
+#define MATERIAL_DESTRUCT			"55 8B EC 64 A1 ? ? ? ? 6A FF 68 ? ? ? ? 50 64 89 25 ? ? ? ? 56 8B F1 B9"					
+

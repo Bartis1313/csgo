@@ -18,6 +18,7 @@ struct Box final
 	constexpr Box(const std::array<ImVec2, 8>& arr) :
 		points{ arr }
 	{}
+	Box(Entity_t* ent, const Vec3& min, const Vec3& max);
 	Box(Entity_t* ent);
 
 	constexpr bool isValid() const { return m_isValid; }

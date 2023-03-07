@@ -19,7 +19,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 		return;
 
 	// init starting keys, undefined
-	m_vKey = 0;
+	UINT key = 0;
 	auto state = KeyState::OFF;
 
 	switch (message)
@@ -29,7 +29,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	{
 		if (wparam < KEYS_SIZE)
 		{
-			m_vKey = wparam;
+			key = wparam;
 			state = KeyState::DOWN;
 		}
 	}
@@ -39,7 +39,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	{
 		if (wparam < KEYS_SIZE)
 		{
-			m_vKey = wparam;
+			key = wparam;
 			state = KeyState::UP;
 		}
 	}
@@ -48,7 +48,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	case WM_LBUTTONUP:
 	case WM_LBUTTONDBLCLK:
 	{
-		m_vKey = VK_LBUTTON;
+		key = VK_LBUTTON;
 		state = message == WM_LBUTTONUP ? KeyState::UP : KeyState::DOWN;
 	}
 	break;
@@ -56,7 +56,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	case WM_RBUTTONUP:
 	case WM_RBUTTONDBLCLK:
 	{
-		m_vKey = VK_RBUTTON;
+		key = VK_RBUTTON;
 		state = message == WM_RBUTTONUP ? KeyState::UP : KeyState::DOWN;
 	}
 	break;
@@ -64,7 +64,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	case WM_MBUTTONUP:
 	case WM_MBUTTONDBLCLK:
 	{
-		m_vKey = VK_MBUTTON;
+		key = VK_MBUTTON;
 		state = message == WM_MBUTTONUP ? KeyState::UP : KeyState::DOWN;
 	}
 	break;
@@ -72,7 +72,7 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	case WM_XBUTTONUP:
 	case WM_XBUTTONDBLCLK:
 	{
-		m_vKey = (GET_XBUTTON_WPARAM(wparam) == XBUTTON1 ? VK_XBUTTON1 : VK_XBUTTON2);
+		key = (GET_XBUTTON_WPARAM(wparam) == XBUTTON1 ? VK_XBUTTON1 : VK_XBUTTON2);
 		state = message == WM_XBUTTONUP ? KeyState::UP : KeyState::DOWN;
 	}
 	break;
@@ -83,34 +83,31 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	// save the key
 	if (state == KeyState::DOWN)
 	{
-		m_keyStates.set(m_vKey);
+		m_keyStates.set(key);
 	}
 	else if (state == KeyState::UP)
 	{
-		m_keyStates.reset(m_vKey);
-		m_keyPressStates.set(m_vKey);
+		m_keyStates.reset(key);
+		m_keyPressStates.set(key);
 	}
 }
 
-bool KeysHandler::isKeyDown(UINT vKey) const
+bool KeysHandler::isKeyDown(UINT vKey)
 {
 	return m_keyStates[vKey];
 }
 
-bool KeysHandler::isKeyPressed(UINT vKey) const
+bool KeysHandler::isKeyPressed(UINT vKey)
 {
-	// trick to allow method to be const
-	auto* temp = const_cast<KeysHandler*>(this);
-
-	if (temp->m_keyPressStates[vKey])
+	if (m_keyPressStates[vKey])
 	{
-		temp->m_keyPressStates.reset(vKey);
+		m_keyPressStates.reset(vKey);
 		return true;
 	}
 	return false;
 }
 
-bool KeysHandler::isKeyDown(const std::initializer_list<UINT>& vKeys) const
+bool KeysHandler::isKeyDown(const std::initializer_list<UINT>& vKeys)
 {
 	for (const auto vKey : vKeys)
 	{
@@ -120,20 +117,17 @@ bool KeysHandler::isKeyDown(const std::initializer_list<UINT>& vKeys) const
 	return true;
 }
 
-bool KeysHandler::isKeyPressed(const std::initializer_list<UINT>& vKeys) const
+bool KeysHandler::isKeyPressed(const std::initializer_list<UINT>& vKeys)
 {
-	// trick to allow method to be const
-	auto* temp = const_cast<KeysHandler*>(this);
-
 	for (const auto vKey : vKeys)
 	{
-		if (!temp->m_keyPressStates[vKey])
+		if (!m_keyPressStates[vKey])
 			return false;
 	}
 
 	for (const auto vKey : vKeys)
 	{
-		temp->m_keyPressStates.reset(vKey);
+		m_keyPressStates.reset(vKey);
 	}
 	return true;
 }

@@ -18,6 +18,11 @@
 #include <cheats/game/game.hpp>
 #include <config/vars.hpp>
 
+void MirrorCam::updateKeys()
+{
+	vars::keys->mirrorCam.update();
+}
+
 void MirrorCam::run(const CViewSetup& view)
 {
 	// this might eat some FPS, if enabled

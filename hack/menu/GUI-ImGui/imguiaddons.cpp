@@ -6,6 +6,67 @@
 #include <utilities/utilities.hpp>
 #include <cheats/game/globals.hpp>
 
+#include <imgui_internal.h>
+
+void ImNotify::handle()
+{
+	const ImVec2 screenSize = ImGui::GetIO().DisplaySize;
+	constexpr float widthRect = 200.0f;
+	constexpr float fineClip = 5.0f;
+
+	constexpr float animationOUT = 0.5f;
+	constexpr float animationIN = 0.02f; // bigger values wont look good cuz its small pos difference
+
+	float height = fineClip;
+	for (size_t i = 0; auto& notify : m_allNotifies)
+	{
+		const float in = static_cast<float>(ImClamp((ImGui::GetTime() - notify.time) / animationIN, 0.95, 1.0));
+		const float out = static_cast<float>(ImClamp(((ImGui::GetTime() - notify.time) - notify.maxTime) / animationOUT, 0.0, 1.0));
+
+		const float alpha = in * (1.0f - out);
+		notify.alpha = alpha;
+
+		if (notify.alpha <= 0.0f)
+		{
+			m_allNotifies.erase(m_allNotifies.begin() + i);
+			continue;
+		}
+
+		char name[15];
+		ImFormatString(name, IM_ARRAYSIZE(name), "##UNIQUE%i", i);
+		ImGui::SetNextWindowBgAlpha(alpha);
+
+		const float initX = screenSize.x - fineClip;
+		const float xAnimated = in * initX + out * initX;
+		ImGui::SetNextWindowPos(ImVec2{ xAnimated, height + fineClip }, ImGuiCond_Always, ImVec2{ 1.0f, 0.0f });
+		ImGui::Begin(name, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoInputs
+			| ImGuiWindowFlags_NoNav | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing);
+		{
+			ImGui::PushTextWrapPos(widthRect);
+
+			ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetColorU32(ImGuiCol_Text, alpha));
+			ImGui::TextUnformatted(notify.title.c_str());
+			ImGui::Separator();
+			ImGui::TextUnformatted(notify.message.c_str());
+
+			ImGui::PopStyleColor();
+
+			ImGui::PopTextWrapPos();
+		}
+
+		height += (ImGui::GetWindowHeight() + fineClip) * alpha;
+
+		ImGui::End();
+
+		i++;
+	}
+}
+
+void ImNotify::add(const ImNotify& notify)
+{
+	m_allNotifies.push_back(notify);
+}
+
 void ImGui::HelpMarker(const char* desc)
 {
 	ImGui::TextDisabled("(?)");
@@ -25,7 +86,6 @@ void ImGui::HelpMarker(const char* desc)
 #include <unordered_map>
 #include <render/render.hpp>
 #include <deps/ImGui/extraDraw.hpp>
-#include <imgui_internal.h>
 
 static std::unordered_map<ImGuiID, std::pair<ImVec2, ImVec2>> m_mapSizes = {};
 static const char* g_GroupPanelName = nullptr;

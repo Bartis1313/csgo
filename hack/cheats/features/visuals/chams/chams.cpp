@@ -18,28 +18,8 @@
 #include <config/vars.hpp>
 #include <cheats/game/game.hpp>
 
-std::optional<Mat_t> Chams::addMaterialByBuffer(const Mat_t& material, bool suppress)
+std::optional<Mat_t> Chams::addMaterialByBuffer(const Mat_t& material)
 {
-	if (const auto itr = std::ranges::find_if(m_materials, [suppress, material](const auto& m)
-		{
-			if (!suppress && material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}); itr != m_materials.end())
-	{
-		console::error("Can't add material {}, duplicating names...", material.data.name);
-		return std::nullopt;
-	}
-	else
-	{
-		console::debug("Adding material {}", material.data.name);
-	}
-
 	KeyValues* key = new KeyValues(material.data.key.c_str());
 	key->fromBuffer(material.data.name.c_str(), material.data.buf.c_str());
 
@@ -54,31 +34,13 @@ std::optional<Mat_t> Chams::addMaterialByBuffer(const Mat_t& material, bool supp
 		return std::nullopt;
 	}
 
+	console::debug("Adding material {}", material.data.name);
+
 	return matToPush;
 }
 
-std::optional<Mat_t> Chams::addMaterialByString(const Mat_t& material, bool suppress)
+std::optional<Mat_t> Chams::addMaterialByString(const Mat_t& material)
 {
-	if (const auto itr = std::ranges::find_if(m_materials, [suppress, material](const auto& m)
-		{
-			if (!suppress && material.data.name == m.data.name) // yes, this should be 3 lines, ide formatting goes crazy
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}); itr != m_materials.end())
-	{
-		console::error("Can't add material {}, duplicating names...", material.data.name);
-		return std::nullopt;
-	}
-	else
-	{
-		console::debug("Adding material {}", material.data.name);
-	}
-
 	Mat_t matToPush = material;
 	matToPush.mat = memory::interfaces::matSys->createMaterial(material.data.name.c_str(),
 		KeyValues::fromString(material.data.key.c_str(), material.data.buf.c_str()));
@@ -90,6 +52,8 @@ std::optional<Mat_t> Chams::addMaterialByString(const Mat_t& material, bool supp
 		console::error("Material {} error", material.data.name);
 		return std::nullopt;
 	}
+
+	console::debug("Adding material {}", material.data.name);
 
 	return matToPush;
 }
@@ -118,6 +82,8 @@ void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& 
 	if (mat->isError())
 		return;
 
+	// this is not intended to force always
+	// todo: material should have a bitset of flags, this is more flexible for chams editor.
 	mat->setMaterialVarFlag(MATERIAL_VAR_ADDITIVE, false);
 	mat->setMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
 	mat->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignore);

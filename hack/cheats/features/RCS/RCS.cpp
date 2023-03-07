@@ -1,5 +1,6 @@
 #include "RCS.hpp"
 
+#include "../aimbot/cmdCache.hpp"
 #include "../aimbot/aimbot.hpp"
 
 #include <SDK/CUserCmd.hpp>
@@ -17,9 +18,11 @@
 void RCS::init()
 {
 	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
+	m_yaw = memory::interfaces::cvar->findVar("m_yaw");
+	m_pitch = memory::interfaces::cvar->findVar("m_pitch");
 }
 
-void RCS::run(CUserCmd* cmd)
+void RCS::run(float* x, float* y)
 {
 	auto cfg = g_Aimbot->getCachedConfig();
 
@@ -40,25 +43,41 @@ void RCS::run(CUserCmd* cmd)
 	if (weapon->isSniper())
 		return;
 
-	prepare(cmd);
+	prepare(x, y);
 }
 
-void RCS::prepare(CUserCmd* cmd)
+void RCS::prepare(float* x, float* y)
 {
 	auto cfg = g_Aimbot->getCachedConfig();
+	const auto cmd = CUserCmdCache::getCmd();
+	if (!cmd)
+		return;
+
 
 	static auto oldPunch = game::getFixedPunch() * m_scale->getFloat();
 	if (game::localPlayer()->m_iShotsFired() > 1 && cmd->m_buttons & IN_ATTACK)
 	{
+		const Vec3 view = game::getViewAngles();
 		auto punch = game::getFixedPunch() * m_scale->getFloat();
 
 		punch[Coord::X] *= cfg.rcsX;
 		punch[Coord::Y] *= cfg.rcsY;
+		const Vec3 deltaPunch = oldPunch - punch;
+		const Vec3 viewPunch = view + deltaPunch;
+		auto& toAdd = Vec3{ view - viewPunch }.normalize().clamp();
 
-		auto toMove = cmd->m_viewangles += (oldPunch - punch);
-		toMove.clamp();
+		toAdd[0] /= m_pitch->getFloat();
+		toAdd[1] /= m_yaw->getFloat();
 
-		memory::interfaces::engine->setViewAngles(toMove);
+		Vec2 mouse = Vec2{ *x, *y };
+		Vec2 mouseScreen = Vec2{ toAdd[1], -toAdd[0] };
+
+		mouseScreen[0] = (mouseScreen[0] + mouse[0]) / 2.0f;
+		mouseScreen[1] = (mouseScreen[1] + mouse[1]) / 2.0f;
+
+		*x = mouseScreen[0];
+		*y = mouseScreen[1];
+
 
 		oldPunch = punch;
 	}

@@ -24,14 +24,9 @@ class CfgWeapon
 public:
 	bool enabled = false;
 	float fov = 5.0f;
-	float smooth = 0.5f;
-	float skill = 0.5f;
+	float frametimeMulttiply = 8.0f;
 	bool randomization = false;
-	float randomizationRatio = smooth / 5.0f;
-	int smoothMode = static_cast<int>(SmoothMode::LINEAR);
-	bool curveAim = false;
-	float curveX = 0.5f;
-	float curveY = 0.3f;
+	float randomizationRatio = 1.0f;
 	int methodAim = static_cast<int>(AimbotMethod::CROSSHAIR);;
 	int aimSelection = static_cast<int>(AimbotHitboxes::NEAREST);
 	bool aimDelay = false;

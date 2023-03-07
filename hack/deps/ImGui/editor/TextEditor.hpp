@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include <iostream>
 #include <string>
 #include <vector>
@@ -190,6 +188,8 @@ public:
 		static const LanguageDefinition& SQL();
 		static const LanguageDefinition& AngelScript();
 		static const LanguageDefinition& Lua();
+		static const LanguageDefinition& CSharp();
+		static const LanguageDefinition& ValveKeyValues();
 	};
 
 	enum class UndoOperationType { Add, Delete };
@@ -213,7 +213,7 @@ public:
 	void SetErrorMarkers(const ErrorMarkers& aMarkers) { mErrorMarkers = aMarkers; }
 	void SetBreakpoints(const Breakpoints& aMarkers) { mBreakpoints = aMarkers; }
 
-	void Render(const char* aTitle, bool aParentIsFocused = false, const ImVec2& aSize = ImVec2(), bool aBorder = false);
+	bool Render(const char* aTitle, bool aParentIsFocused = false, const ImVec2& aSize = ImVec2(), bool aBorder = false);
 	void SetText(const std::string& aText);
 	std::string GetText() const;
 
@@ -238,6 +238,7 @@ public:
 
 	Coordinates GetCursorPosition() const { return GetActualCursorCoordinates(); }
 	void SetCursorPosition(const Coordinates& aPosition, int aCursor = -1);
+	void SetCursorPosition(int aLine, int aCharIndex, int aCursor = -1);
 
 	inline void OnLineDeleted(int aLineIndex, const std::unordered_set<int>* aHandledCursors = nullptr)
 	{
@@ -309,6 +310,7 @@ public:
 	void SetSelectionStart(const Coordinates& aPosition, int aCursor = -1);
 	void SetSelectionEnd(const Coordinates& aPosition, int aCursor = -1);
 	void SetSelection(const Coordinates& aStart, const Coordinates& aEnd, SelectionMode aMode = SelectionMode::Normal, int aCursor = -1, bool isSpawningNewCursor = false);
+	void SetSelection(int aStartLine, int aStartCharIndex, int aEndLine, int aEndCharIndex, SelectionMode aMode = SelectionMode::Normal, int aCursor = -1, bool isSpawningNewCursor = false);
 	void SelectWordUnderCursor();
 	void SelectAll();
 	bool HasSelection() const;
@@ -316,6 +318,7 @@ public:
 	void Copy();
 	void Cut();
 	void Paste();
+	void Paste(const std::string& text);
 	void Delete(bool aWordMode = false);
 
 	bool CanUndo() const;
@@ -398,8 +401,8 @@ private:
 	Coordinates FindWordStart(const Coordinates& aFrom) const;
 	Coordinates FindWordEnd(const Coordinates& aFrom) const;
 	Coordinates FindNextWord(const Coordinates& aFrom) const;
-	int GetCharacterIndexLeftSide(const Coordinates& aCoordinates) const;
-	int GetCharacterIndex(const Coordinates& aCoordinates) const;
+	int GetCharacterIndexL(const Coordinates& aCoordinates) const;
+	int GetCharacterIndexR(const Coordinates& aCoordinates) const;
 	int GetCharacterColumn(int aLine, int aIndex) const;
 	int GetLineCharacterCount(int aLine) const;
 	int GetLineMaxColumn(int aLine) const;

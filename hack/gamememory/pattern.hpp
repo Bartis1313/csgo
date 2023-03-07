@@ -5,8 +5,6 @@
 #include <vector>
 #include <optional>
 
-// can't make it constexpr with xor'ed strings
-// only way is to use const char (&str)[N] as template literal which wont work
 template<typename T>
 struct SigConvert
 {

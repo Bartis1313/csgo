@@ -64,6 +64,7 @@ public:
     VFUNC(void, colorModulate, 28, (float r, float g, float b), (this, r, g, b));
     VFUNC(void, colorModulate, 28, (const Color& color), (this, color.r(), color.g(), color.b()));
     VFUNC(void, setMaterialVarFlag, 29, (MaterialVarFlags_t flag, bool on), (this, flag, on));
+    VFUNC(void, refresh, 37, (), (this));
     VFUNC(IMaterialVar**, getShaderParams, 41, (), (this));
     VFUNC(bool, isError, 42, (), (this));
     VFUNC(void, addRefCount, 10, (), (this));
@@ -74,6 +75,8 @@ public:
         this->colorModulate(color);
         this->alphaModulate(color);
     }
+
+    void destroy();
 };
 
 

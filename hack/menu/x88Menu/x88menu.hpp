@@ -3,13 +3,19 @@
 #include <string>
 
 #include "x88types.hpp"
+#include <cheats/classes/wndProcKeyHandler.hpp>
 
-class X88Menu
+class X88Menu : protected WndProcKeyHandler
 {
 public:
+	constexpr X88Menu() :
+		WndProcKeyHandler{}
+	{}
+
 	void draw();
 	void init();
-	void handleKeys();
+protected:
+	virtual void updateKeys() override;
 private:
 	// in pixels, padding for X
 	[[nodiscard]] size_t addSpaces(const std::string& text);
