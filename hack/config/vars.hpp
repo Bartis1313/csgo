@@ -455,6 +455,12 @@ struct VarMisc
 	};
 	std::unique_ptr<VarPlayerList> playerList{ new VarPlayerList };
 
+	struct VarSpectactorList
+	{
+		bool enabled = false;
+	};
+	std::unique_ptr<VarSpectactorList> spectactorList{ new VarSpectactorList };
+
 	struct VarAimWarn
 	{
 		bool enabled = false;

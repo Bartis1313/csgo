@@ -169,6 +169,8 @@
     <ClCompile Include="hack\cheats\classes\overrideM.cpp" />
     <ClCompile Include="hack\cheats\classes\wndProcKeyHandler.cpp" />
     <ClCompile Include="hack\cheats\features\aimbot\cmdCache.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\list\spectactors.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\misc\noscope.cpp" />
     <ClCompile Include="hack\cheats\game\game.cpp" />
     <ClCompile Include="hack\cheats\hooks\addEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\buildTransformations.cpp" />
@@ -222,7 +224,6 @@
     <ClCompile Include="hack\cheats\features\visuals\misc\drawinfo.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\hat.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\motionblur.cpp" />
-    <ClCompile Include="hack\cheats\features\visuals\misc\noscope.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\screenEffects.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\trails.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\player\boxes.cpp" />
@@ -362,6 +363,7 @@
     <ClInclude Include="hack\cheats\features\visuals\glow\glow.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\hitmarker\hitmark.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\list\playerlist.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\list\spectactors.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\mirrorcam\mirrorCam.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\crosshair.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\drawInfo.hpp" />

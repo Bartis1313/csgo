@@ -22,7 +22,6 @@ else { \
 }
 	hookHelper::initMinhook();
 
-	HOOK(static_cast<LPVOID>(VirtualQueryEx), hooks::customVirtualQuerry);
 	HOOK(memory::clientValidAddr(), hooks::clientValidAddr);
 	HOOK(memory::enginevalidAddr(), hooks::engineValidAddr);
 	HOOK(memory::studioRenderValidAddr(), hooks::studioRenderValidAddr);
@@ -43,13 +42,13 @@ else { \
 	HOOK(memory::interfaces::dx9Device(), hooks::reset);
 	HOOK(memory::interfaces::dx9Device(), hooks::present);
 	HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
-	HOOK(memory::interfaces::client(), hooks::proxyCreateMove);
 	HOOK(memory::interfaces::client(), hooks::frameStageNotify);
 	HOOK(memory::interfaces::client(), hooks::levelInitPreEntity);
 	HOOK(memory::interfaces::client(), hooks::levelInitPostEntity);
 	HOOK(memory::interfaces::client(), hooks::levelShutdown);
 	HOOK(memory::interfaces::panel(), hooks::paintTraverse);
 	HOOK(memory::interfaces::modelRender(), hooks::drawModel);
+	HOOK(memory::interfaces::clientMode(), hooks::createMove);
 	HOOK(memory::interfaces::clientMode(), hooks::overrideView);
 	HOOK(memory::interfaces::clientMode(), hooks::overrideMouse);
 	HOOK(memory::interfaces::clientMode(), hooks::doPostScreenEffects);

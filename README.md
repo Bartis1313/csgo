@@ -87,11 +87,6 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
  * Weather - change weather, might cost a lot of performance drop, due to fact many particles will render.
  </details>
 
-# Default keybinds
- - INSERT (Close/open menu)
- - DELETE (Panic key - shutdowns whole hack thread)
- - HOME (Console key - shows the console window rendered with ImGui)
-
 # Log
 <details>
 

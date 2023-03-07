@@ -33,7 +33,7 @@ enum hookIndexes
 	CREATE_EVENT = 7,
 	RUN_COMMAND = 19,
 	RENDER_VIEW_SCENE_END = 9,
-	OVERRIDE_MOUSE = 23
+	OVERRIDE_MOUSE = 23,
 };
 
 class IPanel;
@@ -105,7 +105,7 @@ namespace hooks
 	HOOK_STRUCT_VFUNC(doPostScreenEffects, int, POSTSCREENEFFECT, int);
 	HOOK_STRUCT_VFUNC(frameStageNotify, void, FRAMESTAGE, int);
 	HOOK_STRUCT_VFUNC(lockCursor, void, LOCK_CURSOR);
-	HOOK_STRUCT_VFUNC(proxyCreateMove, void, PROXY_MOVE, int, float, bool);
+	HOOK_STRUCT_VFUNC(createMove, bool, CREATEMOVE, float, CUserCmd*);
 	HOOK_STRUCT_VFUNC(unknownFileSystem, int, UNKOWN_FILESYS, void*);
 	HOOK_STRUCT_VFUNC(getUnverifiedFileHashes, int, UNVERIFIED_FILE_HASHES, int);
 	HOOK_STRUCT_VFUNC(unkFileCheck, int, UNK_FILE_CHECK);
@@ -145,7 +145,6 @@ namespace hooks
 	HOOK_STRUCT_FUNC(fireIntern, void, IGameEvent*, bool, bool);
 	HOOK_STRUCT_FUNC(preRestartRound, void);
 	HOOK_STRUCT_FUNC(playStepSound, int, Vec3&, void*, float, bool, void*);
-	HOOK_STRUCT_API(customVirtualQuerry, BOOL, HANDLE, LPCVOID, PMEMORY_BASIC_INFORMATION, SIZE_T);
 	HOOK_STRUCT_API_VFUNC(reset, HRESULT, RESETDX, IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
 	HOOK_STRUCT_API_VFUNC(present, HRESULT, PRESENTDX, IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
 	HOOK_STRUCT_API_VFUNC(drawIndexedPrimitive, HRESULT, DRAW_IDX_PRIMITIVE, IDirect3DDevice9*, D3DPRIMITIVETYPE, INT, UINT, UINT, UINT, UINT);

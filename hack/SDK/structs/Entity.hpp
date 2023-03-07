@@ -212,6 +212,7 @@ public:
 	NETVAR(bool, m_bDucking, "DT_CSPlayer", "m_bDucking");
 	NETVAR(float, m_flHealthShotBoostExpirationTime, "DT_CSPlayer", "m_flHealthShotBoostExpirationTime");
 	NETVAR(EHandle_t, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget");
+	NETVAR(ObserverTypes, m_iObserverMode, "DT_BasePlayer", "m_iObserverMode");
 	NETVAR(EHandle_t, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
 	NETVAR(int, m_iAccount, "DT_CSPlayer", "m_iAccount");
 	PTRNETVAR(const char, m_szLastPlaceName, "DT_BasePlayer", "m_szLastPlaceName");

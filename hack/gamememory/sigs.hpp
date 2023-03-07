@@ -273,5 +273,6 @@ ParticleEffect
 // https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/c_baseplayer.cpp#L2906
 #define COMMAND_CONTEXT				"C6 86 0C 35"
 // #STR: "Reference Count for Material %s (%d) != 0\n"
-#define MATERIAL_DESTRUCT			"55 8B EC 64 A1 ? ? ? ? 6A FF 68 ? ? ? ? 50 64 89 25 ? ? ? ? 56 8B F1 B9"					
-
+#define MATERIAL_DESTRUCT			"55 8B EC 64 A1 ? ? ? ? 6A FF 68 ? ? ? ? 50 64 89 25 ? ? ? ? 56 8B F1 B9"
+// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/cstrike15/cs_hud_scope.cpp#L126
+#define SCOPE_PAINT					"55 8B EC 83 E4 F8 83 EC 78 56 89 4C 24 14"

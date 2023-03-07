@@ -55,30 +55,3 @@ hooks::sv_cheats::value FASTCALL hooks::sv_cheats::hooked(FAST_ARGS)
 
 	return original(thisptr);
 }
-
-#include <cheats/game/globals.hpp>
-#include <utilities/console/console.hpp>
-#include <utilities/tools/tools.hpp>
-
-hooks::customVirtualQuerry::value WINAPI hooks::customVirtualQuerry::hooked(HANDLE hProcess, LPCVOID lpAddress, PMEMORY_BASIC_INFORMATION lpBuffer, SIZE_T dwLength)
-{
-	auto originalRes = original(hProcess, lpAddress, lpBuffer, dwLength);
-
-	std::once_flag once;
-	LPHANDLE csgo = NULL;
-	std::call_once(once, [csgo]
-		{
-			HANDLE proc = LI_FN(GetCurrentProcess)();
-			LI_FN(DuplicateHandle).cached()(proc, globals::instance, proc, csgo, PROCESS_ALL_ACCESS, FALSE, 0);
-		});
-
-	if (originalRes && hProcess == &csgo) // do it for cs ONLY
-	{
-		const auto before = lpBuffer->Protect;
-		lpBuffer->Protect &= ~PAGE_EXECUTE;
-		lpBuffer->Protect |= PAGE_NOACCESS;
-
-		console::debug("lpBuffer->Protect = {} now {}", before, lpBuffer->Protect);
-	}
-	return originalRes;
-}

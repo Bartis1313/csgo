@@ -16,36 +16,16 @@
 #include <cheats/game/game.hpp>
 #include <cheats/game/globals.hpp>
 
-#pragma warning(disable: 4409)
-
-//bool __stdcall hooks::createMove::hooked(float inputFrame, CUserCmd* cmd)
-//{
-//	static auto orig = original;
-//
-//	game::localPlayer = reinterpret_cast<Player_t*>(interfaces::entList->getClientEntity(interfaces::engine->getLocalPlayer()));
-//
-//	if (!cmd || !cmd->m_commandNumber || !game::localPlayer)
-//		return orig(inputFrame, cmd);
-//
-//	// thanks for reminding me https://github.com/Bartis1313/csgo/issues/4
-//	if (orig(inputFrame, cmd))
-//		interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
-//
-//	return false;
-//}
-
-// to get the sendPacket correctly and no need to define it anywhere in headers
-void FASTCALL createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool active, bool& sendPacket)
+hooks::createMove::value FASTCALL hooks::createMove::hooked(FAST_ARGS, float inputFrame, CUserCmd* cmd)
 {
-	hooks::proxyCreateMove::original(thisptr, sequence, inputTime, active);
+	original(thisptr, inputFrame, cmd);
 
-	CUserCmd* cmd = memory::interfaces::input->getUserCmd(0, sequence);
-	if (!cmd || !cmd->m_commandNumber)
-		return;
+	if (!cmd || !cmd->m_commandNumber || !game::localPlayer)
+		return original(thisptr, inputFrame, cmd);
 
-	CVerifiedUserCmd* verifiedCmd = memory::interfaces::input->getVerifiedUserCmd(sequence);
-	if (!verifiedCmd)
-		return;
+	// thanks for reminding me https://github.com/Bartis1313/csgo/issues/4
+	if (original(thisptr, inputFrame, cmd))
+		memory::interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
 
 	Vec3 oldAngle = cmd->m_viewangles;
 
@@ -76,25 +56,5 @@ void FASTCALL createMoveProxy(FAST_ARGS, int sequence, float inputTime, bool act
 	cmd->m_viewangles.normalize();
 	cmd->m_viewangles.clamp();
 
-	verifiedCmd->m_cmd = *cmd;
-	verifiedCmd->m_crc = cmd->getChecksum();
-}
-
-// wrapper for function
-__declspec(naked) hooks::proxyCreateMove::value FASTCALL hooks::proxyCreateMove::hooked(FAST_ARGS, int sequence, float inputFrame, bool active)
-{
-	__asm
-	{
-		push ebp
-		mov ebp, esp
-		push ebx
-		push esp
-		push active
-		push inputFrame
-		push sequence
-		call createMoveProxy
-		pop ebx
-		pop ebp
-		retn 0xC
-	}
+	return false;
 }

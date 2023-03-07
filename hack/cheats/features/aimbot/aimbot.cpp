@@ -86,7 +86,7 @@ void Aimbot::run(float* x, float* y)
 		return;
 
 	const auto myEye = game::localPlayer->getEyePos();
-	const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::getFixedPunch() : Vec3{};
+	const auto punch = (weapon->isRifle() || weapon->isSmg()) ? game::localPlayer->getAimPunch() : Vec3{};
 
 	if (!isClicked(cmd))
 	{

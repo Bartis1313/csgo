@@ -35,9 +35,24 @@ void NoScope::draw()
 void NoScopeBlur::init()
 {
 	m_blurScope = memory::interfaces::matSys->findMaterial("dev/scope_bluroverlay", TEXTURE_GROUP_OTHER);
+	m_filterX = memory::interfaces::matSys->findMaterial("dev/blurfilterx_nohdr", TEXTURE_GROUP_OTHER);
+	m_filterY = memory::interfaces::matSys->findMaterial("dev/blurfiltery_nohdr", TEXTURE_GROUP_OTHER);
 }
 
 void NoScopeBlur::run()
 {
 	m_blurScope->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
+	m_filterX->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
+	m_filterY->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
 }
+
+#include <SDK/CViewSetup.hpp>
+
+void NoScopeBlurSnipers::run(CViewSetup* v)
+{
+	if (!vars::misc->scope->enabled)
+		return;
+
+	v->m_edgeBlur = 0;
+}
+

@@ -53,12 +53,11 @@ void RCS::prepare(float* x, float* y)
 	if (!cmd)
 		return;
 
-
-	static auto oldPunch = game::getFixedPunch() * m_scale->getFloat();
+	static auto oldPunch = game::localPlayer->getAimPunch() * m_scale->getFloat();
 	if (game::localPlayer()->m_iShotsFired() > 1 && cmd->m_buttons & IN_ATTACK)
 	{
 		const Vec3 view = game::getViewAngles();
-		auto punch = game::getFixedPunch() * m_scale->getFloat();
+		auto punch = game::localPlayer->getAimPunch() * m_scale->getFloat();
 
 		punch[Coord::X] *= cfg.rcsX;
 		punch[Coord::Y] *= cfg.rcsY;

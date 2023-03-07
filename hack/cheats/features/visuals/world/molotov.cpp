@@ -182,7 +182,7 @@ void MolotovDraw::draw()
 			}
 		}
 
-        imRender.drawPolyGon(hullOuter, vars::visuals->world->projectiles->molotov());
+        imRender.drawPolyGon(hullOuter, vars::visuals->world->molotov->color());
 
 		auto centerPolygon = [hullOuter, hullsize = hullOuter.size()]()
 		{

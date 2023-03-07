@@ -92,54 +92,6 @@ struct Typedescription_t
 	PAD(8);
 };
 
-struct datarun_t
-{
-	datarun_t() : m_nStartFlatField(0), m_nEndFlatField(0), m_nLength(0)
-	{
-		for (int i = 0; i < TD_OFFSET_COUNT; ++i)
-		{
-			m_nStartOffset[i] = 0;
-#ifdef _GAMECONSOLE
-			// These are the offsets of the next run, for priming the L1 cache
-			m_nPrefetchOffset[i] = 0;
-#endif
-		}
-	}
-
-	// Indices of start/end fields in the flattened typedescription_t list
-	int m_nStartFlatField;
-	int m_nEndFlatField;
-
-	// Offsets for run in the packed/unpacked data (I think the run starts need to be properly aligned)
-	int m_nStartOffset[TD_OFFSET_COUNT];
-#ifdef _GAMECONSOLE
-	// These are the offsets of the next run, for priming the L1 cache
-	int m_nPrefetchOffset[TD_OFFSET_COUNT];
-#endif
-	int m_nLength;
-};
-
-struct datacopyruns_t
-{
-public:
-	CUtlVector<datarun_t> m_vecRuns;
-};
-
-struct flattenedoffsets_t
-{
-	CUtlVector<Typedescription_t> m_Flattened;
-	int	m_nPackedSize; // Contiguous memory to pack all of these together for TD_OFFSET_PACKED
-	int	m_nPackedStartOffset;
-};
-
-struct datamapinfo_t
-{
-	// Flattened list, with FIELD_EMBEDDED, FTYPEDESC_PRIVATE, 
-	//  and FTYPEDESC_OVERRIDE (overridden) fields removed
-	flattenedoffsets_t m_Flat;
-	datacopyruns_t m_CopyRuns;
-};
-
 enum
 {
 	PC_NON_NETWORKED_ONLY = 0,
@@ -147,12 +99,6 @@ enum
 
 	PC_COPYTYPE_COUNT,
 	PC_EVERYTHING = PC_COPYTYPE_COUNT,
-};
-
-struct optimized_datamap_t
-{
-	// Optimized info for PC_NON_NETWORKED and PC_NETWORKED data
-	datamapinfo_t m_Info[PC_COPYTYPE_COUNT];
 };
 
 struct DataMap_t
@@ -164,5 +110,5 @@ struct DataMap_t
 	bool m_chainsValidated;
 	bool m_packedOffsetsComputed;
 	int m_packedSize;
-	optimized_datamap_t* m_optimizedDataMap;
+	void* m_optimizedDataMap;
 };

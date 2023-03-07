@@ -578,6 +578,7 @@ static void renderMisc()
 						ImGui::Animations::Checkbox("Place##playerlist", &vars::misc->playerList->lastPlace);
 					}
 				);
+				ImGui::Animations::Checkbox("Spectactors##specson", &vars::misc->spectactorList->enabled);
 				ImGui::Animations::Checkbox("Hat on local", &vars::misc->hat->enabled);
 				ImGui::SameLine();
 				ImGui::Animations::PopupButton("##Hat pop", []()

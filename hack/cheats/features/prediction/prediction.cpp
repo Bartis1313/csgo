@@ -195,8 +195,8 @@ void Prediction::patchDatamap()
 	// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/predictioncopy.cpp#L1556
 	map->m_optimizedDataMap = nullptr; // Forcing the game to recompute flattened chains.
 
-	memory::interfaces::prediction->shutdownPredictables();
-	memory::interfaces::prediction->reinitPredictables();
+	//memory::interfaces::prediction->shutdownPredictables();
+	//memory::interfaces::prediction->reinitPredictables();
 }
 
 void Prediction::update()
