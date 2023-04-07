@@ -224,7 +224,7 @@ void memory::init()
 	bloodUtilCallback = bloodUtilCallback.scan(CLIENT_DLL, BLOOD_UTIL_CALLBACK);
 	chudIsHidden = chudIsHidden.scan(CLIENT_DLL, CHUD_IS_HIDDEN);
 	viewFade = viewFade.scan(ENGINE_DLL, VIEW_FADE);
-	someround = someround.scan(CLIENT_DLL, UNK_SURVIVAL_RELATED);
+	unkRound = unkRound.scan(CLIENT_DLL, UNK_SURVIVAL_RELATED);
 
 	// REST
 

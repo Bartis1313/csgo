@@ -251,8 +251,7 @@ namespace memory
 	inline Address<void*> bloodUtilCallback;
 	inline Address<void*> chudIsHidden;
 	inline Address<void*> viewFade;
-	inline Address<void*> someround;
-	inline Address<void*> weatherrelated;
+	inline Address<void*> unkRound;
 
 	inline Address<teslaCreate_t> tesla;
 	inline Address<dispatchEffect_t> dispatchEffect;

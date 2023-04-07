@@ -66,7 +66,7 @@ else { \
 	HOOK(memory::interfaces::renderView(), hooks::sceneEnd);
 	HOOK(memory::chudIsHidden(), hooks::chudIsHidden);
 	HOOK(memory::viewFade(), hooks::viewDrawFade);
-	HOOK(memory::someround(), hooks::unkround);
+	HOOK(memory::unkRound(), hooks::unkround);
 
 #undef HOOK
 
