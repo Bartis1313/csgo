@@ -15,8 +15,9 @@ public:
 
 protected:
 	virtual void run() override;
-	virtual void init() override;
 private:
+	void initMaterials();
+
 	std::vector<std::pair<IMaterial*, bool>> m_materials;
 };
 

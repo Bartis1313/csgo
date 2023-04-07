@@ -19,6 +19,7 @@ protected:
 public:
 	void initEditor();
 	void changeState() { m_open = !m_open; }
+	[[nodiscard]] std::vector<Mat_t> getEditorMaterials() const;
 private:
 
 	bool loadCfg();

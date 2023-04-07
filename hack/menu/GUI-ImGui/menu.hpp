@@ -26,13 +26,14 @@ public:
 		ImVec2 pos;
 		ImVec2 size;
 	};
+	std::string m_iniFile;
 protected:
 	virtual void updateKeys() override;
 private:
 	bool m_active = true;
 	float sharedAlpha = 0.0f;
 	static constexpr auto m_menuTitle{ "csgo legit" };
-	std::string m_iniFile;
+	
 
 	ImVec2 m_windowSize;
 	ImVec2 m_centrePos;

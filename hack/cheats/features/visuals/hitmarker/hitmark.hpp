@@ -2,8 +2,10 @@
 
 #include <cheats/classes/renderableToSurface.hpp>
 #include <SDK/math/Vector.hpp>
+#include <render/BBox.hpp>
 
 class IGameEvent;
+class Player_t;
 
 class Hitmarker : protected RenderableSurfaceType
 {
@@ -12,22 +14,22 @@ public:
 		RenderableSurfaceType{}
 	{}
 
+	void handleHits(IGameEvent* event);
 protected:
 	virtual void draw() override;
-	virtual void init() override;
 private:
-	void handleHits(IGameEvent* event);
-
 	struct Hitmark_t
 	{
-		float m_expire;
-		int m_dmg;
-		int m_health;
-		bool m_head;
-		Vec3 m_pos;
-
-		bool isAvailable() const { return m_health >= 0; }
+		float expireTime;
+		int damage;
+		int health;
+		bool wasHeadshot;
+		Player_t* player;
+		// dont touch those outside of loop
+		Vec3 pos;
+		float alpha;
 	};
+
 	std::vector<Hitmark_t> m_hitmarkers;
 };
 

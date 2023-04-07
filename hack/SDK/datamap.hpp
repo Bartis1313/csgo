@@ -73,7 +73,6 @@ enum
 };
 
 struct InputData;
-using inputFn = void(*)(InputData&);
 struct DataMap_t;
 
 struct Typedescription_t

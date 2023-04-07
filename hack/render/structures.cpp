@@ -136,3 +136,12 @@ void Arc::draw(ImDrawList* draw) const
 	draw->PathArcTo(m_centre, m_radius, m_aMin, m_aMax, m_segments);
 	draw->PathStroke(m_color, m_flags, m_thickness);
 }
+
+void Image::draw(ImDrawList* draw) const
+{
+	if (m_rounding > 0.0f)
+		draw->AddImageRounded(m_texture, m_pmin, m_pmax, m_uvmin, m_uvmax, m_color, m_rounding, m_flags);
+	else
+		draw->AddImage(m_texture, m_pmin, m_pmax, m_uvmin, m_uvmax, m_color);
+}
+

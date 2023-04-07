@@ -7,6 +7,7 @@
 
 class Entity_t;
 struct RadarEntity;
+enum ClassID;
 
 enum class EntCacheType // add more if needed, each group should contain many idx's, player is the exception
 {
@@ -30,13 +31,13 @@ public:
 	struct HolderData
 	{
 		Entity_t* ent;
-		size_t idx;
-		size_t classID;
+		int idx;
+		ClassID classID;
 	};
 private:
 	static void fill(const HolderData& data);
 	static bool checkRepeatable(Entity_t* ent);
-	static std::optional<std::pair<size_t, size_t>> getIndexes(Entity_t* ent);
+	static std::optional<std::pair<int, ClassID>> getIndexes(Entity_t* ent);
 public:
 	inline static auto getCache(const EntCacheType& type)
 	{

@@ -13,5 +13,7 @@ void RemoveSky::init()
 
 void RemoveSky::run()
 {
+	// do smth about sky controller as well, TODO
+
 	vars::visuals->world->sky->removeSky ? m_sky->setValue(false) : m_sky->setValue(true);
 }

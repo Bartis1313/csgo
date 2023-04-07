@@ -3,6 +3,7 @@
 #include <SDK/CStudioHdr.hpp>
 #include <SDK/CUtlVector.hpp>
 #include <SDK/math/matrix.hpp>
+#include <SDK/vars.hpp>
 
 //#include "../../SDK/CGlobalVars.hpp"
 //#include "../../SDK/structs/Entity.hpp"
@@ -11,21 +12,10 @@
 // prevent spoofing convar for jiggle bones
 hooks::buildTransformations::value FASTCALL hooks::buildTransformations::hooked(FAST_ARGS, CStudioHdr* hdr, void* pos, void* q, const Matrix3x4& matrix, int boneMask, void* computed)
 {
-	//for (int i = 1; i <= interfaces::globalVars->m_maxClients; i++)
-	//{
-	//    auto ent = reinterpret_cast<Entity_t*>(reinterpret_cast<uintptr_t>(thisptr) + 0x64);
-
-	//    if (ent)
-	//        continue;
-
-	//    // and here u check flags |= 8, but there are better ways like on bottom
-	//}
-
 	CUtlVector<int> flags = hdr->m_boneFlags;
-
 	for (int i = 0; i < hdr->m_boneFlags.m_size; i++)
 	{
-		hdr->m_boneFlags.m_elementsCount[i] &= ~4;
+		hdr->m_boneFlags.m_elements[i] &= ~BONE_ALWAYS_PROCEDURAL;
 	}
 
 	original(thisptr, hdr, pos, q, matrix, boneMask, computed);

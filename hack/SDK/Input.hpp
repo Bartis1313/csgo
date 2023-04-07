@@ -2,6 +2,7 @@
 
 #include "math/Vector.hpp"
 #include "CUserCmd.hpp"
+#include "vars.hpp"
 
 #include "helpers/pad.hpp"
 #include "helpers/vfunc.hpp"
@@ -21,6 +22,6 @@ public:
 
     CVerifiedUserCmd* getVerifiedUserCmd(int sequence)
     {
-        return &m_verifiedCommands[sequence % 150];
+        return &m_verifiedCommands[sequence % MULTIPLAYER_BACKUP];
     }
 };

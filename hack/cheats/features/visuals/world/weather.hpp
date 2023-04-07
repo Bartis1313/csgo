@@ -23,6 +23,7 @@ private:
 	struct WeatherFields_t
 	{
 		Entity_t* m_ent = nullptr;
+		Entity_t* m_networkable = nullptr;
 		bool m_created = false;
 	} m_weather;
 

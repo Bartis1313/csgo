@@ -5,27 +5,18 @@
 
 #include <intrin.h>
 
-hooks::clientValidAddr::value FASTCALL hooks::clientValidAddr::hooked(FAST_ARGS, [[maybe_unused]] const char* lpModuleName)
+hooks::allocKeyValues::value FASTCALL hooks::allocKeyValues::hooked(FAST_ARGS, size_t size)
 {
-	return 1;
+	if (const auto retAddr = reinterpret_cast<retaddr_t>(_ReturnAddress());
+		retAddr == memory::allocKeyValuesEngine() || retAddr == memory::allocKeyValuesClient())
+	{
+		return nullptr;
+	}
+
+	return original(thisptr, size);
 }
 
-hooks::engineValidAddr::value FASTCALL hooks::engineValidAddr::hooked(FAST_ARGS, [[maybe_unused]] const char* lpModuleName)
-{
-	return 1;
-}
-
-hooks::studioRenderValidAddr::value FASTCALL hooks::studioRenderValidAddr::hooked(FAST_ARGS, [[maybe_unused]] const char* lpModuleName)
-{
-	return 1;
-}
-
-hooks::materialSystemValidAddr::value FASTCALL hooks::materialSystemValidAddr::hooked(FAST_ARGS, [[maybe_unused]] const char* lpModuleName)
-{
-	return 1;
-}
-
-hooks::isUsingStaticPropDebugModes::value FASTCALL hooks::isUsingStaticPropDebugModes::hooked(FAST_ARGS)
+hooks::isUsingStaticPropDebugModes::value hooks::isUsingStaticPropDebugModes::hooked()
 {
 	return vars::visuals->world->modulate->enabled; // might check ret addr, but pretty useless imho
 }
@@ -43,7 +34,7 @@ hooks::getUnverifiedFileHashes::value FASTCALL hooks::getUnverifiedFileHashes::h
 	return 0;
 }
 
-hooks::unkFileCheck::value FASTCALL hooks::unkFileCheck::hooked(FAST_ARGS)
+hooks::filesCheck::value FASTCALL hooks::filesCheck::hooked(FAST_ARGS)
 {
 	return 1; // 2 is kick
 }

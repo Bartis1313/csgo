@@ -234,7 +234,7 @@ void NadeTrace_t::push()
 	m_path.push_back(m_pos);
 }
 
-bool NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
+bool NadeTrace_t::draw(WeaponIndex idx)
 {
 	if (m_path.empty())
 		return false;
@@ -243,66 +243,60 @@ bool NadeTrace_t::draw(Entity_t* entity, WeaponIndex idx)
 	if (float dist = m_path.back().distToMeters(game::localPlayer->absOrigin()); dist > vars::misc->nade->tracerDist)
 		return false;
 
-	for (Vec3 prev = m_path.front(); const auto & el : m_path)
+	std::vector<ImVec2> points;
+	for (const auto & el : m_path)
 	{
-		if (ImVec2 end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
-			imRender.drawLine(start, end, vars::misc->nade->colorTracer(), 2.0f);
-
-		prev = el;
+		if (imRender.worldToScreen(el, start))
+			points.push_back(start);
 	}
+	if (!points.empty())
+		imRender.drawPolyLine(points, vars::misc->nade->colorTracer(), 0, 2.0f);
 
-	// from visuals, but not gonna use current ent pos for better look
-	auto scaledFont = [=](const float division = 80.0f, const float min = 12.0f, const float max = 30.0f)
-	{
-		float dist = m_path.back().distTo(game::localPlayer->absOrigin());
-		float fontSize = std::clamp(division / (dist / division), min, max);
-		return fontSize;
-	};
-
-	float scale = ((m_nadeEndTime - memory::interfaces::globalVars->m_curtime) / game::ticksToTime(m_tick));
-	float rad = scaledFont();
+	const float scale = ((m_nadeEndTime - memory::interfaces::globalVars->m_curtime) / game::ticksToTime(m_tick));
+	const float rad = game::getScaledFont(m_path.back(), game::localPlayer->absOrigin());
 
 	imRender.drawCircleFilled(start.x, start.y, rad, 32, Colors::Black);
 	imRender.drawProgressRing(start.x, start.y, rad, 32, -90, scale, 3.0f, Colors::Green);
 
-	auto name = utilities::u8toStr(reinterpret_cast<Weapon_t*>(entity)->getIcon(idx));
-	auto size = ImFonts::icon->CalcTextSizeA(rad + 5.0f, std::numeric_limits<float>::max(), 0.0f, name.c_str());
-	imRender.text(start.x, start.y - (size.y / 2.0f), rad + 5.0f, ImFonts::icon, name, true, Colors::White, false);
 
-	auto rotatePoint2D = [](const Vec2& source, const Vec2& dest, float rotateAngle)
+	if (const auto maybeName = getConsoleName(idx); maybeName.has_value())
 	{
-		const auto delta = dest - source;
+		const auto icon = game::getWeaponIcon(maybeName.value());
+		const auto sizeIcon = ImVec2{ rad + 2.0f, rad + 2.0f };
+		imRender.drawImage(icon.texture, ImVec2{ start.x - (sizeIcon.y / 2.0f), start.y - (sizeIcon.y / 2.0f) }, sizeIcon, Colors::White);
 
-		Vec2 pointRotation
+		auto rotatePoint2D = [](const Vec2& source, const Vec2& dest, float rotateAngle)
 		{
-			delta[Coord::X] * std::sin(rotateAngle) - delta[Coord::Y] * std::cos(rotateAngle),
-			delta[Coord::X] * std::cos(rotateAngle) + delta[Coord::Y] * std::sin(rotateAngle)
+			const auto delta = dest - source;
+
+			Vec2 pointRotation
+			{
+				delta[Coord::X] * std::sin(rotateAngle) - delta[Coord::Y] * std::cos(rotateAngle),
+				delta[Coord::X] * std::cos(rotateAngle) + delta[Coord::Y] * std::sin(rotateAngle)
+			};
+
+			return source + pointRotation;
 		};
 
-		return source + pointRotation;
-	};
+		ImVec2 uselessVec;
+		if (vars::misc->nade->tracerWarn && !imRender.worldToScreen(m_pos, uselessVec))
+		{
+			const auto centre = Vec2{ globals::screenX / 2.0f, globals::screenY / 2.0f };
 
-	ImVec2 uselessVec;
-	if (vars::misc->nade->tracerWarn && !imRender.worldToScreen(m_pos, uselessVec))
-	{
-		const auto centre = Vec2{ globals::screenX / 2.0f, globals::screenY / 2.0f };
+			Vec3 localViewAngle;
+			memory::interfaces::engine->getViewAngles(localViewAngle);
+			const auto& localPos = game::localPlayer->absOrigin();
+			const auto angleToNade = math::calcAngleRelative(localPos, m_pos, localViewAngle);
 
-		Vec3 localViewAngle;
-		memory::interfaces::engine->getViewAngles(localViewAngle);
-		const auto& localPos = game::localPlayer->absOrigin();
-		const auto angleToNade = math::calcAngleRelative(localPos, m_pos, localViewAngle);
+			auto screenPosition = centre;
+			screenPosition[Coord::X] -= std::clamp(localPos.distTo(m_pos), 120.0f, centre[Coord::Y] - 12.0f); // 12.0f - min size possible here so wanna clip it
 
-		auto screenPosition = centre;
-		screenPosition[Coord::X] -= std::clamp(localPos.distTo(m_pos), 120.0f, centre[Coord::Y] - 12.0f); // 12.0f - min size possible here so wanna clip it
+			const auto pos = rotatePoint2D(centre, screenPosition, math::DEG2RAD(angleToNade[Coord::Y]));
 
-		const auto pos = rotatePoint2D(centre, screenPosition, math::DEG2RAD(angleToNade[Coord::Y]));
-
-		imRender.drawCircleFilled(pos[Coord::X], pos[Coord::Y], rad, 32, Colors::Black);
-		imRender.drawProgressRing(pos[Coord::X], pos[Coord::Y], rad, 32, -90.0f, scale, 3.0f, Colors::Green);
-
-		auto name = utilities::u8toStr(reinterpret_cast<Weapon_t*>(entity)->getIcon(idx));
-		auto size = ImFonts::icon->CalcTextSizeA(rad + 5.0f, std::numeric_limits<float>::max(), 0.0f, name.c_str());
-		imRender.text(pos[Coord::X], pos[Coord::Y] - (size.y / 2.0f), rad + 5.0f, ImFonts::icon, name, true, Colors::White, false);
+			imRender.drawCircleFilled(pos[Coord::X], pos[Coord::Y], rad, 32, Colors::Black);
+			imRender.drawProgressRing(pos[Coord::X], pos[Coord::Y], rad, 32, -90.0f, scale, 3.0f, Colors::Green);
+			imRender.drawImage(icon.texture, ImVec2{ pos[Coord::X] - (sizeIcon.x / 2), pos[Coord::Y] - (sizeIcon.y / 2.0f) }, sizeIcon, Colors::White);
+		}
 	}
 
 	return true;
@@ -327,15 +321,15 @@ void GrenadeWarningPaint::draw()
 
 		auto model = ent->getModel();
 		if (!model)
-			return;
+			continue;
 
 		auto studio = memory::interfaces::modelInfo->getStudioModel(model);
 		if (!studio)
-			return;
+			continue;
 
 		auto wpnIdx = game::getNadeByClass(classID, studio);
 		if (wpnIdx == WEAPON_NONE)
-			return;
+			continue;
 
 		m_datas.emplace(std::make_pair(
 			idx,
@@ -354,7 +348,25 @@ void GrenadeWarningPaint::draw()
 		);
 
 		// if no path, then delete this owner from map
-		if (!m_datas.at(idx).draw(ent, wpnIdx))
+		if (!m_datas.at(idx).draw(wpnIdx))
 			m_datas.erase(idx);
 	}
+}
+
+std::optional<std::string_view> NadeTrace_t::getConsoleName(WeaponIndex idx) const
+{
+	static std::unordered_map<WeaponIndex, std::string_view> names =
+	{
+		{ WEAPON_HEGRENADE, "weapon_hegrenade" },
+		{ WEAPON_FLASHBANG, "weapon_flashbang" },
+		{ WEAPON_SMOKEGRENADE, "weapon_smokegrenade" },
+		{ WEAPON_MOLOTOV, "weapon_molotov" },
+		{ WEAPON_INCGRENADE, "weapon_inferno" },
+		{ WEAPON_DECOY, "weapon_decoy" }
+	};
+
+	if (const auto itr = names.find(idx); itr != names.end())
+		return itr->second;
+
+	return std::nullopt;
 }

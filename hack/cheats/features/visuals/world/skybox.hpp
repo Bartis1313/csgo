@@ -6,6 +6,8 @@
 #include <filesystem>
 #include <vector>
 
+class IConVar;
+
 class SkyboxEdit : protected FrameStageType
 {
 public:
@@ -25,7 +27,8 @@ private:
 	std::filesystem::path m_pathCustomSkybox;
 	std::vector<std::string> m_allCustomSkyboxes;
 
-	bool m_changed = false;
+	bool m_changed{ false };
+	IConVar* sv_skyname{ nullptr };
 public:
 	void handleButtonState(bool state) { m_changed = state; }
 };

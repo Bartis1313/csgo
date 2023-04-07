@@ -3,19 +3,22 @@
 #include <SDK/IMaterialSystem.hpp>
 #include <SDK/IMatRenderContext.hpp>
 #include <SDK/vars.hpp>
+#include <SDK/materialInit.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/selections.hpp>
 #include <cheats/game/game.hpp>
 #include <cheats/game/globals.hpp>
 #include <config/vars.hpp>
 #include <utilities/tools/tools.hpp>
+#include <gamememory/memory.hpp>
+#include <utilities/console/console.hpp>
 
-void ScreenEffects::init()
+void ScreenEffects::initMaterials()
 {
 	for (const std::string_view el : selections::screenEffects)
 	{
 		bool mark = false;
-		if (el == "effects/nightvision") // this looks bad, dunno
+		if (el == "effects/nightvision") // nighvision is special case, because overwriting a netvar just works
 			mark = true;
 
 		m_materials.emplace_back(std::make_pair(memory::interfaces::matSys->findMaterial(
@@ -25,28 +28,37 @@ void ScreenEffects::init()
 
 void ScreenEffects::run()
 {
+	INIT_MATERIALS_ONCE(initMaterials);
+
 	if (!game::isAvailable())
 		return;
 
 	int cfg = vars::visuals->world->screenEffect->index;
 	if (cfg == 0)
+	{
+		if (auto& night = game::localPlayer->m_bNightVisionOn())
+			night = false;
+
 		return;
+	}
 
-	Color color = vars::visuals->world->screenEffect->color();
+	const Color color = vars::visuals->world->screenEffect->color();
 
-	auto material = m_materials.at(cfg).first;
-	material->colorModulate(color); // -> works for night vision
+	const auto [material, isNightVision] = m_materials.at(cfg);
+	material->colorModulate(color); // wont work for every material, to do on every refer how glow chams are made
 
-	static bool found = false;
-	auto var = material->findVar("$c0_x", &found);
-	if(found)
+	// only materials in special key have this, not all
+	if(const auto var = material->findVar("$c0_x"))
 		var->setValue(vars::visuals->world->screenEffect->param);
 
-	if (m_materials.at(cfg).second) //nightvisioson
+	if (auto& night = game::localPlayer->m_bNightVisionOn(); !night && isNightVision)
+	{
+		night = true;
 		game::localPlayer->m_flNightVisionAlpha() = color.a();
+	}
+	else if(night && !isNightVision)
+		night = false;
 
-	auto ctx = memory::interfaces::matSys->getRenderContext();
-	ctx->drawScreenSpaceRectangle(material, 0, 0, globals::screenX, globals::screenY, 0, 0,
-	 static_cast<float>(globals::screenX), static_cast<float>(globals::screenY), globals::screenX, globals::screenY);
-	ctx->release();
+	const auto ctx = memory::interfaces::matSys->getRenderContext();
+	ctx->drawScreenEffectMaterial(material);
 }

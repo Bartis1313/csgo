@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <unordered_map>
 
 #include <imgui.h>
 
@@ -29,6 +30,15 @@ struct ImNotify
     inline static std::vector<ImNotify> m_allNotifies;
 };
 
+// ImGuiWindowSettings wrapper
+struct ImWindowSettings
+{
+    ImGuiID id;
+    ImVec2 pos, size;
+    ImVec2 targetSize;
+    float alpha;
+};
+
 namespace ImGui
 {
 	// from demo
@@ -38,6 +48,13 @@ namespace ImGui
 	void EndGroupPanel();
 	// from demo with slight changes
 	void ShowStyleEditorCfg(ImGuiStyle* ref);
+
+    void LoadCustomSettings();
+    namespace extraGlobals
+    {
+        inline std::unordered_map<ImGuiID, ImWindowSettings> settings;
+    }
+   
 }
 
 IMGUI_IMPL_API void* ImGui_CreateTexture(const void* data, int width, int height);

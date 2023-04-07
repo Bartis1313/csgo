@@ -28,13 +28,14 @@ public:
 	{}
 
 	std::vector<Mat_t> getMaterials() const { return m_materials; }
+	void CALL(Matrix3x4* matrix);
 protected:
 	virtual void run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix) override;
-	virtual void init() override;
 private:
+	virtual void initMaterials();
+
 	void overrideChams(int styles, bool ignore, bool wireframe, const Color& color, bool force = true, bool call = true);
 	void drawBackTrack(Player_t* ent);
-	void CALL(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 
 	std::optional<Mat_t> addMaterialByBuffer(const Mat_t& material);
 	std::optional<Mat_t> addMaterialByString(const Mat_t& material);

@@ -19,14 +19,13 @@
 #include <utilities/rand.hpp>
 
 #include <imgui.h>
+#include <utilities/console/console.hpp>
 
 #include <mutex>
 
+// https://www.unknowncheats.me/forum/counterstrike-global-offensive/418432-precipitation-effect-similar-llamahook.html
 void WeatherController::run(int frame)
 {
-	if (frame != FRAME_RENDER_START)
-		return;
-
 	if (!game::isAvailable())
 		return;
 
@@ -40,13 +39,15 @@ void WeatherController::run(int frame)
 			{
 				w->release();
 				w = nullptr;
+				m_weather.m_networkable = nullptr;
 			}
 		}
 	};
 
 	auto getNetworkable = [this]() -> Entity_t*
 	{
-		auto ent = reinterpret_cast<Entity_t*>(memory::interfaces::preciptation->m_createFn(MAX_EDICTS - 1, Random::getRandom<int>(0x0, 0xFFF)));
+		auto ent = reinterpret_cast<Entity_t*>(memory::interfaces::preciptation->m_createFn(MAX_EDICTS - 1, 0));
+
 		if (!ent)
 			return nullptr;
 
@@ -61,30 +62,52 @@ void WeatherController::run(int frame)
 	}
 
 	// reduce calling it often
-	if (!m_weather.m_created)
+	if (frame == FRAME_RENDER_START && !m_weather.m_created)
 	{
-		if (!getNetworkable())
+		m_weather.m_networkable = getNetworkable();
+
+		if (!m_weather.m_networkable)
 			return;
 
-		m_weather.m_ent = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientEntity(MAX_EDICTS - 1));
+		m_weather.m_ent = reinterpret_cast<Entity_t*>((uintptr_t)m_weather.m_networkable - 8); // make normal ent from networkbale
 		if (!m_weather.m_ent)
 			return;
 
 		constexpr float halfP = Vec3::MAX_ARG / 2.0f;
 		constexpr float halfM = -Vec3::MAX_ARG / 2.0f;
 
-		m_weather.m_ent->m_nPrecipType() = PRECIPITATION_TYPE_SNOW;
+		m_weather.m_ent->m_nPrecipType() = PrecipitationType_t::PRECIPITATION_TYPE_SNOW;
 
+		// network streams
 		m_weather.m_ent->preDataUpdate(DATA_UPDATE_CREATED);
 		m_weather.m_ent->onPreDataChanged(DATA_UPDATE_CREATED);
 
 		m_weather.m_ent->collideable()->OBBMins() = Vec3{ halfM, halfM, halfM };
 		m_weather.m_ent->collideable()->OBBMaxs() = Vec3{ halfP, halfP, halfP };
 
+		// force this, reason why rain, snow work is due to CClient_Precipitation::OnDataChanged
 		m_weather.m_ent->onDataChanged(DATA_UPDATE_CREATED);
 		m_weather.m_ent->postDataUpdate(DATA_UPDATE_CREATED);
 
 		m_weather.m_created = true;
+
+		// haven't tried those! just a quick lookup
+
+		// FF 35 ? ? ? ? 89 75 FC E8 ? ? ? ? 5F
+		// looks like g_Precipitations - and looks like there is more code for this
+		// E8 ? ? ? ? 8B 0D ? ? ? ? 85 C9 74 10 8B 01 6A 01 
+		// ^ draw global func
+		// 55 8B EC 51 53 56 57 8B F1 E8 ? ? ? ? 
+		// ^ constructor
+
+		memory::precipitationInit()(m_weather.m_ent); // force creation
+
+		//printf("weather %p\n", m_weather.m_ent);
+	}
+
+	if (frame == FRAME_START && m_weather.m_created)
+	{
+		memory::precipitationClientThink()((void*)((uintptr_t)m_weather.m_ent + 12)); // make to thinkable
 	}
 }
 
@@ -113,7 +136,7 @@ void WeatherController::implMenu()
 	{
 		cvarLenght->setValue(vars::visuals->world->weather->length);
 	}
-	if (ImGui::SliderFloat("r_rainspeed", &vars::visuals->world->weather->rainSpeed, 0.0f, 1000.0f))
+	if (ImGui::SliderFloat("r_rainspeed", &vars::visuals->world->weather->rainSpeed, 100.0f, 1000.0f))
 	{
 		cvarRainSpeed->setValue(vars::visuals->world->weather->rainSpeed);
 	}
@@ -125,7 +148,7 @@ void WeatherController::implMenu()
 	{
 		cvarWidth->setValue(vars::visuals->world->weather->width);
 	}
-	if (ImGui::SliderFloat("r_RainSideVel", &vars::visuals->world->weather->velocity, 0.0f, 1000.0f))
+	if (ImGui::SliderFloat("r_RainSideVel", &vars::visuals->world->weather->velocity, 50.0f, 1000.0f))
 	{
 		cvarSidevel->setValue(vars::visuals->world->weather->velocity);
 	}

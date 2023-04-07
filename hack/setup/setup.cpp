@@ -58,7 +58,7 @@ bool Setup::init(void* instance)
 	}
 
 	initTimer.end();
-	console::info("main thread took {:.5f}s", initTimer.getTime());
+	console::debug("main thread took {:.5f}s", initTimer.getTime());
 	m_inited = true;
 
 	return true;

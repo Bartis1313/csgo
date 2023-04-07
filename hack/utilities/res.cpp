@@ -36,7 +36,7 @@ Resource::Resource(const std::string& path)
 
 	m_resBuf.push_back(*this);
 
-	console::info("Image with path {} loaded!", path);
+	console::debug("Image with path {} loaded!", path);
 }
 
 Resource::Resource(int resID, const std::string_view type)
@@ -66,7 +66,7 @@ Resource::Resource(int resID, const std::string_view type)
 
 	m_resBuf.push_back(*this);
 
-	console::info("Resource ID {}:{} image loaded!", resID, type);
+	console::debug("Resource ID {}:{} image loaded!", resID, type);
 }
 
 Resource::Resource(void* data, size_t size)
@@ -83,7 +83,7 @@ Resource::Resource(void* data, size_t size)
 
 	m_resBuf.push_back(*this);
 
-	console::info("Image from memory loaded!");
+	console::debug("Image from memory loaded!");
 }
 
 void Resource::destroyAll()

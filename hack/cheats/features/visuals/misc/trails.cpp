@@ -14,32 +14,25 @@
 
 void Trails::draw()
 {
-	static Vec3 end;
-
 	if (!game::isAvailable())
 		return;
 
-	int type = vars::misc->trail->mode;
+	const int type = vars::misc->trail->mode;
 
 	if (!vars::misc->trail->enabled)
 		return;
 
-	if (type != E2T(MovementTrail::BEAM))
-	{
-		// prepare the point to be corrected
-		end = game::localPlayer->m_vecOrigin();
-	}
-
-	Color color = vars::misc->trail->color();
+	const Color color = vars::misc->trail->color();
 
 	switch (type)
 	{
 	case E2T(MovementTrail::BEAM):
 	{
-		if (!game::localPlayer->isMoving()) // do not add beams on not moving
+		if (!game::localPlayer->isMoving())
 			return;
 
-		const Vec3 start = game::localPlayer->m_vecOrigin();
+		static Vec3 end = game::localPlayer->absOrigin();
+		const Vec3 start = game::localPlayer->absOrigin();
 
 		BeamInfo_t info = {};
 
@@ -74,37 +67,35 @@ void Trails::draw()
 	}
 	case E2T(MovementTrail::LINE):
 	{
-		float curtime = memory::interfaces::globalVars->m_curtime;
-
 		if (game::localPlayer->isMoving())
-			m_trails.push_back(Trail_t{ game::localPlayer->m_vecOrigin(), curtime + vars::misc->trail->time, color });
+			m_trails.emplace_back(game::localPlayer->m_vecOrigin(),
+				memory::interfaces::globalVars->m_curtime + vars::misc->trail->time, color);
 
-		Vec3 last = {};
-		if (!m_trails.empty())
-			last = m_trails.front().m_pos;
-
+		std::vector<ImVec2> points;
 		for (size_t i = 0; const auto & el : m_trails)
 		{
-			if (el.m_expire < curtime)
+			if (el.m_expire < memory::interfaces::globalVars->m_curtime)
 			{
 				m_trails.erase(m_trails.begin() + i);
 				continue;
 			}
 
-			if (ImVec2 start, end; !last.isZero() && imRender.worldToScreen(el.m_pos, start) && imRender.worldToScreen(last, end))
-				imRender.drawLine(start, end, el.m_col, 3.0f);
-
-			last = el.m_pos;
+			if (ImVec2 screen; imRender.worldToScreen(el.m_pos, screen))
+				points.push_back(screen);
 
 			i++;
 		}
+
+		if (!points.empty())
+			imRender.drawPolyLine(points, color, 0, 2.0f);
 
 		break;
 	}
 	case E2T(MovementTrail::SPLASH):
 	{
 		if (game::localPlayer->isMoving())
-			memory::interfaces::effects->energySplash(game::localPlayer->m_vecOrigin(), {}, true);
+			memory::interfaces::effects->energySplash(game::localPlayer->m_vecOrigin(),
+				 game::localPlayer->m_angEyeAngles() * (game::localPlayer->m_vecVelocity().length() / game::localPlayer->m_flMaxspeed()), true);
 
 		break;
 	}

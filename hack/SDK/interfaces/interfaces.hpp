@@ -46,6 +46,7 @@ class IFileSystem;
 class CGameRules;
 class CEngineSoundClient;
 class IMDLCache;
+class IBaseFileSystem;
 #pragma endregion
 
 namespace memory::interfaces
@@ -73,6 +74,7 @@ namespace memory::interfaces
 	inline Interface<IFileSystem*> fileSystem;
 	inline Interface<CEngineSoundClient*> sound;
 	inline Interface<IMDLCache*> mdlCache;
+	inline Interface<IBaseFileSystem*> baseFileSystem;
 
 	void init();
 }

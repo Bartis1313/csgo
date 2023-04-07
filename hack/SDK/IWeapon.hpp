@@ -6,7 +6,9 @@
 class WeaponInfo
 {
 public:
-	PAD(20);
+	PAD(4);
+	const char* m_consoleName;
+	PAD(12);
 	int m_maxClip1;
 	int m_maxClip2;
 	PAD(8);

@@ -152,9 +152,137 @@ Vec3 game::getFixedPunch()
 
 	if (const auto info = game::localPlayer->getActiveWeapon()->getWpnInfo())
 	{
-		const float lerped = std::clamp(1.0f - (time / info->m_cycleTime), 0.0f, 1.0f);
+		const float lerped = std::clamp(time / info->m_cycleTime, 0.0f, 1.0f);
+
+		printf("lerped %f\n", lerped);
+
 		decayed = prevPunch.lerp(decayed, lerped);
 	}
 
 	return decayed;
+}
+
+#include <d3d9.h>
+#include <d3dx9.h>
+#include <unordered_map>
+#include <SDK/IBaseFileSystem.hpp>
+
+#pragma warning (disable : 4244)
+#define NANOSVG_IMPLEMENTATION
+#include <nanosvg.h>
+#define NANOSVGRAST_IMPLEMENTATION
+#include <nanosvgrast.h>
+
+std::optional<game::BitMapData> getSvgIcon(char* data, const float scale)
+{
+	constexpr float csDPI = 96.0f;
+	NSVGimage* image = nsvgParse(data, "px", csDPI);
+	if (!image)
+	{
+		nsvgDelete(image);
+		return std::nullopt;
+	}
+
+	NSVGrasterizer* rasterizer = nsvgCreateRasterizer();
+	if (!rasterizer)
+	{
+		nsvgDeleteRasterizer(rasterizer);
+		nsvgDelete(image);
+
+		return std::nullopt;
+	}
+
+	const auto width = static_cast<size_t>(image->width * scale);
+	const auto height = static_cast<size_t>(image->height * scale);
+	const auto imgData = std::make_unique<uint8_t[]>(width * height * 4);
+	nsvgRasterize(rasterizer, image, 0, 0, scale, imgData.get(), width, height, width * 4);
+
+	LPDIRECT3DTEXTURE9 texture;
+	if (memory::interfaces::dx9Device->CreateTexture(width, height, 1, D3DUSAGE_DYNAMIC, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT, &texture, NULL) != D3D_OK)
+		return std::nullopt;
+
+	D3DLOCKED_RECT lockedRect;
+	constexpr UINT levelLock = 0U;
+	if (texture->LockRect(levelLock, &lockedRect, NULL, 0) != D3D_OK)
+		return std::nullopt;
+
+	for (size_t y = 0; y < height; ++y)
+	{
+		const auto src = imgData.get() + y * width * 4;
+		const auto dst = static_cast<uint8_t*>(lockedRect.pBits) + y * lockedRect.Pitch;
+		std::ranges::copy(src, src + width * 4, dst);
+	}
+
+	texture->UnlockRect(levelLock);
+
+	const auto fwidth = image->width * scale;
+	const auto fheight = image->width * scale;
+
+	nsvgDeleteRasterizer(rasterizer);
+	nsvgDelete(image);
+
+	return game::BitMapData{ .width = fwidth, .height = fheight, .texture = texture };
+}
+
+std::optional<game::BitMapData> getIconTexture(const std::string& path, float scale)
+{
+	const auto file = memory::interfaces::baseFileSystem->open(path.c_str(), "r", "GAME");
+	if (!file)
+		return std::nullopt;
+
+	std::vector<char> buffer(memory::interfaces::baseFileSystem->size(file));
+
+	memory::interfaces::baseFileSystem->read(buffer.data(), buffer.size(), file);
+	memory::interfaces::baseFileSystem->close(file);
+
+	const auto texture = getSvgIcon(buffer.data(), scale);
+	if (!texture.has_value())
+		return std::nullopt;
+
+	return texture;
+}
+
+game::BitMapData game::getWeaponIcon(const std::string_view weapon)
+{
+	static std::unordered_map<std::string_view, BitMapData> icons;
+
+	if (const auto itr = icons.find(weapon); itr != icons.end())
+		return itr->second;
+
+	// remove weapon_ prefix!
+	const std::string path = std::format("materials/panorama/images/icons/equipment/{}.svg", weapon.substr(7));
+	const auto maybetexture = getIconTexture(path, 1.0f);
+
+	assert(maybetexture.has_value() == true);
+	icons.emplace(weapon, maybetexture.value());
+
+	return maybetexture.value();
+}
+
+game::BitMapData game::getImage(const std::string& path)
+{
+	static std::unordered_map<std::string, BitMapData> pics;
+
+	if (const auto itr = pics.find(path); itr != pics.end())
+		return itr->second;
+
+	const auto file = memory::interfaces::baseFileSystem->open(path.c_str(), "r", "GAME");
+	assert(file != nullptr);
+
+	std::vector<char> buffer(memory::interfaces::baseFileSystem->size(file));
+
+	memory::interfaces::baseFileSystem->read(buffer.data(), buffer.size(), file);
+	memory::interfaces::baseFileSystem->close(file);
+
+	LPDIRECT3DTEXTURE9 texture;
+	const auto hrRes = D3DXCreateTextureFromFileInMemory(memory::interfaces::dx9Device(), buffer.data(), buffer.size(), &texture);
+	assert(hrRes == D3D_OK);
+
+	D3DSURFACE_DESC desc;
+	texture->GetLevelDesc(0, &desc);
+
+	const auto bitmap = game::BitMapData{ .width = static_cast<float>(desc.Width), .height = static_cast<float>(desc.Height), .texture = texture };
+	pics.emplace(path, bitmap);
+
+	return bitmap;
 }

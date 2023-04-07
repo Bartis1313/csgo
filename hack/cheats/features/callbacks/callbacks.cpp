@@ -52,7 +52,7 @@ void Callbacks::init()
 				el.m_callback = head->m_function; // own now the original function
 				head->m_function = el.m_function; // point our edited function
 
-				console::info("custom function inited, name: {} at addr {:#0x}",
+				console::debug("custom function inited, name: {} at addr {:#0x}",
 					name, reinterpret_cast<uintptr_t>(el.m_function));
 			}
 		}

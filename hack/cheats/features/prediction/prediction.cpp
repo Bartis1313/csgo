@@ -116,15 +116,12 @@ void Prediction::start(CUserCmd* cmd)
 		game::localPlayer->processMovement(veh, game::localPlayer(), m_data);
 	memory::interfaces::prediction->finishMove(game::localPlayer(), cmd, m_data);
 	memory::interfaces::moveHelper->processImpacts();
-
-	game::localPlayer->m_vecAbsVelocity() = m_data->m_velocity;
-	game::localPlayer->setAbsOrigin(game::localPlayer->m_vecNetworkOrigin());
+	//game::localPlayer->m_vecAbsVelocity() = m_data->m_velocity;
+	//game::localPlayer->setAbsOrigin(game::localPlayer->m_vecNetworkOrigin());
 	// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/prediction.cpp#L1513
-	game::localPlayer->m_iEFlags() &= ~(EFL_DIRTY_ABSTRANSFORM | EFL_DIRTY_ABSVELOCITY);
+	//game::localPlayer->m_iEFlags() &= ~(EFL_DIRTY_ABSTRANSFORM | EFL_DIRTY_ABSVELOCITY);
 
 	game::localPlayer->postThink();
-	CPredictionCopy copyPost(PC_EVERYTHING, reinterpret_cast<byte*>(game::localPlayer()), PC_DATA_NORMAL, m_startData.get(), PC_DATA_PACKED, CPredictionCopy::TRANSFERDATA_COPYONLY);
-	copyPost.transferData("Prediction::Post", game::localPlayer->getIndex(), game::localPlayer->getPredictionDataMap());
 
 	if (weapon && !weapon->isNonAimable())
 		weapon->updateAccuracyPenalty();
@@ -159,6 +156,8 @@ void Prediction::end()
 	}
 
 	memory::interfaces::gameMovement->reset();
+
+	//game::localPlayer->restoreData("Prediction::postEnd", 1313, PC_EVERYTHING);
 }
 
 void Prediction::addToPrediction(CUserCmd* cmd, const std::function<void()>& fun)
@@ -207,24 +206,5 @@ void Prediction::update()
 		memory::interfaces::prediction->update(state->m_deltaTick, validframe,
 			state->m_lastCommandAck, state->m_lastOutGoingCommand + state->m_chockedCommands);
 
-	static std::once_flag once;
-	std::call_once(once, [&]()
-		{
-			patchDatamap();
-		});
-
-	const auto map = game::localPlayer->getPredictionDataMap();
-	int size = map->m_packedSize;
-	assert(size > 0);
-
-	// At least 4 bytes to avoid some really bad stuff
-	m_allocSize = std::max(size, 4);
-	if (!m_startData)
-	{
-		auto allocated = std::make_unique<byte[]>(m_allocSize);
-		m_startData = std::move(allocated);
-	}
-
-	CPredictionCopy copy(PC_EVERYTHING, m_startData.get(), PC_DATA_PACKED, reinterpret_cast<const byte*>(game::localPlayer()), PC_DATA_NORMAL, CPredictionCopy::TRANSFERDATA_COPYONLY);
-	copy.transferData("Prediction::Update-Start", game::localPlayer->getIndex(), map);
+	//game::localPlayer->saveData("Prediction::preUpdate", 1313, PC_EVERYTHING);
 }

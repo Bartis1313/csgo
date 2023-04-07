@@ -19,27 +19,27 @@ void DroppedWeapons::draw()
 {
 	if (!vars::visuals->esp->dropped->enabled)
 		return;
-
+	
 	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::WEAPON))
 	{
-		auto handle = memory::interfaces::entList->getClientFromHandle(entity->m_hOwnerEntity());
-		if (handle)
-			continue;
-
 		auto wpn = reinterpret_cast<Weapon_t*>(entity);
 		if (!wpn)
+			continue;
+
+		auto handle = memory::interfaces::entList->getClientFromHandle(wpn->m_hOwnerEntity());
+		if (handle)
 			continue;
 
 		Box box{ entity };
 		if (!box.isValid())
 			continue;
 	
-		float fontSize = game::getScaledFont(entity->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
+		const float fontSize = game::getScaledFont(entity->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
 		using cont = std::vector<bool>;
 		float padding = 0.0f;
 
 		constexpr float maxDist = 25.0f;
-		float alpha = (maxDist - entity->absOrigin().distToMeters(game::localPlayer->absOrigin())) / (maxDist / 1.5f);
+		const float alpha = (maxDist - entity->absOrigin().distToMeters(game::localPlayer->absOrigin())) / (maxDist / 1.5f);
 
 		if (alpha < 0.0f)
 			continue;
@@ -49,7 +49,7 @@ void DroppedWeapons::draw()
 			return font->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
 		};
 
-		auto flags = vars::visuals->esp->dropped->flags;
+		const auto flags = vars::visuals->esp->dropped->flags;
 
 		if (flags.at(E2T(DroppedFlags::BOX))) // startpoint - no pad
 		{
@@ -69,7 +69,7 @@ void DroppedWeapons::draw()
 		}
 		if (flags.at(E2T(DroppedFlags::TEXT)))
 		{
-			auto name = vars::visuals->esp->weaponBar->translate
+			const auto name = vars::visuals->esp->weaponBar->translate
 				? memory::interfaces::localize->findAsUTF8(wpn->getWpnInfo()->m_WeaponName)
 				: wpn->getWpnName();
 			imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::verdana12,
@@ -80,12 +80,16 @@ void DroppedWeapons::draw()
 		}
 		if (flags.at(E2T(DroppedFlags::ICON)))
 		{
-			auto name = utilities::u8toStr(wpn->getIcon());
-			imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::icon,
-				name, true, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
+			const auto iconData = game::getWeaponIcon(wpn->getWpnInfo()->m_consoleName);
+			
+			// I couldnt find in panorama scaling arguments passed by, it's usually -1.0f for them?
+			auto goodSize = ImVec2{ iconData.width, iconData.height };
+			goodSize = wpn->isGrenade() ? ImVec2{ 8.0f, 12.0f } : ImVec2{ 22.0f, 14.0f };
 
-			auto textSize = getTextSize(name, ImFonts::icon);
-			padding += textSize.y;
+			imRender.drawImage(iconData.texture, ImVec2{ box.x + box.w / 2, box.y + box.h + 2 + padding },
+				goodSize, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
+
+			padding += goodSize.y;
 		}
 	}
 }

@@ -23,7 +23,7 @@ public:
 
 protected:
 	virtual void draw() override;
-	virtual void init() override;
+	virtual void roundRestart() override;
 private:
 	void drawInfo(Player_t* ent, const Box& box);
 	void drawnName(Player_t* ent, const Box& box);
@@ -35,7 +35,6 @@ private:
 	void drawSkeleton(Player_t* ent);
 	void drawSnapLine(Player_t* ent, const Box& box);
 	void drawLaser(Player_t* ent);
-	void resetDormacy([[maybe_unused]] IGameEvent* event);
 	void updateDormacy(Player_t* ent);
 
 	std::array<float, 65> m_health;

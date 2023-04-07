@@ -24,20 +24,27 @@
 
 Vec3 Entity_t::getAimPunch()
 {
-	Vec3 vec = {};
+	Vec3 vec{ };
 	vfunc::callVFunc<void, PUNCH>(this, std::ref(vec));
+	return vec;
+}
+
+Vec3 Entity_t::getEyePos()
+{
+	Vec3 vec{ };
+	vfunc::callVFunc<void, EYE_POS>(this, std::ref(vec));
 	return vec;
 }
 
 AnimationLayer* Entity_t::getAnimOverlays()
 {
-	auto offset = memory::animOverlays();
+	const auto offset = memory::animOverlays();
 	return *reinterpret_cast<AnimationLayer**>(uintptr_t(this) + offset);
 }
 
 size_t Entity_t::getSequenceActivity(size_t sequence)
 {
-	auto studio = memory::interfaces::modelInfo->getStudioModel(this->getModel());
+	const auto studio = memory::interfaces::modelInfo->getStudioModel(this->getModel());
 	if (!studio)
 		return 0;
 
@@ -52,14 +59,14 @@ bool Entity_t::isBreakable()
 	if (!this->getIndex())
 		return false;
 
-	if (bool res = memory::isBreakable()(this); !res)
+	if (const bool res = memory::isBreakable()(this); !res)
 		return false;
 
-	auto cl = this->clientClass();
+	const auto cl = this->clientClass();
 	if (!cl)
 		return false;
 
-	auto id = cl->m_classID;
+	const auto id = cl->m_classID;
 
 	constexpr std::array breakableIds = // for surface ids ONLY!
 	{
@@ -67,7 +74,7 @@ bool Entity_t::isBreakable()
 		CBreakableSurface,
 	};
 
-	if (auto it = std::find(std::cbegin(breakableIds), std::cend(breakableIds), id); it != breakableIds.cend()) // if id was found from surface
+	if (const auto it = std::find(std::cbegin(breakableIds), std::cend(breakableIds), id); it != breakableIds.cend()) // if id was found from surface
 		return true;
 
 	// there we finally check actual entity
@@ -75,6 +82,18 @@ bool Entity_t::isBreakable()
 		return true;
 
 	return false;
+}
+
+Entity_t* Entity_t::firstMoveChild()
+{
+	// fill later
+	return nullptr;
+}
+
+Entity_t* Entity_t::nextMovePeer()
+{
+	// fill later
+	return nullptr;
 }
 
 bool Entity_t::setupBonesShort(Matrix3x4* _out, int maxBones, int mask, float time)
@@ -94,7 +113,7 @@ bool Entity_t::setupBonesShort(Matrix3x4* _out, int maxBones, int mask, float ti
 
 CUtlVector<Matrix3x4> Entity_t::m_CachedBoneData()
 {
-	auto offset = memory::cachedBones();
+	const auto offset = memory::cachedBones();
 	return *reinterpret_cast<CUtlVector<Matrix3x4>*>(uintptr_t(this) + offset);
 }
 
@@ -187,98 +206,6 @@ std::string Weapon_t::getWpnName()
 	case WEAPON_KNIFE_SKELETON:			return "KNIFE";
 	default:
 		return "Err";
-	}
-}
-
-std::u8string Weapon_t::getIcon(int correctIndex)
-{
-	// 0xE000 - start = WEAPON_NONE
-
-	switch (auto idx = correctIndex != -1 ? correctIndex : this->m_iItemDefinitionIndex(); idx)
-	{
-	case WEAPON_DEAGLE:					return u8"\uE001";
-	case WEAPON_ELITE:					return u8"\uE002";
-	case WEAPON_FIVESEVEN:				return u8"\uE003";
-	case WEAPON_GLOCK:					return u8"\uE004";
-	case WEAPON_AK47:					return u8"\uE007";
-	case WEAPON_AUG:					return u8"\uE008";
-	case WEAPON_AWP:					return u8"\uE009";
-	case WEAPON_FAMAS:					return u8"\uE00A";
-	case WEAPON_G3SG1:					return u8"\uE00B";
-	case WEAPON_GALILAR:				return u8"\uE00D";
-	case WEAPON_M249:					return u8"\uE00E";
-	case WEAPON_M4A1:					return u8"\uE010";
-	case WEAPON_MAC10:					return u8"\uE011";
-	case WEAPON_P90:					return u8"\uE013";
-	case WEAPON_ZONE_REPULSOR:			return u8"\uE014";
-	case WEAPON_MP5SD:					return u8"\uE017";
-	case WEAPON_UMP45:					return u8"\uE018";
-	case WEAPON_XM1014:					return u8"\uE019";
-	case WEAPON_BIZON:					return u8"\uE01A";
-	case WEAPON_MAG7:					return u8"\uE01B";
-	case WEAPON_NEGEV:					return u8"\uE01C";
-	case WEAPON_SAWEDOFF:				return u8"\uE01D";
-	case WEAPON_TEC9:					return u8"\uE01E";
-	case WEAPON_TASER:					return u8"\uE01F";
-	case WEAPON_HKP2000:				return u8"\uE020";
-	case WEAPON_MP7:					return u8"\uE021";
-	case WEAPON_MP9:					return u8"\uE022";
-	case WEAPON_NOVA:					return u8"\uE023";
-	case WEAPON_P250:					return u8"\uE024";
-	case WEAPON_SHIELD:					return u8"\uE025";
-	case WEAPON_SCAR20:					return u8"\uE026";
-	case WEAPON_SG553:					return u8"\uE027";
-	case WEAPON_SSG08:					return u8"\uE028";
-	case WEAPON_KNIFEGG:				return u8"\uE029";
-	case WEAPON_KNIFE:					return u8"\uE02A";
-	case WEAPON_FLASHBANG:				return u8"\uE02B";
-	case WEAPON_HEGRENADE:				return u8"\uE02C";
-	case WEAPON_SMOKEGRENADE:			return u8"\uE02D";
-	case WEAPON_MOLOTOV:				return u8"\uE02E";
-	case WEAPON_DECOY:					return u8"\uE02F";
-	case WEAPON_INCGRENADE:				return u8"\uE030";
-	case WEAPON_C4:						return u8"\uE031";
-	case WEAPON_HEALTHSHOT:				return u8"\uE039";
-	case WEAPON_KNIFE_T:				return u8"\uE03B";
-	case WEAPON_M4A1_SILENCER:			return u8"\uE03C";
-	case WEAPON_USP_SILENCER:			return u8"\uE03D";
-	case WEAPON_CZ75A:					return u8"\uE03F";
-	case WEAPON_REVOLVER:				return u8"\uE040";
-	case WEAPON_TAGRENADE:				return u8"\uE044";
-	case WEAPON_FISTS:					return u8"\uE045";
-	case WEAPON_BREACHCHARGE:			return u8"\uE046";
-	case WEAPON_TABLET:					return u8"\uE048";
-	case WEAPON_MELEE:					return u8"\uE04A";
-	case WEAPON_AXE:					return u8"\uE04B";
-	case WEAPON_HAMMER:					return u8"\uE04C";
-	case WEAPON_SPANNER:				return u8"\uE04E";
-	case WEAPON_KNIFE_GHOST:			return u8"\uE050";
-	case WEAPON_FIREBOMB:				return u8"\uE051";
-	case WEAPON_DIVERSION:				return u8"\uE052";
-	case WEAPON_FRAG_GRENADE:			return u8"\uE053";
-	case WEAPON_SNOWBALL:				return u8"\uE054";
-	case WEAPON_BUMPMINE:				return u8"\uE055";
-	case WEAPON_KNIFE_BAYONET:			return u8"\uE1F4";
-	case WEAPON_KNIFE_CSS:				return u8"\uE1F7";
-	case WEAPON_KNIFE_FLIP:				return u8"\uE1F9";
-	case WEAPON_KNIFE_GUT:				return u8"\uE1FA";
-	case WEAPON_KNIFE_KARAMBIT:			return u8"\uE1FB";
-	case WEAPON_KNIFE_M9_BAYONET:		return u8"\uE1FC";
-	case WEAPON_KNIFE_TACTICAL:			return u8"\uE1FD";
-	case WEAPON_KNIFE_FALCHION:			return u8"\uE200";
-	case WEAPON_KNIFE_SURVIVAL_BOWIE:	return u8"\uE202";
-	case WEAPON_KNIFE_BUTTERFLY:		return u8"\uE203";
-	case WEAPON_KNIFE_PUSH:				return u8"\uE204";
-	case WEAPON_KNIFE_CORD:				return u8"\uE205";
-	case WEAPON_KNIFE_CANIS:			return u8"\uE206";
-	case WEAPON_KNIFE_URSUS:			return u8"\uE207";
-	case WEAPON_KNIFE_GYPSY_JACKKNIFE:	return u8"\uE208";
-	case WEAPON_KNIFE_OUTDOOR:			return u8"\uE209";
-	case WEAPON_KNIFE_STILETTO:			return u8"\uE20A";
-	case WEAPON_KNIFE_WIDOWMAKER:		return u8"\uE20B";
-	case WEAPON_KNIFE_SKELETON:			return u8"\uE20D";
-	default:
-		return u8"\u0000";
 	}
 }
 
@@ -382,7 +309,8 @@ size_t Weapon_t::getNadeRadius()
 
 CUserCmd& Player_t::m_LastCmd()
 {
-	return *reinterpret_cast<CUserCmd*>((uintptr_t)this + memory::lastCommand());
+	const auto offset = memory::lastCommand();
+	return *reinterpret_cast<CUserCmd*>((uintptr_t)this + offset);
 }
 
 void Player_t::runThink()
@@ -432,10 +360,15 @@ void Player_t::checkHasThinkFunction(bool isThinkingHint)
 	memory::checkThinkFunction()(this, isThinkingHint);
 }
 
-//void Player_t::selectItem(const char* string, int subType)
-//{
-//	memory::selectItem()(this, string, subType);
-//}
+void Player_t::restoreData(const char* context, int slot, int type)
+{
+	memory::restoreData()(this, context, slot, type);
+}
+
+void Player_t::saveData(const char* context, int slot, int type)
+{
+	memory::saveData()(this, context, slot, type);
+}
 
 bool Player_t::usingStandardWeaponsInVehicle()
 {
@@ -459,20 +392,6 @@ Weapon_t* Player_t::getActiveWeapon()
 
 Vec3 Player_t::getHitboxPos(const int id)
 {
-	/*if (Matrix3x4 matBone[MAX_BONES]; setupBones(matBone, MAX_BONES, BONE_USED_BY_HITBOX, 0.0f))
-	{
-		if (auto modelStudio = interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
-		{
-			if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(id); hitbox != nullptr)
-			{
-				Vector min = math::transformVector(hitbox->m_bbmin, matBone[hitbox->m_bone]);
-				Vector max = math::transformVector(hitbox->m_bbmax, matBone[hitbox->m_bone]);
-
-				return Vector{ min + max } * 0.5f;
-			}
-		}
-	}*/
-
 	if (auto modelStudio = memory::interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
 	{
 		if (auto hitbox = modelStudio->getHitboxSet(0)->getHitbox(id); hitbox != nullptr)
@@ -494,32 +413,9 @@ Vec3 Player_t::getBonePos(const int id)
 
 Vec3 Player_t::getHitgroupPos(const int hitgroup)
 {
-	auto fixHitgroupIndex = [h = hitgroup]()
-	{
-		switch (h)
-		{
-		case HITGROUP_HEAD:
-			return HITBOX_HEAD;
-		case HITGROUP_CHEST:
-			return HITBOX_LOWER_CHEST;
-		case HITGROUP_STOMACH:
-			return HITBOX_BELLY;
-		case HITGROUP_LEFTARM:
-			return HITBOX_LEFT_HAND;
-		case HITGROUP_RIGHTARM:
-			return HITBOX_RIGHT_HAND;
-		case HITGROUP_LEFTLEG:
-			return HITBOX_LEFT_CALF;
-		case HITGROUP_RIGHTLEG:
-			return HITBOX_RIGHT_CALF;
-		default:
-			return HITBOX_PELVIS;
-		}
-	};
-
 	if (auto modelStudio = memory::interfaces::modelInfo->getStudioModel(this->getModel()); modelStudio != nullptr)
 	{
-		if (auto hitbox = modelStudio->getHitboxSet(this->m_nHitboxSet())->getHitbox(fixHitgroupIndex()); hitbox != nullptr)
+		if (auto hitbox = modelStudio->getHitboxSet(this->m_nHitboxSet())->getHitbox(hitgroup); hitbox != nullptr)
 		{
 			Vec3 min = math::transformVector(hitbox->m_bbmin, m_CachedBoneData().m_memory[hitbox->m_bone]);
 			Vec3 max = math::transformVector(hitbox->m_bbmax, m_CachedBoneData().m_memory[hitbox->m_bone]);
@@ -559,7 +455,14 @@ std::string_view Player_t::getRawName()
 	PlayerInfo_t info;
 	memory::interfaces::engine->getPlayerInfo(this->getIndex(), &info);
 
-	return std::string_view{ info.m_name };
+	constexpr auto maxLength = 32U;
+
+	std::array<char, maxLength> buf;
+	const auto nameLength = std::min(maxLength - 1, strlen(info.m_name));
+	std::memcpy(buf.data(), info.m_name, nameLength);
+	buf.back() = '\0';
+
+	return std::string_view{ buf };
 }
 
 int Player_t::getKills()
@@ -589,8 +492,8 @@ int Player_t::getWins()
 
 bool Player_t::isPossibleToSee(Player_t* player, const Vec3& pos)
 {
-	Trace_t tr;
-	TraceFilter filter;
+	Trace_t tr{ };
+	TraceFilter filter{ };
 	filter.m_skip = this;
 	memory::interfaces::trace->traceRay({ this->getEyePos(), pos }, MASK_PLAYER, &filter, &tr);
 
@@ -609,17 +512,18 @@ uintptr_t Player_t::getLiteralAddress()
 
 CUtlVector<ClientHitVerify_t> Player_t::m_vecBulletVerifyListClient()
 {
-	return *reinterpret_cast<CUtlVector<ClientHitVerify_t>*>((uintptr_t)this + memory::vecClientImpacts());
+	const auto offset = memory::vecClientImpacts();
+	return *reinterpret_cast<CUtlVector<ClientHitVerify_t>*>((uintptr_t)this + offset);
 }
 
 AABB_t Player_t::getOcclusionBounds()
 {
-	auto col = this->collideable();
+	const auto col = this->collideable();
 	const auto& mins = col->OBBMins();
 	const auto& maxs = col->OBBMaxs();
 
-	auto m_usSolidFlags = col->getSolidFlags();
-	auto m_nSolidType = col->getSolid();
+	const auto m_usSolidFlags = col->getSolidFlags();
+	const auto m_nSolidType = col->getSolid();
 
 	auto isBoundsDefinedInEntitySpace = [=]()
 	{
@@ -649,8 +553,8 @@ AABB_t Player_t::getCameraBounds()
 	const static auto occlusion_test_jump_margin = memory::interfaces::cvar->findVar("occlusion_test_jump_margin");
 
 	const auto& pos = this->m_vecOrigin();
-	float cameraMargins = occlusion_test_camera_margins->getFloat();
-	float jumpMargin = occlusion_test_jump_margin->getFloat();
+	const float cameraMargins = occlusion_test_camera_margins->getFloat();
+	const float jumpMargin = occlusion_test_jump_margin->getFloat();
 
 	return {
 		pos + Vec3{ 0.0f, 0.0f, 46.0f } - Vec3{ cameraMargins, cameraMargins, 0.0f },
@@ -678,8 +582,10 @@ bool Player_t::isOtherTeam(Player_t* player)
 
 Vec3 Inferno_t::getInfernoPos(size_t indexFire)
 {
-	return Vec3{
+	return Vec3
+	{
 		static_cast<float>(m_fireXDelta()[indexFire]),
 		static_cast<float>(m_fireYDelta()[indexFire]),
-		static_cast<float>(m_fireZDelta()[indexFire]) };
+		static_cast<float>(m_fireZDelta()[indexFire])
+	};
 }

@@ -169,11 +169,14 @@
     <ClCompile Include="hack\cheats\classes\overrideM.cpp" />
     <ClCompile Include="hack\cheats\classes\wndProcKeyHandler.cpp" />
     <ClCompile Include="hack\cheats\features\aimbot\cmdCache.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\chams\factory\create.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\list\spectactors.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\misc\bulletUpdater.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\noscope.cpp" />
     <ClCompile Include="hack\cheats\game\game.cpp" />
     <ClCompile Include="hack\cheats\hooks\addEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\buildTransformations.cpp" />
+    <ClCompile Include="hack\cheats\hooks\chudIsHidden.cpp" />
     <ClCompile Include="hack\cheats\hooks\createEvent.cpp" />
     <ClCompile Include="hack\cheats\hooks\createMove.cpp" />
     <ClCompile Include="hack\cheats\hooks\doPostScreenEffects.cpp" />
@@ -209,6 +212,7 @@
     <ClCompile Include="hack\cheats\hooks\unknownFIleSys.cpp" />
     <ClCompile Include="hack\cheats\hooks\unknownOverviewMap.cpp" />
     <ClCompile Include="hack\cheats\hooks\validAddrChecks.cpp" />
+    <ClCompile Include="hack\cheats\hooks\viewFade.cpp" />
     <ClCompile Include="hack\cheats\hooks\viewRenderSceneEnd.cpp" />
     <ClCompile Include="hack\cheats\hooks\wndproc.cpp" />
     <ClCompile Include="hack\cheats\features\prediction\prediction.cpp" />
@@ -278,6 +282,7 @@
     <ClCompile Include="hack\cheats\classes\screen2dEffects.cpp" />
     <ClCompile Include="hack\cheats\classes\VR.cpp" />
     <ClCompile Include="hack\deps\ImGui\editor\LanguageDefinitions.cpp" />
+    <ClCompile Include="hack\SDK\IMatRenderContext.cpp" />
     <ClCompile Include="hack\SDK\material.cpp" />
     <ClCompile Include="hack\utilities\tools\tools.cpp" />
     <ClCompile Include="pch.cpp">
@@ -359,12 +364,14 @@
     <ClInclude Include="hack\cheats\features\triggerbot\triggerbot.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\chams.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\editor.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\chams\factory\create.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\mat.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\glow\glow.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\hitmarker\hitmark.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\list\playerlist.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\list\spectactors.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\mirrorcam\mirrorCam.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\misc\bulletUpdater.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\crosshair.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\drawInfo.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\hat.hpp" />
@@ -428,7 +435,6 @@
     <ClInclude Include="hack\menu\x88Menu\x88types.hpp" />
     <ClInclude Include="hack\render\BBox.hpp" />
     <ClInclude Include="hack\render\Color.hpp" />
-    <ClInclude Include="hack\render\iconfont.hpp" />
     <ClInclude Include="hack\render\render.hpp" />
     <ClInclude Include="hack\render\structures.hpp" />
     <ClInclude Include="hack\resources\resource.h" />
@@ -465,6 +471,7 @@
     <ClInclude Include="hack\SDK\helpers\pad.hpp" />
     <ClInclude Include="hack\SDK\helpers\vfunc.hpp" />
     <ClInclude Include="hack\SDK\IBaseClientDll.hpp" />
+    <ClInclude Include="hack\SDK\IBaseFileSystem.hpp" />
     <ClInclude Include="hack\SDK\IClientEntityList.hpp" />
     <ClInclude Include="hack\SDK\IClientState.hpp" />
     <ClInclude Include="hack\SDK\ICollideable.hpp" />
@@ -500,11 +507,15 @@
     <ClInclude Include="hack\SDK\KeyValuesSys.hpp" />
     <ClInclude Include="hack\SDK\MapStruct.hpp" />
     <ClInclude Include="hack\SDK\material.hpp" />
+    <ClInclude Include="hack\SDK\materialInit.hpp" />
     <ClInclude Include="hack\SDK\math\AABB.hpp" />
     <ClInclude Include="hack\SDK\math\matrix.hpp" />
+    <ClInclude Include="hack\SDK\math\Rect.hpp" />
     <ClInclude Include="hack\SDK\math\Vector.hpp" />
     <ClInclude Include="hack\SDK\math\VectorAligned.hpp" />
+    <ClInclude Include="hack\SDK\PixEvent.hpp" />
     <ClInclude Include="hack\SDK\Recv.hpp" />
+    <ClInclude Include="hack\SDK\stencil.hpp" />
     <ClInclude Include="hack\SDK\structs\Entity.hpp" />
     <ClInclude Include="hack\SDK\structs\indexes.hpp" />
     <ClInclude Include="hack\SDK\varMapping.hpp" />

@@ -22,10 +22,7 @@ void Hat::draw()
 	if (!memory::interfaces::input->m_cameraInThirdPerson)
 		return;
 
-	auto pos = game::localPlayer->getBonePos(8); // you can play around with vec.z
-
-	// config.get<> enjoyer
-
+	const auto pos = game::localPlayer->getHitboxPos(HITBOX_HEAD);
 	if (vars::misc->hat->rainbow)
 	{
 		drawConeEditedRainbow(pos, vars::misc->hat->radius, 86, vars::misc->hat->size,
@@ -45,8 +42,8 @@ void Hat::drawConeEditedRainbow(const Vec3& pos, const float radius, const int p
 	if (!imRender.worldToScreen(pos, orignalW2S))
 		return;
 
-	float step = math::PI * 2.0f / points;
-	for (float angle = 0.0f; angle < (math::PI * 2.0f); angle += step)
+	const float step = math::PI_2 / points;
+	for (float angle = 0.0f; angle < math::PI_2; angle += step)
 	{
 		Vec3 startWorld = Vec3{ radius * std::cos(angle) + pos[Coord::X], radius * std::sin(angle) + pos[Coord::Y], pos[Coord::Z] };
 		Vec3 endWorld = Vec3{ radius * std::cos(angle + step) + pos[Coord::X], radius * std::sin(angle + step) + pos[Coord::Y], pos[Coord::Z] };

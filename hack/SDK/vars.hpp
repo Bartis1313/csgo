@@ -1,6 +1,11 @@
 #pragma once
 
 #pragma region bone_masks
+#define BONE_CALCULATE_MASK			0x1F
+#define BONE_PHYSICALLY_SIMULATED	0x01	// bone is physically simulated when physics are active
+#define BONE_PHYSICS_PROCEDURAL		0x02	// procedural when physics is active
+#define BONE_ALWAYS_PROCEDURAL		0x04	// bone is always procedurally animated
+#define BONE_SCREEN_ALIGN_SPHERE	0x08	// bone aligns to the screen, not constrained in motion.
 #define BONE_SCREEN_ALIGN_CYLINDER	0x10	// bone aligns to the screen, constrained by it's own axis.
 
 #define BONE_USED_MASK				0x0007FF00
@@ -93,34 +98,38 @@
 #pragma endregion
 
 #pragma region texture_names
-#define TEXTURE_GROUP_LIGHTMAP						        "Lightmaps"
-#define TEXTURE_GROUP_WORLD							          "World textures"
-#define TEXTURE_GROUP_MODEL							          "Model textures"
-#define TEXTURE_GROUP_VGUI							          "VGUI textures"
-#define TEXTURE_GROUP_PARTICLE						        "Particle textures"
-#define TEXTURE_GROUP_DECAL							          "Decal textures"
-#define TEXTURE_GROUP_SKYBOX						          "SkyBox textures"
-#define TEXTURE_GROUP_CLIENT_EFFECTS				      "ClientEffect textures"
-#define TEXTURE_GROUP_OTHER							          "Other textures"
-#define TEXTURE_GROUP_PRECACHED						        "Precached"
-#define TEXTURE_GROUP_CUBE_MAP						        "CubeMap textures"
-#define TEXTURE_GROUP_RENDER_TARGET					      "RenderTargets"
-#define TEXTURE_GROUP_UNACCOUNTED					        "Unaccounted textures"
-//#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER		  "Static Vertex"
-#define TEXTURE_GROUP_STATIC_INDEX_BUFFER			    "Static Indices"
+#define TEXTURE_GROUP_LIGHTMAP						"Lightmaps"
+#define TEXTURE_GROUP_WORLD							"World textures"
+#define TEXTURE_GROUP_MODEL							"Model textures"
+#define TEXTURE_GROUP_STATIC_PROP					"StaticProp textures"
+#define TEXTURE_GROUP_COMBINED						"Combined Textures"
+#define TEXTURE_GROUP_COMPOSITE						"Composited Textures"
+#define TEXTURE_GROUP_VGUI							"VGUI textures"
+#define TEXTURE_GROUP_PARTICLE						"Particle textures"
+#define TEXTURE_GROUP_DECAL							"Decal textures"
+#define TEXTURE_GROUP_SKYBOX						"SkyBox textures"
+#define TEXTURE_GROUP_CLIENT_EFFECTS				"ClientEffect textures"
+#define TEXTURE_GROUP_OTHER							"Other textures"
+#define TEXTURE_GROUP_PRECACHED						"Precached"				// TODO: assign texture groups to the precached materials
+#define TEXTURE_GROUP_CUBE_MAP						"CubeMap textures"
+#define TEXTURE_GROUP_RENDER_TARGET					"RenderTargets"
+#define TEXTURE_GROUP_UNACCOUNTED					"Unaccounted textures"	// Textures that weren't assigned a texture group.
+//#define TEXTURE_GROUP_STATIC_VERTEX_BUFFER		"Static Vertex"
+#define TEXTURE_GROUP_STATIC_INDEX_BUFFER			"Static Indices"
 #define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_DISP		"Displacement Verts"
 #define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_COLOR	"Lighting Verts"
 #define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_WORLD	"World Verts"
 #define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_MODELS	"Model Verts"
 #define TEXTURE_GROUP_STATIC_VERTEX_BUFFER_OTHER	"Other Verts"
-#define TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER			  "Dynamic Indices"
-#define TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER			  "Dynamic Verts"
-#define TEXTURE_GROUP_DEPTH_BUFFER					      "DepthBuffer"
-#define TEXTURE_GROUP_VIEW_MODEL					        "ViewModel"
-#define TEXTURE_GROUP_PIXEL_SHADERS					      "Pixel Shaders"
-#define TEXTURE_GROUP_VERTEX_SHADERS				      "Vertex Shaders"
-#define TEXTURE_GROUP_RENDER_TARGET_SURFACE			  "RenderTarget Surfaces"
-#define TEXTURE_GROUP_MORPH_TARGETS					      "Morph Targets"
+#define TEXTURE_GROUP_DYNAMIC_INDEX_BUFFER			"Dynamic Indices"
+#define TEXTURE_GROUP_DYNAMIC_VERTEX_BUFFER			"Dynamic Verts"
+#define TEXTURE_GROUP_DEPTH_BUFFER					"DepthBuffer"
+#define TEXTURE_GROUP_VIEW_MODEL					"ViewModel"
+#define TEXTURE_GROUP_PIXEL_SHADERS					"Pixel Shaders"
+#define TEXTURE_GROUP_VERTEX_SHADERS				"Vertex Shaders"
+#define TEXTURE_GROUP_RENDER_TARGET_SURFACE			"RenderTarget Surfaces"
+#define TEXTURE_GROUP_MORPH_TARGETS					"Morph Targets"
+#define TEXTURE_GROUP_SCALEFORM						"Scaleform textures"
 #pragma endregion
 
 #pragma region content_masks
@@ -243,4 +252,51 @@
 // no idea how to call it
 #pragma region defs_unknown_name
 #define TICK_NEVER_THINK		( -1 )
+#pragma endregion
+
+#pragma region studio_render
+#define STUDIO_NONE						0x00000000
+#define STUDIO_RENDER					0x00000001
+#define STUDIO_VIEWXFORMATTACHMENTS		0x00000002
+#define STUDIO_DRAWTRANSLUCENTSUBMODELS 0x00000004
+#define STUDIO_TWOPASS					0x00000008
+#define STUDIO_STATIC_LIGHTING			0x00000010
+#define STUDIO_WIREFRAME				0x00000020
+#define STUDIO_ITEM_BLINK				0x00000040
+#define STUDIO_NOSHADOWS				0x00000080
+#define STUDIO_WIREFRAME_VCOLLIDE		0x00000100
+#define STUDIO_NOLIGHTING_OR_CUBEMAP	0x00000200
+#define STUDIO_SKIP_FLEXES				0x00000400
+#define STUDIO_DONOTMODIFYSTENCILSTATE	0x00000800
+#define STUDIO_DEPTH_ONLY				0x01000000
+#define STUDIO_AOPREPASSTEXURE			0x02000000
+#define STUDIO_KEEP_SHADOWS				0x04000000
+#define STUDIO_SSAODEPTHTEXTURE			0x08000000
+#define STUDIO_TRANSPARENCY				0x80000000
+#define STUDIO_SHADOWDEPTHTEXTURE		0x40000000
+#define STUDIO_SHADOWTEXTURE			0x20000000
+#define STUDIO_SKIP_DECALS				0x10000000
+#pragma endregion
+
+#pragma region slots
+// How many data slots to use when in multiplayer.
+#define MULTIPLAYER_BACKUP			150
+#pragma endregion
+
+#pragma region hud_flags
+// Hud Element hiding flags
+#define	HIDEHUD_WEAPONSELECTION		( 1<<0 )	// Hide ammo count & weapon selection
+#define	HIDEHUD_FLASHLIGHT			( 1<<1 )
+#define	HIDEHUD_ALL					( 1<<2 )
+#define HIDEHUD_HEALTH				( 1<<3 )	// Hide health & armor / suit battery
+#define HIDEHUD_PLAYERDEAD			( 1<<4 )	// Hide when local player's dead
+#define HIDEHUD_NEEDSUIT			( 1<<5 )	// Hide when the local player doesn't have the HEV suit
+#define HIDEHUD_MISCSTATUS			( 1<<6 )	// Hide miscellaneous status elements (trains, pickup history, death notices, etc)
+#define HIDEHUD_CHAT				( 1<<7 )	// Hide all communication elements (saytext, voice icon, etc)
+#define	HIDEHUD_CROSSHAIR			( 1<<8 )	// Hide crosshairs
+#define	HIDEHUD_VEHICLE_CROSSHAIR	( 1<<9 )	// Hide vehicle crosshair
+#define HIDEHUD_INVEHICLE			( 1<<10 )
+#define HIDEHUD_BONUS_PROGRESS		( 1<<11 )	// Hide bonus progress display (for bonus map challenges)
+#define HIDEHUD_RADAR				( 1<<12 )   // Hides the radar in CS1.5
+#define HIDEHUD_MINISCOREBOARD      ( 1<<13 )   // Hides the miniscoreboard in CS1.5
 #pragma endregion

@@ -263,6 +263,11 @@ public:
 
 	constexpr auto operator<=>(const Vector&) const = default;
 
+	[[nodiscard]] constexpr auto toArray()
+	{
+		return m_arr;
+	}
+
 	constexpr auto& normalize()
 	{
 		ASSERT_VEC3;

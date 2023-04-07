@@ -11,12 +11,12 @@ public:
 		RenderablePresentType{}
 	{}
 
+	void addHits(IGameEvent* event);
 protected:
 	virtual void init() override;
 	virtual void draw() override;
+	virtual void reset() override;
 private:
-	void addHits(IGameEvent* event);
-	void resetHits(IGameEvent* event);
 	uint32_t m_allHits;
 };
 

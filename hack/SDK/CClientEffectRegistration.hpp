@@ -2,7 +2,7 @@
 
 #include "CEffectData.hpp"
 
-using clientEffectCallback = void(*)(const CEffectData& data); // cdecl
+using clientEffectCallback = std::add_pointer_t<void __cdecl(const CEffectData& data)>;
 
 struct CClientEffectRegistration
 {

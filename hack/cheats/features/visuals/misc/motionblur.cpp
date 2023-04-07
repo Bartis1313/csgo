@@ -3,15 +3,24 @@
 #include <SDK/CViewSetup.hpp>
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/IMaterialSystem.hpp>
+#include <SDK/IMatRenderContext.hpp>
 #include <SDK/ITexture.hpp>
 #include <SDK/math/Vector.hpp>
+#include <SDK/materialInit.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <cheats/game/game.hpp>
 #include <cheats/game/globals.hpp>
 #include <config/vars.hpp>
 #include <utilities/math/math.hpp>
 #include <utilities/tools/tools.hpp>
+#include <utilities/console/console.hpp>
 #include <gamememory/memory.hpp>
+
+void MotionBlur::initMaterials()
+{
+	motion_blur = memory::interfaces::matSys->findMaterial("dev/motion_blur", TEXTURE_GROUP_RENDER_TARGET, false);
+	_rt_FullFrameFB = memory::interfaces::matSys->findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
+}
 
 // 1:1 from https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/viewpostprocess.cpp#L2996
 // with small reduce of code because we dont care for portal/ps3 stuff and also we dont care for detecting blur, but knowing it's enabled
@@ -155,8 +164,6 @@ void MotionBlur::run(CViewSetup* view)
 		m_motionHistory.m_previousYaw = currentYaw;
 		m_motionHistory.m_lastTimeUpdate = memory::interfaces::globalVars->m_realtime;
 
-		static ITexture* _rt_FullFrameFB = memory::interfaces::matSys->findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
-
 		int x = view->x;
 		int y = view->y;
 		int w = view->m_width;
@@ -187,8 +194,36 @@ void MotionBlur::run(CViewSetup* view)
 	}
 }
 
+void MotionBlur::drawBlur()
+{
+	IMaterialVar* MotionBlurInternal = motion_blur->findVar("$MotionBlurInternal", nullptr, false);
+
+	MotionBlurInternal->setVectorComponent(m_motionBlurValues[0], 0);
+	MotionBlurInternal->setVectorComponent(m_motionBlurValues[1], 1);
+	MotionBlurInternal->setVectorComponent(m_motionBlurValues[2], 2);
+	MotionBlurInternal->setVectorComponent(m_motionBlurValues[3], 3);
+
+	// todo: find easiest way to trick the game we run motion blur, (easiest and best way - mempatch correct bytes)
+
+	// edit those fields from memory, todo
+	//float* motionBlurIntervalValues = *reinterpret_cast<float**>(m_motionBlurAddr);
+	//motionBlurIntervalValues = m_motionBlurValues.data();
+
+	IMaterialVar* MotionBlurViewPortInternal = motion_blur->findVar("$MotionBlurViewportInternal", nullptr, false);
+
+	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[0], 0);
+	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[1], 1);
+	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[2], 2);
+	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[3], 3);
+
+	auto ctx = memory::interfaces::matSys->getRenderContext();
+	ctx->drawScreenEffectMaterial(motion_blur);
+}
+
 void MotionBlur::render()
 {
+	INIT_MATERIALS_ONCE(initMaterials);
+
 	if (!vars::misc->motionBlur->enabled)
 		return;
 
@@ -198,45 +233,5 @@ void MotionBlur::render()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	static IMaterial* motion_blur = memory::interfaces::matSys->findMaterial("dev/motion_blur", TEXTURE_GROUP_RENDER_TARGET, false);
-
-	static IMaterialVar* MotionBlurInternal = motion_blur->findVar("$MotionBlurInternal", nullptr, false);
-
-	MotionBlurInternal->setVectorComponent(m_motionBlurValues[0], 0);
-	MotionBlurInternal->setVectorComponent(m_motionBlurValues[1], 1);
-	MotionBlurInternal->setVectorComponent(m_motionBlurValues[2], 2);
-	MotionBlurInternal->setVectorComponent(m_motionBlurValues[3], 3);
-	
-	// todo: find easiest way to trick the game we run motion blur, (easiest and best way - mempatch correct bytes)
-
-	// edit those fields from memory, todo
-	//float* motionBlurIntervalValues = *reinterpret_cast<float**>(m_motionBlurAddr);
-	//motionBlurIntervalValues = m_motionBlurValues.data();
-
-	static IMaterialVar* MotionBlurViewPortInternal = motion_blur->findVar("$MotionBlurViewportInternal", nullptr, false);
-
-	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[0], 0);
-	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[1], 1);
-	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[2], 2);
-	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[3], 3);
-
-	// this code will make fullscreen blured, you probably don't want it. Also group will fuck up everything
-	// TEXTURE_GROUP_CLIENT_EFFECTS will pass
-	/*auto ctx = interfaces::matSys->getRenderContext();
-	ctx->drawScreenSpaceRectangle(motion_blur, 0, 0, globals::screenX, globals::screenY, 0, 0,
-		globals::screenX, globals::screenY, globals::screenX, globals::screenY);
-	ctx->release();*/
-
-	// so we have to wrap it and call directly in isdepth hook to prevent problems like weapon being blurred
-	const static auto _call = memory::drawSpacedRectangle();
-	__asm
-	{
-		push globals::screenY
-		push globals::screenX
-		push 0
-		xor edx, edx
-		mov ecx, motion_blur
-		call _call
-		add esp, 12
-	}
+	drawBlur();
 }

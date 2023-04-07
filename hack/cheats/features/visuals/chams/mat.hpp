@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <SDK/material.hpp>
 
 class IMaterial;
 
@@ -30,6 +31,7 @@ struct Mat_t
 	StrategyType strategy{ StrategyType::BUFFER }; // editor
 	Data data{};
 	IMaterial* mat{};
+	MaterialVarFlags_t flags;
 
 	constexpr IMaterial* operator->() const { return mat; }
 	constexpr bool operator!() const { return mat == nullptr; }

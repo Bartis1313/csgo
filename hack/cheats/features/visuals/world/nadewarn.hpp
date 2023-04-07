@@ -25,7 +25,7 @@ public:
 	{}
 
 	void simulate(const Vec3& pos, const Vec3& velocity, float nadeThrowTime, uint32_t ticks);
-	bool draw(Entity_t* entity, WeaponIndex idx);
+	bool draw(WeaponIndex idx);
 private:
 	void addGravityMove(Vec3& move, Vec3& vel, float frametime);
 	void physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce);
@@ -37,6 +37,7 @@ private:
 	void traceHull(const Vec3& src, const Vec3& end, Entity_t* entity, Trace_t* tr);
 	void pushEntity(const Vec3& src, Trace_t& tr);
 	void resolveFlyCollisionCustom(Trace_t& tr, float interval);
+	std::optional<std::string_view> getConsoleName(WeaponIndex idx) const;
 
 	bool m_detonated = false;
 	// nade index

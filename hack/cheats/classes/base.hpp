@@ -22,7 +22,7 @@ protected:
 	virtual void shutdown() = 0;
 	virtual void roundRestart() = 0;
 private:
-	inline static std::vector<BaseHack*> m_hacks;
+	inline static std::vector<std::add_pointer_t<BaseHack>> m_hacks;
 };
 
-#define GLOBAL_FEATURE(className) [[maybe_unused]] inline auto g_##className = std::unique_ptr<className>{ new className };
+#define GLOBAL_FEATURE(className) [[maybe_unused]] inline auto g_##className{ std::make_unique<className>() };

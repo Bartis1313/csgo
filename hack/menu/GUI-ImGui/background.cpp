@@ -8,6 +8,8 @@
 #include <utilities/rand.hpp>
 #include <config/vars.hpp>
 
+#include <mutex>
+
 void Background::drawLine(const Vec2& start, const Vec2& end, const Color& color, float thickness)
 {
 	m_draw->AddLine(ImVec2{ start[Coord::X], start[Coord::Y] }, ImVec2{ end[Coord::X], end[Coord::Y] }, Color::U32(color), thickness);
@@ -69,7 +71,7 @@ void Background::find(ParticlePoint_t& particle)
 {
 	for (auto& el : m_particleArr)
 	{
-		if (auto dis = particle.m_pos.distTo(el.m_pos); dis < m_maxDistLines)
+		if (const auto dis = particle.m_pos.distTo(el.m_pos); dis < m_maxDistLines)
 		{
 			el.m_alpha = (m_maxDistLines - dis) / m_maxDistLines;
 			drawLine(particle.m_pos, el.m_pos, particle.m_color.getColorEditAlpha(el.m_alpha));
@@ -77,19 +79,12 @@ void Background::find(ParticlePoint_t& particle)
 	}
 }
 
-void Background::draw(ImDrawList* _draw)
+void Background::draw()
 {
 	if (globals::isShutdown)
 		return;
 
-	m_draw = _draw;
-
-	static bool bOnce = [this]() // init
-	{		
-		init();
-
-		return true;
-	} ();
+	m_draw = ImGui::GetBackgroundDrawList();
 
 	if (!menu.isMenuActive())
 		return;

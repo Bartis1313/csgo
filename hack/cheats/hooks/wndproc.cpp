@@ -44,7 +44,7 @@ LRESULT wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpara
 		ImPlot::CreateContext();
 		ImGui_ImplWin32_Init(hwnd);
 
-		console::info("init for wndProc success");
+		console::debug("init for wndProc success");
 	});
 
 	KeysHandler::run(message, wparam);

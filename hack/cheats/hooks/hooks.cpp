@@ -22,10 +22,11 @@ else { \
 }
 	hookHelper::initMinhook();
 
-	HOOK(memory::clientValidAddr(), hooks::clientValidAddr);
-	HOOK(memory::enginevalidAddr(), hooks::engineValidAddr);
-	HOOK(memory::studioRenderValidAddr(), hooks::studioRenderValidAddr);
-	HOOK(memory::materialSysValidAddr(), hooks::materialSystemValidAddr);
+	HOOK(memory::interfaces::dx9Device(), hooks::reset);
+	HOOK(memory::interfaces::dx9Device(), hooks::present);
+	HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
+
+	HOOK(memory::interfaces::keyValuesSys(), hooks::allocKeyValues);
 	HOOK(memory::isUsingPropDebug(), hooks::isUsingStaticPropDebugModes);
 	HOOK(memory::getColorModulation(), hooks::getColorModulation);
 	HOOK(memory::extraBonesProcessing(), hooks::doExtraBonesProcessing);
@@ -34,18 +35,12 @@ else { \
 	HOOK(memory::sendDataGram(), hooks::sendDatagram);
 	HOOK(memory::unkOverviewMap(), hooks::unknownOverViewFun);
 	HOOK(memory::isDepth(), hooks::isDepthOfField);
-	HOOK(memory::fxBlood(), hooks::fxBlood);
-	HOOK(memory::fxBloodSpray(), hooks::fxBloodSpray);
 	HOOK(memory::addEnt(), hooks::addEnt);
-	HOOK(memory::removeEnt(), hooks::removeEnt);
-	
-	HOOK(memory::interfaces::dx9Device(), hooks::reset);
-	HOOK(memory::interfaces::dx9Device(), hooks::present);
-	HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
+	HOOK(memory::removeEnt(), hooks::removeEnt);	
 	HOOK(memory::interfaces::client(), hooks::frameStageNotify);
 	HOOK(memory::interfaces::client(), hooks::levelInitPreEntity);
 	HOOK(memory::interfaces::client(), hooks::levelInitPostEntity);
-	HOOK(memory::interfaces::client(), hooks::levelShutdown);
+	HOOK(memory::interfaces::client(), hooks::levelShutdown);	
 	HOOK(memory::interfaces::panel(), hooks::paintTraverse);
 	HOOK(memory::interfaces::modelRender(), hooks::drawModel);
 	HOOK(memory::interfaces::clientMode(), hooks::createMove);
@@ -54,8 +49,8 @@ else { \
 	HOOK(memory::interfaces::clientMode(), hooks::doPostScreenEffects);
 	HOOK(memory::interfaces::surface(), hooks::lockCursor);
 	HOOK(memory::interfaces::cvar->findVar("sv_cheats"), hooks::sv_cheats);
-	HOOK(memory::interfaces::fileSystem(), hooks::unknownFileSystem);
-	HOOK(memory::interfaces::fileSystem(), hooks::unkFileCheck);
+	HOOK(memory::interfaces::fileSystem(), hooks::unknownFileSystemAlloc);
+	HOOK(memory::interfaces::fileSystem(), hooks::filesCheck);
 	HOOK(memory::interfaces::fileSystem(), hooks::getUnverifiedFileHashes);
 	HOOK(memory::interfaces::viewRender(), hooks::viewRender);
 	HOOK(memory::interfaces::viewRender(), hooks::screen2DEffect);
@@ -69,12 +64,15 @@ else { \
 	HOOK(memory::preRound(), hooks::preRestartRound);
 	HOOK(memory::playSoundStep(), hooks::playStepSound);
 	HOOK(memory::interfaces::renderView(), hooks::sceneEnd);
+	HOOK(memory::chudIsHidden(), hooks::chudIsHidden);
+	HOOK(memory::viewFade(), hooks::viewDrawFade);
+	HOOK(memory::someround(), hooks::unkround);
 
 #undef HOOK
 
 	hookHelper::checkAllHooks();
 
-	console::info("hooks success");
+	console::debug("hooks success");
 }
 
 void hooks::shutdown()

@@ -502,7 +502,7 @@ bool ImGui::Animations::BeginCombo(const char* label, const char* preview_value,
 		return false;
 
 	g.NextWindowData.Flags = backup_next_window_data_flags;
-	return BeginComboPopup(popup_id, bb, flags, /*pop.value*/ 1.0f);
+	return BeginComboPopup(popup_id, bb, flags, pop.value);
 }
 
 bool ImGui::Animations::ColorPicker(const char* label, CfgColor* clr)
@@ -1159,4 +1159,156 @@ bool ImGui::Animations::ColorButton(const char* desc_id, const ImVec4& col, ImGu
 		ColorTooltip(desc_id, &col.x, flags & (ImGuiColorEditFlags_InputMask_ | ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaPreviewHalf));
 
 	return pressed;
+}
+
+#include "imguiaddons.hpp"
+
+void ImGui::Animations::Window(const char* label, bool* opened, const ImGui::Animations::WindowConfig& config, const std::function<void()>& callback)
+{
+	const ImGuiID id = ImGui::GetID(label);
+	ImGuiIO& io = ImGui::GetIO();
+
+	auto itr = ImGui::extraGlobals::settings.find(id);
+	const bool newWindow = itr == ImGui::extraGlobals::settings.end();
+	if (newWindow)
+	{
+		ImGui::extraGlobals::settings[id] = ImWindowSettings
+		{
+			.id = id,
+			.pos = config.defaultPos + (config.defaultSize / 2),
+			.size = ImVec2{ 0, 0 },
+			.targetSize = config.defaultSize,
+			.alpha = 0.0f
+		};
+		// force itr to be updated
+		itr = ImGui::extraGlobals::settings.find(id);
+	}
+
+	auto inTransmission = [opened, config, itr](const auto min, const auto max)
+	{
+		constexpr float lerpThreshold = 0.01f;
+
+		if (itr->second.alpha >= max - lerpThreshold)
+			return false;
+
+		if (itr->second.alpha <= min + lerpThreshold)
+			return false;
+
+		return true;
+	};
+
+	auto isMovedWindow = [id]()
+	{
+		const ImGuiWindow* movingWindow = GImGui->MovingWindow;
+		if (movingWindow == nullptr)
+			return false;
+
+		/*if (movingWindow->ID != id)
+			return false;*/
+
+		return true;
+	};
+
+	auto isResizedWindow = []()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (ImGui::GetWindowResizeCornerID(ImGui::GetCurrentWindow(), i) != ImGui::GetActiveID())
+				continue;
+
+			return true;
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (ImGui::GetWindowResizeBorderID(ImGui::GetCurrentWindow(), i) != ImGui::GetActiveID())
+				continue;
+
+			return true;
+		}
+
+		return false;
+	};
+
+	
+	auto renderGui = [&](ImGuiWindowFlags flags)
+	{
+		if (ImGui::Begin(label, opened, flags))
+		{
+			// cant perfectly know when lerp ended, this is enough
+			if(const auto size = ImGui::GetWindowSize(); size.x > 35 && size.y > 35)
+				io.IniFilename = menu.m_iniFile.c_str();
+
+			ImGui::GetForegroundDrawList()->AddCircleFilled(ImGui::GetWindowPos(), 10, ImColor{ 255, 60, 255, 255 }, 18);
+
+			const bool sizeChanged = isResizedWindow();
+			const bool posChanged = isMovedWindow();
+
+			if (sizeChanged || posChanged)
+			{
+				itr->second.targetSize = ImGui::GetWindowSize();
+				itr->second.pos = ImGui::GetWindowPos() + itr->second.targetSize / 2;
+
+				ImGui::SaveIniSettingsToDisk(menu.m_iniFile.c_str());
+			}
+
+			callback();
+
+			ImGui::End();
+		}
+	};
+
+#ifdef _DEBUG
+	//ImGui::GetForegroundDrawList()->AddCircleFilled(itr->second.pos, 10, ImColor{ 0, 60, 255, 255 }, 18);
+#endif
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	//const ImGuiStyle& backupStyle = style;
+
+	constexpr float min = 0.0f, max = 1.0f;
+	const float wantedAlpha = *opened ? max : min;
+	//const float step = ImGui::GetIO().DeltaTime * 4.0f;
+	itr->second.alpha = ImLerp(itr->second.alpha, wantedAlpha, ImGui::GetIO().DeltaTime * 10.0f);
+	//itr->second.alpha = ImClamp(itr->second.alpha + (*opened ? step : -step), min, max);
+	//itr->second.size = itr->second.targetSize * itr->second.alpha
+	const ImVec2 target = *opened ? itr->second.targetSize : ImVec2{ 0, 0 };
+	// 14 is passed to accelrate the lerping steps, so the inTransmission check can work well enough
+	itr->second.size = ImLerp(itr->second.size, target, ImGui::GetIO().DeltaTime * 14.0f);
+
+	ImGui::GetForegroundDrawList()->AddCircleFilled(itr->second.pos, 10, ImColor{ 0, 60, 255, 255 }, 18);
+
+	if (inTransmission(min, max))
+	{
+		io.IniFilename = nullptr;
+
+		for (int i = 0; i < ImGuiCol_COUNT; ++i)
+		{
+			ImVec4 color = style.Colors[i];
+			color.w *= itr->second.alpha;
+			ImGui::PushStyleColor(i, color);
+		}
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, style.WindowBorderSize * itr->second.alpha);
+		ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, style.ScrollbarSize * itr->second.alpha);
+
+		ImGui::SetNextWindowPos(itr->second.pos, ImGuiCond_Always, ImVec2{ 0.5f, 0.5f });
+		ImGui::SetNextWindowSize(itr->second.size);
+
+		renderGui(ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+
+		ImGui::PopStyleColor(ImGuiCol_COUNT);
+
+		ImGui::PopStyleVar(2);
+		return;
+	}
+	if (*opened)
+	{
+		if (newWindow)
+		{
+			ImGui::SetNextWindowPos(itr->second.pos, ImGuiCond_Once);
+			ImGui::SetNextWindowSize(itr->second.size);
+		}
+
+		renderGui(config.flags);
+	}
 }

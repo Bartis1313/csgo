@@ -43,7 +43,7 @@ void SurfaceRender::init()
 	fonts::franklinGothic = __createFont("Franklin Gothic", 10, 300, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 	fonts::verdana = __createFont("Verdana", 12, 350, FONTFLAG_ANTIALIAS | FONTFLAG_DROPSHADOW);
 
-	console::info("render init success");
+	console::debug("render init success");
 }
 
 void SurfaceRender::drawLine(const int x, const int y, const int x2, const int y2, const Color& color)
@@ -510,7 +510,6 @@ void SurfaceRender::drawProgressRing(const int x, const int y, float radius, con
 #include <ShlObj.h>
 #include <filesystem>
 #include <imgui_freetype.h>
-#include "iconfont.hpp"
 
 void ImGuiRender::init(ImGuiIO& io)
 {
@@ -544,20 +543,13 @@ void ImGuiRender::init(ImGuiIO& io)
 		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "framd.ttf" }.string().c_str(), 30.0f, &cfg, textRanges);
 		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "Verdana.ttf" }.string().c_str(), 12.0f, &cfg, textRanges);
 
-		constexpr ImWchar ranges[] =
-		{
-			0xE000, 0xF8FF,
-			0,
-		};
-		ImFonts::icon = io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, 80.0f, &cfg, ranges);
-
 		if (!ImGuiFreeType::BuildFontAtlas(io.Fonts))
 			throw std::runtime_error("ImGuiFreeType::BuildFontAtlas returned false");
 	}
 	else
 		throw std::runtime_error("could not reach windows path");
 
-	console::info("init imgui fonts success");
+	console::debug("init imgui fonts success");
 }
 
 void ImGuiRender::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)
@@ -1018,6 +1010,11 @@ void ImGuiRender::drawCone(const Vec3& pos, const float radius, const int points
 			drawTrianglePoly({ orignalW2S.x, orignalW2S.y + size /*- std::abs(size)*/ }, start, end, colCone);
 		}
 	}
+}
+
+void ImGuiRender::drawImage(const ImTextureID img, const ImVec2& pos, const ImVec2& size, const Color& color, const float rounding, const ImDrawFlags flags)
+{
+	m_drawData.emplace_back(std::make_unique<drawing::Image>(img, pos, ImVec2{ pos.x + size.x, pos.y + size.y }, ImVec2{ 0.0f, 0.0f }, ImVec2{ 1.0f, 1.0f }, Color::U32(color), rounding, flags));
 }
 
 void ImGuiRender::renderPresent(ImDrawList* draw)

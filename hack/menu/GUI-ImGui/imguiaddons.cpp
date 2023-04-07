@@ -555,6 +555,28 @@ void ImGui::ShowStyleEditorCfg(ImGuiStyle* ref)
 	ImGui::PopItemWidth();
 }
 
+void ImGui::LoadCustomSettings()
+{
+	ImGuiContext& g = *GImGui;
+	for (ImGuiWindowSettings* settings = g.SettingsWindows.begin(); settings != NULL; settings = g.SettingsWindows.next_chunk(settings))
+	{
+		const ImVec2 pos = ImVec2{ static_cast<float>(settings->Pos.x), static_cast<float>(settings->Pos.y) };
+		const ImVec2 size = ImVec2{ static_cast<float>(settings->Size.x), static_cast<float>(settings->Size.y) };
+
+		//std::cout << "name : " << settings->GetName() << " Size " << size.x << " " << size.y << '\n';
+		
+		extraGlobals::settings[ImGui::GetID(settings->GetName())] =
+			ImWindowSettings
+		{
+			.id = settings->ID,
+			.pos = pos + (size / 2),
+			.size = ImVec2{},
+			.targetSize = size,
+			.alpha = 0.0f
+		};
+	}
+}
+
 #include <d3d9.h>
 
 #ifdef IMGUI_USE_BGRA_PACKED_COLOR

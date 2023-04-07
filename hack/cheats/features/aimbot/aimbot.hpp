@@ -13,12 +13,14 @@ class Player_t;
 class Weapon_t;
 class IConVar;
 
+enum Hitboxes;
+
 struct AimbotTarget_t
 {
 	Player_t* m_player;
 	float m_fov;
-	size_t m_index;
-	size_t m_bestHitboxID;
+	int m_index;
+	Hitboxes m_bestHitboxID;
 	Vec3 m_pos;
 };
 
@@ -42,9 +44,8 @@ private:
 	void resetFields();
 	[[nodiscard]] bool isClicked(CUserCmd* cmd);
 	[[nodiscard]] bool getBestTarget(Weapon_t* wpn, const Vec3& eye, const Vec3& punch);
-	[[nodiscard]] float getRandomizedSmooth(float currentSmooth);
 
-	[[nodiscard]] std::vector<size_t> getHitboxes();
+	[[nodiscard]] std::vector<Hitboxes> getHitboxes();
 
 	Player_t* m_bestEnt;
 	Vec3 m_bestHitpos;

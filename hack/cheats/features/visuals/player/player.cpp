@@ -30,11 +30,6 @@
 
 #include <ranges>
 
-void PlayerVisuals::init()
-{
-	events::add("round_prestart", std::bind(&PlayerVisuals::resetDormacy, this, std::placeholders::_1));
-}
-
 void PlayerVisuals::draw()
 {
 	if (!vars::visuals->esp->boxes->enabled)
@@ -421,11 +416,32 @@ void PlayerVisuals::runDLight(Player_t* ent)
 	if (!vars::visuals->esp->dlight->enabled)
 		return;
 
-	auto dLight = memory::interfaces::efx->clAllocDLight(ent->getIndex());
+	// in theory this should boost performance, in reality nope
+	// the real performance would be rebuild of dlight not using many useless allocations
+	constexpr auto lightDie = 1e4f;
+	static std::array<DLight_t*, 128> dlights;
+	static std::once_flag once;
+	std::call_once(once, [&]()
+		{
+			for (size_t i = 0; i < dlights.size(); ++i)
+			{
+				dlights.at(i) = memory::interfaces::efx->clAllocDLight(i);
+				// so this will 
+				dlights.at(i)->m_die = memory::interfaces::globalVars->m_curtime + lightDie;
+			}
+		});
+
+	auto& dLight = dlights.at(ent->getIndex());
+	if (dLight->m_die == memory::interfaces::globalVars->m_curtime)
+	{
+		// reallocate the light
+		dLight = memory::interfaces::efx->clAllocDLight(ent->getIndex());
+		dLight->m_die = memory::interfaces::globalVars->m_curtime + lightDie;
+	}
+
 	dLight->m_color = vars::visuals->esp->dlight->color();
 	dLight->m_origin = ent->m_vecOrigin();
 	dLight->m_radius = vars::visuals->esp->dlight->radius;
-	dLight->m_die = memory::interfaces::globalVars->m_curtime + 0.1f;
 	dLight->m_exponent = static_cast<char>(vars::visuals->esp->dlight->exponent);
 	dLight->m_decay = vars::visuals->esp->dlight->decay;
 	dLight->m_key = ent->getIndex();
@@ -519,7 +535,7 @@ bool PlayerVisuals::DormacyInfo_t::isValid() const
 	return memory::interfaces::globalVars->m_curtime - m_lastUpdate < vars::visuals->dormacy->limit;
 }
 
-void PlayerVisuals::resetDormacy(IGameEvent* event)
+void PlayerVisuals::roundRestart()
 {
 	m_calledEvent = true;
 }

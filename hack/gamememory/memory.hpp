@@ -35,6 +35,7 @@ class CGlobalVarsBase;
 class Input;
 class CFlashlightEffect;
 class ClientClass;
+class IMaterial;
 
 enum ClassID;
 
@@ -115,7 +116,8 @@ namespace memory
 				return (T)(m_addr);
 		}
 
-		Address<T> scan(const std::string_view mod, const std::string_view sig, uintptr_t offset = 0);
+		template<size_t N>
+		Address<T> scan(const std::string_view mod, const std::array<std::optional<uint8_t>, N>& sig);
 		template<li::detail::offset_hash_pair hash>
 		Address<T> byExport(const std::string_view module);
 		template<typename TT>
@@ -162,11 +164,15 @@ namespace memory
 	using reinitPredictables_t = int(__stdcall*)();
 	using shutdownPredictables_t = void(__stdcall*)();
 	using destroyMaterial_t = void(__thiscall*)(void*);
+	using restoreData_t = void(__thiscall*)(Player_t*, const char*, int, int);
+	using saveData_t = void(__thiscall*)(Player_t*, const char*, int, int);
+	using precipClientThink_t = void(__thiscall*)(void*);
+	using precipInit_t = int(__thiscall*)(void*);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
 	inline Address<Matrix4x4> viewMatrixAddr;
-	inline Address<uintptr_t> drawSpacedRectangle;
+	inline Address<uintptr_t> drawScreenEffectMaterial;
 	inline Address<float*> motionBlurVec;
 	inline Address<uintptr_t> disableTargetAlloc;
 	inline Address<inSmoke_t> throughSmoke;
@@ -215,11 +221,15 @@ namespace memory
 	inline Address<reinitPredictables_t> reinitPredicatbles;
 	inline Address<shutdownPredictables_t> shutdownPredicatbles;
 	inline Address<destroyMaterial_t> destroyMaterial;
+	inline Address<restoreData_t> restoreData;
+	inline Address<saveData_t> saveData;
+	inline Address<retaddr_t> allocKeyValuesClient;
+	inline Address<retaddr_t> allocKeyValuesEngine;
+	inline Address<retaddr_t> flashbangRet;
+	inline Address<retaddr_t> flashbangWhiteRet;
+	inline Address<precipClientThink_t> precipitationClientThink;
+	inline Address<precipInit_t> precipitationInit;
 
-	inline Address<void*> clientValidAddr;
-	inline Address<void*> enginevalidAddr;
-	inline Address<void*> studioRenderValidAddr;
-	inline Address<void*> materialSysValidAddr;
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;
 	inline Address<void*> extraBonesProcessing;
@@ -238,6 +248,11 @@ namespace memory
 	inline Address<void*> fireInternfn;
 	inline Address<void*> preRound;
 	inline Address<void*> playSoundStep;
+	inline Address<void*> bloodUtilCallback;
+	inline Address<void*> chudIsHidden;
+	inline Address<void*> viewFade;
+	inline Address<void*> someround;
+	inline Address<void*> weatherrelated;
 
 	inline Address<teslaCreate_t> tesla;
 	inline Address<dispatchEffect_t> dispatchEffect;

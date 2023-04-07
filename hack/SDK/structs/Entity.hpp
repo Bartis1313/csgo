@@ -35,12 +35,16 @@ struct ClientHitVerify_t;
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
+// TODO: create real interfaces like game has them stored
 #define RENDERABLE 0x4
 #define NETWORKABLE 0x8
+#define THINKABLE 0x12
 
 class Entity_t
 {
 public:
+
+
 	NETVAR(int, m_iTeamNum, "DT_CSPlayer", "m_iTeamNum");
 	NETVAR(Vec3, m_vecOrigin, "DT_BasePlayer", "m_vecOrigin");
 	NETVAR(EHandle_t, m_hOwnerEntity, "DT_BaseEntity", "m_hOwnerEntity");
@@ -75,19 +79,22 @@ public:
 	VFUNC(bool, isDormant, IS_DORMANT, (), (this + NETWORKABLE));
 	VFUNC(Matrix3x4&, renderableToWorldTransform, RENDERABLE_TO_WORLD, (), (this + RENDERABLE));
 	VFUNC(void, release, RELEASE, (), (this + NETWORKABLE));
+	VFUNC(void, clientThink, CLIENT_THINK, (), (this + THINKABLE));
 	VFUNC(void, onPreDataChanged, PRE_DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(void, onDataChanged, DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(void, preDataUpdate, PRE_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 
-
 	[[nodiscard]] CUtlVector<Matrix3x4> m_CachedBoneData();
 	[[nodiscard]] Vec3 getAimPunch();
-	[[nodiscard]] Vec3 getEyePos() { return m_vecOrigin() + m_ViewOffset(); }
+	[[nodiscard]] Vec3 getEyePos();
 	[[nodiscard]] AnimationLayer* getAnimOverlays();
 	[[nodiscard]] size_t getSequenceActivity(size_t sequence);
 
 	[[nodiscard]] bool isBreakable();
+
+	[[nodiscard]] Entity_t* firstMoveChild();
+	[[nodiscard]] Entity_t* nextMovePeer();
 };
 
 class Weapon_t : public Entity_t
@@ -116,7 +123,6 @@ public:
 	VFUNC(void, updateAccuracyPenalty, UPDATE_WEAPON_PENALTY, (), (this));
 
 	[[nodiscard]] std::string getWpnName();
-	[[nodiscard]] std::u8string getIcon(int correctIndex = -1);
 
 	[[nodiscard]] bool isEmpty() { return m_iClip1() <= 0; }
 	[[nodiscard]] bool isRifle();
@@ -202,6 +208,7 @@ public:
 	NETVAR(float, m_flFlashDuration, "DT_CSPlayer", "m_flFlashDuration");
 	NETVAR_ADDR(float, m_flFlashBangTime, "DT_CSPlayer", "m_flFlashDuration", -0x10);
 	NETVAR_ADDR(float, m_flNightVisionAlpha, "DT_CSPlayer", "m_flFlashDuration", -0x1C);
+	NETVAR(bool, m_bNightVisionOn, "DT_CSPlayer", "m_bNightVisionOn");
 	NETVAR(int, m_lifeState, "DT_CSPlayer", "m_lifeState");
 	NETVAR(int, m_fFlags, "DT_CSPlayer", "m_fFlags");
 	NETVAR(int, m_nHitboxSet, "DT_CSPlayer", "m_nHitboxSet");
@@ -229,6 +236,7 @@ public:
 	NETVAR_ADDR(int, m_afButtonDisabled, "DT_BasePlayer", "m_iDefaultFOV", 0x4);
 	PTRNETVAR_ADDR(CUserCmd*, m_pCurrentCommand, "DT_BasePlayer", "m_iDefaultFOV", 0xC);
 	NETVAR_ADDR(float, m_flSpawnTime, "DT_CSPlayer", "m_iAddonBits", -0x4);
+	NETVAR(int, m_iHideHUD, "DT_CSPlayer", "m_iHideHUD");
 	[[nodiscard]] CUserCmd& m_LastCmd();
 	PTRDATAMAP_FIELD(int, m_nButtons, getPredictionDataMap(), "m_nButtons");
 	PTRDATAMAP_FIELD(int, m_nImpulse, getPredictionDataMap(), "m_nImpulse");
@@ -241,6 +249,8 @@ public:
 	void runThink();
 	void postThink();
 	void checkHasThinkFunction(bool isThinkingHint = false);
+	void restoreData(const char* context, int slot, int type);
+	void saveData(const char* context, int slot, int type);
 	VFUNC(void, selectItem, SELECTITEM, (const char* string, int subType = 0), (this, string, subType));
 	bool usingStandardWeaponsInVehicle();
 	VFUNC(void, updateCollisionBounds, UPDATE_COLLISION_BOUNDS, (), (this));

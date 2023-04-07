@@ -14,22 +14,30 @@ public:
 	VFUNC(void, setValue, 16, (int val), (this, val));
 	VFUNC(void, setValue, 17, (bool val), (this, val));
 
-	PAD(4);
+private:
+	void* sometable;
+public:
 	IConVar* m_next;
-	int m_isRegistered;
+	alignas(4) bool registered;
 	char* m_name;
 	char* m_helper;
 	int m_flags;
-	PAD(4);
+private:
+	void* unkCallback;
+public:
 	IConVar* m_parent;
-	char* m_defaultVal;
-	char* m_string;
-	int m_stringLenght;
-	float m_floatVal;
-	int m_numVal;
-	int m_hasMIn;
-	float m_min;
-	int m_hasMax;
-	float m_max;
-	CUtlVector<void(__cdecl*)()> m_callbacks;
+	const char* m_defaultValue;
+	char* m_valueNow;
+	int m_valueLength;
+private:
+	IConVar* parentCopy1;
+	IConVar* parentCopy2;
+public:
+	char* valuenowCopied; // bit delayed
+	int m_valueLengthCopied;
+private:
+	IConVar* parentCopy3;
+	IConVar* parentCopy4; // wtf?
+	PAD(16); // all zeros
+	CUtlVector<std::add_pointer_t<void __cdecl()>> m_callbacks;
 };

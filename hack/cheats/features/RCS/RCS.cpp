@@ -82,7 +82,7 @@ void RCS::prepare(float* x, float* y)
 	}
 	else
 	{
-		auto punch = game::getFixedPunch() * m_scale->getFloat();
+		auto punch = game::localPlayer->getAimPunch() * m_scale->getFloat();
 		punch[Coord::X] *= cfg.rcsX;
 		punch[Coord::Y] *= cfg.rcsY;
 

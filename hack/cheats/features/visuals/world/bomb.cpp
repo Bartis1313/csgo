@@ -30,6 +30,8 @@ void BombOverlay::init()
 {
 	m_timer = memory::interfaces::cvar->findVar("mp_c4timer");
 
+	// if we seriously do not want to use events all
+	// then find a way to get planted bomb info, I was lazy to do so
 	events::add("bomb_planted", std::bind(&BombOverlay::handleWhoPlanted, this, std::placeholders::_1));
 }
 
@@ -97,9 +99,10 @@ void BombOverlay::draw()
 		const auto text = defusetime > bombtime ? "Too late" : std::format("{:.2f}", m_bombEnt->m_hBombDefuser().isValid() ? defusetime : bombtime);
 		drawing::Text{ ImFonts::tahoma14, ImVec2{ pos.x + xCircle, pos.y + yCircle - ImFonts::tahoma14->FontSize / 2.0f },
 			Color::U32(Colors::White), text, false, true }.draw(draw);
-		constexpr float fontSizeC4 = 40.0f;
-		drawing::TextSize{ fontSizeC4, ImFonts::icon, ImVec2{ pos.x + 5.0f, pos.y + 5.0f },
-			Color::U32(Colors::White), u8"\uE031"_u8str, false, false }.draw(draw);
+
+		const auto icon = game::getWeaponIcon("weapon_c4");
+		drawing::Image{ icon.texture, ImVec2{ pos.x + 5.0f, pos.y + 5.0f }, ImVec2{ pos.x + 5.0f + 30.0f, pos.y + 5.0f + 40.0f },
+			ImVec2{ 0.0f, 0.0f }, ImVec2{ 1.0f, 1.0f }, Color::U32(Colors::White) }.draw(draw);
 
 		float yPosInfo = pos.y + size.y / 2.0f;
 

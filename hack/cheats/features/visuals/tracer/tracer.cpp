@@ -22,6 +22,8 @@
 
 #include <ranges>
 
+#include "../misc/bulletUpdater.hpp"
+
 void BulletTracer::draw()
 {
 	if (!vars::visuals->world->tracer->enabled)
@@ -33,91 +35,52 @@ void BulletTracer::draw()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	CfgBeam cfgbeam = vars::visuals->world->tracer->beamTracer;
-
-	auto m_vecBulletVerifyListClient = game::localPlayer->m_vecBulletVerifyListClient();
-	static int gameBulletCount = m_vecBulletVerifyListClient.m_size; // init current count
-
-	for (int i = m_vecBulletVerifyListClient.m_size; i > gameBulletCount; i--) // get current bullets, NOT all
-		m_hitsClientSide.emplace_back(HitStruct_t
-			{
-				m_vecBulletVerifyListClient[i - 1].m_pos,
-				memory::interfaces::globalVars->m_curtime + cfgbeam.life
-			});
-
-	if (m_vecBulletVerifyListClient.m_size != gameBulletCount)
-		gameBulletCount = m_vecBulletVerifyListClient.m_size;
-
-	Color outline = vars::visuals->world->impacts->colorClient();
-	Color fill = vars::visuals->world->impacts->colorClientFill();
-
-	for (size_t i = 0; auto & el : m_hitsClientSide)
+	auto convertToFlag = [](const std::string& flag)
 	{
-		float diff = el.m_expire - memory::interfaces::globalVars->m_curtime;
-
-		if (diff < 0.0f)
+		int ret{ 0 };
+		for (const auto& el : std::views::split(flag, '|'))
 		{
-			m_hitsClientSide.erase(m_hitsClientSide.begin() + i);
-			continue;
+			const std::string v{ el.begin(), el.end() };
+			const int num = std::stoi(v);
+			ret |= num;
 		}
 
-		if (el.called)
-			continue;
+		return ret;
+	};
 
-		if (!el.called)
-		{
-			Trace_t tr;
-			Vec3 src = game::localPlayer->getEyePos();
-			TraceFilter filter;
-			filter.m_skip = game::localPlayer();
-			memory::interfaces::trace->traceRay({ src, el.m_pos }, MASK_PLAYER, &filter, &tr);
+	const auto lastbullets = g_BulletUpdater->getLastBullets();
+	if (lastbullets.empty())
+		return;
 
-			auto convertToFlag = [](const std::string& flag)
-			{
-				int ret = 0;
-				for (const auto& el : std::views::split(flag, '|'))
-				{
-					std::string v{ el.begin(), el.end() };
-					int num = std::stoi(v);
-					ret |= num;
-				}
+	CfgBeam cfgbeam = vars::visuals->world->tracer->beamTracer;
+	auto& strWithoutSpaces = cfgbeam.flags;
+	strWithoutSpaces.erase(std::remove(strWithoutSpaces.begin(), strWithoutSpaces.end(), ' '), strWithoutSpaces.end());
+	const Vec3 correctEnd = lastbullets.size() == 2 ? lastbullets.back() : lastbullets.front();
+	const Vec3 src{ game::localPlayer->getEyePos() };
 
-				return ret;
-			};
-
-			BeamInfo_t info = {};
-
-			auto& strWithoutSpaces = cfgbeam.flags;
-			strWithoutSpaces.erase(std::remove(strWithoutSpaces.begin(), strWithoutSpaces.end(), ' '), strWithoutSpaces.end());
-
-			info.m_type = /*convertToFlag(config.get<std::string>(vars.sBulletTracerType))*/ TE_BEAMPOINTS;
-			info.m_flags = convertToFlag(strWithoutSpaces);
-			info.m_modelName = selections::beamNames.at(cfgbeam.index);
-			info.m_modelIndex = -1;
-			info.m_haloIndex = -1;
-			info.m_haloScale = 0.0f;
-			info.m_life = cfgbeam.life;
-			info.m_width = cfgbeam.width;
-			info.m_endWidth = cfgbeam.width;
-			info.m_fadeLength = cfgbeam.fadeLength;
-			info.m_amplitude = cfgbeam.amplitude;
-			info.m_red = cfgbeam.color().rMultiplied();
-			info.m_green = cfgbeam.color().gMultiplied();
-			info.m_blue = cfgbeam.color().bMultiplied();
-			info.m_brightness = cfgbeam.color().aMultiplied();
-			info.m_speed = cfgbeam.speed;
-			info.m_startFrame = static_cast<int>(cfgbeam.startFrame);
-			info.m_frameRate = cfgbeam.frameRate;
-			info.m_vecStart = src;
-			info.m_vecEnd = tr.m_end;
-			info.m_segments = cfgbeam.segments;
-			info.m_renderable = true;
-
-			memory::interfaces::beams->createBeamPoints(info);
-
-			el.called = true;
-		}
-
-		i++;
-	}
+	BeamInfo_t info = {};
+	info.m_type = /*convertToFlag(config.get<std::string>(vars.sBulletTracerType))*/ TE_BEAMPOINTS;
+	info.m_flags = convertToFlag(strWithoutSpaces);
+	info.m_modelName = selections::beamNames.at(cfgbeam.index);
+	info.m_modelIndex = -1;
+	info.m_haloIndex = -1;
+	info.m_haloScale = 0.0f;
+	info.m_life = cfgbeam.life;
+	info.m_width = cfgbeam.width;
+	info.m_endWidth = cfgbeam.width;
+	info.m_fadeLength = cfgbeam.fadeLength;
+	info.m_amplitude = cfgbeam.amplitude;
+	info.m_red = cfgbeam.color().rMultiplied();
+	info.m_green = cfgbeam.color().gMultiplied();
+	info.m_blue = cfgbeam.color().bMultiplied();
+	info.m_brightness = cfgbeam.color().aMultiplied();
+	info.m_speed = cfgbeam.speed;
+	info.m_startFrame = static_cast<int>(cfgbeam.startFrame);
+	info.m_frameRate = cfgbeam.frameRate;
+	info.m_vecStart = src;
+	info.m_vecEnd = correctEnd;
+	info.m_segments = cfgbeam.segments;
+	info.m_renderable = true;
+	
+	memory::interfaces::beams->createBeamPoints(info);
 }

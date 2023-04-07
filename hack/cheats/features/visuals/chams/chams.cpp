@@ -11,6 +11,7 @@
 #include <SDK/IVModelInfo.hpp>
 #include <SDK/IVStudioRender.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <SDK/materialInit.hpp>
 
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/tools/tools.hpp>
@@ -58,12 +59,12 @@ std::optional<Mat_t> Chams::addMaterialByString(const Mat_t& material)
 	return matToPush;
 }
 
-void Chams::init()
+void Chams::initMaterials()
 {
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = "Flat", .key = "UnlitGeneric" } }).value());
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = "Generic", .key = "VertexLitGeneric" } }).value());
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .type = Mat_t::ExtraType::GLOW, .data = Mat_t::Data{.name = "Glow", .key = "VertexLitGeneric",
-		.buf = "$additive 1 $envmap models/effects/cube_white $envmapfresnel 1" } }).value());
+		.buf = "$additive 1 $envmap models/effects/cube_white $envmapfresnel 1 $envmaptint 1" } }).value());
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = "Metalic", .key = "VertexLitGeneric",
 		.buf = "$basetexture white $envmap env_cubemap $normalmapalphaenvmapmask 1 $envmapcontrast 1 $nofog 1 $model 1 $nocull 0 $selfillum 1 $halfambert 1 $znearer 0 $flat 1"} }).value());
 	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = "Pearlescent", .key = "VertexLitGeneric",
@@ -82,18 +83,13 @@ void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& 
 	if (mat->isError())
 		return;
 
-	// this is not intended to force always
-	// todo: material should have a bitset of flags, this is more flexible for chams editor.
-	mat->setMaterialVarFlag(MATERIAL_VAR_ADDITIVE, false);
 	mat->setMaterialVarFlag(MATERIAL_VAR_WIREFRAME, wireframe);
 	mat->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, ignore);
 
 	if (mat.type == Mat_t::ExtraType::GLOW)
 	{
-		static bool found = false;
-		auto matColor = mat->findVar("$envmaptint", &found);
-		if (found)
-			matColor->setValues(color);
+		if (const auto envmap = mat->findVar("$envmaptint"))
+			envmap->setValues(color);
 
 		mat->setMaterialVarFlag(MATERIAL_VAR_ADDITIVE, true);
 	}
@@ -103,18 +99,20 @@ void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& 
 	if (force)
 		memory::interfaces::studioRender->forcedMaterialOverride(mat.mat);
 	if (call)
-		CALL(m_result, m_state, m_info, m_matrix);
+		CALL(m_matrix);
 }
 
 #include <cheats/hooks/hooks.hpp>
 
-void Chams::CALL(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
+void Chams::CALL(Matrix3x4* matrix)
 {
-	hooks::drawModel::original(memory::interfaces::modelRender(), result, state, info, matrix);
+	hooks::drawModel::original(memory::interfaces::modelRender(), m_result, m_state, m_info, matrix);
 }
 
 void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
 {
+	INIT_MATERIALS_ONCE(initMaterials);
+
 	m_result = result;
 	m_state = state;
 	m_info = info;
@@ -225,7 +223,7 @@ void Chams::drawBackTrack(Player_t* ent)
 				break;
 
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false, vars::visuals->chams->colorBacktrack(), true, false);
-			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
+			CALL(record->at(i).m_matrix.data());
 			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
@@ -235,7 +233,7 @@ void Chams::drawBackTrack(Player_t* ent)
 		if (g_Backtrack->isValid(record->front().m_simtime))
 		{
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false, vars::visuals->chams->colorBacktrack(), true, false);
-			CALL(m_result, m_state, m_info, record->back().m_matrix.data());
+			CALL(record->back().m_matrix.data());
 			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
@@ -249,7 +247,7 @@ void Chams::drawBackTrack(Player_t* ent)
 
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false,
 				Color::rainbowColor(memory::interfaces::globalVars->m_curtime + (i / 3.0f), vars::visuals->chams->rainbowBacktrackSpeed), true, false);
-			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
+			CALL(record->at(i).m_matrix.data());
 			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;
@@ -267,7 +265,7 @@ void Chams::drawBackTrack(Player_t* ent)
 				i * (fromCfg.g() / record->size()), fromCfg.b(), fromCfg.a());
 
 			overrideChams(vars::visuals->chams->modeBacktrack, false, false, color, true, false);
-			CALL(m_result, m_state, m_info, record->at(i).m_matrix.data());
+			CALL(record->at(i).m_matrix.data());
 			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
 		break;

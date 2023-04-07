@@ -5,6 +5,8 @@
 #include <render/Color.hpp>
 #include <SDK/math/Vector.hpp>
 
+#include <cheats/classes/renderableToPresent.hpp>
+
 struct ImDrawList;
 
 struct ParticlePoint_t
@@ -19,21 +21,25 @@ struct ParticlePoint_t
 	float m_alpha = 1.0f;
 };
 
-class Background
+class Background : protected RenderablePresentType
 {
 public:
-	Background() = default;
+	constexpr Background()
+		: RenderablePresentType{}
+	{}
 
 	constexpr Background(size_t size, float maxDist, const std::vector<Color>& colorArr) :
+		RenderablePresentType{},
 		m_size{ size }, m_maxDistLines{ maxDist }, m_colorArr{ colorArr }
 	{}
 
-	void draw(ImDrawList* _draw);
-	void init();
+	virtual void init() override;
+	virtual void draw() override;
 private:
 	void pushRandomPoints();
 	void update(ParticlePoint_t& particle);
 	void find(ParticlePoint_t& particle);
+
 	void drawLine(const Vec2& start, const Vec2& end, const Color& color, float thickness = 1.0f);
 	void drawCircleFilled(const Vec2& pos, float radius, size_t points, const Color& color);
 	void drawRectFilled(float x, float y, float width, float height, const Color& color);
@@ -42,9 +48,9 @@ private:
 	float m_maxDistLines; // dist between
 
 	std::vector<ParticlePoint_t> m_particleArr;
-	std::vector<Color> m_colorArr; // temp limited usage, FIXME
+	std::vector<Color> m_colorArr;
 
 	ImDrawList* m_draw;
 };
 
-inline Background background;
+GLOBAL_FEATURE(Background);

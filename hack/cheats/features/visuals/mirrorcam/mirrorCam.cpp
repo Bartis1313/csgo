@@ -11,12 +11,18 @@
 #include <SDK/CViewSetup.hpp>
 #include <SDK/IVRenderView.hpp>
 #include <SDK/CGlobalVars.hpp>
+#include <SDK/materialInit.hpp>
 #include <utilities/tools/tools.hpp>
 #include <utilities/inputSystem.hpp>
 #include <utilities/console/console.hpp>
 #include <cheats/hooks/hooks.hpp>
 #include <cheats/game/game.hpp>
 #include <config/vars.hpp>
+
+void MirrorCam::initTexture()
+{
+	m_texture = memory::interfaces::matSys->createFullFrameRenderTarget("mirrorCam");
+}
 
 void MirrorCam::updateKeys()
 {
@@ -25,6 +31,8 @@ void MirrorCam::updateKeys()
 
 void MirrorCam::run(const CViewSetup& view)
 {
+	INIT_MATERIALS_ONCE(initTexture);
+
 	// this might eat some FPS, if enabled
 	if (!vars::misc->mirrorCam->enabled)
 		return;
@@ -60,17 +68,6 @@ void MirrorCamDraw::draw()
 	if (!game::isAvailable())
 		return;
 
-	if (!g_MirrorCam->m_inited)
-	{
-		//interfaces::matSys->forceBeginRenderTargetAllocation();
-		g_MirrorCam->m_texture = memory::interfaces::matSys->createFullFrameRenderTarget("mirrorCam");
-		//interfaces::matSys->forceEndRenderTargetAllocation();
-
-		g_MirrorCam->m_inited = true;
-
-		console::info("Inited mirrorcam texture!");
-	}
-
 	if (!vars::misc->mirrorCam->enabled)
 		return;
 
@@ -79,11 +76,6 @@ void MirrorCamDraw::draw()
 		if (!vars::keys->mirrorCam.isEnabled())
 			return;
 	}
-
-	// useless, use getActual...
-	// raw sizes, returns ur screen size
-	/*D3DSURFACE_DESC surfaceDesc;
-	m_texture->m_handle[0]->m_texture->GetLevelDesc(0, &surfaceDesc);*/
 
 	if (ImGui::Begin("Camera", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
 	{

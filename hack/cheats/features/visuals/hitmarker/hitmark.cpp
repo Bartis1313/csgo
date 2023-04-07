@@ -6,25 +6,21 @@
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/ISurface.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <SDK/clientHitVerify.hpp>
 #include <gamememory/memory.hpp>
 #include <cheats/game/game.hpp>
 #include <cheats/game/globals.hpp>
 #include <config/vars.hpp>
 #include <render/render.hpp>
+#include <render/BBox.hpp>
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <cheats/features/events/events.hpp>
 
 #include <functional>
+#include <imgui_internal.h>
 
-// TODO: try if this is okay-ish https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/takedamageinfo.h#L24
-// and then: https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/server/player.cpp#L1725
-// server.dll 55 8B EC 83 EC 18 56 57 8B 7D 08 8B F1 57
-// retaddr to check 84 C0 74 34 8B 4D 08 8B 01 
-void Hitmarker::init()
-{
-	events::add("player_hurt", std::bind(&Hitmarker::handleHits, this, std::placeholders::_1));
-}
+#include "../player/boxes.hpp"
 
 void Hitmarker::draw()
 {
@@ -38,19 +34,23 @@ void Hitmarker::draw()
 		return;
 
 	float x, y;
-	bool mode3D = vars::misc->hitmarker->enabled3D;
+	const bool mode3D = vars::misc->hitmarker->enabled3D;
 	if (!mode3D)
 	{
 		x = globals::screenX / 2.0f;
 		y = globals::screenY / 2.0f;
 	}
 
-	float currentAlpha = 0.0f;
-	for (size_t i = 0; const auto & el : m_hitmarkers)
-	{
-		float diff = el.m_expire - memory::interfaces::globalVars->m_curtime;
+	const auto bulletList = game::localPlayer->m_vecBulletVerifyListClient();
 
-		if (diff < 0.0f)
+	for (size_t i = 0; auto & [expire, damage, health, wasHeadhsot, player, hitPos, alpha] : m_hitmarkers)
+	{
+		// cant think of anything else, hitgroups are limited
+		if (const auto bulletPos = bulletList[bulletList.m_size - 2].m_pos; bulletPos != hitPos)
+			hitPos = bulletPos;
+
+		const float diff = expire - memory::interfaces::globalVars->m_curtime;
+		if (diff <= 0.0f)
 		{
 			m_hitmarkers.erase(m_hitmarkers.begin() + i);
 			continue;
@@ -58,30 +58,27 @@ void Hitmarker::draw()
 
 		if (mode3D)
 		{
-			if (ImVec2 s; imRender.worldToScreen(el.m_pos, s))
+			if (ImVec2 s; imRender.worldToScreen(hitPos, s))
 			{
 				x = s.x;
 				y = s.y;
 			}
 		}
 
-		currentAlpha = diff / vars::misc->hitmarker->time;
-		float sizeFont = 16.0f;
-		Color actualColor = vars::misc->hitmarker->colorNormal().getColorEditAlpha(currentAlpha);
+		alpha = diff / vars::misc->hitmarker->time;
+		Color actualColor = vars::misc->hitmarker->colorNormal().getColorEditAlpha(alpha);
 		float lineX = 10.0f;
 		float lineY = 5.0f;
 
-		if (el.isAvailable() && el.m_head)
+		if (health >= 0 && wasHeadhsot)
 		{
-			actualColor = vars::misc->hitmarker->colorHead().getColorEditAlpha(currentAlpha);
-			sizeFont = 24.0f;
+			actualColor = vars::misc->hitmarker->colorHead().getColorEditAlpha(alpha);
 			lineX = 14.0f;
 			lineY = 7.0f;
 		}
-		else if (!el.isAvailable())
+		else if (health <= 0)
 		{
-			actualColor = vars::misc->hitmarker->colorDead().getColorEditAlpha(currentAlpha);
-			sizeFont = 28.0f;
+			actualColor = vars::misc->hitmarker->colorDead().getColorEditAlpha(alpha);
 			lineX = 18.0f;
 			lineY = 9.0f;
 		}
@@ -90,21 +87,28 @@ void Hitmarker::draw()
 		float lineAddonY = lineY;
 		if (vars::misc->hitmarker->enabledResize)
 		{
-			lineAddonX = lineX / (1.0f / (currentAlpha + 0.01f)); // prevent division by 0 and make ratio
-			lineAddonY = lineY / (1.0f / (currentAlpha + 0.01f));
+			lineAddonX = lineX * alpha;
+			lineAddonY = lineY * alpha;
 		}
 
 		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor);
 		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor);
 		imRender.drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor);
 		imRender.drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor);
+		
+		Box box{ player };
+		if (!box.isValid())
+			continue;
 
-		constexpr int moveMultiply = 25;
-		float correction = (1.0f - currentAlpha) * moveMultiply; // this maybe should have el.expire ratio to previous one
-		float Xcorrection = x + 8.0f + (correction * 0.6f); // multiply 0.6 to get a bit niver effect, 8 comes from padding
-		float Ycorrection = (1.0f - currentAlpha) * y; // 4.0f comes from hardcoding. Make it more nice, maybe there are better ways for this
+		const auto headPos = player->getHitboxPos(HITBOX_HEAD);
 
-		imRender.text(Xcorrection, Ycorrection, sizeFont, ImFonts::tahoma14, std::format("{}", el.m_dmg), false, actualColor, false);
+		const auto text = std::format("{}", damage);
+		const auto textSize = imRender.getTextSize(ImFonts::franklinGothic30, text);
+		const float fontSize = game::getScaledFont(game::localPlayer->getEyePos(), headPos, 150.0f, 12.0f, 30.0f);
+
+		ImVec2 coord{ (box.x + box.w / 2) - textSize.x / 2, box.y };
+		coord.y -= (i + 1) * fontSize; // some scaling with alpha would be nice
+		imRender.text(coord.x, coord.y, fontSize, ImFonts::franklinGothic30, text, true, actualColor, false);
 
 		i++;
 	}
@@ -115,7 +119,7 @@ void Hitmarker::handleHits(IGameEvent* event)
 	if (!vars::misc->hitmarker->enabled)
 		return;
 
-	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("attacker")));
+	const auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("attacker")));
 	if (!attacker)
 		return;
 
@@ -123,22 +127,23 @@ void Hitmarker::handleHits(IGameEvent* event)
 	if (attacker != game::localPlayer)
 		return;
 
-	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("userid"))));
+	const auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("userid"))));
 	if (!ent) // should never happen
 		return;
 
-	auto dmg_health = event->getInt("dmg_health");
-	auto health = ent->m_iHealth() - dmg_health;
-	auto hitgroup = event->getInt("hitgroup");
+	const auto dmg_health = event->getInt("dmg_health");
+	const auto health = ent->m_iHealth() - dmg_health;
+	const auto hitgroup = event->getInt("hitgroup");
 
-	Hitmark_t hit =
+	Hitmark_t hit // rest fields are controlled in loop
 	{
-		memory::interfaces::globalVars->m_curtime + vars::misc->hitmarker->time,
-		dmg_health,
-		ent->m_iHealth() - dmg_health,
-		hitgroup == 1, // head
-		ent->getHitgroupPos(hitgroup)
+		.expireTime = memory::interfaces::globalVars->m_curtime + vars::misc->hitmarker->time,
+		.damage = dmg_health,
+		.health = ent->m_iHealth() - dmg_health,
+		.wasHeadshot = hitgroup == HITGROUP_HEAD,
+		.player = ent
 	};
+
 	m_hitmarkers.push_back(hit);
 
 	if (vars::misc->hitmarker->play)

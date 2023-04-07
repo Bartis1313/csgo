@@ -15,15 +15,7 @@
 
 void MiscInfo::init()
 {
-	if (game::isAvailable())
-	{
-		m_allHits = game::localPlayer->m_totalHitsOnServer(); // those gets clamped at 255 :(
-		// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/shared/cstrike15/cs_player_shared.cpp#L1682
-		// ida: direct reference: [actual address in first opcode] E8 ? ? ? ? 8B 44 24 24 46 
-	}
-
-	events::add("player_hurt", std::bind(&MiscInfo::addHits, this, std::placeholders::_1));
-	events::add("round_end", std::bind(&MiscInfo::resetHits, this, std::placeholders::_1));
+	m_allHits = game::localPlayer->m_totalHitsOnServer(); // those gets clamped at 255 :(
 }
 
 void MiscInfo::addHits(IGameEvent* event)
@@ -43,7 +35,7 @@ void MiscInfo::addHits(IGameEvent* event)
 	++m_allHits;
 }
 
-void MiscInfo::resetHits(IGameEvent* event)
+void MiscInfo::reset()
 {
 	m_allHits = 0;
 }
@@ -60,8 +52,7 @@ void MiscInfo::draw()
 	if (!weapon)
 		return;
 
-	auto text = []
-	(const std::string& text, const Color& color)
+	auto text = [](const std::string& text, const Color& color)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Text, ImVec4{ color.r(), color.g(), color.b(), color.a() });
 		ImGui::TextUnformatted(text.c_str()); // because textcolored is formatted by va args

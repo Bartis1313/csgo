@@ -84,7 +84,6 @@ namespace ImFonts
 	inline ImFont* franklinGothic30;
 	inline ImFont* franklinGothic12;
 	inline ImFont* verdana12;
-	inline ImFont* icon;
 }
 
 #include <memory>
@@ -145,6 +144,7 @@ public:
 	void drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 	void drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 	void drawSphere(const Vec3& pos, float radius, float angleSphere, const Color& color);
+	void drawImage(const ImTextureID img, const ImVec2& pos, const ImVec2& size, const Color& color, const float rounding = 0.0f, const ImDrawFlags flags = 0);
 	[[nodiscard]] ImVec2 getTextSize(ImFont* font, const std::string& text);
 	[[nodiscard]] bool worldToScreen(const Vec3& in, ImVec2& out);
 

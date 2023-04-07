@@ -23,17 +23,17 @@
 #include <ranges>
 
 template<typename T>
-memory::Address<T> memory::Address<T>::scan(const std::string_view mod, const std::string_view sig, uintptr_t offset)
+template<size_t N>
+memory::Address<T> memory::Address<T>::scan(const std::string_view mod, const std::array<std::optional<uint8_t>, N>& sig)
 {
 	const auto _module = memory::getModule(mod);
 	const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(_module);
 	const auto ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<uint8_t*>(_module) + dosHeader->e_lfanew);
 	const auto sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
-	const auto rangeStart = reinterpret_cast<uintptr_t>(_module);
 
-	auto check = [](std::byte* data, const std::vector<std::optional<std::byte>>& _mask)
+	auto check = [sig](uint8_t* data)
 	{
-		for (const auto& _byte : _mask)
+		for (const auto& _byte : sig)
 		{
 			if (_byte && _byte.value() != *data)
 				return false;
@@ -42,18 +42,18 @@ memory::Address<T> memory::Address<T>::scan(const std::string_view mod, const st
 		return true;
 	};
 
-	const auto converted = SigConvert<std::byte>::get(sig);
-
 	for (auto i : std::views::iota(reinterpret_cast<size_t>(_module), static_cast<size_t>(sizeOfImage + reinterpret_cast<size_t>(_module))))
 	{
-		if (check(reinterpret_cast<std::byte*>(i), converted))
+		if (check(reinterpret_cast<uint8_t*>(i)))
 		{
-			m_addr = i + offset;
+			m_addr = i;
 			break;
 		}
 	}
 
-	assert(m_addr);
+	if (!m_addr)	
+		throw std::runtime_error{ std::format("Couldn't find signature, module {}, signature: {}", mod, signature::to_string(sig)) };
+
 	m_module = mod;
 	return Address<T>{ m_addr };
 }
@@ -117,7 +117,7 @@ memory::Address<T> memory::Address<T>::findFromGameLoop(ClassID id)
 void memory::init()
 {
 #define ADD_TO_MAP(name) \
-	detail::m_ModulesAddr[name] =  reinterpret_cast<HMODULE>(LI_MODULE(name).cached()); \
+	detail::m_ModulesAddr[name] = reinterpret_cast<HMODULE>(LI_MODULE(name).cached()); \
 
 	ADD_TO_MAP("engine.dll");
 	ADD_TO_MAP("client.dll");
@@ -140,30 +140,30 @@ void memory::init()
 	using namespace memory;
 	using namespace memory::interfaces;
 
-	traceFilterSimple = traceFilterSimple.scan(CLIENT_DLL, CTRACE_FILTER_SIMPLE, 0x3D);
+	traceFilterSimple = traceFilterSimple.scan(CLIENT_DLL, CTRACE_FILTER_SIMPLE).add(0x3D);
 	returnAddrRadarImage = returnAddrRadarImage.scan(PANORAMA_DLL, UNK_FILESYS);
-	viewMatrixAddr = viewMatrixAddr.scan(CLIENT_DLL, VIEW_MATRIX_CLIENT, 0x3).deRef().add(0xB0);
-	drawSpacedRectangle = drawSpacedRectangle.scan(CLIENT_DLL, DRAW_SPACE_RECTANGLE_CALL);
-	motionBlurVec = motionBlurVec.scan(CLIENT_DLL, BLUR_MATERIAL_ARR_1, 0x1).deRef();
-	disableTargetAlloc = disableTargetAlloc.scan(MATERIAL_DLL, DISABLE_RENDER_TARGET_ALLOC, 0x2);
+	viewMatrixAddr = viewMatrixAddr.scan(CLIENT_DLL, VIEW_MATRIX_CLIENT).add(0x3).deRef().add(0xB0);
+	drawScreenEffectMaterial = drawScreenEffectMaterial.scan(CLIENT_DLL, DRAW_EFFECT_MATRIAL);
+	motionBlurVec = motionBlurVec.scan(CLIENT_DLL, BLUR_MATERIAL_ARR_1).add(0x1).deRef();
+	disableTargetAlloc = disableTargetAlloc.scan(MATERIAL_DLL, DISABLE_RENDER_TARGET_ALLOC).add(0x2);
 	throughSmoke = throughSmoke.scan(CLIENT_DLL, GOES_THROUGH_SMOKE);
 	smokeCount = throughSmoke.add(0x8).deRef().cast<uintptr_t>();
 	loadSky = loadSky.scan(ENGINE_DLL, LOAD_SKY);
-	callbacksHead = callbacksHead.scan(CLIENT_DLL, HEAD_OF_EFFECTS, 0x2).deRef(Dereference::TWICE);
+	callbacksHead = callbacksHead.scan(CLIENT_DLL, HEAD_OF_EFFECTS).add(0x2).deRef(Dereference::TWICE);
 	camThink = camThink.scan(CLIENT_DLL, CAM_THINK);
 	renderDrawPoints = renderDrawPoints.scan(STUDIORENDER_DLL, R_STUDIODRAWPOINTS);
-	localPlayer = localPlayer.scan(CLIENT_DLL, LOCAL_PLAYER, 0x2).deRef();
-	csgoHud = csgoHud.scan(CLIENT_DLL, CSGO_HUD, 0x1).deRef();
+	localPlayer = localPlayer.scan(CLIENT_DLL, LOCAL_PLAYER).add(0x2).deRef();
+	csgoHud = csgoHud.scan(CLIENT_DLL, CSGO_HUD).add(0x1).deRef();
 	hudfindElement = hudfindElement.scan(CLIENT_DLL, FIND_ELEMENT);
 	keyValuesFromString = keyValuesFromString.scan(CLIENT_DLL, KEY_VALUES_FROM_STR);
-	animOverlays = animOverlays.scan(CLIENT_DLL, ANIMATION_LAYER, 0x2).deRef();
+	animOverlays = animOverlays.scan(CLIENT_DLL, ANIMATION_LAYER).add(0x2).deRef();
 	sequenceActivity = sequenceActivity.scan(CLIENT_DLL, SEQUENCE_ACTIVITY);
-	cachedBones = cachedBones.scan(CLIENT_DLL, CACHED_BONE, 0x2).deRef().add(0x4);
+	cachedBones = cachedBones.scan(CLIENT_DLL, CACHED_BONE).add(0x2).deRef().add(0x4);
 	setAbsOrigin = setAbsOrigin.scan(CLIENT_DLL, SETABSORIGIN);
 	isC4Owner = isC4Owner.scan(CLIENT_DLL, HASC4);
 	isBreakable = isBreakable.scan(CLIENT_DLL, IS_BREAKBLE);
-	predictionData = predictionData.scan(CLIENT_DLL, PREDICTION_MOVE_DATA, 0x1).deRef(Dereference::TWICE);
-	predictionSeed = predictionSeed.scan(CLIENT_DLL, PREDICTIONRANDOMSEED, 0x2).deRef();
+	predictionData = predictionData.scan(CLIENT_DLL, PREDICTION_MOVE_DATA).add(0x1).deRef(Dereference::TWICE);
+	predictionSeed = predictionSeed.scan(CLIENT_DLL, PREDICTIONRANDOMSEED).add(0x2).deRef();
 	flashlightCreate = flashlightCreate.scan(CLIENT_DLL, FLASHLIGHT_CREATE);
 	flashlightUpdate = flashlightUpdate.scan(CLIENT_DLL, FLASHLIGHT_UPDATE);
 	flashlightDestroy = flashlightDestroy.scan(CLIENT_DLL, FLASHLIGHT_DESTROY);
@@ -171,7 +171,7 @@ void memory::init()
 	velocity = velocity.scan(CLIENT_DLL, SETUP_VELOCITY);
 	accumulate = accumulate.scan(CLIENT_DLL, SETUP_VELOCITY);
 	particleIsCached = particleIsCached.scan(CLIENT_DLL, IS_EFFECT_CACHED);
-	particleSystem = particleSystem.scan(CLIENT_DLL, PARTICLE_SYSTEM, 0x7).deRef(Dereference::TWICE);
+	particleSystem = particleSystem.scan(CLIENT_DLL, PARTICLE_SYSTEM).add(0x7).deRef(Dereference::TWICE);
 	particleFindStringIndex = particleFindStringIndex.scan(CLIENT_DLL, FIND_STRING_INDEX);
 	particleCall = particleCall.scan(CLIENT_DLL, PARTICLE_CALL);
 	particleSetControlPoint = particleSetControlPoint.scan(CLIENT_DLL, SET_PARTICLE_POINT);
@@ -192,13 +192,15 @@ void memory::init()
 	reinitPredicatbles = reinitPredicatbles.scan(CLIENT_DLL, REINIT_PREDICTABLES);
 	shutdownPredicatbles = shutdownPredicatbles.scan(CLIENT_DLL, SHUTDOWN_PREDICTABLES);
 	destroyMaterial = destroyMaterial.scan(MATERIAL_DLL, MATERIAL_DESTRUCT);
+	allocKeyValuesClient = allocKeyValuesClient.scan(CLIENT_DLL, RET_ADDR_KEYVALUES_CLIENT).add(0x3E);
+	allocKeyValuesEngine = allocKeyValuesEngine.scan(ENGINE_DLL, RET_ADDR_KEYVALUES_ENGINE).add(0x4A);
+	flashbangRet = flashbangRet.scan(CLIENT_DLL, FLASH_EFFECT_RET).add(0x3);
+	flashbangWhiteRet = flashbangWhiteRet.scan(CLIENT_DLL, FLASH_EFFECT_WHITE_RET).add(0xA);
+	precipitationClientThink = precipitationClientThink.scan(CLIENT_DLL, CLIENT_THINK_PRECIPITATION);
+	precipitationInit = precipitationInit.scan(CLIENT_DLL, PRECIPITATION_INIT);
 
 	// HOOKS
 
-	clientValidAddr = clientValidAddr.scan(CLIENT_DLL, NEW_CHECK);
-	enginevalidAddr = enginevalidAddr.scan(ENGINE_DLL, NEW_CHECK);
-	studioRenderValidAddr = studioRenderValidAddr.scan(STUDIORENDER_DLL, NEW_CHECK);
-	materialSysValidAddr = materialSysValidAddr.scan(MATERIAL_DLL, NEW_CHECK);
 	isUsingPropDebug = isUsingPropDebug.scan(ENGINE_DLL, IS_USING_PROP_DEBUG).rel(0x1);
 	getColorModulation = getColorModulation.scan(MATERIAL_DLL, GET_COLOR_MODULATION);
 	extraBonesProcessing = extraBonesProcessing.scan(CLIENT_DLL, EXTRA_BONES_PROCCESSING);
@@ -215,8 +217,14 @@ void memory::init()
 	isFollowedEntity = isFollowedEntity.scan(CLIENT_DLL, IS_FOLLOWED_ENT);
 	spottedEntityUpdate = spottedEntityUpdate.scan(CLIENT_DLL, SPOTTED_ENTITIY_UPDATE);
 	fireInternfn = fireInternfn.scan(ENGINE_DLL, FIRE_INTERN);
-	preRound = preRound.scan(SERVER_DLL, SERVER_PREROUND);
+	preRound = preRound.scan(CLIENT_DLL, GAME_INSTRUCTOR_EVENT);
 	playSoundStep = playSoundStep.scan(CLIENT_DLL, PLAY_STEP_SOUND);
+	restoreData = restoreData.scan(CLIENT_DLL, RESTORE_DATA);
+	saveData = saveData.scan(CLIENT_DLL, SAVE_DATA);
+	bloodUtilCallback = bloodUtilCallback.scan(CLIENT_DLL, BLOOD_UTIL_CALLBACK);
+	chudIsHidden = chudIsHidden.scan(CLIENT_DLL, CHUD_IS_HIDDEN);
+	viewFade = viewFade.scan(ENGINE_DLL, VIEW_FADE);
+	someround = someround.scan(CLIENT_DLL, UNK_SURVIVAL_RELATED);
 
 	// REST
 
@@ -228,17 +236,17 @@ void memory::init()
 	game::localPlayer.init();
 	memory::interfaces::init();
 
-	glowManager = glowManager.scan(CLIENT_DLL, GLOWMANAGER, 0x3).deRef();
-	weaponInterface = weaponInterface.scan(CLIENT_DLL, WEAPONDATA, 0x2).deRef();
-	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER, 0x2).deRef(Dereference::TWICE);
-	dx9Device = dx9Device.scan(SHARED_API, DX9_DEVICE, 0x1).deRef(Dereference::TWICE);
-	clientState = clientState.scan(ENGINE_DLL, CLIENT_STATE, 0x1).deRef(Dereference::TWICE);
-	viewRender = viewRender.scan(CLIENT_DLL, VIEW_RENDER, 0x2).deRef(Dereference::TWICE);
+	glowManager = glowManager.scan(CLIENT_DLL, GLOWMANAGER).add(0x3).deRef();
+	weaponInterface = weaponInterface.scan(CLIENT_DLL, WEAPONDATA).add(0x2).deRef();
+	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER).add(0x2).deRef(Dereference::TWICE);
+	dx9Device = dx9Device.scan(SHARED_API, DX9_DEVICE).add(0x1).deRef(Dereference::TWICE);
+	clientState = clientState.scan(ENGINE_DLL, CLIENT_STATE).add(0x1).deRef(Dereference::TWICE);
+	viewRender = viewRender.scan(CLIENT_DLL, VIEW_RENDER).add(0x2).deRef(Dereference::TWICE);
 
 	keyValuesSys = keyValuesSys.byExport<"KeyValuesSystem"_hasher>(VSTD_DLL).cast<keyValuesSystem_t>()()();
 	memAlloc = memAlloc.byExport<"g_pMemAlloc"_hasher>(TIER_DLL).deRef();
-	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER, 0x2).deRef(Dereference::TWICE);
-	beams = beams.scan(CLIENT_DLL, BEAMS, 0x1).deRef();
+	moveHelper = moveHelper.scan(CLIENT_DLL, MOVEHELPER).add(0x2).deRef(Dereference::TWICE);
+	beams = beams.scan(CLIENT_DLL, BEAMS).add(0x1).deRef();
 	
 	globalVars = globalVars.byVFunc(memory::interfaces::client, 0).add(0x1F).deRef(Dereference::TWICE);
 	clientMode = clientMode.byVFunc(memory::interfaces::client, 10).add(0x5).deRef(Dereference::TWICE);
@@ -246,7 +254,7 @@ void memory::init()
 
 	postInit();
 
-	console::info("memory init success");
+	console::debug("memory init success");
 }
 
 void memory::postInit()

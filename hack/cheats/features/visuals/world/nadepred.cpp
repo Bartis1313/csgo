@@ -172,13 +172,14 @@ void GrenadePrediction::draw()
 		}
 	}
 
-	for (Vec3 prev = m_path.front(); const auto & el : m_path)
+	std::vector<ImVec2> points;
+	for (const auto & el : m_path)
 	{
-		if (ImVec2 start, end; imRender.worldToScreen(prev, start) && imRender.worldToScreen(el, end))
-			imRender.drawLine(start, end, vars::misc->nade->colorPredLine(), 2.0f);
-
-		prev = el;
+		if (ImVec2 screen; imRender.worldToScreen(el, screen))
+			points.push_back(screen);
 	}
+	if (!points.empty())
+		imRender.drawPolyLine(points, vars::misc->nade->colorPredLine(), 0, 2.0f);
 
 	for (const auto& el : m_bounces)
 	{

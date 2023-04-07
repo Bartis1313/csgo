@@ -311,4 +311,26 @@ namespace drawing
 		ImDrawFlags m_flags;
 		float m_thickness;
 	};
+
+	class Image : public Draw
+	{
+	public:
+		constexpr Image(const ImTextureID img, const ImVec2& pmin, const ImVec2& pmax, const ImVec2& uvmin, const ImVec2& uvmax, ImU32 col)
+			: m_texture{ img }, m_pmin{ pmin }, m_pmax{ pmax }, m_uvmin{ uvmin }, m_uvmax{ uvmax }, m_color{ col }
+		{}
+		constexpr Image(const ImTextureID img, const ImVec2& pmin, const ImVec2& pmax, const ImVec2& uvmin, const ImVec2& uvmax, ImU32 col, float rounding, ImDrawFlags flags)
+			: m_texture{ img }, m_pmin{ pmin }, m_pmax{ pmax }, m_uvmin{ uvmin }, m_uvmax{ uvmax }, m_color{ col }, m_rounding{ rounding }, m_flags{ flags }
+		{}
+
+		virtual void draw(ImDrawList* draw) const override;
+	private:
+		ImTextureID m_texture;
+		ImVec2 m_pmin;
+		ImVec2 m_pmax;
+		ImVec2 m_uvmin;
+		ImVec2 m_uvmax;
+		ImU32 m_color;
+		float m_rounding = 0.0f;
+		ImDrawFlags m_flags = 0;
+	};
 }

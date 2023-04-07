@@ -25,9 +25,9 @@ public:
 		char* m_string;
 		void* m_data;
 		Vec3 m_vector;
-		__int64 m_int64;
+		int64_t m_int64;
 	};
-	SendPropType  m_type;
+	SendPropType m_type;
 };
 
 class RecvTable;
@@ -42,7 +42,7 @@ public:
 	int	m_objectID;
 };
 
-using RecvVarProxyFn = void(*)(CRecvProxyData&, void*, void*); // cdecl
+using RecvVarProxyFn = std::add_pointer_t<void __cdecl(CRecvProxyData&, void*, void*)>;
 
 class RecvProp
 {

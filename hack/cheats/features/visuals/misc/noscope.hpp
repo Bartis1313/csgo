@@ -34,6 +34,7 @@ private:
 	IMaterial* m_blurScope;
 	IMaterial* m_filterX;
 	IMaterial* m_filterY;
+	IMaterial* scope_lens_dirt;
 };
 
 GLOBAL_FEATURE(NoScopeBlur);

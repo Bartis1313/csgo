@@ -433,3 +433,13 @@ std::optional<Mat_t> MaterialEditor::getMaterialIndexed(size_t index) const
 		.data = Mat_t::Data{.name = material.data.name, .key = material.data.key, .buf = material.data.buf }
 	};
 }
+
+std::vector<Mat_t> MaterialEditor::getEditorMaterials() const
+{
+	std::vector<Mat_t> res{};
+	
+	for (auto i : std::views::iota(m_oldIndex, g_Chams->m_materials.size()))
+		res.push_back(g_Chams->m_materials.at(i));
+
+	return res;
+}

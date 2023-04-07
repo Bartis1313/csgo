@@ -16,29 +16,31 @@
 #include <render/render.hpp>
 #include <utilities/tools/tools.hpp>
 
+#include "../misc/bulletUpdater.hpp"
+
 void BulletImpactsClient::draw()
 {
 	if (!vars::visuals->world->impacts->enabledClient)
+	{
+		if(!m_hitsClientSide.empty())
+			m_hitsClientSide.clear();
 		return;
+	}
 
 	if (!game::isAvailable())
 		return;
 
-	auto m_vecBulletVerifyListClient = game::localPlayer->m_vecBulletVerifyListClient();
-	static int gameBulletCount = m_vecBulletVerifyListClient.m_size; // init current count
-
-	for (int i = m_vecBulletVerifyListClient.m_size; i > gameBulletCount; i--) // get current bullets, NOT all
+	for (const auto& el : g_BulletUpdater->getLastBullets())
+	{
 		m_hitsClientSide.emplace_back(HitStruct_t
 			{
-				m_vecBulletVerifyListClient[i - 1].m_pos,
+				el,
 				memory::interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeClient
 			});
+	}
 
-	if (m_vecBulletVerifyListClient.m_size != gameBulletCount)
-		gameBulletCount = m_vecBulletVerifyListClient.m_size;
-
-	Color outline = vars::visuals->world->impacts->colorClient();
-	Color fill = vars::visuals->world->impacts->colorClientFill();
+	const Color outline = vars::visuals->world->impacts->colorClient();
+	const Color fill = vars::visuals->world->impacts->colorClientFill();
 
 	for (size_t i = 0; const auto & el : m_hitsClientSide)
 	{

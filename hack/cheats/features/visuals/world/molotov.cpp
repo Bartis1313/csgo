@@ -71,18 +71,21 @@ void removeClosePoints(std::vector<std::pair<bool, ImVec2>>& points, float thres
 {
 	// I hate the formatting of lambdas in vs, please don't reformat this
 	std::erase_if(points, [&](const auto& p1) 
-		{
+	{
 		if (p1.first) // skip outer
 			return false;
 
 		return std::ranges::any_of(points, [&](const auto& p2)
-			{
-				const ImVec2 between = p2.second - p1.second;
-				const float dist = std::sqrt(ImLengthSqr(between));
+		{
+			if (p2.first)
+				return false;
 
-				return dist < threshold && &p1 != &p2;
-			});
+			const ImVec2 between = p2.second - p1.second;
+			const float dist = std::sqrt(ImLengthSqr(between));
+
+			return dist < threshold && &p1 != &p2;
 		});
+	});
 }
 
 void MolotovDraw::draw()
@@ -143,7 +146,7 @@ void MolotovDraw::draw()
 		
 		auto hull = grahamScanIndicies(points);
 		if (!hull.has_value())
-			return;
+			continue;
 
 		std::vector<ImVec2> hullOuter;
 		for (const auto& [outer, coord] : hull.value())
@@ -151,6 +154,9 @@ void MolotovDraw::draw()
 			if (outer)
 				hullOuter.push_back(coord);
 		}
+
+		if (hullOuter.size() < 3) // can't even contrcut a triangle of edges
+			continue;
 
 		// bit hardocding to give acceptable treshold
 		constexpr float acceptableScaled = 100.0f;
@@ -170,13 +176,13 @@ void MolotovDraw::draw()
 
 		const delaunator::Delaunator<float> d{ triangPoints };
 
-		if (vars::visuals->world->molotov->triangulation && hull.value().size() > 3)
+		if (vars::visuals->world->molotov->triangulation && d.triangles.size() > 6)
 		{
 			for (std::size_t i = 0; i < d.triangles.size(); i += 3)
 			{
-				ImVec2 p1{ hull.value()[d.triangles[i]].second.x, hull.value()[d.triangles[i]].second.y };
-				ImVec2 p2{ hull.value()[d.triangles[i + 1]].second.x, hull.value()[d.triangles[i + 1]].second.y };
-				ImVec2 p3{ hull.value()[d.triangles[i + 2]].second.x, hull.value()[d.triangles[i + 2]].second.y };
+				ImVec2 p1{ d.coords.at(2 * d.triangles.at(i)), d.coords.at(2 * d.triangles.at(i) + 1)};
+				ImVec2 p2{ d.coords.at(2 * d.triangles.at(i + 1)), d.coords.at(2 * d.triangles.at(i + 1) + 1) };
+				ImVec2 p3{ d.coords.at(2 * d.triangles.at(i + 2)), d.coords.at(2 * d.triangles.at(i + 2) + 1) };
 
 				imRender.drawTriangle(p1, p2, p3, Colors::White);
 			}

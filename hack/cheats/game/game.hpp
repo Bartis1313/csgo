@@ -5,6 +5,8 @@
 
 class CUserCmd;
 struct Studiohdr_t;
+struct IDirect3DTexture9;
+using LPDIRECT3DTEXTURE9 = IDirect3DTexture9*;
 
 class LocalPlayer final
 {
@@ -31,6 +33,12 @@ private:
 
 namespace game
 {
+	struct BitMapData
+	{
+		float width, height;
+		LPDIRECT3DTEXTURE9 texture;
+	};
+
 	inline LocalPlayer localPlayer;
 	[[nodiscard]] bool isAvailable();
 	float serverTime(CUserCmd* cmd = nullptr);
@@ -47,6 +55,10 @@ namespace game
 	[[nodiscard]] Vec3 getViewAngles();
 	// lerped and decayed punch
 	[[nodiscard]] Vec3 getFixedPunch();
+	[[nodiscard]] BitMapData getWeaponIcon(const std::string_view weapon);
+	// not for svg, string_view is not passed due to high possibility of using std::format
+	// eg path: resource/flash/econ/weapons/base_weapons/ + weapon name + .png
+	[[nodiscard]] BitMapData getImage(const std::string& path);
 }
 
 template<typename T>

@@ -37,14 +37,6 @@ void Aimbot::updateKeys()
 	vars::keys->aimbot.update();
 }
 
-float Aimbot::getRandomizedSmooth(float currentSmooth)
-{
-	const float sineWave = std::sin(static_cast<float>(memory::interfaces::globalVars->m_tickCount));
-	const float factor = sineWave * m_config.randomizationRatio;
-	const float smoothness = currentSmooth + factor;
-	return currentSmooth *= smoothness;
-}
-
 void Aimbot::run(float* x, float* y)
 {
 	if (!game::isAvailable())
@@ -129,8 +121,8 @@ void Aimbot::run(float* x, float* y)
 
 	const auto currentAngle = Vec3{ m_view + punch };
 	const auto& angle = math::calcAngle(myEye, bestpos);
-	const float smoothingFactor = std::min(memory::interfaces::globalVars->m_frametime * m_config.frametimeMulttiply, 1.0f);	
-	const auto& lerpedAngle = currentAngle.lerp(angle, std::clamp(smoothingFactor, 0.0f, 1.0f)).normalize();
+	float smoothingFactor = std::min(memory::interfaces::globalVars->m_frametime * m_config.frametimeMulttiply, 1.0f);
+	const auto& lerpedAngle = currentAngle.lerp(angle, smoothingFactor).normalize();
 
 	auto& toAdd = Vec3{ currentAngle - lerpedAngle }.normalize().clamp();
 	toAdd[0] /= m_pitch->getFloat();
@@ -274,28 +266,29 @@ bool Aimbot::isClicked(CUserCmd* cmd)
 		return cmd->m_buttons & IN_ATTACK;
 }
 
-std::vector<size_t> Aimbot::getHitboxes()
+std::vector<Hitboxes> Aimbot::getHitboxes()
 {
-	std::vector<size_t> hitboxes;
+	static std::vector<Hitboxes> allHitboxes(HITBOX_MAX);
+	static std::once_flag once;
+	std::call_once(once, [&]()
+	{
+		// iota won't work, so doing it manually
+		for (int i = HITBOX_HEAD; i < HITBOX_MAX; i++)
+			allHitboxes.at(i) = static_cast<Hitboxes>(i);
+	});
+	static std::vector<Hitboxes> headHitbox{ HITBOX_HEAD };
+	static std::vector<Hitboxes> chestHitbox{ HITBOX_LOWER_CHEST, HITBOX_UPPER_CHEST };
+
 
 	switch (m_config.aimSelection)
 	{
 	case E2T(AimbotHitboxes::NEAREST):
-	{
-		for (size_t i = HITBOX_HEAD; i < HITBOX_MAX; i++)
-			hitboxes.push_back(i);
-
-		break;
-	}
+		return allHitboxes;
 	case E2T(AimbotHitboxes::HEAD):
-		hitboxes = { HITBOX_HEAD };
-		break;
+		return headHitbox;
 	case E2T(AimbotHitboxes::CHEST):
-		hitboxes = { HITBOX_LOWER_CHEST };
-		break;
-	default:
-		break;
+		return chestHitbox;
 	}
 
-	return hitboxes;
+	return {};
 }

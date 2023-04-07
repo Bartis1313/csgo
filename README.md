@@ -61,7 +61,7 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
  * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic. Would need some rework for tracing specific things as water, glass, ents...
  * Engine prediction - useful to never skip tick and get correct server time.
  * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records. Also possible to create your own.
- * Glow - highlight player ents. (rebuild needed - think of removing this or creating glow texture on own (game provides such materials), client.dll checks it and it in general has performance issues)
+ * Glow - highlight player ents, does not force memory glow vector, but controls it by own.
  * Sound Esp - apex legends like sound esp from passive skill of bloodhound character.
  * Esp - name, flags, boxes, health, armor, ammo, skeleton. 2D/3D.
  * DLight - highlights player by dlight. (Can't shortly fix the optimazation for them, it's due to overcomplication in how dlights are generated)
@@ -166,11 +166,12 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
 * 1.7.3 - visuals health/armor bug fix, more "clear" hooked functions definitions, accurate info gathered directly from the game about shots, not using events to count them manually (awful!). Prediction last edits. SDK cleanup and addons. Sound is finally not using events, wip to remove other events. Editor still not finished, almost... Plots reworked to work for last rendering change. Fixes to radar, eg: MapStruct, triangle enemies.
 * 2.0.0 - Made it as a new version since it does change a lot. Provided very simple instruction for people who want to use this at long end. Bunch of very few refactors/renames in functions. 2.0 is now having a friendly folder structure. Replaced render from utils to own folder. As well as other things which were "overnamed" to be in utils. Very soon to finally end that project.
 * 2.0.1 - Removed xorstr from here, it's a public source. Fixed hotkey with id detection, removed FORMAT wrapper since there is now no need. Removed console macros to few wrapping functions, removed macro for EXPORT, replaced in memory namespace as a template function. Added game punch which should be more "smoothed". Wip SEHCatch as well as features cleanup.
-* 2.0.2 - Ending it soon... Finally got some free time. What is worth mentioning is fixing the aimbot smooth as well as RCS, they both now never set angles. Chams editor is finally added, current code is very far from clean, but the generation / updating / deleting / saving work well. Molotov now has a better way of drawing its range, added fancy triangulation with some poor workarounds to make it scaled. 
+* 2.0.2 - Ending it soon... Finally got some free time. What is worth mentioning is fixing the aimbot smooth as well as RCS, they both now never set angles. Chams editor is finally added, current code is very far from clean, but the generation / updating / deleting / saving work well. Molotov now has a better way of drawing its range, added fancy triangulation with some poor workarounds to make it scaled.
+* 2.0.3 - Added proper icon parsing, glow 1:1 to the game's code, constexpr signature to hex, less logging on release, fixed few crashes under visual features, and possible crashes with material system. What's left is cleaning up this code.
 </details>
 
 # People who helped
 * [KittenPopo](https://github.com/KittenPopo) - answering questions I have been confused how something works and for cs18 leak which made reversing even easier.
 * [Pawel Gozdur](https://github.com/carlos-konewka) - helping me with math, especially plot logic.
 * [UC Wiki](https://www.unknowncheats.me/wiki/UnKnoWnCheaTs_Game_Hacking_Wiki) - for very helpful sources.
-* [rollraw/qo0](https://github.com/rollraw) - swapchain render + icon font.
+* [rollraw/qo0](https://github.com/rollraw) - swapchain render.

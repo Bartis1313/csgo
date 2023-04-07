@@ -46,7 +46,7 @@ bool Config::save(const std::string& file)
 		console::error("Saving {} file has failed: {}", file, err.what());
 	}
 
-	console::info("Saving file {}", file);
+	console::debug("Saving file {}", file);
 
 	return true;
 }
@@ -67,7 +67,7 @@ bool Config::load(const std::string& file)
 	from_json(j["Misc"], *vars::misc);
 	from_json(j["Styling"], *vars::styling);
 
-	console::info("Loading file {}", file);
+	console::debug("Loading file {}", file);
 
 	return true;
 }
@@ -211,5 +211,5 @@ void Config::deleteCfg(const std::string& file)
 	}
 
 	if (auto toDel = getHackPath() / path; std::filesystem::remove(toDel))
-		console::info("Removed config {}", toDel.filename().string());
+		console::debug("Removed config {}", toDel.filename().string());
 }

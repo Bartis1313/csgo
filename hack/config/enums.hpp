@@ -110,3 +110,18 @@ enum class MenuTypes
 	CLASSIC,
 	WHITE
 };
+
+enum class GlowRenderStyle
+{
+	DEFAULT = 0,
+	RIMGLOW3D,
+	EDGE_HIGHLIGHT,
+	EDGE_HIGHLIGHT_PULSE
+};
+
+
+enum class GlowRenderPulse
+{
+	RIM,
+	EDGE
+};

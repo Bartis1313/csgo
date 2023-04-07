@@ -13,14 +13,15 @@
 #include <d3d9.h>
 #include <string>
 #include <optional>
+#include <mutex>
 
 template <typename T>
 static std::optional<Interface<T>> getInterface(const std::string_view moduleName, const std::string_view interfaceName)
 {
-	using fun = void* (*)(const char*, int*);
+	using fun = std::add_pointer_t<void* __cdecl(const char*, int*)>;
 	auto capture = memory::exportVar<fun, "CreateInterface"_hasher>(moduleName);
 
-	const auto addr = memory::Address<InterfacesNode*>{ reinterpret_cast<uintptr_t>(capture) };
+	const auto addr = memory::Address<std::add_pointer_t<InterfacesNode>>{ reinterpret_cast<uintptr_t>(capture) };
 	const auto esi = addr.rel(0x5, 0x6).deRef(memory::Dereference::TWICE);
 
 	for (auto el = esi(); el; el = el->m_next)
@@ -36,7 +37,6 @@ static std::optional<Interface<T>> getInterface(const std::string_view moduleNam
 
 // capture and log
 // var - var you want to init
-// type - type for template
 // _module - module name from the game, eg: engine.dll
 // _interface - interface' name
 #define CAP(var, _module, _interface) \
@@ -71,6 +71,7 @@ void memory::interfaces::init()
 	CAP(fileSystem, FILESYS_DLL, "VFileSystem0");
 	CAP(sound, ENGINE_DLL, "IEngineSoundClient0");
 	CAP(mdlCache, DATACACHE_DLL, "MDLCache0");
+	CAP(baseFileSystem, FILESYS_DLL, "VBaseFileSystem0");
 
-	console::info("interfaces success");
+	console::debug("interfaces success");
 }

@@ -13,6 +13,7 @@
 #include <imgui_impl_win32.h>
 
 #include <d3d9.h>
+#include <mutex>
 
 hooks::present::value D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {
@@ -20,16 +21,15 @@ hooks::present::value D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RE
 	if (!ImGui::GetCurrentContext())
 		return original(device, srcRect, dstRect, window, region);
 
-	static auto bOnce = [=]()
-	{
-		ImGui_ImplDX9_Init(device);
-		// style, colors, ini file etc.
-		menu.init();
+	static std::once_flag once;
+	std::call_once(once, [device]
+		{
+			ImGui_ImplDX9_Init(device);
+			// style, colors, ini file etc.
+			menu.init();
 
-		console::debug("init for present success");
-
-		return true;
-	} ();
+			console::debug("init for present success");
+		});
 
 	static Resource res{ IDB_PNG1, "PNG" };
 
@@ -37,12 +37,11 @@ hooks::present::value D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RE
 	ImGui_ImplDX9_NewFrame();
 	ImGui_ImplWin32_NewFrame();
 	ImGui::NewFrame();
-	// anything that is responsible by imgui to be drawn, not including the game's w2s
 	{
 		menu.draw();
-		const auto imdraw = ImGui::GetBackgroundDrawList();
-		imRender.renderPresent(imdraw);
-		background.draw(imdraw);
+
+		imRender.renderPresent(ImGui::GetBackgroundDrawList());
+
 		RenderablePresentType::runAll();
 		ImNotify::handle();
 	}

@@ -22,10 +22,7 @@
 void ImGuiMenu::updateKeys()
 {
 	if (vars::keys->menu.isPressed())
-	{
 		m_active = !m_active;
-		ImGui::SaveIniSettingsToDisk(m_iniFile.c_str());
-	}
 }
 
 void ImGuiMenu::init()
@@ -34,16 +31,10 @@ void ImGuiMenu::init()
 	ImGuiStyle& style = ImGui::GetStyle();
 	style = vars::styling->imStyle;
 
-	// NEED static here
-	static auto iniLocation = (config.getHackPath() / "window.ini").string();
+	m_iniFile = (config.getHackPath() / "window.ini").string();
 
-	io.IniFilename = iniLocation.c_str();
-	m_iniFile = iniLocation;
+	io.IniFilename = m_iniFile.c_str();
 	io.LogFilename = nullptr;
-
-	auto posAndSize = getPosAndSizeSetting(iniLocation, m_menuTitle);
-	m_targetSize = posAndSize.size;
-	m_windowPos = posAndSize.pos + m_targetSize / 2;
 
 	try
 	{
@@ -53,25 +44,6 @@ void ImGuiMenu::init()
 	{
 		console::error(err.what());
 	}
-}
-
-ImGuiMenu::NamedPair ImGuiMenu::getPosAndSizeSetting(const std::string& fileName, const std::string& windowName)
-{
-	std::ifstream file{ fileName };
-	if (!file)
-		return ImGuiMenu::NamedPair{ ImVec2{ 0, 0 }, ImVec2{ 0, 0 } };
-
-	std::string contents{ std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>() };
-
-	std::regex sectionRegex{ "\\[Window\\]\\[" + windowName + "\\].*?\\n\\s*Pos=(\\d+),(\\d+).*?\\n\\s*Size=(\\d+),(\\d+)" };
-	std::smatch sectionMatch;
-	if (!std::regex_search(contents, sectionMatch, sectionRegex))
-		return ImGuiMenu::NamedPair{ ImVec2{ 0, 0 }, ImVec2{ 0, 0 } };
-
-	const auto pos = ImVec2{ static_cast<float>(std::stoi(sectionMatch[1])), static_cast<float>(std::stoi(sectionMatch[2])) };
-	const auto size = ImVec2{ static_cast<float>(std::stoi(sectionMatch[3])), static_cast<float>(std::stoi(sectionMatch[4])) };
-
-	return ImGuiMenu::NamedPair{ .pos = pos, .size = size };
 }
 
 void ImGuiMenu::shutdown()
@@ -136,13 +108,11 @@ static void renderAimbot()
 				ImGui::SameLine();
 				ImGui::Animations::Hotkey("Aimkey", &vars::keys->aimbot);
 				ImGui::Animations::SliderFloat("Fov##aim", &cfg.fov, 0.0f, 50.0f);
+				ImGui::Animations::Combo("Method##aim", &cfg.methodAim, magic_enum::enum_names_pretty<AimbotMethod>());
 				ImGui::Animations::Combo("Hitboxes##aim", &cfg.aimSelection, magic_enum::enum_names_pretty<AimbotHitboxes>());
 				ImGui::Animations::SliderFloat("Multiply##aim", &cfg.frametimeMulttiply, 0.0f, 30.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 				ImGui::SameLine();
 				ImGui::HelpMarker("Scales with the frametime, more = faster");
-				ImGui::Animations::Checkbox("Randomization##aim", &cfg.randomization);
-				if (cfg.randomization)
-					ImGui::Animations::SliderFloat("Ratio##aim", &cfg.randomizationRatio, 0.0f, cfg.frametimeMulttiply / 5.0f);
 				ImGui::Animations::Checkbox("Delay##aim", &cfg.aimDelay);
 				ImGui::Animations::SliderFloat("Delay ms##aim", &cfg.aimDelayVal, 0.0f, 800.0f);
 				ImGui::Animations::Checkbox("Aim at Backtrack", &cfg.aimBacktrack);
@@ -322,10 +292,34 @@ static void renderVisuals()
 					});
 				ImGui::Animations::Checkbox("Enabled glow", &vars::visuals->glow->enabled);
 				ImGui::SameLine();
-				ImGui::Animations::PopupButton("##Chams options", []()
+				ImGui::Animations::PopupButton("##Glow options", []()
 					{
-						ImGui::Animations::ColorPicker("Glow color", &vars::visuals->glow->colorPlayer);
+						const static auto names = magic_enum::enum_names_pretty<GlowRenderStyle>();
+						ImGui::Animations::MultiCombo("Type", names, &vars::visuals->glow->usedMats);
+						ImGui::Animations::MultiCombo("Ignorez", names, &vars::visuals->glow->ignorez);
+						ImGui::Animations::Checkbox("Full bloom", &vars::visuals->glow->fullBloom);
+						ImGui::SameLine();
+						ImGui::Animations::ColorPicker("Color", &vars::visuals->glow->colorPlayer);
+						ImGui::Animations::Checkbox("Occluded", &vars::visuals->glow->occluded);
+						ImGui::SameLine();
+						ImGui::Animations::Checkbox("UnOccluded", &vars::visuals->glow->unoccluded);
+						ImGui::Animations::SliderFloat("Exponent", &vars::visuals->glow->exponent, 0.0f, 10.0f);
+						ImGui::Animations::SliderFloat("Saturation", &vars::visuals->glow->saturation, 0.0f, 50.0f);
+						ImGui::Animations::SliderFloat("$C0_X (halo add screen)", &vars::visuals->glow->C0_X, 0.0f, 1.0f);
+						ImGui::Animations::SliderFloat("Thickness", &vars::visuals->glow->thickness, 0.0f, 100.0f);
+						if (vars::visuals->glow->usedMats.at(E2T(GlowRenderStyle::RIMGLOW3D)))
+						{
+							ImGui::Animations::SliderFloat("Pulse rim3d",
+								&vars::visuals->glow->pulseSpeeeds.at(E2T(GlowRenderPulse::RIM)), 1.0f, 50.0f);
+						}
+
+						if (vars::visuals->glow->usedMats.at(E2T(GlowRenderStyle::EDGE_HIGHLIGHT_PULSE)))
+						{
+							ImGui::Animations::SliderFloat("Pulse edge",
+								&vars::visuals->glow->pulseSpeeeds.at(E2T(GlowRenderPulse::EDGE)), 1.0f, 50.0f);
+						}
 					});
+
 				if (ImGui::Animations::Button("Open editor##mat"))
 				{
 					g_MaterialEditor->changeState();
@@ -778,6 +772,7 @@ static void renderMisc()
 				changed |= ImGui::Animations::ColorPicker("Color##ambient col", &vars::visuals->world->ambient->color);
 				g_AmbientLight->setPickerState(changed);
 				ImGui::Animations::Checkbox("Disable Interpolation", &vars::misc->disableItems->interpolate);
+				ImGui::Animations::SliderFloat("Flashbang %", &vars::misc->disableItems->flashPercentage, 0.0f, 1.0f);
 				
 				ImGui::EndGroupPanel();
 			}
@@ -949,7 +944,7 @@ static void renderStyles()
 				ImGui::SameLine();
 				ImGui::Animations::ColorPicker("Background color3", &vars::styling->color3);
 				if (ImGui::Animations::Button("Refresh background"))
-					background.init();
+					g_Background->init();
 				ImGui::Animations::Checkbox("Discord RPC", &vars::misc->discord->enabled);
 				ImGui::Animations::Checkbox("Show editor", &editorOpened);
 			}
@@ -1000,7 +995,7 @@ bool isMovedPos()
 
 void ImGuiMenu::renderAll()
 {
-	if(ImGui::Begin(m_menuTitle, &m_active, ImGuiWindowFlags_NoCollapse))
+	if (ImGui::Begin(m_menuTitle, &m_active, ImGuiWindowFlags_NoCollapse))
 	{
 		m_windowSize = ImLerp(m_windowSize, m_active ? m_targetSize : ImVec2{}, ImGui::GetIO().DeltaTime * 8.0f);
 		m_centrePos = m_windowPos - (m_windowSize / 2);
@@ -1012,7 +1007,7 @@ void ImGuiMenu::renderAll()
 		{
 			m_targetSize = ImGui::GetWindowSize();
 			m_windowPos = ImGui::GetWindowPos() + m_targetSize / 2;
-		}			
+		}
 
 		ImGuiStyle& style = ImGui::GetStyle();
 		ImVec2 backupPadding = style.FramePadding;
@@ -1043,25 +1038,59 @@ void ImGuiMenu::renderAll()
 	ImGui::End();
 }
 
-bool ImGuiMenu::inTransmission()
-{
-	constexpr float ratio = 1.0f / 0.5f;
-	float step = ratio * ImGui::GetIO().DeltaTime;
-	const auto bgAlpha = ImGui::ColorConvertU32ToFloat4(ImGui::GetColorU32(ImGuiCol_WindowBg)).w;
-
-	sharedAlpha = std::clamp(sharedAlpha + (m_active ? step : -step), 0.0f, bgAlpha);
-
-	if (sharedAlpha == bgAlpha)
-		return false;
-
-	if (sharedAlpha == 0.0f)
-		return false;
-
-	return true;
-}
 
 void ImGuiMenu::draw()
 {
+	//static std::once_flag once;
+	//std::call_once(once, []() {ImGui::LoadCustomSettings(); });
+
+	//ImGui::Animations::setAnimationSpeeds();
+
+	//if (editorOpened)
+	//{
+	//	if (ImGui::Begin("Style editor", &editorOpened))
+	//	{
+	//		ImGui::ShowStyleEditorCfg(nullptr);
+
+	//		ImGui::End();
+	//	}
+	//}
+
+	//ImGui::Animations::Window(m_menuTitle, &m_active,
+	//	ImGui::Animations::WindowConfig
+	//	{
+	//		.flags = ImGuiWindowFlags_NoCollapse,
+	//		.defaultPos = {400, 300},
+	//		.defaultSize = {250, 500}
+	//	}, [this]()
+	//	{
+	//		ImGuiStyle& style = ImGui::GetStyle();
+	//ImVec2 backupPadding = style.FramePadding;
+	//float width = ImGui::GetContentRegionAvail().x;
+
+	//// remove tab underline
+	//ImGui::PushStyleColor(ImGuiCol_TabActive, Color::U32(Colors::Blank));
+	//ImGui::PushStyleColor(ImGuiCol_TabUnfocusedActive, Color::U32(Colors::Blank));
+
+	//if (ImGui::BeginTabBar("tabbar", ImGuiTabBarFlags_Reorderable))
+	//{
+	//	style.FramePadding = { width / tabs.size(), backupPadding.y }; // still this is clamped by imgui in tabs
+	//	ImGui::PopStyleColor(2);
+	//	for (const auto& el : tabs)
+	//	{
+	//		if (ImGui::BeginTabItem(el.m_name))
+	//		{
+	//			style.FramePadding = backupPadding;
+	//			if (el.funcExist())
+	//				el.m_func();
+
+	//			ImGui::EndTabItem();
+	//		}
+	//	}
+	//	ImGui::EndTabBar();
+	//}
+	//	});
+
 	ImGui::Animations::setAnimationSpeeds();
 
 	if (editorOpened)
@@ -1074,25 +1103,6 @@ void ImGuiMenu::draw()
 		}
 	}
 
-	if (inTransmission())
-	{
-		// prevents issues with saving very small window size
-		ImGui::GetIO().IniFilename = nullptr;
-
-		ImGui::PushStyleColor(ImGuiStyleVar_Alpha, ImGui::GetColorU32(ImGuiStyleVar_Alpha, sharedAlpha));
-		ImGui::SetNextWindowBgAlpha(sharedAlpha);
-		
-		ImGui::SetNextWindowPos(m_centrePos);
-		ImGui::SetNextWindowSize(m_windowSize);
-
-		renderAll();
-		ImGui::PopStyleColor();
-
-		return;
-	}
 	if (m_active)
-	{
-		ImGui::GetIO().IniFilename = m_iniFile.c_str();
 		renderAll();
-	}
 }

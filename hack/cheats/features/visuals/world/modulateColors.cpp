@@ -20,7 +20,7 @@ void ModulateColor::run(void* thisptr, float* r, float* g, float* b)
 		color->refresh();
 	};
 
-	auto material = reinterpret_cast<IMaterial*>(thisptr);
+	const auto material = reinterpret_cast<IMaterial*>(thisptr);
 
 	if (!material)
 		return;
@@ -28,18 +28,16 @@ void ModulateColor::run(void* thisptr, float* r, float* g, float* b)
 	if (material->isError())
 		return;
 
-	std::string_view name = material->getTextureGroupName();
-
 	static std::unordered_map<std::string_view, CfgColor*> mapped =
 	{
-		{ "World textures", &vars::visuals->world->modulate->texture },
-		{ "StaticProp textures", &vars::visuals->world->modulate->prop },
-		{ "SkyBox textures", &vars::visuals->world->modulate->sky },
+		{ TEXTURE_GROUP_WORLD, &vars::visuals->world->modulate->texture },
+		{ TEXTURE_GROUP_STATIC_PROP, &vars::visuals->world->modulate->prop },
+		{ TEXTURE_GROUP_SKYBOX, &vars::visuals->world->modulate->sky },
 	};
 
 	bool goodMat = false;
-
-	if (auto itr = mapped.find(name); itr != mapped.end())
+	const std::string_view group = material->getTextureGroupName();
+	if (auto itr = mapped.find(group); itr != mapped.end())
 	{
 		editColor(itr->second);
 		goodMat = true;

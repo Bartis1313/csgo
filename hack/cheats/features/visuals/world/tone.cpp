@@ -22,16 +22,19 @@ void ToneController::run(int frame)
 		auto ent = reinterpret_cast<EnvTonemapController_t*>(entity);
 
 		// this is needed to ONLY change when we changed anything
+		// this is also stupid, CEnvTonemapController adr changes only on map change (not tested), but I guess so
+		// and overwriting those need just check the memory instead of those stupid menu checks
+		// remove later, TODO
 		if (auto cfg = vars::visuals->world->tone->enabled; cfg && (m_checkStateSlider || m_checkStateButton))
 		{
-			ent->m_bUseCustomAutoExposureMin() = cfg;
-			ent->m_bUseCustomAutoExposureMax() = cfg;
-			ent->m_bUseCustomBloomScale() = cfg;
+			ent->m_bUseCustomAutoExposureMin() = true;
+			ent->m_bUseCustomAutoExposureMax() = true;
+			ent->m_bUseCustomBloomScale() = true;
 			ent->m_flCustomAutoExposureMin() = vars::visuals->world->tone->min;
 			ent->m_flCustomAutoExposureMax() = vars::visuals->world->tone->max;
 			ent->m_flCustomBloomScale() = vars::visuals->world->tone->bloom;
 		}
-		else if (globals::isShutdown || (!cfg && m_checkStateButton))
+		if (globals::isShutdown)
 		{
 			ent->m_bUseCustomAutoExposureMin() = false;
 			ent->m_bUseCustomAutoExposureMax() = false;

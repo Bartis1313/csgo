@@ -113,6 +113,20 @@ namespace ImGui
 		void RenderFrameBorderAlpha(ImVec2 p_min, ImVec2 p_max, float rounding, float alpha);
 		void RenderArrow(ImDrawList* draw_list, ImVec2 pos, ImU32 col, ImGuiDir dir, float angle, float scale);
 		bool BeginComboPopup(ImGuiID popup_id, const ImRect& bb, ImGuiComboFlags flags, float pop);
+		
+		struct WindowConfig
+		{
+			ImGuiWindowFlags flags{ 0 };
+
+			// will only work at the very first start, later it will be saved in config
+			ImVec2 defaultPos, defaultSize;
+		};
+
+		// DONT USE NOW, this is working, but saving is completely broken with this
+		// reasoning is:
+		// I find using ImGuiStorage for this painfull
+		// This manipulates how imgui originally should handle stack window openinig/closing.
+		void Window(const char* label, bool* opened, const WindowConfig& config, const std::function<void()>& callback);
 	}
 }
 

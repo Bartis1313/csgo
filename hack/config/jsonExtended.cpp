@@ -198,13 +198,33 @@ void to_json(json& j, const VarVisuals::VarChams& val)
 void from_json(const json& j, VarVisuals::VarGlow& val)
 {
 	from_json(j, "Enabled", val.enabled);
+	from_json(j, "Full Bloom", val.fullBloom);
 	from_json(j["Color player"], val.colorPlayer);
+	from_json(j, "Speeds", val.pulseSpeeeds);
+	from_json(j, "Occluded", val.occluded);
+	from_json(j, "UnOccluded", val.unoccluded);
+	from_json(j, "Exponent", val.exponent);
+	from_json(j, "Saturation", val.saturation);
+	from_json(j, "Bloom", val.C0_X);
+	from_json(j, "Thickness", val.thickness);
+	from_json(j, "UsedMats", val.usedMats);
+	from_json(j, "Ignorez", val.ignorez);
 }
 
 void to_json(json& j, const VarVisuals::VarGlow& val)
 {
-	j["Enabled"] = val.enabled;
+	j["Enabled"]= val.enabled;
+	j["Full Bloom"] = val.fullBloom;
 	j["Color player"] = val.colorPlayer;
+	j["Speeds"] = val.pulseSpeeeds;
+	j["Occluded"] = val.occluded;
+	j["UnOccluded"] = val.unoccluded;
+	j["Exponent"] = val.exponent;
+	j["Saturation"] = val.saturation;
+	j["Bloom"] = val.C0_X;
+	j["Thickness"] = val.thickness;
+	j["UsedMats"] = val.usedMats;
+	j["Ignorez"] = val.ignorez;
 }
 
 void from_json(const json& j, VarVisuals::VarEsp& val)
@@ -1174,11 +1194,13 @@ void to_json(json& j, const VarMisc::VarFlashlight& val)
 void from_json(const json& j, VarMisc::DisableItems& val)
 {
 	from_json(j, "Interpolate", val.interpolate);
+	from_json(j, "Flash", val.flashPercentage);
 }
 
 void to_json(json& j, const VarMisc::DisableItems& val)
 {
 	j["Interpolate"] = val.interpolate;
+	j["Flash"] = val.flashPercentage;
 }
 
 #include <imgui.h>

@@ -2,6 +2,8 @@
 
 #include "helpers/vfunc.hpp"
 
+class IMaterial;
+
 class IVRenderView
 {
 public:

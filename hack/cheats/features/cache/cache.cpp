@@ -24,7 +24,6 @@ void EntityCache::init()
 	if (maxIdx <= 1)
 		return;
 
-	HolderData data{};
 	for (auto i : std::views::iota(1, maxIdx))
 	{
 		auto entity = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientEntity(i));
@@ -35,10 +34,7 @@ void EntityCache::init()
 		if (!cl)
 			continue;
 
-		size_t index = i;
-		size_t classID = cl->m_classID;
-
-		data = HolderData{ .ent = entity, .idx = index, .classID = classID };
+		HolderData data{ .ent = entity, .idx = i, .classID = cl->m_classID };
 		fill(data);
 	}
 }
@@ -58,7 +54,7 @@ void EntityCache::add(Entity_t* ent)
 	fill(data);
 }
 
-std::optional<std::pair<size_t, size_t>> EntityCache::getIndexes(Entity_t* ent)
+std::optional<std::pair<int, ClassID>> EntityCache::getIndexes(Entity_t* ent)
 {
 	int i = ent->getIndex();
 	if (i <= 1)
@@ -68,10 +64,7 @@ std::optional<std::pair<size_t, size_t>> EntityCache::getIndexes(Entity_t* ent)
 	if (!cl)
 		return std::nullopt;
 
-	size_t index = i;
-	size_t classID = cl->m_classID;
-
-	return std::make_pair(index, classID);
+	return std::make_pair(i, cl->m_classID);
 }
 
 bool EntityCache::checkRepeatable(Entity_t* ent)
@@ -97,8 +90,13 @@ bool EntityCache::checkRepeatable(Entity_t* ent)
 
 void EntityCache::fill(const HolderData& data)
 {
+	constexpr std::array specialWeaponIds = 
+	{
+		CAK47, CDEagle, CHEGrenade, CDecoyGrenade, CIncendiaryGrenade, CMolotovGrenade, CSensorGrenade, CSmokeGrenade, CFlashbang
+	};
+
 	if (auto id = data.classID; id >= CWeaponAug && id <= CWeaponXM1014
-		|| id == CAK47 || id == CDEagle)
+		|| std::ranges::find(specialWeaponIds, id) != specialWeaponIds.cend())
 	{
 		m_entCache[EntCacheType::WEAPON].emplace_back(data);
 	}

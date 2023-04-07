@@ -15,6 +15,8 @@ void SkyboxEdit::init()
 {
 	checkCustomSkybox();
 	reloadCustomSkyboxes();
+
+	sv_skyname = memory::interfaces::cvar->findVar("sv_skyname");
 }
 
 void SkyboxEdit::run(int frame)
@@ -44,8 +46,7 @@ void SkyboxEdit::run(int frame)
 	else
 	{
 		// restore the sky
-		const static auto oldSky = memory::interfaces::cvar->findVar("sv_skyname");
-		loadSkybox(oldSky->m_string);
+		loadSkybox(sv_skyname->m_valueNow);
 	}
 }
 
