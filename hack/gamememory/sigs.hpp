@@ -309,3 +309,7 @@ ParticleEffect
 #define FIRST_MOVE_CHILD			SIG("8B 46 04 8B 80 ? ? ? ?")
 // found from glow DrawModel function
 #define NEXT_PEER					SIG("8B 8E ? ? ? ? 83 F9 FF 74 1F 0F B7 C1 C1 E0 04 05 ? ? ? ? 74 0C C1 E9 10 39 48 04 75 04 8B 30 EB 02 33 F6 85 F6 75 B5")
+// #STR: "func_breakable", "func_breakable_surf"
+#define TAKE_DMG					SIG("80 BE ? ? ? ? ? 75 46 8B 86 ? ? ? ? 83 F8 11")
+// below other setabs... functions, as a reference take anything in client that uses it
+#define SET_ABS_VELOCITY			SIG("55 8B EC 83 E4 F8 83 EC 0C 53 56 57 8B 7D 08 8B F1 F3 0F 10 07 0F 2E 86 ? ? ? ? 9F F6 C4 44 7A 28 F3 0F")

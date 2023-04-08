@@ -15,7 +15,8 @@
 
 void MiscInfo::init()
 {
-	m_allHits = game::localPlayer->m_totalHitsOnServer(); // those gets clamped at 255 :(
+	if(game::isAvailable())
+		m_allHits = game::localPlayer->m_totalHitsOnServer(); // those gets clamped at 255 :(
 }
 
 void MiscInfo::addHits(IGameEvent* event)

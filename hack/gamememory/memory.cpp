@@ -198,6 +198,8 @@ void memory::init()
 	flashbangWhiteRet = flashbangWhiteRet.scan(CLIENT_DLL, FLASH_EFFECT_WHITE_RET).add(0xA);
 	precipitationClientThink = precipitationClientThink.scan(CLIENT_DLL, CLIENT_THINK_PRECIPITATION);
 	precipitationInit = precipitationInit.scan(CLIENT_DLL, PRECIPITATION_INIT);
+	takeDmg = takeDmg.scan(CLIENT_DLL, TAKE_DMG).add(0x2).deRef();
+	setAbsVelocity = setAbsVelocity.scan(CLIENT_DLL, SET_ABS_VELOCITY);
 
 	// HOOKS
 

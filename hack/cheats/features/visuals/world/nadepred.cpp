@@ -369,32 +369,35 @@ void GrenadePrediction::pushEntity(Vec3& src, const Vec3& move, Trace_t& tr)
 	traceHull(src, end, tr);
 }
 
+inline bool fClassnameIs(Entity_t* ent, const std::string_view name)
+{
+	if (!ent)
+		return false;
+
+	auto cl = ent->clientClass();
+	if (!cl)
+		return false;
+
+	return std::string_view{ cl->m_networkName } == name;
+}
+
 void GrenadePrediction::resolveFlyCollisionCustom(Trace_t& tr, Vec3& velocity, const Vec3& move, float interval)
 {
-	/*float surfaceElasticity = 1.0;*/
-	if (auto e = tr.m_entity; e) // if it's any entity
+	// better fix isbroken, temp solution
+	if (tr.m_entity->isPlayer() && tr.m_entity->m_iHealth() > 0)
 	{
-		if (auto e = tr.m_entity; e->isPlayer()) // if player don't stop but make it bouned a lot slower
-		{
-			/*surfaceElasticity = 0.3f;*/
-			velocity *= 0.3f;
-			return;
-		}
+		velocity *= 0.4f;
+		//tr.m_entity->setAbsVelocity(velocity);
 
-		if (e->isBreakable()) // for example glass or window
-		{
-			if (!e->isAlive()) // any better solution?
-			{
-				velocity *= 0.4f;
-				return;
-			}
-		}
-		// here some checks are needed, I honestly don't know how to make it pixel perfect in this case
+		return;
 	}
 
-	constexpr float surfaceElasticity = 1.0f;
+	float surfaceElasticity = 1.0f;
+	if (tr.m_entity->isPlayer())
+		surfaceElasticity = 0.3f;
+
 	constexpr float nadeElascity = 0.45f;
-	static float totalElascity = surfaceElasticity * nadeElascity;
+	float totalElascity = surfaceElasticity * nadeElascity;
 	totalElascity = std::clamp(totalElascity, 0.0f, 0.9f);
 
 	Vec3 absVelocity;

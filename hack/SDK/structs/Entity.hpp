@@ -43,8 +43,6 @@ struct ClientHitVerify_t;
 class Entity_t
 {
 public:
-
-
 	NETVAR(int, m_iTeamNum, "DT_CSPlayer", "m_iTeamNum");
 	NETVAR(Vec3, m_vecOrigin, "DT_BasePlayer", "m_vecOrigin");
 	NETVAR(EHandle_t, m_hOwnerEntity, "DT_BaseEntity", "m_hOwnerEntity");
@@ -84,7 +82,9 @@ public:
 	VFUNC(void, onDataChanged, DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(void, preDataUpdate, PRE_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
-
+	VFUNC(const char*, getClassName, CLASS_NAME, (), (this));
+	VFUNC(int, getMaxHealth, GET_MAX_HEALTH, (), (this));
+	
 	[[nodiscard]] CUtlVector<Matrix3x4> m_CachedBoneData();
 	[[nodiscard]] Vec3 getAimPunch();
 	[[nodiscard]] Vec3 getEyePos();
@@ -95,6 +95,10 @@ public:
 
 	[[nodiscard]] Entity_t* firstMoveChild();
 	[[nodiscard]] Entity_t* nextMovePeer();
+	[[nodiscard]] int m_takedamage();
+
+	void setAbsOrigin(const Vec3& origin);
+	void setAbsVelocity(const Vec3& velocity);
 };
 
 class Weapon_t : public Entity_t
@@ -261,7 +265,6 @@ public:
 	[[nodiscard]] bool physicsRunThink(thinkmethods_t think);
 	[[nodiscard]] CUtlVector<ClientHitVerify_t> m_vecBulletVerifyListClient();
 
-	void setAbsOrigin(const Vec3& origin);
 	[[nodiscard]] Weapon_t* getActiveWeapon();
 	[[nodiscard]] bool isAlive() { return m_iHealth() > 0; }
 	[[nodiscard]] bool isInAir() { return !(m_fFlags() & FL_ONGROUND); }

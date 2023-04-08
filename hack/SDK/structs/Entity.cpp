@@ -96,6 +96,22 @@ Entity_t* Entity_t::nextMovePeer()
 	return nullptr;
 }
 
+int Entity_t::m_takedamage()
+{
+	const auto offset = memory::takeDmg();
+	return *reinterpret_cast<int*>((uintptr_t)this + offset);
+}
+
+void Entity_t::setAbsOrigin(const Vec3& origin)
+{
+	memory::setAbsOrigin()(this, std::cref(origin));
+}
+
+void Entity_t::setAbsVelocity(const Vec3& velocity)
+{
+	memory::setAbsVelocity()(this, std::cref(velocity));
+}
+
 bool Entity_t::setupBonesShort(Matrix3x4* _out, int maxBones, int mask, float time)
 {
 	__asm
@@ -378,11 +394,6 @@ bool Player_t::usingStandardWeaponsInVehicle()
 bool Player_t::physicsRunThink(thinkmethods_t think)
 {
 	return memory::physicsRunThink()(this, think);
-}
-
-void Player_t::setAbsOrigin(const Vec3& origin)
-{
-	memory::setAbsOrigin()(this, std::cref(origin));
 }
 
 Weapon_t* Player_t::getActiveWeapon()

@@ -168,6 +168,7 @@ namespace memory
 	using saveData_t = void(__thiscall*)(Player_t*, const char*, int, int);
 	using precipClientThink_t = void(__thiscall*)(void*);
 	using precipInit_t = int(__thiscall*)(void*);
+	using setAbsVelocity_t = void(__thiscall*)(void*, const Vec3&);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
@@ -229,6 +230,8 @@ namespace memory
 	inline Address<retaddr_t> flashbangWhiteRet;
 	inline Address<precipClientThink_t> precipitationClientThink;
 	inline Address<precipInit_t> precipitationInit;
+	inline Address<uintptr_t> takeDmg;
+	inline Address<setAbsVelocity_t> setAbsVelocity;
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;

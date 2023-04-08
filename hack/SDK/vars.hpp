@@ -300,3 +300,10 @@
 #define HIDEHUD_RADAR				( 1<<12 )   // Hides the radar in CS1.5
 #define HIDEHUD_MINISCOREBOARD      ( 1<<13 )   // Hides the miniscoreboard in CS1.5
 #pragma endregion
+
+#pragma region dmg_type
+#define	DAMAGE_NO				0
+#define DAMAGE_EVENTS_ONLY		1		// Call damage functions, but don't modify health
+#define	DAMAGE_YES				2
+#define	DAMAGE_AIM				3
+#pragma endregion
