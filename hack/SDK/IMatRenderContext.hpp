@@ -31,6 +31,8 @@ public:
     VFUNC(void, clearColor3ub, 78, (unsigned char r, unsigned char g, unsigned char b), (this, r, g, b));
     VFUNC(void, depthRange, 11, (float zNear, float zFar), (this, zNear, zFar));
     VFUNC(void, clearBuffers, 12, (bool clearColor, bool clearDepth, bool clearStencil = false), (this, clearColor, clearDepth, clearStencil));
+    VFUNC(void, overrideAlphaWriteEnable, 195, (bool overrideEnable, bool alphaWriteEnable), (this, overrideEnable, alphaWriteEnable));
+    VFUNC(void, overrideColorWriteEnable, 196, (bool overrideEnable, bool alphaWriteEnable), (this, overrideEnable, alphaWriteEnable));
 
     // custom
     void drawScreenEffectMaterial(IMaterial* material);

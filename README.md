@@ -23,6 +23,11 @@ Dependencies folder IS NOT for dependencies themselves, if they are on vcpkg, do
 <br />
 Some rare exceptions are edited libraries, but it is prefered to not.
 
+## How to build
+Please follow the short read [here](https://github.com/Microsoft/vcpkg#getting-started)
+After installing, open the project and click build.
+If there are any errors, please open the issue.
+
 ## How to run
 
 Default menu key is ``INSERT`` more options will be self explanained by viewing menu.

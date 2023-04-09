@@ -31,14 +31,15 @@ ImVec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos
 	float directionX = entPos[Coord::X] - eye[Coord::X];
 	float directionY = -(entPos[Coord::Y] - eye[Coord::Y]);
 
-	auto yawDeg = angles[Coord::Y] - 90.0f;
+	const auto yawDeg = angles[Coord::Y] - 90.0f;
 	// calculate dots of radian and return correct view
 	const auto yawToRadian = math::DEG2RAD(yawDeg);
 	const auto cosine = std::cos(yawToRadian);
 	const auto sine = std::sin(yawToRadian);
+	// this 20 is a magic scaling value, it seems to be the best and without need as configurable
+	// game also does hardcoded scaling
 	float dotX = (directionX * cosine - directionY * sine) / 20.0f;
 	float dotY = (directionX * sine + directionY * cosine) / 20.0f;
-	// return correct scale, it zooms in/out depends what value is thrown
 	dotX *= scale;
 	dotY *= scale;
 

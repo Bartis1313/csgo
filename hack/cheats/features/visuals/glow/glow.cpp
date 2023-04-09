@@ -232,7 +232,7 @@ void Glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 		auto overrideColor = Colors::White.getRGB();
 		memory::interfaces::renderView->modulateColor(overrideColor.data());
 
-		for (const auto& ent : edgeHighlightGlows)	
+		for (const auto& ent : edgeHighlightGlows)
 			ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
 
 		memory::interfaces::studioRender->forcedMaterialOverride(nullptr);

@@ -169,9 +169,9 @@ Vec3 game::getFixedPunch()
 
 #pragma warning (disable : 4244)
 #define NANOSVG_IMPLEMENTATION
-#include <nanosvg.h>
+#include <nanosvg/nanosvg.h>
 #define NANOSVGRAST_IMPLEMENTATION
-#include <nanosvgrast.h>
+#include <nanosvg/nanosvgrast.h>
 
 std::optional<game::BitMapData> getSvgIcon(char* data, const float scale)
 {
