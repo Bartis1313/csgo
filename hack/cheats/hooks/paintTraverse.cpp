@@ -64,11 +64,6 @@ hooks::paintTraverse::value FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, uns
 	}
 	else if (panelID == panel)
 	{
-		imRender.addToRender([]()
-			{
-				RenderableSurfaceType::runAll();
-			});
-
-		x88menu.draw();
+		ImRender::think();
 	}
 }

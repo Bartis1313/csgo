@@ -319,9 +319,12 @@ public:
 	NETVAR(float, m_flCustomBloomScale, "DT_EnvTonemapController", "m_flCustomBloomScale");
 };
 
+struct SDKColor;
+
 class EnvAmbientLight_t : public Entity_t
 {
 public:
+	NETVAR(SDKColor, m_Color, "DT_EnvAmbientLight", "m_Color");
 	NETVAR(Vec3, m_vecColor, "DT_EnvAmbientLight", "m_vecColor");
 };
 

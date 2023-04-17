@@ -133,7 +133,7 @@ void memory::init()
 	ADD_TO_MAP("panorama.dll");
 	ADD_TO_MAP("filesystem_stdio.dll");
 	ADD_TO_MAP("datacache.dll");
-	ADD_TO_MAP("server.dll");
+	ADD_TO_MAP("gameoverlayrenderer.dll");
 
 #undef ADD_TO_MAP
 
@@ -200,6 +200,8 @@ void memory::init()
 	precipitationInit = precipitationInit.scan(CLIENT_DLL, PRECIPITATION_INIT);
 	takeDmg = takeDmg.scan(CLIENT_DLL, TAKE_DMG).add(0x2).deRef();
 	setAbsVelocity = setAbsVelocity.scan(CLIENT_DLL, SET_ABS_VELOCITY);
+	firstMoveChild = firstMoveChild.scan(CLIENT_DLL, FIRST_MOVE_CHILD).add(0x2).deRef();
+	nextMovePeer = nextMovePeer.scan(CLIENT_DLL, NEXT_PEER).add(0x2).deRef();
 
 	// HOOKS
 
@@ -227,6 +229,8 @@ void memory::init()
 	chudIsHidden = chudIsHidden.scan(CLIENT_DLL, CHUD_IS_HIDDEN);
 	viewFade = viewFade.scan(ENGINE_DLL, VIEW_FADE);
 	unkRound = unkRound.scan(CLIENT_DLL, UNK_SURVIVAL_RELATED);
+	present = present.scan(GAME_OVERLAY, DX9_PRESENT).add(0x2);
+	reset = reset.scan(GAME_OVERLAY, DX9_RESET).add(0x9);
 
 	// REST
 
@@ -255,6 +259,7 @@ void memory::init()
 	input = input.byVFunc(memory::interfaces::client, 16).add(0x1).deRef();
 
 	postInit();
+	netvars::init();
 
 	console::debug("memory init success");
 }
@@ -266,4 +271,7 @@ void memory::postInit()
 	preciptation = preciptation.findFromGame(CPrecipitation);
 	resourceInterface = resourceInterface.findFromGameLoop(CCSPlayerResource);
 	gameRules = gameRules.findFromGameLoop(CCSGameRulesProxy);
+	toneController = toneController.findFromGameLoop(CEnvTonemapController);
+	fogController = fogController.findFromGameLoop(CFogController);
+	ambientLight = ambientLight.findFromGameLoop(CEnvAmbientLight);
 }

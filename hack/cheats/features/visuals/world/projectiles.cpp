@@ -75,6 +75,6 @@ void Projectiles::draw()
 
 		const auto [text, col] = nades;
 		if (Box box{ entity }; box.isValid())
-			imRender.text(box.x + box.w / 2, box.y + box.h + 2, ImFonts::verdana12, text, true, col);
+			ImRender::text(box.x + box.w / 2, box.y + box.h + 2, ImRender::fonts::verdana12, text, true, col);
 	}
 }

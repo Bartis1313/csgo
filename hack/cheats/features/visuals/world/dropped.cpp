@@ -44,7 +44,7 @@ void DroppedWeapons::draw()
 		if (alpha < 0.0f)
 			continue;
 
-		auto getTextSize = [=](const std::string& text, ImFont* font = ImFonts::verdana12)
+		auto getTextSize = [=](const std::string& text, ImFont* font = ImRender::fonts::verdana12)
 		{
 			return font->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
 		};
@@ -53,16 +53,16 @@ void DroppedWeapons::draw()
 
 		if (flags.at(E2T(DroppedFlags::BOX))) // startpoint - no pad
 		{
-			imRender.drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Colors::Black.getColorEditAlpha(alpha));
-			imRender.drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Colors::Black.getColorEditAlpha(alpha));
-			imRender.drawRect(box.x, box.y, box.w, box.h, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
+			ImRender::drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Colors::Black.getColorEditAlpha(alpha));
+			ImRender::drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Colors::Black.getColorEditAlpha(alpha));
+			ImRender::drawRect(box.x, box.y, box.w, box.h, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
 		}
 		if (flags.at(E2T(DroppedFlags::AMMO)) && !wpn->isNonAimable()) // no pad font logic, we just draw extra box
 		{
 			constexpr float startPad = 3.0f;
 
-			imRender.drawRectFilled(box.x - 1.0f, box.y + box.h - 1.0f + startPad, box.w + 2.0f, 4.0f, Colors::Black.getColorEditAlpha(alpha));
-			imRender.drawRectFilled(box.x, box.y + box.h + startPad,
+			ImRender::drawRectFilled(box.x - 1.0f, box.y + box.h - 1.0f + startPad, box.w + 2.0f, 4.0f, Colors::Black.getColorEditAlpha(alpha));
+			ImRender::drawRectFilled(box.x, box.y + box.h + startPad,
 				wpn->m_iClip1() * box.w / wpn->getWpnInfo()->m_maxClip1, 2.0f, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
 
 			padding += 4.0f;
@@ -72,7 +72,7 @@ void DroppedWeapons::draw()
 			const auto name = vars::visuals->esp->weaponBar->translate
 				? memory::interfaces::localize->findAsUTF8(wpn->getWpnInfo()->m_WeaponName)
 				: wpn->getWpnName();
-			imRender.text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImFonts::verdana12,
+			ImRender::text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImRender::fonts::verdana12,
 				name, true, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
 
 			auto textSize = getTextSize(name);
@@ -86,7 +86,7 @@ void DroppedWeapons::draw()
 			auto goodSize = ImVec2{ iconData.width, iconData.height };
 			goodSize = wpn->isGrenade() ? ImVec2{ 8.0f, 12.0f } : ImVec2{ 22.0f, 14.0f };
 
-			imRender.drawImage(iconData.texture, ImVec2{ box.x + box.w / 2, box.y + box.h + 2 + padding },
+			ImRender::drawImage(iconData.texture, ImVec2{ box.x + box.w / 2, box.y + box.h + 2 + padding },
 				goodSize, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
 
 			padding += goodSize.y;

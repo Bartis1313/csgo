@@ -97,7 +97,7 @@ void BombOverlay::draw()
 
 		drawing::Arc{ ImVec2{ pos.x + xCircle, pos.y + yCircle }, scaledRadius, math::DEG2RAD(minAngle), math::DEG2RAD(maxAngle), 32, Color::U32(color), 0, 5.0f }.draw(draw);
 		const auto text = defusetime > bombtime ? "Too late" : std::format("{:.2f}", m_bombEnt->m_hBombDefuser().isValid() ? defusetime : bombtime);
-		drawing::Text{ ImFonts::tahoma14, ImVec2{ pos.x + xCircle, pos.y + yCircle - ImFonts::tahoma14->FontSize / 2.0f },
+		drawing::Text{ ImRender::fonts::tahoma14, ImVec2{ pos.x + xCircle, pos.y + yCircle - ImRender::fonts::tahoma14->FontSize / 2.0f },
 			Color::U32(Colors::White), text, false, true }.draw(draw);
 
 		const auto icon = game::getWeaponIcon("weapon_c4");
@@ -108,22 +108,22 @@ void BombOverlay::draw()
 
 		if (!m_whoPlanted.empty())
 		{
-			drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + 5.0f, yPosInfo }, Color::U32(Colors::White),
+			drawing::Text{ ImRender::fonts::tahoma20, ImVec2{ pos.x + 5.0f, yPosInfo }, Color::U32(Colors::White),
 			std::format("Planted by {}s", m_whoPlanted), false, false }.draw(draw);
-			yPosInfo -= ImFonts::tahoma20->FontSize;
+			yPosInfo -= ImRender::fonts::tahoma20->FontSize;
 		}
 		if (m_bombEnt->m_hBombDefuser().isValid())
 		{
-			drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + 5.0f, yPosInfo }, Color::U32(Colors::White),
+			drawing::Text{ ImRender::fonts::tahoma20, ImVec2{ pos.x + 5.0f, yPosInfo }, Color::U32(Colors::White),
 			std::format("Defusing {}", ent->getName()), false, false }.draw(draw);
-			yPosInfo -= ImFonts::tahoma20->FontSize;
+			yPosInfo -= ImRender::fonts::tahoma20->FontSize;
 		}
 
-		float yCentreInfo = pos.y + 2.0f + ImFonts::tahoma20->FontSize;
-		drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(Colors::White), std::format("Site {}",
+		float yCentreInfo = pos.y + 2.0f + ImRender::fonts::tahoma20->FontSize;
+		drawing::Text{ ImRender::fonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(Colors::White), std::format("Site {}",
 			m_bombEnt->getBombSiteName()), false, true }.draw(draw);
-		yCentreInfo += ImFonts::tahoma20->FontSize;
-		drawing::Text{ ImFonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(isSafe ? Colors::Green : Colors::Red),
+		yCentreInfo += ImRender::fonts::tahoma20->FontSize;
+		drawing::Text{ ImRender::fonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(isSafe ? Colors::Green : Colors::Red),
 			std::format("Damage {:.2f}", dmg), false, true }.draw(draw);
 
 		ImGui::End();

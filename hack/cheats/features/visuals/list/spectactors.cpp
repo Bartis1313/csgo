@@ -44,32 +44,16 @@ void SpectactorList::draw()
 		return;
 
 	if (ImGui::Begin("Spectactors", &vars::misc->spectactorList->enabled, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration))
-	{
-		static std::array tableNames
+	{	
+		for (size_t i = 0; auto [name, mode] : m_specs)
 		{
-			std::pair<std::string_view, int>{ "Name", ImGuiTableColumnFlags_WidthFixed },
-			std::pair<std::string_view, int>{ "Mode", ImGuiTableColumnFlags_WidthFixed }
-		};
+			ImGui::TextUnformatted(std::format("{} | {}", name, m_modeString.at(mode)).c_str());
+			if (i != m_specs.size())
+				ImGui::Separator();
 
-		if (ImGui::BeginTable("##speclist", tableNames.size(),
-			ImGuiTableFlags_Borders | ImGuiTableFlags_Hideable | ImGuiTableFlags_Resizable /*| ImGuiTableFlags_Sortable*/))
-		{
-			for (const auto [name, flags] : tableNames)
-				ImGui::TableSetupColumn(name.data(), flags);
-
-			for (auto [name, mode] : m_specs)
-			{
-				ImGui::TableNextRow();
-
-				if (ImGui::TableNextColumn())
-					ImGui::TextUnformatted(name.c_str());
-
-				if (ImGui::TableNextColumn())
-					ImGui::TextUnformatted(m_modeString.at(mode).data());
-			}
-
-			ImGui::EndTable();
+			i++;
 		}
+
 		ImGui::End();
 	}
 }

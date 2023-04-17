@@ -19,33 +19,30 @@ void FogController::run(int frame)
 	if (!game::isAvailable())
 		return;
 
-	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::CONTROLLERS))
+	const auto ent = memory::interfaces::fogController();
+	if (!ent) // not all maps support it by default
+		return;
+
+	if (globals::isShutdown)
 	{
-		if (classID != CFogController)
-			continue;
-
-		auto ent = reinterpret_cast<FogController_t*>(entity);
-
-		if (globals::isShutdown)
-		{
-			ent->m_fogenable() = false;
-			break;
-		}
-
-		if (bool opt = vars::visuals->world->fog->enabled; opt)
-			ent->m_fogenable() = opt;
-		else
-		{
-			ent->m_fogenable() = opt;
-			break;
-		}
-
-		SDKColor col = vars::visuals->world->fog->color();
-
-		ent->m_fogstart() = 0.0f;
-		ent->m_fogend() = vars::visuals->world->fog->distance * 10.0f;
-		ent->m_fogmaxdensity() = col.a / 100.0f;
-		ent->m_fogcolorPrimary() = U32RGB(col);
-		ent->m_fogcolorSecondary() = U32RGB(col);
+		ent->m_fogenable() = false;
+		return;
 	}
+
+	if (vars::visuals->world->fog->enabled)
+		ent->m_fogenable() = true;
+	else
+	{
+		ent->m_fogenable() = false;
+		
+		return;
+	}
+
+	SDKColor col = vars::visuals->world->fog->color();
+
+	ent->m_fogstart() = 0.0f;
+	ent->m_fogend() = vars::visuals->world->fog->distance * 10.0f;
+	ent->m_fogmaxdensity() = col.a / 100.0f;
+	ent->m_fogcolorPrimary() = U32RGB(col);
+	ent->m_fogcolorSecondary() = U32RGB(col);
 }

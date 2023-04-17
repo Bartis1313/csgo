@@ -36,6 +36,9 @@ class Input;
 class CFlashlightEffect;
 class ClientClass;
 class IMaterial;
+class EnvTonemapController_t;
+class FogController_t;
+class EnvAmbientLight_t;
 
 enum ClassID;
 
@@ -52,18 +55,6 @@ namespace memory
 
 	void init();
 	void postInit();
-
-	namespace detail
-	{
-		inline std::unordered_map<std::string_view, HMODULE> m_ModulesAddr;
-	}
-
-	inline HMODULE getModule(const std::string_view str) { return detail::m_ModulesAddr.at(str); }
-	template<typename T, li::detail::offset_hash_pair __hash>
-	T exportVar(const std::string_view _module)
-	{
-		return static_cast<T>(::li::detail::lazy_function<__hash, T>().in(getModule(_module)));
-	}	
 
 	template<typename T>
 	struct Address
@@ -131,6 +122,18 @@ namespace memory
 		uintptr_t m_addr;
 		std::string_view m_module;
 	};
+
+	namespace detail
+	{
+		inline std::unordered_map<std::string_view, HMODULE> m_ModulesAddr;
+	}
+
+	inline HMODULE getModule(const std::string_view str) { return detail::m_ModulesAddr.at(str); }
+	template<typename T, li::detail::offset_hash_pair __hash>
+	T exportVar(const std::string_view _module)
+	{
+		return static_cast<T>(::li::detail::lazy_function<__hash, T>().in(getModule(_module)));
+	}
 };
 
 namespace memory
@@ -232,6 +235,8 @@ namespace memory
 	inline Address<precipInit_t> precipitationInit;
 	inline Address<uintptr_t> takeDmg;
 	inline Address<setAbsVelocity_t> setAbsVelocity;
+	inline Address<uintptr_t> firstMoveChild;
+	inline Address<uintptr_t> nextMovePeer;
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;
@@ -255,6 +260,8 @@ namespace memory
 	inline Address<void*> chudIsHidden;
 	inline Address<void*> viewFade;
 	inline Address<void*> unkRound;
+	inline Address<void*> present;
+	inline Address<void*> reset;
 
 	inline Address<teslaCreate_t> tesla;
 	inline Address<dispatchEffect_t> dispatchEffect;
@@ -276,5 +283,8 @@ namespace memory
 		inline Address<ClientMode*> clientMode;
 		inline Address<Input*> input;
 		inline Address<ClientClass*> preciptation;
+		inline Address<EnvTonemapController_t*> toneController;
+		inline Address<FogController_t*> fogController;
+		inline Address<EnvAmbientLight_t*> ambientLight;
 	}
 }

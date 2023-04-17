@@ -10,6 +10,7 @@
 #include <SDK/IVModelRender.hpp>
 #include <SDK/IVModelInfo.hpp>
 #include <SDK/IVStudioRender.hpp>
+#include <SDK/IMatRenderContext.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <SDK/materialInit.hpp>
 
@@ -59,18 +60,42 @@ std::optional<Mat_t> Chams::addMaterialByString(const Mat_t& material)
 	return matToPush;
 }
 
-void Chams::initMaterials()
+// DONT init any materials with material system here, this part is only useful for gui
+void Chams::init()
 {
-	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = "Flat", .key = "UnlitGeneric" } }).value());
-	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = "Generic", .key = "VertexLitGeneric" } }).value());
-	m_materials.emplace_back(addMaterialByString(Mat_t{ .type = Mat_t::ExtraType::GLOW, .data = Mat_t::Data{.name = "Glow", .key = "VertexLitGeneric",
-		.buf = "$additive 1 $envmap models/effects/cube_white $envmapfresnel 1 $envmaptint 1" } }).value());
-	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = "Metalic", .key = "VertexLitGeneric",
-		.buf = "$basetexture white $envmap env_cubemap $normalmapalphaenvmapmask 1 $envmapcontrast 1 $nofog 1 $model 1 $nocull 0 $selfillum 1 $halfambert 1 $znearer 0 $flat 1"} }).value());
-	m_materials.emplace_back(addMaterialByString(Mat_t{ .data = Mat_t::Data{.name = "Pearlescent", .key = "VertexLitGeneric",
-		.buf = "$ambientonly 1 $phong 1 $pearlescent 3 $basemapalphaphongmask 1" } }).value());
+	m_materials.emplace_back(Mat_t{ .isFromEditor = false, .strategy = Mat_t::StrategyType::FROM_STRING,
+		.data = Mat_t::Data{.name = "Flat", .key = "UnlitGeneric"}});
+	m_materials.emplace_back(Mat_t{ .isFromEditor = false, .strategy = Mat_t::StrategyType::FROM_STRING,
+		.data = Mat_t::Data{.name = "Generic", .key = "VertexLitGeneric" } });
+	m_materials.emplace_back(Mat_t{ .isFromEditor = false, .strategy = Mat_t::StrategyType::FROM_STRING,
+		.type = Mat_t::ExtraType::GLOW, .data = Mat_t::Data{.name = "Glow", .key = "VertexLitGeneric",
+		.buf = "$additive 1 $envmap models/effects/cube_white $envmapfresnel 1 $envmaptint 1" } });
+	m_materials.emplace_back(Mat_t{ .isFromEditor = false, .strategy = Mat_t::StrategyType::FROM_STRING,
+		.data = Mat_t::Data{.name = "Metalic", .key = "VertexLitGeneric",
+		.buf = "$basetexture white $envmap env_cubemap $normalmapalphaenvmapmask 1 $envmapcontrast 1 $nofog 1 $model 1 $nocull 0 $selfillum 1 $halfambert 1 $znearer 0 $flat 1"} });
+	m_materials.emplace_back(Mat_t{ .isFromEditor = false, .strategy = Mat_t::StrategyType::FROM_STRING,
+		.data = Mat_t::Data{ .name = "Pearlescent", .key = "VertexLitGeneric",
+		.buf = "$ambientonly 1 $phong 1 $pearlescent 3 $basemapalphaphongmask 1" } });
 
 	g_MaterialEditor->initEditor();
+}
+
+void Chams::initMaterials()
+{
+	auto addMaterial = [this](const Mat_t& mat)
+	{
+		return mat.strategy == Mat_t::StrategyType::BUFFER
+			? addMaterialByBuffer(mat)
+			: addMaterialByString(mat);
+	};
+
+	for (auto& material : m_materials)
+	{
+		if (material.mat)
+			continue;
+
+		material = addMaterial(material).value();
+	}
 }
 
 void Chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& color, bool force, bool call)
@@ -108,6 +133,8 @@ void Chams::CALL(Matrix3x4* matrix)
 {
 	hooks::drawModel::original(memory::interfaces::modelRender(), m_result, m_state, m_info, matrix);
 }
+
+#include <SDK/IMatRenderContext.hpp>
 
 void Chams::run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
 {

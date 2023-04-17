@@ -31,7 +31,9 @@ Resource::Resource(const std::string& path)
 		return;
 	}
 	m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
-	surfaceRender.initNewTexture(m_textureID, m_buffer, m_width, m_height);
+#ifdef SURFACE_RENDER
+	SurfaceRender::initNewTexture(m_textureID, m_buffer, m_width, m_height);
+#endif
 	stbi_image_free(m_buffer);
 
 	m_resBuf.push_back(*this);
@@ -60,7 +62,9 @@ Resource::Resource(int resID, const std::string_view type)
 		return;
 	}
 	m_texture = reinterpret_cast<IDirect3DTexture9*>(ImGui_CreateTexture(m_buffer, m_width, m_height));
-	surfaceRender.initNewTexture(m_textureID, m_buffer, m_width, m_height);
+#ifdef SURFACE_RENDER
+	SurfaceRender::initNewTexture(m_textureID, m_buffer, m_width, m_height);
+#endif
 	stbi_image_free(m_buffer);
 	LI_FN_CACHED(FreeResource)(hResData);
 
@@ -93,7 +97,9 @@ void Resource::destroyAll()
 		if (el.getTexture() && el.getTextureID())
 		{
 			ImGui_DestroyTexture(el.getTexture());
+#ifdef SURFACE_RENDER
 			memory::interfaces::surface->deleteTextureID(el.getTextureID());
+#endif
 		}
 	}
 }

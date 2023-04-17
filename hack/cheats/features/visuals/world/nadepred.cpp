@@ -42,26 +42,12 @@ void GreandePredictionButton::run(CUserCmd* cmd)
 	if (!vars::misc->nade->enabledPred)
 		return;
 
+	m_ready = false;
+
 	if (vars::misc->nade->predAlways)
-	{
-		m_button = ACT_THROW;
-		return;
-	}
-
-	m_button = ACT_NONE;
-
-	int attack = cmd->m_buttons & IN_ATTACK;
-	int attack2 = cmd->m_buttons & IN_ATTACK2;
-
-	if (attack || attack2)
-	{
-		if (attack && attack2)
-			m_button = ACT_LOB;
-		else if (!attack)
-			m_button = ACT_DROP;
-		else
-			m_button = ACT_THROW;
-	}
+		m_ready = true;
+	else
+		m_ready = cmd->m_buttons & (IN_ATTACK | IN_ATTACK2);
 
 	runView();
 }
@@ -78,7 +64,7 @@ void GreandePredictionButton::runView()
 	if (!wpn || !wpn->isGrenade())
 		return;
 
-	if (m_button != ACT_NONE)
+	if (m_ready)
 	{
 		m_weaponIdx = wpn->m_iItemDefinitionIndex();
 		g_GrenadePrediction->simulate();
@@ -156,7 +142,7 @@ void GrenadePrediction::draw()
 				continue;
 
 			float dmgDealt = ent->m_iHealth() - resultDmg;
-			if (ImVec2 pos; imRender.worldToScreen(ent->absOrigin(), pos))
+			if (ImVec2 pos; ImRender::worldToScreen(ent->absOrigin(), pos))
 			{
 				std::string text = dmgDealt < 0.0f ? "DIE" : std::format("{:.2f}", -resultDmg);
 				nadesDmg.emplace_back(pos, text, Color::healthBased(static_cast<uint8_t>(dmgDealt)));
@@ -167,7 +153,7 @@ void GrenadePrediction::draw()
 			if (deltaDist > 180.0f) // 180 is not always accurate perfectly
 				continue;
 
-			if (ImVec2 pos; imRender.worldToScreen(ent->absOrigin(), pos))
+			if (ImVec2 pos; ImRender::worldToScreen(ent->absOrigin(), pos))
 				nadesDmg.emplace_back(pos, "In range", Colors::LightBlue);
 		}
 	}
@@ -175,23 +161,23 @@ void GrenadePrediction::draw()
 	std::vector<ImVec2> points;
 	for (const auto & el : m_path)
 	{
-		if (ImVec2 screen; imRender.worldToScreen(el, screen))
+		if (ImVec2 screen; ImRender::worldToScreen(el, screen))
 			points.push_back(screen);
 	}
 	if (!points.empty())
-		imRender.drawPolyLine(points, vars::misc->nade->colorPredLine(), 0, 2.0f);
+		ImRender::drawPolyLine(points, vars::misc->nade->colorPredLine(), 0, 2.0f);
 
 	for (const auto& el : m_bounces)
 	{
-		imRender.drawBox3DFilled(el, 2.0f, 2.0f, vars::misc->nade->colorPredBox(), vars::misc->nade->colorPredBoxFill());
+		ImRender::drawBox3DFilled(el, 2.0f, 2.0f, vars::misc->nade->colorPredBox(), vars::misc->nade->colorPredBoxFill());
 	}
 
 	for (const auto& [pos, text, color] : nadesDmg)
 	{
-		imRender.text(pos.x, pos.y, ImFonts::tahoma20, text, true, color, false);
+		ImRender::text(pos.x, pos.y, ImRender::fonts::tahoma20, text, true, color, false);
 	}
 
-	//imRender.drawCircle3D(m_path.back(), weapon->getNadeRadius(), 32, Colors::White);
+	//ImRender::drawCircle3D(m_path.back(), weapon->getNadeRadius(), 32, Colors::White);
 }
 
 // not using magic value given by valve, so we never are based on buttons

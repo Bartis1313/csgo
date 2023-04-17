@@ -53,8 +53,6 @@ namespace game
 	// and people who think definition index is ok are wrong, player ents DON'T hold the nade anymore in that case
 	[[nodiscard]] WeaponIndex getNadeByClass(int idx, Studiohdr_t* studio);
 	[[nodiscard]] Vec3 getViewAngles();
-	// lerped and decayed punch
-	[[nodiscard]] Vec3 getFixedPunch();
 	[[nodiscard]] BitMapData getWeaponIcon(const std::string_view weapon);
 	// not for svg, string_view is not passed due to high possibility of using std::format
 	// eg path: resource/flash/econ/weapons/base_weapons/ + weapon name + .png

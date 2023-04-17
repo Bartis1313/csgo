@@ -21,6 +21,7 @@ DEFINE_HOOK_CLASS_MEMBER(hooks::preRestartRound, void* event)
 #include <SDK/IClientEntityList.hpp>
 #include <cheats/game/game.hpp>
 
+#include <cheats/features/logger/logger.hpp>
 #include <cheats/features/visuals/hitmarker/hitmark.hpp>
 #include <cheats/features/visuals/misc/drawInfo.hpp>
 
@@ -33,6 +34,7 @@ hooks::unkround::value FASTCALL hooks::unkround::hooked(FAST_ARGS, void* event)
 	const auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(ev->getInt("attacker")));
 	if (attacker == game::localPlayer)
 	{
+		g_Logger->handleHits(ev);
 		g_Hitmarker->handleHits(ev);
 		g_MiscInfo->addHits(ev);
 	}

@@ -7,7 +7,6 @@
 #include <SDK/Enums.hpp>
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/interfaces/interfaces.hpp>
-#include <menu/GUI-ImGui/animations.hpp>
 #include <cheats/features/blacklist/blacklist.hpp>
 #include <render/Color.hpp>
 
@@ -21,10 +20,6 @@
 
 struct TableStruct
 {
-	constexpr TableStruct(const std::string_view name, const int flags, bool* cfg = nullptr)
-		: name{ name }, flags{ flags }, cfg{ cfg }
-	{}
-
 	std::string_view name;
 	int flags;
 	bool* cfg = nullptr; // some are default always
@@ -39,7 +34,7 @@ void PlayerList::draw()
 		return;
 
 	// ImGui demo: Tables/Borders
-	if (ImGui::Begin("PlayerList", &vars::misc->playerList->enabled))
+	if (ImGui::Begin("PlayerList", &vars::misc->playerList->enabled, ImGuiWindowFlags_NoCollapse))
 	{
 		static std::array tableNames
 		{
@@ -149,7 +144,7 @@ void PlayerList::draw()
 
 					const auto [title, isOn] = blacklist;
 
-					if (ImGui::Animations::Button(title.c_str(), ImVec2{ -std::numeric_limits<float>::min(), 0.0f }))
+					if (ImGui::Button(title.c_str(), ImVec2{ -std::numeric_limits<float>::min(), 0.0f }))
 					{	
 						isOn == BlacklistAction::ADD
 							? g_Blacklist->add(ent)

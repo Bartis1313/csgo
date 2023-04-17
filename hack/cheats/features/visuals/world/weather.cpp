@@ -111,59 +111,101 @@ void WeatherController::run(int frame)
 	}
 }
 
+struct ConfigWeather
+{
+	IConVar* convar;
+	float defaultVal;
+	float min, max;
+	float* configRef;
+};
+
 void WeatherController::implMenu()
 {
-	const static auto cvarLenght = memory::interfaces::cvar->findVar("r_rainlength");
-	const static auto cvarRainSpeed = memory::interfaces::cvar->findVar("r_rainspeed");
-	const static auto cvarRadius = memory::interfaces::cvar->findVar("r_rainradius");
-	const static auto cvarWidth = memory::interfaces::cvar->findVar("r_rainwidth");
-	const static auto cvarSidevel = memory::interfaces::cvar->findVar("r_RainSideVel");
-	const static auto cvarAlpha = memory::interfaces::cvar->findVar("r_rainalpha");
-	const static auto cvarWindSpeed = memory::interfaces::cvar->findVar("cl_windspeed");
-
-	const static std::array defaults =
+	const static ConfigWeather cvarLenght
 	{
-		std::make_pair(cvarLenght, cvarLenght->getFloat()),
-		std::make_pair(cvarRainSpeed, cvarRainSpeed->getFloat()),
-		std::make_pair(cvarRadius, cvarRadius->getFloat()),
-		std::make_pair(cvarWidth, cvarWidth->getFloat()),
-		std::make_pair(cvarSidevel, cvarSidevel->getFloat()),
-		std::make_pair(cvarAlpha, cvarAlpha->getFloat()),
-		std::make_pair(cvarWindSpeed, cvarWindSpeed->getFloat()),
+		.convar = memory::interfaces::cvar->findVar("r_rainlength"),
+		.defaultVal = memory::interfaces::cvar->findVar("r_rainlength")->getFloat(),
+		.min = 0.0f,
+		.max = 1.0f,
+		.configRef = &vars::visuals->world->weather->length
+	};
+	const static ConfigWeather cvarRadius
+	{
+		.convar = memory::interfaces::cvar->findVar("r_rainradius"),
+		.defaultVal = memory::interfaces::cvar->findVar("r_rainradius")->getFloat(),
+		.min = 0.0f,
+		.max = 3000.0f,
+		.configRef = &vars::visuals->world->weather->radius
+	};
+	const static ConfigWeather cvarWidth
+	{
+		.convar = memory::interfaces::cvar->findVar("r_rainwidth"),
+		.defaultVal = memory::interfaces::cvar->findVar("r_rainwidth")->getFloat(),
+		.min = 0.0f,
+		.max = 5.0f,
+		.configRef = &vars::visuals->world->weather->width
+	};
+	const static ConfigWeather cvarSidevel
+	{
+		.convar = memory::interfaces::cvar->findVar("r_RainSideVel"),
+		.defaultVal = memory::interfaces::cvar->findVar("r_RainSideVel")->getFloat(),
+		.min = 50.0f,
+		.max = 1000.0f,
+		.configRef = &vars::visuals->world->weather->velocity
+	};
+	const static ConfigWeather cvarAlpha
+	{
+		.convar = memory::interfaces::cvar->findVar("r_rainalpha"),
+		.defaultVal = memory::interfaces::cvar->findVar("r_rainalpha")->getFloat(),
+		.min = 0.0f,
+		.max = 1.0f,
+		.configRef = &vars::visuals->world->weather->alpha
+	};
+	const static ConfigWeather cvarWindSpeed
+	{
+		.convar = memory::interfaces::cvar->findVar("cl_windspeed"),
+		.defaultVal = memory::interfaces::cvar->findVar("cl_windspeed")->getFloat(),
+		.min = 0.0f,
+		.max = 1000.0f,
+		.configRef = &vars::visuals->world->weather->windSpeed
 	};
 
-	if (ImGui::SliderFloat("r_rainlength", &vars::visuals->world->weather->length, 0.0f, 1.0f))
+	static std::array allvars
 	{
-		cvarLenght->setValue(vars::visuals->world->weather->length);
-	}
-	if (ImGui::SliderFloat("r_rainspeed", &vars::visuals->world->weather->rainSpeed, 100.0f, 1000.0f))
+		cvarLenght,
+		cvarRadius,
+		cvarWidth,
+		cvarSidevel,
+		cvarAlpha,
+		cvarWindSpeed
+	};
+
+	static std::once_flag onceFlag;
+	std::call_once(onceFlag, []()
+		{
+			for (auto& cfg : allvars)
+				*cfg.configRef = cfg.defaultVal;
+		});
+
+	for(auto& cfg : allvars)
 	{
-		cvarRainSpeed->setValue(vars::visuals->world->weather->rainSpeed);
+		if(ImGui::SliderFloat(cfg.convar->m_name, cfg.configRef, cfg.min, cfg.max))
+			cfg.convar->setValue(*cfg.configRef);
+
+		if (cfg.convar->m_helper)
+		{
+			ImGui::SameLine();
+			ImGui::HelpMarker(cfg.convar->m_helper);
+		}
 	}
-	if (ImGui::SliderFloat("r_rainradius", &vars::visuals->world->weather->radius, 0.0f, 3000.0f))
-	{
-		cvarRadius->setValue(vars::visuals->world->weather->radius);
-	}
-	if (ImGui::SliderFloat("r_rainwidth", &vars::visuals->world->weather->width, 0.0f, 5.0f))
-	{
-		cvarWidth->setValue(vars::visuals->world->weather->width);
-	}
-	if (ImGui::SliderFloat("r_RainSideVel", &vars::visuals->world->weather->velocity, 50.0f, 1000.0f))
-	{
-		cvarSidevel->setValue(vars::visuals->world->weather->velocity);
-	}
-	if (ImGui::SliderFloat("r_rainalpha", &vars::visuals->world->weather->alpha, 0.0f, 1.0f))
-	{
-		cvarAlpha->setValue(vars::visuals->world->weather->alpha);
-	}
-	if (ImGui::SliderFloat("cl_windspeed", &vars::visuals->world->weather->windSpeed, 0.0f, 1000.0f))
-	{
-		cvarWindSpeed->setValue(vars::visuals->world->weather->windSpeed);
-	}
+
 	if (ImGui::Button("Default rain cvars"))
 	{
-		for (const auto [convar, defVal] : defaults)
-			convar->setValue(defVal);
+		for (const auto& cfg : allvars)
+		{
+			*cfg.configRef = cfg.defaultVal;
+			cfg.convar->setValue(cfg.defaultVal);
+		}
 	}
 }
 

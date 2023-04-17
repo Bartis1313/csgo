@@ -34,7 +34,7 @@ void ScreenEffects::run()
 		return;
 
 	int cfg = vars::visuals->world->screenEffect->index;
-	if (cfg == 0)
+	if (cfg == 0 || globals::isShutdown)
 	{
 		if (auto& night = game::localPlayer->m_bNightVisionOn())
 			night = false;

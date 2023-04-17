@@ -14,31 +14,40 @@ void ToneController::run(int frame)
 	if (!game::isAvailable())
 		return;
 
-	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::CONTROLLERS))
+	const auto ent = memory::interfaces::toneController();
+	const bool isOn = ent->m_bUseCustomAutoExposureMin() || ent->m_bUseCustomAutoExposureMax();
+
+	if (!ent) // not all maps support it by default
+		return;
+
+	auto resetTone = [ent]()
 	{
-		if (classID != CEnvTonemapController)
-			continue;
+		ent->m_bUseCustomAutoExposureMin() = false;
+		ent->m_bUseCustomAutoExposureMax() = false;
+		ent->m_bUseCustomBloomScale() = false;
+		ent->m_flCustomAutoExposureMin() = 0.0f;
+		ent->m_flCustomAutoExposureMax() = 0.0f;
+		ent->m_flCustomBloomScale() = 0.0f;
+	};
 
-		auto ent = reinterpret_cast<EnvTonemapController_t*>(entity);
+	if (globals::isShutdown)
+	{
+		resetTone();
 
-		// this is needed to ONLY change when we changed anything
-		// this is also stupid, CEnvTonemapController adr changes only on map change (not tested), but I guess so
-		// and overwriting those need just check the memory instead of those stupid menu checks
-		// remove later, TODO
-		if (auto cfg = vars::visuals->world->tone->enabled; cfg && (m_checkStateSlider || m_checkStateButton))
-		{
-			ent->m_bUseCustomAutoExposureMin() = true;
-			ent->m_bUseCustomAutoExposureMax() = true;
-			ent->m_bUseCustomBloomScale() = true;
-			ent->m_flCustomAutoExposureMin() = vars::visuals->world->tone->min;
-			ent->m_flCustomAutoExposureMax() = vars::visuals->world->tone->max;
-			ent->m_flCustomBloomScale() = vars::visuals->world->tone->bloom;
-		}
-		if (globals::isShutdown)
-		{
-			ent->m_bUseCustomAutoExposureMin() = false;
-			ent->m_bUseCustomAutoExposureMax() = false;
-			ent->m_bUseCustomBloomScale() = false;
-		}
+		return;
+	}
+
+	if (bool cfg = vars::visuals->world->tone->enabled; cfg)
+	{
+		ent->m_bUseCustomAutoExposureMin() = true;
+		ent->m_bUseCustomAutoExposureMax() = true;
+		ent->m_bUseCustomBloomScale() = true;
+		ent->m_flCustomAutoExposureMin() = vars::visuals->world->tone->min;
+		ent->m_flCustomAutoExposureMax() = vars::visuals->world->tone->max;
+		ent->m_flCustomBloomScale() = vars::visuals->world->tone->bloom;
+	}
+	else if (!cfg)
+	{
+		resetTone();
 	}
 }

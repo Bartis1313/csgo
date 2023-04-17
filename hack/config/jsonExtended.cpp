@@ -7,8 +7,7 @@ void from_json(const json& j, CfgWeapon& val)
 	from_json(j, "Enabled", val.enabled);
 	from_json(j, "Fov", val.fov);
 	from_json(j, "Smooth", val.frametimeMulttiply);
-	from_json(j, "Randomization", val.randomization);
-	from_json(j, "Randomization Ratio", val.randomizationRatio);
+	from_json(j, "maxDistanceMeters", val.maxDistanceMeters);
 	from_json(j, "Aim method", val.methodAim);
 	from_json(j, "Aim selection", val.aimSelection);
 	from_json(j, "Aim delay enabled", val.aimDelay);
@@ -27,8 +26,7 @@ void to_json(json& j, const CfgWeapon& val)
 	j["Enabled"] = val.enabled;
 	j["Fov"] = val.fov;
 	j["Smooth"] = val.frametimeMulttiply;
-	j["Randomization"] = val.randomization;
-	j["Randomization Ratio"] = val.randomizationRatio;
+	j["maxDistanceMeters"], val.maxDistanceMeters;
 	j["Aim method"] = val.methodAim;
 	j["Aim selection"] = val.aimSelection;
 	j["Aim delay enabled"] = val.aimDelay;
@@ -102,13 +100,11 @@ void to_json(json& j, const Key& val)
 void from_json(const json& j, VarAim& val)
 {
 	from_json(j, "AimbotArr", val.weapons);
-	from_json(j, "Use key", val.useKey);
 }
 
 void to_json(json& j, const VarAim& val)
 {
 	j["AimbotArr"] = val.weapons;
-	j["Use key"] = val.useKey;
 }
 
 void from_json(const json& j, VarAimPaint& val)
@@ -736,11 +732,11 @@ void to_json(json& j, const VarVisuals::VarWorld::VarAmbient& val)
 void from_json(const json& j, VarKeys& val)
 {
 	from_json(j, "Enabled X88", val.enabledX88Menu);
-	from_json(j["Aimbot"], val.aimbot);
+	from_json(j, "X88", val.x88Toggle);
+	//from_json(j["Aimbot"], val.aimbot);
 	from_json(j["Menu"], val.menu);
 	from_json(j["Panic"], val.panic);
 	from_json(j["Logs"], val.console);
-	from_json(j["Freelook"], val.freeLook);
 	from_json(j["MirrorCam"], val.mirrorCam);
 	from_json(j["FreeCam"], val.freeCam);
 	from_json(j["FlashLight"], val.flashLight);
@@ -750,11 +746,11 @@ void from_json(const json& j, VarKeys& val)
 void to_json(json& j, const VarKeys& val)
 {
 	j["Enabled X88"] = val.enabledX88Menu;
-	j["Aimbot"] = val.aimbot;
+	j["X88"] = val.x88Toggle;
+	//j["Aimbot"] = val.aimbot;
 	j["Menu"] = val.menu;
 	j["Panic"] = val.panic;
 	j["Logs"] = val.console;
-	j["Freelook"] = val.freeLook;
 	j["MirrorCam"] = val.mirrorCam;
 	j["FreeCam"] = val.freeCam;
 	j["FlashLight"] = val.flashLight;
@@ -795,10 +791,8 @@ void from_json(const json& j, VarMisc& val)
 	from_json(j["Radar"], *val.radar);
 	from_json(j["Trail"], *val.trail);
 	from_json(j["Nades"], *val.nade);
-	from_json(j["Hat"], *val.hat);
 	from_json(j["Discord"], *val.discord);
 	from_json(j["MotionBlur"], *val.motionBlur);
-	from_json(j["FreeLook"], *val.freeLook);
 	from_json(j["MirrorCam"], *val.mirrorCam);
 	from_json(j["FreeCam"], *val.freeCam);
 	from_json(j["Flashlight"], *val.flashLight);
@@ -823,10 +817,8 @@ void to_json(json& j, const VarMisc& val)
 	to_json(j["Radar"], *val.radar);
 	to_json(j["Trail"], *val.trail);
 	to_json(j["Nades"], *val.nade);
-	to_json(j["Hat"], *val.hat);
 	to_json(j["Discord"], *val.discord);
 	to_json(j["MotionBlur"], *val.motionBlur);
-	to_json(j["FreeLook"], *val.freeLook);
 	to_json(j["MirrorCam"], *val.mirrorCam);
 	to_json(j["FreeCam"], *val.freeCam);
 	to_json(j["Flashlight"], *val.flashLight);
@@ -1020,41 +1012,37 @@ void from_json(const json& j, VarMisc::VarRadar& val)
 	from_json(j, "Length", val.length);
 	from_json(j, "Scale", val.scale);
 	from_json(j, "Ranges", val.ranges);
-	from_json(j, "Size", val.size);
 }
 
 void to_json(json& j, const VarMisc::VarRadar& val)
 {
 	j["Enabled"] = val.enabled;
-	j["Line"]= val.colorLine;
-	j["Player"]= val.colorPlayer;
+	j["Line"] = val.colorLine;
+	j["Player"] = val.colorPlayer;
 	j["Thickness"] = val.thickness;
 	j["Length"] = val.length;
 	j["Scale"] = val.scale;
 	j["Ranges"] = val.ranges;
-	j["Size"] = val.size;
 }
 
 void from_json(const json& j, VarMisc::VarTrail& val)
 {
 	from_json(j, "Enabled", val.enabled);
 	from_json(j, "Mode", val.mode);
-	from_json(j["Color"], val.color);
-	from_json(j, "Rainbow Col", val.rainbow);
-	from_json(j, "Speed", val.rainbowSpeed);
-	from_json(j, "Beam Speed", val.beamSpeed);
-	from_json(j, "Life", val.time);
+	from_json(j["Beam"], val.beam);
+	from_json(j["Color line"], val.colorLine);
+	from_json(j, "Line life", val.lineLife);
+	from_json(j["Color splash"], val.colorSplash);
 }
 
 void to_json(json& j, const VarMisc::VarTrail& val)
 {
 	j["Enabled"] = val.enabled;
 	j["Mode"] = val.mode;
-	j["Color"]= val.color;
-	j["Rainbow Col"] = val.rainbow;
-	j["Speed"] = val.rainbowSpeed;
-	j["Beam Speed"] = val.beamSpeed;
-	j["Life"] = val.time;
+	j["Beam"]= val.beam;
+	j["Color line"]= val.colorLine;
+	j["Line life"]= val.lineLife;
+	j["Color splash"]= val.colorSplash;
 }
 
 void from_json(const json& j, VarMisc::VarNades& val)
@@ -1081,32 +1069,6 @@ void to_json(json& j, const VarMisc::VarNades& val)
 	j["TracerLine"]= val.colorTracer;
 	j["Tracer distance"] = val.tracerDist;
 	j["Tracer warning"] = val.tracerWarn;
-}
-
-void from_json(const json& j, VarMisc::VarHat& val)
-{
-	from_json(j, "Enable", val.enabled);
-	from_json(j, "Enable rainbow", val.rainbow);
-	from_json(j, "Speed", val.rainbowSpeed);
-	from_json(j, "Size", val.size);
-	from_json(j, "Radius", val.radius);
-	from_json(j, "Triangle alpha", val.rainbowAlpha);
-	from_json(j, "Line alpha", val.rainbowLinesAlpha);
-	from_json(j["Triangle"], val.colorTriangle);
-	from_json(j["Line"], val.colorLine);
-}
-
-void to_json(json& j, const VarMisc::VarHat& val)
-{
-	j["Enable"] = val.enabled;
-	j["Enable rainbow"] = val.rainbow;
-	j["Speed"] = val.rainbowSpeed;
-	j["Size"] = val.size;
-	j["Radius"] = val.radius;
-	j["Triangle alpha"] = val.rainbowAlpha;
-	j["Line alpha"] = val.rainbowLinesAlpha;
-	j["Triangle"]= val.colorTriangle;
-	j["Line"]= val.colorLine;
 }
 
 void from_json(const json& j, VarMisc::VarDiscord& val)
@@ -1141,16 +1103,6 @@ void to_json(json& j, const VarMisc::VarMotionBlur& val)
 	j["Strength"] = val.strength;
 	j["Rotation Intensity"] = val.rotationIntensity;
 	j["Roll Intensity"] = val.rollIntensity;
-}
-
-void from_json(const json& j, VarMisc::VarFreeLook& val)
-{
-	from_json(j, "Enable", val.enabled);
-}
-
-void to_json(json& j, const VarMisc::VarFreeLook& val)
-{
-	j["Enable"] = val.enabled;
 }
 
 void from_json(const json& j, VarMisc::VarMirrorCam& val)
@@ -1218,10 +1170,6 @@ void from_json(const json& j, VarStyling& val)
 	from_json(j["ImGuiStyling"], val.imStyle);
 	from_json(j["GroupPanel Colors"], val.groupPanelBackground);
 	from_json(j["GroupPanel Line"], val.groupPanelLines);
-	from_json(j["SmoothAlpha"], val.smoothAlpha);
-	from_json(j["SmoothOutline"], val.smoothOutline);
-	from_json(j["SmoothPop"], val.smoothPop);
-	from_json(j["SmoothMove"], val.speedMove);
 }
 
 void to_json(json& j, const VarStyling& val)
@@ -1237,10 +1185,6 @@ void to_json(json& j, const VarStyling& val)
 	j["ImGuiStyling"] = val.imStyle;
 	j["GroupPanel Colors"] = val.groupPanelBackground;
 	j["GroupPanel Line"] = val.groupPanelLines;
-	j["SmoothAlpha"] = val.smoothAlpha;
-	j["SmoothOutline"] = val.smoothOutline;
-	j["SmoothPop"] = val.smoothPop;
-	j["SmoothMove"] = val.speedMove;
 }
 
 void from_json(const json& j, ImVec2& val)

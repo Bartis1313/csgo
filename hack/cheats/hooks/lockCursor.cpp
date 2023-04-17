@@ -6,7 +6,7 @@
 
 hooks::lockCursor::value FASTCALL hooks::lockCursor::hooked(FAST_ARGS)
 {
-	if (menu.isMenuActive())
+	if (g_ImGuiMenu->isMenuActive())
 	{
 		memory::interfaces::surface->unlockCursor();
 		return;

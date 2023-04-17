@@ -32,6 +32,7 @@ public:
 protected:
 	virtual void run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix) override;
 private:
+	virtual void init();
 	virtual void initMaterials();
 
 	void overrideChams(int styles, bool ignore, bool wireframe, const Color& color, bool force = true, bool call = true);

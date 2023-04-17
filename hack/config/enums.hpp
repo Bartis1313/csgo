@@ -125,3 +125,9 @@ enum class GlowRenderPulse
 	RIM,
 	EDGE
 };
+
+enum class RadarMode
+{
+	TRIANGLE,
+	CIRCLE
+};

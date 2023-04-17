@@ -4,15 +4,15 @@
 
 struct CfgBeam
 {
-	int index;
-	std::string flags;
-	float life;
-	CfgColor color;
-	float width;
-	float fadeLength;
-	float amplitude;
-	float speed;
-	float startFrame;
-	float frameRate;
-	int segments;
+	int index{ 0 };
+	std::string flags{ "4" };
+	float life{ 2.0f };
+	CfgColor color{ Colors::LightBlue };
+	float width{ 2.0f };
+	float fadeLength{ 1.0f };
+	float amplitude{ 2.0f };
+	float speed{ 0.0f };
+	float startFrame{ 0.0f };
+	float frameRate{ 0.0f };
+	int segments{ 2 };
 };

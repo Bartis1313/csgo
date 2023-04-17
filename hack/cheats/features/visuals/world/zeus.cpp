@@ -36,8 +36,8 @@ void ZeusDraw::draw()
 		Color color = vars::visuals->world->zeus->color();
 
 		if (vars::visuals->world->zeus->tracing)
-			imRender.drawCircle3DTraced(abs, range, 32, game::localPlayer(), color, true, 2.5f);
+			ImRender::drawCircle3DTraced(abs, range, 32, game::localPlayer(), color, true, 2.5f);
 		else
-			imRender.drawCircle3D(abs, range, 32, color, true, 2.0f);
+			ImRender::drawCircle3D(abs, range, 32, color, true, 2.0f);
 	}
 }

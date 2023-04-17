@@ -48,5 +48,5 @@ public:
 	}
 	constexpr std::vector<std::pair<X88Pair, Limits>> getVars() const { return m_vars; }
 private:
-	std::vector<std::pair<X88Pair, Limits>> m_vars;
+	std::vector<std::pair<X88Pair, Limits>> m_vars{ };
 };

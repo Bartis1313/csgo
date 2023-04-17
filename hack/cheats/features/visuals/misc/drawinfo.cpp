@@ -60,6 +60,8 @@ void MiscInfo::draw()
 		ImGui::PopStyleColor();
 	};
 
+	// bulletlist - m_allHits is done because bulletlist contain hits too
+
 	if (ImGui::Begin("##info", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoTitleBar
 		| ImGuiWindowFlags_NoResize | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoScrollbar))
 	{
@@ -78,14 +80,14 @@ void MiscInfo::draw()
 		text(std::format("KD {:.2f} KPM: {:.2f}", kd, kpm), Colors::Yellow);
 		text(std::format("Ping {}", game::localPlayer->getPing()), Colors::Yellow);
 		float accuracy = game::localPlayer->m_vecBulletVerifyListClient().m_size
-			? (static_cast<float>(m_allHits) / static_cast<float>(game::localPlayer->m_vecBulletVerifyListClient().m_size)) * 100.0f
+			? (static_cast<float>(m_allHits) / static_cast<float>(game::localPlayer->m_vecBulletVerifyListClient().m_size - m_allHits)) * 100.0f
 			: 0.0f;
 		float fixedKills = game::localPlayer->getKills() ? game::localPlayer->getKills() : 1.0f;
 		float hs = game::localPlayer->m_iNumRoundKillsHeadshots()
 			? (static_cast<float>(game::localPlayer->m_iNumRoundKillsHeadshots()) / fixedKills) * 100.0f
 			: 0.0f;
 		text(std::format("Accuracy [{} / {}] {:.2f}% HS {:.2f}%",
-			m_allHits, game::localPlayer->m_vecBulletVerifyListClient().m_size, accuracy, hs), Colors::Yellow);
+			m_allHits, game::localPlayer->m_vecBulletVerifyListClient().m_size - m_allHits, accuracy, hs), Colors::Yellow);
 
 		ImGui::End();
 	}

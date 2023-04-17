@@ -11,11 +11,6 @@
 #include <cheats/features/events/events.hpp>
 #include <cheats/game/globals.hpp>
 
-void Logger::init()
-{
-	events::add("player_hurt", std::bind(&Logger::handleHits, this, std::placeholders::_1));
-}
-
 void Logger::add(const Log_t& log)
 {
 	if (!vars::misc->logs->enabled)
@@ -54,7 +49,7 @@ void Logger::draw()
 		}
 
 		drawing::Text text{ el.m_font, ImVec2{ x, y }, Color::U32(el.m_color.getColorEditAlpha(alpha)), el.m_text, false, false };
-		text.draw(ImGui::GetBackgroundDrawList());
+		text.draw(ImGui::GetForegroundDrawList());
 
 		i++;
 	}
@@ -106,6 +101,6 @@ void Logger::handleHits(IGameEvent* event)
 			.m_text = std::format("Hit {} for [{} hp {}hp left] dmg in {}", ent->getName(), dmg_health, health, hitGroupToStr()),
 			.m_color = Colors::Cyan,
 			.m_timeLog = memory::interfaces::globalVars->m_curtime,
-			.m_font = ImFonts::tahoma14
+			.m_font = ImRender::fonts::tahoma14
 		});
 }

@@ -10,6 +10,10 @@
 #include <utilities/inputSystem.hpp>
 #include <magic_enum.hpp>
 
+static void drawText(float x, float y, ImFont* font, const std::string& text, const Color& color)
+{
+	drawing::Text{ font, ImVec2{ x, y }, Color::U32(color), text, false, false }.draw(ImGui::GetBackgroundDrawList());
+}
 
 void X88Menu::draw()
 {
@@ -21,68 +25,64 @@ void X88Menu::draw()
 
 	const static Color highlight = Colors::Grey.getColorEditAlpha(0.85f);
 	const static Color normal = Colors::White;
-	const static auto font = fonts::tahoma;
+	const static auto font = ImRender::fonts::csgoTahoma15;
 
-	int x = static_cast<int>(globals::screenX * 0.2f);
-	int y = 20;
+	float x = globals::screenX * 0.2f;
+	float y = 20.0f;
 
-	// start
 	if (!game::localPlayer)
 	{
-		surfaceRender.text(x, y, font, "Hello undefined :)", false, Colors::Yellow);
-		// going to hardcode the padding for this
-		y += 15;
+		drawText(x, y, font, "Hello undefined :)", Colors::Yellow);
+		y += font->FontSize;
 	}
 	else
 	{
-		surfaceRender.text(x, y, font,
-			std::format("Hello {} :) Local Player {:#0x}", game::localPlayer->getName(), game::localPlayer->getLiteralAddress()),
-			false, Colors::Yellow);
-		y += 15;
+		drawText(x, y, font, std::format("Hello {} :) Local Player {:#0x}", game::localPlayer->getName(), game::localPlayer->getLiteralAddress()), Colors::Yellow);
+		y += font->FontSize;
 	}
 
-	int yBackup = y;
-	
+	const float yBackup = y;
+
 	for (size_t i = 0; const auto& [x88p, limits] : x88types.getVars())
 	{
-		Color color = index == i ? highlight : normal;
+		Color color = normal;
+		if (vars::keys->x88Toggle.isToggled())
+		{
+			if (index == i)
+				color = highlight;
+		}
 
 		if (!(i % 10) && i != 0)
 		{
-			x += 150; // hardcode
+			x += 150.0f; // hardcode
 			y = yBackup;
 		}
 
-		auto value = x88p.second;
+		const auto value = x88p.second;
 		const auto& name = x88p.first;
 
-		auto vecSize = surfaceRender.getTextSizeXY(font, name);
-		auto vecX = static_cast<int>(vecSize[Coord::X]);
-		auto vecY = static_cast<int>(vecSize[Coord::Y]);
+		const auto vecSize = ImRender::getTextSize(font, font->FontSize, name);
 
 		if (std::holds_alternative<bool*>(value))
 		{
 			auto val = *std::get<bool*>(value);
 			Color active = val ? Colors::LightBlue : Colors::White;
 
-			surfaceRender.text(x, y, font, name, false, color);
-			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
-				std::format("{}", val), false, active);
-			y += vecY;
+			drawText(x, y, font, name, color);
+			drawText(x + addSpaces(name) + vecSize.x, y, font, std::format("{}", val), active);
+			y += vecSize.y;
 		}
 		else if(std::holds_alternative<int*>(value))
 		{
-			surfaceRender.text(x, y, font, name, false, color);
-			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
-				std::format("{}", *std::get<int*>(value)), false, color);
-			y += vecY;
+			drawText(x, y, font, name, color);
+			drawText(x + addSpaces(name) + vecSize.x, y, font, std::format("{}", *std::get<int*>(value)), color);
+			y += vecSize.y;
 		}
 		else if (std::holds_alternative<float*>(value))
 		{
-			surfaceRender.text(x, y, font, name, false, color);
-			surfaceRender.text(x + addSpaces(name) + vecX, y, font,
-				std::format("{:.2f}", *std::get<float*>(value)), false, color);
-			y += vecY;
+			drawText(x, y, font, name, color);
+			drawText(x + addSpaces(name) + vecSize.x, y, font, std::format("{:.2f}", *std::get<float*>(value)), color);
+			y += vecSize.y;
 		}
 
 		i++;
@@ -90,7 +90,7 @@ void X88Menu::draw()
 
 }
 
-void X88Menu::init()
+void X88Menu::setStyles()
 {
 	x88types.push("Chams", &vars::visuals->chams->indexPlayers, magic_enum::enum_count<ChamsType>() - 1);
 	x88types.push("ESP", &vars::visuals->esp->boxes->enabled);
@@ -107,7 +107,7 @@ void X88Menu::init()
 	size_t longest = 0;
 	for (const auto& [x88p, limits] : x88types.getVars())
 	{
-		if (auto size = static_cast<size_t>(surfaceRender.getTextSizeXY(fonts::tahoma, x88p.first)[Coord::X]); size > longest)
+		if (auto size = static_cast<size_t>(ImRender::getTextSize(ImRender::fonts::csgoTahoma15, ImRender::fonts::csgoTahoma15->FontSize, x88p.first).x); size > longest)
 			longest = size;
 	}
 	m_longestNameSize = longest;
@@ -118,13 +118,18 @@ void X88Menu::init()
 size_t X88Menu::addSpaces(const std::string& text)
 {
 	// 5px added to align them well for max size
-	auto size = (m_longestNameSize + 5) - surfaceRender.getTextSizeXY(fonts::tahoma, text)[Coord::X];
+	auto size = (m_longestNameSize + 5) - ImRender::getTextSize(ImRender::fonts::csgoTahoma15, ImRender::fonts::csgoTahoma15->FontSize, text).x;
 	return static_cast<size_t>(size);
 }
 
 void X88Menu::updateKeys()
 {
 	if (!vars::keys->enabledX88Menu)
+		return;
+
+	vars::keys->x88Toggle.update();
+
+	if (!vars::keys->x88Toggle.isToggled())
 		return;
 
 	if (!m_inited)

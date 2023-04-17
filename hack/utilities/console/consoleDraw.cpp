@@ -3,7 +3,6 @@
 
 #include <render/Color.hpp>
 #include <utilities/tools/tools.hpp>
-#include <menu/GUI-ImGui/animations.hpp>
 
 void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 {
@@ -16,11 +15,11 @@ void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 	filter.Draw("Filter");
 
 	ImGui::SameLine();
-	bool clear = ImGui::Animations::Button("Clear");
+	bool clear = ImGui::Button("Clear");
 	ImGui::SameLine();
-	bool copy = ImGui::Animations::Button("Copy");
+	bool copy = ImGui::Button("Copy");
 	ImGui::SameLine();
-	if (ImGui::Animations::Button("Wrap"))
+	if (ImGui::Button("Wrap"))
 		wrap = !wrap;
 
 	ImGui::Spacing();

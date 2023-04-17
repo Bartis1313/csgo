@@ -3,6 +3,8 @@
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/IViewRenderBeams.hpp>
 #include <SDK/IEffects.hpp>
+#include <SDK/material.hpp>
+#include <SDK/IMaterialSystem.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <gamememory/memory.hpp>
 #include <cheats/game/game.hpp>
@@ -11,6 +13,7 @@
 #include <render/render.hpp>
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
+#include <menu/GUI-ImGui/selections.hpp>
 
 void Trails::draw()
 {
@@ -22,45 +25,46 @@ void Trails::draw()
 	if (!vars::misc->trail->enabled)
 		return;
 
-	const Color color = vars::misc->trail->color();
-
 	switch (type)
 	{
 	case E2T(MovementTrail::BEAM):
 	{
 		if (!game::localPlayer->isMoving())
 			return;
+		
+		// we will use vecorigin for trails, absorigin updates too often
+		static Vec3 end = game::localPlayer->m_vecOrigin();
+		const Vec3 start = game::localPlayer->m_vecOrigin();
 
-		static Vec3 end = game::localPlayer->absOrigin();
-		const Vec3 start = game::localPlayer->absOrigin();
+		CfgBeam cfgbeam = vars::misc->trail->beam;
 
 		BeamInfo_t info = {};
 
+		// or create a beam follow, I ended up displaying nothing
 		info.m_type = TE_BEAMPOINTS;
-		info.m_modelName = "sprites/purplelaser1.vmt";
+		info.m_modelName = selections::beamNames.at(cfgbeam.index);
 		info.m_modelIndex = -1;
-		info.m_vecStart = start;
-		info.m_vecEnd = end;
 		info.m_haloIndex = -1;
 		info.m_haloScale = 0.0f;
-		info.m_life = vars::misc->trail->time;
-		info.m_width = 5.0f;
-		info.m_endWidth = 5.0f;
-		info.m_fadeLength = 0.0f;
-		info.m_amplitude = 2.0;
-		info.m_brightness = 255.0f;
-		info.m_red = color.rMultiplied();
-		info.m_green = color.gMultiplied();
-		info.m_blue = color.bMultiplied();
-		info.m_speed = vars::misc->trail->beamSpeed;
-		info.m_startFrame = 0;
-		info.m_frameRate = 0.0f;
-		info.m_segments = 2;
+		info.m_life = cfgbeam.life;
+		info.m_width = cfgbeam.width;
+		info.m_endWidth = cfgbeam.width;
+		info.m_fadeLength = cfgbeam.fadeLength;
+		info.m_amplitude = cfgbeam.amplitude;
+		info.m_red = cfgbeam.color().rMultiplied();
+		info.m_green = cfgbeam.color().gMultiplied();
+		info.m_blue = cfgbeam.color().bMultiplied();
+		info.m_brightness = cfgbeam.color().aMultiplied();
+		info.m_speed = cfgbeam.speed;
+		info.m_startFrame = static_cast<int>(cfgbeam.startFrame);
+		info.m_frameRate = cfgbeam.frameRate;
+		info.m_vecStart = start;
+		info.m_vecEnd = end;
+		info.m_segments = cfgbeam.segments;
 		info.m_renderable = true;
 
-		auto myBeam = memory::interfaces::beams->createBeamPoints(info);
+		memory::interfaces::beams->createBeamPoints(info);
 
-		// change to pos after beam is drawn, since it's static it's possible
 		end = start;
 
 		break;
@@ -69,7 +73,7 @@ void Trails::draw()
 	{
 		if (game::localPlayer->isMoving())
 			m_trails.emplace_back(game::localPlayer->m_vecOrigin(),
-				memory::interfaces::globalVars->m_curtime + vars::misc->trail->time, color);
+				memory::interfaces::globalVars->m_curtime + vars::misc->trail->lineLife);
 
 		std::vector<ImVec2> points;
 		for (size_t i = 0; const auto & el : m_trails)
@@ -80,19 +84,23 @@ void Trails::draw()
 				continue;
 			}
 
-			if (ImVec2 screen; imRender.worldToScreen(el.m_pos, screen))
+			if (ImVec2 screen; ImRender::worldToScreen(el.m_pos, screen))
 				points.push_back(screen);
 
 			i++;
 		}
 
 		if (!points.empty())
-			imRender.drawPolyLine(points, color, 0, 2.0f);
+			ImRender::drawPolyLine(points, vars::misc->trail->colorLine(), 0, 2.0f);
 
 		break;
 	}
 	case E2T(MovementTrail::SPLASH):
 	{
+		static auto spark = memory::interfaces::matSys->findMaterial("effects/spark", TEXTURE_GROUP_PARTICLE);
+		if (spark)
+			spark->modulateAllColor(vars::misc->trail->colorSplash());
+
 		if (game::localPlayer->isMoving())
 			memory::interfaces::effects->energySplash(game::localPlayer->m_vecOrigin(),
 				 game::localPlayer->m_angEyeAngles() * (game::localPlayer->m_vecVelocity().length() / game::localPlayer->m_flMaxspeed()), true);

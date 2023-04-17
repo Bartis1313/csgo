@@ -162,6 +162,23 @@ namespace drawing
 		ImU32 m_color;
 	};
 
+	class TriangleMultiColor : public Draw
+	{
+	public:
+		constexpr TriangleMultiColor(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, ImU32 color1, ImU32 color2, ImU32 color3)
+			: m_p1{ p1 }, m_p2{ p2 }, m_p3{ p3 }, m_color1{ color1 }, m_color2{ color2 }, m_color3{ color3 }
+		{}
+
+		virtual void draw(ImDrawList* draw) const override;
+	private:
+		ImVec2 m_p1;
+		ImVec2 m_p2;
+		ImVec2 m_p3;
+		ImU32 m_color1;
+		ImU32 m_color2;
+		ImU32 m_color3;
+	};
+
 	class Quad : public Draw
 	{
 	public:

@@ -1,6 +1,6 @@
 #include "setup.hpp"
 
-#include "SEHcatch.hpp"
+#include "seh.hpp"
 
 #include <config/vars.hpp>
 #include <utilities/console/console.hpp>
@@ -8,7 +8,7 @@
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/simpleTimer.hpp>
 #include <SDK/helpers/netvars.hpp>
-#include <render/render.hpp>
+#include <render/backend/backend.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/x88Menu/x88menu.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
@@ -28,11 +28,17 @@
 #include <chrono>
 #include <Windows.h>
 
+#define STACK_TRACE 0
+
 DiscordPresence Setup::m_dc;
 
 bool Setup::init(void* instance)
 {
-	//AddVectoredExceptionHandler(0, handler);
+#if STACK_TRACE == 1
+	AddVectoredExceptionHandler(TRUE, SEH::CATCH);
+#endif
+
+	console::info("Hack start, {} {}", __DATE__, __TIME__);
 
 	TimeCount initTimer{};
 	// might need to rewrite this later with setting those names
@@ -42,11 +48,8 @@ bool Setup::init(void* instance)
 	{
 		config.init("default.cfg", "load.LOAD", "utility");
 		memory::init();
-		netvarMan.init();
 		wndProcSys::init();
 		BaseHack::initAll();
-		surfaceRender.init();
-		x88menu.init();
 		hooks::init();
 		EntityCache::init();
 	}
@@ -58,7 +61,7 @@ bool Setup::init(void* instance)
 	}
 
 	initTimer.end();
-	console::debug("main thread took {:.5f}s", initTimer.getTime());
+	console::info("Main thread took {:.5f}s", initTimer.getTime());
 	m_inited = true;
 
 	return true;
@@ -68,13 +71,17 @@ void Setup::shutdown(void* instance)
 {
 	globals::isShutdown = true;
 
-	//RemoveVectoredExceptionHandler(globals::instance);
+#if STACK_TRACE == 1
+	RemoveVectoredExceptionHandler(globals::instance);
+#endif
+
 	wndProcSys::shutdown();
 	BaseHack::shutdownAll();
 	Resource::destroyAll();
 	events::shutdown();
 	hooks::shutdown();
-	menu.shutdown();
+	// doing this after hooks shutdown very unlikely will throw those ctx nullptr errors
+	renderbackend::shutdown();
 	console::info("Hack shutdown");
 	console::shutdown();
 	m_dc.shutdown();

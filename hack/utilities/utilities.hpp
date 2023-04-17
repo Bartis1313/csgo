@@ -24,4 +24,5 @@ namespace utilities
     [[deprecated("use key classes")]]
     uint32_t getKey(const uint32_t vKey);
     [[nodiscard]] std::string u8toStr(const std::u8string& u8str);
+    [[nodiscard]] int convertStringToFlag(const std::string& flag);
 }

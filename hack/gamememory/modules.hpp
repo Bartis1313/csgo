@@ -14,4 +14,4 @@
 #define PANORAMA_DLL				"panorama.dll"
 #define FILESYS_DLL					"filesystem_stdio.dll"
 #define DATACACHE_DLL				"datacache.dll"
-#define SERVER_DLL					"server.dll"
+#define GAME_OVERLAY				"gameoverlayrenderer.dll"

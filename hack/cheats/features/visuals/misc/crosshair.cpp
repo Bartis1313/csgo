@@ -15,6 +15,7 @@
 
 void Crosshair::init()
 {
+	m_crosshair = memory::interfaces::cvar->findVar("crosshair");
 	m_crosshairRecoil = memory::interfaces::cvar->findVar("cl_crosshair_recoil");
 	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
 }
@@ -22,11 +23,20 @@ void Crosshair::init()
 void Crosshair::draw()
 {
 	int cfgCross = vars::misc->crosshair->index;
+	if(!m_crosshair->getInt())
+		m_crosshair->setValue(true);
 
-	m_crosshairRecoil->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
+	if (m_crosshairRecoil->getInt())
+		m_crosshairRecoil->setValue(false);
 
 	if (!cfgCross)
 		return;
+
+	m_crosshairRecoil->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
+	if (m_crosshairRecoil->getInt())
+		m_crosshair->setValue(true);
+	else
+		m_crosshair->setValue(false);
 
 	if (!game::localPlayer)
 		return;
@@ -62,37 +72,37 @@ void Crosshair::draw()
 	{
 		float moveCross = 8.0f;
 
-		imRender.drawLine(x - moveCross, y, x + moveCross, y, Colors::Black, 3.0f);
-		imRender.drawLine(x, y - moveCross, x, y + moveCross, Colors::Black, 3.0f);
+		ImRender::drawLine(x - moveCross, y, x + moveCross, y, Colors::Black, 3.0f);
+		ImRender::drawLine(x, y - moveCross, x, y + moveCross, Colors::Black, 3.0f);
 
 		moveCross -= 1.5f;
 
-		imRender.drawLine(x - moveCross, y, x + moveCross, y, Colors::LightBlue, 1.0f);
-		imRender.drawLine(x, y - moveCross, x, y + moveCross, Colors::LightBlue, 1.0f);
+		ImRender::drawLine(x - moveCross, y, x + moveCross, y, Colors::LightBlue, 1.0f);
+		ImRender::drawLine(x, y - moveCross, x, y + moveCross, Colors::LightBlue, 1.0f);
 		break;
 	}
 	case E2T(CrossHairTypes::RECOIL):
 	{
-		if (ImVec2 endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
+		if (ImVec2 endScreen; ImRender::worldToScreen(getPunchPos(), endScreen))
 		{
 			float x = endScreen.x;
 			float y = endScreen.y;
 
 			float moveCross = 8.0f;
 
-			imRender.drawLine(x - moveCross, y, x + moveCross, y, Colors::Black, 3.0f);
-			imRender.drawLine(x, y - moveCross, x, y + moveCross, Colors::Black, 3.0f);
+			ImRender::drawLine(x - moveCross, y, x + moveCross, y, Colors::Black, 3.0f);
+			ImRender::drawLine(x, y - moveCross, x, y + moveCross, Colors::Black, 3.0f);
 
 			moveCross -= 1.5f;
 
-			imRender.drawLine(x - moveCross, y, x + moveCross, y, Colors::LightBlue, 1.0f);
-			imRender.drawLine(x, y - moveCross, x, y + moveCross, Colors::LightBlue, 1.0f);
+			ImRender::drawLine(x - moveCross, y, x + moveCross, y, Colors::LightBlue, 1.0f);
+			ImRender::drawLine(x, y - moveCross, x, y + moveCross, Colors::LightBlue, 1.0f);
 		}
 		break;
 	}
 	case E2T(CrossHairTypes::SPREAD):
 	{
-		if (ImVec2 endScreen; imRender.worldToScreen(getPunchPos(), endScreen))
+		if (ImVec2 endScreen; ImRender::worldToScreen(getPunchPos(), endScreen))
 		{
 			// this is game's logic how to do it
 			/*float spread = weapon->getSpread();
@@ -107,12 +117,18 @@ void Crosshair::draw()
 			float x = endScreen.x;
 			float y = endScreen.y;
 
-			imRender.drawCircle(x, y, radiusSpread, 32, Colors::Black);
-			imRender.drawCircleFilled(x, y, radiusSpread, 32, Colors::LightBlue.getColorEditAlpha(0.2f));
+			ImRender::drawCircle(x, y, radiusSpread, 32, Colors::Black);
+			ImRender::drawCircleFilled(x, y, radiusSpread, 32, Colors::LightBlue.getColorEditAlpha(0.2f));
 		}
 		break;
 	}
 	default:
 		break;
 	}
+}
+
+void Crosshair::shutdown()
+{
+	m_crosshair->setValue(true);
+	m_crosshairRecoil->setValue(false);
 }

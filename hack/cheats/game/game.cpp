@@ -123,45 +123,6 @@ Vec3 game::getViewAngles()
 	return ret;
 }
 
-#include <SDK/CGameMovement.hpp>
-#include <SDK/IWeapon.hpp>
-
-Vec3 game::getFixedPunch()
-{
-	static auto prevPunch = Vec3{};
-	if (!game::localPlayer->getActiveWeapon())
-		return game::localPlayer->m_aimPunchAngle();
-
-	float time = game::localPlayer->getActiveWeapon()->m_flNextPrimaryAttack() - memory::interfaces::globalVars->m_curtime;
-	int ticks = timeToTicks(time);
-
-	const auto& punchNow = game::localPlayer->m_aimPunchAngle();
-
-	if (ticks <= 0)
-		prevPunch = punchNow;
-	else
-	{
-		for (int i = 0; i < ticks; i++)
-		{
-			memory::interfaces::gameMovement->decayAimPunchAngle();
-		}
-	}
-
-	auto& decayed = game::localPlayer->m_aimPunchAngle();
-	game::localPlayer->m_aimPunchAngle() = punchNow;
-
-	if (const auto info = game::localPlayer->getActiveWeapon()->getWpnInfo())
-	{
-		const float lerped = std::clamp(time / info->m_cycleTime, 0.0f, 1.0f);
-
-		printf("lerped %f\n", lerped);
-
-		decayed = prevPunch.lerp(decayed, lerped);
-	}
-
-	return decayed;
-}
-
 #include <d3d9.h>
 #include <d3dx9.h>
 #include <unordered_map>

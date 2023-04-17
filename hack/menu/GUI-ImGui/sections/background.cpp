@@ -1,6 +1,6 @@
 #include "background.hpp"
 
-#include "menu.hpp"
+#include "../menu.hpp"
 
 #include <imgui.h>
 #include <cheats/game/globals.hpp>
@@ -58,6 +58,22 @@ void Background::pushRandomPoints()
 
 void Background::update(ParticlePoint_t& particle)
 {
+	// not working perfectly
+	/*const auto circlePos = Vec2{ float(globals::mouseX), float(globals::mouseY) };
+	float distToCircle = particle.m_pos.distTo(circlePos);
+	float circleRadius = 60.0f;
+	drawCircleFilled(circlePos, circleRadius, 64, Colors::Green.getColorEditAlpha(0.1f));
+
+	if (distToCircle < circleRadius)
+	{
+		auto alp = (circleRadius - distToCircle) / circleRadius;
+
+		Vec2 dir = (particle.m_pos - circlePos) * alp;
+		particle.m_pos += dir * (circleRadius - distToCircle) * 1.2f;
+
+		particle.m_move = particle.m_move * -1.0f;
+	}*/
+
 	if (particle.m_pos[Coord::X] > globals::screenX || particle.m_pos[Coord::X] < 0)
 		particle.m_move[Coord::X] = -particle.m_move[Coord::X];
 
@@ -86,7 +102,7 @@ void Background::draw()
 
 	m_draw = ImGui::GetBackgroundDrawList();
 
-	if (!menu.isMenuActive())
+	if (!g_ImGuiMenu->isMenuActive())
 		return;
 
 	if (!vars::styling->background)

@@ -58,5 +58,6 @@ namespace selections
 		"sprites/purplelaser1.vmt",
 		"sprites/radio.vmt",
 		"sprites/white.vmt",
+		"sprites/laserbeam.vmt"
 	};
 }

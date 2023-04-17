@@ -102,3 +102,18 @@ std::string utilities::u8toStr(const std::u8string& u8str)
 {
 	return std::string{ u8str.cbegin(), u8str.cend() };
 }
+
+int utilities::convertStringToFlag(const std::string& flag)
+{
+	std::string fixed{ flag };
+	fixed.erase(std::remove(fixed.begin(), fixed.end(), ' '), fixed.end());
+	int ret{ 0 };
+	for (const auto& el : std::views::split(fixed, '|'))
+	{
+		const std::string v{ el.begin(), el.end() };
+		const int num = std::stoi(v);
+		ret |= num;
+	}
+
+	return ret;
+}

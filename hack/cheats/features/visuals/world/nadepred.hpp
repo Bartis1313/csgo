@@ -23,13 +23,12 @@ public:
 		CreateMovePrePredictionType{}
 	{}
 
-	[[nodiscard]] int getButton() const { return m_button; }
 	[[nodiscard]] int getWeaponIdx() const { return m_weaponIdx; }
 protected:
 	virtual void run(CUserCmd* cmd);
 private:
 	void runView();
-	int m_button;
+	bool m_ready;
 	int m_weaponIdx;
 };
 

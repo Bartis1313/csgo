@@ -24,7 +24,6 @@ namespace vars { \
 struct VarAim
 {
 	std::array<CfgWeapon, magic_enum::enum_count<WeaponList>()> weapons;
-	bool useKey{ false };
 };
 USE_NAMESPACE_VARS(VarAim, aim);
 
@@ -355,11 +354,10 @@ USE_NAMESPACE_VARS(VarVisuals, visuals);
 struct VarKeys
 {
 	bool enabledX88Menu{ true };
-	Key aimbot{ KeyMode::DOWN, VK_LBUTTON };
+	Key x88Toggle{ KeyMode::TOGGLE, VK_F10 };
 	Key menu{ KeyMode::TOGGLE, VK_INSERT };
 	Key panic{ KeyMode::DOWN, VK_DELETE };
 	Key console{ KeyMode::TOGGLE, VK_HOME };
-	Key freeLook{ KeyMode::DOWN, VK_MENU };
 	Key mirrorCam{ KeyMode::TOGGLE, VK_F1 };
 	Key freeCam{ KeyMode::TOGGLE, VK_F2 };
 	Key flashLight{ KeyMode::TOGGLE, 0x4C }; // L key
@@ -489,7 +487,7 @@ struct VarMisc
 		float length{ 20.0f };
 		float scale{ 1.8f };
 		bool ranges{ true };
-		float size{ 200.0f };
+		int mode{ 0 };
 	};
 	ADD_MEMBER_PTR(VarRadar, radar);
 
@@ -497,11 +495,10 @@ struct VarMisc
 	{
 		int mode{ 0 };
 		bool enabled{ false };
-		CfgColor color{ Colors::Coral };
-		bool rainbow{ false };
-		float rainbowSpeed{ 3.0f };
-		float beamSpeed{ 2.0f };
-		float time{ 4.0f };
+		CfgBeam beam;
+		CfgColor colorLine;
+		float lineLife;
+		CfgColor colorSplash;
 	};
 	ADD_MEMBER_PTR(VarTrail, trail);
 
@@ -552,12 +549,6 @@ struct VarMisc
 	};
 	ADD_MEMBER_PTR(VarMotionBlur, motionBlur);
 
-	struct VarFreeLook
-	{
-		bool enabled{ false };
-	};
-	ADD_MEMBER_PTR(VarFreeLook, freeLook);
-
 	struct VarMirrorCam
 	{
 		bool enabled{ false };
@@ -589,9 +580,7 @@ struct VarMisc
 };
 USE_NAMESPACE_VARS(VarMisc, misc);
 
-struct ImGuiStyle;
-
-#include <imgui.h>
+#include <menu/GUI-ImGui/styles/styles.hpp>
 
 struct VarStyling
 {
@@ -603,13 +592,9 @@ struct VarStyling
 	CfgColor color1{ Color{ 220, 10, 100, 255 } };
 	CfgColor color2{ Color{ 65, 75, 105, 255 } };
 	CfgColor color3{ Color{ 220, 240, 240, 255 } };
-	ImGuiStyle imStyle;
-	std::array<CfgColor, 4> groupPanelBackground{ utilities::getFilledArray<CfgColor, 4>(Color{ 0, 140, 250, 0 }) };
+	ImGuiStyle imStyle{ styles::getCherryStyle().style };
+	std::array<CfgColor, 4> groupPanelBackground{ styles::getCherryStyle().extraColors };
 	CfgColor groupPanelLines{ Colors::White };
-	float smoothAlpha{ 0.1f };
-	float smoothOutline{ 0.1f };
-	float smoothPop{ 0.0f };
-	float speedMove{ 10.0f };
 };
 USE_NAMESPACE_VARS(VarStyling, styling);
 

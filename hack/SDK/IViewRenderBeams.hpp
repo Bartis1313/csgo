@@ -46,5 +46,6 @@ class IViewRenderBeams
 public:
 	VFUNC(void, drawBeam, 4, (Beam_t* beam), (this, beam));
 	VFUNC(Beam_t*, createBeamPoints, 12, (BeamInfo_t& beamInfo), (this, std::ref(beamInfo)));
-	VFUNC(Beam_t*, createRingPoint, 16, (BeamInfo_t& beamInfo), (this, std::ref(beamInfo)));
+	VFUNC(Beam_t*, createBeamRingPoint, 16, (BeamInfo_t& beamInfo), (this, std::ref(beamInfo)));
+	VFUNC(Beam_t*, createBeamFollow, 18, (BeamInfo_t& beamInfo), (this, std::ref(beamInfo)));
 };

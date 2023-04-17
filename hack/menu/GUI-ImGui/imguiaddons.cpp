@@ -130,7 +130,7 @@ void ImGui::BeginGroupPanel(const char* name, const ImVec2& size)
 	ImGui::BeginGroup();
 	ImGui::Dummy(ImVec2(frameHeight * 0.5f, 0.0f));
 	ImGui::SameLine(0.0f, 0.0f);
-	ImGui::PushFont(ImFonts::tahoma20);
+	ImGui::PushFont(ImRender::fonts::tahoma20);
 	ImGui::TextUnformatted(name);
 	ImGui::PopFont();
 	auto labelMin = ImGui::GetItemRectMin();
@@ -231,330 +231,6 @@ void ImGui::EndGroupPanel()
 	ImGui::EndGroup();
 }
 
-#include <config/vars.hpp>
-
-void ImGui::ShowStyleEditorCfg(ImGuiStyle* ref)
-{
-	// You can pass in a reference ImGuiStyle structure to compare to, revert to and save to
-	// (without a reference style pointer, we will use one compared locally as a reference)
-	ImGuiStyle& style = ImGui::GetStyle();
-	static ImGuiStyle ref_saved_style;
-	// ugly methods for custom colors, TODO: do own struct for this
-	static auto ref_saved_gradient = vars::styling->groupPanelBackground;
-	static auto ref_saved_color_panel_line = vars::styling->groupPanelLines;
-
-	// Default to using internal storage as reference
-	static bool init = true;
-	if (init && ref == NULL)
-		ref_saved_style = style;
-	init = false;
-	if (ref == NULL)
-		ref = &ref_saved_style;
-
-	ImGui::PushItemWidth(ImGui::GetWindowWidth() * 0.50f);
-
-	if (ImGui::ShowStyleSelector("Colors##Selector"))
-		ref_saved_style = style;
-	ImGui::ShowFontSelector("Fonts##Selector");
-
-	// Simplified Settings (expose floating-pointer border sizes as boolean representing 0.0f or 1.0f)
-	if (ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f"))
-		style.GrabRounding = style.FrameRounding; // Make GrabRounding always the same value as FrameRounding
-	ImGui::SliderFloat("Smooth alpha", &vars::styling->smoothAlpha, 0.0f, 1.0f);
-	ImGui::SliderFloat("Smooth outline", &vars::styling->smoothOutline, 0.0f, 1.0f);
-	ImGui::SliderFloat("Smooth pop", &vars::styling->smoothPop, 0.0f, 1.0f);
-	ImGui::SliderFloat("Speed move", &vars::styling->speedMove, 0.0f, 15.0f);
-	{ bool border = (style.WindowBorderSize > 0.0f); if (ImGui::Checkbox("WindowBorder", &border)) { style.WindowBorderSize = border ? 1.0f : 0.0f; } }
-	ImGui::SameLine();
-	{ bool border = (style.FrameBorderSize > 0.0f);  if (ImGui::Checkbox("FrameBorder", &border)) { style.FrameBorderSize = border ? 1.0f : 0.0f; } }
-	ImGui::SameLine();
-	{ bool border = (style.PopupBorderSize > 0.0f);  if (ImGui::Checkbox("PopupBorder", &border)) { style.PopupBorderSize = border ? 1.0f : 0.0f; } }
-
-	// Save/Revert button
-	if (ImGui::Button("Save Ref"))
-		*ref = ref_saved_style = style;
-	ImGui::SameLine();
-	if (ImGui::Button("Revert Ref"))
-		style = *ref;
-	ImGui::SameLine();
-	HelpMarker(
-		"Save/Revert in local non-persistent storage. Default Colors definition are not affected. "
-		"Use \"Export\" below to save them somewhere.");
-
-	ImGui::Separator();
-
-	if (ImGui::BeginTabBar("##tabs", ImGuiTabBarFlags_None))
-	{
-		if (ImGui::BeginTabItem("Sizes"))
-		{
-			bool changedbut = false; // small optimazation for stack. Won't be huge, just less copying
-			ImGui::Text("Main");
-			changedbut |= ImGui::SliderFloat2("WindowPadding", (float*)&style.WindowPadding, 0.0f, 20.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat2("FramePadding", (float*)&style.FramePadding, 0.0f, 20.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat2("CellPadding", (float*)&style.CellPadding, 0.0f, 20.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat2("ItemSpacing", (float*)&style.ItemSpacing, 0.0f, 20.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat2("ItemInnerSpacing", (float*)&style.ItemInnerSpacing, 0.0f, 20.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat2("TouchExtraPadding", (float*)&style.TouchExtraPadding, 0.0f, 10.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("IndentSpacing", &style.IndentSpacing, 0.0f, 30.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("ScrollbarSize", &style.ScrollbarSize, 1.0f, 20.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("GrabMinSize", &style.GrabMinSize, 1.0f, 20.0f, "%.0f");
-			ImGui::Text("Borders");
-			changedbut |= ImGui::SliderFloat("WindowBorderSize", &style.WindowBorderSize, 0.0f, 1.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("ChildBorderSize", &style.ChildBorderSize, 0.0f, 1.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("PopupBorderSize", &style.PopupBorderSize, 0.0f, 1.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("FrameBorderSize", &style.FrameBorderSize, 0.0f, 3.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("TabBorderSize", &style.TabBorderSize, 0.0f, 1.0f, "%.0f");
-			ImGui::Text("Rounding");
-			changedbut |= ImGui::SliderFloat("WindowRounding", &style.WindowRounding, 0.0f, 12.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("ChildRounding", &style.ChildRounding, 0.0f, 12.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("FrameRounding", &style.FrameRounding, 0.0f, 12.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("PopupRounding", &style.PopupRounding, 0.0f, 12.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("ScrollbarRounding", &style.ScrollbarRounding, 0.0f, 12.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("GrabRounding", &style.GrabRounding, 0.0f, 12.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("LogSliderDeadzone", &style.LogSliderDeadzone, 0.0f, 12.0f, "%.0f");
-			changedbut |= ImGui::SliderFloat("TabRounding", &style.TabRounding, 0.0f, 12.0f, "%.0f");
-			ImGui::Text("Alignment");
-			changedbut |= ImGui::SliderFloat2("WindowTitleAlign", (float*)&style.WindowTitleAlign, 0.0f, 1.0f, "%.2f");
-			int window_menu_button_position = style.WindowMenuButtonPosition + 1;
-			if (changedbut |= ImGui::Combo("WindowMenuButtonPosition", (int*)&window_menu_button_position, "None\0Left\0Right\0"))
-				style.WindowMenuButtonPosition = window_menu_button_position - 1;
-			changedbut |= ImGui::Combo("ColorButtonPosition", (int*)&style.ColorButtonPosition, "Left\0Right\0");
-			changedbut |= ImGui::SliderFloat2("ButtonTextAlign", (float*)&style.ButtonTextAlign, 0.0f, 1.0f, "%.2f");
-			ImGui::SameLine(); HelpMarker("Alignment applies when a button is larger than its text content.");
-			changedbut |= ImGui::SliderFloat2("SelectableTextAlign", (float*)&style.SelectableTextAlign, 0.0f, 1.0f, "%.2f");
-			ImGui::SameLine(); HelpMarker("Alignment applies when a selectable is larger than its text content.");
-			ImGui::Text("Safe Area Padding");
-			ImGui::SameLine(); HelpMarker("Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).");
-			changedbut |= ImGui::SliderFloat2("DisplaySafeAreaPadding", (float*)&style.DisplaySafeAreaPadding, 0.0f, 30.0f, "%.0f");
-			ImGui::EndTabItem();
-
-			if (changedbut)
-			{
-				// this should obvioulsy be in some struct, or just overwite varstyle = style. But then we would save unwanted stuff
-				vars::styling->imStyle.WindowPadding = style.WindowPadding;
-				vars::styling->imStyle.FramePadding = style.FramePadding;
-				vars::styling->imStyle.CellPadding = style.CellPadding;
-				vars::styling->imStyle.ItemSpacing = style.ItemSpacing;
-				vars::styling->imStyle.ItemInnerSpacing = style.ItemInnerSpacing;
-				vars::styling->imStyle.TouchExtraPadding = style.TouchExtraPadding;
-				vars::styling->imStyle.IndentSpacing = style.IndentSpacing;
-				vars::styling->imStyle.ScrollbarSize = style.ScrollbarSize;
-				vars::styling->imStyle.GrabMinSize = style.GrabMinSize;
-				vars::styling->imStyle.WindowBorderSize = style.WindowBorderSize;
-				vars::styling->imStyle.ChildBorderSize = style.ChildBorderSize;
-				vars::styling->imStyle.PopupBorderSize = style.PopupBorderSize;
-				vars::styling->imStyle.FrameBorderSize = style.FrameBorderSize;
-				vars::styling->imStyle.TabBorderSize = style.TabBorderSize;
-				vars::styling->imStyle.WindowRounding = style.WindowRounding;
-				vars::styling->imStyle.ChildRounding = style.ChildRounding;
-				vars::styling->imStyle.FrameRounding = style.FrameRounding;
-				vars::styling->imStyle.PopupRounding = style.PopupRounding;
-				vars::styling->imStyle.ScrollbarRounding = style.ScrollbarRounding;
-				vars::styling->imStyle.GrabRounding = style.GrabRounding;
-				vars::styling->imStyle.LogSliderDeadzone = style.LogSliderDeadzone;
-				vars::styling->imStyle.TabRounding = style.TabRounding;
-				vars::styling->imStyle.WindowMenuButtonPosition = style.WindowMenuButtonPosition;
-				vars::styling->imStyle.ColorButtonPosition = style.ColorButtonPosition;
-				vars::styling->imStyle.ButtonTextAlign = style.ButtonTextAlign;
-				vars::styling->imStyle.SelectableTextAlign = style.SelectableTextAlign;
-				vars::styling->imStyle.DisplaySafeAreaPadding = style.DisplaySafeAreaPadding;
-			}
-		}
-
-		if (ImGui::BeginTabItem("Colors"))
-		{
-			static int output_dest = 0;
-			static bool output_only_modified = true;
-
-			static ImGuiTextFilter filter;
-			filter.Draw("Filter colors", ImGui::GetFontSize() * 16);
-
-			static ImGuiColorEditFlags alpha_flags = 0;
-			if (ImGui::RadioButton("Opaque", alpha_flags == ImGuiColorEditFlags_None)) { alpha_flags = ImGuiColorEditFlags_None; } ImGui::SameLine();
-			if (ImGui::RadioButton("Alpha", alpha_flags == ImGuiColorEditFlags_AlphaPreview)) { alpha_flags = ImGuiColorEditFlags_AlphaPreview; } ImGui::SameLine();
-			if (ImGui::RadioButton("Both", alpha_flags == ImGuiColorEditFlags_AlphaPreviewHalf)) { alpha_flags = ImGuiColorEditFlags_AlphaPreviewHalf; } ImGui::SameLine();
-			HelpMarker(
-				"In the color list:\n"
-				"Left-click on color square to open color picker,\n"
-				"Right-click to open edit options menu.");
-
-			ImGui::BeginChild("##colors", ImVec2(0, 0), true, ImGuiWindowFlags_AlwaysVerticalScrollbar | ImGuiWindowFlags_AlwaysHorizontalScrollbar | ImGuiWindowFlags_NavFlattened);
-			ImGui::PushItemWidth(-160);
-			for (int i = 0; i < ImGuiCol_COUNT; i++)
-			{
-				const char* name = ImGui::GetStyleColorName(i);
-				if (!filter.PassFilter(name))
-					continue;
-				ImGui::PushID(i);
-				ImGui::ColorEdit4("##color", (float*)&style.Colors[i], ImGuiColorEditFlags_AlphaBar | alpha_flags);
-				if (memcmp(&style.Colors[i], &ref->Colors[i], sizeof(ImVec4)) != 0)
-				{
-					// Tips: in a real user application, you may want to merge and use an icon font into the main font,
-					// so instead of "Save"/"Revert" you'd use icons!
-					// Read the FAQ and docs/FONTS.md about using icon fonts. It's really easy and super convenient!
-					ImGui::SameLine(0.0f, style.ItemInnerSpacing.x); if (ImGui::Button("Save"))
-					{
-						ref->Colors[i] = style.Colors[i];
-						vars::styling->imStyle.Colors[i] = style.Colors[i];
-					}
-					ImGui::SameLine(0.0f, style.ItemInnerSpacing.x); if (ImGui::Button("Revert")) { style.Colors[i] = ref->Colors[i]; }
-				}
-				ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
-				ImGui::TextUnformatted(name);
-				ImGui::PopID();
-			}
-
-			// should fix this... by own struct
-			for (size_t i = 0; i < vars::styling->groupPanelBackground.size(); i++)
-			{
-				constexpr std::array names = { "Groupleft_up", "Groupright_up", "Groupright_down", "Groupleft_down" };
-				const char* name = names[i];
-				if (!filter.PassFilter(name))
-					continue;
-				ImGui::PushID(names[i]);
-
-				ImGui::ColorEdit4("##color2", vars::styling->groupPanelBackground[i].getColorRef().data(), ImGuiColorEditFlags_AlphaBar | alpha_flags);
-				if (memcmp(vars::styling->groupPanelBackground[i].getColorRef().data(), ref_saved_gradient[i].getColorRef().data(), sizeof(ImVec4)) != 0)
-				{
-					// Tips: in a real user application, you may want to merge and use an icon font into the main font,
-					// so instead of "Save"/"Revert" you'd use icons!
-					// Read the FAQ and docs/FONTS.md about using icon fonts. It's really easy and super convenient!
-					ImGui::SameLine(0.0f, style.ItemInnerSpacing.x); if (ImGui::Button("Save"))
-					{
-						ref_saved_gradient[i] = vars::styling->groupPanelBackground[i];
-					}
-					ImGui::SameLine(0.0f, style.ItemInnerSpacing.x); if (ImGui::Button("Revert")) { vars::styling->groupPanelBackground[i] = ref_saved_gradient[i]; }
-				}
-				ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
-				ImGui::TextUnformatted(name);
-				ImGui::PopID();
-			}
-
-			const char* name = "Groupline";
-			if (filter.PassFilter(name))
-			{
-				ImGui::PushID(name);
-				ImGui::ColorEdit4("##color3", vars::styling->groupPanelLines.getColorRef().data(), ImGuiColorEditFlags_AlphaBar | alpha_flags);
-
-				if (memcmp(vars::styling->groupPanelLines.getColorRef().data(), ref_saved_color_panel_line.getColorRef().data(), sizeof(ImVec4)) != 0)
-				{
-					// Tips: in a real user application, you may want to merge and use an icon font into the main font,
-					// so instead of "Save"/"Revert" you'd use icons!
-					// Read the FAQ and docs/FONTS.md about using icon fonts. It's really easy and super convenient!
-					ImGui::SameLine(0.0f, style.ItemInnerSpacing.x); if (ImGui::Button("Save"))
-					{
-						ref_saved_color_panel_line = vars::styling->groupPanelLines;
-					}
-					ImGui::SameLine(0.0f, style.ItemInnerSpacing.x); if (ImGui::Button("Revert")) { vars::styling->groupPanelLines = ref_saved_color_panel_line; }
-				}
-
-				ImGui::SameLine(0.0f, style.ItemInnerSpacing.x);
-				ImGui::TextUnformatted(name);
-				ImGui::PopID();
-			}
-
-			ImGui::PopItemWidth();
-			ImGui::EndChild();
-
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("Fonts"))
-		{
-			ImGuiIO& io = ImGui::GetIO();
-			ImFontAtlas* atlas = io.Fonts;
-			HelpMarker("Read FAQ and docs/FONTS.md for details on font loading.");
-			ImGui::ShowFontAtlas(atlas);
-
-			// Post-baking font scaling. Note that this is NOT the nice way of scaling fonts, read below.
-			// (we enforce hard clamping manually as by default DragFloat/SliderFloat allows CTRL+Click text to get out of bounds).
-			const float MIN_SCALE = 0.3f;
-			const float MAX_SCALE = 2.0f;
-			HelpMarker(
-				"Those are old settings provided for convenience.\n"
-				"However, the _correct_ way of scaling your UI is currently to reload your font at the designed size, "
-				"rebuild the font atlas, and call style.ScaleAllSizes() on a reference ImGuiStyle structure.\n"
-				"Using those settings here will give you poor quality results.");
-			static float window_scale = 1.0f;
-			ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
-			if (ImGui::DragFloat("window scale", &window_scale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", ImGuiSliderFlags_AlwaysClamp)) // Scale only this window
-				ImGui::SetWindowFontScale(window_scale);
-			ImGui::DragFloat("global scale", &io.FontGlobalScale, 0.005f, MIN_SCALE, MAX_SCALE, "%.2f", ImGuiSliderFlags_AlwaysClamp); // Scale everything
-			ImGui::PopItemWidth();
-
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("Rendering"))
-		{
-			ImGui::Checkbox("Anti-aliased lines", &style.AntiAliasedLines);
-			ImGui::SameLine();
-			HelpMarker("When disabling anti-aliasing lines, you'll probably want to disable borders in your style as well.");
-
-			ImGui::Checkbox("Anti-aliased lines use texture", &style.AntiAliasedLinesUseTex);
-			ImGui::SameLine();
-			HelpMarker("Faster lines using texture data. Require backend to render with bilinear filtering (not point/nearest filtering).");
-
-			ImGui::Checkbox("Anti-aliased fill", &style.AntiAliasedFill);
-			ImGui::PushItemWidth(ImGui::GetFontSize() * 8);
-			ImGui::DragFloat("Curve Tessellation Tolerance", &style.CurveTessellationTol, 0.02f, 0.10f, 10.0f, "%.2f");
-			if (style.CurveTessellationTol < 0.10f) style.CurveTessellationTol = 0.10f;
-
-			// When editing the "Circle Segment Max Error" value, draw a preview of its effect on auto-tessellated circles.
-			ImGui::DragFloat("Circle Tessellation Max Error", &style.CircleTessellationMaxError, 0.005f, 0.10f, 5.0f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
-			if (ImGui::IsItemActive())
-			{
-				ImGui::SetNextWindowPos(ImGui::GetCursorScreenPos());
-				ImGui::BeginTooltip();
-				ImGui::TextUnformatted("(R = radius, N = number of segments)");
-				ImGui::Spacing();
-				ImDrawList* draw_list = ImGui::GetWindowDrawList();
-				const float min_widget_width = ImGui::CalcTextSize("N: MMM\nR: MMM").x;
-				for (int n = 0; n < 8; n++)
-				{
-					const float RAD_MIN = 5.0f;
-					const float RAD_MAX = 70.0f;
-					const float rad = RAD_MIN + (RAD_MAX - RAD_MIN) * (float)n / (8.0f - 1.0f);
-
-					ImGui::BeginGroup();
-
-					ImGui::Text("R: %.f\nN: %d", rad, draw_list->_CalcCircleAutoSegmentCount(rad));
-
-					const float canvas_width = ImMax(min_widget_width, rad * 2.0f);
-					const float offset_x = floorf(canvas_width * 0.5f);
-					const float offset_y = floorf(RAD_MAX);
-
-					const ImVec2 p1 = ImGui::GetCursorScreenPos();
-					draw_list->AddCircle(ImVec2(p1.x + offset_x, p1.y + offset_y), rad, ImGui::GetColorU32(ImGuiCol_Text));
-					ImGui::Dummy(ImVec2(canvas_width, RAD_MAX * 2));
-
-					/*
-					const ImVec2 p2 = ImGui::GetCursorScreenPos();
-					draw_list->AddCircleFilled(ImVec2(p2.x + offset_x, p2.y + offset_y), rad, ImGui::GetColorU32(ImGuiCol_Text));
-					ImGui::Dummy(ImVec2(canvas_width, RAD_MAX * 2));
-					*/
-
-					ImGui::EndGroup();
-					ImGui::SameLine();
-				}
-				ImGui::EndTooltip();
-			}
-			ImGui::SameLine();
-			HelpMarker("When drawing circle primitives with \"num_segments == 0\" tesselation will be calculated automatically.");
-
-			ImGui::DragFloat("Global Alpha", &style.Alpha, 0.005f, 0.20f, 1.0f, "%.2f"); // Not exposing zero here so user doesn't "lose" the UI (zero alpha clips all widgets). But application code could have a toggle to switch between zero and non-zero.
-			ImGui::DragFloat("Disabled Alpha", &style.DisabledAlpha, 0.005f, 0.0f, 1.0f, "%.2f"); ImGui::SameLine(); HelpMarker("Additional alpha multiplier for disabled items (multiply over current value of Alpha).");
-			ImGui::PopItemWidth();
-
-			ImGui::EndTabItem();
-		}
-
-		ImGui::EndTabBar();
-	}
-
-	ImGui::PopItemWidth();
-}
-
 void ImGui::LoadCustomSettings()
 {
 	ImGuiContext& g = *GImGui;
@@ -574,6 +250,363 @@ void ImGui::LoadCustomSettings()
 			.targetSize = size,
 			.alpha = 0.0f
 		};
+	}
+}
+
+// leaving this, because it might be helpful
+static void RenderArrow(ImDrawList* draw_list, ImVec2 pos, ImU32 col, ImGuiDir dir, float angle, float scale)
+{
+	const float h = draw_list->_Data->FontSize * 1.00f;
+	float r = h * 0.40f * scale;
+	ImVec2 center = pos + ImVec2(h * 0.50f, h * 0.50f * scale);
+	ImVec2 a, b, c;
+
+	const float cangle = ImCos(angle);
+	const float sangle = ImSin(angle);
+
+	switch (dir)
+	{
+	case ImGuiDir_Up:
+	case ImGuiDir_Down:
+		if (dir == ImGuiDir_Up) r = -r;
+		a = ImRotate(ImVec2(+0.000f, +0.750f), cangle, sangle) * r;
+		b = ImRotate(ImVec2(-0.866f, -0.750f), cangle, sangle) * r;
+		c = ImRotate(ImVec2(+0.866f, -0.750f), cangle, sangle) * r;
+		break;
+	case ImGuiDir_Left:
+	case ImGuiDir_Right:
+		if (dir == ImGuiDir_Left) r = -r;
+		a = ImRotate(ImVec2(+0.750f, +0.000f), cangle, sangle) * r;
+		b = ImRotate(ImVec2(-0.750f, +0.866f), cangle, sangle) * r;
+		c = ImRotate(ImVec2(-0.750f, -0.866f), cangle, sangle) * r;
+		break;
+	case ImGuiDir_None:
+	case ImGuiDir_COUNT:
+		IM_ASSERT(0);
+		break;
+	}
+
+	draw_list->AddTriangleFilled(center + a, center + b, center + c, col);
+}
+
+bool ImGui::PopupButton(const char* label, const std::function<void()>& fun)
+{
+	ImGui::PushID(label);
+
+	if (ImGui::Button("Options"))
+		ImGui::OpenPopup("");
+
+	bool ret = false;
+	if (ImGui::BeginPopup(""))
+	{
+		fun();
+		ret = true;
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::PopID();
+
+	return ret;
+}
+
+bool ImGui::ColorPicker(const char* label, CfgColor* clr)
+{
+	constexpr auto pickerFlags = ImGuiColorEditFlags_DisplayRGB | ImGuiColorEditFlags_NoSidePreview | ImGuiColorEditFlags_AlphaPreview | ImGuiColorEditFlags_AlphaBar;
+	constexpr auto pickerButtonFlags = ImGuiColorEditFlags_NoTooltip | ImGuiColorEditFlags_AlphaPreview;
+	constexpr auto paletteButoonFlags = ImGuiColorEditFlags_NoAlpha | ImGuiColorEditFlags_NoPicker | ImGuiColorEditFlags_NoTooltip;
+
+	bool toReturn = false;
+
+	static std::array<Color, 32> palette = {};
+	static auto bOnce = [=]()
+	{
+		for (size_t i = 0; auto & el : palette)
+		{
+			ImGui::ColorConvertHSVtoRGB(i / static_cast<float>(palette.size()), 1.0f, 1.0f,
+				el.at(0), el.at(1), el.at(2));
+			el.at(3) = 1.0f;
+
+			i++;
+		}
+		return true;
+	} ();
+
+	ImGui::PushID(label);
+
+	bool openPopup = ImGui::ColorButton("##colbut", ImVec4{ clr->getColor().r(), clr->getColor().g(), clr->getColor().b(), clr->getColor().a() }, pickerButtonFlags);
+
+	if (std::strncmp(label, "##", 2))
+	{
+		ImGui::SameLine();
+		ImGui::TextUnformatted(label, std::strstr(label, "##"));
+	}
+
+	if (openPopup)
+		ImGui::OpenPopup("##colpop");
+
+	if (ImGui::BeginPopup("##colpop"))
+	{
+		std::array col{ clr->getColor().r(), clr->getColor().g(), clr->getColor().b(), clr->getColor().a() };
+		toReturn = ImGui::ColorPicker4("##colpicker", col.data(), pickerFlags);
+		*clr = CfgColor{ col, clr->getRainbow(), clr->getSpeed() };
+
+		ImGui::SameLine();
+
+		constexpr int seperateLimit = 7;
+		constexpr auto paletteButtonSize = ImVec2{ 20.0f, 20.0f };
+
+		if (ImGui::BeginChild("##colorsaddon", { seperateLimit * paletteButtonSize.x, 0.0f }))
+		{
+			for (size_t i = 0; const auto & el : palette)
+			{
+				ImGui::PushID(i);
+				if ((i % seperateLimit) != 0)
+					ImGui::SameLine(0.0f, ImGui::GetStyle().ItemSpacing.y);
+
+				if (ImGui::ColorButton("##palette", ImVec4{ el.r(), el.g(), el.b(), el.a() }, paletteButoonFlags, paletteButtonSize))
+				{
+					*clr = CfgColor{ Color{ el, clr->getColor().a() }, clr->getRainbow(), clr->getSpeed() };
+					toReturn = true;
+				}
+				ImGui::PopID();
+
+				i++;
+			}
+
+			ImGui::Checkbox("Rainbow mode", &clr->getRainbowRef());
+			if (clr->getRainbow())
+			{
+				ImGui::PushItemWidth(seperateLimit * paletteButtonSize.x);
+				ImGui::SliderFloat("##ranbowspeed", &clr->getSpeedRef(), 0.0f, 15.0f, "Speed %.1f", ImGuiSliderFlags_Logarithmic);
+				ImGui::PopItemWidth();
+
+				// apply return as updated color
+				toReturn = true;
+			}
+
+			ImGui::EndChild();
+		}
+
+		ImGui::EndPopup();
+
+	}
+	ImGui::PopID();
+
+	return toReturn;
+}
+
+// because some update made stack for those items kinda different, I will use own non api-like solution to solve this
+static std::unordered_map<ImGuiID, bool> stackHotkey;
+
+bool ImGui::Hotkey(const char* label, Key* key, bool useExtended, const ImVec2& size)
+{
+	ImGui::PushID(label);
+	if (std::strncmp(label, "##", 2))
+		ImGui::TextUnformatted(label, std::strstr(label, "##"));
+
+	ImGui::SameLine();
+	const auto id = ImGui::GetID(label);
+
+	bool isInHotkey = stackHotkey[id];
+
+	if (isInHotkey)
+	{
+		ImGui::Button("...", size);
+		ImGui::SetItemAllowOverlap();
+
+		if (key->checkKey())
+		{
+			globals::isInHotkey = false;
+			stackHotkey[id] = false;
+			ImGui::ClearActiveID();
+		}
+
+	}
+	else if (ImGui::Button(utilities::getKeyName(key->getKeyCode()).c_str(), size))
+	{
+		globals::isInHotkey = true;
+		stackHotkey[id] = true;
+		ImGui::SetActiveID(id, GetCurrentWindow());
+	}
+
+	if (useExtended)
+	{
+		if (ImGui::BeginPopup("##pop", ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoMove))
+		{
+			for (const auto [mode, name] : Key::getKeyPairs())
+			{
+				bool selected = key->getKeyMode() == mode;
+				if (ImGui::Selectable(name, &selected))
+				{
+					if (selected)
+						key->setKeyMode(mode);
+				}
+			}
+
+			ImGui::EndPopup();
+		}
+		if (IsItemHovered())
+		{
+			ImGui::SetTooltip("Key mode");
+
+			if (ImGui::GetIO().MouseClicked[1])
+				ImGui::OpenPopup("##pop");
+		}
+	}
+
+	ImGui::PopID();
+
+	return true;
+}
+
+void ImGui::Window(const char* label, bool* opened, const ImGui::WindowConfig& config, const std::function<void()>& callback)
+{
+	const ImGuiID id = ImGui::GetID(label);
+	ImGuiIO& io = ImGui::GetIO();
+
+	auto itr = ImGui::extraGlobals::settings.find(id);
+	const bool newWindow = itr == ImGui::extraGlobals::settings.end();
+	if (newWindow)
+	{
+		ImGui::extraGlobals::settings[id] = ImWindowSettings
+		{
+			.id = id,
+			.pos = config.defaultPos + (config.defaultSize / 2),
+			.size = ImVec2{ 0, 0 },
+			.targetSize = config.defaultSize,
+			.alpha = 0.0f
+		};
+		// force itr to be updated
+		itr = ImGui::extraGlobals::settings.find(id);
+	}
+
+	auto inTransmission = [opened, config, itr](const auto min, const auto max)
+	{
+		constexpr float lerpThreshold = 0.01f;
+
+		if (itr->second.alpha >= max - lerpThreshold)
+			return false;
+
+		if (itr->second.alpha <= min + lerpThreshold)
+			return false;
+
+		return true;
+	};
+
+	auto isMovedWindow = [id]()
+	{
+		const ImGuiWindow* movingWindow = GImGui->MovingWindow;
+		if (movingWindow == nullptr)
+			return false;
+
+		/*if (movingWindow->ID != id)
+			return false;*/
+
+		return true;
+	};
+
+	auto isResizedWindow = []()
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			if (ImGui::GetWindowResizeCornerID(ImGui::GetCurrentWindow(), i) != ImGui::GetActiveID())
+				continue;
+
+			return true;
+		}
+
+		for (int i = 0; i < 4; i++)
+		{
+			if (ImGui::GetWindowResizeBorderID(ImGui::GetCurrentWindow(), i) != ImGui::GetActiveID())
+				continue;
+
+			return true;
+		}
+
+		return false;
+	};
+
+
+	auto renderGui = [&](ImGuiWindowFlags flags)
+	{
+		if (ImGui::Begin(label, opened, flags))
+		{
+			// cant perfectly know when lerp ended, this is enough
+			/*if (const auto size = ImGui::GetWindowSize(); size.x > 35 && size.y > 35)
+				io.IniFilename = menu.m_iniFile.c_str();*/
+
+			ImGui::GetForegroundDrawList()->AddCircleFilled(ImGui::GetWindowPos(), 10, ImColor{ 255, 60, 255, 255 }, 18);
+
+			const bool sizeChanged = isResizedWindow();
+			const bool posChanged = isMovedWindow();
+
+			if (sizeChanged || posChanged)
+			{
+				itr->second.targetSize = ImGui::GetWindowSize();
+				itr->second.pos = ImGui::GetWindowPos() + itr->second.targetSize / 2;
+
+				//ImGui::SaveIniSettingsToDisk(menu.m_iniFile.c_str());
+			}
+
+			callback();
+
+			ImGui::End();
+		}
+	};
+
+#ifdef _DEBUG
+	//ImGui::GetForegroundDrawList()->AddCircleFilled(itr->second.pos, 10, ImColor{ 0, 60, 255, 255 }, 18);
+#endif
+
+	ImGuiStyle& style = ImGui::GetStyle();
+	//const ImGuiStyle& backupStyle = style;
+
+	constexpr float min = 0.0f, max = 1.0f;
+	const float wantedAlpha = *opened ? max : min;
+	//const float step = ImGui::GetIO().DeltaTime * 4.0f;
+	itr->second.alpha = ImLerp(itr->second.alpha, wantedAlpha, ImGui::GetIO().DeltaTime * 10.0f);
+	//itr->second.alpha = ImClamp(itr->second.alpha + (*opened ? step : -step), min, max);
+	//itr->second.size = itr->second.targetSize * itr->second.alpha
+	const ImVec2 target = *opened ? itr->second.targetSize : ImVec2{ 0, 0 };
+	// 14 is passed to accelrate the lerping steps, so the inTransmission check can work well enough
+	itr->second.size = ImLerp(itr->second.size, target, ImGui::GetIO().DeltaTime * 14.0f);
+
+	ImGui::GetForegroundDrawList()->AddCircleFilled(itr->second.pos, 10, ImColor{ 0, 60, 255, 255 }, 18);
+
+	if (inTransmission(min, max))
+	{
+		io.IniFilename = nullptr;
+
+		for (int i = 0; i < ImGuiCol_COUNT; ++i)
+		{
+			ImVec4 color = style.Colors[i];
+			color.w *= itr->second.alpha;
+			ImGui::PushStyleColor(i, color);
+		}
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, style.WindowBorderSize * itr->second.alpha);
+		ImGui::PushStyleVar(ImGuiStyleVar_ScrollbarSize, style.ScrollbarSize * itr->second.alpha);
+
+		ImGui::SetNextWindowPos(itr->second.pos, ImGuiCond_Always, ImVec2{ 0.5f, 0.5f });
+		ImGui::SetNextWindowSize(itr->second.size);
+
+		renderGui(ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize);
+
+		ImGui::PopStyleColor(ImGuiCol_COUNT);
+
+		ImGui::PopStyleVar(2);
+		return;
+	}
+	if (*opened)
+	{
+		if (newWindow)
+		{
+			ImGui::SetNextWindowPos(itr->second.pos, ImGuiCond_Once);
+			ImGui::SetNextWindowSize(itr->second.size);
+		}
+
+		renderGui(config.flags);
 	}
 }
 

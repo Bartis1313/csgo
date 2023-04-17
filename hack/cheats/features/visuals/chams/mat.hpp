@@ -27,8 +27,8 @@ struct Mat_t
 	};
 
 	bool isFromEditor{ false }; // editor
+	StrategyType strategy{ StrategyType::BUFFER };
 	ExtraType type{ ExtraType::NONE };
-	StrategyType strategy{ StrategyType::BUFFER }; // editor
 	Data data{};
 	IMaterial* mat{};
 	MaterialVarFlags_t flags;

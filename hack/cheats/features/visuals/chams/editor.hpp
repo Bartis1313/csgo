@@ -2,23 +2,22 @@
 
 #include "chams.hpp"
 
-#include <cheats/classes/renderableToPresent.hpp>
+#include <cheats/classes/onlyInit.hpp>
 #include <nlohmann/json.hpp>
 #include <deps/ImGui/editor/TextEditor.hpp>
 
 // this code is a mess. It's a MUST to not friend the Chams
-class MaterialEditor : protected RenderablePresentType
+class MaterialEditor : protected OnlyInitType
 {
 public:
 	MaterialEditor()
-		: RenderablePresentType{}
+		: OnlyInitType{}
 	{}
 
-protected:
-	virtual void draw() override;
 public:
+	virtual void init() {};
+	void draw();
 	void initEditor();
-	void changeState() { m_open = !m_open; }
 	[[nodiscard]] std::vector<Mat_t> getEditorMaterials() const;
 private:
 

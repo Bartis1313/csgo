@@ -16,7 +16,7 @@ void Freecam::updateKeys()
 
 void Freecam::run(CViewSetup* view)
 {
-	if (menu.isMenuActive())
+	if (g_ImGuiMenu->isMenuActive())
 		return;
 
 	if (!game::isAvailable())
@@ -26,6 +26,8 @@ void Freecam::run(CViewSetup* view)
 
 	if (vars::misc->freeCam->enabled && vars::keys->freeCam.isEnabled())
 	{
+		//game::localPlayer->drawModel(STUDIO_RENDER, 0);
+
 		m_inCam = true;
 		if (KeysHandler::isKeyPressed(VK_SHIFT))
 			vars::misc->freeCam->speed += 0.1f;

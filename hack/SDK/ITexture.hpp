@@ -16,6 +16,7 @@ class ITexture
 public:
 	VFUNC(int, getActualWidth, 3, (), (this));
 	VFUNC(int, getActualHeight, 4, (), (this));
+	VFUNC(void, release, 11, (), (this));
 	PAD(80);
 	TextureHandle_t** m_handle;
 };

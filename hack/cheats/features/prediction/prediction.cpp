@@ -178,7 +178,7 @@ void Prediction::patchDatamap()
 
 	velmod.m_type = FIELD_FLOAT;
 	velmod.m_name = "m_flVelocityModifier";
-	velmod.m_offset[TD_OFFSET_NORMAL] = netvarMan.getNetvar("DT_CSPlayer", "m_flVelocityModifier");
+	velmod.m_offset[TD_OFFSET_NORMAL] = netvars::getNetvar("DT_CSPlayer", "m_flVelocityModifier");
 	//int copiedPackedSize = map->m_packedSize;
 	//copiedPackedSize = ALIGN_VALUE(copiedPackedSize, sizeof(float));
 	//velmod.m_offset[TD_OFFSET_PACKED] = copiedPackedSize;

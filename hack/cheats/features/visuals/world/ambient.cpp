@@ -21,6 +21,8 @@ void AmbientLight::run(int frame)
 	if (frame != FRAME_RENDER_START)
 		return;
 
+	// cant use env from memory, it wont differ just by changing fields
+
 	if (auto cfg = vars::visuals->world->ambient->enabled; cfg && (m_buttonState || m_pickerState))
 	{
 		auto cfgCol = vars::visuals->world->ambient->color();

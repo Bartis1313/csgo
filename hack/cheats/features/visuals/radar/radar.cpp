@@ -38,6 +38,7 @@ ImVec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos
 	const auto sine = std::sin(yawToRadian);
 	// this 20 is a magic scaling value, it seems to be the best and without need as configurable
 	// game also does hardcoded scaling
+	// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/cstrike15/Scaleform/HUD/sfhudradar.cpp#L184
 	float dotX = (directionX * cosine - directionY * sine) / 20.0f;
 	float dotY = (directionX * sine + directionY * cosine) / 20.0f;
 	dotX *= scale;
@@ -83,17 +84,10 @@ bool Radar::manuallyInitTexture()
 	std::string levelName = memory::interfaces::engine->getLevelName();
 
 	// not really working for workshops
-	if (auto place = levelName.rfind('/'); place != std::string::npos)
+	if (const auto place = levelName.rfind('/'); place != std::string::npos)
 		levelName = levelName.substr(place + 1, levelName.size());
 
-	std::string path = std::format("csgo\\resource\\overviews\\{}_radar.dds", levelName);
-
-	// prob not supported format
-	/*Resource res{ path };
-	if (res.getTexture())
-		m_mapTexture = res.getTexture();
-	else
-		return false;*/
+	const std::string path = std::format("csgo\\resource\\overviews\\{}_radar.dds", levelName);
 
 	if (auto hr = D3DXCreateTextureFromFileA(memory::interfaces::dx9Device(), path.c_str(), &m_mapTexture); hr == D3D_OK)
 		console::info("Created map texture from path: {}", path);
@@ -116,11 +110,11 @@ void Radar::drawMap()
 	if (!m_inited)
 		manuallyInitPos();
 
-	auto map = getMapPos();
+	const auto map = getMapPos();
 
 	// square
-	float size = map.m_scale;
-	std::array poses =
+	const float size = map.m_scale;
+	const std::array poses =
 	{
 		Vec3{ m_pos[Coord::X], m_pos[Coord::Y], 0.0f },
 		Vec3{ m_pos[Coord::X] + size, m_pos[Coord::Y], 0.0f },
@@ -129,8 +123,7 @@ void Radar::drawMap()
 	};
 
 	const auto myEye = game::localPlayer->getEyePos();
-	Vec3 ang = {};
-	memory::interfaces::engine->getViewAngles(ang);
+	const auto ang = game::getViewAngles();
 	const float scale = vars::misc->radar->scale;
 
 	auto p1 = entToRadar(myEye, ang, poses.at(0), scale, false);
@@ -152,54 +145,20 @@ void Radar::draw()
 	if (!memory::interfaces::engine->isInGame())
 		return;
 
-	float size = vars::misc->radar->size;
-	ImGui::SetNextWindowSize({ size, size });
-	if (ImGui::Begin("Radar", &vars::misc->radar->enabled, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize))
+	// force square sized window
+	const auto maxSize = std::max(globals::screenX, globals::screenY);
+	ImGui::SetNextWindowSizeConstraints(ImVec2{ 100.0f, 100.0f }, ImVec2{ static_cast<float>(maxSize), static_cast<float>(maxSize) },
+		[](ImGuiSizeCallbackData* data) { data->DesiredSize.x = data->DesiredSize.y; });
+	if (ImGui::Begin("Radar", &vars::misc->radar->enabled, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoTitleBar))
 	{
 		const auto windowList = ImGui::GetWindowDrawList();
 		const auto windowPos = ImGui::GetWindowPos();
 		const auto windowSize = ImGui::GetWindowSize();
 
-		const float scaledFov = globals::FOV / 5.0f;
-		// assume calculation is only in straight line representing 2D, so max = 180 deg, and this is not correct in 100%, idk better solution
-		const float fovAddon = windowSize.y / std::tan(math::DEG2RAD((180.0f - (globals::FOV + scaledFov)) / 2.0f));
-
 		const float middleX = windowSize.x / 2.0f;
 		const float middleY = windowSize.y / 2.0f;
 
 		drawMap();
-
-		drawing::TriangleFilled{
-			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
-			ImVec2{ windowPos.x + middleX, windowPos.y },
-			ImVec2{ windowPos.x + middleX + fovAddon / 2.0f, windowPos.y },
-			Color::U32(Colors::White.getColorEditAlpha(0.4f)) }.draw(windowList);
-
-		drawing::TriangleFilled{
-			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
-			ImVec2{ windowPos.x + middleX, windowPos.y },
-			ImVec2{ windowPos.x + middleX - fovAddon / 2.0f, windowPos.y },
-			Color::U32(Colors::White.getColorEditAlpha(0.4f)) }.draw(windowList);
-
-		drawing::Line{
-			ImVec2{ windowPos.x + middleX + fovAddon / 2.0f, windowPos.y },
-			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
-			Color::U32(Colors::White), 1.0f }.draw(windowList);
-
-		drawing::Line{
-			ImVec2{ windowPos.x + middleX - fovAddon / 2.0f, windowPos.y },
-			ImVec2{ windowPos.x + middleX, windowPos.y + middleY },
-			Color::U32(Colors::White), 1.0f }.draw(windowList);
-
-		drawing::Line{
-			ImVec2{ windowPos.x + 0.0f, windowPos.y + middleY },
-			ImVec2{ windowPos.x + windowSize.x, windowPos.y + middleY },
-			Color::U32(Colors::White), 1.0f }.draw(windowList);
-
-		drawing::Line{
-			ImVec2{ windowPos.x + middleX, windowPos.y + 0.0f },
-			ImVec2{ windowPos.x + middleX, windowPos.y + windowSize.y },
-			Color::U32(Colors::White), 1.0f }.draw(windowList);
 
 		// draw small circle where are we
 		drawing::CircleFilled{ 
@@ -207,8 +166,7 @@ void Radar::draw()
 			5.0f, 12, Color::U32(Colors::Green) }.draw(windowList);
 
 		const auto myEye = game::localPlayer->getEyePos();
-		Vec3 viewAngle = {};
-		memory::interfaces::engine->getViewAngles(viewAngle);
+		Vec3 viewAngle = game::getViewAngles();
 
 		for(auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 		{
@@ -241,7 +199,11 @@ void Radar::draw()
 			const auto finalX = dotRad * std::cos(math::DEG2RAD(rotated));
 			const auto finalY = dotRad * std::sin(math::DEG2RAD(rotated));
 
-			if (vars::misc->radar->ranges ? true : entRotatedPos.x != 0.0f && entRotatedPos.y != 0.0f)
+			const bool isZeroEnt = vars::misc->radar->ranges ? true : entRotatedPos.x != 0.0f && entRotatedPos.y != 0.0f;
+			if (!isZeroEnt)
+				return;
+
+			if (vars::misc->radar->mode == E2T(RadarMode::TRIANGLE))
 			{
 				const auto dotThickness = vars::misc->radar->thickness;
 				const float radian = math::DEG2RAD(rotated);
@@ -251,8 +213,17 @@ void Radar::draw()
 				const ImVec2 p2 = ImVec2{ (-dotThickness / 2.0f) * std::cos(radian90) + entRotatedPos.x, (-dotThickness / 2.0f) * std::sin(radian90) + entRotatedPos.y };
 				const ImVec2 p3 = ImVec2{ dotThickness * std::cos(radian) + entRotatedPos.x, dotThickness * std::sin(radian) + entRotatedPos.y };
 				drawing::TriangleFilled{ p1, p2, p3, Color::U32(vars::misc->radar->colorPlayer()) }.draw(windowList);
-				drawing::Line{ p3, { p3.x + finalX, p3.y + finalY }, Color::U32(vars::misc->radar->colorLine()), 1.0f }.draw(windowList);
+			}
+			else if (vars::misc->radar->mode == E2T(RadarMode::CIRCLE))
+			{
+				const auto dotThickness = vars::misc->radar->thickness;
+				const float radian = math::DEG2RAD(rotated);
 
+				// we use p3 as a reference to triangles because we need optimal start where to draw based on enemy angles
+				const ImVec2 p3 = ImVec2{ dotThickness * std::cos(radian) + entRotatedPos.x, dotThickness * std::sin(radian) + entRotatedPos.y };
+
+				drawing::CircleFilled{ entRotatedPos, dotThickness, 32, Color::U32(vars::misc->radar->colorPlayer()) }.draw(windowList);
+				drawing::Line{ p3, { p3.x + finalX, p3.y + finalY }, Color::U32(vars::misc->radar->colorLine()), 1.0f }.draw(windowList);
 			}
 		}
 		

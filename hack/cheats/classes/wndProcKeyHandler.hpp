@@ -1,5 +1,7 @@
 #pragma once
 
+#include "base.hpp"
+
 #include <vector>
 
 // special class, doesn't touch BaseHack at all

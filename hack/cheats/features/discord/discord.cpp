@@ -53,8 +53,20 @@ static std::pair<std::string, std::string> getImage(const std::string& map)
 
 void DiscordPresence::run()
 {
+	static bool didReset{ false };
+
 	if (!vars::misc->discord->enabled)
+	{
+		if (!didReset)
+		{
+			Discord_ClearPresence();
+			didReset = true;
+		}
+
 		return;
+	}
+
+	didReset = false;
 
 	DiscordRichPresence pres;
 	std::memset(&pres, 0, sizeof(pres));

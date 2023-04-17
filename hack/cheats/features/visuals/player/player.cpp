@@ -32,9 +32,6 @@
 
 void PlayerVisuals::draw()
 {
-	if (!vars::visuals->esp->boxes->enabled)
-		return;
-
 	if (!game::isAvailable())
 		return;
 
@@ -135,18 +132,18 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 	};
 
 	// fill first
-	imRender.drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
-	imRender.drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, Color::healthBased(ent->m_iHealth()).getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+	ImRender::drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+	ImRender::drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, Color::healthBased(ent->m_iHealth()).getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 
 	// if the player has health below max, then draw HP info
 	if (health < 100)
 	{
 		auto text = std::format("{}", realHealth);
 		float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer->absOrigin(), 100.0f, 10.0f, 14.0f);
-		auto size = ImFonts::franklinGothic12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
+		auto size = ImRender::fonts::franklinGothic12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, text.c_str());
 
-		imRender.text(newBox.x - 4.0f - size.x, newBox.y + pad - 4.0f,
-			fontSize, ImFonts::franklinGothic12, text, false, Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+		ImRender::text(newBox.x - 4.0f - size.x, newBox.y + pad - 4.0f,
+			fontSize, ImRender::fonts::franklinGothic12, text, false, Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 	}
 }
 
@@ -180,8 +177,8 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 
 	if (armor != 0)
 	{
-		imRender.drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
-		imRender.drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, armorCol.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+		ImRender::drawRoundedRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, 4.0f, newBox.h + 2.0f, 120.0f, Colors::Black.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+		ImRender::drawRoundedRectFilled(newBox.x, newBox.y + pad, 2.0f, offset, 120.0f, armorCol.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 	}
 }
 
@@ -201,7 +198,7 @@ void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 	int maxAmmo = weapon->getWpnInfo()->m_maxClip1;
 	int currentAmmo = weapon->m_iClip1();
 
-	imRender.text(box.x + box.w / 2, box.y + box.h + 5, ImFonts::franklinGothic12, std::format("{} {}/{}",
+	ImRender::text(box.x + box.w / 2, box.y + box.h + 5, ImRender::fonts::franklinGothic12, std::format("{} {}/{}",
 		vars::visuals->esp->weaponBar->translate ? memory::interfaces::localize->findAsUTF8(weapon->getWpnInfo()->m_WeaponName) : ent->getActiveWeapon()->getWpnName(), currentAmmo, maxAmmo),
 		true, tex.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 
@@ -230,8 +227,8 @@ void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 			barWidth = (animlayer.m_cycle * box.w) / 1.0f;
 	}
 
-	imRender.drawRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, newBox.w, 4.0f, Colors::Black.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
-	imRender.drawRectFilled(newBox.x, newBox.y, barWidth, 2.0f, vars::visuals->esp->weaponBar->bar().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+	ImRender::drawRectFilled(newBox.x - 1.0f, newBox.y - 1.0f, newBox.w, 4.0f, Colors::Black.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+	ImRender::drawRectFilled(newBox.x, newBox.y, barWidth, 2.0f, vars::visuals->esp->weaponBar->bar().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 }
 
 void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
@@ -284,14 +281,14 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 
 	for (size_t i = 0; const auto & [name, color] : flags)
 	{
-		imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana12, name, false, color, false);
-		auto textSize = ImFonts::verdana12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, name.c_str());
+		ImRender::text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImRender::fonts::verdana12, name, false, color, false);
+		auto textSize = ImRender::fonts::verdana12->CalcTextSizeA(fontSize, std::numeric_limits<float>::max(), 0.0f, name.c_str());
 		padding += textSize.y;
 		i++;
 
 		if (i != flags.size() && padding + fontSize > box.h) // when too many flags for long distances
 		{
-			imRender.text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImFonts::verdana12,
+			ImRender::text(box.x + box.w + addon + 2.0f, box.y + padding, fontSize, ImRender::fonts::verdana12,
 				std::format("{} more...", flags.size() - i), false, Colors::White.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha), false);
 			break;
 		}
@@ -305,7 +302,7 @@ void PlayerVisuals::drawnName(Player_t* ent, const Box& box)
 
 	float fontSize = game::getScaledFont(ent->absOrigin(), game::localPlayer()->absOrigin());
 
-	imRender.text(box.x + box.w / 2.0f, box.y - fontSize - 2.0f, fontSize, ImFonts::verdana12, ent->getName(), true,
+	ImRender::text(box.x + box.w / 2.0f, box.y - fontSize - 2.0f, fontSize, ImRender::fonts::verdana12, ent->getName(), true,
 		Color::healthBased(ent->m_iHealth()).getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha), false);
 }
 
@@ -372,12 +369,12 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 
 		if (vars::visuals->esp->skeleton->showDebug)
 		{
-			if (ImVec2 s; imRender.worldToScreen(ent->getBonePos(i), s))
-				imRender.text(s.x, s.y, ImFonts::franklinGothic12, std::format("{}", i), true, Colors::White, true);
+			if (ImVec2 s; ImRender::worldToScreen(ent->getBonePos(i), s))
+				ImRender::text(s.x, s.y, ImRender::fonts::franklinGothic12, std::format("{}", i), true, Colors::White, true);
 		}
 
-		if (ImVec2 start, end; imRender.worldToScreen(parent, start) && imRender.worldToScreen(child, end))
-			imRender.drawLine(start, end, vars::visuals->esp->skeleton->color().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+		if (ImVec2 start, end; ImRender::worldToScreen(parent, start) && ImRender::worldToScreen(child, end))
+			ImRender::drawLine(start, end, vars::visuals->esp->skeleton->color().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 	}
 }
 
@@ -386,7 +383,7 @@ void PlayerVisuals::drawSnapLine(Player_t* ent, const Box& box)
 	if (ent == g_Aimbot->getTargetted())
 	{
 		// lines on the bottom and center bottom box
-		imRender.drawLine(globals::screenX / 2.0f, static_cast<float>(globals::screenY), box.x + box.w / 2, box.y + box.h, Colors::Purple);
+		ImRender::drawLine(globals::screenX / 2.0f, static_cast<float>(globals::screenY), box.x + box.w / 2, box.y + box.h, Colors::Purple);
 	}
 }
 
@@ -402,10 +399,10 @@ void PlayerVisuals::drawLaser(Player_t* ent)
 	// end is where lines just ends, this 70 is hardcoded, but whatever here tbh
 	auto end = start + forward * 70.f;
 
-	if (ImVec2 startP, endLine; imRender.worldToScreen(start, startP) && imRender.worldToScreen(end, endLine))
+	if (ImVec2 startP, endLine; ImRender::worldToScreen(start, startP) && ImRender::worldToScreen(end, endLine))
 	{
-		imRender.drawCircleFilled(startP.x, startP.y, 3, 32, Colors::Red);
-		imRender.drawLine(startP, endLine, Colors::Purple.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
+		ImRender::drawCircleFilled(startP.x, startP.y, 3, 32, Colors::Red);
+		ImRender::drawLine(startP, endLine, Colors::Purple.getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 	}
 }
 
@@ -449,9 +446,6 @@ void PlayerVisuals::runDLight(Player_t* ent)
 
 void PlayerVisuals::drawPlayer(Player_t* ent)
 {
-	if (!vars::visuals->esp->boxes->enabled)
-		return;
-
 	Box box{ent};
 	if (!box.isValid())
 		return;

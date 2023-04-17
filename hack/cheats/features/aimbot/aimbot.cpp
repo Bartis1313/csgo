@@ -34,11 +34,14 @@ void Aimbot::init()
 
 void Aimbot::updateKeys()
 {
-	vars::keys->aimbot.update();
+	m_config.key.update();
 }
 
 void Aimbot::run(float* x, float* y)
 {
+	/*if (*x == 0.0f && *y == 0.0f)
+		return;*/
+
 	if (!game::isAvailable())
 		return;
 
@@ -255,15 +258,17 @@ void Aimbot::resetFields()
 
 bool Aimbot::isClicked(CUserCmd* cmd)
 {
-	if (vars::aim->useKey)
+	if (m_config.useKey)
 	{
-		if (vars::keys->aimbot.isEnabled())
+		if (m_config.key.isEnabled())
 			return true;
 		else
 			return false;
 	}
 	else
 		return cmd->m_buttons & IN_ATTACK;
+
+	return false;
 }
 
 std::vector<Hitboxes> Aimbot::getHitboxes()

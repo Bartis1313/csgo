@@ -28,7 +28,7 @@ Box::Box(Entity_t* ent)
 	std::array<ImVec2, 8> screen = {};
 	for (size_t i = 0; auto & el : screen)
 	{
-		if (!imRender.worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
+		if (!ImRender::worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
 		{
 			m_isValid = false;
 			return;
@@ -73,7 +73,7 @@ Box::Box(Entity_t* ent, const Vec3& min, const Vec3& max)
 	std::array<ImVec2, 8> screen = {};
 	for (size_t i = 0; auto & el : screen)
 	{
-		if (!imRender.worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
+		if (!ImRender::worldToScreen(math::transformVector(points.at(i), matrixWorld), el))
 		{
 			m_isValid = false;
 			return;

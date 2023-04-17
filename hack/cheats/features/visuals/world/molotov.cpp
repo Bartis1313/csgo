@@ -139,7 +139,7 @@ void MolotovDraw::draw()
         {
 			for (const auto& flame : extraFlames)
 			{
-				if (ImVec2 s; imRender.worldToScreen(el + flame, s))
+				if (ImVec2 s; ImRender::worldToScreen(el + flame, s))
 					points.push_back(s);
 			}
         }
@@ -184,11 +184,11 @@ void MolotovDraw::draw()
 				ImVec2 p2{ d.coords.at(2 * d.triangles.at(i + 1)), d.coords.at(2 * d.triangles.at(i + 1) + 1) };
 				ImVec2 p3{ d.coords.at(2 * d.triangles.at(i + 2)), d.coords.at(2 * d.triangles.at(i + 2) + 1) };
 
-				imRender.drawTriangle(p1, p2, p3, Colors::White);
+				ImRender::drawTriangle(p1, p2, p3, Colors::White);
 			}
 		}
 
-        imRender.drawPolyGon(hullOuter, vars::visuals->world->molotov->color());
+        ImRender::drawPolyGon(hullOuter, vars::visuals->world->molotov->color());
 
 		auto centerPolygon = [hullOuter, hullsize = hullOuter.size()]()
 		{
@@ -202,9 +202,9 @@ void MolotovDraw::draw()
 			return centre / static_cast<float>(hullsize);
 		};
 		
-		static float size = ImFonts::tahoma14->FontSize;
+		static float size = ImRender::fonts::tahoma14->FontSize;
 		const auto centerPoint = centerPolygon();
-		imRender.drawProgressRing(centerPoint.x, centerPoint.y, 25, 32, -90.0f, scale, 5.0f, Colors::LightBlue);
-		imRender.text(centerPoint.x, centerPoint.y - (size / 2.0f), ImFonts::tahoma14, std::format("{:.2f}s", time), true, Colors::White);
+		ImRender::drawProgressRing(centerPoint.x, centerPoint.y, 25, 32, -90.0f, scale, 5.0f, Colors::LightBlue);
+		ImRender::text(centerPoint.x, centerPoint.y - (size / 2.0f), ImRender::fonts::tahoma14, std::format("{:.2f}s", time), true, Colors::White);
 	}
 }

@@ -57,6 +57,17 @@ void TriangleFilled::draw(ImDrawList* draw) const
 	draw->AddTriangleFilled(m_p1, m_p2, m_p3, m_color);
 }
 
+void TriangleMultiColor::draw(ImDrawList* draw) const
+{
+	if (((m_color1 | m_color2 | m_color3) & IM_COL32_A_MASK) == 0)
+		return;
+
+	ImVec2 verts[] = { m_p1, m_p2, m_p3 };
+	ImU32 colors[] = { m_color1, m_color2, m_color3 };
+
+	ImGui::ExtraDrawlist::AddConvexPolyFilledMultiColor(draw, verts, colors, IM_ARRAYSIZE(verts));
+}
+
 void Quad::draw(ImDrawList* draw) const
 {
 	draw->AddQuad(m_p1, m_p2, m_p3, m_p4, m_color, m_thickness);

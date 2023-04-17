@@ -72,14 +72,14 @@ void AimbotDraw::drawFov()
 		// final vector where we aim
 		auto aimingView = destination + forward;
 
-		if (ImVec2 v; imRender.worldToScreen(aimingView, v))
+		if (ImVec2 v; ImRender::worldToScreen(aimingView, v))
 			radius = std::abs(globals::screenX / 2.0f - v.x);
 
 		break;
 	}
 	}
 
-	imRender.drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, vars::aimPaint->colorFov());
+	ImRender::drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, vars::aimPaint->colorFov());
 }
 
 void AimbotDraw::drawBestPoint()
@@ -94,6 +94,6 @@ void AimbotDraw::drawBestPoint()
 	if (hitbox.isZero())
 		return;
 
-	if (ImVec2 p; imRender.worldToScreen(hitbox, p))
-		imRender.drawCircleFilled(p.x, p.y, 5, 12, vars::aimPaint->colorPoint());
+	if (ImVec2 p; ImRender::worldToScreen(hitbox, p))
+		ImRender::drawCircleFilled(p.x, p.y, 5, 12, vars::aimPaint->colorPoint());
 }

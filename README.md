@@ -1,6 +1,8 @@
 # Csgo
 Source aimed for visual aspects of the game.
 
+This is and was a part of me learning C++ and gamehacking.
+
 ![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/179428634-adf44410-4002-4e5d-9ac5-b794dcb1c35f.png)
 
 ## How to build
@@ -82,7 +84,6 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
  * Bomb overlay with info. - draws infomation about bomb, where, what dmg, who planted.
  * Mirrorcam - show what is behind you on extra window (contains fixing setupbones occlusion problems)
  * Freecam - view any place without moving your model (dormant ents won't render)
- * Freelook - a copy of how it looks like in PUBG
  * Blacklist - blacklist bots and players, forces aimbot to fucus blacklisted players.
  * Playerlist - a playerlist that will give information of every player on the server, in one window. Does provide information for dormant ents.
  * Cache - not a feature, just escapes using same loops for(int i; 64)... everywhere.
@@ -173,6 +174,8 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
 * 2.0.1 - Removed xorstr from here, it's a public source. Fixed hotkey with id detection, removed FORMAT wrapper since there is now no need. Removed console macros to few wrapping functions, removed macro for EXPORT, replaced in memory namespace as a template function. Added game punch which should be more "smoothed". Wip SEHCatch as well as features cleanup.
 * 2.0.2 - Ending it soon... Finally got some free time. What is worth mentioning is fixing the aimbot smooth as well as RCS, they both now never set angles. Chams editor is finally added, current code is very far from clean, but the generation / updating / deleting / saving work well. Molotov now has a better way of drawing its range, added fancy triangulation with some poor workarounds to make it scaled.
 * 2.0.3 - Added proper icon parsing, glow 1:1 to the game's code, constexpr signature to hex, less logging on release, fixed few crashes under visual features, and possible crashes with material system. What's left is cleaning up this code.
+* 2.0.4 - Dropped animations, it's useless to keep it updated all the time to newest lib version. Colorized the menu, and somewhat reworked look of it. render -> use namespace, and deprecate surface at all. Provided rendering backends for easier lookup. x88 menu now won't update keys if we don't want to. Control present / reset targets on own for streamproof method. Completely removed vectored handler - reason is because we can actually force memory leaks? That's happening eg: if you are the local host. Did some random cleanups.
+* 2.0.5 - menu recode, I hope it's "clean" now. Recode of bunch of classes, WIP chams editor cleanup, because it annoys me how complicated it is.
 </details>
 
 # People who helped

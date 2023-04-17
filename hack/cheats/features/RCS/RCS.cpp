@@ -6,6 +6,9 @@
 #include <SDK/CUserCmd.hpp>
 #include <SDK/ICvar.hpp>
 #include <SDK/ConVar.hpp>
+#include <SDK/ConVar.hpp>
+#include <SDK/CGlobalVars.hpp>
+#include <SDK/CGameMovement.hpp>
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/math/Vector.hpp>
 #include <SDK/interfaces/interfaces.hpp>
@@ -53,39 +56,41 @@ void RCS::prepare(float* x, float* y)
 	if (!cmd)
 		return;
 
-	static auto oldPunch = game::localPlayer->getAimPunch() * m_scale->getFloat();
+	Vec3 punch = game::localPlayer->getAimPunch();
+	punch[0] *= m_scale->getFloat() * cfg.rcsX;
+	punch[1] *= m_scale->getFloat() * cfg.rcsY;
+
+	static auto oldPunch = punch;
 	if (game::localPlayer()->m_iShotsFired() > 1 && cmd->m_buttons & IN_ATTACK)
 	{
-		const Vec3 view = game::getViewAngles();
-		auto punch = game::localPlayer->getAimPunch() * m_scale->getFloat();
+		const Vec3 deltaPunch = punch - oldPunch;
+		constexpr int steps = 10;
+		const float step = punch.length() / steps;
+		// do smth better with length? this is cheap solution to dont overwrite the aimangle so obviously at like single-patch
+		// yet still control the recoil perfectly
+		// maybe interpolate with pix?
+		for (float pix = 0.0f; pix <= std::min(1.0f, punch.length()); pix += step)
+		{
+			const Vec3 punchPos = game::getViewAngles() - (deltaPunch * (1.0f - pix));
+			auto& toAdd = Vec3{ game::getViewAngles() - punchPos }.normalize().clamp();
 
-		punch[Coord::X] *= cfg.rcsX;
-		punch[Coord::Y] *= cfg.rcsY;
-		const Vec3 deltaPunch = oldPunch - punch;
-		const Vec3 viewPunch = view + deltaPunch;
-		auto& toAdd = Vec3{ view - viewPunch }.normalize().clamp();
+			toAdd[0] /= m_pitch->getFloat();
+			toAdd[1] /= m_yaw->getFloat();
 
-		toAdd[0] /= m_pitch->getFloat();
-		toAdd[1] /= m_yaw->getFloat();
+			Vec2 mouse = Vec2{ *x, *y };
+			Vec2 mouseScreen = Vec2{ toAdd[1], -toAdd[0] };
 
-		Vec2 mouse = Vec2{ *x, *y };
-		Vec2 mouseScreen = Vec2{ toAdd[1], -toAdd[0] };
+			mouseScreen[0] = (mouseScreen[0] + mouse[0]) / 2.0f;
+			mouseScreen[1] = (mouseScreen[1] + mouse[1]) / 2.0f;
 
-		mouseScreen[0] = (mouseScreen[0] + mouse[0]) / 2.0f;
-		mouseScreen[1] = (mouseScreen[1] + mouse[1]) / 2.0f;
-
-		*x = mouseScreen[0];
-		*y = mouseScreen[1];
-
+			*x = mouseScreen[0];
+			*y = mouseScreen[1];
+		}
 
 		oldPunch = punch;
 	}
 	else
 	{
-		auto punch = game::localPlayer->getAimPunch() * m_scale->getFloat();
-		punch[Coord::X] *= cfg.rcsX;
-		punch[Coord::Y] *= cfg.rcsY;
-
 		oldPunch = punch;
 	}
 }

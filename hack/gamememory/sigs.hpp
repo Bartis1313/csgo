@@ -41,6 +41,11 @@
 #define RET_ADDR_KEYVALUES_CLIENT	SIG("55 8B EC 56 57 8B F9 8B F2 83 FF 11 0F 87")
 // #STR: "Video driver has crashed and been reset, re-uploading reso
 #define DX9_DEVICE					SIG("A1 ? ? ? ? 50 8B 08 FF 51 0C")
+// https://aixxe.net/2017/09/steam-overlay-rendering
+#define DX9_PRESENT					SIG("FF 15 ? ? ? ? 8B F0 85 FF")
+// https://aixxe.net/2017/09/steam-overlay-rendering
+// less safe sig: FF 15 ? ? ? ? 8B D8 85 DB 78 18
+#define DX9_RESET					SIG("C7 45 ? ? ? ? ? FF 15 ? ? ? ? 8B D8")
 // #STR: DebugView
 // #STR: debug/
 // finding it with live debugger is easier and I don't think it needs any explanation how to find your local view matrix
@@ -306,7 +311,7 @@ ParticleEffect
 // #STR: "origin: <%d, %d, %d>\n", "light:  %d\n"
 #define HOST_STATE					SIG("A1 ? ? ? ? 0F 84 ? ? ? ? 33 C9")
 // found from glow DrawModel function
-#define FIRST_MOVE_CHILD			SIG("8B 46 04 8B 80 ? ? ? ?")
+#define FIRST_MOVE_CHILD			SIG("8B 80 0C 03 00 00 83 F8 FF 0F 84 C2 00 00 00")
 // found from glow DrawModel function
 #define NEXT_PEER					SIG("8B 8E ? ? ? ? 83 F9 FF 74 1F 0F B7 C1 C1 E0 04 05 ? ? ? ? 74 0C C1 E9 10 39 48 04 75 04 8B 30 EB 02 33 F6 85 F6 75 B5")
 // #STR: "func_breakable", "func_breakable_surf"

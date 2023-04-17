@@ -26,12 +26,12 @@ public:
 		void add(TypeLogs type, const std::string_view fmt, Args_t&&... args);
 		void draw(const char* title, bool* p_open = NULL);
 	private:
-		bool wrap = false;
-		ImGuiTextFilter filter;
-		std::vector<std::pair<std::string, TypeLogs>> buffer;
+		bool wrap{ false };
+		ImGuiTextFilter filter{ };
+		std::vector<std::pair<std::string, TypeLogs>> buffer{ };
 	} log;
 private:
-	bool m_opened = false;
+	bool m_opened{ false };
 };
 
 GLOBAL_FEATURE(LogDrawer);

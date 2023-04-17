@@ -227,7 +227,6 @@
     <ClCompile Include="hack\cheats\features\visuals\mirrorcam\mirrorCam.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\crosshair.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\drawinfo.cpp" />
-    <ClCompile Include="hack\cheats\features\visuals\misc\hat.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\motionblur.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\screenEffects.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\trails.cpp" />
@@ -265,7 +264,6 @@
     <ClCompile Include="hack\cheats\features\fakelatency\fakelatency.cpp" />
     <ClCompile Include="hack\cheats\features\logger\logger.cpp" />
     <ClCompile Include="hack\cheats\features\misc\cameras\freeCam.cpp" />
-    <ClCompile Include="hack\cheats\features\misc\cameras\freeLook.cpp" />
     <ClCompile Include="hack\cheats\features\misc\disable\interpolate.cpp" />
     <ClCompile Include="hack\cheats\features\misc\flashlight\flashlight.cpp" />
     <ClCompile Include="hack\cheats\features\misc\movement\movement.cpp" />
@@ -283,8 +281,18 @@
     <ClCompile Include="hack\cheats\classes\screen2dEffects.cpp" />
     <ClCompile Include="hack\cheats\classes\VR.cpp" />
     <ClCompile Include="hack\deps\ImGui\editor\LanguageDefinitions.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\sections\combat\aim.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\sections\editors\chamsEditor.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\sections\editors\editors.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\sections\editors\styleEditor.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\sections\misc\misc.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\sections\settings\settings.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\sections\visuals\visuals.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\styles\styles.cpp" />
+    <ClCompile Include="hack\render\backend\backend.cpp" />
     <ClCompile Include="hack\SDK\IMatRenderContext.cpp" />
     <ClCompile Include="hack\SDK\material.cpp" />
+    <ClCompile Include="hack\setup\seh.cpp" />
     <ClCompile Include="hack\utilities\tools\tools.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -299,8 +307,7 @@
     <ClCompile Include="hack\deps\ImGui\extraDraw.cpp" />
     <ClCompile Include="hack\deps\ImGui\editor\TextEditor.cpp" />
     <ClCompile Include="hack\gamememory\memory.cpp" />
-    <ClCompile Include="hack\menu\GUI-ImGui\animations.cpp" />
-    <ClCompile Include="hack\menu\GUI-ImGui\background.cpp" />
+    <ClCompile Include="hack\menu\GUI-ImGui\sections\background.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\imguiaddons.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\menu.cpp" />
     <ClCompile Include="hack\menu\x88Menu\x88menu.cpp" />
@@ -315,7 +322,6 @@
     <ClCompile Include="hack\SDK\IPrediction.cpp" />
     <ClCompile Include="hack\SDK\KeyValues.cpp" />
     <ClCompile Include="hack\SDK\structs\Entity.cpp" />
-    <ClCompile Include="hack\setup\SEHcatch.cpp" />
     <ClCompile Include="hack\setup\setup.cpp" />
     <ClCompile Include="hack\utilities\console\console.cpp" />
     <ClCompile Include="hack\utilities\console\consoleDraw.cpp" />
@@ -354,7 +360,6 @@
     <ClInclude Include="hack\cheats\features\fakelatency\fakelatency.hpp" />
     <ClInclude Include="hack\cheats\features\logger\logger.hpp" />
     <ClInclude Include="hack\cheats\features\misc\cameras\freeCam.hpp" />
-    <ClInclude Include="hack\cheats\features\misc\cameras\freeLook.hpp" />
     <ClInclude Include="hack\cheats\features\misc\disable\interpolate.hpp" />
     <ClInclude Include="hack\cheats\features\misc\flashlight\flashlight.hpp" />
     <ClInclude Include="hack\cheats\features\misc\movement\movement.hpp" />
@@ -367,6 +372,7 @@
     <ClInclude Include="hack\cheats\features\visuals\chams\editor.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\factory\create.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\mat.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\chams\shared.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\glow\glow.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\hitmarker\hitmark.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\list\playerlist.hpp" />
@@ -375,7 +381,6 @@
     <ClInclude Include="hack\cheats\features\visuals\misc\bulletUpdater.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\crosshair.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\drawInfo.hpp" />
-    <ClInclude Include="hack\cheats\features\visuals\misc\hat.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\motionblur.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\noscope.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\screenEffects.hpp" />
@@ -426,16 +431,26 @@
     <ClInclude Include="hack\gamememory\modules.hpp" />
     <ClInclude Include="hack\gamememory\pattern.hpp" />
     <ClInclude Include="hack\gamememory\sigs.hpp" />
-    <ClInclude Include="hack\menu\GUI-ImGui\animations.hpp" />
-    <ClInclude Include="hack\menu\GUI-ImGui\background.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\sections\background.hpp" />
     <ClInclude Include="hack\menu\GUI-ImGui\imguiaddons.hpp" />
     <ClInclude Include="hack\menu\GUI-ImGui\menu.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\sections\combat\aim.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\sections\common.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\sections\editors\chamsEditor.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\sections\editors\editors.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\sections\misc\misc.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\sections\settings\settings.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\sections\visuals\visuals.hpp" />
     <ClInclude Include="hack\menu\GUI-ImGui\selections.hpp" />
+    <ClInclude Include="hack\menu\GUI-ImGui\styles\styles.hpp" />
     <ClInclude Include="hack\menu\GUI-ImGui\tabrender.hpp" />
     <ClInclude Include="hack\menu\x88Menu\x88menu.hpp" />
     <ClInclude Include="hack\menu\x88Menu\x88types.hpp" />
+    <ClInclude Include="hack\render\backend\backend.hpp" />
     <ClInclude Include="hack\render\BBox.hpp" />
     <ClInclude Include="hack\render\Color.hpp" />
+    <ClInclude Include="hack\render\fonts\fontawesome.hpp" />
+    <ClInclude Include="hack\render\fonts\icon.hpp" />
     <ClInclude Include="hack\render\render.hpp" />
     <ClInclude Include="hack\render\structures.hpp" />
     <ClInclude Include="hack\resources\resource.h" />
@@ -521,7 +536,7 @@
     <ClInclude Include="hack\SDK\structs\indexes.hpp" />
     <ClInclude Include="hack\SDK\varMapping.hpp" />
     <ClInclude Include="hack\SDK\vars.hpp" />
-    <ClInclude Include="hack\setup\SEHcatch.hpp" />
+    <ClInclude Include="hack\setup\seh.hpp" />
     <ClInclude Include="hack\setup\setup.hpp" />
     <ClInclude Include="hack\utilities\console\console.hpp" />
     <ClInclude Include="hack\utilities\console\consoleDraw.hpp" />
@@ -541,6 +556,7 @@
   <ItemGroup>
     <None Include="hack\cheats\classes\README.md" />
     <None Include="hack\deps\README.md" />
+    <None Include="hack\menu\GUI-ImGui\sections\editors\styleEditor.hpp" />
     <None Include="hack\resources\csgo-legit.aps" />
     <None Include="vcpkg.json" />
   </ItemGroup>

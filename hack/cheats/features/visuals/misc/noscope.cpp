@@ -27,8 +27,8 @@ void NoScope::draw()
 
 	if (game::localPlayer->m_bIsScoped())
 	{
-		imRender.drawLine(globals::screenX / 2.0f, 0.0f, globals::screenX / 2.0f, static_cast<float>(globals::screenY), Colors::Black);
-		imRender.drawLine(0.0f, globals::screenY / 2.0f, static_cast<float>(globals::screenX), globals::screenY / 2.0f, Colors::Black);
+		ImRender::drawLine(globals::screenX / 2.0f, 0.0f, globals::screenX / 2.0f, static_cast<float>(globals::screenY), Colors::Black);
+		ImRender::drawLine(0.0f, globals::screenY / 2.0f, static_cast<float>(globals::screenX), globals::screenY / 2.0f, Colors::Black);
 	}
 }
 

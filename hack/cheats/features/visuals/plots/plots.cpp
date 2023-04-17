@@ -7,13 +7,16 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <gamememory/memory.hpp>
 #include <cheats/game/game.hpp>
-#include <menu/GUI-ImGui/animations.hpp>
 #include <config/vars.hpp>
 #include <utilities/utilities.hpp>
 #include <render/render.hpp>
 #include <utilities/console/console.hpp>
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
+
+#include <menu/GUI-ImGui/imguiaddons.hpp>
+#include <imgui.h>
+#include <imgui_internal.h>
 #include <implot.h>
 
 #include <numeric>
@@ -66,9 +69,9 @@ void Plots::drawFps()
 		{
 			if (ImGui::BeginMenu("Menu"))
 			{
-				ImGui::Animations::SliderFloat("Set max FPS", &MAX_FPS, 30.0f, 1000.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
-				ImGui::Animations::SliderInt("Records size", &vars::misc->plots->sizeFps, 10, 1000);
-				ImGui::Animations::ColorPicker("Color lines plot fps", &vars::misc->plots->colorFPS);
+				ImGui::SliderFloat("Set max FPS", &MAX_FPS, 30.0f, 1000.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
+				ImGui::SliderInt("Records size", &vars::misc->plots->sizeFps, 10, 1000);
+				ImGui::ColorPicker("Color lines plot fps", &vars::misc->plots->colorFPS);
 
 				ImGui::EndMenu();
 			}
@@ -78,8 +81,8 @@ void Plots::drawFps()
 
 		if (m_FpsRecords.size() != MAX_SIZE_PLOTS)
 		{
-			drawing::TextSize{ 30.0f, ImFonts::franklinGothic30, ImGui::GetCurrentWindow()->DC.CursorPos,
-				Color::U32(Colors::Yellow), "Wait for buffer to load!", false, false }.draw(ImGui::GetWindowDrawList());
+			ImGui::TextUnformatted("Wait for buffer to load!");
+			ImGui::ProgressBar(m_FpsRecords.size() / static_cast<float>(MAX_SIZE_PLOTS), ImVec2{ 0, 0 });
 
 			ImGui::End();
 			return;
@@ -142,8 +145,8 @@ void Plots::drawVelocity()
 			{
 				if (ImGui::BeginMenu("Menu"))
 				{
-					ImGui::Animations::SliderInt("Records size", &vars::misc->plots->sizeVelocity, 10, MAX_SIZE_PLOTS - 1);
-					ImGui::Animations::ColorPicker("Color lines plot vel", &vars::misc->plots->colorVelocity);
+					ImGui::SliderInt("Records size", &vars::misc->plots->sizeVelocity, 10, MAX_SIZE_PLOTS - 1);
+					ImGui::ColorPicker("Color lines plot vel", &vars::misc->plots->colorVelocity);
 
 					ImGui::EndMenu();
 				}
@@ -154,8 +157,8 @@ void Plots::drawVelocity()
 
 		if (m_VelocityRecords.size() != MAX_SIZE_PLOTS)
 		{
-			drawing::TextSize{ 30.0f, ImFonts::franklinGothic30, ImGui::GetCurrentWindow()->DC.CursorPos,
-				Color::U32(Colors::Yellow), "Wait for buffer to load!", false, false }.draw(ImGui::GetWindowDrawList());
+			ImGui::TextUnformatted("Wait for buffer to load!");
+			ImGui::ProgressBar(m_VelocityRecords.size() / static_cast<float>(MAX_SIZE_PLOTS), ImVec2{ 0, 0 });
 
 			ImGui::End();
 			return;

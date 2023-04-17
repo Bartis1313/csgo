@@ -86,14 +86,16 @@ bool Entity_t::isBreakable()
 
 Entity_t* Entity_t::firstMoveChild()
 {
-	// fill later
-	return nullptr;
+	const auto offset = memory::firstMoveChild();
+	const auto handle = *reinterpret_cast<EHandle_t*>((uintptr_t)this + offset);
+	return reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientFromHandle(handle));
 }
 
 Entity_t* Entity_t::nextMovePeer()
 {
-	// fill later
-	return nullptr;
+	const auto offset = memory::nextMovePeer();
+	const auto handle = *reinterpret_cast<EHandle_t*>((uintptr_t)this + offset);
+	return reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientFromHandle(handle));
 }
 
 int Entity_t::m_takedamage()

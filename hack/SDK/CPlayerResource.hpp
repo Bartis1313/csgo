@@ -9,22 +9,22 @@ class PlayerResource
 public:
 	int getKills(int id)
 	{
-		const static auto addr = netvarMan.getNetvar("DT_PlayerResource", "m_iKills");
+		const static auto addr = netvars::getNetvar("DT_PlayerResource", "m_iKills");
 		return *reinterpret_cast<int*>(uintptr_t(this) + addr + id * sizeof(int*));
 	}
 	int getDeaths(int id)
 	{
-		const static auto addr = netvarMan.getNetvar("DT_PlayerResource", "m_iDeaths");
+		const static auto addr = netvars::getNetvar("DT_PlayerResource", "m_iDeaths");
 		return *reinterpret_cast<int*>(uintptr_t(this) + addr + id * sizeof(int*));
 	}
 	int getPing(int id)
 	{
-		const static auto addr = netvarMan.getNetvar("DT_PlayerResource", "m_iPing");
+		const static auto addr = netvars::getNetvar("DT_PlayerResource", "m_iPing");
 		return *reinterpret_cast<int*>(uintptr_t(this) + addr + id * sizeof(int*));
 	}
 	std::string getRank(int id, bool useShortName = false)
 	{
-		const static auto addr = netvarMan.getNetvar("DT_CSPlayerResource", "m_iCompetitiveRanking");
+		const static auto addr = netvars::getNetvar("DT_CSPlayerResource", "m_iCompetitiveRanking");
 
 		const static std::pair<std::string, std::string> ranks[] =
 		{
@@ -57,7 +57,7 @@ public:
 
 	int getWins(int id)
 	{
-		const static auto addr = netvarMan.getNetvar("DT_CSPlayerResource", "m_iCompetitiveWins");
+		const static auto addr = netvars::getNetvar("DT_CSPlayerResource", "m_iCompetitiveWins");
 		return *reinterpret_cast<int*>(uintptr_t(this) + addr + id * sizeof(int*));
 	}
 };

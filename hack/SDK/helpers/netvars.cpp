@@ -10,11 +10,23 @@
 
 #include <array>
 #include <ranges>
+#include <fstream>
+#include <unordered_map>
 
-void NetvarManager::init()
+namespace netvars
 {
-	m_Tables.clear();
+	std::unordered_map<std::string_view, RecvTable*> m_Tables{ };
+	std::ofstream file{ };
 
+	[[nodiscard]] uintptr_t getProp(const std::string_view tableName, const std::string_view propName, RecvProp** prop = nullptr);
+	[[nodiscard]] uintptr_t getProp(RecvTable* recvTable, const std::string_view propName, RecvProp** prop = nullptr);
+	[[nodiscard]] RecvTable* getTable(const std::string_view tableName);
+	[[nodiscard]] std::string getType(RecvProp* recvTable);
+	void dump(RecvTable* recvTable);
+}
+
+void netvars::init()
+{
 	auto clientClass = memory::interfaces::client->getAllClasses();
 	if (!clientClass)
 		return;
@@ -30,7 +42,7 @@ void NetvarManager::init()
 	dump();
 }
 
-uintptr_t NetvarManager::getNetvar(const std::string_view tableName, const std::string_view propName) const
+uintptr_t netvars::getNetvar(const std::string_view tableName, const std::string_view propName)
 {
 	auto offset = getProp(tableName, propName);
 	if (!offset)
@@ -39,7 +51,7 @@ uintptr_t NetvarManager::getNetvar(const std::string_view tableName, const std::
 	return offset;
 }
 
-uintptr_t NetvarManager::getProp(const std::string_view tableName, const std::string_view propName, RecvProp** prop) const
+uintptr_t netvars::getProp(const std::string_view tableName, const std::string_view propName, RecvProp** prop)
 {
 	auto recvTable = getTable(tableName);
 	if (!recvTable)
@@ -52,7 +64,7 @@ uintptr_t NetvarManager::getProp(const std::string_view tableName, const std::st
 	return offset;
 }
 
-uintptr_t NetvarManager::getProp(RecvTable* recvTable, const std::string_view propName, RecvProp** prop) const
+uintptr_t netvars::getProp(RecvTable* recvTable, const std::string_view propName, RecvProp** prop)
 {
 	uintptr_t extraOffset = 0;
 
@@ -81,7 +93,7 @@ uintptr_t NetvarManager::getProp(RecvTable* recvTable, const std::string_view pr
 	return extraOffset;
 }
 
-RecvTable* NetvarManager::getTable(const std::string_view tableName) const
+RecvTable* netvars::getTable(const std::string_view tableName)
 {
 	if (m_Tables.empty())
 		return nullptr;
@@ -95,7 +107,7 @@ RecvTable* NetvarManager::getTable(const std::string_view tableName) const
 	return nullptr;
 }
 
-std::string NetvarManager::getType(RecvProp* recvTable) const
+std::string netvars::getType(RecvProp* recvTable)
 {
 	static std::unordered_map<SendPropType, std::string> props =
 	{
@@ -118,7 +130,7 @@ std::string NetvarManager::getType(RecvProp* recvTable) const
 	return props.at(recvTable->m_recvType);
 }
 
-void NetvarManager::dump(RecvTable* recvTable)
+void netvars::dump(RecvTable* recvTable)
 {
 	for (auto i : std::views::iota(0, recvTable->m_propsNum))
 	{
@@ -128,7 +140,6 @@ void NetvarManager::dump(RecvTable* recvTable)
 			continue;
 
 		std::string_view recvName = recvProp->m_varName;
-
 		if (recvName.find("baseclass") != std::string::npos)
 			continue;
 
@@ -148,7 +159,7 @@ void NetvarManager::dump(RecvTable* recvTable)
 
 #include <SDK/datamap.hpp>
 
-uintptr_t NetvarManager::getDataMap(DataMap_t* map, const std::string_view name) const
+uintptr_t netvars::getDataMap(DataMap_t* map, const std::string_view name)
 {
 	while (map)
 	{
@@ -159,15 +170,14 @@ uintptr_t NetvarManager::getDataMap(DataMap_t* map, const std::string_view name)
 			if (descriptor.m_name == nullptr)
 				continue;
 
-			// string_view as map->m_dataDescription[i].m_name sometimes crashes on this, UB
-			if(std::strcmp(name.data(), descriptor.m_name) == 0)
+			if (name == std::string_view{ descriptor.m_name })
 				return descriptor.m_offset[TD_OFFSET_NORMAL];
 
 			if (descriptor.m_type == FIELD_EMBEDDED)
 			{
 				if (descriptor.m_dataMap)
 				{
-					if (const auto offset = getDataMap(descriptor.m_dataMap, name); offset)
+					if (const auto offset = getDataMap(descriptor.m_dataMap, name))
 						return offset;
 				}
 			}
@@ -180,21 +190,24 @@ uintptr_t NetvarManager::getDataMap(DataMap_t* map, const std::string_view name)
 
 #include <utilities/simpleTimer.hpp>
 
-void NetvarManager::dump()
+void netvars::dump()
 {
 	file = std::ofstream{ config.getHackPath() / "netvarsDump.txt" };
 	file << std::format("Netvars from: {}", utilities::getTime()) << "\n\n";
 
 	TimeCount timer{};
+	size_t count{ 0U };
+
 	auto client = memory::interfaces::client->getAllClasses();
 	do {
 		const auto recvTable = client->m_recvTable;
 		dump(recvTable);
 		client = client->m_next;
+		++count;
 	} while (client);
+
 	timer.end();
 
-	file << '\n' << std::format("Finished in {:.2f} secs", timer.getTime());
-
+	file << '\n' << std::format("Found {} netvars\nFinished in {:.2f} secs", count, timer.getTime());
 	file.close();
 }

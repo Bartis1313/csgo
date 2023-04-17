@@ -22,8 +22,11 @@ else { \
 }
 	hookHelper::initMinhook();
 
-	HOOK(memory::interfaces::dx9Device(), hooks::reset);
-	HOOK(memory::interfaces::dx9Device(), hooks::present);
+	hooks::present::original = memory::Address<hooks::present::fn>{ memory::present() }.deRef(memory::Dereference::TWICE)();
+	hooks::reset::original = memory::Address<hooks::reset::fn>{ memory::reset() }.deRef(memory::Dereference::TWICE)();
+	**reinterpret_cast<void***>(memory::present()) = present::hooked;
+	**reinterpret_cast<void***>(memory::reset()) = reset::hooked;
+	
 	HOOK(memory::interfaces::dx9Device(), hooks::drawIndexedPrimitive);
 
 	HOOK(memory::interfaces::keyValuesSys(), hooks::allocKeyValues);
@@ -77,5 +80,8 @@ else { \
 
 void hooks::shutdown()
 {
+	**reinterpret_cast<void***>(memory::present()) = hooks::present::original;
+	**reinterpret_cast<void***>(memory::reset()) = hooks::reset::original;
+
 	hookHelper::shutdownAllHooks();
 }

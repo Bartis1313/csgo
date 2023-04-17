@@ -52,7 +52,7 @@ void BulletImpactsClient::draw()
 			continue;
 		}
 
-		imRender.drawBox3DFilled(el.m_pos, 4.0f, 4.0f, outline, fill);
+		ImRender::drawBox3DFilled(el.m_pos, 4.0f, 4.0f, outline, fill);
 
 		i++;
 	}

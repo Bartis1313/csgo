@@ -13,7 +13,6 @@ enum class EntCacheType // add more if needed, each group should contain many id
 {
 	PLAYER,
 	GRENADE_PROJECTILES,
-	CONTROLLERS, // fog, tone, ambient...
 	WORLD_ENTS, // c4 and such...
 	WEAPON,
 };

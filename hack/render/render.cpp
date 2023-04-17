@@ -6,13 +6,14 @@
 
 #include <SDK/interfaces/interfaces.hpp>
 #include <SDK/ISurface.hpp>
-#include <SDk/math/matrix.hpp>
+#include <SDK/math/matrix.hpp>
 #include <utilities/res.hpp>
 
 #include <ranges>
 
 #define BUFFER_SIZE 256
 
+#ifdef SURFACE_RENDER
 enum FontFlags
 {
 	FONTFLAG_NONE,
@@ -499,6 +500,7 @@ void SurfaceRender::drawProgressRing(const int x, const int y, float radius, con
 			color);
 	}
 }
+#endif
 
 /*
 
@@ -507,23 +509,44 @@ void SurfaceRender::drawProgressRing(const int x, const int y, float radius, con
 
 */
 
+
+#include "fonts/fontawesome.hpp"
+#include "fonts/icon.hpp"
+
+#include <gamememory/memory.hpp>
+
 #include <ShlObj.h>
 #include <filesystem>
+#include <imgui_internal.h>
 #include <imgui_freetype.h>
+#include <deque>
+#include <array>
+#include <shared_mutex>
 
-void ImGuiRender::init(ImGuiIO& io)
+namespace
+{
+	std::deque<std::unique_ptr<drawing::Draw>> m_drawData;
+}
+
+void ImRender::init(ImGuiIO& io)
 {
 	if (CHAR fontsPath[MAX_PATH]; SUCCEEDED(LI_FN_CACHED(SHGetFolderPathA)(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fontsPath)))
 	{
 		const std::filesystem::path path{ fontsPath };
+		const std::filesystem::path csFontsPath{ std::filesystem::current_path() / "platform" / "vgui" / "fonts" };
 
 		ImFontConfig cfg;
-		cfg.OversampleH = 3;
-		cfg.OversampleV = 3;
-		cfg.FontBuilderFlags = ImGuiFreeTypeBuilderFlags_LightHinting;
+		cfg.OversampleH = 2;
+		cfg.OversampleV = 1;
 
-		ImVector<ImWchar> range;
-		ImFontGlyphRangesBuilder textBuilder;
+		ImFontConfig iconsCfg;
+		iconsCfg.MergeMode = true;
+		iconsCfg.PixelSnapH = true;
+
+		constexpr ImWchar iconRanges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+
+		ImVector<ImWchar> ranges;
+		ImFontGlyphRangesBuilder builder;
 		constexpr ImWchar textRanges[] =
 		{
 			0x0020, 0x00FF, // Basic Latin
@@ -532,19 +555,28 @@ void ImGuiRender::init(ImGuiIO& io)
 			0x0E00, 0x0E7F, // Thai
 			0
 		};
-		textBuilder.AddRanges(textRanges);
-		textBuilder.AddRanges(io.Fonts->GetGlyphRangesCyrillic());
-		textBuilder.AddRanges(io.Fonts->GetGlyphRangesDefault());
-		textBuilder.BuildRanges(&range);
+		builder.AddRanges(textRanges);
+		builder.AddRanges(ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+		builder.BuildRanges(&ranges);
 
-		ImFonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "tahoma.ttf" }.string().c_str(), 14.0f, &cfg, textRanges);
-		ImFonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "tahoma.ttf" }.string().c_str(), 20.0f, &cfg, textRanges);
-		ImFonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "framd.ttf" }.string().c_str(), 12.0f, &cfg, textRanges);
-		ImFonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "framd.ttf" }.string().c_str(), 30.0f, &cfg, textRanges);
-		ImFonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "Verdana.ttf" }.string().c_str(), 12.0f, &cfg, textRanges);
+#define ADD_MERGED_ICONS io.Fonts->AddFontFromMemoryCompressedTTF(fontawesome_compressed_data, fontawesome_compressed_size, 15.0f, &iconsCfg, iconRanges);
 
-		if (!ImGuiFreeType::BuildFontAtlas(io.Fonts))
-			throw std::runtime_error("ImGuiFreeType::BuildFontAtlas returned false");
+		fonts::tahoma14 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "tahoma.ttf" }.string().c_str(), 14.0f, &cfg, ranges.Data);
+		ADD_MERGED_ICONS;
+		fonts::tahoma20 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "tahoma.ttf" }.string().c_str(), 20.0f, &cfg, ranges.Data);
+		ADD_MERGED_ICONS;
+		fonts::franklinGothic12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "framd.ttf" }.string().c_str(), 12.0f, &cfg, ranges.Data);
+		ADD_MERGED_ICONS;
+		fonts::franklinGothic30 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "framd.ttf" }.string().c_str(), 30.0f, &cfg, ranges.Data);
+		ADD_MERGED_ICONS;
+		fonts::verdana12 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ path / "Verdana.ttf" }.string().c_str(), 12.0f, &cfg, ranges.Data);
+		ADD_MERGED_ICONS;
+		fonts::csgoTahoma15 = io.Fonts->AddFontFromFileTTF(std::filesystem::path{ csFontsPath / "tahoma.ttf" }.string().c_str(), 15.0f, &cfg, ranges.Data);
+		ADD_MERGED_ICONS;
+
+		io.Fonts->Build();
+
+#undef ADD_MERGED_ICONS
 	}
 	else
 		throw std::runtime_error("could not reach windows path");
@@ -552,44 +584,44 @@ void ImGuiRender::init(ImGuiIO& io)
 	console::debug("init imgui fonts success");
 }
 
-void ImGuiRender::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)
+void ImRender::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Line>(ImVec2{ x, y }, ImVec2{ x2, y2 }, Color::U32(color), thickness));
 }
 
-void ImGuiRender::drawLine(const ImVec2& start, const ImVec2& end, const Color& color, const float thickness)
+void ImRender::drawLine(const ImVec2& start, const ImVec2& end, const Color& color, const float thickness)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Line>(start, end, Color::U32(color), thickness));
 }
 
-void ImGuiRender::drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImRender::drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags, const float thickness)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Rectangle>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), 0.0f, flags, thickness));
 }
 
-void ImGuiRender::drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags)
+void ImRender::drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::RectangleFilled>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), 0.0f, flags));
 }
 
-void ImGuiRender::drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImRender::drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags, const float thickness)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Rectangle>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), rounding, flags, thickness));
 }
 
-void ImGuiRender::drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags)
+void ImRender::drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::RectangleFilled>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), rounding, flags));
 }
 
-void ImGuiRender::drawRectFilledMultiColor(const float x, const float y, const float w, const float h,
+void ImRender::drawRectFilledMultiColor(const float x, const float y, const float w, const float h,
 	const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::RectangleMultiColor>(ImVec2{ x, y }, ImVec2{ x + w, y + h },
 		Color::U32(colUprLeft), Color::U32(colUprRight), Color::U32(colBotRight), Color::U32(colBotLeft)));
 }
 
-void ImGuiRender::drawTrianglePoly(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
+void ImRender::drawTrianglePoly(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
 {
 	std::vector verts =
 	{
@@ -598,7 +630,7 @@ void ImGuiRender::drawTrianglePoly(const ImVec2& p1, const ImVec2& p2, const ImV
 		p3
 	};
 
-	imRender.drawPolyGon(verts, color);
+	drawPolyGon(verts, color);
 }
 
 static ImVec2 operator-(const ImVec2& v, float val)
@@ -611,7 +643,7 @@ static ImVec2 operator+(const ImVec2& v, float val)
 	return ImVec2{ v.x + val, v.y + val };
 }
 
-void ImGuiRender::drawBox3D(const Vec3& pos, const float width, const float height, const Color& color, bool outlined, const float thickness)
+void ImRender::drawBox3D(const Vec3& pos, const float width, const float height, const Color& color, bool outlined, const float thickness)
 {
 	// dividing to get a centre to world position
 	float boxW = width / 2.0f;
@@ -660,7 +692,7 @@ void ImGuiRender::drawBox3D(const Vec3& pos, const float width, const float heig
 	}
 }
 
-void ImGuiRender::drawBox3DFilled(const Vec3& pos, const float width, const float height, const Color& color, const Color& filling, bool outlined, const float thickness)
+void ImRender::drawBox3DFilled(const Vec3& pos, const float width, const float height, const Color& color, const Color& filling, bool outlined, const float thickness)
 {
 	// dividing to get a centre to world position
 	float boxW = width / 2.0f;
@@ -719,17 +751,17 @@ void ImGuiRender::drawBox3DFilled(const Vec3& pos, const float width, const floa
 	}
 }
 
-void ImGuiRender::drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness)
+void ImRender::drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Circle>(ImVec2{ x, y }, radius, points, Color::U32(color), thickness));
 }
 
-void ImGuiRender::drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color)
+void ImRender::drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::CircleFilled>(ImVec2{ x, y }, radius, points, Color::U32(color)));
 }
 
-void ImGuiRender::drawCircle3D(const Vec3& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImRender::drawCircle3D(const Vec3& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
 {
 	float step = math::PI_2 / points;
 
@@ -747,7 +779,7 @@ void ImGuiRender::drawCircle3D(const Vec3& pos, const float radius, const int po
 #include <SDK/IEngineTrace.hpp>
 #include <SDK/vars.hpp>
 
-void ImGuiRender::drawCircle3DTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImRender::drawCircle3DTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const ImDrawFlags flags, const float thickness)
 {
 	float step = math::PI_2 / points;
 
@@ -769,7 +801,7 @@ void ImGuiRender::drawCircle3DTraced(const Vec3& pos, const float radius, const 
 	drawPolyLine(pointsVec, color, flags, thickness);
 }
 
-void ImGuiRender::drawCircle3DFilled(const Vec3& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
+void ImRender::drawCircle3DFilled(const Vec3& pos, const float radius, const int points, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
 	float step = math::PI_2 / points;
 
@@ -785,7 +817,7 @@ void ImGuiRender::drawCircle3DFilled(const Vec3& pos, const float radius, const 
 	drawPolyLine(pointsVec, color, flags, thickness);
 }
 
-void ImGuiRender::drawCircle3DFilledTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
+void ImRender::drawCircle3DFilledTraced(const Vec3& pos, const float radius, const int points, void* skip, const Color& color, const Color& outline, const ImDrawFlags flags, const float thickness)
 {
 	float step = math::PI *2.0f / points;
 
@@ -808,12 +840,12 @@ void ImGuiRender::drawCircle3DFilledTraced(const Vec3& pos, const float radius, 
 	drawPolyLine(pointsVec, color, flags, thickness);
 }
 
-void ImGuiRender::drawTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color, const float thickness)
+void ImRender::drawTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color, const float thickness)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
 }
 
-void ImGuiRender::drawTriangle(const float x, const float y, const float w, const float h, const Color& color, const float angle, const float thickness)
+void ImRender::drawTriangle(const float x, const float y, const float w, const float h, const Color& color, const float angle, const float thickness)
 {
 	float radian = math::DEG2RAD(angle);
 	float radian90 = math::DEG2RAD(angle + 90);
@@ -825,12 +857,12 @@ void ImGuiRender::drawTriangle(const float x, const float y, const float w, cons
 	m_drawData.emplace_back(std::make_unique<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
 }
 
-void ImGuiRender::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
+void ImRender::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
 }
 
-void ImGuiRender::drawTriangleFilled(const float x, const float y, const float w, const float h, const float angle, const Color& color)
+void ImRender::drawTriangleFilled(const float x, const float y, const float w, const float h, const float angle, const Color& color)
 {
 	float radian = math::DEG2RAD(angle);
 	float radian90 = math::DEG2RAD(angle + 90);
@@ -842,49 +874,49 @@ void ImGuiRender::drawTriangleFilled(const float x, const float y, const float w
 	m_drawData.emplace_back(std::make_unique<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
 }
 
-void ImGuiRender::drawQuad(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color, const float thickness)
+void ImRender::drawQuad(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color, const float thickness)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Quad>(p1, p2, p3, p4, Color::U32(color), thickness));
 }
 
-void ImGuiRender::drawQuadFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color)
+void ImRender::drawQuadFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::QuadFilled>(p1, p2, p3, p4, Color::U32(color)));
 }
 
-void ImGuiRender::drawQuadFilledMultiColor(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4,
+void ImRender::drawQuadFilledMultiColor(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4,
 	const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::QuadMultiColor>(p1, p2, p3, p4,
 		Color::U32(colUprLeft), Color::U32(colUprRight), Color::U32(colBotRight), Color::U32(colBotLeft)));
 }
 
-void ImGuiRender::drawPolyLine(const std::vector<ImVec2>& verts, const Color& color, const ImDrawFlags flags, const float thickness)
+void ImRender::drawPolyLine(const std::vector<ImVec2>& verts, const Color& color, const ImDrawFlags flags, const float thickness)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Polyline>(verts, Color::U32(color), flags, thickness));
 }
 
-void ImGuiRender::drawPolyGon(const std::vector<ImVec2>& verts, const Color& color)
+void ImRender::drawPolyGon(const std::vector<ImVec2>& verts, const Color& color)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Polygon>(verts, Color::U32(color)));
 }
 
-void ImGuiRender::drawPolyGonMultiColor(const std::vector<ImVec2>& verts, const std::vector<ImU32>& colors)
+void ImRender::drawPolyGonMultiColor(const std::vector<ImVec2>& verts, const std::vector<ImU32>& colors)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::PolygonMultiColor>(verts, colors));
 }
 
-void ImGuiRender::drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal)
+void ImRender::drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::RectangleGradient>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(first), Color::U32(second), horizontal));
 }
 
-void ImGuiRender::text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
+void ImRender::text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Text>(font, ImVec2{ x, y }, Color::U32(color), text, dropShadow, centered));
 }
 
-void ImGuiRender::text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow)
+void ImRender::text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow)
 {
 	std::string _text(text.length(), 0);
 	// because warning
@@ -896,12 +928,12 @@ void ImGuiRender::text(const float x, const float y, ImFont* font, const std::ws
 	m_drawData.emplace_back(std::make_unique<drawing::Text>(font, ImVec2{ x, y }, Color::U32(color), _text, dropShadow, centered));
 }
 
-void ImGuiRender::text(const float x, const float y, const float fontSize, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
+void ImRender::text(const float x, const float y, const float fontSize, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::TextSize>(fontSize, font, ImVec2{ x, y }, Color::U32(color), text, dropShadow, centered));
 }
 
-void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...)
+void ImRender::textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...)
 {
 	if (!fmt)
 		return;
@@ -925,13 +957,13 @@ void ImGuiRender::textf(const float x, const float y, ImFont* font, const bool c
 	text(x, y, font, buf.data(), centered, color, dropShadow);
 }
 
-ImVec2 ImGuiRender::getTextSize(ImFont* font, const std::string& text)
+ImVec2 ImRender::getTextSize(ImFont* font, float size, const std::string& text, float wrap, float wrapMax)
 {
-	auto ret = ImGui::CalcTextSize(text.c_str());
+	auto ret = font->CalcTextSizeA(size, wrapMax, wrap, text.c_str());
 	return ret;
 }
 
-bool ImGuiRender::worldToScreen(const Vec3& in, ImVec2& out)
+bool ImRender::worldToScreen(const Vec3& in, ImVec2& out)
 {
 	auto screenMatrix = memory::viewMatrixAddr();
 
@@ -951,18 +983,18 @@ bool ImGuiRender::worldToScreen(const Vec3& in, ImVec2& out)
 	return true;
 }
 
-void ImGuiRender::drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags)
+void ImRender::drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Arc>(ImVec2{ x, y }, radius, math::DEG2RAD(angleMin), math::DEG2RAD(angleMax), points, Color::U32(color), flags, thickness));
 }
 
-void ImGuiRender::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
+void ImRender::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
 {
 	float maxAngle = math::RAD2DEG(math::PI *2.0f * percent) + angleMin;
 	m_drawData.emplace_back(std::make_unique<drawing::Arc>(ImVec2{ x, y }, radius, math::DEG2RAD(angleMin), math::DEG2RAD(maxAngle), points, Color::U32(color), flags, thickness));
 }
 
-void ImGuiRender::drawSphere(const Vec3& pos, float radius, float angleSphere, const Color& color)
+void ImRender::drawSphere(const Vec3& pos, float radius, float angleSphere, const Color& color)
 {
 	std::vector<ImVec2> verts = {};
 
@@ -979,18 +1011,18 @@ void ImGuiRender::drawSphere(const Vec3& pos, float radius, float angleSphere, c
 				radius * std::cos(angle) + pos[Coord::Z]
 			};
 
-			if (ImVec2 screenStart; imRender.worldToScreen(worldStart, screenStart))
+			if (ImVec2 screenStart; worldToScreen(worldStart, screenStart))
 				verts.push_back(screenStart);
 		}
 
 		if (verts.empty())
 			continue;
 
-		imRender.drawPolyLine(verts, color);
+		drawPolyLine(verts, color);
 	}
 }
 
-void ImGuiRender::drawCone(const Vec3& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags, const float thickness)
+void ImRender::drawCone(const Vec3& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags, const float thickness)
 {
 	ImVec2 orignalW2S = {};
 	if (!worldToScreen(pos, orignalW2S))
@@ -1012,12 +1044,39 @@ void ImGuiRender::drawCone(const Vec3& pos, const float radius, const int points
 	}
 }
 
-void ImGuiRender::drawImage(const ImTextureID img, const ImVec2& pos, const ImVec2& size, const Color& color, const float rounding, const ImDrawFlags flags)
+void ImRender::drawImage(const ImTextureID img, const ImVec2& pos, const ImVec2& size, const Color& color, const float rounding, const ImDrawFlags flags)
 {
 	m_drawData.emplace_back(std::make_unique<drawing::Image>(img, pos, ImVec2{ pos.x + size.x, pos.y + size.y }, ImVec2{ 0.0f, 0.0f }, ImVec2{ 1.0f, 1.0f }, Color::U32(color), rounding, flags));
 }
 
-void ImGuiRender::renderPresent(ImDrawList* draw)
+namespace
+{
+	std::deque<std::unique_ptr<drawing::Draw>> m_drawDataSafe;
+	std::shared_mutex m_mutex;
+}
+
+void clearData()
+{
+	if (!m_drawData.empty())
+		m_drawData.clear();
+}
+
+void swapData()
+{
+	std::unique_lock<std::shared_mutex> lock{ m_mutex };
+	m_drawData.swap(m_drawDataSafe);
+}
+
+#include <cheats/classes/renderableToSurface.hpp>
+
+void ImRender::think()
+{
+	clearData();
+	RenderableSurfaceType::runAll();
+	swapData();
+}
+
+void ImRender::present(ImDrawList* draw)
 {
 	std::unique_lock<std::shared_mutex> lock{ m_mutex };
 
@@ -1026,25 +1085,6 @@ void ImGuiRender::renderPresent(ImDrawList* draw)
 
 	for (const auto& data : m_drawDataSafe)
 		data->draw(draw);
-}
-
-void ImGuiRender::clearData()
-{
-	if (!m_drawData.empty())
-		m_drawData.clear();
-}
-
-void ImGuiRender::swapData()
-{
-	std::unique_lock<std::shared_mutex> lock{ m_mutex };
-	m_drawData.swap(m_drawDataSafe);
-}
-
-void ImGuiRender::addToRender(const std::function<void()>& fun)
-{
-	clearData();
-	fun();
-	swapData();
 }
 
 #undef BUFFER_SIZE

@@ -15,10 +15,10 @@ struct ParticlePoint_t
 		m_pos{ pos }, m_move{ move }, m_color{ color }
 	{}
 
-	Vec2 m_pos; // actual pos to draw
-	Vec2 m_move; // how much to move the element +/- need small values!
-	Color m_color;
-	float m_alpha = 1.0f;
+	Vec2 m_pos{ }; // actual pos to draw
+	Vec2 m_move{ }; // how much to move the element +/- need small values!
+	Color m_color{ };
+	float m_alpha{ 1.0f };
 };
 
 class Background : protected RenderablePresentType
@@ -44,11 +44,11 @@ private:
 	void drawCircleFilled(const Vec2& pos, float radius, size_t points, const Color& color);
 	void drawRectFilled(float x, float y, float width, float height, const Color& color);
 
-	size_t m_size; // how many particless
-	float m_maxDistLines; // dist between
+	size_t m_size{ }; // how many particless
+	float m_maxDistLines{ }; // dist between
 
-	std::vector<ParticlePoint_t> m_particleArr;
-	std::vector<Color> m_colorArr;
+	std::vector<ParticlePoint_t> m_particleArr{ };
+	std::vector<Color> m_colorArr{ };
 
 	ImDrawList* m_draw;
 };

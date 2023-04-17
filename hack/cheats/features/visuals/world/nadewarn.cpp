@@ -246,24 +246,24 @@ bool NadeTrace_t::draw(WeaponIndex idx)
 	std::vector<ImVec2> points;
 	for (const auto & el : m_path)
 	{
-		if (imRender.worldToScreen(el, start))
+		if (ImRender::worldToScreen(el, start))
 			points.push_back(start);
 	}
 	if (!points.empty())
-		imRender.drawPolyLine(points, vars::misc->nade->colorTracer(), 0, 2.0f);
+		ImRender::drawPolyLine(points, vars::misc->nade->colorTracer(), 0, 2.0f);
 
 	const float scale = ((m_nadeEndTime - memory::interfaces::globalVars->m_curtime) / game::ticksToTime(m_tick));
 	const float rad = game::getScaledFont(m_path.back(), game::localPlayer->absOrigin());
 
-	imRender.drawCircleFilled(start.x, start.y, rad, 32, Colors::Black);
-	imRender.drawProgressRing(start.x, start.y, rad, 32, -90, scale, 3.0f, Colors::Green);
+	ImRender::drawCircleFilled(start.x, start.y, rad, 32, Colors::Black);
+	ImRender::drawProgressRing(start.x, start.y, rad, 32, -90, scale, 3.0f, Colors::Green);
 
 
 	if (const auto maybeName = getConsoleName(idx); maybeName.has_value())
 	{
 		const auto icon = game::getWeaponIcon(maybeName.value());
 		const auto sizeIcon = ImVec2{ rad + 2.0f, rad + 2.0f };
-		imRender.drawImage(icon.texture, ImVec2{ start.x - (sizeIcon.y / 2.0f), start.y - (sizeIcon.y / 2.0f) }, sizeIcon, Colors::White);
+		ImRender::drawImage(icon.texture, ImVec2{ start.x - (sizeIcon.y / 2.0f), start.y - (sizeIcon.y / 2.0f) }, sizeIcon, Colors::White);
 
 		auto rotatePoint2D = [](const Vec2& source, const Vec2& dest, float rotateAngle)
 		{
@@ -279,7 +279,7 @@ bool NadeTrace_t::draw(WeaponIndex idx)
 		};
 
 		ImVec2 uselessVec;
-		if (vars::misc->nade->tracerWarn && !imRender.worldToScreen(m_pos, uselessVec))
+		if (vars::misc->nade->tracerWarn && !ImRender::worldToScreen(m_pos, uselessVec))
 		{
 			const auto centre = Vec2{ globals::screenX / 2.0f, globals::screenY / 2.0f };
 
@@ -293,9 +293,9 @@ bool NadeTrace_t::draw(WeaponIndex idx)
 
 			const auto pos = rotatePoint2D(centre, screenPosition, math::DEG2RAD(angleToNade[Coord::Y]));
 
-			imRender.drawCircleFilled(pos[Coord::X], pos[Coord::Y], rad, 32, Colors::Black);
-			imRender.drawProgressRing(pos[Coord::X], pos[Coord::Y], rad, 32, -90.0f, scale, 3.0f, Colors::Green);
-			imRender.drawImage(icon.texture, ImVec2{ pos[Coord::X] - (sizeIcon.x / 2), pos[Coord::Y] - (sizeIcon.y / 2.0f) }, sizeIcon, Colors::White);
+			ImRender::drawCircleFilled(pos[Coord::X], pos[Coord::Y], rad, 32, Colors::Black);
+			ImRender::drawProgressRing(pos[Coord::X], pos[Coord::Y], rad, 32, -90.0f, scale, 3.0f, Colors::Green);
+			ImRender::drawImage(icon.texture, ImVec2{ pos[Coord::X] - (sizeIcon.x / 2), pos[Coord::Y] - (sizeIcon.y / 2.0f) }, sizeIcon, Colors::White);
 		}
 	}
 

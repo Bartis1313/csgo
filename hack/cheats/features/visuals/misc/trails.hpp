@@ -18,7 +18,6 @@ private:
 	{
 		Vec3 m_pos;
 		float m_expire;
-		Color m_col;
 	};
 
 	std::vector<Trail_t> m_trails;

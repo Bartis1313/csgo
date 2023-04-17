@@ -16,18 +16,20 @@
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 
+#include <imgui_internal.h>
+
 // https://www.unknowncheats.me/forum/counterstrike-global-offensive/333825-bloodhound-inspired-legit-csgo-esp.html
 void SoundDraw::findBest(Player_t* ent)
 {
 	if (!vars::visuals->sound->enabled)
 		return;
 
-	int index = ent->getIndex();
+	const int index = ent->getIndex();
 
-	float x = globals::screenX / 2.0f;
-	float y = globals::screenY / 2.0f;
-	float maxDist = vars::visuals->sound->maxDist;
-	float maxDistLine = vars::visuals->sound->maxDistLine;
+	const float x = globals::screenX / 2.0f;
+	const float y = globals::screenY / 2.0f;
+	const float maxDist = vars::visuals->sound->maxDist;
+	const float maxDistLine = vars::visuals->sound->maxDistLine;
 
 	for (size_t i = 0; const auto & el : m_steps.at(index))
 	{
@@ -40,7 +42,7 @@ void SoundDraw::findBest(Player_t* ent)
 		}
 
 		ImVec2 elPos;
-		if (!imRender.worldToScreen(el.m_pos, elPos))
+		if (!ImRender::worldToScreen(el.m_pos, elPos))
 			continue;
 
 		//float scale = diff / config.get<float>(vars.fStepTime); // ratio
@@ -51,19 +53,12 @@ void SoundDraw::findBest(Player_t* ent)
 		if (constexpr float maxDiff = 1.0f; diff < maxDiff) // fading effect
 			alpha = (diff / maxDiff) * alpha;
 
-		// again same thing, I don't want to use ent origin but current pos
-		auto scaledFont = [=](const float division = 80.0f, const float min = 12.0f, const float max = 30.0f)
-		{
-			float dist = el.m_pos.distTo(game::localPlayer->absOrigin());
-			float fontSize = std::clamp(division / (dist / division), min, max);
-			return fontSize;
-		};
-
-		float rad = scaledFont(50.0f, 3.0f, 8.0f);
-		imRender.drawCircleFilled(elPos.x, elPos.y, rad, 32,
+		const float rad = game::getScaledFont(el.m_pos, game::localPlayer->absOrigin(), 50.0f, 3.0f, 8.0f);;
+		ImRender::drawCircleFilled(elPos.x, elPos.y, rad, 32,
 			vars::visuals->sound->color().getColorEditAlpha(alpha));
 
-		float distFromMiddle = std::round(std::sqrt((elPos.x - x) * (elPos.x - x) + (elPos.y - y) * (elPos.y - y)));
+		const ImVec2 fromScreen = ImVec2{ elPos.x - x,  elPos.y - y };
+		const float distFromMiddle = std::round(std::sqrt(ImLengthSqr(fromScreen)));
 
 		if (distFromMiddle < maxDistLine)
 		{
@@ -85,31 +80,31 @@ void SoundDraw::findBest(Player_t* ent)
 void SoundDraw::draw()
 {
 	float x = globals::screenX / 2.0f;
-	float y = globals::screenY / 2.0f;
+	const float y = globals::screenY / 2.0f;
 
 	if (m_bestStep.m_player)
 	{
-		if (ImVec2 pos; imRender.worldToScreen(m_bestStep.m_pos, pos))
+		if (ImVec2 pos; ImRender::worldToScreen(m_bestStep.m_pos, pos))
 		{
 			std::string_view place = m_bestStep.m_player->m_szLastPlaceName();
 			if (place.empty())
 				place = "Unknown";
-			std::string nameText = std::format("{} -> {} [{:.1f}m]", m_bestStep.m_player->getName(),
+			const std::string nameText = std::format("{} -> {} [{:.1f}m]", m_bestStep.m_player->getName(),
 				place, game::localPlayer->absOrigin().distToMeters(m_bestStep.m_pos));
-			std::string timeText = std::format("Time left {:.1f}s", m_bestStep.m_timeToPrint);
+			const std::string timeText = std::format("Time left {:.1f}s", m_bestStep.m_timeToPrint);
 
 			x = globals::screenX / 2.5f;
 
-			float textSize = std::max(
-				imRender.getTextSize(ImFonts::tahoma14, timeText).x,
-				imRender.getTextSize(ImFonts::tahoma14, nameText).x);
+			const float textSize = std::max(
+				ImRender::getTextSize(ImRender::fonts::tahoma14, ImRender::fonts::tahoma14->FontSize, timeText).x,
+				ImRender::getTextSize(ImRender::fonts::tahoma14, ImRender::fonts::tahoma14->FontSize, nameText).x);
 
-			static float fontSize = ImFonts::tahoma14->FontSize + 2.0f;
+			static float fontSize = ImRender::fonts::tahoma14->FontSize + 2.0f;
 
-			imRender.text(x, y, ImFonts::tahoma14, timeText, false, Colors::White);
-			imRender.text(x, y - fontSize, ImFonts::tahoma14, nameText, false, Colors::White);
-			imRender.drawLine(x, y, x + textSize, y, vars::visuals->sound->colorLine());
-			imRender.drawLine(x + textSize, y, pos.x, pos.y, vars::visuals->sound->colorLine());
+			ImRender::text(x, y, ImRender::fonts::tahoma14, timeText, false, Colors::White);
+			ImRender::text(x, y - fontSize, ImRender::fonts::tahoma14, nameText, false, Colors::White);
+			ImRender::drawLine(x, y, x + textSize, y, vars::visuals->sound->colorLine());
+			ImRender::drawLine(x + textSize, y, pos.x, pos.y, vars::visuals->sound->colorLine());
 		}
 
 		m_bestStep.m_player = nullptr;

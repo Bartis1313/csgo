@@ -58,7 +58,7 @@ void Hitmarker::draw()
 
 		if (mode3D)
 		{
-			if (ImVec2 s; imRender.worldToScreen(hitPos, s))
+			if (ImVec2 s; ImRender::worldToScreen(hitPos, s))
 			{
 				x = s.x;
 				y = s.y;
@@ -91,10 +91,10 @@ void Hitmarker::draw()
 			lineAddonY = lineY * alpha;
 		}
 
-		imRender.drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor);
-		imRender.drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor);
-		imRender.drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor);
-		imRender.drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor);
+		ImRender::drawLine(x - lineAddonX, y + lineAddonX, x - lineAddonY, y + lineAddonY, actualColor);
+		ImRender::drawLine(x + lineAddonX, y + lineAddonX, x + lineAddonY, y + lineAddonY, actualColor);
+		ImRender::drawLine(x - lineAddonX, y - lineAddonX, x - lineAddonY, y - lineAddonY, actualColor);
+		ImRender::drawLine(x + lineAddonX, y - lineAddonX, x + lineAddonY, y - lineAddonY, actualColor);
 		
 		Box box{ player };
 		if (!box.isValid())
@@ -103,12 +103,12 @@ void Hitmarker::draw()
 		const auto headPos = player->getHitboxPos(HITBOX_HEAD);
 
 		const auto text = std::format("{}", damage);
-		const auto textSize = imRender.getTextSize(ImFonts::franklinGothic30, text);
-		const float fontSize = game::getScaledFont(game::localPlayer->getEyePos(), headPos, 150.0f, 12.0f, 30.0f);
+		const float fontSize = game::getScaledFont(game::localPlayer->getEyePos(), headPos, 150.0f, 12.0f, 30.0f) * std::max(0.7f, alpha);
+		const auto textSize = ImRender::getTextSize(ImRender::fonts::franklinGothic30, fontSize, text);
 
 		ImVec2 coord{ (box.x + box.w / 2) - textSize.x / 2, box.y };
 		coord.y -= (i + 1) * fontSize; // some scaling with alpha would be nice
-		imRender.text(coord.x, coord.y, fontSize, ImFonts::franklinGothic30, text, true, actualColor, false);
+		ImRender::text(coord.x, coord.y, fontSize, ImRender::fonts::franklinGothic30, text, true, actualColor, false);
 
 		i++;
 	}

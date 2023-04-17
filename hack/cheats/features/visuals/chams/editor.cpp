@@ -3,7 +3,6 @@
 #include <cheats/classes/renderableToPresent.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/tools/tools.hpp>
-#include <menu/GUI-ImGui/animations.hpp>
 #include <menu/GUI-ImGui/imguiaddons.hpp>
 #include <imgui_stdlib.h>
 #include <deps/ImGui/imgui_markdown.h>
@@ -17,6 +16,8 @@
 #include <SDK/KeyValuesSys.hpp>
 #include <gamememory/memory.hpp>
 
+#include <imgui.h>
+#include <imgui_internal.h>
 #include <ranges>
 #include <fstream>
 #include <Shellapi.h>
@@ -69,46 +70,22 @@ void markdownEditor(const std::string& markdown_)
 
 void MaterialEditor::draw()
 {
-	if (!m_open)
-		return;
-
-	constexpr auto popupTitle = "Material error";
-
-	// [SECTION] Example App: Simple Layout / ShowExampleAppLayout() demo ref
-	ImGui::SetNextWindowSize(ImVec2{ 500.0f, 440.0f }, ImGuiCond_FirstUseEver);
-	if (ImGui::Begin("Material editor", &m_open, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_MenuBar))
+	ImGui::BeginChild("##editor");
 	{
 		renderHelpBar();
 		renderAddMaterial();
 		renderMaterialsList();
 		renderMaterialsView();
-
-		ImGui::End();
 	}
+	ImGui::EndChild();
 }
 
 void MaterialEditor::renderHelpBar()
 {
-	if (ImGui::BeginMenuBar())
-	{
-		ImGui::SetNextWindowSize(ImVec2{ 250.0f, 0.0f });
-		if (ImGui::BeginMenu("Help"))
-		{
-			const std::string markdown_text = R"(First, read basics written [here](https://developer.valvesoftware.com/wiki/KeyValues)
+		const std::string markdown_text = R"(First, read basics written [here](https://developer.valvesoftware.com/wiki/KeyValues)
 Second, read about [materials](https://developer.valvesoftware.com/wiki/Material)
 **CTRL-S as a shortcut adds / updates current material**)";
-			markdownEditor(markdown_text);
-
-			ImGui::EndMenu();
-		}
-
-		if (ImGui::Button("Add##material"))
-		{
-			m_subAddOpen = true;
-		}
-
-		ImGui::EndMenuBar();
-	}
+		markdownEditor(markdown_text);
 }
 
 void MaterialEditor::renderAddMaterial()
@@ -132,7 +109,7 @@ void MaterialEditor::renderAddMaterial()
 						// prob good to split the \n 's here ?
 						mat = g_Chams->addMaterialByString(Mat_t
 							{
-								.isFromEditor = true, .type = m_materialToAdd.type, .strategy = m_materialToAdd.strategy,
+								.isFromEditor = true, .strategy = m_materialToAdd.strategy, .type = m_materialToAdd.type,
 								.data = Mat_t::Data{.name = m_materialToAdd.data.name, .key = m_materialToAdd.data.key, .buf = m_ImEdtorSubAdd.GetText() }
 							});
 					}
@@ -140,7 +117,7 @@ void MaterialEditor::renderAddMaterial()
 					{
 						mat = g_Chams->addMaterialByBuffer(Mat_t
 							{
-								.isFromEditor = true, .type = m_materialToAdd.type, .strategy = m_materialToAdd.strategy,
+								.isFromEditor = true, .strategy = m_materialToAdd.strategy,.type = m_materialToAdd.type,
 								.data = Mat_t::Data{.name = m_materialToAdd.data.name, .key = m_materialToAdd.data.key, .buf = m_ImEdtorSubAdd.GetText() }
 							});
 					}
@@ -179,7 +156,7 @@ void MaterialEditor::renderMaterialInfo(Mat_t& mat)
 	ImGui::RadioButton("From String", reinterpret_cast<int*>(& mat.strategy), 1);
 	ImGui::InputText("Name", &mat.data.name);
 	ImGui::InputText("Key", &mat.data.key);
-	ImGui::Animations::Combo("Style", reinterpret_cast<int*>(&mat.type), magic_enum::enum_names_pretty<Mat_t::ExtraType>());
+	ImGui::Combo("Style", reinterpret_cast<int*>(&mat.type), magic_enum::enum_names_pretty<Mat_t::ExtraType>());
 }
 
 void MaterialEditor::renderMaterialsList()
@@ -188,7 +165,7 @@ void MaterialEditor::renderMaterialsList()
 	{
 		for (auto i : std::views::iota(m_oldIndex, g_Chams->m_materials.size()))
 		{
-			if (ImGui::Animations::Selectable(g_Chams->m_materials.at(i).data.name.data(), m_currectIndex == i))
+			if (ImGui::Selectable(g_Chams->m_materials.at(i).data.name.data(), m_currectIndex == i))
 			{
 				// cache text
 				g_Chams->m_materials.at(m_currectIndex).data.buf = m_ImEditor.GetText();
@@ -214,8 +191,14 @@ void MaterialEditor::renderMaterialsView()
 			ImGui::TextUnformatted("No materials yet, add one!");
 
 
+		if (ImGui::Button("Add##material", ImVec2{ 120.0f, 0.0f }))
+		{
+			m_subAddOpen = true;
+		}
 		ImGui::SameLine();
-		if (ImGui::Animations::Button("Delete"))
+
+		ImGui::SameLine();
+		if (ImGui::Button("Delete", ImVec2{ 120.0f, 0.0f }))
 		{
 			const size_t elementsRemoved = std::erase_if(g_Chams->m_materials,
 				[this](const auto& m)
@@ -263,7 +246,7 @@ void MaterialEditor::renderMaterialsView()
 					// prob good to split the \n 's here ?
 					mat = g_Chams->addMaterialByString(Mat_t
 						{
-							.isFromEditor = true, .type = m_material.type, .strategy = m_material.strategy,
+							.isFromEditor = true, .strategy = m_material.strategy, .type = m_material.type,
 							.data = Mat_t::Data{.name = m_material.data.name, .key = m_material.data.key, .buf = m_ImEditor.GetText() }
 						});
 				}
@@ -271,7 +254,7 @@ void MaterialEditor::renderMaterialsView()
 				{
 					mat = g_Chams->addMaterialByBuffer(Mat_t
 						{
-							.isFromEditor = true, .type = m_material.type, .strategy = m_material.strategy,
+							.isFromEditor = true, .strategy = m_material.strategy, .type = m_material.type,
 							.data = Mat_t::Data{.name = m_material.data.name, .key = m_material.data.key, .buf = m_ImEditor.GetText() }
 						});
 				}
@@ -327,18 +310,6 @@ void MaterialEditor::initEditor()
 	m_oldIndex = g_Chams->m_materials.size();
 	m_currectIndex = m_oldIndex;
 	loadCfg();
-
-	for (auto i : std::views::iota(m_oldIndex, g_Chams->m_materials.size()))
-	{
-		auto addCorrectStrategy = [i]()
-		{
-			return g_Chams->m_materials.at(i).strategy == Mat_t::StrategyType::FROM_STRING
-				? g_Chams->addMaterialByString(g_Chams->m_materials.at(i)).value()
-				: g_Chams->addMaterialByBuffer(g_Chams->m_materials.at(i)).value();
-		};
-
-		g_Chams->m_materials.at(i).mat = addCorrectStrategy().mat;
-	}
 
 	if (m_oldIndex == g_Chams->m_materials.size())
 		m_material = {};
@@ -429,7 +400,7 @@ std::optional<Mat_t> MaterialEditor::getMaterialIndexed(size_t index) const
 	const auto& material = g_Chams->m_materials.at(index);
 	return Mat_t
 	{
-		.isFromEditor = true, .type = material.type, .strategy = material.strategy,
+		.isFromEditor = true, .strategy = material.strategy, .type = material.type,
 		.data = Mat_t::Data{.name = material.data.name, .key = material.data.key, .buf = material.data.buf }
 	};
 }

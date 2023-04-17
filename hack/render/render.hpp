@@ -1,35 +1,29 @@
 #pragma once
 
+#include "Color.hpp"
 #include "BBox.hpp"
 
 #include <string>
-#include <mutex>
-#include <shared_mutex>
-#include <functional>
-#include <any>
-#include <deque>
-#include <array>
-
 #include <SDK/math/Vector.hpp>
-#include <imgui.h>
-#include "Color.hpp"
+
+//#define SURFACE_RENDER
 
 class Color;
 class Resource;
-class Entity_t;
+
+#ifdef SURFACE_RENDER
 struct Vertex_t;
 
-namespace fonts
-{
-	inline unsigned long tahoma;
-	inline unsigned long franklinGothic;
-	inline unsigned long verdana;
-}
-
 // rendering with game's engine
-class SurfaceRender
+namespace SurfaceRender
 {
-public:
+	namespace fonts
+	{
+		inline unsigned long tahoma;
+		inline unsigned long franklinGothic;
+		inline unsigned long verdana;
+	}
+
 	void init();
 
 	[[nodiscard]] unsigned long  __createFont(const char* fontName, const int size, const int weight, const unsigned long flags);
@@ -72,28 +66,25 @@ public:
 	void drawImage(const Resource& res, const int x, const int y, const int w, const int h, const Color& color);
 };
 
-inline SurfaceRender surfaceRender;
+#endif
 
-struct ImGuiIO;
-struct ImFont;
-
-namespace ImFonts
-{
-	inline ImFont* tahoma14;
-	inline ImFont* tahoma20;
-	inline ImFont* franklinGothic30;
-	inline ImFont* franklinGothic12;
-	inline ImFont* verdana12;
-}
-
-#include <memory>
+#include <imgui.h>
 #include "structures.hpp"
 
 // rendering supported by dear ImGui, few changes and new functions comparing to surface draw
 // thread safe idea - full credits to qo0' as I couldn't really rebuild manually w2s with any success removing this weird stutter
-class ImGuiRender
+namespace ImRender
 {
-public:
+	namespace fonts
+	{
+		inline ImFont* tahoma14;
+		inline ImFont* tahoma20;
+		inline ImFont* franklinGothic30;
+		inline ImFont* franklinGothic12;
+		inline ImFont* verdana12;
+		inline ImFont* csgoTahoma15;
+	}
+
 	void init(ImGuiIO& io);
 
 	void drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness = 1.0f);
@@ -131,35 +122,13 @@ public:
 	void drawBox3D(const Vec3& pos, const float width, const float height, const Color& color, bool outlined = false, const float thickness = 2.0f);
 	void drawBox3DFilled(const Vec3& pos, const float width, const float height, const Color& color, const Color& filling, bool outlined = false, const float thickness = 2.0f);
 	void drawCone(const Vec3& pos, const float radius, const int points, const float size, const Color& colCircle, const Color& colCone, const ImDrawFlags flags = 1, const float thickness = 1.0f);
-
-	/*
-	* arcs - there are few problems with them. Especially you can see it when trying to do arc that is a full circle.
-	* You will see that they infact are maybe filled, but few pixels are missing.
-	* 1st fix - ghetto, but will maybe behave better for performance, when delta is 360 deg or for progress - percent is 100
-	* then we make delta - 0.1f, same thing for percent. And then call ImDrawFlags_Closed.
-	* No ghetto fix, is just to call it with many segments.
-	* Correct me if you found any better solution, or explain it why.
-	*/
-
 	void drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 	void drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags = 0);
 	void drawSphere(const Vec3& pos, float radius, float angleSphere, const Color& color);
 	void drawImage(const ImTextureID img, const ImVec2& pos, const ImVec2& size, const Color& color, const float rounding = 0.0f, const ImDrawFlags flags = 0);
-	[[nodiscard]] ImVec2 getTextSize(ImFont* font, const std::string& text);
+	[[nodiscard]] ImVec2 getTextSize(ImFont* font, float size, const std::string& text, float wrap = 0.0f, float wrapMax = std::numeric_limits<float>::max());
 	[[nodiscard]] bool worldToScreen(const Vec3& in, ImVec2& out);
 
-	// add to present
-	void renderPresent(ImDrawList* draw);
-	// add to surface
-	void addToRender(const std::function<void()>& fun);
-private:
-	// add to surface
-	void clearData();
-	// add to surface
-	void swapData();
-	std::deque<std::unique_ptr<drawing::Draw>> m_drawData;
-	std::deque<std::unique_ptr<drawing::Draw>> m_drawDataSafe;
-	std::shared_mutex m_mutex;
+	void think();
+	void present(ImDrawList* draw);
 };
-
-inline ImGuiRender imRender;

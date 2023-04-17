@@ -38,14 +38,14 @@ void SmokeDraw::draw()
 		const auto& origin = ent->absOrigin();
 		constexpr int smokeRadius = 144;
 
-		imRender.drawCircle3DFilled(origin, smokeRadius, 216, Colors::Grey, Colors::Black, true, 2.0f);
+		ImRender::drawCircle3DFilled(origin, smokeRadius, 216, Colors::Grey, Colors::Black, true, 2.0f);
 		//drawCustomSmokeEffect(origin, smokeRadius);
 
-		static float size = ImFonts::tahoma14->FontSize;
-		if (ImVec2 s; imRender.worldToScreen(origin, s))
+		static float size = ImRender::fonts::tahoma14->FontSize;
+		if (ImVec2 s; ImRender::worldToScreen(origin, s))
 		{
-			imRender.drawProgressRing(s.x, s.y, 25, 32, -90, scale, 5.0f, Colors::LightBlue);
-			imRender.text(s.x, s.y - (size / 2.0f), ImFonts::tahoma14, std::format("{:.2f}s", time), true, Colors::White);
+			ImRender::drawProgressRing(s.x, s.y, 25, 32, -90, scale, 5.0f, Colors::LightBlue);
+			ImRender::text(s.x, s.y - (size / 2.0f), ImRender::fonts::tahoma14, std::format("{:.2f}s", time), true, Colors::White);
 		}
 	}
 }

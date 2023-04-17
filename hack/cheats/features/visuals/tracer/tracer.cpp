@@ -35,32 +35,18 @@ void BulletTracer::draw()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	auto convertToFlag = [](const std::string& flag)
-	{
-		int ret{ 0 };
-		for (const auto& el : std::views::split(flag, '|'))
-		{
-			const std::string v{ el.begin(), el.end() };
-			const int num = std::stoi(v);
-			ret |= num;
-		}
-
-		return ret;
-	};
-
 	const auto lastbullets = g_BulletUpdater->getLastBullets();
 	if (lastbullets.empty())
 		return;
 
 	CfgBeam cfgbeam = vars::visuals->world->tracer->beamTracer;
-	auto& strWithoutSpaces = cfgbeam.flags;
-	strWithoutSpaces.erase(std::remove(strWithoutSpaces.begin(), strWithoutSpaces.end(), ' '), strWithoutSpaces.end());
+	
 	const Vec3 correctEnd = lastbullets.size() == 2 ? lastbullets.back() : lastbullets.front();
 	const Vec3 src{ game::localPlayer->getEyePos() };
 
-	BeamInfo_t info = {};
-	info.m_type = /*convertToFlag(config.get<std::string>(vars.sBulletTracerType))*/ TE_BEAMPOINTS;
-	info.m_flags = convertToFlag(strWithoutSpaces);
+	BeamInfo_t info{ };
+	info.m_type = TE_BEAMPOINTS;
+	info.m_flags = utilities::convertStringToFlag(cfgbeam.flags);
 	info.m_modelName = selections::beamNames.at(cfgbeam.index);
 	info.m_modelIndex = -1;
 	info.m_haloIndex = -1;

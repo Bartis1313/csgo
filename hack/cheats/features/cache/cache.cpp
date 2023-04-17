@@ -113,11 +113,6 @@ void EntityCache::fill(const HolderData& data)
 	case CInferno:
 		m_entCache[EntCacheType::GRENADE_PROJECTILES].emplace_back(data);
 		break;
-	case CFogController:
-	case CEnvTonemapController:
-	case CPostProcessController:
-		m_entCache[EntCacheType::CONTROLLERS].emplace_back(data);
-		break;
 	case CPlantedC4:
 		m_entCache[EntCacheType::WORLD_ENTS].emplace_back(data);
 		break;

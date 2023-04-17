@@ -14,7 +14,9 @@ public:
 protected:
 	virtual void init() override;
 	virtual void draw() override;
+	virtual void shutdown() override;
 private:
+	IConVar* m_crosshair;
 	IConVar* m_scale;
 	IConVar* m_crosshairRecoil;
 };
