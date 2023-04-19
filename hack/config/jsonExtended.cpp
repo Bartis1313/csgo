@@ -5,9 +5,10 @@ using namespace nlohmann::detail;
 void from_json(const json& j, CfgWeapon& val)
 {
 	from_json(j, "Enabled", val.enabled);
+	from_json(j, "UseKey", val.useKey);
+	from_json(j["Key"], val.key);
 	from_json(j, "Fov", val.fov);
 	from_json(j, "Smooth", val.frametimeMulttiply);
-	from_json(j, "maxDistanceMeters", val.maxDistanceMeters);
 	from_json(j, "Aim method", val.methodAim);
 	from_json(j, "Aim selection", val.aimSelection);
 	from_json(j, "Aim delay enabled", val.aimDelay);
@@ -24,9 +25,10 @@ void from_json(const json& j, CfgWeapon& val)
 void to_json(json& j, const CfgWeapon& val)
 {
 	j["Enabled"] = val.enabled;
+	j["UseKey"] = val.useKey;
+	j["Key"] = val.key;
 	j["Fov"] = val.fov;
 	j["Smooth"] = val.frametimeMulttiply;
-	j["maxDistanceMeters"], val.maxDistanceMeters;
 	j["Aim method"] = val.methodAim;
 	j["Aim selection"] = val.aimSelection;
 	j["Aim delay enabled"] = val.aimDelay;
@@ -733,7 +735,6 @@ void from_json(const json& j, VarKeys& val)
 {
 	from_json(j, "Enabled X88", val.enabledX88Menu);
 	from_json(j, "X88", val.x88Toggle);
-	//from_json(j["Aimbot"], val.aimbot);
 	from_json(j["Menu"], val.menu);
 	from_json(j["Panic"], val.panic);
 	from_json(j["Logs"], val.console);
@@ -747,7 +748,6 @@ void to_json(json& j, const VarKeys& val)
 {
 	j["Enabled X88"] = val.enabledX88Menu;
 	j["X88"] = val.x88Toggle;
-	//j["Aimbot"] = val.aimbot;
 	j["Menu"] = val.menu;
 	j["Panic"] = val.panic;
 	j["Logs"] = val.console;
