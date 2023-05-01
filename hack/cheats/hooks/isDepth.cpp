@@ -1,10 +1,10 @@
-#include "hooks.hpp"
+#include "isDepth.hpp"
 
-#include "../features/visuals/misc/motionblur.hpp"
+#include <cheats/features/visuals/misc/motionblur.hpp>
 
-hooks::isDepthOfField::value hooks::isDepthOfField::hooked()
+hooks::IsDepthOfField::value hooks::IsDepthOfField::hook()
 {
-	g_MotionBlur->render();
+	motionBlur::render();
 
 	return false;
 }

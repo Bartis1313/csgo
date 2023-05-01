@@ -20,9 +20,29 @@
 #include <functional>
 #include <imgui_internal.h>
 
-#include "../player/boxes.hpp"
+#include <cheats/hooks/paintTraverse.hpp>
+#include <cheats/hooks/unknownPlayerHurt.hpp>
 
-void Hitmarker::draw()
+namespace
+{
+	struct HitmarkerHandler : hooks::PaintTraverse
+	{
+		HitmarkerHandler()
+		{
+			this->registerRender(hitmarker::draw);
+		}
+	} hitmarkerHandler;
+
+	struct HitmarkerHits : hooks::UnknownPlayerHurt
+	{
+		HitmarkerHits()
+		{
+			this->registerRun(hitmarker::handleHits);
+		}
+	} hitmarkerHits;
+}
+
+void hitmarker::draw()
 {
 	if (!vars::misc->hitmarker->enabled)
 		return;
@@ -114,7 +134,7 @@ void Hitmarker::draw()
 	}
 }
 
-void Hitmarker::handleHits(IGameEvent* event)
+void hitmarker::handleHits(IGameEvent* event)
 {
 	if (!vars::misc->hitmarker->enabled)
 		return;

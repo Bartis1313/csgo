@@ -5,81 +5,89 @@
 #include <utilities/inputSystem.hpp>
 #include <utilities/math/math.hpp>
 #include <config/vars.hpp>
+#include <SDK/IVModelInfo.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
 #include <cheats/game/game.hpp>
 
-void Freecam::updateKeys()
+#include <cheats/hooks/overrideView.hpp>
+#include <cheats/hooks/wndproc.hpp>
+
+namespace
+{
+	struct FreecamKeys : hooks::wndProcSys
+	{
+		FreecamKeys()
+		{
+			this->registerRun(freecam::updateKeys);
+		}
+	} freecamKeys;
+
+	struct FreecamView : hooks::OverrideView
+	{
+		FreecamView()
+		{
+			this->registerRun(freecam::run);
+		}
+	} freecamView;
+}
+
+void freecam::updateKeys()
 {
 	vars::keys->freeCam.update();
 }
 
-void Freecam::run(CViewSetup* view)
+void freecam::run(CViewSetup* view)
 {
-	if (g_ImGuiMenu->isMenuActive())
-		return;
-
 	if (!game::isAvailable())
 		return;
 
-	static Vec3 v = view->m_angles;
+	static Vec3 viewAngles{ view->m_angles };
 
 	if (vars::misc->freeCam->enabled && vars::keys->freeCam.isEnabled())
 	{
-		//game::localPlayer->drawModel(STUDIO_RENDER, 0);
+		isInCam = true;
 
-		m_inCam = true;
-		if (KeysHandler::isKeyPressed(VK_SHIFT))
-			vars::misc->freeCam->speed += 0.1f;
-		else if (KeysHandler::isKeyPressed(VK_CONTROL))
-			vars::misc->freeCam->speed -= 0.1f;
+		/*auto model = game::localPlayer->getModel();
+		if (!model)
+			return;
 
-		Vec3 ang = view->m_angles;
-		const float speed = std::clamp(vars::misc->freeCam->speed, 1.0f, 20.0f);
+		auto studio = memory::interfaces::modelInfo->getStudioModel(model);
+		if (!studio)
+			return;
 
-		const auto [forward, right, up] = math::angleVectors(ang);
-		if (KeysHandler::isKeyDown(VK_SPACE))
+		studio->m_flags |= 0x0080;*/
+
+		const auto [forward, right, up] = math::angleVectors(view->m_angles);
+
+		bool anyPressed{ false };
+
+		if (anyPressed |= KeysHandler::isKeyDown(VK_SPACE))
 		{
-			v += up * speed;
+			viewAngles += up * vars::misc->freeCam->speed;
 		}
-		if (KeysHandler::isKeyDown(0x57)) // w
+		if (anyPressed |= KeysHandler::isKeyDown(0x57)) // w
 		{
-			v += forward * speed;
+			viewAngles += forward * vars::misc->freeCam->speed;
 		}
-		if (KeysHandler::isKeyDown(0x41)) // a
+		if (anyPressed |= KeysHandler::isKeyDown(0x41)) // a
 		{
-			v -= right * speed;
+			viewAngles -= right * vars::misc->freeCam->speed;
 		}
-		if (KeysHandler::isKeyDown(0x53)) // s
+		if (anyPressed |= KeysHandler::isKeyDown(0x53)) // s
 		{
-			v -= forward * speed;
+			viewAngles -= forward * vars::misc->freeCam->speed;
 		}
-		if (KeysHandler::isKeyDown(0x44)) // d
+		if (anyPressed |= KeysHandler::isKeyDown(0x44)) // d
 		{
-			v += right * speed;
+			viewAngles += right * vars::misc->freeCam->speed;
 		}
-		view->m_origin += v;
+
+		view->m_origin += viewAngles;
 	}
 	else
 	{
-		v = view->m_angles;
-		m_inCam = false;
-	}
-}
-
-#include <imgui.h>
-#include <utilities/tools/tools.hpp>
-#include <utilities/tools/wrappers.hpp>
-
-void FreecamDraw::draw()
-{
-	if (!g_Freecam->isInCam())
-		return;
-
-	if (ImGui::Begin("Info##cam", nullptr, ImGuiWindowFlags_AlwaysAutoResize /*| ImGuiWindowFlags_NoResize*/ | ImGuiWindowFlags_NoCollapse))
-	{
-		ImGui::TextUnformatted(std::format("Speed: {:.2f}", vars::misc->freeCam->speed).c_str());
-
-		ImGui::End();
+		viewAngles = view->m_angles;
+		isInCam = false;
 	}
 }

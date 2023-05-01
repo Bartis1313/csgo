@@ -11,7 +11,32 @@
 #include <gamememory/memory.hpp>
 #include <menu/GUI-ImGui/selections.hpp>
 
-void SkyboxEdit::init()
+#include <cheats/hooks/frameStageNotify.hpp>
+#include <cheats/helper/initable.hpp>
+
+namespace
+{
+	struct SkyboxHandler : hooks::FrameStageNotify
+	{
+		SkyboxHandler()
+		{
+			this->registerInit(skybox::init);
+			this->registerRun(skybox::run);
+			this->registerShutdown(skybox::shutdown);
+		}
+	} skyboxHandler;
+}
+
+namespace skybox
+{
+	void loadSkybox(const std::string& name);
+	void checkCustomSkybox();
+
+	std::filesystem::path m_pathCustomSkybox;
+	IConVar* sv_skyname;
+}
+
+void skybox::init()
 {
 	checkCustomSkybox();
 	reloadCustomSkyboxes();
@@ -19,12 +44,12 @@ void SkyboxEdit::init()
 	sv_skyname = memory::interfaces::cvar->findVar("sv_skyname");
 }
 
-void SkyboxEdit::run(int frame)
+void skybox::run(FrameStage stage)
 {
-	if (frame != FRAME_RENDER_START)
+	if (stage != FRAME_RENDER_START)
 		return;
 
-	if (!m_changed)
+	if (!changedState)
 		return;
 
 	if (!game::isAvailable())
@@ -40,7 +65,7 @@ void SkyboxEdit::run(int frame)
 	if (keySky.first != 0 && !globals::isShutdown) // is not none and there is no shutdown
 	{
 		keySky.second == true
-			? loadSkybox(m_allCustomSkyboxes.at(keySky.first).c_str())
+			? loadSkybox(customSkyboxes.at(keySky.first).c_str())
 			: loadSkybox(selections::skyboxes.at(keySky.first));
 	}
 	else
@@ -50,12 +75,12 @@ void SkyboxEdit::run(int frame)
 	}
 }
 
-void SkyboxEdit::loadSkybox(const std::string& name)
+void skybox::loadSkybox(const std::string& name)
 {
 	memory::loadSky()(name.c_str());
 }
 
-void SkyboxEdit::checkCustomSkybox()
+void skybox::checkCustomSkybox()
 {
 	auto path = std::filesystem::current_path() / "csgo" / "materials" / "skybox";
 
@@ -68,17 +93,22 @@ void SkyboxEdit::checkCustomSkybox()
 	m_pathCustomSkybox = path;
 }
 
-void SkyboxEdit::reloadCustomSkyboxes()
+void skybox::reloadCustomSkyboxes()
 {
-	m_allCustomSkyboxes.clear();
-	m_allCustomSkyboxes.emplace_back("none");
+	customSkyboxes.clear();
+	customSkyboxes.emplace_back("none");
 	auto iterator = std::filesystem::directory_iterator(m_pathCustomSkybox);
 	for (const auto& entry : iterator)
 	{
 		if (std::string name = entry.path().filename().string();
 			entry.path().extension() == ".vtf" && !name.empty())
 		{
-			m_allCustomSkyboxes.push_back(name);
+			customSkyboxes.push_back(name);
 		}
 	}
+}
+
+void skybox::shutdown()
+{
+	loadSkybox(sv_skyname->m_valueNow);
 }

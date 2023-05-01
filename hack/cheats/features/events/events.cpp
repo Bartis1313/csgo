@@ -3,9 +3,9 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <cheats/game/globals.hpp>
 
-void EventCallback::addToCallback(const std::string_view eventName, const std::function<void(IGameEvent*)>& callback)
+void EventCallback::addToCallback(const std::string_view eventName, const callbackType& callback)
 {
-	if (auto itr = m_map.find(eventName); itr != m_map.end())
+	if (auto itr = events.find(eventName); itr != events.end())
 	{
 		// if found, then only push to vector with functions
 		itr->second.push_back(callback);
@@ -13,17 +13,17 @@ void EventCallback::addToCallback(const std::string_view eventName, const std::f
 	else // create new
 	{
 		memory::interfaces::eventManager->addListener(this, eventName.data());
-		m_map.emplace(std::make_pair
+		events.emplace(std::make_pair
 		(
 			eventName,
-			std::vector<std::function<void(IGameEvent*)>>{ callback }
+			std::vector<callbackType>{ callback }
 		));
 	}
 }
 
-void EventCallback::FireGameEvent(IGameEvent* event)
+void EventCallback::fireGameEvent(IGameEvent* event)
 {
-	for (const auto [name, funcs] : m_map)
+	for (const auto [name, funcs] : events)
 	{
 		if (const std::string_view ename{ event->getName() }; ename == name)
 		{

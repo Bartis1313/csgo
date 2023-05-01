@@ -1,8 +1,13 @@
-#include "hooks.hpp"
+#include "sendDatagram.hpp"
 
-#include "../features/fakelatency/fakelatency.hpp"
+#include <cheats/features/fakelatency/fakelatency.hpp>
+#include <config/vars.hpp>
+#include <cheats/game/game.hpp>
 
-hooks::sendDatagram::value FASTCALL hooks::sendDatagram::hooked(FAST_ARGS, void* datagram)
+hooks::SendDatagram::value hooks::SendDatagram::hook(FAST_ARGS, void* datagram)
 {
-	return FakeLatency::runDatagram(reinterpret_cast<INetChannel*>(thisptr), datagram);
+	if (datagram || !vars::misc->fakeLatency->enabled || !game::isAvailable())
+		return original(thisptr, datagram);
+
+	return fakeLatency::runDatagram(static_cast<INetChannel*>(thisptr), datagram);
 }

@@ -1,5 +1,7 @@
 #include "glow.hpp"
 
+#include "../chams/factory/factory.hpp"
+
 #include <SDK/IMaterialSystem.hpp>
 #include <SDK/IVStudioRender.hpp>
 #include <SDK/IVModelRender.hpp>
@@ -21,9 +23,44 @@
 #include <cheats/game/globals.hpp>
 #include <cheats/features/cache/cache.hpp>
 #include <config/vars.hpp>
-#include <cheats/features/visuals/chams/factory/create.hpp>
+
+#include <cheats/hooks/doPostScreenEffects.hpp>
 
 // recreation of: https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/glow_outline_effect.cpp
+
+namespace
+{
+	struct GlowHandler : hooks::DoPostScreenEffects
+	{
+		GlowHandler()
+		{
+			this->registerInit(glow::initMaterials);
+			this->registerRun(glow::run);
+		}
+	} glowHandler;
+}
+
+namespace glow
+{
+	void renderGlowModels(IMatRenderContext* ctx, int x, int y);
+	void applyEntityGlowEffects(IMatRenderContext* ctx);
+	void downSampleAndBlurRT(IMatRenderContext* ctx);
+
+	ITexture* _rt_FullFrameFB{ };
+	ITexture* _rt_FullScreen{ };
+	ITexture* _rt_SmallFB0{ };
+	ITexture* _rt_SmallFB1{ };
+
+	IMaterial* glow_color{ };
+	IMaterial* glow_rim3d{ };
+	IMaterial* glow_downsample{ };
+	IMaterial* glow_blur_x{ };
+	IMaterial* glow_blur_y{ };
+	IMaterial* halo_add_to_screen{ };
+	IMaterial* glow_edge_highlight{ };
+
+	constexpr int renderFlags{ STUDIO_RENDER | STUDIO_SKIP_FLEXES | STUDIO_DONOTMODIFYSTENCILSTATE | STUDIO_NOLIGHTING_OR_CUBEMAP | STUDIO_SKIP_DECALS };
+}
 
 static void setRenderTargetAndViewPort(ITexture* rt, int w, int h)
 {
@@ -32,7 +69,7 @@ static void setRenderTargetAndViewPort(ITexture* rt, int w, int h)
 	ctx->viewport(0, 0, w, h);
 }
 
-void Glow::initMaterials()
+void glow::initMaterials()
 {
 	_rt_FullFrameFB = memory::interfaces::matSys->findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
 	_rt_FullScreen = memory::interfaces::matSys->findTexture("_rt_FullScreen", TEXTURE_GROUP_RENDER_TARGET);
@@ -41,8 +78,14 @@ void Glow::initMaterials()
 
 
 	glow_color = memory::interfaces::matSys->findMaterial("dev/glow_color", TEXTURE_GROUP_OTHER);
-	glow_downsample = material::factory::createMaterial(MaterialData{ .name = "downsampleGlow_fixed", .key = "Downsample_nohdr",
-		.buffer = "$bloomtintenable 1 $bloomtype 1 $basetexture _rt_FullFrameFB $bloomexp 2.5 $bloomsaturation 1.0" }, CreationType::FROM_STRING);
+	MaterialData downSampleFixed
+	{
+		.name = "downsampleGlow_fixed",
+		.key = "Downsample_nohdr",
+		.buffer = "$bloomtintenable 1 $bloomtype 1 $basetexture _rt_FullFrameFB $bloomexp 2.5 $bloomsaturation 1.0",
+		.createType = CreationType::FROM_STRING
+	};
+	glow_downsample = material::factory::createMaterial(downSampleFixed);
 	glow_rim3d = memory::interfaces::matSys->findMaterial("dev/glow_rim3d", TEXTURE_GROUP_OTHER);
 	glow_blur_x = memory::interfaces::matSys->findMaterial("dev/glow_blur_x", TEXTURE_GROUP_OTHER);
 	glow_blur_y = memory::interfaces::matSys->findMaterial("dev/glow_blur_y", TEXTURE_GROUP_OTHER);
@@ -52,7 +95,7 @@ void Glow::initMaterials()
 	console::debug("loaded all glow textures / materials");
 }
 
-void Glow::downSampleAndBlurRT(IMatRenderContext* ctx)
+void glow::downSampleAndBlurRT(IMatRenderContext* ctx)
 {
 	ctx->pushRenderTargetAndViewport();
 
@@ -113,7 +156,7 @@ void Glow::downSampleAndBlurRT(IMatRenderContext* ctx)
 	ctx->popRenderTargetAndViewport();
 }
 
-void Glow::renderGlowModels(IMatRenderContext* ctx, int x, int y)
+void glow::renderGlowModels(IMatRenderContext* ctx, int x, int y)
 {
 	ctx->pushRenderTargetAndViewport();
 
@@ -155,7 +198,7 @@ void Glow::renderGlowModels(IMatRenderContext* ctx, int x, int y)
 	ctx->popRenderTargetAndViewport();
 }
 
-void Glow::applyEntityGlowEffects(IMatRenderContext* ctx)
+void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 {
 	std::vector<Player_t*> rim3DGlows, edgeHighlightGlows, glows;
 
@@ -404,10 +447,8 @@ void Glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 	ctx->setStencilState(stencilStateDisable);
 }
 
-void Glow::run()
+void glow::run()
 {
-	INIT_MATERIALS_ONCE(initMaterials);
-
 	if (!vars::visuals->glow->enabled)
 		return;
 

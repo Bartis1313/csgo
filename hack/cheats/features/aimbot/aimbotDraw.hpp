@@ -1,18 +1,10 @@
 #pragma once
 
-#include <cheats/classes/renderableToSurface.hpp>
-
-class AimbotDraw : protected RenderableSurfaceType
+namespace AimbotDraw
 {
-public:
-	constexpr AimbotDraw() :
-		RenderableSurfaceType{}
-	{}
 
-	virtual void draw() override;
-private:
+	void draw();
+
 	void drawFov();
 	void drawBestPoint();
 };
-
-GLOBAL_FEATURE(AimbotDraw);

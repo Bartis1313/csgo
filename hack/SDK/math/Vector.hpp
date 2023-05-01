@@ -8,11 +8,8 @@
 #include <compare>
 
 #include <utilities/tools/wrappers.hpp>
-#include <imgui.h>
 
 enum class Coord { X, Y, Z };
-
-#define ASSERT_VEC3 static_assert(SIZE == 3, "Use for only v3");
 
 template<typename T, size_t SIZE>
 class Vector
@@ -99,11 +96,10 @@ public:
 
 	constexpr auto& clamp()
 	{
-		ASSERT_VEC3;
-
 		m_arr[0] = std::clamp(m_arr[0], (T)-89, (T)89);
 		m_arr[1] = std::clamp(std::remainder(m_arr[1], (T)360), (T)-180, (T)180);
-		m_arr[2] = std::clamp(m_arr[2], (T)-50, (T)50);
+		if constexpr (SIZE > 3)
+			m_arr[2] = std::clamp(m_arr[2], (T)-50, (T)50);
 
 		return *this;
 	}
@@ -135,12 +131,12 @@ public:
 
 	constexpr const auto operator[](Coord coord) const
 	{
-		return this->m_arr[E2T(coord)];
+		return this->m_arr[static_cast<size_t>(coord)];
 	}
 
 	constexpr auto& operator[](Coord coord)
 	{
-		return this->m_arr[E2T(coord)];
+		return this->m_arr[static_cast<size_t>(coord)];
 	}
 
 	constexpr auto& operator+=(const Vector& vec)
@@ -270,13 +266,12 @@ public:
 
 	constexpr auto& normalize()
 	{
-		ASSERT_VEC3;
-
 		m_arr[0] = std::isfinite(m_arr[0]) ? (T)std::remainder(m_arr[0], (T)360) : (T)0;
 		m_arr[1] = std::isfinite(m_arr[1]) ? (T)std::remainder(m_arr[1], (T)360) : (T)0;
-		m_arr[2] = (T)0;
+		if constexpr(SIZE > 2)
+			m_arr[2] = (T)0;
 
-		return *this;
+		return* this;
 	}
 
 	[[nodiscard]] auto normalizeInPlace() const
@@ -296,8 +291,6 @@ public:
 
 	[[nodiscard]] constexpr auto normalized() const
 	{
-		ASSERT_VEC3;
-
 		Vector vec = this->get();
 		vec.normalize();
 
@@ -321,11 +314,6 @@ public:
 	[[nodiscard]] T distToMeters(const Vector& vec) const
 	{
 		return distTo(vec) * (T)0.0254f;
-	}
-
-	[[nodiscard]] constexpr ImVec2 toImVec() const
-	{
-		return ImVec2{ m_arr[0], m_arr[1] };
 	}
 
 	[[nodiscard]] constexpr auto lerp(const Vector& end, float t) const

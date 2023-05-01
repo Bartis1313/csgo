@@ -1,16 +1,10 @@
 #pragma once
 
-class DiscordPresence;
-
-struct Setup
+namespace setup
 {
-public:
-	static bool init([[maybe_unused]] void* instance);
-	static void looper([[maybe_unused]] void* instance);
-	static void shutdown([[maybe_unused]] void* instance);
-private:
-	inline static bool m_inited = false;
+	bool init([[maybe_unused]] void* instance);
+	void looper([[maybe_unused]] void* instance);
+	void shutdown([[maybe_unused]] void* instance);
 
-	// specific for looper
-	static DiscordPresence m_dc;
+	inline bool inited{ false };
 };

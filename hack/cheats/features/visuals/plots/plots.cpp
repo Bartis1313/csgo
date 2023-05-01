@@ -21,21 +21,56 @@
 
 #include <numeric>
 
-void Plots::init()
-{
-	m_VelocityRecords.reserve(MAX_SIZE_PLOTS);
-	m_FpsRecords.reserve(MAX_SIZE_PLOTS);
+#include <cheats/hooks/present.hpp>
+#include <cheats/hooks/createMove.hpp>
 
-	std::iota(m_sharedXS.begin(), m_sharedXS.end(), 0);
+namespace
+{
+	struct PlotHandler : hooks::Present
+	{
+		PlotHandler()
+		{
+			this->registerRun(plots::draw);
+		}
+	} plotHandler;
+
+	struct PlotVelocityCollector : hooks::CreateMove
+	{
+		PlotVelocityCollector()
+		{
+			this->registerRunPrediction(plots::collectVelocity);
+		}
+	} plotVelocityCollector;
 }
 
-void Plots::draw()
+namespace plots
+{
+	constexpr size_t MAX_ELEMENTS_PLOTS{ 1000 };
+
+	// using vector, because it's easier to implement in code (emplace_back)
+	// even tho, it has known capacity so no big deal
+	std::vector<double> velocityRecords;
+	std::vector<double> fpsRecords;
+
+	// both plots will use it
+	std::array<double, MAX_ELEMENTS_PLOTS> sharedXS;
+}
+
+void plots::init()
+{
+	velocityRecords.reserve(MAX_ELEMENTS_PLOTS);
+	fpsRecords.reserve(MAX_ELEMENTS_PLOTS);
+
+	std::iota(sharedXS.begin(), sharedXS.end(), 0);
+}
+
+void plots::draw()
 {
 	drawFps();
 	drawVelocity();
 }
 
-void Plots::drawFps()
+void plots::drawFps()
 {
 	if (!vars::misc->plots->enabledFps)
 		return;
@@ -56,10 +91,10 @@ void Plots::drawFps()
 		return;
 	}
 
-	m_FpsRecords.emplace_back(fps);
+	fpsRecords.emplace_back(fps);
 
-	while (m_FpsRecords.size() > MAX_SIZE_PLOTS)
-		m_FpsRecords.erase(m_FpsRecords.begin());
+	while (fpsRecords.size() > MAX_ELEMENTS_PLOTS)
+		fpsRecords.erase(fpsRecords.begin());
 
 	static float MAX_FPS = memory::interfaces::engine->isInGame() ? 350.0f : 120.0f;
 
@@ -79,17 +114,17 @@ void Plots::drawFps()
 			ImGui::EndMenuBar();
 		}
 
-		if (m_FpsRecords.size() != MAX_SIZE_PLOTS)
+		if (fpsRecords.size() != MAX_ELEMENTS_PLOTS)
 		{
 			ImGui::TextUnformatted("Wait for buffer to load!");
-			ImGui::ProgressBar(m_FpsRecords.size() / static_cast<float>(MAX_SIZE_PLOTS), ImVec2{ 0, 0 });
+			ImGui::ProgressBar(fpsRecords.size() / static_cast<float>(MAX_ELEMENTS_PLOTS), ImVec2{ 0, 0 });
 
 			ImGui::End();
 			return;
 		}
 
-		std::vector<double> xs{ m_sharedXS.begin(), m_sharedXS.begin() + vars::misc->plots->sizeFps };
-		std::vector<double> fps{ m_FpsRecords.end() - vars::misc->plots->sizeFps, m_FpsRecords.end() };
+		std::vector<double> xs{ sharedXS.begin(), sharedXS.begin() + vars::misc->plots->sizeFps };
+		std::vector<double> fps{ fpsRecords.end() - vars::misc->plots->sizeFps, fpsRecords.end() };
 
 		ImPlot::SetNextAxesLimits(0, vars::misc->plots->sizeFps, 0, MAX_FPS, ImPlotCond_::ImPlotCond_Always);
 		ImPlot::PushStyleColor(ImPlotCol_Fill, Color::getImguiColor(vars::misc->plots->colorFPS().getColorEditAlpha(0.25f)));
@@ -113,7 +148,7 @@ void Plots::drawFps()
 	}
 }
 
-void Plots::drawVelocity()
+void plots::drawVelocity()
 {
 	if (!vars::misc->plots->enabledVelocity)
 		return;
@@ -123,14 +158,15 @@ void Plots::drawVelocity()
 
 	static float MAX_SPEEED_MOVE = memory::interfaces::cvar->findVar("sv_maxspeed")->getFloat(); // should be accurate
 
-	if (m_VelocityRecords.empty())
+	if (velocityRecords.empty())
 		return;
 
-	std::vector<double> xs(m_VelocityRecords.size());
+	std::vector<double> xs(velocityRecords.size());
 	for (size_t i = 0; auto& el : xs)
 	{
 		el = i;
-		i++;
+
+		++i;
 	}
 
 	const int flags = vars::misc->plots->transparencyVelocity
@@ -145,7 +181,7 @@ void Plots::drawVelocity()
 			{
 				if (ImGui::BeginMenu("Menu"))
 				{
-					ImGui::SliderInt("Records size", &vars::misc->plots->sizeVelocity, 10, MAX_SIZE_PLOTS - 1);
+					ImGui::SliderInt("Records size", &vars::misc->plots->sizeVelocity, 10, MAX_ELEMENTS_PLOTS - 1);
 					ImGui::ColorPicker("Color lines plot vel", &vars::misc->plots->colorVelocity);
 
 					ImGui::EndMenu();
@@ -155,17 +191,17 @@ void Plots::drawVelocity()
 			}
 		}
 
-		if (m_VelocityRecords.size() != MAX_SIZE_PLOTS)
+		if (velocityRecords.size() != MAX_ELEMENTS_PLOTS)
 		{
 			ImGui::TextUnformatted("Wait for buffer to load!");
-			ImGui::ProgressBar(m_VelocityRecords.size() / static_cast<float>(MAX_SIZE_PLOTS), ImVec2{ 0, 0 });
+			ImGui::ProgressBar(velocityRecords.size() / static_cast<float>(MAX_ELEMENTS_PLOTS), ImVec2{ 0, 0 });
 
 			ImGui::End();
 			return;
 		}
 
-		std::vector<double> xs{ m_sharedXS.begin(), m_sharedXS.begin() + vars::misc->plots->sizeVelocity };
-		std::vector<double> vel{ m_VelocityRecords.end() - vars::misc->plots->sizeVelocity, m_VelocityRecords.end() };
+		std::vector<double> xs{ sharedXS.begin(), sharedXS.begin() + vars::misc->plots->sizeVelocity };
+		std::vector<double> vel{ velocityRecords.end() - vars::misc->plots->sizeVelocity, velocityRecords.end() };
 
 		ImPlot::SetNextAxesLimits(0, vars::misc->plots->sizeVelocity, 0, MAX_SPEEED_MOVE + 20, ImPlotCond_::ImPlotCond_Always);
 		ImPlot::PushStyleColor(ImPlotCol_Fill, Color::getImguiColor(vars::misc->plots->colorVelocity().getColorEditAlpha(0.25f)));
@@ -194,7 +230,7 @@ void Plots::drawVelocity()
 	}
 }
 
-void VelocityGather::run(CUserCmd* cmd)
+void plots::collectVelocity(CUserCmd* cmd)
 {
 	if (!vars::misc->plots->enabledVelocity)
 		return;
@@ -204,7 +240,7 @@ void VelocityGather::run(CUserCmd* cmd)
 
 	if (!memory::interfaces::engine->isInGame())
 	{
-		g_Plots->m_VelocityRecords.clear();
+		velocityRecords.clear();
 		return;
 	}
 
@@ -215,9 +251,9 @@ void VelocityGather::run(CUserCmd* cmd)
 		return;
 	}
 
-	g_Plots->m_VelocityRecords.emplace_back(game::localPlayer->m_vecVelocity().toVecPrev().length());
+	velocityRecords.emplace_back(game::localPlayer->m_vecVelocity().toVecPrev().length());
 
 	// width
-	while (g_Plots->m_VelocityRecords.size() > g_Plots->MAX_SIZE_PLOTS)
-		g_Plots->m_VelocityRecords.erase(g_Plots->m_VelocityRecords.begin());
+	while (velocityRecords.size() > MAX_ELEMENTS_PLOTS)
+		velocityRecords.erase(velocityRecords.begin());
 }

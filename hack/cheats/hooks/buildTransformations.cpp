@@ -1,16 +1,9 @@
-#include "hooks.hpp"
+#include "buildTransformations.hpp"
 
-#include <SDK/CStudioHdr.hpp>
-#include <SDK/CUtlVector.hpp>
-#include <SDK/math/matrix.hpp>
 #include <SDK/vars.hpp>
 
-//#include "../../SDK/CGlobalVars.hpp"
-//#include "../../SDK/structs/Entity.hpp"
-//#include "../../SDK/interfaces/interfaces.hpp"
-
 // prevent spoofing convar for jiggle bones
-hooks::buildTransformations::value FASTCALL hooks::buildTransformations::hooked(FAST_ARGS, CStudioHdr* hdr, void* pos, void* q, const Matrix3x4& matrix, int boneMask, void* computed)
+hooks::BuildTransformations::value hooks::BuildTransformations::hook(FAST_ARGS, CStudioHdr* hdr, void* pos, void* q, const Matrix3x4& matrix, int boneMask, void* computed)
 {
 	CUtlVector<int> flags = hdr->m_boneFlags;
 	for (int i = 0; i < hdr->m_boneFlags.m_size; i++)

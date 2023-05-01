@@ -25,6 +25,35 @@
 #include <utilities/rand.hpp>
 #include <cheats/features/blacklist/blacklist.hpp>
 
+#include <cheats/hooks/createMove.hpp>
+#include <cheats/hooks/overrideMouse.hpp>
+#include <cheats/hooks/wndproc.hpp>
+
+namespace
+{
+	struct HandlerAim : hooks::OverrideMouse
+	{
+		HandlerAim()
+		{
+			this->registerInit(Aimbot::init);
+			this->registerRun(Aimbot::run);
+		}
+	} handlerAim;
+
+	struct HandlerAimKeys : hooks::wndProcSys
+	{
+		HandlerAimKeys()
+		{
+			this->registerRun(Aimbot::updateKeys);
+		}
+	} handlerAimKeys;
+}
+
+namespace Aimbot
+{
+	CfgWeapon config;
+}
+
 void Aimbot::init()
 {
 	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
@@ -34,7 +63,7 @@ void Aimbot::init()
 
 void Aimbot::updateKeys()
 {
-	m_config.key.update();
+	config.key.update();
 }
 
 void Aimbot::run(float* x, float* y)
@@ -55,14 +84,13 @@ void Aimbot::run(float* x, float* y)
 	if (!weapon)
 		return;
 
-	auto weaponCfg = CfgWeapon::getWeaponByIndex(weapon->m_iItemDefinitionIndex());
-	if (weaponCfg == WeaponList::WEAPON_UNKNOWN)
+	const auto maybeCfg = CUserCmdCache::getWeaponConfig();
+	if (!maybeCfg.has_value())
 		return;
 
-	auto indexCfg = E2T(weaponCfg);
-	m_config = vars::aim->weapons.at(indexCfg);
+	config = maybeCfg.value();
 
-	if (!m_config.enabled)
+	if (!config.enabled)
 		return;
 
 	if (!game::isAvailable())
@@ -98,17 +126,17 @@ void Aimbot::run(float* x, float* y)
 	// everything sorted by fov. Blacklists go on top + they ofc are sorted
 	// we always want front() as current target
 	std::ranges::sort(m_targets,
-		[this](const AimbotTarget_t& lhs, const AimbotTarget_t& rhs) // std::tie won't work in that case
+		[](const AimbotTarget_t& lhs, const AimbotTarget_t& rhs) // std::tie won't work in that case
 		{
-			if (g_Blacklist->isBlacklisted(lhs.m_player) ^ g_Blacklist->isBlacklisted(rhs.m_player))
-			return g_Blacklist->isBlacklisted(lhs.m_player);
+			if (blacklist::isBlacklisted(lhs.m_player) ^ blacklist::isBlacklisted(rhs.m_player))
+				return blacklist::isBlacklisted(lhs.m_player);
 
-	return lhs.m_fov < rhs.m_fov;
+			return lhs.m_fov < rhs.m_fov;
 		});
 
 	auto [player, fov, index, bestHitbox, bestpos] = m_targets.front();
 
-	if (m_config.aimBacktrack)
+	if (config.aimBacktrack)
 	{
 		int boneID = 8; // HEAD start
 		if (auto modelStudio = memory::interfaces::modelInfo->getStudioModel(player->getModel()); modelStudio != nullptr)
@@ -118,13 +146,13 @@ void Aimbot::run(float* x, float* y)
 				boneID = hitbox->m_bone;
 			}
 		}
-		const auto& record = g_Backtrack->getAllRecords().at(player->getIndex());
-		bestpos = record.at(record.size() / 2).m_matrix[boneID].origin(); // middle, u can play with this as u want to
+		const auto& record = backtrack::records.at(player->getIndex());
+		bestpos = record.at(record.size() / 2).matrices[boneID].origin(); // middle, u can play with this as u want to
 	}
 
 	const auto currentAngle = Vec3{ m_view + punch };
 	const auto& angle = math::calcAngle(myEye, bestpos);
-	float smoothingFactor = std::min(memory::interfaces::globalVars->m_frametime * m_config.frametimeMulttiply, 1.0f);
+	float smoothingFactor = std::min(memory::interfaces::globalVars->m_frametime * config.frametimeMulttiply, 1.0f);
 	const auto& lerpedAngle = currentAngle.lerp(angle, smoothingFactor).normalize();
 
 	auto& toAdd = Vec3{ currentAngle - lerpedAngle }.normalize().clamp();
@@ -150,7 +178,7 @@ bool Aimbot::getBestTarget(Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
 	// will not work for the special case:
 	// delay did not hit timer limit but we switched manually to new target -> should reset the timer. I couldn't detect it without false positives :(
 	// epic solution - stop shooting and start again
-	if (m_config.aimDelay)
+	if (config.aimDelay)
 	{
 		/*if (m_bestEnt && m_bestEnt->isAlive())
 		{
@@ -159,7 +187,7 @@ bool Aimbot::getBestTarget(Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
 		if (m_targets.size() && !m_delay && !m_targets.front().m_player->isAlive()) // if ent is found and dead, then set field to delay and wait curr time + cfgtime
 		{
 			m_delay = true;
-			delay = memory::interfaces::globalVars->m_curtime + (m_config.aimDelayVal / 1000.0f);
+			delay = memory::interfaces::globalVars->m_curtime + (config.aimDelayVal / 1000.0f);
 		}
 		if (m_delay) // if the delay is hit, check time, so when ent died
 		{
@@ -179,7 +207,7 @@ bool Aimbot::getBestTarget(Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
 
 	if (game::localPlayer->m_flFlashDuration() > 0.0f)
 	{
-		if (game::localPlayer->m_flFlashBangTime() >= m_config.flashLimit)
+		if (game::localPlayer->m_flFlashBangTime() >= config.flashLimit)
 			return false;
 	}
 
@@ -215,14 +243,14 @@ bool Aimbot::getBestTarget(Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
 			if (!game::localPlayer->isPossibleToSee(ent, hitPos))
 				continue;
 
-			if (m_config.smokeCheck && game::localPlayer->isViewInSmoke(hitPos))
+			if (config.smokeCheck && game::localPlayer->isViewInSmoke(hitPos))
 				continue;
 
-			auto fov = m_config.methodAim == E2T(AimbotMethod::CROSSHAIR)
+			auto fov = config.methodAim == E2T(AimbotMethod::CROSSHAIR)
 				? math::calcFov(eye, hitPos, angles)
 				: math::calcFovReal(eye, hitPos, angles);
 
-			if (fov <= m_config.fov)
+			if (fov <= config.fov)
 				m_targets.emplace_back(AimbotTarget_t{ ent, fov, idx, pos, hitPos });
 		}
 	}
@@ -230,24 +258,14 @@ bool Aimbot::getBestTarget(Weapon_t* wpn, const Vec3& eye, const Vec3& punch)
 	return m_targets.size();
 }
 
-Player_t* Aimbot::getTargetted() const
+Player_t* Aimbot::getTargetted()
 {
 	return m_bestEnt;
 }
 
-Vec3 Aimbot::getCachedView() const
-{
-	return m_view;
-}
-
-Vec3 Aimbot::getBestHibox() const
+Vec3 Aimbot::getBestHibox()
 {
 	return m_bestHitpos;
-}
-
-CfgWeapon Aimbot::getCachedConfig() const
-{
-	return m_config;
 }
 
 void Aimbot::resetFields()
@@ -258,9 +276,9 @@ void Aimbot::resetFields()
 
 bool Aimbot::isClicked(CUserCmd* cmd)
 {
-	if (m_config.useKey)
+	if (config.useKey)
 	{
-		if (m_config.key.isEnabled())
+		if (config.key.isEnabled())
 			return true;
 		else
 			return false;
@@ -285,7 +303,7 @@ std::vector<Hitboxes> Aimbot::getHitboxes()
 	static std::vector<Hitboxes> chestHitbox{ HITBOX_LOWER_CHEST, HITBOX_UPPER_CHEST };
 
 
-	switch (m_config.aimSelection)
+	switch (config.aimSelection)
 	{
 	case E2T(AimbotHitboxes::NEAREST):
 		return allHitboxes;

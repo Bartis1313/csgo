@@ -7,7 +7,7 @@
 
 #include <unordered_map>
 
-void ModulateColor::run(void* thisptr, float* r, float* g, float* b)
+void modulateColor::run(void* thisptr, float* r, float* g, float* b)
 {
 	if (!vars::visuals->world->modulate->enabled)
 		return;

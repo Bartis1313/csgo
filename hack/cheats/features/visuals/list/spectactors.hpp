@@ -1,23 +1,15 @@
 #pragma once
 
-#include <cheats/classes/renderableToPresent.hpp>
-
 #include <unordered_map>
 #include <string>
 #include <SDK/Enums.hpp>
 
-class SpectactorList : RenderablePresentType
+namespace spectactor
 {
-public:
-	SpectactorList() :
-		RenderablePresentType{}
-	{}
-	
-protected:
-	virtual void draw() override;
-	virtual void reset() override;
-private:
-	std::unordered_map<ObserverTypes, std::string_view> m_modeString
+	void draw();
+	void reset();
+
+	inline std::unordered_map<ObserverTypes, std::string_view> m_modeString
 	{
 		{ OBS_MODE_NONE, "None" },
 		{ OBS_MODE_DEATHCAM, "Deathcam" },
@@ -29,7 +21,5 @@ private:
 		{ OBS_MODE_ROAMING, "Roaming" }
 	};
 
-	std::vector<std::pair<std::string, ObserverTypes>> m_specs;
-};
-
-GLOBAL_FEATURE(SpectactorList);
+	inline std::vector<std::pair<std::string, ObserverTypes>> m_specs;
+}

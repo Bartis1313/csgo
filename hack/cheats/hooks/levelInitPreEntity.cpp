@@ -1,10 +1,9 @@
-#include "hooks.hpp"
+#include "levelInitPreEntity.hpp"
 
-#include <cheats/classes/base.hpp>
 
-hooks::levelInitPreEntity::value FASTCALL hooks::levelInitPreEntity::hooked(FAST_ARGS, const char* map)
+hooks::LevelInitPreEntity::value FASTCALL hooks::LevelInitPreEntity::hook(FAST_ARGS, const char* map)
 {
-	BaseHack::resetAll();
+	Storage::runs.run();
 
 	original(thisptr, map);
 }

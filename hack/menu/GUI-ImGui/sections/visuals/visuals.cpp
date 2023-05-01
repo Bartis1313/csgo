@@ -80,11 +80,11 @@ void tabs::visuals::draw()
 
 		ImGui::BeginGroupPanel("Chams & Glow", ImGui::GetContentRegionAvail());
 		{
-			const auto materials = g_Chams->getMaterials();
+			const auto materials = chams::materials;
 			std::vector<std::string> names;
 			std::vector<std::string> matNames(materials.size());
 			for (size_t i = 0; const auto & mat : materials)
-				matNames[i++] = mat.data.name;
+				matNames[i++] = mat.name;
 
 			ImGui::Checkbox("Players##chams", &vars::visuals->chams->players);
 			if (vars::visuals->chams->players)
@@ -176,7 +176,7 @@ void tabs::visuals::draw()
 			ImGui::Combo("Mode", &vars::misc->radar->mode, magic_enum::enum_names_pretty<RadarMode>());
 			if (ImGui::Button("Refresh texture manually"))
 			{
-				g_Radar->manuallyInitTexture();
+			//
 			}
 			ImGui::SameLine();
 			ImGui::HelpMarker("Will not work for workshop maps\nYou can try forcing the engine to re-render by pressing escape few times");
@@ -274,14 +274,14 @@ void tabs::visuals::draw()
 			ImGui::SameLine();
 			ImGui::ColorPicker("Smoke##edited", &vars::visuals->world->particles->colorSmoke);
 
-			const auto customsky = g_SkyboxEdit->getAllCustomSkyBoxes();
+			const auto& customsky = skybox::customSkyboxes;
 			bool state{ false };
 			state |= ImGui::Combo("Normal", &vars::visuals->world->sky->indexNormal, std::span(selections::skyboxes.data(), selections::skyboxes.size()));
 			state |= ImGui::Combo("Custom##Skybox", &vars::visuals->world->sky->indexCustom, customsky);
-			g_SkyboxEdit->handleButtonState(state);
+			skybox::changedState = state;
 			if (ImGui::Button("Reload Custom Skybox"))
 			{
-				g_SkyboxEdit->reloadCustomSkyboxes();
+				skybox::reloadCustomSkyboxes();
 			}
 
 			ImGui::Checkbox("Fog", &vars::visuals->world->fog->enabled);
@@ -303,17 +303,17 @@ void tabs::visuals::draw()
 			ImGui::Checkbox("Weather", &vars::visuals->world->weather->enabled);
 			if (vars::visuals->world->weather->enabled)
 			{
-				g_WeatherController->implMenu();
+				weatherController::implMenu();
 			}
 
 			bool changedButton{ false };
 			changedButton |= ImGui::Checkbox("##Ambientenab", &vars::visuals->world->ambient->enabled);
-			g_AmbientLight->setButtonState(changedButton);
+			ambientLight::buttonState = changedButton;
 
 			ImGui::SameLine();
 			bool changedPicker{ false };
 			changedPicker |= ImGui::ColorPicker("Ambient", &vars::visuals->world->ambient->color);
-			g_AmbientLight->setPickerState(changedPicker);
+			ambientLight::pickerState = changedPicker;
 
 			ImGui::Combo("Screen effect", &vars::visuals->world->screenEffect->index, selections::screenEffects);
 			ImGui::SliderFloat("Param##Screen effect", &vars::visuals->world->screenEffect->param, 0.0f, 1.0f);

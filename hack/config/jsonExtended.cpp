@@ -5,9 +5,10 @@ using namespace nlohmann::detail;
 void from_json(const json& j, CfgWeapon& val)
 {
 	from_json(j, "Enabled", val.enabled);
+	from_json(j, "UseKey", val.useKey);
+	from_json(j["Key"], val.key);
 	from_json(j, "Fov", val.fov);
 	from_json(j, "Smooth", val.frametimeMulttiply);
-	from_json(j, "maxDistanceMeters", val.maxDistanceMeters);
 	from_json(j, "Aim method", val.methodAim);
 	from_json(j, "Aim selection", val.aimSelection);
 	from_json(j, "Aim delay enabled", val.aimDelay);
@@ -24,9 +25,10 @@ void from_json(const json& j, CfgWeapon& val)
 void to_json(json& j, const CfgWeapon& val)
 {
 	j["Enabled"] = val.enabled;
+	j["UseKey"] = val.useKey;
+	j["Key"] = val.key;
 	j["Fov"] = val.fov;
 	j["Smooth"] = val.frametimeMulttiply;
-	j["maxDistanceMeters"], val.maxDistanceMeters;
 	j["Aim method"] = val.methodAim;
 	j["Aim selection"] = val.aimSelection;
 	j["Aim delay enabled"] = val.aimDelay;
@@ -75,7 +77,7 @@ void to_json(json& j, const CfgBeam& val)
 	j["Index"] = val.index;
 	j["Flags"] = val.flags;
 	j["Life"] = val.life;
-	j["BeamCol"]= val.color;
+	j["BeamCol"] = val.color;
 	j["Width"] = val.width;
 	j["Fade length"] = val.fadeLength;
 	j["Amplitude"] = val.amplitude;
@@ -209,7 +211,7 @@ void from_json(const json& j, VarVisuals::VarGlow& val)
 
 void to_json(json& j, const VarVisuals::VarGlow& val)
 {
-	j["Enabled"]= val.enabled;
+	j["Enabled"] = val.enabled;
 	j["Full Bloom"] = val.fullBloom;
 	j["Color player"] = val.colorPlayer;
 	j["Speeds"] = val.pulseSpeeeds;
@@ -413,7 +415,7 @@ void from_json(const json& j, VarVisuals::VarEsp::VarDropped& val)
 void to_json(json& j, const VarVisuals::VarEsp::VarDropped& val)
 {
 	j["Enabled"] = val.enabled;
-	j["Color"] =val.color;
+	j["Color"] = val.color;
 	j["Flags"] = val.flags;
 }
 
@@ -592,7 +594,7 @@ void to_json(json& j, const VarVisuals::VarWorld::VarZeus& val)
 	j["Range"] = val.enabled;
 	j["Party"] = val.party;
 	j["Tracing"] = val.tracing;
-	j["Color"]= val.color;
+	j["Color"] = val.color;
 }
 
 void from_json(const json& j, VarVisuals::VarWorld::VarParticles& val)
@@ -624,7 +626,7 @@ void from_json(const json& j, VarVisuals::VarWorld::VarTracer& val)
 void to_json(json& j, const VarVisuals::VarWorld::VarTracer& val)
 {
 	j["Enabled"] = val.enabled;
-	j["Beam"]= val.beamTracer;
+	j["Beam"] = val.beamTracer;
 }
 
 void from_json(const json& j, VarVisuals::VarWorld::VarImpacts& val)
@@ -635,7 +637,7 @@ void from_json(const json& j, VarVisuals::VarWorld::VarImpacts& val)
 	from_json(j["FillClient"], val.colorClientFill);
 	from_json(j, "Local enabled", val.enabledClient);
 	from_json(j, "Local time", val.timeLocal);
-	from_json(j["LineLocal"],  val.colorLocal);
+	from_json(j["LineLocal"], val.colorLocal);
 	from_json(j["FillLocal"], val.colorLocalFill);
 }
 
@@ -643,12 +645,12 @@ void to_json(json& j, const VarVisuals::VarWorld::VarImpacts& val)
 {
 	j["Client enabled"] = val.enabledClient;
 	j["Client time"] = val.timeClient;
-	j["LineClient"]= val.colorClient;
-	j["FillClient"]= val.colorClientFill;
+	j["LineClient"] = val.colorClient;
+	j["FillClient"] = val.colorClientFill;
 	j["Local enabled"] = val.enabledClient;
 	j["Local time"] = val.timeLocal;
-	j["LineLocal"]= val.colorLocal;
-	j["FillLocal"]= val.colorLocalFill;
+	j["LineLocal"] = val.colorLocal;
+	j["FillLocal"] = val.colorLocalFill;
 }
 
 void from_json(const json& j, VarVisuals::VarWorld::VarFog& val)
@@ -720,7 +722,7 @@ void to_json(json& j, const VarVisuals::VarWorld::VarWeather& val)
 void from_json(const json& j, VarVisuals::VarWorld::VarAmbient& val)
 {
 	from_json(j, "Enabled", val.enabled);
-	from_json(j[ "Color"], val.color);
+	from_json(j["Color"], val.color);
 }
 
 void to_json(json& j, const VarVisuals::VarWorld::VarAmbient& val)
@@ -733,7 +735,6 @@ void from_json(const json& j, VarKeys& val)
 {
 	from_json(j, "Enabled X88", val.enabledX88Menu);
 	from_json(j, "X88", val.x88Toggle);
-	//from_json(j["Aimbot"], val.aimbot);
 	from_json(j["Menu"], val.menu);
 	from_json(j["Panic"], val.panic);
 	from_json(j["Logs"], val.console);
@@ -747,7 +748,6 @@ void to_json(json& j, const VarKeys& val)
 {
 	j["Enabled X88"] = val.enabledX88Menu;
 	j["X88"] = val.x88Toggle;
-	//j["Aimbot"] = val.aimbot;
 	j["Menu"] = val.menu;
 	j["Panic"] = val.panic;
 	j["Logs"] = val.console;
@@ -917,9 +917,9 @@ void to_json(json& j, const VarMisc::VarHitmarker& val)
 	j["Play"] = val.play;
 	j["3D"] = val.enabled3D;
 	j["Resize"] = val.enabledResize;
-	j["Normal"]=val.colorNormal;
-	j["Head"]=val.colorHead;
-	j["Dead"]= val.colorDead;
+	j["Normal"] = val.colorNormal;
+	j["Head"] = val.colorHead;
+	j["Dead"] = val.colorDead;
 	j["Time"] = val.time;
 }
 
@@ -939,7 +939,7 @@ void from_json(const json& j, VarMisc::VarPlots& val)
 	from_json(j, "Enabled Velocity", val.enabledVelocity);
 	from_json(j["Fps"], val.colorFPS);
 	from_json(j["Velocity"], val.colorVelocity);
-	from_json(j, "FPS size", val.sizeFps);	
+	from_json(j, "FPS size", val.sizeFps);
 	from_json(j, "Velocity size", val.sizeVelocity);
 	from_json(j, "Velocity transparency", val.transparencyVelocity);
 }
@@ -948,8 +948,8 @@ void to_json(json& j, const VarMisc::VarPlots& val)
 {
 	j["Enabled FPS"] = val.enabledFps;
 	j["Enabled Velocity"] = val.enabledVelocity;
-	j["Fps"]= val.colorFPS;
-	j["Velocity"]= val.colorVelocity;
+	j["Fps"] = val.colorFPS;
+	j["Velocity"] = val.colorVelocity;
 	j["FPS size"] = val.sizeFps;
 	j["Velocity size"] = val.sizeVelocity;
 	j["Velocity transparency"] = val.transparencyVelocity;
@@ -1039,10 +1039,10 @@ void to_json(json& j, const VarMisc::VarTrail& val)
 {
 	j["Enabled"] = val.enabled;
 	j["Mode"] = val.mode;
-	j["Beam"]= val.beam;
-	j["Color line"]= val.colorLine;
-	j["Line life"]= val.lineLife;
-	j["Color splash"]= val.colorSplash;
+	j["Beam"] = val.beam;
+	j["Color line"] = val.colorLine;
+	j["Line life"] = val.lineLife;
+	j["Color splash"] = val.colorSplash;
 }
 
 void from_json(const json& j, VarMisc::VarNades& val)
@@ -1062,11 +1062,11 @@ void to_json(json& j, const VarMisc::VarNades& val)
 {
 	j["Enable prediction"] = val.enabledPred;
 	j["Always"] = val.predAlways;
-	j["Pred"]= val.colorPredLine;
-	j["Fill"]= val.colorPredBoxFill;
-	j["Outline"]= val.colorPredBox;
+	j["Pred"] = val.colorPredLine;
+	j["Fill"] = val.colorPredBoxFill;
+	j["Outline"] = val.colorPredBox;
 	j["Enable tracer"] = val.enabledTracer;
-	j["TracerLine"]= val.colorTracer;
+	j["TracerLine"] = val.colorTracer;
 	j["Tracer distance"] = val.tracerDist;
 	j["Tracer warning"] = val.tracerWarn;
 }
@@ -1279,23 +1279,23 @@ void to_json(json& j, const ImGuiStyle& val)
 {
 	j["Alpha"] = val.Alpha;
 	j["AisabledAlpha"] = val.DisabledAlpha;
-	j["WindowPadding"]= val.WindowPadding;
+	j["WindowPadding"] = val.WindowPadding;
 	j["WindowRounding"] = val.WindowRounding;
 	j["WindowBorderSize"] = val.WindowBorderSize;
-	j["WindowMinSize"]= val.WindowMinSize;
-	j["WindowTitleAlign"]= val.WindowTitleAlign;
+	j["WindowMinSize"] = val.WindowMinSize;
+	j["WindowTitleAlign"] = val.WindowTitleAlign;
 	j["WindowMenuButtonPosition"] = val.WindowMenuButtonPosition;
 	j["ChildRounding"] = val.ChildRounding;
 	j["ChildBorderSize"] = val.ChildBorderSize;
-	j["PopupRounding"]  = val.PopupRounding;
+	j["PopupRounding"] = val.PopupRounding;
 	j["PopupBorderSize"] = val.PopupBorderSize;
-	j["FramePadding"]= val.FramePadding;
+	j["FramePadding"] = val.FramePadding;
 	j["FrameRounding"] = val.FrameRounding;
 	j["FrameBorderSize"] = val.FrameBorderSize;
-	j["ItemSpacing"]= val.ItemSpacing;
-	j["ItemInnerSpacing"]= val.ItemInnerSpacing;
-	j["CellPadding"]= val.CellPadding;
-	j["TouchExtraPadding"]= val.TouchExtraPadding;
+	j["ItemSpacing"] = val.ItemSpacing;
+	j["ItemInnerSpacing"] = val.ItemInnerSpacing;
+	j["CellPadding"] = val.CellPadding;
+	j["TouchExtraPadding"] = val.TouchExtraPadding;
 	j["IndentSpacing"] = val.IndentSpacing;
 	j["ColumnsMinSpacing"] = val.ColumnsMinSpacing;
 	j["ScrollbarSize"] = val.ScrollbarSize;
@@ -1306,10 +1306,10 @@ void to_json(json& j, const ImGuiStyle& val)
 	j["TabBorderSize"] = val.TabBorderSize;
 	j["TabMinWidthForCloseButton"] = val.TabMinWidthForCloseButton;
 	j["ColorButtonPosition"] = val.ColorButtonPosition;
-	j["ButtonTextAlign"]= val.ButtonTextAlign;
-	j["SelectableTextAlign"]= val.SelectableTextAlign;
-	j["DisplayWindowPadding"]= val.DisplayWindowPadding;
-	j["DisplaySafeAreaPadding"]= val.DisplaySafeAreaPadding;
+	j["ButtonTextAlign"] = val.ButtonTextAlign;
+	j["SelectableTextAlign"] = val.SelectableTextAlign;
+	j["DisplayWindowPadding"] = val.DisplayWindowPadding;
+	j["DisplaySafeAreaPadding"] = val.DisplaySafeAreaPadding;
 	j["MouseCursorScale"] = val.MouseCursorScale;
 	j["AntiAliasedLines"] = val.AntiAliasedLines;
 	j["AntiAliasedLinesUseTex"] = val.AntiAliasedLinesUseTex;

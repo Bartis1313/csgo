@@ -26,66 +26,81 @@
 
 #include <ranges>
 
+#include <cheats/hooks/createMove.hpp>
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct NadePredDraw : hooks::PaintTraverse
+	{
+		NadePredDraw()
+		{
+			this->registerRender(grenadePrediction::draw);
+		}
+	} nadeDraw;
+
+	struct NadeButtons : hooks::CreateMove
+	{
+		NadeButtons()
+		{
+			this->registerRunPrePrediction(grenadePrediction::run);
+		}
+	} nadeButtons;
+}
+
 #define DETONATE 1
 #define BOUNCE 2
 
-enum ACT
+namespace grenadePrediction
 {
-	ACT_NONE,
-	ACT_THROW,
-	ACT_LOB,
-	ACT_DROP,
-};
-
-void GreandePredictionButton::run(CUserCmd* cmd)
-{
-	if (!vars::misc->nade->enabledPred)
-		return;
-
-	m_ready = false;
-
-	if (vars::misc->nade->predAlways)
-		m_ready = true;
-	else
-		m_ready = cmd->m_buttons & (IN_ATTACK | IN_ATTACK2);
-
-	runView();
+	std::vector<Vec3> pathNade;
+	std::vector<Vec3> bouncesNade;
+	bool isReady;
+	int weaponIndex;
+	void setup(Vec3& src, Vec3& vecThrow, const Vec3& viewangles);
+	size_t step(Vec3& src, Vec3& vecThrow, int tick, float interval);
+	void simulate();
+	bool checkDetonate(const Vec3& vecThrow, const Trace_t& tr, int tick, float interval);
+	void addGravityMove(Vec3& move, Vec3& vel, float frametime);
+	void traceHull(Vec3& src, Vec3& end, Trace_t& tr);
+	void pushEntity(Vec3& src, const Vec3& move, Trace_t& tr);
+	void resolveFlyCollisionCustom(Trace_t& tr, Vec3& velocity, const Vec3& move, float interval);
+	void physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce);
 }
 
-void GreandePredictionButton::runView()
+void grenadePrediction::run(CUserCmd* cmd)
 {
 	if (!vars::misc->nade->enabledPred)
 		return;
 
-	if (!game::isAvailable())
-		return;
+	isReady = false;
+
+	if (vars::misc->nade->predAlways)
+		isReady = true;
+	else
+		isReady = cmd->m_buttons & (IN_ATTACK | IN_ATTACK2);
 
 	auto wpn = game::localPlayer->getActiveWeapon();
 	if (!wpn || !wpn->isGrenade())
 		return;
 
-	if (m_ready)
+	if (isReady)
 	{
-		m_weaponIdx = wpn->m_iItemDefinitionIndex();
-		g_GrenadePrediction->simulate();
+		weaponIndex = wpn->m_iItemDefinitionIndex();
+		simulate();
 	}
 	else
-		m_weaponIdx = 0;
+		weaponIndex = WEAPON_NONE;
 }
 
 struct DmgNadeInfo_t
 {
-public:
-	constexpr DmgNadeInfo_t(const ImVec2& pos, const std::string& dmgtext, const Color& color)
-		: m_pos{ pos }, m_textDmg{ dmgtext }, m_color{ color }
-	{}
-
 	ImVec2 m_pos;
 	std::string m_textDmg;
 	Color m_color;
 };
 
-void GrenadePrediction::draw()
+void grenadePrediction::draw()
 {
 	if (!vars::misc->nade->enabledPred)
 		return;
@@ -100,10 +115,10 @@ void GrenadePrediction::draw()
 	if (!weapon->isGrenade())
 		return;
 
-	if (!g_GreandePredictionButton->getWeaponIdx())
+	if (!weaponIndex)
 		return;
 
-	if (m_path.empty())
+	if (pathNade.empty())
 		return;
 
 	std::vector<DmgNadeInfo_t> nadesDmg = {};
@@ -128,7 +143,7 @@ void GrenadePrediction::draw()
 		if (!ent->isOtherTeam(game::localPlayer()))
 			continue;
 
-		float deltaDist = (ent->absOrigin() - m_path.back()).length();
+		float deltaDist = (ent->absOrigin() - pathNade.back()).length();
 
 		if (int idx = weapon->m_iItemDefinitionIndex(); idx == WEAPON_HEGRENADE)
 		{
@@ -159,7 +174,7 @@ void GrenadePrediction::draw()
 	}
 
 	std::vector<ImVec2> points;
-	for (const auto & el : m_path)
+	for (const auto & el : pathNade)
 	{
 		if (ImVec2 screen; ImRender::worldToScreen(el, screen))
 			points.push_back(screen);
@@ -167,7 +182,7 @@ void GrenadePrediction::draw()
 	if (!points.empty())
 		ImRender::drawPolyLine(points, vars::misc->nade->colorPredLine(), 0, 2.0f);
 
-	for (const auto& el : m_bounces)
+	for (const auto& el : bouncesNade)
 	{
 		ImRender::drawBox3DFilled(el, 2.0f, 2.0f, vars::misc->nade->colorPredBox(), vars::misc->nade->colorPredBoxFill());
 	}
@@ -181,7 +196,7 @@ void GrenadePrediction::draw()
 }
 
 // not using magic value given by valve, so we never are based on buttons
-void GrenadePrediction::setup(Vec3& src, Vec3& vecThrow, const Vec3& viewangles)
+void grenadePrediction::setup(Vec3& src, Vec3& vecThrow, const Vec3& viewangles)
 {
 	auto weapon = game::localPlayer->getActiveWeapon();
 	if (!weapon)
@@ -219,7 +234,7 @@ void GrenadePrediction::setup(Vec3& src, Vec3& vecThrow, const Vec3& viewangles)
 	vecThrow += forward * finalVel;
 }
 
-void GrenadePrediction::simulate()
+void grenadePrediction::simulate()
 {
 	Vec3 vecSrc, vecThrow;
 	Vec3 angles; memory::interfaces::engine->getViewAngles(angles);
@@ -229,13 +244,13 @@ void GrenadePrediction::simulate()
 	size_t logstep = static_cast<size_t>(0.05f / interval);
 	size_t logtimer = 0;
 
-	m_path.clear();
-	m_bounces.clear();
+	pathNade.clear();
+	bouncesNade.clear();
 
 	for (auto i : std::views::iota(0, 1024)) // 1024 is hardcoded, we prob will never ever reach it
 	{
 		if (!logtimer)
-			m_path.push_back(vecSrc);
+			pathNade.push_back(vecSrc);
 
 		size_t s = step(vecSrc, vecThrow, i, interval);
 
@@ -251,11 +266,11 @@ void GrenadePrediction::simulate()
 			break;
 	}
 
-	m_path.push_back(vecSrc);
-	m_bounces.push_back(vecSrc);
+	pathNade.push_back(vecSrc);
+	bouncesNade.push_back(vecSrc);
 }
 
-size_t GrenadePrediction::step(Vec3& src, Vec3& vecThrow, int tick, float interval)
+size_t grenadePrediction::step(Vec3& src, Vec3& vecThrow, int tick, float interval)
 {
 	Vec3 move;
 	addGravityMove(move, vecThrow, interval);
@@ -271,17 +286,17 @@ size_t GrenadePrediction::step(Vec3& src, Vec3& vecThrow, int tick, float interv
 	{
 		result |= BOUNCE;
 		resolveFlyCollisionCustom(tr, vecThrow, move, interval);
-		m_bounces.push_back(tr.m_end);
+		bouncesNade.push_back(tr.m_end);
 	}
 
-	if (auto size = m_bounces.size() - 1; !m_bounces.empty() && size > 20)
-		m_bounces.erase(m_bounces.begin() + size);
+	if (auto size = bouncesNade.size() - 1; !bouncesNade.empty() && size > 20)
+		bouncesNade.erase(bouncesNade.begin() + size);
 
 	src = tr.m_end;
 	return result;
 }
 
-bool GrenadePrediction::checkDetonate(const Vec3& vecThrow, const Trace_t& tr, int tick, float interval)
+bool grenadePrediction::checkDetonate(const Vec3& vecThrow, const Trace_t& tr, int tick, float interval)
 {
 	auto check = [=](float amount = 0.2f)
 	{
@@ -290,7 +305,7 @@ bool GrenadePrediction::checkDetonate(const Vec3& vecThrow, const Trace_t& tr, i
 
 	const float time = game::ticksToTime(tick);
 
-	switch (g_GreandePredictionButton->getWeaponIdx())
+	switch (weaponIndex)
 	{
 	case WEAPON_SMOKEGRENADE:
 	{
@@ -322,7 +337,7 @@ bool GrenadePrediction::checkDetonate(const Vec3& vecThrow, const Trace_t& tr, i
 }
 
 // should add more traces, as in some cases the prediction can fail badly
-void GrenadePrediction::traceHull(Vec3& src, Vec3& end, Trace_t& tr)
+void grenadePrediction::traceHull(Vec3& src, Vec3& end, Trace_t& tr)
 {
 	uintptr_t filter[] =
 	{
@@ -335,7 +350,7 @@ void GrenadePrediction::traceHull(Vec3& src, Vec3& end, Trace_t& tr)
 	memory::interfaces::trace->traceRay({ src, end, Vec3{ -2.0f, -2.0f, -2.0f }, Vec3{ 2.0f, 2.0f, 2.0f } }, MASK_SOLID, reinterpret_cast<TraceFilter*>(&filter), &tr);
 }
 
-void GrenadePrediction::addGravityMove(Vec3& move, Vec3& vel, float frametime)
+void grenadePrediction::addGravityMove(Vec3& move, Vec3& vel, float frametime)
 {
 	move[Coord::X] = vel[Coord::X] * frametime;
 	move[Coord::Y] = vel[Coord::Y] * frametime;
@@ -348,7 +363,7 @@ void GrenadePrediction::addGravityMove(Vec3& move, Vec3& vel, float frametime)
 	vel[Coord::Z] = z;
 }
 
-void GrenadePrediction::pushEntity(Vec3& src, const Vec3& move, Trace_t& tr)
+void grenadePrediction::pushEntity(Vec3& src, const Vec3& move, Trace_t& tr)
 {
 	Vec3 end = src;
 	end += move;
@@ -367,7 +382,7 @@ inline bool fClassnameIs(Entity_t* ent, const std::string_view name)
 	return std::string_view{ cl->m_networkName } == name;
 }
 
-void GrenadePrediction::resolveFlyCollisionCustom(Trace_t& tr, Vec3& velocity, const Vec3& move, float interval)
+void grenadePrediction::resolveFlyCollisionCustom(Trace_t& tr, Vec3& velocity, const Vec3& move, float interval)
 {
 	// better fix isbroken, temp solution
 	if (tr.m_entity->isPlayer() && tr.m_entity->m_iHealth() > 0)
@@ -408,7 +423,7 @@ void GrenadePrediction::resolveFlyCollisionCustom(Trace_t& tr, Vec3& velocity, c
 	}
 }
 
-void GrenadePrediction::physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce)
+void grenadePrediction::physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce)
 {
 	constexpr float STOP_EPSILON = 0.1f;
 

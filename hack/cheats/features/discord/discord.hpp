@@ -1,8 +1,8 @@
 #pragma once
 
-class DiscordPresence final
+// handle on own!
+namespace discord
 {
-public:
 	void init();
 	void run();
 	void shutdown();

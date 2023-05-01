@@ -1,6 +1,6 @@
 #include "triggerbot.hpp"
 
-#include "../aimbot/aimbot.hpp"
+#include "../aimbot/cmdCache.hpp"
 
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/CUserCmd.hpp>
@@ -16,9 +16,26 @@
 #include <cheats/game/game.hpp>
 #include <utilities/math/math.hpp>
 
-void Triggerbot::run(CUserCmd* cmd)
+#include <cheats/hooks/createMove.hpp>
+
+namespace
 {
-	auto cfg = g_Aimbot->getCachedConfig();
+	struct TriggerbotHandler : hooks::CreateMove
+	{
+		TriggerbotHandler()
+		{
+			this->registerRunPrediction(triggerbot::run);
+		}
+	} triggerbotHandler;
+}
+
+void triggerbot::run(CUserCmd* cmd)
+{
+	auto maybeConfig = CUserCmdCache::getWeaponConfig();
+	if (!maybeConfig.has_value())
+		return;
+
+	auto cfg = maybeConfig.value();
 
 	if (!cfg.triggerbot)
 		return;
@@ -60,9 +77,6 @@ void Triggerbot::run(CUserCmd* cmd)
 			return;
 	}
 
-	if (cfg.smokeCheck && game::localPlayer->isViewInSmoke(end))
-		return;
-
 	Trace_t trace;
 	TraceFilter filter;
 
@@ -71,6 +85,9 @@ void Triggerbot::run(CUserCmd* cmd)
 
 	// so this way we skip time of trace
 	delay = current;
+	
+	if (cfg.smokeCheck && game::localPlayer->isViewInSmoke(trace.m_end))
+		return;
 
 	if (trace.m_hitgroup == 0)
 		return;

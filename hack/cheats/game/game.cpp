@@ -134,6 +134,8 @@ Vec3 game::getViewAngles()
 #define NANOSVGRAST_IMPLEMENTATION
 #include <nanosvg/nanosvgrast.h>
 
+#include <cassert>
+
 std::optional<game::BitMapData> getSvgIcon(char* data, const float scale)
 {
 	constexpr float csDPI = 96.0f;

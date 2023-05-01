@@ -1,9 +1,9 @@
-#include "hooks.hpp"
+#include "viewFade.hpp"
 
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
-hooks::viewDrawFade::value FASTCALL hooks::viewDrawFade::hooked(FAST_ARGS, uint8_t* color, IMaterial* material, bool t)
+hooks::ViewFade::value hooks::ViewFade::hook(FAST_ARGS, uint8_t* color, IMaterial* material, bool t)
 {
 	if (const auto retAddr = reinterpret_cast<retaddr_t>(_ReturnAddress()); 
 		retAddr == memory::flashbangRet() || retAddr == memory::flashbangWhiteRet())

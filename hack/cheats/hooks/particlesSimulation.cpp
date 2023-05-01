@@ -1,4 +1,4 @@
-#include "hooks.hpp"
+#include "particlesSimulation.hpp"
 
 #include <SDK/CParticelCollection.hpp>
 #include <config/vars.hpp>
@@ -34,23 +34,23 @@ constexpr std::array bloodnames =
 	"blood_impact_light_headshot"
 };
 
-hooks::particlesSimulations::value FASTCALL hooks::particlesSimulations::hooked(FAST_ARGS)
+hooks::ParticlesSimulations::value hooks::ParticlesSimulations::hook(FAST_ARGS)
 {
 	original(thisptr);
 
-	auto ptr = reinterpret_cast<CParticleCollection*>(thisptr);
+	const auto ptr = reinterpret_cast<CParticleCollection*>(thisptr);
 	CParticleCollection* root = ptr;
 	while (root->m_parent)
 		root = root->m_parent;
 
-	std::string_view name = root->m_def.m_obj->m_name.m_buffer;
-	Color colorMolly = vars::visuals->world->particles->colorMolotov();
-	Color colorBlood = vars::visuals->world->particles->colorBlood();
-	Color colorSmoke = vars::visuals->world->particles->colorSmoke();
+	const std::string_view name = root->m_def.m_obj->m_name.m_buffer;
+	const Color colorMolly = vars::visuals->world->particles->colorMolotov();
+	const Color colorBlood = vars::visuals->world->particles->colorBlood();
+	const Color colorSmoke = vars::visuals->world->particles->colorSmoke();
 
 	if (vars::visuals->world->particles->enabledSmoke)
 	{
-		if (auto itr = std::find(smokenames.cbegin(), smokenames.cend(), name); itr != smokenames.cend())
+		if (auto itr = std::ranges::find(smokenames, name); itr != smokenames.cend())
 		{
 			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{
@@ -61,7 +61,7 @@ hooks::particlesSimulations::value FASTCALL hooks::particlesSimulations::hooked(
 
 	if (vars::visuals->world->particles->enabledBlood)
 	{
-		if (auto itr = std::find(bloodnames.cbegin(), bloodnames.cend(), name); itr != bloodnames.cend())
+		if (auto itr = std::ranges::find(bloodnames, name); itr != bloodnames.cend())
 		{
 			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{
@@ -72,7 +72,7 @@ hooks::particlesSimulations::value FASTCALL hooks::particlesSimulations::hooked(
 
 	if (vars::visuals->world->particles->enabledMolotov)
 	{
-		if (auto itr = std::find(mollyNames.cbegin(), mollyNames.cend(), name); itr != mollyNames.cend())
+		if (auto itr = std::ranges::find(mollyNames, name); itr != mollyNames.cend())
 		{
 			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{

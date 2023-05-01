@@ -23,28 +23,51 @@
 
 #include <mutex>
 
+#include <cheats/hooks/frameStageNotify.hpp>
+
+namespace
+{
+	struct WeatherHandler : hooks::FrameStageNotify
+	{
+		WeatherHandler()
+		{
+			this->registerRun(weatherController::run);
+		}
+	} weatherHandler;
+}
+
+namespace weatherController
+{
+	struct WeatherFields_t
+	{
+		Entity_t* ent;
+		Entity_t* networkable;
+		bool created;
+	} weatherFields;
+}
+
 // https://www.unknowncheats.me/forum/counterstrike-global-offensive/418432-precipitation-effect-similar-llamahook.html
-void WeatherController::run(int frame)
+void weatherController::run(FrameStage stage)
 {
 	if (!game::isAvailable())
 		return;
 
 	// when enable/shutdown
-	auto reset = [this]()
+	auto reset = []()
 	{
-		if (m_weather.m_created)
+		if (weatherFields.created)
 		{
-			m_weather.m_created = false;
-			if (auto w = m_weather.m_ent)
+			weatherFields.created = false;
+			if (auto w = weatherFields.ent)
 			{
 				w->release();
 				w = nullptr;
-				m_weather.m_networkable = nullptr;
+				weatherFields.networkable = nullptr;
 			}
 		}
 	};
 
-	auto getNetworkable = [this]() -> Entity_t*
+	auto getNetworkable = []() -> Entity_t*
 	{
 		auto ent = reinterpret_cast<Entity_t*>(memory::interfaces::preciptation->m_createFn(MAX_EDICTS - 1, 0));
 
@@ -62,34 +85,34 @@ void WeatherController::run(int frame)
 	}
 
 	// reduce calling it often
-	if (frame == FRAME_RENDER_START && !m_weather.m_created)
+	if (stage == FRAME_RENDER_START && !weatherFields.created)
 	{
-		m_weather.m_networkable = getNetworkable();
+		weatherFields.networkable = getNetworkable();
 
-		if (!m_weather.m_networkable)
+		if (!weatherFields.networkable)
 			return;
 
-		m_weather.m_ent = reinterpret_cast<Entity_t*>((uintptr_t)m_weather.m_networkable - 8); // make normal ent from networkbale
-		if (!m_weather.m_ent)
+		weatherFields.ent = reinterpret_cast<Entity_t*>((uintptr_t)weatherFields.networkable - 8); // make normal ent from networkbale
+		if (!weatherFields.ent)
 			return;
 
 		constexpr float halfP = Vec3::MAX_ARG / 2.0f;
 		constexpr float halfM = -Vec3::MAX_ARG / 2.0f;
 
-		m_weather.m_ent->m_nPrecipType() = PrecipitationType_t::PRECIPITATION_TYPE_SNOW;
+		weatherFields.ent->m_nPrecipType() = PrecipitationType_t::PRECIPITATION_TYPE_SNOW;
 
 		// network streams
-		m_weather.m_ent->preDataUpdate(DATA_UPDATE_CREATED);
-		m_weather.m_ent->onPreDataChanged(DATA_UPDATE_CREATED);
+		weatherFields.ent->preDataUpdate(DATA_UPDATE_CREATED);
+		weatherFields.ent->onPreDataChanged(DATA_UPDATE_CREATED);
 
-		m_weather.m_ent->collideable()->OBBMins() = Vec3{ halfM, halfM, halfM };
-		m_weather.m_ent->collideable()->OBBMaxs() = Vec3{ halfP, halfP, halfP };
+		weatherFields.ent->collideable()->OBBMins() = Vec3{ halfM, halfM, halfM };
+		weatherFields.ent->collideable()->OBBMaxs() = Vec3{ halfP, halfP, halfP };
 
 		// force this, reason why rain, snow work is due to CClient_Precipitation::OnDataChanged
-		m_weather.m_ent->onDataChanged(DATA_UPDATE_CREATED);
-		m_weather.m_ent->postDataUpdate(DATA_UPDATE_CREATED);
+		weatherFields.ent->onDataChanged(DATA_UPDATE_CREATED);
+		weatherFields.ent->postDataUpdate(DATA_UPDATE_CREATED);
 
-		m_weather.m_created = true;
+		weatherFields.created = true;
 
 		// haven't tried those! just a quick lookup
 
@@ -100,14 +123,14 @@ void WeatherController::run(int frame)
 		// 55 8B EC 51 53 56 57 8B F1 E8 ? ? ? ? 
 		// ^ constructor
 
-		memory::precipitationInit()(m_weather.m_ent); // force creation
+		memory::precipitationInit()(weatherFields.ent); // force creation
 
 		//printf("weather %p\n", m_weather.m_ent);
 	}
 
-	if (frame == FRAME_START && m_weather.m_created)
+	if (stage == FRAME_START && weatherFields.created)
 	{
-		memory::precipitationClientThink()((void*)((uintptr_t)m_weather.m_ent + 12)); // make to thinkable
+		memory::precipitationClientThink()((void*)((uintptr_t)weatherFields.ent + 12)); // make to thinkable
 	}
 }
 
@@ -119,7 +142,7 @@ struct ConfigWeather
 	float* configRef;
 };
 
-void WeatherController::implMenu()
+void weatherController::implMenu()
 {
 	const static ConfigWeather cvarLenght
 	{
@@ -209,7 +232,7 @@ void WeatherController::implMenu()
 	}
 }
 
-void WeatherController::reset()
+void weatherController::reset()
 {
-	m_weather.m_created = false;
+	weatherFields.created = false;
 }

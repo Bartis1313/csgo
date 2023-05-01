@@ -18,45 +18,81 @@
 #include <utilities/math/math.hpp>
 #include <utilities/tools/tools.hpp>
 
-void Backtrack::init()
+#include <cheats/hooks/createMove.hpp>
+#include <cheats/hooks/frameStageNotify.hpp>
+
+namespace
 {
-	cvars.updateRate = memory::interfaces::cvar->findVar("cl_updaterate");
-	cvars.maxUpdateRate = memory::interfaces::cvar->findVar("sv_maxupdaterate");
+	struct BacktrackCMHandler : hooks::CreateMove
+	{
+		BacktrackCMHandler()
+		{
+			this->registerInit(backtrack::init);
+			this->registerRunPrediction(backtrack::run);
+		}
+	} handlerCM;
 
-	cvarsRatios.interp = memory::interfaces::cvar->findVar("cl_interp")->getFloat();
-	cvarsRatios.interpRatio = memory::interfaces::cvar->findVar("cl_interp_ratio")->getFloat();
-	cvarsRatios.minInterpRatio = memory::interfaces::cvar->findVar("sv_client_min_interp_ratio")->getFloat();
-	cvarsRatios.maxInterpRatio = memory::interfaces::cvar->findVar("sv_client_max_interp_ratio")->getFloat();
-	cvarsRatios.maxUnlag = memory::interfaces::cvar->findVar("sv_maxunlag")->getFloat();
-};
-
-float Backtrack::getLerp() const
-{
-	float updateRate = cvars.maxUpdateRate ? cvars.maxUpdateRate->getFloat() : cvars.updateRate->getFloat();
-	float ratio = cvarsRatios.interpRatio == 0.0f ? 1.0f : cvarsRatios.interpRatio;
-
-	ratio = std::clamp(ratio, cvarsRatios.minInterpRatio, cvarsRatios.maxInterpRatio);
-	return std::max(cvarsRatios.interp, (ratio / updateRate));
+	struct BacktrackStageHandler : hooks::FrameStageNotify
+	{
+		BacktrackStageHandler()
+		{
+			this->registerRun(backtrack::updater::run);
+		}
+	} handlerFSN;
 }
 
-bool Backtrack::isValid(float simtime) const
+namespace backtrack
 {
-	auto network = memory::interfaces::engine->getNameNetChannel();
+	IConVar* cl_updaterate{ nullptr };
+	IConVar* sv_maxupdaterate{ nullptr };
+	IConVar* cl_interp{ nullptr };
+	IConVar* cl_interp_ratio{ nullptr };
+	IConVar* sv_client_min_interp_ratio{ nullptr };
+	IConVar* sv_client_max_interp_ratio{ nullptr };
+	IConVar* sv_maxunlag{ nullptr };
+	
+	float extraTicks();
+}
+
+void backtrack::init()
+{
+	cl_updaterate = memory::interfaces::cvar->findVar("cl_updaterate");
+	sv_maxupdaterate = memory::interfaces::cvar->findVar("sv_maxupdaterate");
+
+	cl_interp = memory::interfaces::cvar->findVar("cl_interp");
+	cl_interp_ratio = memory::interfaces::cvar->findVar("cl_interp_ratio");
+	sv_client_min_interp_ratio = memory::interfaces::cvar->findVar("sv_client_min_interp_ratio");
+	sv_client_max_interp_ratio = memory::interfaces::cvar->findVar("sv_client_max_interp_ratio");
+	sv_maxunlag = memory::interfaces::cvar->findVar("sv_maxunlag");
+};
+
+float backtrack::getLerp()
+{
+	float updateRate = sv_maxupdaterate ? sv_maxupdaterate->getFloat() : cl_updaterate->getFloat();
+	float ratio = cl_interp_ratio->getFloat() == 0.0f ? 1.0f : cl_interp_ratio->getFloat();
+
+	ratio = std::clamp(ratio, sv_client_min_interp_ratio->getFloat(), sv_client_max_interp_ratio->getFloat());
+	return std::max(cl_interp->getFloat(), (ratio / updateRate));
+}
+
+bool backtrack::isValid(float simtime)
+{
+	const auto network = memory::interfaces::engine->getNameNetChannel();
 	if (!network)
 		return false;
 
-	if (auto time = static_cast<int>(game::serverTime() - cvarsRatios.maxUnlag); simtime < time)
+	if (auto time = static_cast<int>(game::serverTime() - sv_maxunlag->getFloat()); simtime < time)
 	{
 		//printf("simtime precheck, sim %f lag sim %f\n", simtime, game::serverTime() - cvarsRatios.maxUnlag);
 		return false;
 	}
 
-	auto delta = std::clamp(network->getLatency(FLOW_OUTGOING) + network->getLatency(FLOW_INCOMING) + getLerp(),
-		0.0f, cvarsRatios.maxUnlag) - (game::serverTime() - simtime);
+	const auto delta = std::clamp(network->getLatency(FLOW_OUTGOING) + network->getLatency(FLOW_INCOMING) + getLerp(),
+		0.0f, sv_maxunlag->getFloat()) - (game::serverTime() - simtime);
 	return std::abs(delta) <= 0.2f;
 }
 
-float Backtrack::extraTicks() const
+float backtrack::extraTicks()
 {
 	if (!vars::misc->fakeLatency->enabled)
 		return 0.0f;
@@ -64,7 +100,7 @@ float Backtrack::extraTicks() const
 	return vars::misc->fakeLatency->amount / 1000.0f;
 }
 
-void Backtrack::run(CUserCmd* cmd)
+void backtrack::run(CUserCmd* cmd)
 {
 	if (!vars::backtrack->enabled)
 		return;
@@ -128,12 +164,12 @@ void Backtrack::run(CUserCmd* cmd)
 
 		bestFov = 180.0f;
 
-		for (size_t i = 0; const auto & el : m_records.at(bestPlayerIdx))
+		for (size_t i = 0; const auto & el : records.at(bestPlayerIdx))
 		{
-			if (!isValid(el.m_simtime))
+			if (!isValid(el.simtime))
 				continue;
 
-			const auto fov = math::calcFovReal(myEye, el.m_head, cmd->m_viewangles + aimPunch);
+			const auto fov = math::calcFovReal(myEye, el.head, cmd->m_viewangles + aimPunch);
 
 			if (fov < bestFov)
 			{
@@ -147,9 +183,9 @@ void Backtrack::run(CUserCmd* cmd)
 
 	if (bestRecordIdx != -1)
 	{
-		const auto& record = m_records.at(bestPlayerIdx).at(bestRecordIdx);
+		const auto& record = records.at(bestPlayerIdx).at(bestRecordIdx);
 
-		auto simTimeCorrected = record.m_simtime;
+		auto simTimeCorrected = record.simtime;
 		if (auto deltaLerp = getLerp() - memory::interfaces::globalVars->m_intervalPerTick; deltaLerp > 0.0f)
 			simTimeCorrected += memory::interfaces::globalVars->m_intervalPerTick - deltaLerp;
 
@@ -157,16 +193,17 @@ void Backtrack::run(CUserCmd* cmd)
 	}
 }
 
-void BackTrackUpdater::run(int frame)
+void backtrack::updater::run(FrameStage stage)
 {
-	m_correctTime = vars::backtrack->time / 1000.0f + g_Backtrack->extraTicks();
+	const auto correctTime = vars::backtrack->time / 1000.0f + extraTicks();
 
-	if (frame != FRAME_RENDER_START)
+	if (stage != FRAME_RENDER_START)
 		return;
 
-	auto& records = g_Backtrack->getAllRecords();
+	if (!game::isAvailable())
+		return;
 
-	if (!game::localPlayer || !vars::backtrack->enabled || !game::localPlayer->isAlive())
+	if (!vars::backtrack->enabled || !game::localPlayer->isAlive())
 	{
 		for (auto& el : records)
 			el.clear();
@@ -192,8 +229,7 @@ void BackTrackUpdater::run(int frame)
 
 	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
-		auto ent = reinterpret_cast<Player_t*>(entity);
-
+		const auto ent = reinterpret_cast<Player_t*>(entity);
 		auto i = idx;
 
 		if (!isGoodEnt(ent))
@@ -202,33 +238,31 @@ void BackTrackUpdater::run(int frame)
 			continue;
 		}
 
-		if (records.at(i).size() && (records.at(i).front().m_simtime == ent->m_flSimulationTime()))
+		if (records.at(i).size() && (records.at(i).front().simtime == ent->m_flSimulationTime()))
 			continue;
 
-		if (!g_Backtrack->isValid(ent->m_flSimulationTime() /*m_correct.at(i).m_correctSimtime*/))
+		if (!isValid(ent->m_flSimulationTime() /*m_correct.at(i).m_correctSimtime*/))
 			continue;
 
-		Backtrack::StoredRecord record = {};
-		record.m_origin = ent->absOrigin();
-		record.m_simtime = ent->m_flSimulationTime();
-		if (!ent->setupBonesShort(record.m_matrix.data(), ent->m_CachedBoneData().m_size,
+		StoredRecord record = {};
+		record.origin = ent->absOrigin();
+		record.simtime = ent->m_flSimulationTime();
+		if (!ent->setupBonesShort(record.matrices.data(), ent->m_CachedBoneData().m_size,
 			BONE_USED_MASK, memory::interfaces::globalVars->m_curtime))
 			continue;
-		record.m_head = record.m_matrix[8].origin();
+		record.head = record.matrices[8].origin();
 
 		records.at(i).push_front(record);
 
-		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(game::timeToTicks(m_correctTime)))
+		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(game::timeToTicks(correctTime)))
 			records.at(i).pop_back();
 
-		auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [this](const Backtrack::StoredRecord& rec)
+		auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [](const StoredRecord& rec)
 			{
-				return !g_Backtrack->isValid(rec.m_simtime);
+				return !isValid(rec.simtime);
 			});
 
 		if (invalid != std::cend(records.at(i)))
 			records.at(i).erase(invalid, std::cend(records.at(i)));
-
-		i++;
 	}
 }

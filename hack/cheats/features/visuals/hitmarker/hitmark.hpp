@@ -1,23 +1,16 @@
 #pragma once
 
-#include <cheats/classes/renderableToSurface.hpp>
 #include <SDK/math/Vector.hpp>
 #include <render/BBox.hpp>
 
 class IGameEvent;
 class Player_t;
 
-class Hitmarker : protected RenderableSurfaceType
+namespace hitmarker
 {
-public:
-	constexpr Hitmarker() :
-		RenderableSurfaceType{}
-	{}
-
 	void handleHits(IGameEvent* event);
-protected:
-	virtual void draw() override;
-private:
+	void draw();
+
 	struct Hitmark_t
 	{
 		float expireTime;
@@ -30,7 +23,5 @@ private:
 		float alpha;
 	};
 
-	std::vector<Hitmark_t> m_hitmarkers;
-};
-
-GLOBAL_FEATURE(Hitmarker);
+	inline std::vector<Hitmark_t> m_hitmarkers;
+}

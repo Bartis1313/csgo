@@ -1,23 +1,13 @@
 #pragma once
 
-#include <cheats/classes/renderableToPresent.hpp>
-
 class IGameEvent;
 
-class MiscInfo : protected RenderablePresentType
+namespace miscInfo
 {
-public:
-	constexpr MiscInfo() :
-		RenderablePresentType{}
-	{}
-
 	void addHits(IGameEvent* event);
-protected:
-	virtual void init() override;
-	virtual void draw() override;
-	virtual void reset() override;
-private:
-	uint32_t m_allHits;
-};
+	void init();
+	void draw();
+	void reset();
 
-GLOBAL_FEATURE(MiscInfo);
+	inline uint32_t m_allHits;
+}

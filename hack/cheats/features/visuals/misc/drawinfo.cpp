@@ -13,13 +13,53 @@
 #include <render/render.hpp>
 #include <cheats/features/events/events.hpp>
 
-void MiscInfo::init()
+#include <cheats/hooks/levelInitPreEntity.hpp>
+#include <cheats/helper/initable.hpp>
+#include <cheats/hooks/present.hpp>
+#include <cheats/hooks/unknownPlayerHurt.hpp>
+
+namespace
+{
+	struct MiscInfoHandler : hooks::LevelInitPreEntity
+	{
+		MiscInfoHandler()
+		{
+			this->registerReset(miscInfo::reset);
+		}
+	} miscInfoHandler;
+
+	struct MiscInit : InitAble
+	{
+		MiscInit()
+		{
+			this->registerInit(miscInfo::init);
+		}
+	} miscInit;
+
+	struct MiscDrawer : hooks::Present
+	{
+		MiscDrawer()
+		{
+			this->registerRun(miscInfo::draw);
+		}
+	} miscDrawer;
+
+	struct MiscHits : hooks::UnknownPlayerHurt
+	{
+		MiscHits()
+		{
+			this->registerRun(miscInfo::addHits);
+		}
+	} miscHits;
+}
+
+void miscInfo::init()
 {
 	if(game::isAvailable())
 		m_allHits = game::localPlayer->m_totalHitsOnServer(); // those gets clamped at 255 :(
 }
 
-void MiscInfo::addHits(IGameEvent* event)
+void miscInfo::addHits(IGameEvent* event)
 {
 	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("attacker")));
 	if (!attacker)
@@ -36,12 +76,12 @@ void MiscInfo::addHits(IGameEvent* event)
 	++m_allHits;
 }
 
-void MiscInfo::reset()
+void miscInfo::reset()
 {
 	m_allHits = 0;
 }
 
-void MiscInfo::draw()
+void miscInfo::draw()
 {
 	if (!vars::misc->info->enabled)
 		return;

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <cheats/classes/base.hpp>
-
 struct Box;
 
 struct BoxesDraw

@@ -98,23 +98,23 @@ void EntityCache::fill(const HolderData& data)
 	if (auto id = data.classID; id >= CWeaponAug && id <= CWeaponXM1014
 		|| std::ranges::find(specialWeaponIds, id) != specialWeaponIds.cend())
 	{
-		m_entCache[EntCacheType::WEAPON].emplace_back(data);
+		m_entCache[EntCacheType::WEAPON].push_back(data);
 	}
 
 	switch (data.classID)
 	{
 	case CCSPlayer:
-		m_entCache[EntCacheType::PLAYER].emplace_back(data);
+		m_entCache[EntCacheType::PLAYER].push_back(data);
 		break;
 	case CBaseCSGrenadeProjectile:
 	case CDecoyProjectile:
 	case CMolotovProjectile:
 	case CSmokeGrenadeProjectile:
 	case CInferno:
-		m_entCache[EntCacheType::GRENADE_PROJECTILES].emplace_back(data);
+		m_entCache[EntCacheType::GRENADE_PROJECTILES].push_back(data);
 		break;
 	case CPlantedC4:
-		m_entCache[EntCacheType::WORLD_ENTS].emplace_back(data);
+		m_entCache[EntCacheType::WORLD_ENTS].push_back(data);
 		break;
 	default:
 		break;

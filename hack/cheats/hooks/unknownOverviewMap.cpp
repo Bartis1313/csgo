@@ -1,12 +1,12 @@
-#include "hooks.hpp"
+#include "unknownOverviewMap.hpp"
 
-#include "../classes/overViewMap.hpp"
+#include <cheats/features/visuals/radar/radar.hpp>
 
-#include <SDK/MapStruct.hpp>
-
-hooks::unknownOverViewFun::value hooks::unknownOverViewFun::hooked(FAST_ARGS, int unk)
+hooks::UnknownOverviewMap::value hooks::UnknownOverviewMap::hook(FAST_ARGS, int unk)
 {
 	const int ret = original(thisptr, unk);
-	OverViewMapType::runAll(reinterpret_cast<MapStruct*>(thisptr));
+
+	radar::gatherMap(static_cast<MapStruct*>(thisptr));
+	
 	return ret;
 }

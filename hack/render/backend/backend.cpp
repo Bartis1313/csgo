@@ -15,8 +15,8 @@ void renderbackend::impl(IDirect3DDevice9* device)
 		{
 			ImGui_ImplDX9_Init(device);
 			ImRender::init(ImGui::GetIO());
-			g_ImGuiMenu->setStyles();
-			g_X88Menu->setStyles();
+			ImGuiMenu::setStyles();
+			x88Menu::setStyles();
 			console::debug("renderbackend::impl success");
 		});
 }

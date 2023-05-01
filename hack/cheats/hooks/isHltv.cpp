@@ -1,12 +1,10 @@
-#include "hooks.hpp"
-
-#include <intrin.h>
+#include "isHltv.hpp"
 
 #include <SDK/CGlobalVars.hpp>
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
-hooks::isHltv::value FASTCALL hooks::isHltv::hooked(FAST_ARGS)
+hooks::IsHltv::value hooks::IsHltv::hook(FAST_ARGS)
 {
 	uintptr_t ent;
 	__asm mov ent, edi
@@ -14,9 +12,8 @@ hooks::isHltv::value FASTCALL hooks::isHltv::hooked(FAST_ARGS)
 	const static auto occlusion = memory::occlusion();
 	const static auto velocity = memory::velocity();
 	const static auto accumulate = memory::accumulate();
-	const uintptr_t ret = reinterpret_cast<uintptr_t>(_ReturnAddress());
 
-	if (ret == occlusion)
+	if (memory::retAddr() == occlusion)
 	{
 		// no need to set those values for normal view
 		if (vars::misc->mirrorCam->enabled && ent)
@@ -31,7 +28,7 @@ hooks::isHltv::value FASTCALL hooks::isHltv::hooked(FAST_ARGS)
 	}
 
 	// skip layers & setup velocity -> or EFL_DIRTY_ABSANGVELOCITY and set direct vel not interpolated
-	if (ret == velocity || ret == accumulate)
+	if (memory::retAddr() == velocity || memory::retAddr() == accumulate)
 		return true;
 	
 	return original(thisptr);

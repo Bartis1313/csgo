@@ -1,24 +1,9 @@
 #pragma once
 
-#include <cheats/classes/screen2dEffects.hpp>
+class CViewSetup;
 
-#include <vector>
-
-class IMaterial;
-
-class ScreenEffects : protected Screen2DEffectsType
+namespace screenEffects
 {
-public:
-	constexpr ScreenEffects() :
-		Screen2DEffectsType{}
-	{}
-
-protected:
-	virtual void run() override;
-private:
+	void run([[maybe_unused]] CViewSetup* view);
 	void initMaterials();
-
-	std::vector<std::pair<IMaterial*, bool>> m_materials;
-};
-
-GLOBAL_FEATURE(ScreenEffects);
+}

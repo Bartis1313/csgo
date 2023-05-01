@@ -5,9 +5,27 @@
 #include <gamememory/memory.hpp>
 #include <cheats/game/game.hpp>
 
-void BulletUpdater::run(int frame)
+#include <cheats/hooks/frameStageNotify.hpp>
+
+namespace
 {
-	if (frame != FRAME_START)
+	struct BulletHandler : hooks::FrameStageNotify
+	{
+		BulletHandler()
+		{
+			this->registerRun(bulletUpdater::run);
+		}
+	} bulletHandler;
+}
+
+namespace bulletUpdater
+{
+	std::vector<Vec3> lastBullets;
+}
+
+void bulletUpdater::run(FrameStage stage)
+{
+	if (stage != FRAME_START)
 		return;
 
 	if (!game::isAvailable())
@@ -17,19 +35,18 @@ void BulletUpdater::run(int frame)
 	static int gameBulletCount = bulletsList.m_size; // init current count
 	if (gameBulletCount == bulletsList.m_size)
 	{
-		m_lastBullets.clear();
+		lastBullets.clear();
 		return;
 	}
 
 	for (int i = bulletsList.m_size; i > gameBulletCount; i--)
-		m_lastBullets.emplace_back(bulletsList[i - 1].m_pos);
-
+		lastBullets.emplace_back(bulletsList[i - 1].m_pos);
 	
 	if (bulletsList.m_size != gameBulletCount)
 		gameBulletCount = bulletsList.m_size;
 }
 
-std::vector<Vec3> BulletUpdater::getLastBullets() const
+std::vector<Vec3> bulletUpdater::getLastBullets()
 {
-	return m_lastBullets;
+	return lastBullets;
 }

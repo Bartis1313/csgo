@@ -1,4 +1,4 @@
-#include "hooks.hpp"
+#include "unknownFileSys.hpp"
 
 #include <d3dx9.h>
 #include <intrin.h>
@@ -13,7 +13,7 @@
 // A DWORD (magic number) containing the four character code value 'DDS ' (0x20534444).
 #define DDS_HEADER 0x20534444
 
-hooks::unknownFileSystemAlloc::value FASTCALL hooks::unknownFileSystemAlloc::hooked(FAST_ARGS, void* image)
+hooks::UnknownFileSysAlloc::value hooks::UnknownFileSysAlloc::hook(FAST_ARGS, void* image)
 {
 	uintptr_t thisptrStack;
 	__asm mov thisptrStack, ebx;
@@ -22,7 +22,7 @@ hooks::unknownFileSystemAlloc::value FASTCALL hooks::unknownFileSystemAlloc::hoo
 	{
 		size_t size = *reinterpret_cast<size_t*>(thisptrStack + 0x50);
 
-		if (auto hr = D3DXCreateTextureFromFileInMemory(memory::interfaces::dx9Device(), image, size, &g_Radar->getTexture()); hr == D3D_OK)
+		if (auto hr = D3DXCreateTextureFromFileInMemory(memory::interfaces::dx9Device(), image, size, &radar::mapTexture); hr == D3D_OK)
 			console::debug("Created map texture, size: {}", size);
 		else
 			console::error("Creating map texture failed, code: {}", hr);

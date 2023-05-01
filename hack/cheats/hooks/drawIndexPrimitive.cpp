@@ -1,11 +1,6 @@
-#include "hooks.hpp"
+#include "drawIndexPrimitive.hpp"
 
 #include <gamememory/memory.hpp>
-#include <SDK/structs/Entity.hpp>
-#include <SDK/IClientEntityList.hpp>
-#include <SDK/IVEngineClient.hpp>
-#include <cheats/game/game.hpp>
-#include <utilities/console/console.hpp>
 
 // not placed in SDK, unique use-case
 //struct MaterialEbp
@@ -56,13 +51,25 @@ static void* getStack(void** data)
 	return getStack(next);
 }
 
-hooks::drawIndexedPrimitive::value D3DAPI hooks::drawIndexedPrimitive::hooked(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex,
+hooks::DrawIndexedPrimitive::value hooks::DrawIndexedPrimitive::hook(IDirect3DDevice9* device, D3DPRIMITIVETYPE primType, INT basevertexIndex, UINT minVertexIndex,
 	UINT numVertices, UINT startIndex, UINT primCount)
 {
+	if (globals::isShutdown)
+	{
+		static std::once_flag onceFlag;
+		std::call_once(onceFlag, []() { Storage::shutdowns.run(); });
+		return original(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);
+	}
+
 	void** data;
 	__asm mov data, ebp
 	
 	auto test = getStack(data);
+
+	static std::once_flag onceFlag;
+	std::call_once(onceFlag, []() { Storage::inits.run(); });
+
+	Storage::runs.run(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);
 
 	return original(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);
 }

@@ -16,13 +16,26 @@
 #include <deps/delaunator-cpp/delaunator.hpp>
 #include <imgui_internal.h>
 
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct MolotovHandler : hooks::PaintTraverse
+	{
+		MolotovHandler()
+		{
+			this->registerRender(molotov::draw);
+		}
+	} molotovHandler;
+}
+
 static constexpr float orient(const ImVec2& a, const ImVec2& b, const ImVec2& c)
 {
 	return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x);
 }
 
 // returns list of pair when outer or not
-std::optional<std::vector<std::pair<bool, ImVec2>>> grahamScanIndicies(std::span<const ImVec2> points)
+static std::optional<std::vector<std::pair<bool, ImVec2>>> grahamScanIndicies(std::span<const ImVec2> points)
 {
 	// case when it's impossible
 	if (points.size() < 3)
@@ -67,7 +80,7 @@ std::optional<std::vector<std::pair<bool, ImVec2>>> grahamScanIndicies(std::span
 	return result;
 }
 
-void removeClosePoints(std::vector<std::pair<bool, ImVec2>>& points, float threshold)
+static void removeClosePoints(std::vector<std::pair<bool, ImVec2>>& points, float threshold)
 {
 	// I hate the formatting of lambdas in vs, please don't reformat this
 	std::erase_if(points, [&](const auto& p1) 
@@ -88,7 +101,7 @@ void removeClosePoints(std::vector<std::pair<bool, ImVec2>>& points, float thres
 	});
 }
 
-void MolotovDraw::draw()
+void molotov::draw()
 {
 	if (!vars::visuals->world->molotov->enabled)
 		return;
@@ -107,9 +120,7 @@ void MolotovDraw::draw()
 		float scale = time / molotov->expireTime();
 
 		const auto& origin = molotov->absOrigin();
-		constexpr float molotovRadius = 60; // 30 * 2
-
-		Color col = vars::visuals->world->molotov->color();
+		constexpr float molotovRadius{ 60 }; // 30 * 2
 
 		std::vector<Vec3> molotovWorldPoints;
 		for (auto i = 0; i <= molotov->m_fireCount(); i++)
@@ -192,7 +203,7 @@ void MolotovDraw::draw()
 
 		auto centerPolygon = [hullOuter, hullsize = hullOuter.size()]()
 		{
-			ImVec2 centre{};
+			ImVec2 centre{ };
 			for (const auto& el : hullOuter)
 			{
 				centre.x += el.x;

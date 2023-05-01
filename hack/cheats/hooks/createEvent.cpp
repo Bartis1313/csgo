@@ -1,6 +1,6 @@
-#include "hooks.hpp"
+#include "createEvent.hpp"
 
-hooks::createEvent::value FASTCALL hooks::createEvent::hooked(FAST_ARGS, const char* name, bool allowed, uint32_t unk)
+hooks::CreateEvent::value FASTCALL hooks::CreateEvent::hook(FAST_ARGS, const char* name, bool allowed, uint32_t unk)
 {
 	//allowed = true;
 

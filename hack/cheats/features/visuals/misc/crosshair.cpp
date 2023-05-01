@@ -13,27 +13,34 @@
 #include <utilities/math/math.hpp>
 #include <render/render.hpp>
 
-void Crosshair::init()
+namespace crosshair
 {
-	m_crosshair = memory::interfaces::cvar->findVar("crosshair");
-	m_crosshairRecoil = memory::interfaces::cvar->findVar("cl_crosshair_recoil");
-	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
+	IConVar* m_crosshair;
+	IConVar* weapon_recoil_scale;
+	IConVar* cl_crosshair_recoil;
 }
 
-void Crosshair::draw()
+void crosshair::init()
+{
+	m_crosshair = memory::interfaces::cvar->findVar("crosshair");
+	cl_crosshair_recoil = memory::interfaces::cvar->findVar("cl_crosshair_recoil");
+	weapon_recoil_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
+}
+
+void crosshair::draw()
 {
 	int cfgCross = vars::misc->crosshair->index;
 	if(!m_crosshair->getInt())
 		m_crosshair->setValue(true);
 
-	if (m_crosshairRecoil->getInt())
-		m_crosshairRecoil->setValue(false);
+	if (cl_crosshair_recoil->getInt())
+		cl_crosshair_recoil->setValue(false);
 
 	if (!cfgCross)
 		return;
 
-	m_crosshairRecoil->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
-	if (m_crosshairRecoil->getInt())
+	cl_crosshair_recoil->setValue(cfgCross == E2T(CrossHairTypes::ENGINE) ? true : false);
+	if (cl_crosshair_recoil->getInt())
 		m_crosshair->setValue(true);
 	else
 		m_crosshair->setValue(false);
@@ -58,7 +65,7 @@ void Crosshair::draw()
 	{
 		Vec3 angle;
 		memory::interfaces::engine->getViewAngles(angle);
-		angle += game::localPlayer->m_aimPunchAngle() * m_scale->getFloat();
+		angle += game::localPlayer->m_aimPunchAngle() * weapon_recoil_scale->getFloat();
 
 		auto start = game::localPlayer->getEyePos();
 		auto end = start + math::angleVec(angle) * weapon->getWpnInfo()->m_range;
@@ -127,8 +134,8 @@ void Crosshair::draw()
 	}
 }
 
-void Crosshair::shutdown()
+void crosshair::shutdown()
 {
 	m_crosshair->setValue(true);
-	m_crosshairRecoil->setValue(false);
+	cl_crosshair_recoil->setValue(false);
 }

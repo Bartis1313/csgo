@@ -1,16 +1,6 @@
 #pragma once
 
-#include <cheats/classes/renderableToSurface.hpp>
-
-class Projectiles : protected RenderableSurfaceType
+namespace projectiles
 {
-public:
-	constexpr Projectiles() :
-		RenderableSurfaceType{}
-	{}
-
-protected:
-	virtual void draw() override;
-};
-
-GLOBAL_FEATURE(Projectiles);
+	void draw();
+}

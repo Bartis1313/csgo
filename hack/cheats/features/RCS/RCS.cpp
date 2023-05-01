@@ -18,16 +18,44 @@
 #include <config/vars.hpp>
 #include <utilities/tools/tools.hpp>
 
-void RCS::init()
+#include <cheats/hooks/overrideMouse.hpp>
+
+namespace
 {
-	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
-	m_yaw = memory::interfaces::cvar->findVar("m_yaw");
-	m_pitch = memory::interfaces::cvar->findVar("m_pitch");
+	struct RcsHandler : hooks::OverrideMouse
+	{
+		RcsHandler()
+		{
+			this->registerInit(rcs::init);
+			this->registerRun(rcs::run);
+		}
+	} rcsHandler;
 }
 
-void RCS::run(float* x, float* y)
+namespace rcs
 {
-	auto cfg = g_Aimbot->getCachedConfig();
+	IConVar* scale{ };
+	IConVar* yaw{ };
+	IConVar* pitch{ };
+	CfgWeapon cfg{ };
+
+	void prepare(float* x, float* y);
+}
+
+void rcs::init()
+{
+	scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
+	yaw = memory::interfaces::cvar->findVar("m_yaw");
+	pitch = memory::interfaces::cvar->findVar("m_pitch");
+}
+
+void rcs::run(float* x, float* y)
+{
+	auto maybeConfig = CUserCmdCache::getWeaponConfig();
+	if (!maybeConfig.has_value())
+		return;
+
+	cfg = maybeConfig.value();
 
 	if (!cfg.rcs)
 		return;
@@ -49,16 +77,15 @@ void RCS::run(float* x, float* y)
 	prepare(x, y);
 }
 
-void RCS::prepare(float* x, float* y)
+void rcs::prepare(float* x, float* y)
 {
-	auto cfg = g_Aimbot->getCachedConfig();
 	const auto cmd = CUserCmdCache::getCmd();
 	if (!cmd)
 		return;
 
 	Vec3 punch = game::localPlayer->getAimPunch();
-	punch[0] *= m_scale->getFloat() * cfg.rcsX;
-	punch[1] *= m_scale->getFloat() * cfg.rcsY;
+	punch *= scale->getFloat();
+	punch[2] = 0.0f;
 
 	static auto oldPunch = punch;
 	if (game::localPlayer()->m_iShotsFired() > 1 && cmd->m_buttons & IN_ATTACK)
@@ -74,8 +101,8 @@ void RCS::prepare(float* x, float* y)
 			const Vec3 punchPos = game::getViewAngles() - (deltaPunch * (1.0f - pix));
 			auto& toAdd = Vec3{ game::getViewAngles() - punchPos }.normalize().clamp();
 
-			toAdd[0] /= m_pitch->getFloat();
-			toAdd[1] /= m_yaw->getFloat();
+			toAdd[0] /= pitch->getFloat();
+			toAdd[1] /= yaw->getFloat();
 
 			Vec2 mouse = Vec2{ *x, *y };
 			Vec2 mouseScreen = Vec2{ toAdd[1], -toAdd[0] };

@@ -46,7 +46,6 @@ void tabs::aim::draw()
 					}
 
 					ImGui::SliderFloat("Fov##aim", &cfg.fov, 0.0f, 50.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
-					ImGui::SliderFloat("Distance##aim", &cfg.maxDistanceMeters, 0.0f, 500.0f);
 					ImGui::Combo("Hitboxes##aim", &cfg.aimSelection, magic_enum::enum_names_pretty<AimbotHitboxes>());
 					ImGui::Combo("Method##aim", &cfg.methodAim, magic_enum::enum_names_pretty<AimbotMethod>());
 					ImGui::Checkbox("Delay##aim", &cfg.aimDelay);

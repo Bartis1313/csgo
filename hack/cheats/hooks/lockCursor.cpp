@@ -1,12 +1,12 @@
-#include "hooks.hpp"
+#include "lockCursor.hpp"
 
 #include <SDK/ISurface.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
 
-hooks::lockCursor::value FASTCALL hooks::lockCursor::hooked(FAST_ARGS)
+hooks::LockCursor::value hooks::LockCursor::hook(FAST_ARGS)
 {
-	if (g_ImGuiMenu->isMenuActive())
+	if (ImGuiMenu::active)
 	{
 		memory::interfaces::surface->unlockCursor();
 		return;

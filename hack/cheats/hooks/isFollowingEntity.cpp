@@ -1,11 +1,11 @@
-#include "hooks.hpp"
+#include "isFollowingEntity.hpp"
 
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
-hooks::isFollowingEntity::value FASTCALL hooks::isFollowingEntity::hooked(FAST_ARGS)
+hooks::IsFollowingEntity::value hooks::IsFollowingEntity::hook(FAST_ARGS)
 {
-	if (vars::misc->disableItems->interpolate && _ReturnAddress() == memory::retAddrToInterpolation.cast<void*>()())
+	if (vars::misc->disableItems->interpolate && memory::retAddr() == memory::retAddrToInterpolation())
 	{
 		return true;
 	}

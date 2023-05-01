@@ -1,6 +1,5 @@
-#include "hooks.hpp"
+#include "createMove.hpp"
 
-#include "../classes/createMove.hpp"
 #include "../features/prediction/prediction.hpp"
 #include "../features/misc/movement/movement.hpp"
 #include "../features/misc/cameras/freeCam.hpp"
@@ -11,12 +10,13 @@
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/ClientClass.hpp>
+#include <SDK/IPrediction.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 #include <gamememory/memory.hpp>
 #include <cheats/game/game.hpp>
 #include <cheats/game/globals.hpp>
 
-hooks::createMove::value FASTCALL hooks::createMove::hooked(FAST_ARGS, float inputFrame, CUserCmd* cmd)
+hooks::CreateMove::value hooks::CreateMove::hook(FAST_ARGS, float inputFrame, CUserCmd* cmd)
 {
 	original(thisptr, inputFrame, cmd);
 
@@ -27,10 +27,13 @@ hooks::createMove::value FASTCALL hooks::createMove::hooked(FAST_ARGS, float inp
 	if (original(thisptr, inputFrame, cmd))
 		memory::interfaces::prediction->setLocalViewangles(cmd->m_viewangles);
 
+	static std::once_flag onceFlag;
+	std::call_once(onceFlag, []() { Storage::inits.run(); });
+
 	Vec3 oldAngle = cmd->m_viewangles;
 
 	// otherwise we moving
-	if (g_Freecam->isInCam())
+	if (freecam::isInCam)
 	{
 		cmd->m_buttons = 0;
 		cmd->m_forwardmove = 0;
@@ -39,21 +42,18 @@ hooks::createMove::value FASTCALL hooks::createMove::hooked(FAST_ARGS, float inp
 	}
 
 	CUserCmdCache::run(cmd);
-
 	game::serverTime(cmd);
-	CreateMovePrePredictionType::runAll(cmd);
 
-	g_Prediction->addToPrediction(cmd, [=]()
-		{
-			CreateMoveInPredictionType::runAll(cmd);
-		});
+	Storage::runsPrePrediction.run(cmd);
+	prediction::begin(cmd);
+	Storage::runsPrediction.run(cmd);
+	prediction::end();
 
-	CreateMovePostPredictionType::runAll(cmd);
+	Storage::runsPostPrediction.run(cmd);
 
-	MovementFix::run(cmd, oldAngle);
+	movement::fixMovement(cmd, oldAngle);
 
 	// don't get untrusted
-	cmd->m_viewangles.normalize();
 	cmd->m_viewangles.clamp();
 
 	return false;

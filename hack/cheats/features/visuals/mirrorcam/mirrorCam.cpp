@@ -19,20 +19,56 @@
 #include <cheats/game/game.hpp>
 #include <config/vars.hpp>
 
-void MirrorCam::initTexture()
+#include <cheats/hooks/wndproc.hpp>
+#include <cheats/hooks/present.hpp>
+#include <cheats/hooks/viewRender.hpp>
+
+namespace
 {
-	m_texture = memory::interfaces::matSys->createFullFrameRenderTarget("mirrorCam");
+	struct MirrorDraw : hooks::Present
+	{
+		MirrorDraw()
+		{
+			this->registerRun(mirrorcam::draw);
+		}
+	} mirrorDraw;
+
+	struct MirrrorKeys : hooks::wndProcSys
+	{
+		MirrrorKeys()
+		{
+			this->registerRun(mirrorcam::updateKeys);
+		}
+	} mirrorKeys;
+
+	struct MirrorView : hooks::ViewRender
+	{
+		MirrorView()
+		{
+			this->registerInit(mirrorcam::initTexture);
+			this->registerRun(mirrorcam::run);
+		}
+	} mirrorView;
 }
 
-void MirrorCam::updateKeys()
+namespace mirrorcam
+{
+	Vec2 size{ 1.0f, 1.0f };
+	ITexture* texture;
+}
+
+void mirrorcam::initTexture()
+{
+	texture = memory::interfaces::matSys->createFullFrameRenderTarget("mirrorCam");
+}
+
+void mirrorcam::updateKeys()
 {
 	vars::keys->mirrorCam.update();
 }
 
-void MirrorCam::run(const CViewSetup& view)
+void mirrorcam::run(const CViewSetup& view)
 {
-	INIT_MATERIALS_ONCE(initTexture);
-
 	// this might eat some FPS, if enabled
 	if (!vars::misc->mirrorCam->enabled)
 		return;
@@ -42,28 +78,28 @@ void MirrorCam::run(const CViewSetup& view)
 	v.m_angles[Coord::Y] = v.m_angles[Coord::Y] + 180.0f; // back
 	v.x = v.xOld = 0;
 	v.y = v.yOld = 0;
-	v.m_width = v.m_widthOld = static_cast<int>(m_size[Coord::X]);
-	v.m_height = v.m_heightOld = static_cast<int>(m_size[Coord::Y]);
+	v.m_width = v.m_widthOld = static_cast<int>(size[Coord::X]);
+	v.m_height = v.m_heightOld = static_cast<int>(size[Coord::Y]);
 	v.m_aspectRatio = static_cast<float>(v.m_width / v.m_height);
 	v.m_nearZ = v.m_nearViewModelZ = 7.0f;
 	v.m_fov = 50.0f;
 
 	auto ctx = memory::interfaces::matSys->getRenderContext();
 	ctx->pushRenderTargetAndViewport();
-	ctx->setRenderTarget(m_texture);
+	ctx->setRenderTarget(texture);
 
-	hooks::viewRender::original(memory::interfaces::viewRender(), v, v, VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH | VIEW_CLEAR_STENCIL, 0);
+	hooks::ViewRender::getOriginal()(memory::interfaces::viewRender(), v, v, VIEW_CLEAR_COLOR | VIEW_CLEAR_DEPTH | VIEW_CLEAR_STENCIL, 0);
 
 	ctx->popRenderTargetAndViewport();
 	ctx->release();
 }
 
-IDirect3DTexture9* MirrorCam::getTexture() const
+auto getTexture()
 {
-	return m_texture->m_handle[0]->m_texture;
+	return mirrorcam::texture->m_handle[0]->m_texture;
 }
 
-void MirrorCamDraw::draw()
+void mirrorcam::draw()
 {
 	if (!game::isAvailable())
 		return;
@@ -84,11 +120,11 @@ void MirrorCamDraw::draw()
 
 		if (auto size = ImGui::GetContentRegionAvail(); size.x != 0.0f && size.y != 0.0f) // / 0
 		{
-			float xRatio = static_cast<float>(g_MirrorCam->m_texture->getActualWidth()) / size.x;
-			float yRatio = static_cast<float>(g_MirrorCam->m_texture->getActualHeight()) / size.y;
+			float xRatio = static_cast<float>(texture->getActualWidth()) / size.x;
+			float yRatio = static_cast<float>(texture->getActualHeight()) / size.y;
 
-			g_MirrorCam->setSize(Vec2{ size.x * xRatio, size.y * yRatio });
-			ImGui::Image(g_MirrorCam->getTexture(), size);
+			mirrorcam::size = Vec2{ size.x * xRatio, size.y * yRatio };
+			ImGui::Image(getTexture(), size);
 		}
 
 		ImGui::End();

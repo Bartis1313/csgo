@@ -18,6 +18,19 @@
 #include <ranges>
 #include <iostream>
 
+#include <cheats/hooks/present.hpp>
+
+namespace
+{
+	struct PlayerListhandler : hooks::Present
+	{
+		PlayerListhandler()
+		{
+			this->registerRun(playerList::draw);
+		}
+	} playerlistHandler;
+}
+
 struct TableStruct
 {
 	std::string_view name;
@@ -25,7 +38,7 @@ struct TableStruct
 	bool* cfg = nullptr; // some are default always
 };
 
-void PlayerList::draw()
+void playerList::draw()
 {
 	if (!vars::misc->playerList->enabled)
 		return;
@@ -138,7 +151,7 @@ void PlayerList::draw()
 				{
 					enum class BlacklistAction { ADD, REMOVE };
 
-					const auto blacklist = !g_Blacklist->isBlacklisted(ent)
+					const auto blacklist = !blacklist::isBlacklisted(ent)
 						? std::make_pair(std::format("Add##{}", idx), BlacklistAction::ADD)
 						: std::make_pair(std::format("Delete##{}", idx), BlacklistAction::REMOVE);
 
@@ -147,8 +160,8 @@ void PlayerList::draw()
 					if (ImGui::Button(title.c_str(), ImVec2{ -std::numeric_limits<float>::min(), 0.0f }))
 					{	
 						isOn == BlacklistAction::ADD
-							? g_Blacklist->add(ent)
-							: g_Blacklist->remove(ent);
+							? blacklist::add(ent)
+							: blacklist::remove(ent);
 					}
 				}
 

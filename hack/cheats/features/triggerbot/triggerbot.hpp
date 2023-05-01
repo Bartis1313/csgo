@@ -1,16 +1,8 @@
 #pragma once
 
-#include <cheats/classes/createMove.hpp>
+class CUserCmd;
 
-class Triggerbot : protected CreateMoveInPredictionType
+namespace triggerbot
 {
-public:
-	constexpr Triggerbot() :
-		CreateMoveInPredictionType{}
-	{}
-
-protected:
-	virtual void run(CUserCmd* cmd) override;
+	void run(CUserCmd* cmd);
 };
-
-GLOBAL_FEATURE(Triggerbot);

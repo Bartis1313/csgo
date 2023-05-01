@@ -15,7 +15,20 @@
 #include <render/render.hpp>
 #include <utilities/utilities.hpp>
 
-void DroppedWeapons::draw()
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct DroppedHandler : hooks::PaintTraverse
+	{
+		DroppedHandler()
+		{
+			this->registerRender(dropped::draw);
+		}
+	} droppedHandler;
+}
+
+void dropped::draw()
 {
 	if (!vars::visuals->esp->dropped->enabled)
 		return;

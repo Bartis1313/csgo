@@ -99,6 +99,12 @@ public:
 
 	void setAbsOrigin(const Vec3& origin);
 	void setAbsVelocity(const Vec3& velocity);
+
+	template<typename T>
+	T cast()
+	{
+		return static_cast<T>(this);
+	}
 };
 
 class Weapon_t : public Entity_t

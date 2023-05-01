@@ -30,7 +30,7 @@ void styleEditor::draw()
 	ImGui::SameLine();
 	ImGui::ColorPicker("Background color3", &vars::styling->color3);
 	if (ImGui::Button("Refresh background"))
-		g_Background->init();
+		background::init();
 
 	if (ImGui::ShowStyleSelector("Colors##Selector"))
 		ref_saved_style = style;

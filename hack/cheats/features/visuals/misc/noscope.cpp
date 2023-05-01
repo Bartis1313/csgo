@@ -10,51 +10,51 @@
 #include <utilities/tools/tools.hpp>
 #include <render/render.hpp>
 
-void NoScope::draw()
-{
-	if (!vars::misc->scope->enabled)
-		return;
-
-	if (!game::isAvailable())
-		return;
-
-	auto weapon = game::localPlayer->getActiveWeapon();
-	if (!weapon)
-		return;
-
-	if (!weapon->isSniper())
-		return;
-
-	if (game::localPlayer->m_bIsScoped())
-	{
-		ImRender::drawLine(globals::screenX / 2.0f, 0.0f, globals::screenX / 2.0f, static_cast<float>(globals::screenY), Colors::Black);
-		ImRender::drawLine(0.0f, globals::screenY / 2.0f, static_cast<float>(globals::screenX), globals::screenY / 2.0f, Colors::Black);
-	}
-}
-
-void NoScopeBlur::init()
-{
-	/*m_blurScope = memory::interfaces::matSys->findMaterial("dev/scope_bluroverlay", TEXTURE_GROUP_OTHER);
-	m_filterX = memory::interfaces::matSys->findMaterial("dev/blurfilterx_nohdr", TEXTURE_GROUP_OTHER);
-	m_filterY = memory::interfaces::matSys->findMaterial("dev/blurfiltery_nohdr", TEXTURE_GROUP_OTHER);
-	scope_lens_dirt = memory::interfaces::matSys->findMaterial("models/weapons/shared/scope/scope_lens_dirt", TEXTURE_GROUP_OTHER);*/
-}
-
-void NoScopeBlur::run()
-{
-	/*m_blurScope->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
-	m_filterX->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
-	m_filterY->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
-	scope_lens_dirt->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);*/
-}
-
-#include <SDK/CViewSetup.hpp>
-
-void NoScopeBlurSnipers::run(CViewSetup* v)
-{
-	if (!vars::misc->scope->enabled)
-		return;
-
-	/*v->m_edgeBlur = 0;*/
-}
-
+//void NoScope::draw()
+//{
+//	if (!vars::misc->scope->enabled)
+//		return;
+//
+//	if (!game::isAvailable())
+//		return;
+//
+//	auto weapon = game::localPlayer->getActiveWeapon();
+//	if (!weapon)
+//		return;
+//
+//	if (!weapon->isSniper())
+//		return;
+//
+//	if (game::localPlayer->m_bIsScoped())
+//	{
+//		ImRender::drawLine(globals::screenX / 2.0f, 0.0f, globals::screenX / 2.0f, static_cast<float>(globals::screenY), Colors::Black);
+//		ImRender::drawLine(0.0f, globals::screenY / 2.0f, static_cast<float>(globals::screenX), globals::screenY / 2.0f, Colors::Black);
+//	}
+//}
+//
+//void NoScopeBlur::init()
+//{
+//	/*m_blurScope = memory::interfaces::matSys->findMaterial("dev/scope_bluroverlay", TEXTURE_GROUP_OTHER);
+//	m_filterX = memory::interfaces::matSys->findMaterial("dev/blurfilterx_nohdr", TEXTURE_GROUP_OTHER);
+//	m_filterY = memory::interfaces::matSys->findMaterial("dev/blurfiltery_nohdr", TEXTURE_GROUP_OTHER);
+//	scope_lens_dirt = memory::interfaces::matSys->findMaterial("models/weapons/shared/scope/scope_lens_dirt", TEXTURE_GROUP_OTHER);*/
+//}
+//
+//void NoScopeBlur::run()
+//{
+//	/*m_blurScope->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
+//	m_filterX->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
+//	m_filterY->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
+//	scope_lens_dirt->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);*/
+//}
+//
+//#include <SDK/CViewSetup.hpp>
+//
+//void NoScopeBlurSnipers::run(CViewSetup* v)
+//{
+//	if (!vars::misc->scope->enabled)
+//		return;
+//
+//	/*v->m_edgeBlur = 0;*/
+//}
+//

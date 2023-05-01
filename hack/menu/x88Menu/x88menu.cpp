@@ -1,5 +1,7 @@
 #include "x88menu.hpp"
 
+#include "x88types.hpp"
+
 #include <cheats/game/game.hpp>
 #include <cheats/game/globals.hpp>
 #include <SDK/structs/Entity.hpp>
@@ -10,12 +12,45 @@
 #include <utilities/inputSystem.hpp>
 #include <magic_enum.hpp>
 
+#include <cheats/hooks/wndproc.hpp>
+#include <cheats/hooks/present.hpp>
+
+namespace
+{
+	struct x88Draw : hooks::Present
+	{
+		x88Draw()
+		{
+			this->registerRun(x88Menu::draw);
+		}
+	} x88Draw;
+
+	struct x88Keys : hooks::wndProcSys
+	{
+		x88Keys()
+		{
+			this->registerRun(x88Menu::updateKeys);
+		}
+	} x88Keys;
+}
+
 static void drawText(float x, float y, ImFont* font, const std::string& text, const Color& color)
 {
 	drawing::Text{ font, ImVec2{ x, y }, Color::U32(color), text, false, false }.draw(ImGui::GetBackgroundDrawList());
 }
 
-void X88Menu::draw()
+namespace x88Menu
+{
+	// in pixels, padding for X
+	size_t addSpaces(const std::string& text);
+
+	size_t index{ 0 };
+	size_t m_longestNameSize{ };
+	bool m_inited{ false };
+	X88Types x88types{ };
+}
+
+void x88Menu::draw()
 {
 	if (!vars::keys->enabledX88Menu)
 		return;
@@ -90,7 +125,7 @@ void X88Menu::draw()
 
 }
 
-void X88Menu::setStyles()
+void x88Menu::setStyles()
 {
 	x88types.push("Chams", &vars::visuals->chams->indexPlayers, magic_enum::enum_count<ChamsType>() - 1);
 	x88types.push("ESP", &vars::visuals->esp->boxes->enabled);
@@ -115,14 +150,14 @@ void X88Menu::setStyles()
 	m_inited = true;
 }
 
-size_t X88Menu::addSpaces(const std::string& text)
+size_t x88Menu::addSpaces(const std::string& text)
 {
 	// 5px added to align them well for max size
 	auto size = (m_longestNameSize + 5) - ImRender::getTextSize(ImRender::fonts::csgoTahoma15, ImRender::fonts::csgoTahoma15->FontSize, text).x;
 	return static_cast<size_t>(size);
 }
 
-void X88Menu::updateKeys()
+void x88Menu::updateKeys()
 {
 	if (!vars::keys->enabledX88Menu)
 		return;

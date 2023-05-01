@@ -79,54 +79,6 @@
 #define CACHED_BONE					SIG("FF B7 ? ? ? ? 52")
 // #STR: "CParticleCollection::Simulate", "Particle Simulation"
 #define PARTICLE_SIMULATE			SIG("55 8B EC 83 E4 F8 83 EC 30 56 57 8B F9 0F 28 E1 8B 0D ? ? ? ? F3 0F 11 64 24 ? 89 7C 24 18 8B 81")
-#pragma region dumped_effect_names
-/*
-ManhackSparks
-TeslaZap
-TeslaHitboxes
-CommandPointer
-GunshipImpact
-Smoke
-MuzzleFlash
-Error
-BoltImpact
-RPGShotDown
-GlassImpact
-EjectBrass_338Mag
-EjectBrass_762Nato
-EjectBrass_556
-EjectBrass_57
-EjectBrass_12Gauge
-EjectBrass_9mm
-CS_MuzzleFlash_X
-CS_MuzzleFlash
-KnifeSlash
-Impact
-CS_HolidayLight
-csblood
-waterripple
-gunshotsplash
-watersplashquiet
-watersplash
-TracerSound
-ParticleTracer
-Tracer
-ShotgunShellEject
-RifleShellEject
-ShellEject
-RagdollImpact
-HelicopterMegaBomb
-WaterSurfaceExplosion
-Explosion
-HunterDamage
-BloodImpact
-bloodspray
-WheelDust
-ShakeRopes
-ParticleEffectStop
-ParticleEffect
-*/
-#pragma endregion
 // #STR: "DispatchEffect: effect \"%s\" not found on client\n", "Encountered multiple different effects with the same nam
 // see what calls this and you can see head ptr, should be close to actual message
 #define HEAD_OF_EFFECTS				SIG("8B 35 ? ? ? ? 85 F6 0F 84 ? ? ? ? 0F 1F 00")
@@ -318,3 +270,7 @@ ParticleEffect
 #define TAKE_DMG					SIG("80 BE ? ? ? ? ? 75 46 8B 86 ? ? ? ? 83 F8 11")
 // below other setabs... functions, as a reference take anything in client that uses it
 #define SET_ABS_VELOCITY			SIG("55 8B EC 83 E4 F8 83 EC 0C 53 56 57 8B 7D 08 8B F1 F3 0F 10 07 0F 2E 86 ? ? ? ? 9F F6 C4 44 7A 28 F3 0F")
+// #STR: "Client: Missing precache for particle system \"%s\"!\n"
+#define GET_PARTICLE_SYSTEM_IDX		SIG("56 8B F1 85 F6 74 22 8B 0D ? ? ? ?")
+// #STR: "Client: Missing precache for particle system \"%s\"!\n"
+#define DISPATCH_PARTICLE_EFFECT	SIG("55 8B EC 83 E4 F8 81 EC ? ? ? ? 56 8B F1 85 F6")

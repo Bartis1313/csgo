@@ -9,23 +9,46 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <SDK/structs/Entity.hpp>
 
+#include <cheats/helper/initable.hpp>
+#include <cheats/helper/shutdownable.hpp>
+#include <cheats/hooks/helpers/common.hpp>
+
+namespace
+{
+	struct BlacklistInit : InitAble
+	{
+		BlacklistInit()
+		{
+			this->registerInit(blacklist::init);
+		}
+	} blacklistInit;
+
+	struct BlacklistShutdown : ShutdownAble
+	{
+		BlacklistShutdown()
+		{
+			this->registerShutdown(blacklist::shutdown);
+		}
+	} blacklistShutdown;
+}
+
 using json = nlohmann::json;
 
-void from_json(const json& j, Blacklist::BlacklistedPlayer& val)
+void from_json(const json& j, blacklist::BlacklistedPlayer& val)
 {
-	from_json(j, "Guid", val.m_guid);
-	from_json(j, "Bot", val.m_bot);
-	from_json(j, "Name", val.m_playerName);
+	from_json(j, "Guid", val.guid);
+	from_json(j, "Bot", val.bot);
+	from_json(j, "Name", val.playerName);
 }
 
-void to_json(json& j, const Blacklist::BlacklistedPlayer& val)
+void to_json(json& j, const blacklist::BlacklistedPlayer& val)
 {
-	j["Guid"] = val.m_guid;
-	j["Bot"] = val.m_bot;
-	j["Name"] = val.m_playerName;
+	j["Guid"] = val.guid;
+	j["Bot"] = val.bot;
+	j["Name"] = val.playerName;
 }
 
-void Blacklist::init()
+void blacklist::init()
 {
 	m_folderName = "blacklist";
 	m_saveDir = config.getHackPath() / config.getExtraLoadPath() / m_folderName / getPathForConfig();
@@ -33,25 +56,26 @@ void Blacklist::init()
 	loadCfg();
 }
 
-void Blacklist::reset()
+// we only erase bots after the whole match has ended, players are left untouched
+void blacklist::reset()
 {
 	if (m_allGuids.empty())
 		return;
 
-	m_allGuids.erase(std::remove_if(m_allGuids.begin(), m_allGuids.end(), [this](const BlacklistedPlayer& player)
+	m_allGuids.erase(std::remove_if(m_allGuids.begin(), m_allGuids.end(), [](const BlacklistedPlayer& player)
 		{
-			if (player.m_bot)
+			if (player.bot)
 			{
 				m_json.erase(m_json.find(getCorrectKey(player)));
 				return true;
 			}
 
-	return false;
+			return false;
 		})
 	);
 }
 
-bool Blacklist::loadCfg()
+bool blacklist::loadCfg()
 {
 	if (auto path = config.getHackPath() / config.getExtraLoadPath() / m_folderName; !std::filesystem::exists(path))
 		std::filesystem::create_directories(path);
@@ -66,7 +90,7 @@ bool Blacklist::loadCfg()
 
 		for (const auto& [key, value] : m_json.items())
 		{
-			BlacklistedPlayer player;
+			BlacklistedPlayer player{ };
 			from_json(value, player);
 
 			m_allGuids.push_back(player);
@@ -76,32 +100,32 @@ bool Blacklist::loadCfg()
 	return true;
 }
 
-bool Blacklist::saveCfg()
+bool saveCfg()
 {
-	std::ofstream out{ m_saveDir };
+	std::ofstream out{ blacklist::m_saveDir };
 	if (!out)
 		return false;
 
 	json j;
-	for (const auto& el : m_allGuids)
-		to_json(j[getCorrectKey(el)], el);
+	for (const auto& el : blacklist::m_allGuids)
+		to_json(j[blacklist::getCorrectKey(el)], el);
 
 	if (!j.empty())
-		m_json.update(j);
+		blacklist::m_json.update(j);
 
-	out << std::setw(4) << m_json;
+	out << std::setw(4) << blacklist::m_json;
 
 	return true;
 }
 
-// for performance
-void Blacklist::shutdown()
+// we will be saving only at end, because it doesn't really matter to save it instantly
+void blacklist::shutdown()
 {
 	if (!saveCfg())
 		console::error("Saving config has failed");
 }
 
-bool Blacklist::isBlacklisted(Player_t* ent) const
+bool blacklist::isBlacklisted(Player_t* ent)
 {
 	const auto guid = getGuid(ent);
 	auto itr = std::ranges::find_if(m_allGuids, [guid](const BlacklistedPlayer& player)
@@ -113,7 +137,7 @@ bool Blacklist::isBlacklisted(Player_t* ent) const
 	return itr != m_allGuids.end();
 }
 
-void Blacklist::add(Player_t* ent)
+void blacklist::add(Player_t* ent)
 {
 	const auto guid = getGuid(ent);
 	if (!isBlacklisted(ent))
@@ -124,13 +148,13 @@ void Blacklist::add(Player_t* ent)
 		m_json.update(j);
 	}
 	else
-		console::warn("Player already blacklisted! guid: {} isBot {}", guid.m_guid, guid.m_bot);
+		console::warn("Player already blacklisted! guid: {} isBot {}", guid.guid, guid.bot);
 }
 
-void Blacklist::remove(Player_t* ent)
+void blacklist::remove(Player_t* ent)
 {
 	const auto guid = getGuid(ent);
-	m_allGuids.erase(std::remove_if(m_allGuids.begin(), m_allGuids.end(), [this, guid](const BlacklistedPlayer& player)
+	m_allGuids.erase(std::remove_if(m_allGuids.begin(), m_allGuids.end(), [guid](const BlacklistedPlayer& player)
 		{
 			if (player == guid)
 			{
@@ -138,36 +162,36 @@ void Blacklist::remove(Player_t* ent)
 				return true;
 			}
 
-	return false;
+			return false;
 		})
 	);
 }
 
-std::filesystem::path Blacklist::getPathForConfig() const
+std::filesystem::path blacklist::getPathForConfig()
 {
-	std::filesystem::path path(m_folderName);
+	std::filesystem::path path{ m_folderName };
 	if (path.extension() != ".json")
 		path.replace_extension(".json");
 
 	return path;
 }
 
-std::string Blacklist::getCorrectKey(const BlacklistedPlayer& player) const
+std::string blacklist::getCorrectKey(const blacklist::BlacklistedPlayer& player)
 {
-	auto key = player.m_bot
-		? std::format("{} BOT", player.m_guid)
-		: std::format("{}", player.m_guid);
+	auto key = player.bot
+		? std::format("{} BOT", player.bot)
+		: std::format("{}", player.guid);
 
 	return key;
 }
 
-Blacklist::BlacklistedPlayer Blacklist::getGuid(Player_t* ent) const
+blacklist::BlacklistedPlayer blacklist::getGuid(Player_t* ent)
 {
-	PlayerInfo_t info;
+	PlayerInfo_t info{ };
 	memory::interfaces::engine->getPlayerInfo(ent->getIndex(), &info);
-	auto guid = info.m_fakePlayer
-		? BlacklistedPlayer{ .m_guid = static_cast<uint64_t>(info.m_userID), .m_bot = true, .m_playerName = std::string{ info.m_name } }
-	: BlacklistedPlayer{ .m_guid = info.m_steamID64, .m_bot = false, .m_playerName = std::string{ info.m_name } };
+	const auto guid = info.m_fakePlayer
+		? BlacklistedPlayer{ .bot = true, .guid = static_cast<uint64_t>(info.m_userID), .playerName = std::string{ info.m_name } }
+	: BlacklistedPlayer{ .bot = false, .guid = info.m_steamID64, .playerName = std::string{ info.m_name } };
 
 	return guid;
 }

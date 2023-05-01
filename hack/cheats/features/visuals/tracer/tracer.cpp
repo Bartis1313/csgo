@@ -24,7 +24,20 @@
 
 #include "../misc/bulletUpdater.hpp"
 
-void BulletTracer::draw()
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct BulletTracerHandler : hooks::PaintTraverse
+	{
+		BulletTracerHandler()
+		{
+			this->registerRender(bulletTracer::draw);
+		}
+	} bulletHandler;
+}
+
+void bulletTracer::draw()
 {
 	if (!vars::visuals->world->tracer->enabled)
 		return;
@@ -35,7 +48,7 @@ void BulletTracer::draw()
 	if (!game::localPlayer->isAlive())
 		return;
 
-	const auto lastbullets = g_BulletUpdater->getLastBullets();
+	const auto lastbullets = bulletUpdater::getLastBullets();
 	if (lastbullets.empty())
 		return;
 

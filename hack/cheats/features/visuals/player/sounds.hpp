@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cheats/classes/onlyInit.hpp>
 #include <SDK/math/Vector.hpp>
 
 #include <array>

@@ -11,7 +11,20 @@
 #include <utilities/tools/tools.hpp>
 #include <render/render.hpp>
 
-void Projectiles::draw()
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct ProjectileHandler : hooks::PaintTraverse
+	{
+		ProjectileHandler()
+		{
+			this->registerRender(projectiles::draw);
+		}
+	} projectilesHandler;
+}
+
+void projectiles::draw()
 {
 	if(!game::isAvailable())
 		return;

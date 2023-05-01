@@ -10,12 +10,25 @@
 
 #include <array>
 
-void SpectactorList::reset()
+#include <cheats/hooks/present.hpp>
+
+namespace
+{
+	struct SpectactorHandler : hooks::Present
+	{
+		SpectactorHandler()
+		{
+			this->registerRun(spectactor::draw);
+		}
+	} specHandler;
+}
+
+void spectactor::reset()
 {
 	m_specs.clear();
 }
 
-void SpectactorList::draw()
+void spectactor::draw()
 {
 	if (!vars::misc->spectactorList->enabled)
 		return;

@@ -7,7 +7,6 @@
 #include <gamememory/memory.hpp>
 #include <utilities/console/console.hpp>
 #include <utilities/console/consoleDraw.hpp>
-#include <cheats/classes/wndProcKeyHandler.hpp>
 
 #include <MinHook.h>
 #include <imgui_impl_win32.h>
@@ -15,7 +14,7 @@
 
 #include <mutex>
 
-void wndProcSys::init()
+void hooks::wndProcSys::init()
 {
 	currentWindow = FindWindowA("Valve001", NULL);
 	wndProcOriginal = reinterpret_cast<WNDPROC>(SetWindowLongW(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(wndProcSys::wndproc)));
@@ -27,7 +26,7 @@ void wndProcSys::init()
 #include <menu/x88Menu/x88menu.hpp>
 #include <render/backend/backend.hpp>
 
-void wndProcSys::shutdown()
+void hooks::wndProcSys::shutdown()
 {
 	SetWindowLongW(currentWindow, GWL_WNDPROC, reinterpret_cast<LONG>(wndProcSys::wndProcOriginal));
 	memory::interfaces::iSystem->enableInput(true);
@@ -35,16 +34,16 @@ void wndProcSys::shutdown()
 
 extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam);
 
-LRESULT wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
+LRESULT hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
 	renderbackend::createContext(hwnd);
 
 	KeysHandler::run(message, wparam);
-	WndProcKeyHandler::updateAllKeys();
+	Storage::runs.run();
 
-	memory::interfaces::iSystem->enableInput(!g_ImGuiMenu->isMenuActive());
+	memory::interfaces::iSystem->enableInput(!ImGuiMenu::active);
 	
-	if(g_ImGuiMenu->isMenuActive() && ImGui_ImplWin32_WndProcHandler(hwnd, message, wparam, lparam))
+	if(ImGuiMenu::active && ImGui_ImplWin32_WndProcHandler(hwnd, message, wparam, lparam))
 		return TRUE;
 	
 	return LI_FN_CACHED(CallWindowProcA)(wndProcOriginal, hwnd, message, wparam, lparam);

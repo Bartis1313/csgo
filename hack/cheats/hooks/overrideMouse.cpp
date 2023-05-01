@@ -1,9 +1,11 @@
-#include "hooks.hpp"
+#include "overrideMouse.hpp"
 
-#include <cheats/classes/overrideM.hpp>
-
-hooks::overrideMouse::value FASTCALL hooks::overrideMouse::hooked(FAST_ARGS, float* x, float* y)
+hooks::OverrideMouse::value hooks::OverrideMouse::hook(FAST_ARGS, float* x, float* y)
 {
+	static std::once_flag onceFlag;
+	std::call_once(onceFlag, []() { Storage::intis.run(); });
+
 	original(thisptr, x, y);
-	OverrideMouseType::runAll(x, y);
+
+	Storage::runs.run(x, y);
 }

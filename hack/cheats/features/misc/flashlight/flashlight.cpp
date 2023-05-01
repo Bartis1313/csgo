@@ -15,35 +15,46 @@
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/tools/tools.hpp>
 
-CFlashlightEffect* Flashlight::createFlashlight(float fov, Entity_t* ent, const char* effectName,
-	float farZ, float linearAtten)
+#include <cheats/hooks/frameStageNotify.hpp>
+#include <cheats/hooks/wndproc.hpp>
+
+namespace
 {
-	auto flashlightMemory = reinterpret_cast<CFlashlightEffect*>(memory::interfaces::memAlloc->_alloc(sizeof(CFlashlightEffect)));
-	if (!flashlightMemory)
-		return nullptr;
+	struct FlashlightFSN : hooks::FrameStageNotify
+	{
+		FlashlightFSN()
+		{
+			this->registerRun(flashlight::run);
+			this->registerShutdown(flashlight::shutdown);
+		}
+	} flashlightFSN;
 
-	memory::flashlightCreate()(flashlightMemory, nullptr, 0.0f, 0.0f, 0.0f, fov, ent->getIndex(), effectName, farZ, linearAtten);
-
-	return flashlightMemory;
+	struct FlashlightKeys : hooks::wndProcSys
+	{
+		FlashlightKeys()
+		{
+			this->registerRun(flashlight::updateKeys);
+		}
+	};
 }
 
-void Flashlight::destroyFlashLight(CFlashlightEffect* flashlight)
+namespace flashlight
 {
-	memory::flashlightDestroy()(flashlight, nullptr); // second arg is not even used there
+	CFlashlightEffect* createFlashlight(float fov, Entity_t* ent, float farZ = 1000.0f, float linearAtten = 1000.0f);
+	void destroyFlashLight(CFlashlightEffect* flashlight);
+	void updateFlashlight(CFlashlightEffect* flashlight, const Vec3& pos, const Vec3& forward, const Vec3& right, const Vec3& up);
+
+	CFlashlightEffect* flashlightPtr{ nullptr };
+	const std::string_view flashlightEffect{ "effects/flashlight001" };
+	const std::string_view flashlightSound{ "items\\flashlight1.wav" };
 }
 
-void Flashlight::updateFlashlight(CFlashlightEffect* flashlight, const Vec3& pos, const Vec3& forward, const Vec3& right, const Vec3& up)
-{
-	memory::flashlightUpdate()(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov,
-		flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
-}
-
-void Flashlight::run(int frame)
+void flashlight::run(FrameStage stage)
 {
 	if (globals::isShutdown)
 		return;
 
-	if (frame != FRAME_RENDER_START)
+	if (stage != FRAME_RENDER_START)
 		return;
 
 	if (!game::isAvailable())
@@ -55,7 +66,7 @@ void Flashlight::run(int frame)
 	if (!vars::misc->flashLight->enabled)
 		return;
 
-	auto key = vars::keys->flashLight;
+	const auto key = vars::keys->flashLight;
 	switch (key.getKeyMode())
 	{
 	case KeyMode::DOWN:
@@ -66,8 +77,8 @@ void Flashlight::run(int frame)
 		{
 			if (!done)
 			{
-				memory::interfaces::surface->playSound("items\\flashlight1.wav");
-				m_flashlight = createFlashlight(vars::misc->flashLight->fov, game::localPlayer());
+				memory::interfaces::surface->playSound(flashlightSound.data());
+				flashlightPtr = createFlashlight(vars::misc->flashLight->fov, game::localPlayer());
 				done = true;
 			}
 		}
@@ -75,8 +86,8 @@ void Flashlight::run(int frame)
 		{
 			if (done)
 			{
-				destroyFlashLight(m_flashlight);
-				m_flashlight = nullptr;
+				destroyFlashLight(flashlightPtr);
+				flashlightPtr = nullptr;
 				done = false;
 			}
 		}
@@ -87,41 +98,66 @@ void Flashlight::run(int frame)
 	{
 		if (key.isPressed())
 		{
-			memory::interfaces::surface->playSound("items\\flashlight1.wav");
+			memory::interfaces::surface->playSound(flashlightSound.data());
 
-			if (m_flashlight)
+			if (flashlightPtr)
 			{
-				destroyFlashLight(m_flashlight);
-				m_flashlight = nullptr;
+				destroyFlashLight(flashlightPtr);
+				flashlightPtr = nullptr;
 			}
 			else
-				m_flashlight = createFlashlight(vars::misc->flashLight->fov, game::localPlayer());
+				flashlightPtr = createFlashlight(vars::misc->flashLight->fov, game::localPlayer());
 		}
 
 		break;
 	}
 	}
 
-	if (!m_flashlight)
+	if (!flashlightPtr)
 		return;
 
-	Vec3 angle;
-	memory::interfaces::engine->getViewAngles(angle);
-	auto [forward, right, up] = math::angleVectors(angle);
+	const auto [forward, right, up] = math::angleVectors(game::getViewAngles());
 
-	m_flashlight->m_isOn = true;
-	m_flashlight->m_castsShadows = true;
-	m_flashlight->m_bigMode = vars::misc->flashLight->bigMode;
-	m_flashlight->m_fov = vars::misc->flashLight->fov;
+	flashlightPtr->m_isOn = true;
+	flashlightPtr->m_castsShadows = true;
+	flashlightPtr->m_bigMode = vars::misc->flashLight->bigMode;
+	flashlightPtr->m_fov = vars::misc->flashLight->fov;
 
-	updateFlashlight(m_flashlight, game::localPlayer->getEyePos(), forward, right, up);
+	updateFlashlight(flashlightPtr, game::localPlayer->getEyePos(), forward, right, up);
 }
 
-void Flashlight::shutdown()
+CFlashlightEffect* flashlight::createFlashlight(float fov, Entity_t* ent, float farZ, float linearAtten)
 {
-	if (m_flashlight)
+	const auto flashlightMemory = reinterpret_cast<CFlashlightEffect*>(memory::interfaces::memAlloc->_alloc(sizeof(CFlashlightEffect)));
+	if (!flashlightMemory)
+		return nullptr;
+
+	memory::flashlightCreate()(flashlightMemory, nullptr, 0.0f, 0.0f, 0.0f, fov, ent->getIndex(), flashlightEffect.data(), farZ, linearAtten);
+
+	return flashlightMemory;
+}
+
+void flashlight::destroyFlashLight(CFlashlightEffect* flashlight)
+{
+	memory::flashlightDestroy()(flashlight, nullptr); // second arg is not even used there
+}
+
+void flashlight::updateFlashlight(CFlashlightEffect* flashlight, const Vec3& pos, const Vec3& forward, const Vec3& right, const Vec3& up)
+{
+	memory::flashlightUpdate()(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov,
+		flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
+}
+
+void flashlight::shutdown()
+{
+	if (flashlightPtr)
 	{
-		destroyFlashLight(m_flashlight);
-		m_flashlight = nullptr;
+		destroyFlashLight(flashlightPtr);
+		flashlightPtr = nullptr;
 	}
+}
+
+void flashlight::updateKeys()
+{
+	vars::keys->flashLight.update();
 }

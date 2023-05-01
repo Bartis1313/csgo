@@ -25,57 +25,95 @@
 #include <render/render.hpp>
 #include <utilities/math/math.hpp>
 
+#include <cheats/hooks/present.hpp>
+#include <cheats/hooks/frameStageNotify.hpp>
+#include <cheats/hooks/unkownRoundEnd.hpp>
 
-void BombOverlay::init()
+namespace
 {
-	m_timer = memory::interfaces::cvar->findVar("mp_c4timer");
+	struct BombDrawer : hooks::Present
+	{
+		BombDrawer()
+		{
+			this->registerRun(bombOverlay::draw);
+		}
+	} bombDrawer;
+
+	struct BombEntHandler : hooks::FrameStageNotify
+	{
+		BombEntHandler()
+		{
+			this->registerInit(bombOverlay::init);
+			this->registerRun(bombOverlay::run);
+		}
+	} bombEntHandler;
+
+	struct BombReset : hooks::UnknownRoundEnd
+	{
+		BombReset()
+		{
+			this->registerRun(bombOverlay::roundRestart);
+		}
+	} bombReset;
+}
+
+namespace bombOverlay
+{
+	Bomb_t* bombEnt{ };
+	IConVar* c4Timer{ };
+	std::string whoPlanted{ };
+}
+
+void bombOverlay::init()
+{
+	c4Timer = memory::interfaces::cvar->findVar("mp_c4timer");
 
 	// if we seriously do not want to use events all
 	// then find a way to get planted bomb info, I was lazy to do so
-	events::add("bomb_planted", std::bind(&BombOverlay::handleWhoPlanted, this, std::placeholders::_1));
+	events::add("bomb_planted", std::bind(&handleWhoPlanted, std::placeholders::_1));
 }
 
-void BombOverlay::roundRestart()
+void bombOverlay::roundRestart()
 {
-	g_BombOverlay->m_bombEnt = nullptr;
+	bombEnt = nullptr;
 }
 
-void BombOverlay::draw()
+void bombOverlay::draw()
 {
 	if (!game::isAvailable())
-		m_bombEnt = nullptr;
+		bombEnt = nullptr;
 
-	if (!m_bombEnt)
+	if (!bombEnt)
 		return;
 
 	if (!vars::visuals->world->bomb->enabled)
 		return;
 
-	const auto bombent = reinterpret_cast<Bomb_t*>(m_bombEnt);
+	const auto bombent = reinterpret_cast<Bomb_t*>(bombEnt);
 	const auto bombtime = bombent->m_flC4Blow() - memory::interfaces::globalVars->m_curtime;
-	const auto defusetime = m_bombEnt->m_flDefuseCountDown() - memory::interfaces::globalVars->m_curtime;
-	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientFromHandle(m_bombEnt->m_hBombDefuser()));
+	const auto defusetime = bombEnt->m_flDefuseCountDown() - memory::interfaces::globalVars->m_curtime;
+	auto ent = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientFromHandle(bombEnt->m_hBombDefuser()));
 	const auto defuseMaxTime = ent && ent->m_bHasDefuser() ? 5.0f : 10.0f; // check ent too
 
 	if (bombtime < 0.0f || bombent->m_bBombDefused())
 	{
-		m_bombEnt = nullptr;
+		bombEnt = nullptr;
 		return;
 	}
 
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/389530-bomb-damage-indicator.html
 	constexpr float bombRadius = 500.0f; // there is no info for this, run some map scanner
-	constexpr float sigma = (500.0f * 3.5f) / 3.0f;
-	const float hypDist = (m_bombEnt->getEyePos() - game::localPlayer->getEyePos()).length();
+	constexpr float sigma = (bombRadius * 3.5f) / 3.0f;
+	const float hypDist = (bombEnt->getEyePos() - game::localPlayer->getEyePos()).length();
 	const float dmg = game::scaleDamageArmor((bombRadius * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), static_cast<float>(game::localPlayer->m_ArmorValue()));
 	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 
-	float scaled = m_bombEnt->m_hBombDefuser().isValid() ? (defusetime / defuseMaxTime) : (bombtime / m_timer->getFloat());
+	float scaled = bombEnt->m_hBombDefuser().isValid() ? (defusetime / defuseMaxTime) : (bombtime / c4Timer->getFloat());
 
 	float fdef = defusetime / defuseMaxTime;
-	float fbomb = bombtime / m_timer->getFloat();
-	float forRed = m_bombEnt->m_hBombDefuser().isValid() ? fdef : fbomb;
-	float forGreen = m_bombEnt->m_hBombDefuser().isValid() ? fdef : fbomb;
+	float fbomb = bombtime / c4Timer->getFloat();
+	float forRed = bombEnt->m_hBombDefuser().isValid() ? fdef : fbomb;
+	float forGreen = bombEnt->m_hBombDefuser().isValid() ? fdef : fbomb;
 
 	float r = (1.0f - forRed);
 	Color color{ r, forGreen, 0.0f, 0.8f };
@@ -96,7 +134,7 @@ void BombOverlay::draw()
 		const auto yCircle = size.y / 2.0f;
 
 		drawing::Arc{ ImVec2{ pos.x + xCircle, pos.y + yCircle }, scaledRadius, math::DEG2RAD(minAngle), math::DEG2RAD(maxAngle), 32, Color::U32(color), 0, 5.0f }.draw(draw);
-		const auto text = defusetime > bombtime ? "Too late" : std::format("{:.2f}", m_bombEnt->m_hBombDefuser().isValid() ? defusetime : bombtime);
+		const auto text = defusetime > bombtime ? "Too late" : std::format("{:.2f}", bombEnt->m_hBombDefuser().isValid() ? defusetime : bombtime);
 		drawing::Text{ ImRender::fonts::tahoma14, ImVec2{ pos.x + xCircle, pos.y + yCircle - ImRender::fonts::tahoma14->FontSize / 2.0f },
 			Color::U32(Colors::White), text, false, true }.draw(draw);
 
@@ -106,13 +144,13 @@ void BombOverlay::draw()
 
 		float yPosInfo = pos.y + size.y / 2.0f;
 
-		if (!m_whoPlanted.empty())
+		if (!whoPlanted.empty())
 		{
 			drawing::Text{ ImRender::fonts::tahoma20, ImVec2{ pos.x + 5.0f, yPosInfo }, Color::U32(Colors::White),
-			std::format("Planted by {}s", m_whoPlanted), false, false }.draw(draw);
+			std::format("Planted by {}s", whoPlanted), false, false }.draw(draw);
 			yPosInfo -= ImRender::fonts::tahoma20->FontSize;
 		}
-		if (m_bombEnt->m_hBombDefuser().isValid())
+		if (bombEnt->m_hBombDefuser().isValid())
 		{
 			drawing::Text{ ImRender::fonts::tahoma20, ImVec2{ pos.x + 5.0f, yPosInfo }, Color::U32(Colors::White),
 			std::format("Defusing {}", ent->getName()), false, false }.draw(draw);
@@ -121,7 +159,7 @@ void BombOverlay::draw()
 
 		float yCentreInfo = pos.y + 2.0f + ImRender::fonts::tahoma20->FontSize;
 		drawing::Text{ ImRender::fonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(Colors::White), std::format("Site {}",
-			m_bombEnt->getBombSiteName()), false, true }.draw(draw);
+			bombEnt->getBombSiteName()), false, true }.draw(draw);
 		yCentreInfo += ImRender::fonts::tahoma20->FontSize;
 		drawing::Text{ ImRender::fonts::tahoma20, ImVec2{ pos.x + size.x / 2.0f, yCentreInfo }, Color::U32(isSafe ? Colors::Green : Colors::Red),
 			std::format("Damage {:.2f}", dmg), false, true }.draw(draw);
@@ -131,18 +169,18 @@ void BombOverlay::draw()
 	ImGui::PopStyleColor();
 }
 
-void BombOverlay::handleWhoPlanted(IGameEvent* event)
+void bombOverlay::handleWhoPlanted(IGameEvent* event)
 {
 	auto who = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("userid"))));
 	if (!who)
 		return;
 
-	m_whoPlanted = who->getName();
+	whoPlanted = who->getName();
 }
 
-void BombOverlayEntGrabber::run(int frame)
+void bombOverlay::run(FrameStage stage)
 {
-	if (frame != FRAME_RENDER_START)
+	if (stage != FRAME_RENDER_START)
 		return;
 
 	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::WORLD_ENTS))
@@ -150,6 +188,6 @@ void BombOverlayEntGrabber::run(int frame)
 		if (classID != CPlantedC4)
 			continue;
 
-		g_BombOverlay->m_bombEnt = reinterpret_cast<Bomb_t*>(entity);
+		bombEnt = reinterpret_cast<Bomb_t*>(entity);
 	}
 }

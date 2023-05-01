@@ -12,6 +12,20 @@
 #include <utilities/tools/wrappers.hpp>
 
 #include "aimbot.hpp"
+#include "cmdCache.hpp"
+
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct DrawHandler : hooks::PaintTraverse
+	{
+		DrawHandler()
+		{
+			this->registerRender(AimbotDraw::draw);
+		}
+	} aimbotDraw;
+}
 
 void AimbotDraw::draw()
 {
@@ -21,7 +35,11 @@ void AimbotDraw::draw()
 
 void AimbotDraw::drawFov()
 {
-	auto cfg = g_Aimbot->getCachedConfig();
+	auto maybeConfig = CUserCmdCache::getWeaponConfig();
+	if (!maybeConfig.has_value())
+		return;
+
+	auto cfg = maybeConfig.value();
 
 	if (!vars::aimPaint->enabledFov)
 		return;
@@ -59,7 +77,7 @@ void AimbotDraw::drawFov()
 		TraceFilter filter{ game::localPlayer() };
 		const auto myEye = game::localPlayer->getEyePos();
 		constexpr float range = 8192.0f; // because we need max range possible
-		const auto view = g_Aimbot->getCachedView();
+		const auto view = game::getViewAngles();
 		const auto end = myEye + (math::angleVec(view) * range);
 		memory::interfaces::trace->traceRay({ myEye, end }, MASK_SHOT, &filter, &trace);
 		// 3d end
@@ -90,7 +108,7 @@ void AimbotDraw::drawBestPoint()
 	if (!game::isAvailable())
 		return;
 
-	const auto hitbox = g_Aimbot->getBestHibox();
+	const auto hitbox = Aimbot::getBestHibox();
 	if (hitbox.isZero())
 		return;
 

@@ -8,28 +8,58 @@
 #include <utilities/rand.hpp>
 #include <config/vars.hpp>
 
-#include <mutex>
+#include <cheats/hooks/present.hpp>
 
-void Background::drawLine(const Vec2& start, const Vec2& end, const Color& color, float thickness)
+namespace
 {
-	m_draw->AddLine(ImVec2{ start[Coord::X], start[Coord::Y] }, ImVec2{ end[Coord::X], end[Coord::Y] }, Color::U32(color), thickness);
+	struct BackgroundHandle : hooks::Present
+	{
+		BackgroundHandle()
+		{
+			this->registerRun(background::draw);
+		}
+	} backgroundHandle;
 }
 
-void Background::drawCircleFilled(const Vec2& pos, float radius, size_t points, const Color& color)
+namespace background
 {
-	m_draw->AddCircleFilled(ImVec2{ pos[Coord::X], pos[Coord::Y] }, radius, Color::U32(color), points);
+	void pushRandomPoints();
+	void update(ParticlePoint_t& particle);
+	void find(ParticlePoint_t& particle);
+
+	void drawLine(const Vec2& start, const Vec2& end, const Color& color, float thickness = 1.0f);
+	void drawCircleFilled(const Vec2& pos, float radius, size_t points, const Color& color);
+	void drawRectFilled(float x, float y, float width, float height, const Color& color);
+
+	size_t particlesCount; // how many particless
+	float maxDistance; // dist between
+
+	std::vector<ParticlePoint_t> particles;
+	std::vector<Color> colors;
+
+	ImDrawList* ImDraw;
 }
 
-void Background::drawRectFilled(float x, float y, float width, float height, const Color& color)
+void background::drawLine(const Vec2& start, const Vec2& end, const Color& color, float thickness)
 {
-	m_draw->AddRectFilled(ImVec2{ x, y }, ImVec2{ x + width, y + height }, Color::U32(color));
+	ImDraw->AddLine(ImVec2{ start[Coord::X], start[Coord::Y] }, ImVec2{ end[Coord::X], end[Coord::Y] }, Color::U32(color), thickness);
 }
 
-void Background::init()
+void background::drawCircleFilled(const Vec2& pos, float radius, size_t points, const Color& color)
 {
-	m_size = static_cast<size_t>(vars::styling->size);
-	m_maxDistLines = vars::styling->distance;
-	m_colorArr =
+	ImDraw->AddCircleFilled(ImVec2{ pos[Coord::X], pos[Coord::Y] }, radius, Color::U32(color), points);
+}
+
+void background::drawRectFilled(float x, float y, float width, float height, const Color& color)
+{
+	ImDraw->AddRectFilled(ImVec2{ x, y }, ImVec2{ x + width, y + height }, Color::U32(color));
+}
+
+void background::init()
+{
+	particlesCount = static_cast<size_t>(vars::styling->size);
+	maxDistance = vars::styling->distance;
+	colors =
 	{
 		vars::styling->color1(),
 		vars::styling->color2(),
@@ -39,24 +69,24 @@ void Background::init()
 	pushRandomPoints();
 }
 
-void Background::pushRandomPoints()
+void background::pushRandomPoints()
 {
-	m_particleArr.clear();
+	particles.clear();
 
 	float speed = vars::styling->speed;
-	for (size_t i = 0; i < m_size; i++)
+	for (size_t i = 0; i < particlesCount; i++)
 	{
-		m_particleArr.emplace_back(
+		particles.emplace_back(
 			ParticlePoint_t
 			{
 				Vec2{ static_cast<float>(Random::getRandom<size_t>(0, globals::screenX)), static_cast<float>(Random::getRandom<size_t>(0, globals::screenY)) }, // pos
 				Vec2{ Random::getRandom<float>(-0.1f, 0.1f) * speed, Random::getRandom<float>(-0.1f, 0.1f) * speed }, // move
-				Color	{ m_colorArr.at(Random::getRandom<size_t>(0, m_colorArr.size() - 1)) } // color
+				Color	{ colors.at(Random::getRandom<size_t>(0, colors.size() - 1)) } // color
 			});
 	}
 }
 
-void Background::update(ParticlePoint_t& particle)
+void background::update(ParticlePoint_t& particle)
 {
 	// not working perfectly
 	/*const auto circlePos = Vec2{ float(globals::mouseX), float(globals::mouseY) };
@@ -83,34 +113,37 @@ void Background::update(ParticlePoint_t& particle)
 	particle.m_pos += particle.m_move;
 }
 
-void Background::find(ParticlePoint_t& particle)
+void background::find(ParticlePoint_t& particle)
 {
-	for (auto& el : m_particleArr)
+	for (auto& el : particles)
 	{
-		if (const auto dis = particle.m_pos.distTo(el.m_pos); dis < m_maxDistLines)
+		if (const auto dis = particle.m_pos.distTo(el.m_pos); dis < maxDistance)
 		{
-			el.m_alpha = (m_maxDistLines - dis) / m_maxDistLines;
+			el.m_alpha = (maxDistance - dis) / maxDistance;
 			drawLine(particle.m_pos, el.m_pos, particle.m_color.getColorEditAlpha(el.m_alpha));
 		}
 	}
 }
 
-void Background::draw()
+void background::draw()
 {
 	if (globals::isShutdown)
 		return;
 
-	m_draw = ImGui::GetBackgroundDrawList();
+	ImDraw = ImGui::GetBackgroundDrawList();
 
-	if (!g_ImGuiMenu->isMenuActive())
+	if (!ImGuiMenu::active)
 		return;
 
 	if (!vars::styling->background)
 		return;
 
+	static std::once_flag onceFlag;
+	std::call_once(onceFlag, []() { init(); });
+
 	drawRectFilled(0.0f, 0.0f, static_cast<float>(globals::screenX), static_cast<float>(globals::screenY), Colors::Grey);
 
-	for (auto& el : m_particleArr)
+	for (auto& el : particles)
 	{
 		update(el);
 		find(el);

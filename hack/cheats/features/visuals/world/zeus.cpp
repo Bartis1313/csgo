@@ -9,17 +9,22 @@
 #include <utilities/utilities.hpp>
 #include <render/render.hpp>
 
-void ZeusDraw::init()
+namespace zeus
 {
-	m_party = memory::interfaces::cvar->findVar("sv_party_mode");
+	IConVar* sv_party_mode;
 }
 
-void ZeusDraw::draw()
+void zeus::init()
+{
+	sv_party_mode = memory::interfaces::cvar->findVar("sv_party_mode");
+}
+
+void zeus::draw()
 {
 	if (!game::isAvailable())
 		return;
 
-	vars::visuals->world->zeus->party ? m_party->setValue(true) : m_party->setValue(false);
+	vars::visuals->world->zeus->party ? sv_party_mode->setValue(true) : sv_party_mode->setValue(false);
 
 	if (!vars::visuals->world->zeus->enabled)
 		return;

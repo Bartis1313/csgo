@@ -4,7 +4,29 @@
 #include <render/Color.hpp>
 #include <utilities/tools/tools.hpp>
 
-void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
+#include <cheats/hooks/present.hpp>
+#include <cheats/hooks/wndproc.hpp>
+
+namespace
+{
+	struct LogDraw : hooks::Present
+	{
+		LogDraw()
+		{
+			this->registerRun(logDrawer::draw);
+		}
+	} logDraw;
+
+	struct LogKeys : hooks::wndProcSys
+	{
+		LogKeys()
+		{
+			this->registerRun(logDrawer::updateKeys);
+		}
+	} logKeys;
+}
+
+void logDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 {
 	if (!ImGui::Begin(title, p_open))
 	{
@@ -78,16 +100,16 @@ void LogDrawer::ExampleAppLog::draw(const char* title, bool* p_open)
 	ImGui::End();
 }
 
-void LogDrawer::draw()
+void logDrawer::draw()
 {
-	if (m_opened)
-		log.draw("Logging Console", &m_opened);
+	if (opened)
+		log.draw("Logging Console", &opened);
 }
 
 #include <config/vars.hpp>
 
-void LogDrawer::updateKeys()
+void logDrawer::updateKeys()
 {
 	if (vars::keys->console.isPressed())
-		m_opened = !m_opened;
+		opened = !opened;
 }

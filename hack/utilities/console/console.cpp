@@ -57,7 +57,7 @@ void console::detail::addLogToStream(TypeLogs type, const std::string& buf)
 #endif
 
 	m_fileStream << buf;
-	g_LogDrawer->log.add(type, buf);
+	logDrawer::log.add(type, buf);
 }
 
 bool console::detail::isPossibleToLog(TypeLogs type)

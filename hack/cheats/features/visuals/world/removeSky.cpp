@@ -6,14 +6,33 @@
 #include <config/vars.hpp>
 #include <utilities/tools/tools.hpp>
 
-void RemoveSky::init()
+#include <cheats/hooks/doPostScreenEffects.hpp>
+
+namespace
 {
-	m_sky = memory::interfaces::cvar->findVar("r_3dsky");
+	struct SkyHandler : hooks::DoPostScreenEffects
+	{
+		SkyHandler()
+		{
+			this->registerInit(sky::init);
+			this->registerRun(sky::run);
+		}
+	} skyHandler;
 }
 
-void RemoveSky::run()
+namespace sky
+{
+	IConVar* r_3dsky;
+}
+
+void sky::init()
+{
+	r_3dsky = memory::interfaces::cvar->findVar("r_3dsky");
+}
+
+void sky::run()
 {
 	// do smth about sky controller as well, TODO
 
-	vars::visuals->world->sky->removeSky ? m_sky->setValue(false) : m_sky->setValue(true);
+	vars::visuals->world->sky->removeSky ? r_3dsky->setValue(false) : r_3dsky->setValue(true);
 }

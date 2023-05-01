@@ -12,19 +12,18 @@
 #include <render/render.hpp>
 #include <utilities/tools/tools.hpp>
 
-
-void EnemyWarning::init()
+namespace enemyWarning
 {
-	m_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
+	using checkType = std::optional<std::pair<bool, bool>>;
+	checkType check(Player_t* ent);
+
+	std::array<checkType, 65> spottedEnts;
 }
 
-std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
+enemyWarning::checkType enemyWarning::check(Player_t* ent)
 {
-	if (!vars::misc->aimWarn->enabled)
-		return { false, false };
-
 	if (!game::isAvailable())
-		return { false, false };
+		return std::nullopt;
 
 	auto posDelta = ent->getEyePos() - game::localPlayer->getEyePos();
 	/*Vector idealAimAngle = math::vectorToAngle(posDelta);
@@ -52,13 +51,39 @@ std::pair<bool, bool> EnemyWarning::check(Player_t* ent)
 
 	bool checkAim = trace.m_hitgroup != 0;
 
-	return { check, checkAim };
+	return std::pair{ check, checkAim };
 }
 
-void EnemyWarning::draw(const std::pair<bool, bool>& checks)
+void enemyWarning::think(Player_t* ent)
 {
-	if(checks.first) // trace
+	if (!vars::misc->aimWarn->enabled)
+		return;
+
+	spottedEnts.at(ent->getIndex()) = check(ent);
+}
+
+void enemyWarning::draw()
+{
+	if (!vars::misc->aimWarn->enabled)
+		return;
+
+	bool visible{ false };
+	bool aiming{ false };
+	for (const auto& spot : spottedEnts)
+	{
+		if (spot.has_value())
+		{
+			const auto [vis, aim] = spot.value();
+			if (vis)
+				visible = true;
+
+			if (aiming)
+				aiming = true;
+		}
+	}
+
+	if(visible)
 		ImRender::text(globals::screenX / 2.0f, 60.0f, ImRender::fonts::tahoma14, "Enemy can see you", true, Colors::Green);
-	if(checks.second) // dynamic fov
+	if(aiming)
 		ImRender::text(globals::screenX / 2.0f, 80.0f, ImRender::fonts::tahoma14, "Enemy is aiming you", true, Colors::Red);
 }

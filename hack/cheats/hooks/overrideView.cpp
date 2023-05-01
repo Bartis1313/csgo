@@ -1,6 +1,5 @@
-#include "hooks.hpp"
+#include "overrideView.hpp"
 
-#include "../classes/overrideView.hpp"
 
 #include <SDK/CViewSetup.hpp>
 #include <SDK/structs/Entity.hpp>
@@ -9,7 +8,7 @@
 #include <cheats/game/game.hpp>
 #include <config/vars.hpp>
 
-hooks::overrideView::value FASTCALL hooks::overrideView::hooked(FAST_ARGS, CViewSetup* view)
+hooks::OverrideView::value hooks::OverrideView::hook(FAST_ARGS, CViewSetup* view)
 {	
 	if(!game::isAvailable())
 		return original(thisptr, view);
@@ -19,7 +18,7 @@ hooks::overrideView::value FASTCALL hooks::overrideView::hooked(FAST_ARGS, CView
 			view->m_fov += fov;
 
 	globals::FOV = view->m_fov;
-	OverrideViewType::runAll(view);
+	Storage::runs.run(view);
 
 	original(thisptr, view);
 }

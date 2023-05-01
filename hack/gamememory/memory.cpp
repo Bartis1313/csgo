@@ -202,6 +202,8 @@ void memory::init()
 	setAbsVelocity = setAbsVelocity.scan(CLIENT_DLL, SET_ABS_VELOCITY);
 	firstMoveChild = firstMoveChild.scan(CLIENT_DLL, FIRST_MOVE_CHILD).add(0x2).deRef();
 	nextMovePeer = nextMovePeer.scan(CLIENT_DLL, NEXT_PEER).add(0x2).deRef();
+	getParticleSystemIndex = getParticleSystemIndex.scan(CLIENT_DLL, GET_PARTICLE_SYSTEM_IDX);
+	dispatchParticleEffect = dispatchParticleEffect.scan(CLIENT_DLL, DISPATCH_PARTICLE_EFFECT);
 
 	// HOOKS
 

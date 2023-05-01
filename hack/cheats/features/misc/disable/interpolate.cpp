@@ -4,24 +4,37 @@
 #include <cheats/features/cache/cache.hpp>
 #include <config/vars.hpp>
 
-void Interpolate::run(int frame)
+#include <cheats/hooks/frameStageNotify.hpp>
+
+namespace
+{
+	struct InterpolateHandler : hooks::FrameStageNotify
+	{
+		InterpolateHandler()
+		{
+			this->registerRun(interpolate::run);
+		}
+	} interpolateHandler;
+}
+
+void interpolate::run(FrameStage stage)
 {
 	if (!vars::misc->disableItems->interpolate)
 		return;
 
-	if (frame != FRAME_NET_UPDATE_POSTDATAUPDATE_END)
+	if (stage != FRAME_NET_UPDATE_POSTDATAUPDATE_END)
 		return;
 
-	for (auto [ent, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
+	for (const auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
-		const auto entity = reinterpret_cast<Player_t*>(ent);
-		const auto map = entity->getVarMap();
+		const auto player = entity->cast<Player_t*>();
+		const auto map = player->getVarMap();
 		if (!map)
 			continue;
 
-		for (auto i : std::views::iota(0, map->m_interpolatedEntries))
+		for (int i = 0; i < map->m_interpolatedEntries; ++i)
 		{
-			auto entry = &map->m_Entries[i];
+			const auto entry = &map->m_Entries[i];
 			entry->m_needsToInterpolate = false;
 		}
 	}

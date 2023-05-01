@@ -6,36 +6,38 @@
 #include <cheats/game/globals.hpp>
 #include <config/vars.hpp>
 
-void ToneController::run(int frame)
+#include <cheats/hooks/frameStageNotify.hpp>
+
+namespace
 {
-	if (frame != FRAME_RENDER_START)
+	struct ToneHandler : hooks::FrameStageNotify
+	{
+		ToneHandler()
+		{
+			this->registerRun(toneController::run);
+			this->registerShutdown(toneController::shutdown);
+		}
+	} toneHandler;
+}
+
+namespace toneController
+{
+	EnvTonemapController_t* ent;
+}
+
+void toneController::run(FrameStage stage)
+{
+	if (stage != FRAME_RENDER_START)
 		return;
 
 	if (!game::isAvailable())
 		return;
 
-	const auto ent = memory::interfaces::toneController();
+	ent = memory::interfaces::toneController();
 	const bool isOn = ent->m_bUseCustomAutoExposureMin() || ent->m_bUseCustomAutoExposureMax();
 
 	if (!ent) // not all maps support it by default
 		return;
-
-	auto resetTone = [ent]()
-	{
-		ent->m_bUseCustomAutoExposureMin() = false;
-		ent->m_bUseCustomAutoExposureMax() = false;
-		ent->m_bUseCustomBloomScale() = false;
-		ent->m_flCustomAutoExposureMin() = 0.0f;
-		ent->m_flCustomAutoExposureMax() = 0.0f;
-		ent->m_flCustomBloomScale() = 0.0f;
-	};
-
-	if (globals::isShutdown)
-	{
-		resetTone();
-
-		return;
-	}
 
 	if (bool cfg = vars::visuals->world->tone->enabled; cfg)
 	{
@@ -48,6 +50,19 @@ void ToneController::run(int frame)
 	}
 	else if (!cfg)
 	{
-		resetTone();
+		shutdown();
 	}
+}
+
+void toneController::shutdown()
+{
+	if (!ent)
+		return;
+
+	ent->m_bUseCustomAutoExposureMin() = false;
+	ent->m_bUseCustomAutoExposureMax() = false;
+	ent->m_bUseCustomBloomScale() = false;
+	ent->m_flCustomAutoExposureMin() = 0.0f;
+	ent->m_flCustomAutoExposureMax() = 0.0f;
+	ent->m_flCustomBloomScale() = 0.0f;
 }

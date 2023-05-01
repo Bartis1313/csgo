@@ -13,10 +13,10 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
 
         globals::instance = instance;
 
-        if (auto initThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(Setup::init), instance, NULL, nullptr))
+        if (auto initThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::init), instance, NULL, nullptr))
             LI_FN(CloseHandle)(initThread);
 
-        if (auto looperThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(Setup::looper), instance, NULL, nullptr))
+        if (auto looperThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::looper), instance, NULL, nullptr))
             LI_FN(CloseHandle)(looperThread);
 
         return TRUE;
@@ -25,7 +25,7 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
     {
         if (!globals::isShutdown) // then panic key forced shutdown
         {
-            if (auto shutdownThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(Setup::shutdown), instance, NULL, nullptr))
+            if (auto shutdownThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::shutdown), instance, NULL, nullptr))
                 LI_FN(CloseHandle)(shutdownThread);
         }
     }

@@ -11,24 +11,47 @@
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/rand.hpp>
 
+#include <cheats/hooks/createMove.hpp>
+
+namespace
+{
+	struct MovementHander : hooks::CreateMove
+	{
+		MovementHander()
+		{
+			this->registerInit(movement::init);
+			this->registerRunPrePrediction(movement::run);
+		}
+	} movementHandler;
+}
+
 enum movetypes
 {
 	NOCLIP = 8,
 	LADDER = 9
 };
 
-void Movement::init()
+namespace movement
 {
-	m_sideSpeed = memory::interfaces::cvar->findVar("cl_sidespeed");
+	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/333797-humanised-bhop.html
+	void bunnyhop(CUserCmd* cmd);
+	void strafe(CUserCmd* cmd);
+
+	IConVar* sideSpeed{ };
 }
 
-void Movement::run(CUserCmd* cmd)
+void movement::init()
+{
+	sideSpeed = memory::interfaces::cvar->findVar("cl_sidespeed");
+}
+
+void movement::run(CUserCmd* cmd)
 {
 	bunnyhop(cmd);
 	strafe(cmd);
 }
 
-void Movement::bunnyhop(CUserCmd* cmd)
+void movement::bunnyhop(CUserCmd* cmd)
 {
 	if (!vars::misc->bunnyHop->enabled)
 		return;
@@ -72,7 +95,7 @@ void Movement::bunnyhop(CUserCmd* cmd)
 	}
 }
 
-void Movement::strafe(CUserCmd* cmd)
+void movement::strafe(CUserCmd* cmd)
 {
 	const int mode = vars::misc->bunnyHop->indexStrafe;
 	if (mode == E2T(MovementStraferMode::OFF))
@@ -97,7 +120,7 @@ void Movement::strafe(CUserCmd* cmd)
 	case E2T(MovementStraferMode::SIDESPEED):
 	{
 		if (inAir)
-			cmd->m_sidemove = cmd->m_mousedx > 1 ? m_sideSpeed->getFloat() : -m_sideSpeed->getFloat();
+			cmd->m_sidemove = cmd->m_mousedx > 1 ? sideSpeed->getFloat() : -sideSpeed->getFloat();
 
 		break;
 	}
@@ -116,7 +139,7 @@ void Movement::strafe(CUserCmd* cmd)
 			// https://www.quakeworld.nu/wiki/QW_physics_air
 			const float idealAngle = std::clamp(math::RAD2DEG(std::asin(30.0f / speed) * 0.5f), 0.0f, 45.0f);
 			const float side = cmd->m_commandNumber % 2 ? 1.0f : -1.0f; // or use static -/+
-			rotateStrafe((idealAngle - 90.0f) * side, m_sideSpeed->getFloat());
+			rotateStrafe((idealAngle - 90.0f) * side, sideSpeed->getFloat());
 		}
 
 		break;
@@ -169,8 +192,8 @@ void Movement::strafe(CUserCmd* cmd)
 				const float delta = deltaAngle(velocityDirection, bestAngleMove);
 				const float finalMove = delta < 0.0f ? velocityDirection + deltaAir : velocityDirection - deltaAir;
 
-				cmd->m_forwardmove = std::cos(finalMove) * m_sideSpeed->getFloat();
-				cmd->m_sidemove = -std::sin(finalMove) * m_sideSpeed->getFloat();
+				cmd->m_forwardmove = std::cos(finalMove) * sideSpeed->getFloat();
+				cmd->m_sidemove = -std::sin(finalMove) * sideSpeed->getFloat();
 			}
 		}
 
@@ -179,7 +202,7 @@ void Movement::strafe(CUserCmd* cmd)
 	}
 }
 
-void MovementFix::run(CUserCmd* cmd, const Vec3& oldAngle)
+void movement::fixMovement(CUserCmd* cmd, const Vec3& oldAngle)
 {
 	const Vec3 angle = Vec3{ 0.0f, oldAngle[1], 0.0f };
 	auto [forward, right, up] = math::angleVectors(angle);

@@ -16,7 +16,38 @@
 #include <utilities/console/console.hpp>
 #include <gamememory/memory.hpp>
 
-void MotionBlur::initMaterials()
+#include <cheats/hooks/overrideView.hpp>
+
+namespace
+{
+	struct MotionHandler : hooks::OverrideView
+	{
+		MotionHandler()
+		{
+			this->registerRun(motionBlur::run);
+		}
+	} motionHandler;
+}
+
+namespace motionBlur
+{
+	struct MotionBlurHistory_t
+	{
+		float lastTimeUpdate{ };
+		float previousPitch{ };
+		float previousYaw{ };
+		Vec3 previousPositon{ };
+		float noRotationalMotionBlurUntil{ };
+	} motionHistory;
+
+	IMaterial* motion_blur;
+	ITexture* _rt_FullFrameFB;
+
+	std::array motionBlurValues{ 0.0f, 0.0f, 0.0f, 0.0f };
+	std::array motionBlurViewportValues{ 0.0f, 0.0f, 0.0f, 0.0f };
+}
+
+void motionBlur::initMaterials()
 {
 	motion_blur = memory::interfaces::matSys->findMaterial("dev/motion_blur", TEXTURE_GROUP_RENDER_TARGET, false);
 	_rt_FullFrameFB = memory::interfaces::matSys->findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
@@ -24,7 +55,7 @@ void MotionBlur::initMaterials()
 
 // 1:1 from https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/viewpostprocess.cpp#L2996
 // with small reduce of code because we dont care for portal/ps3 stuff and also we dont care for detecting blur, but knowing it's enabled
-void MotionBlur::run(CViewSetup* view)
+void motionBlur::run(CViewSetup* view)
 {
 	if (!vars::misc->motionBlur->enabled)
 		return;
@@ -50,7 +81,7 @@ void MotionBlur::run(CViewSetup* view)
 
 	if (view)
 	{
-		float timeElapsed = memory::interfaces::globalVars->m_realtime - m_motionHistory.m_lastTimeUpdate;
+		float timeElapsed = memory::interfaces::globalVars->m_realtime - motionHistory.lastTimeUpdate;
 
 		float currentPitch = view->m_angles[Coord::X];
 		while (currentPitch > 180.0f)
@@ -67,19 +98,19 @@ void MotionBlur::run(CViewSetup* view)
 		auto [currentForwardVec, currentSideVec, uselessVec ] = math::angleVectors(view->m_angles);
 
 		Vec3 currentPosition = view->m_origin;
-		Vec3 positionChange = m_motionHistory.m_previousPositon - currentPosition;
+		Vec3 positionChange = motionHistory.previousPositon - currentPosition;
 
 		if ((positionChange.length() > 30.0f) && (timeElapsed >= 0.5f))
 		{
-			resetArr(m_motionBlurValues, m_motionBlurValues.size());
+			resetArr(motionBlurValues, motionBlurValues.size());
 		}
 		else if (timeElapsed > (1.0f / 15.0f))
 		{
-			resetArr(m_motionBlurValues, m_motionBlurValues.size());
+			resetArr(motionBlurValues, motionBlurValues.size());
 		}
 		else if (positionChange.length() > 50.0f)
 		{
-			m_motionHistory.m_noRotationalMotionBlurUntil = memory::interfaces::globalVars->m_realtime + 1.0f;
+			motionHistory.noRotationalMotionBlurUntil = memory::interfaces::globalVars->m_realtime + 1.0f;
 		}
 		else
 		{
@@ -88,15 +119,15 @@ void MotionBlur::run(CViewSetup* view)
 			const float viewDotMotion = currentForwardVec.dot(positionChange);
 
 			if (vars::misc->motionBlur->forward)
-				m_motionBlurValues[2] = viewDotMotion;
+				motionBlurValues[2] = viewDotMotion;
 			else
-				m_motionBlurValues[2] = viewDotMotion * std::abs(currentForwardVec[2]);
+				motionBlurValues[2] = viewDotMotion * std::abs(currentForwardVec[2]);
 
 			const float sideDotMotion = currentSideVec.dot(positionChange);
-			float yawDiffOriginal = m_motionHistory.m_previousYaw - currentYaw;
-			if (((m_motionHistory.m_previousYaw - currentYaw > 180.0f) || (m_motionHistory.m_previousYaw - currentYaw < -180.0f)) &&
-				((m_motionHistory.m_previousYaw + currentYaw > -180.0f) && (m_motionHistory.m_previousYaw + currentYaw < 180.0f)))
-				yawDiffOriginal = m_motionHistory.m_previousYaw + currentYaw;
+			float yawDiffOriginal = motionHistory.previousYaw - currentYaw;
+			if (((motionHistory.previousYaw - currentYaw > 180.0f) || (motionHistory.previousYaw - currentYaw < -180.0f)) &&
+				((motionHistory.previousYaw + currentYaw > -180.0f) && (motionHistory.previousYaw + currentYaw < 180.0f)))
+				yawDiffOriginal = motionHistory.previousYaw + currentYaw;
 
 			float yawDiffAdjusted = yawDiffOriginal + (sideDotMotion / 3.0f);
 
@@ -106,10 +137,10 @@ void MotionBlur::run(CViewSetup* view)
 				yawDiffAdjusted = std::clamp(yawDiffAdjusted, 0.0f, yawDiffOriginal);
 
 			const float undampenedYaw = yawDiffAdjusted / horizontalFov;
-			m_motionBlurValues[0] = undampenedYaw * (1.0f - (std::abs(currentPitch) / 90.0f));
+			motionBlurValues[0] = undampenedYaw * (1.0f - (std::abs(currentPitch) / 90.0f));
 
 			const float pitchCompensateMask = 1.0f - ((1.0f - std::abs(currentForwardVec[2])) * (1.0f - std::abs(currentForwardVec[2])));
-			const float pitchDiffOriginal = m_motionHistory.m_previousPitch - currentPitch;
+			const float pitchDiffOriginal = motionHistory.previousPitch - currentPitch;
 			float pitchdiffAdjusted = pitchDiffOriginal;
 
 			if (currentPitch > 0.0f)
@@ -122,47 +153,47 @@ void MotionBlur::run(CViewSetup* view)
 			else
 				pitchdiffAdjusted = std::clamp(pitchdiffAdjusted, 0.0f, pitchDiffOriginal);
 
-			m_motionBlurValues[1] = pitchdiffAdjusted / verticalFov;
-			m_motionBlurValues[3] = undampenedYaw;
-			m_motionBlurValues[3] *= (std::abs(currentPitch) / 90.0f) * (std::abs(currentPitch) / 90.0f) * (std::abs(currentPitch) / 90.0f);
+			motionBlurValues[1] = pitchdiffAdjusted / verticalFov;
+			motionBlurValues[3] = undampenedYaw;
+			motionBlurValues[3] *= (std::abs(currentPitch) / 90.0f) * (std::abs(currentPitch) / 90.0f) * (std::abs(currentPitch) / 90.0f);
 
 			if (timeElapsed > 0.0f)
-				m_motionBlurValues[2] /= timeElapsed * 30.0f;
+				motionBlurValues[2] /= timeElapsed * 30.0f;
 			else
-				m_motionBlurValues[2] = 0.0f;
+				motionBlurValues[2] = 0.0f;
 
-			m_motionBlurValues[2] = std::clamp((std::abs(m_motionBlurValues[2]) - vars::misc->motionBlur->fallingMin) / (vars::misc->motionBlur->fallingMax - vars::misc->motionBlur->fallingMin),
-				0.0f, 1.0f) * (m_motionBlurValues[2] >= 0.0f ? 1.0f : -1.0f);
-			m_motionBlurValues[2] /= 30.0f;
-			m_motionBlurValues[0] *= vars::misc->motionBlur->rotationIntensity * vars::misc->motionBlur->strength;
-			m_motionBlurValues[1] *= vars::misc->motionBlur->rotationIntensity * vars::misc->motionBlur->strength;
-			m_motionBlurValues[2] *= vars::misc->motionBlur->fallingIntensity * vars::misc->motionBlur->strength;
-			m_motionBlurValues[3] *= vars::misc->motionBlur->rollIntensity * vars::misc->motionBlur->strength;
+			motionBlurValues[2] = std::clamp((std::abs(motionBlurValues[2]) - vars::misc->motionBlur->fallingMin) / (vars::misc->motionBlur->fallingMax - vars::misc->motionBlur->fallingMin),
+				0.0f, 1.0f) * (motionBlurValues[2] >= 0.0f ? 1.0f : -1.0f);
+			motionBlurValues[2] /= 30.0f;
+			motionBlurValues[0] *= vars::misc->motionBlur->rotationIntensity * vars::misc->motionBlur->strength;
+			motionBlurValues[1] *= vars::misc->motionBlur->rotationIntensity * vars::misc->motionBlur->strength;
+			motionBlurValues[2] *= vars::misc->motionBlur->fallingIntensity * vars::misc->motionBlur->strength;
+			motionBlurValues[3] *= vars::misc->motionBlur->rollIntensity * vars::misc->motionBlur->strength;
 
 			float slowFps = 30.0f;
 			float fastFps = 50.0f;
 			float currentFps = (timeElapsed > 0.0f) ? (1.0f / timeElapsed) : 0.0f;
 			float dumpenFactor = std::clamp(((currentFps - slowFps) / (fastFps - slowFps)), 0.0f, 1.0f);
 
-			m_motionBlurValues[0] *= dumpenFactor;
-			m_motionBlurValues[1] *= dumpenFactor;
-			m_motionBlurValues[2] *= dumpenFactor;
-			m_motionBlurValues[3] *= dumpenFactor;
+			motionBlurValues[0] *= dumpenFactor;
+			motionBlurValues[1] *= dumpenFactor;
+			motionBlurValues[2] *= dumpenFactor;
+			motionBlurValues[3] *= dumpenFactor;
 		}
 
-		if (memory::interfaces::globalVars->m_realtime < m_motionHistory.m_noRotationalMotionBlurUntil)
+		if (memory::interfaces::globalVars->m_realtime < motionHistory.noRotationalMotionBlurUntil)
 		{
-			resetArr(m_motionBlurValues, 3);
+			resetArr(motionBlurValues, 3);
 		}
 		else
 		{
-			m_motionHistory.m_noRotationalMotionBlurUntil = 0.0f;
+			motionHistory.noRotationalMotionBlurUntil = 0.0f;
 		}
 
-		m_motionHistory.m_previousPositon = currentPosition;
-		m_motionHistory.m_previousPitch = currentPitch;
-		m_motionHistory.m_previousYaw = currentYaw;
-		m_motionHistory.m_lastTimeUpdate = memory::interfaces::globalVars->m_realtime;
+		motionHistory.previousPositon = currentPosition;
+		motionHistory.previousPitch = currentPitch;
+		motionHistory.previousYaw = currentYaw;
+		motionHistory.lastTimeUpdate = memory::interfaces::globalVars->m_realtime;
 
 		int x = view->x;
 		int y = view->y;
@@ -173,18 +204,18 @@ void MotionBlur::run(CViewSetup* view)
 		float srcHeight = static_cast<float>(_rt_FullFrameFB->getActualHeight());
 		int offset;
 		offset = (x > 0) ? 1 : 0;
-		m_motionBlurViewportValues[0] = static_cast<float>(x + offset) / (srcWidth - 1);
+		motionBlurViewportValues[0] = static_cast<float>(x + offset) / (srcWidth - 1);
 
 		offset = (x < (srcWidth - 1)) ? -1 : 0;
-		m_motionBlurViewportValues[3] = static_cast<float>(x + w + offset) / (srcWidth - 1);
+		motionBlurViewportValues[3] = static_cast<float>(x + w + offset) / (srcWidth - 1);
 
 		offset = (y > 0) ? 1 : 0;
-		m_motionBlurViewportValues[1] = static_cast<float>(y + offset) / (srcHeight - 1);
+		motionBlurViewportValues[1] = static_cast<float>(y + offset) / (srcHeight - 1);
 
 		offset = (y < (srcHeight - 1)) ? -1 : 0;
-		m_motionBlurViewportValues[2] = static_cast<float>(y + h + offset) / (srcHeight - 1);
+		motionBlurViewportValues[2] = static_cast<float>(y + h + offset) / (srcHeight - 1);
 
-		for (auto& el : m_motionBlurViewportValues)
+		for (auto& el : motionBlurViewportValues)
 		{
 			if (el <= 0.0f)
 				el = -1.0f;
@@ -194,14 +225,14 @@ void MotionBlur::run(CViewSetup* view)
 	}
 }
 
-void MotionBlur::drawBlur()
+void motionBlur::drawBlur()
 {
 	IMaterialVar* MotionBlurInternal = motion_blur->findVar("$MotionBlurInternal", nullptr, false);
 
-	MotionBlurInternal->setVectorComponent(m_motionBlurValues[0], 0);
-	MotionBlurInternal->setVectorComponent(m_motionBlurValues[1], 1);
-	MotionBlurInternal->setVectorComponent(m_motionBlurValues[2], 2);
-	MotionBlurInternal->setVectorComponent(m_motionBlurValues[3], 3);
+	MotionBlurInternal->setVectorComponent(motionBlurValues[0], 0);
+	MotionBlurInternal->setVectorComponent(motionBlurValues[1], 1);
+	MotionBlurInternal->setVectorComponent(motionBlurValues[2], 2);
+	MotionBlurInternal->setVectorComponent(motionBlurValues[3], 3);
 
 	// todo: find easiest way to trick the game we run motion blur, (easiest and best way - mempatch correct bytes)
 
@@ -211,16 +242,16 @@ void MotionBlur::drawBlur()
 
 	IMaterialVar* MotionBlurViewPortInternal = motion_blur->findVar("$MotionBlurViewportInternal", nullptr, false);
 
-	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[0], 0);
-	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[1], 1);
-	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[2], 2);
-	MotionBlurViewPortInternal->setVectorComponent(m_motionBlurViewportValues[3], 3);
+	MotionBlurViewPortInternal->setVectorComponent(motionBlurViewportValues[0], 0);
+	MotionBlurViewPortInternal->setVectorComponent(motionBlurViewportValues[1], 1);
+	MotionBlurViewPortInternal->setVectorComponent(motionBlurViewportValues[2], 2);
+	MotionBlurViewPortInternal->setVectorComponent(motionBlurViewportValues[3], 3);
 
 	auto ctx = memory::interfaces::matSys->getRenderContext();
 	ctx->drawScreenEffectMaterial(motion_blur);
 }
 
-void MotionBlur::render()
+void motionBlur::render()
 {
 	INIT_MATERIALS_ONCE(initMaterials);
 

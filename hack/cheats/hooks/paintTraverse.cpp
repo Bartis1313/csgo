@@ -1,17 +1,12 @@
-#include "hooks.hpp"
+#include "paintTraverse.hpp"
 
-#include "../classes/renderableToSurface.hpp"
+#include <render/render.hpp>
+#include <gamememory/memory.hpp>
 
 #include <SDK/IVEngineClient.hpp>
-#include <SDK/IPanel.hpp>
 #include <SDK/ISurface.hpp>
+#include <SDK/IPanel.hpp>
 #include <SDK/interfaces/interfaces.hpp>
-#include <cheats/game/globals.hpp>
-#include <config/vars.hpp>
-#include <render/render.hpp>
-#include <menu/x88Menu/x88menu.hpp>
-#include <utilities/res.hpp>
-#include <utilities/tools/tools.hpp>
 
 static void getScreen()
 {
@@ -29,7 +24,7 @@ static void getMouse()
 	globals::mouseY = y;
 }
 
-hooks::paintTraverse::value FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, unsigned int panel, bool forceRepaint, bool allowForce)
+hooks::PaintTraverse::value hooks::PaintTraverse::hook(FAST_ARGS, uint32_t panel, bool forceRepaint, bool allowForce)
 {
 	getScreen();
 	getMouse();
@@ -39,23 +34,9 @@ hooks::paintTraverse::value FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, uns
 
 	const std::string_view panelName = memory::interfaces::panel->getName(panel);
 
-	static unsigned int panelScope = 0;
-	static unsigned int panelID = 0;
-
-	if (!panelScope)
-	{
-		if (panelName == "HudZoom")
-			panelScope = panel;
-	}
-	else if (panelScope == panel)
-	{
-		if (memory::interfaces::engine->isInGame() && vars::misc->scope->enabled)
-			return;
-	}
+	static uint32_t panelID = 0;
 
 	original(thisptr, panel, forceRepaint, allowForce);
-
-	//static Resource res{ IDB_PNG1, "PNG" };
 
 	if (!panelID)
 	{
@@ -64,6 +45,8 @@ hooks::paintTraverse::value FASTCALL hooks::paintTraverse::hooked(FAST_ARGS, uns
 	}
 	else if (panelID == panel)
 	{
-		ImRender::think();
+		ImRender::beginThink();
+		Storage::runs.run();
+		ImRender::endThink();
 	}
 }

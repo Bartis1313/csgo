@@ -11,12 +11,34 @@
 #include <utilities/math/math.hpp>
 #include <config/vars.hpp>
 
-void Thirdperson::updateKeys()
+#include <cheats/hooks/overrideView.hpp>
+#include <cheats/hooks/wndproc.hpp>
+
+namespace
+{
+	struct ThirdpersonView : hooks::OverrideView
+	{
+		ThirdpersonView()
+		{
+			this->registerRun(thirdperson::run);
+		}
+	} thispersonView;
+
+	struct ThirdpersonKeys : hooks::wndProcSys
+	{
+		ThirdpersonKeys()
+		{
+			this->registerRun(thirdperson::updateKeys);
+		}
+	} thirpersonKeys;
+}
+
+void thirdperson::updateKeys()
 {
 	vars::keys->thirdP.update();
 }
 
-void Thirdperson::run(CViewSetup* view)
+void thirdperson::run(CViewSetup* view)
 {
 	if (!vars::misc->thirdp->enabled)
 		return;

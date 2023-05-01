@@ -1,5 +1,6 @@
 #include "prediction.hpp"
 
+#include <SDK/IPrediction.hpp>
 #include <SDK/CGameMovement.hpp>
 #include <SDK/CUserCmd.hpp>
 #include <SDK/CGlobalVars.hpp>
@@ -12,17 +13,51 @@
 #include <cheats/game/game.hpp>
 #include <gamememory/memory.hpp>
 
+#include <cheats/hooks/createMove.hpp>
+
 #include <mutex>
 
-void Prediction::init()
+namespace
 {
-	m_predicionRandomSeed = memory::predictionSeed();
-	m_data = memory::predictionData();
-	m_player = memory::predictedPlayer();
+	struct PredictionInit : hooks::CreateMove
+	{
+		PredictionInit()
+		{
+			this->registerInit(prediction::init);
+		}
+	} preidictionInit;
+}
+
+namespace prediction
+{
+	struct PredictionCache
+	{
+		bool isInPrediction;
+		bool isFirstTimePredicted;
+		float curTime;
+		float frameTime;
+		int tick;
+		float weaponPenalty;
+		float recoilIndex;
+	} cache;
+
+	uintptr_t* predictionRandomSeed;
+	CMoveData* data;
+	Player_t** player;
+
+	void update();
+	void end();
+}
+
+void prediction::init()
+{
+	predictionRandomSeed = memory::predictionSeed();
+	data = memory::predictionData();
+	player = memory::predictedPlayer();
 }
 
 // 55 8B EC 83 E4 C0 83 EC 34 53 56 8B 75 08
-void Prediction::start(CUserCmd* cmd)
+void prediction::begin(CUserCmd* cmd)
 {
 	if (!game::localPlayer)
 		return;
@@ -32,8 +67,8 @@ void Prediction::start(CUserCmd* cmd)
 	*game::localPlayer->m_pCurrentCommand() = cmd;
 	game::localPlayer->m_LastCmd() = *cmd;
 
-	*m_predicionRandomSeed = cmd->m_randomSeed;
-	*m_player = game::localPlayer();
+	*predictionRandomSeed = cmd->m_randomSeed;
+	*player = game::localPlayer();
 
 	// backup pre-prediction
 	cache = PredictionCache
@@ -109,12 +144,12 @@ void Prediction::start(CUserCmd* cmd)
 	}
 
 	memory::interfaces::moveHelper->setHost(game::localPlayer());
-	memory::interfaces::prediction->setupMove(game::localPlayer(), cmd, memory::interfaces::moveHelper(), m_data);
+	memory::interfaces::prediction->setupMove(game::localPlayer(), cmd, memory::interfaces::moveHelper(), data);
 	if (!veh)
-		memory::interfaces::gameMovement->processMovement(game::localPlayer(), m_data);
+		memory::interfaces::gameMovement->processMovement(game::localPlayer(), data);
 	else
-		game::localPlayer->processMovement(veh, game::localPlayer(), m_data);
-	memory::interfaces::prediction->finishMove(game::localPlayer(), cmd, m_data);
+		game::localPlayer->processMovement(veh, game::localPlayer(), data);
+	memory::interfaces::prediction->finishMove(game::localPlayer(), cmd, data);
 	memory::interfaces::moveHelper->processImpacts();
 	//game::localPlayer->m_vecAbsVelocity() = m_data->m_velocity;
 	//game::localPlayer->setAbsOrigin(game::localPlayer->m_vecNetworkOrigin());
@@ -130,7 +165,7 @@ void Prediction::start(CUserCmd* cmd)
 	memory::interfaces::prediction->m_firstTimePredicted = cache.isFirstTimePredicted;
 }
 
-void Prediction::end()
+void prediction::end()
 {
 	if (!game::localPlayer)
 		return;
@@ -138,8 +173,8 @@ void Prediction::end()
 	memory::interfaces::gameMovement->finishTrackPredictionErrors(game::localPlayer());
 	memory::interfaces::moveHelper->setHost(nullptr);
 
-	*m_predicionRandomSeed = -1;
-	*m_player = nullptr;
+	*predictionRandomSeed = -1;
+	*player = nullptr;
 	*game::localPlayer->m_pCurrentCommand() = nullptr;
 
 	memory::interfaces::globalVars->m_curtime = cache.curTime;
@@ -160,14 +195,7 @@ void Prediction::end()
 	//game::localPlayer->restoreData("Prediction::postEnd", 1313, PC_EVERYTHING);
 }
 
-void Prediction::addToPrediction(CUserCmd* cmd, const std::function<void()>& fun)
-{
-	start(cmd);
-	fun();
-	end();
-}
-
-void Prediction::patchDatamap()
+void prediction::patchDatamap()
 {
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/564094-guwop-prediction-datamap-variable-fix.html
 	const auto map = game::localPlayer->getPredictionDataMap();
@@ -198,7 +226,7 @@ void Prediction::patchDatamap()
 	//memory::interfaces::prediction->reinitPredictables();
 }
 
-void Prediction::update()
+void prediction::update()
 {
 	const static auto state = memory::interfaces::clientState;
 	// https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/engine/cl_pred.cpp#L64

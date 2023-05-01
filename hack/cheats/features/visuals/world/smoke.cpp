@@ -14,7 +14,20 @@
 #include <utilities/math/math.hpp>
 #include <gamememory/memory.hpp>
 
-void SmokeDraw::draw()
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct SmokeHandler : hooks::PaintTraverse
+	{
+		SmokeHandler()
+		{
+			this->registerRender(smoke::draw);
+		}
+	} smokeHandler;
+}
+
+void smoke::draw()
 {
 	if (!vars::visuals->world->smoke->enabled)
 		return;
@@ -50,7 +63,7 @@ void SmokeDraw::draw()
 	}
 }
 
-void SmokeDraw::drawCustomSmokeEffect(const Vec3& pos, float radius)
+void drawCustomSmokeEffect(const Vec3& pos, float radius)
 {
 	// clockwise for better effect
 	Vec3 end = Vec3
@@ -61,16 +74,4 @@ void SmokeDraw::drawCustomSmokeEffect(const Vec3& pos, float radius)
 	};
 
 	memory::interfaces::effects->smoke(end, -1, 5.0f, 1.0f);
-}
-
-void SmokeRemoval::run(int frame)
-{
-	if (frame != FRAME_RENDER_START)
-		return;
-
-	if (!game::localPlayer)
-		return;
-
-	if (vars::visuals->world->smoke->enabled) // remove effects from inside, this is why we nulling smoke count
-		*reinterpret_cast<uintptr_t*>(memory::smokeCount()) = 0;
 }

@@ -30,16 +30,70 @@
 
 #include <ranges>
 
-void PlayerVisuals::draw()
+#include <cheats/hooks/paintTraverse.hpp>
+#include <cheats/hooks/unkownRoundEnd.hpp>
+
+namespace
+{
+	struct PlayerVisualsHandler : hooks::PaintTraverse
+	{
+		PlayerVisualsHandler()
+		{
+			this->registerRender(playerVisuals::draw);
+		}
+	} playerVisualsHandler;
+
+	struct PlayerVisualsReset : hooks::UnknownRoundEnd
+	{
+		PlayerVisualsReset()
+		{
+			this->registerRun(playerVisuals::roundRestart);
+		}
+	} playerVisualsReset;
+}
+
+namespace playerVisuals
+{
+	void drawInfo(Player_t* ent, const Box& box);
+	void drawnName(Player_t* ent, const Box& box);
+	void drawPlayer(Player_t* ent);
+	void runDLight(Player_t* ent);
+	void drawHealth(Player_t* ent, const Box& box);
+	void drawArmor(Player_t* ent, const Box& box);
+	void drawWeapon(Player_t* ent, const Box& box);
+	void drawSkeleton(Player_t* ent);
+	void drawSnapLine(Player_t* ent, const Box& box);
+	void drawLaser(Player_t* ent);
+	void updateDormacy(Player_t* ent);
+
+	std::array<float, 65> m_health;
+	std::array<float, 65> m_armor;
+
+	struct DormacyInfo_t
+	{
+		float m_alpha;
+		Vec3 m_lastPos;
+		float m_lastUpdate;
+		bool m_calledEvent;
+
+		bool isValid() const;
+	};
+
+	// for everything except boxes
+	std::array<DormacyInfo_t, 65> m_dormant;
+	std::array<float, 65> m_boxAlpha;
+
+	bool m_calledEvent; // for dormacy resets
+}
+
+void playerVisuals::draw()
 {
 	if (!game::isAvailable())
 		return;
 
 	bool drawDead = vars::visuals->esp->checks->dead;
+	bool isFlashOk{ true };
 
-	std::pair<bool, bool> warnChecks = { false, false };
-
-	bool isFlashOk = true;
 	if (game::localPlayer->m_flFlashDuration() > 0.0f)
 	{
 		if (game::localPlayer->m_flFlashBangTime() >= vars::visuals->esp->checks->flashLimit)
@@ -89,6 +143,7 @@ void PlayerVisuals::draw()
 			runDLight(ent);
 			drawLaser(ent);
 			SoundDraw::findBest(ent);
+			enemyWarning::think(ent);
 		};
 
 		if (drawDead)
@@ -98,14 +153,12 @@ void PlayerVisuals::draw()
 		}
 		else
 			runFeatures();
-
-		warnChecks = g_EnemyWarning->check(ent);
 	}
 	SoundDraw::draw();
-	g_EnemyWarning->draw(warnChecks);
+	enemyWarning::draw();
 }
 
-void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
+void playerVisuals::drawHealth(Player_t* ent, const Box& box)
 {
 	if (!vars::visuals->esp->healthBar->enabled)
 		return;
@@ -147,7 +200,7 @@ void PlayerVisuals::drawHealth(Player_t* ent, const Box& box)
 	}
 }
 
-void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
+void playerVisuals::drawArmor(Player_t* ent, const Box& box)
 {
 	if (!vars::visuals->esp->armorBar->enabled)
 		return;
@@ -184,7 +237,7 @@ void PlayerVisuals::drawArmor(Player_t* ent, const Box& box)
 
 #include <SDK/ILocalize.hpp>
 
-void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
+void playerVisuals::drawWeapon(Player_t* ent, const Box& box)
 {
 	if (!vars::visuals->esp->weaponBar->enabled)
 		return;
@@ -231,7 +284,7 @@ void PlayerVisuals::drawWeapon(Player_t* ent, const Box& box)
 	ImRender::drawRectFilled(newBox.x, newBox.y, barWidth, 2.0f, vars::visuals->esp->weaponBar->bar().getColorEditAlpha(m_dormant.at(ent->getIndex()).m_alpha));
 }
 
-void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
+void playerVisuals::drawInfo(Player_t* ent, const Box& box)
 {
 	std::vector<std::pair<std::string, Color>> flags = {};
 	using cont = std::vector<bool>; // container
@@ -295,7 +348,7 @@ void PlayerVisuals::drawInfo(Player_t* ent, const Box& box)
 	}
 }
 
-void PlayerVisuals::drawnName(Player_t* ent, const Box& box)
+void playerVisuals::drawnName(Player_t* ent, const Box& box)
 {
 	if (!vars::visuals->esp->nameBar->enabled)
 		return;
@@ -307,7 +360,7 @@ void PlayerVisuals::drawnName(Player_t* ent, const Box& box)
 }
 
 // yoinked: https://www.unknowncheats.me/wiki/Counter_Strike_Global_Offensive:Bone_ESP
-void PlayerVisuals::drawSkeleton(Player_t* ent)
+void playerVisuals::drawSkeleton(Player_t* ent)
 {
 	if (!vars::visuals->esp->skeleton->enabled)
 		return;
@@ -321,11 +374,11 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 		return;
 
 	// have to check if selected record is filled, if no then just skip
-	auto record = !g_Backtrack->getAllRecords().at(ent->getIndex()).empty() ? &g_Backtrack->getAllRecords().at(ent->getIndex()) : nullptr;
+	auto record = !backtrack::records.at(ent->getIndex()).empty() ? &backtrack::records.at(ent->getIndex()) : nullptr;
 	auto skeletPos = [=](const size_t idx)
 	{
 		auto child = record != nullptr
-			? record->back().m_matrix[idx].origin()
+			? record->back().matrices[idx].origin()
 			: ent->getBonePos(idx);
 		return child;
 	};
@@ -346,7 +399,7 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 		if (!(bone->m_flags & BONE_USED_BY_HITBOX))
 			continue;
 
-		if (record && !g_Backtrack->isValid(record->front().m_simtime)) // if backtrack
+		if (record && !backtrack::isValid(record->front().simtime))
 			continue;
 
 		auto child = skeletPos(i);
@@ -378,16 +431,16 @@ void PlayerVisuals::drawSkeleton(Player_t* ent)
 	}
 }
 
-void PlayerVisuals::drawSnapLine(Player_t* ent, const Box& box)
+void playerVisuals::drawSnapLine(Player_t* ent, const Box& box)
 {
-	if (ent == g_Aimbot->getTargetted())
+	if (ent == Aimbot::getTargetted())
 	{
 		// lines on the bottom and center bottom box
 		ImRender::drawLine(globals::screenX / 2.0f, static_cast<float>(globals::screenY), box.x + box.w / 2, box.y + box.h, Colors::Purple);
 	}
 }
 
-void PlayerVisuals::drawLaser(Player_t* ent)
+void playerVisuals::drawLaser(Player_t* ent)
 {
 	if (!vars::visuals->esp->lasers->enabled)
 		return;
@@ -406,7 +459,7 @@ void PlayerVisuals::drawLaser(Player_t* ent)
 	}
 }
 
-void PlayerVisuals::runDLight(Player_t* ent)
+void playerVisuals::runDLight(Player_t* ent)
 {
 	// https://github.com/ValveSoftware/source-sdk-2013/blob/0d8dceea4310fde5706b3ce1c70609d72a38efdf/sp/src/game/client/c_spotlight_end.cpp#L112
 
@@ -444,7 +497,7 @@ void PlayerVisuals::runDLight(Player_t* ent)
 	dLight->m_key = ent->getIndex();
 }
 
-void PlayerVisuals::drawPlayer(Player_t* ent)
+void playerVisuals::drawPlayer(Player_t* ent)
 {
 	Box box{ent};
 	if (!box.isValid())
@@ -501,7 +554,7 @@ void PlayerVisuals::drawPlayer(Player_t* ent)
 	drawnName(ent, box);
 }
 
-void PlayerVisuals::updateDormacy(Player_t* ent)
+void playerVisuals::updateDormacy(Player_t* ent)
 {
 	auto& dormacy = m_dormant.at(ent->getIndex());
 
@@ -524,12 +577,12 @@ void PlayerVisuals::updateDormacy(Player_t* ent)
 	dormacy.m_alpha = std::clamp(dormacy.m_alpha, 0.0f, 1.0f);
 }
 
-bool PlayerVisuals::DormacyInfo_t::isValid() const
+bool playerVisuals::DormacyInfo_t::isValid() const
 {
 	return memory::interfaces::globalVars->m_curtime - m_lastUpdate < vars::visuals->dormacy->limit;
 }
 
-void PlayerVisuals::roundRestart()
+void playerVisuals::roundRestart()
 {
 	m_calledEvent = true;
 }

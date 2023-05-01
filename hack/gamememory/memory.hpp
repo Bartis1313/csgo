@@ -134,6 +134,12 @@ namespace memory
 	{
 		return static_cast<T>(::li::detail::lazy_function<__hash, T>().in(getModule(_module)));
 	}
+
+	template<typename T = retaddr_t>
+	T retAddr()
+	{
+		return reinterpret_cast<T>(_ReturnAddress());
+	}
 };
 
 namespace memory
@@ -172,6 +178,8 @@ namespace memory
 	using precipClientThink_t = void(__thiscall*)(void*);
 	using precipInit_t = int(__thiscall*)(void*);
 	using setAbsVelocity_t = void(__thiscall*)(void*, const Vec3&);
+	using getParticleSystemIndex_t = int(__stdcall*)(const char*);
+	using dispatchParticleEffect_t = void(__stdcall*)(const char*, Vec3, Vec3, void*, int, void*);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
@@ -183,7 +191,7 @@ namespace memory
 	inline Address<uintptr_t> smokeCount;
 	inline Address<loadSky_t> loadSky;
 	inline Address<CClientEffectRegistration*> callbacksHead;
-	inline Address<void*> camThink;
+	inline Address<retaddr_t> camThink;
 	inline Address<void*> renderDrawPoints;
 	inline Address<Player_t**> localPlayer;
 	inline Address<void*> csgoHud;
@@ -237,6 +245,8 @@ namespace memory
 	inline Address<setAbsVelocity_t> setAbsVelocity;
 	inline Address<uintptr_t> firstMoveChild;
 	inline Address<uintptr_t> nextMovePeer;
+	inline Address<getParticleSystemIndex_t> getParticleSystemIndex;
+	inline Address<dispatchParticleEffect_t> dispatchParticleEffect;
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;

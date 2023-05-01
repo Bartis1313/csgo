@@ -1,14 +1,8 @@
 #pragma once
 
-#include <cheats/classes/frameStage.hpp>
+enum FrameStage;
 
-class Interpolate : protected FrameStageType
+namespace interpolate
 {
-public:
-	constexpr Interpolate()
-		: FrameStageType{}
-	{}
-
-protected:
-	virtual void run(int frame) override;
+	void run(FrameStage stage);
 };

@@ -14,36 +14,40 @@
 #include <chrono>
 #include <unordered_map>
 
-void DiscordPresence::init()
+namespace
 {
-	Discord_Initialize("990623614527213578", NULL, 1, "730"); // GetAppID -> 730
+	constexpr std::string_view dcKey{ "990623614527213578" };
+	constexpr std::string_view appID{ "730" }; // GetAppID -> 730
+}
+
+void discord::init()
+{
+	Discord_Initialize(dcKey.data(), NULL, 1, appID.data());
 }
 
 static std::pair<std::string, std::string> getImage(const std::string& map)
 {
-#define AM(f, s) { f, s }
 	static std::unordered_map<std::string, std::string> mapNames = // my images under this app I have added
 	{
-		AM("de_dust2", "dust2"),
-		AM("de_mirage", "mirage"),
-		AM("de_inferno", "inferno"),
-		AM("de_vertigo", "vertigo"),
-		AM("de_cobble", "cobble"),
-		AM("de_cache", "cache"),
-		AM("de_iris", "iris"),
-		AM("de_ancient", "ancient"),
-		AM("de_train", "train"),
-		AM("de_overpass", "overpass"),
-		AM("de_nuke", "nuke"),
-		AM("de_canals", "canals"),
-		AM("de_climb", "climb"),
-		AM("de_agency", "agency"),
-		AM("cs_militia", "milita"),
-		AM("de_office", "office"),
-		AM("de_italy", "italy"),
-		AM("de_assault", "assault"),
+		{ "de_dust2", "dust2" },
+		{ "de_mirage", "mirage" },
+		{ "de_inferno", "inferno" },
+		{ "de_vertigo", "vertigo" },
+		{ "de_cobble", "cobble" },
+		{ "de_cache", "cache" },
+		{ "de_iris", "iris" },
+		{ "de_ancient", "ancient" },
+		{ "de_train", "train" },
+		{ "de_overpass", "overpass" },
+		{ "de_nuke", "nuke" },
+		{ "de_canals", "canals" },
+		{ "de_climb", "climb" },
+		{ "de_agency", "agency" },
+		{ "cs_militia", "milita" },
+		{ "de_office", "office" },
+		{ "de_italy", "italy" },
+		{ "de_assault", "assault" }
 	};
-#undef AM
 
 	if (auto ok = mapNames.find(map); ok == mapNames.end())
 		return std::make_pair("unknown", "unknown");
@@ -51,7 +55,7 @@ static std::pair<std::string, std::string> getImage(const std::string& map)
 		return std::make_pair(ok->first, ok->second);
 }
 
-void DiscordPresence::run()
+void discord::run()
 {
 	static bool didReset{ false };
 
@@ -68,12 +72,11 @@ void DiscordPresence::run()
 
 	didReset = false;
 
-	DiscordRichPresence pres;
+	DiscordRichPresence pres{ };
 	std::memset(&pres, 0, sizeof(pres));
 
-	static std::string state;
-
-	static std::pair<std::string, std::string> image;
+	static std::string state{ "State Unknown" };
+	static std::pair<std::string, std::string> image{ };
 
 	if (!memory::interfaces::engine->isInGame())
 	{
@@ -90,7 +93,7 @@ void DiscordPresence::run()
 
 	pres.state = state.c_str();
 
-	static std::string details;
+	static std::string details{ "Unknown details" };
 	if (game::isAvailable())
 	{
 		if (auto wpn = game::localPlayer->getActiveWeapon(); wpn)
@@ -101,8 +104,6 @@ void DiscordPresence::run()
 			details = std::format("Weapon: {} Pos: {}", wpn->getWpnName(), pos);
 		}
 	}
-	else
-		details = "Unknown details";
 
 	pres.details = details.c_str();
 	const static auto epoch = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::system_clock::now().time_since_epoch()).count();
@@ -114,7 +115,7 @@ void DiscordPresence::run()
 	Discord_UpdatePresence(&pres);
 }
 
-void DiscordPresence::shutdown()
+void discord::shutdown()
 {
 	Discord_ClearPresence();
 	Discord_Shutdown();

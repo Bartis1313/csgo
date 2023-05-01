@@ -18,21 +18,45 @@
 
 #include "../misc/bulletUpdater.hpp"
 
-void BulletImpactsClient::draw()
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct BulletImpactHandler : hooks::PaintTraverse
+	{
+		BulletImpactHandler()
+		{
+			this->registerRender(bulletImpacts::draw);
+		}
+	} bulletImpactHandler;
+}
+
+namespace bulletImpacts
+{
+	struct HitStruct_t
+	{
+		Vec3 pos{ };
+		float expire{ };
+	};
+
+	std::vector<HitStruct_t> hits{ };
+}
+
+void bulletImpacts::draw()
 {
 	if (!vars::visuals->world->impacts->enabledClient)
 	{
-		if(!m_hitsClientSide.empty())
-			m_hitsClientSide.clear();
+		if(!hits.empty())
+			hits.clear();
 		return;
 	}
 
 	if (!game::isAvailable())
 		return;
 
-	for (const auto& el : g_BulletUpdater->getLastBullets())
+	for (const auto& el : bulletUpdater::getLastBullets())
 	{
-		m_hitsClientSide.emplace_back(HitStruct_t
+		hits.emplace_back(HitStruct_t
 			{
 				el,
 				memory::interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeClient
@@ -42,18 +66,18 @@ void BulletImpactsClient::draw()
 	const Color outline = vars::visuals->world->impacts->colorClient();
 	const Color fill = vars::visuals->world->impacts->colorClientFill();
 
-	for (size_t i = 0; const auto & el : m_hitsClientSide)
+	for (size_t i = 0; const auto [pos, expire] : hits)
 	{
-		float diff = el.m_expire - memory::interfaces::globalVars->m_curtime;
+		float diff = expire - memory::interfaces::globalVars->m_curtime;
 
 		if (diff < 0.0f)
 		{
-			m_hitsClientSide.erase(m_hitsClientSide.begin() + i);
+			hits.erase(hits.begin() + i);
 			continue;
 		}
 
-		ImRender::drawBox3DFilled(el.m_pos, 4.0f, 4.0f, outline, fill);
+		ImRender::drawBox3DFilled(pos, 4.0f, 4.0f, outline, fill);
 
-		i++;
+		++i;
 	}
 }

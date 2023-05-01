@@ -2,9 +2,11 @@
 
 #include <SDK/interfaces/interfaces.hpp>
 #include <SDK/math/Vector.hpp>
+#include <SDK/CEffectData.hpp>
 #include <utilities/utilities.hpp>
 #include <gamememory/memory.hpp>
 
+#if PARTICLE_MANUAL == true
 void* Particle::getCallAddr(const std::string& name)
 {
 	int ret = -1;
@@ -54,3 +56,22 @@ __declspec(naked) void* Particle::createParticle(void* caller, void* addr, Vec3*
 		retn
 	}
 }
+#else
+
+void particle::dispatchParticleEffect(const std::string_view name, const Vec3& pos, const Vec3& angles)
+{
+	memory::dispatchParticleEffect()(name.data(), pos, angles, nullptr, -1, nullptr);
+}
+
+void particle::stopParticleEffect(const std::string_view name)
+{
+	CEffectData data{ };
+
+	// we skip entity index handling
+
+	data.m_hitBox = memory::getParticleSystemIndex()(name.data());
+
+	memory::dispatchEffect()("ParticleEffectStop", data);
+}
+
+#endif

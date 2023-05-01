@@ -3,22 +3,15 @@
 #include "consoleUtils.hpp"
 
 #include <menu/GUI-ImGui/imguiaddons.hpp>
-#include <cheats/classes/renderableToPresent.hpp>
-#include <cheats/classes/wndProcKeyHandler.hpp>
 
 #include <vector>
 #include <string>
 
-class LogDrawer : protected RenderablePresentType, protected WndProcKeyHandler
+namespace logDrawer
 {
-public:
-	LogDrawer()
-		: RenderablePresentType{}
-	{}
-protected:
-	virtual void draw() override;
-	virtual void updateKeys() override;
-public:
+	void draw();
+	void updateKeys();
+
 	// from demo, slight edit, usage same as normal console.log
 	struct ExampleAppLog
 	{
@@ -29,15 +22,13 @@ public:
 		bool wrap{ false };
 		ImGuiTextFilter filter{ };
 		std::vector<std::pair<std::string, TypeLogs>> buffer{ };
-	} log;
-private:
-	bool m_opened{ false };
+	} inline log;
+
+	inline bool opened{ false };
 };
 
-GLOBAL_FEATURE(LogDrawer);
-
 template<typename... Args_t>
-void LogDrawer::ExampleAppLog::add(TypeLogs logs, const std::string_view fmt, Args_t&&... args)
+void logDrawer::ExampleAppLog::add(TypeLogs logs, const std::string_view fmt, Args_t&&... args)
 {
 	std::string text{ };
 	if constexpr (sizeof...(args) > 0)

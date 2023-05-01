@@ -6,18 +6,48 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <config/vars.hpp>
 #include <cheats/game/game.hpp>
-#include <cheats/hooks/hooks.hpp>
 
-void FakeLatency::init()
+#include <cheats/hooks/sendDatagram.hpp>
+#include <cheats/hooks/createMove.hpp>
+
+namespace
+{
+	struct FakeLatencyCM : hooks::CreateMove
+	{
+		FakeLatencyCM()
+		{
+			this->registerInit(fakeLatency::init);
+			this->registerRunPrePrediction(fakeLatency::run);
+		}
+	} fakeLatCM;
+}
+
+namespace fakeLatency
+{
+	struct SequenceRecord
+	{
+		int inReliableState;
+		int outReliableState;
+		int m_sequenceNr;
+		float m_curtime;
+	};
+
+	int m_lastSequence{ 0 };
+	std::deque<SequenceRecord> m_sequences;
+	IConVar* maxUnlag;
+
+	void addLatency(INetChannel* netChannel, float latency);
+	void updateSequences();
+	void clearSequences();
+}
+
+void fakeLatency::init()
 {
 	maxUnlag = memory::interfaces::cvar->findVar("sv_maxunlag");
 }
 
-int FakeLatency::runDatagram(INetChannel* netChannel, void* datagram)
+int fakeLatency::runDatagram(INetChannel* netChannel, void* datagram)
 {
-	if (datagram || !vars::misc->fakeLatency->enabled || !game::isAvailable())
-		return CALL(netChannel, datagram);
-
 	int reliableStateBackup = netChannel->m_inReliableState;
 	int sequenceNrBackup = netChannel->m_inSequenceNr;
 
@@ -25,7 +55,7 @@ int FakeLatency::runDatagram(INetChannel* netChannel, void* datagram)
 		- netChannel->getLatency(FLOW_OUTGOING));
 	addLatency(netChannel, maxLatency);
 
-	const auto ret = CALL(netChannel, datagram);
+	const auto ret = hooks::SendDatagram::getOriginal()(netChannel, datagram);
 
 	netChannel->m_inReliableState = reliableStateBackup;
 	netChannel->m_inSequenceNr = sequenceNrBackup;
@@ -33,17 +63,12 @@ int FakeLatency::runDatagram(INetChannel* netChannel, void* datagram)
 	return ret;
 }
 
-void FakeLatency::run(CUserCmd* cmd)
+void fakeLatency::run(CUserCmd* cmd)
 {
 	updateSequences();
 }
 
-int FakeLatency::CALL(INetChannel* netChannel, void* datagram)
-{
-	return hooks::sendDatagram::original(netChannel, datagram);
-}
-
-void FakeLatency::updateSequences()
+void fakeLatency::updateSequences()
 {
 	if (!game::isAvailable())
 		return;
@@ -67,10 +92,10 @@ void FakeLatency::updateSequences()
 		m_sequences.emplace_front(
 			SequenceRecord
 			{
-					network->m_inReliableState,
-					network->m_outReliableState,
-					network->m_inSequenceNr,
-					game::serverTime()
+				.inReliableState = network->m_inReliableState,
+				.outReliableState = network->m_outReliableState,
+				.m_sequenceNr = network->m_inSequenceNr,
+				.m_curtime = game::serverTime()
 			}
 		);
 	}
@@ -79,7 +104,7 @@ void FakeLatency::updateSequences()
 		m_sequences.pop_back();
 }
 
-void FakeLatency::clearSequences()
+void fakeLatency::clearSequences()
 {
 	if (!m_sequences.empty())
 	{
@@ -88,13 +113,13 @@ void FakeLatency::clearSequences()
 	}
 }
 
-void FakeLatency::addLatency(INetChannel* netChannel, float latency)
+void fakeLatency::addLatency(INetChannel* netChannel, float latency)
 {
 	for (auto& el : m_sequences)
 	{
 		if (game::serverTime() - el.m_curtime >= latency)
 		{
-			netChannel->m_inReliableState = el.m_inReliableState;
+			netChannel->m_inReliableState = el.inReliableState;
 			netChannel->m_inSequenceNr = el.m_sequenceNr;
 			break;
 		}

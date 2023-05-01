@@ -1,6 +1,4 @@
-#include "hooks.hpp"
-
-#include "../classes/renderableToPresent.hpp"
+#include "present.hpp"
 
 #include <menu/GUI-ImGui/menu.hpp>
 #include <render/render.hpp>
@@ -16,7 +14,7 @@
 #include <d3d9.h>
 #include <mutex>
 
-hooks::present::value D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
+hooks::Present::value hooks::Present::hook(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {
 	// check if there is any context, needed when shutdown
 	if (!ImGui::GetCurrentContext())
@@ -31,7 +29,7 @@ hooks::present::value D3DAPI hooks::present::hooked(IDirect3DDevice9* device, RE
 	{
 		ImRender::present(ImGui::GetBackgroundDrawList());
 
-		RenderablePresentType::runAll();
+		Storage::runs.run();
 		ImNotify::handle();
 	}
 

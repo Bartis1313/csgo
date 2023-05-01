@@ -15,7 +15,31 @@
 #include <utilities/tools/wrappers.hpp>
 #include <menu/GUI-ImGui/selections.hpp>
 
-void Trails::draw()
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct TrailsHandler : hooks::PaintTraverse
+	{
+		TrailsHandler()
+		{
+			this->registerRender(trails::draw);
+		}
+	} trailsHandler;
+}
+
+namespace trails
+{
+	struct Trail_t
+	{
+		Vec3 pos;
+		float expire;
+	};
+
+	std::vector<Trail_t> trailsList;
+}
+
+void trails::draw()
 {
 	if (!game::isAvailable())
 		return;
@@ -72,19 +96,19 @@ void Trails::draw()
 	case E2T(MovementTrail::LINE):
 	{
 		if (game::localPlayer->isMoving())
-			m_trails.emplace_back(game::localPlayer->m_vecOrigin(),
+			trailsList.emplace_back(game::localPlayer->m_vecOrigin(),
 				memory::interfaces::globalVars->m_curtime + vars::misc->trail->lineLife);
 
 		std::vector<ImVec2> points;
-		for (size_t i = 0; const auto & el : m_trails)
+		for (size_t i = 0; const auto [pos, expire] : trailsList)
 		{
-			if (el.m_expire < memory::interfaces::globalVars->m_curtime)
+			if (expire < memory::interfaces::globalVars->m_curtime)
 			{
-				m_trails.erase(m_trails.begin() + i);
+				trailsList.erase(trailsList.begin() + i);
 				continue;
 			}
 
-			if (ImVec2 screen; ImRender::worldToScreen(el.m_pos, screen))
+			if (ImVec2 screen; ImRender::worldToScreen(pos, screen))
 				points.push_back(screen);
 
 			i++;

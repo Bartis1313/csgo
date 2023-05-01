@@ -8,34 +8,63 @@
 #include <config/vars.hpp>
 #include <cheats/game/globals.hpp>
 
-// C7 44 24 ? ? ? ? ? 8B 84 24 ? ? ? ? in sdsshader_dx9 looks to be an array of those
-void AmbientLight::init()
+#include <cheats/hooks/frameStageNotify.hpp>
+
+namespace
 {
-	m_ambientR = memory::interfaces::cvar->findVar("mat_ambient_light_r");
-	m_ambientG = memory::interfaces::cvar->findVar("mat_ambient_light_g");
-	m_ambientB = memory::interfaces::cvar->findVar("mat_ambient_light_b");
+	struct AmbientHandler : hooks::FrameStageNotify
+	{
+		AmbientHandler()
+		{
+			this->registerInit(ambientLight::init);
+			this->registerRun(ambientLight::run);
+			this->registerShutdown(ambientLight::shutdown);
+		}
+	} ambientHandler;
 }
 
-void AmbientLight::run(int frame)
+namespace ambientLight
 {
-	if (frame != FRAME_RENDER_START)
+	IConVar* ambientR;
+	IConVar* ambientG;
+	IConVar* ambientB;
+}
+
+// C7 44 24 ? ? ? ? ? 8B 84 24 ? ? ? ? in sdsshader_dx9 looks to be an array of those
+void ambientLight::init()
+{
+	ambientR = memory::interfaces::cvar->findVar("mat_ambient_light_r");
+	ambientG = memory::interfaces::cvar->findVar("mat_ambient_light_g");
+	ambientB = memory::interfaces::cvar->findVar("mat_ambient_light_b");
+}
+
+void ambientLight::run(FrameStage stage)
+{
+	if (stage != FRAME_RENDER_START)
 		return;
 
 	// cant use env from memory, it wont differ just by changing fields
 
-	if (auto cfg = vars::visuals->world->ambient->enabled; cfg && (m_buttonState || m_pickerState))
+	if (auto cfg = vars::visuals->world->ambient->enabled; cfg && (buttonState || pickerState))
 	{
 		auto cfgCol = vars::visuals->world->ambient->color();
 
-		m_ambientR->setValue(cfgCol.r());
-		m_ambientG->setValue(cfgCol.g());
-		m_ambientB->setValue(cfgCol.b());
+		ambientR->setValue(cfgCol.r());
+		ambientG->setValue(cfgCol.g());
+		ambientB->setValue(cfgCol.b());
 
 	}
-	else if (globals::isShutdown || (!cfg && m_buttonState))
+	else if (!cfg && buttonState)
 	{
-		m_ambientR->setValue(0.0f);
-		m_ambientG->setValue(0.0f);
-		m_ambientB->setValue(0.0f);
+		ambientR->setValue(0.0f);
+		ambientG->setValue(0.0f);
+		ambientB->setValue(0.0f);
 	}
+}
+
+void ambientLight::shutdown()
+{
+	ambientR->setValue(0.0f);
+	ambientG->setValue(0.0f);
+	ambientB->setValue(0.0f);
 }

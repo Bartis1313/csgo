@@ -523,9 +523,9 @@ void SurfaceRender::drawProgressRing(const int x, const int y, float radius, con
 #include <array>
 #include <shared_mutex>
 
-namespace
+namespace ImRender
 {
-	std::deque<std::unique_ptr<drawing::Draw>> m_drawData;
+	std::deque<std::unique_ptr<drawing::Draw>> drawData{ };
 }
 
 void ImRender::init(ImGuiIO& io)
@@ -586,38 +586,38 @@ void ImRender::init(ImGuiIO& io)
 
 void ImRender::drawLine(const float x, const float y, const float x2, const float y2, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Line>(ImVec2{ x, y }, ImVec2{ x2, y2 }, Color::U32(color), thickness));
+	drawData.emplace_back(std::make_unique<drawing::Line>(ImVec2{ x, y }, ImVec2{ x2, y2 }, Color::U32(color), thickness));
 }
 
 void ImRender::drawLine(const ImVec2& start, const ImVec2& end, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Line>(start, end, Color::U32(color), thickness));
+	drawData.emplace_back(std::make_unique<drawing::Line>(start, end, Color::U32(color), thickness));
 }
 
 void ImRender::drawRect(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Rectangle>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), 0.0f, flags, thickness));
+	drawData.emplace_back(std::make_unique<drawing::Rectangle>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), 0.0f, flags, thickness));
 }
 
 void ImRender::drawRectFilled(const float x, const float y, const float w, const float h, const Color& color, const ImDrawFlags flags)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::RectangleFilled>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), 0.0f, flags));
+	drawData.emplace_back(std::make_unique<drawing::RectangleFilled>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), 0.0f, flags));
 }
 
 void ImRender::drawRoundedRect(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Rectangle>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), rounding, flags, thickness));
+	drawData.emplace_back(std::make_unique<drawing::Rectangle>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), rounding, flags, thickness));
 }
 
 void ImRender::drawRoundedRectFilled(const float x, const float y, const float w, const float h, const float rounding, const Color& color, const ImDrawFlags flags)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::RectangleFilled>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), rounding, flags));
+	drawData.emplace_back(std::make_unique<drawing::RectangleFilled>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(color), rounding, flags));
 }
 
 void ImRender::drawRectFilledMultiColor(const float x, const float y, const float w, const float h,
 	const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::RectangleMultiColor>(ImVec2{ x, y }, ImVec2{ x + w, y + h },
+	drawData.emplace_back(std::make_unique<drawing::RectangleMultiColor>(ImVec2{ x, y }, ImVec2{ x + w, y + h },
 		Color::U32(colUprLeft), Color::U32(colUprRight), Color::U32(colBotRight), Color::U32(colBotLeft)));
 }
 
@@ -753,12 +753,12 @@ void ImRender::drawBox3DFilled(const Vec3& pos, const float width, const float h
 
 void ImRender::drawCircle(const float x, const float y, const float radius, const int points, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Circle>(ImVec2{ x, y }, radius, points, Color::U32(color), thickness));
+	drawData.emplace_back(std::make_unique<drawing::Circle>(ImVec2{ x, y }, radius, points, Color::U32(color), thickness));
 }
 
 void ImRender::drawCircleFilled(const float x, const float y, const float radius, const int points, const Color& color)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::CircleFilled>(ImVec2{ x, y }, radius, points, Color::U32(color)));
+	drawData.emplace_back(std::make_unique<drawing::CircleFilled>(ImVec2{ x, y }, radius, points, Color::U32(color)));
 }
 
 void ImRender::drawCircle3D(const Vec3& pos, const float radius, const int points, const Color& color, const ImDrawFlags flags, const float thickness)
@@ -842,7 +842,7 @@ void ImRender::drawCircle3DFilledTraced(const Vec3& pos, const float radius, con
 
 void ImRender::drawTriangle(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
+	drawData.emplace_back(std::make_unique<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
 }
 
 void ImRender::drawTriangle(const float x, const float y, const float w, const float h, const Color& color, const float angle, const float thickness)
@@ -854,12 +854,12 @@ void ImRender::drawTriangle(const float x, const float y, const float w, const f
 	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian90) + x, (-w / 2.0f) * std::sin(radian90) + y };
 	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian) + y };
 
-	m_drawData.emplace_back(std::make_unique<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
+	drawData.emplace_back(std::make_unique<drawing::Triangle>(p1, p2, p3, Color::U32(color), thickness));
 }
 
 void ImRender::drawTriangleFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const Color& color)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
+	drawData.emplace_back(std::make_unique<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
 }
 
 void ImRender::drawTriangleFilled(const float x, const float y, const float w, const float h, const float angle, const Color& color)
@@ -871,49 +871,49 @@ void ImRender::drawTriangleFilled(const float x, const float y, const float w, c
 	const ImVec2 p2 = ImVec2{ (-w / 2.0f) * std::cos(radian90) + x, (-w / 2.0f) * std::sin(radian90) + y };
 	const ImVec2 p3 = ImVec2{ h * std::cos(radian) + x, h * std::sin(radian) + y };
 
-	m_drawData.emplace_back(std::make_unique<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
+	drawData.emplace_back(std::make_unique<drawing::TriangleFilled>(p1, p2, p3, Color::U32(color)));
 }
 
 void ImRender::drawQuad(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color, const float thickness)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Quad>(p1, p2, p3, p4, Color::U32(color), thickness));
+	drawData.emplace_back(std::make_unique<drawing::Quad>(p1, p2, p3, p4, Color::U32(color), thickness));
 }
 
 void ImRender::drawQuadFilled(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4, const Color& color)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::QuadFilled>(p1, p2, p3, p4, Color::U32(color)));
+	drawData.emplace_back(std::make_unique<drawing::QuadFilled>(p1, p2, p3, p4, Color::U32(color)));
 }
 
 void ImRender::drawQuadFilledMultiColor(const ImVec2& p1, const ImVec2& p2, const ImVec2& p3, const ImVec2& p4,
 	const Color& colUprLeft, const Color& colUprRight, const Color& colBotRight, const Color& colBotLeft)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::QuadMultiColor>(p1, p2, p3, p4,
+	drawData.emplace_back(std::make_unique<drawing::QuadMultiColor>(p1, p2, p3, p4,
 		Color::U32(colUprLeft), Color::U32(colUprRight), Color::U32(colBotRight), Color::U32(colBotLeft)));
 }
 
 void ImRender::drawPolyLine(const std::vector<ImVec2>& verts, const Color& color, const ImDrawFlags flags, const float thickness)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Polyline>(verts, Color::U32(color), flags, thickness));
+	drawData.emplace_back(std::make_unique<drawing::Polyline>(verts, Color::U32(color), flags, thickness));
 }
 
 void ImRender::drawPolyGon(const std::vector<ImVec2>& verts, const Color& color)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Polygon>(verts, Color::U32(color)));
+	drawData.emplace_back(std::make_unique<drawing::Polygon>(verts, Color::U32(color)));
 }
 
 void ImRender::drawPolyGonMultiColor(const std::vector<ImVec2>& verts, const std::vector<ImU32>& colors)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::PolygonMultiColor>(verts, colors));
+	drawData.emplace_back(std::make_unique<drawing::PolygonMultiColor>(verts, colors));
 }
 
 void ImRender::drawGradient(const float x, const float y, const float w, const float h, const Color& first, const Color& second, bool horizontal)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::RectangleGradient>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(first), Color::U32(second), horizontal));
+	drawData.emplace_back(std::make_unique<drawing::RectangleGradient>(ImVec2{ x, y }, ImVec2{ x + w, y + h }, Color::U32(first), Color::U32(second), horizontal));
 }
 
 void ImRender::text(const float x, const float y, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Text>(font, ImVec2{ x, y }, Color::U32(color), text, dropShadow, centered));
+	drawData.emplace_back(std::make_unique<drawing::Text>(font, ImVec2{ x, y }, Color::U32(color), text, dropShadow, centered));
 }
 
 void ImRender::text(const float x, const float y, ImFont* font, const std::wstring& text, const bool centered, const Color& color, const bool dropShadow)
@@ -925,12 +925,12 @@ void ImRender::text(const float x, const float y, ImFont* font, const std::wstri
 			return static_cast<char>(wc);
 		});
 
-	m_drawData.emplace_back(std::make_unique<drawing::Text>(font, ImVec2{ x, y }, Color::U32(color), _text, dropShadow, centered));
+	drawData.emplace_back(std::make_unique<drawing::Text>(font, ImVec2{ x, y }, Color::U32(color), _text, dropShadow, centered));
 }
 
 void ImRender::text(const float x, const float y, const float fontSize, ImFont* font, const std::string& text, const bool centered, const Color& color, const bool dropShadow)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::TextSize>(fontSize, font, ImVec2{ x, y }, Color::U32(color), text, dropShadow, centered));
+	drawData.emplace_back(std::make_unique<drawing::TextSize>(fontSize, font, ImVec2{ x, y }, Color::U32(color), text, dropShadow, centered));
 }
 
 void ImRender::textf(const float x, const float y, ImFont* font, const bool centered, const Color& color, const bool dropShadow, const char* fmt, ...)
@@ -985,13 +985,13 @@ bool ImRender::worldToScreen(const Vec3& in, ImVec2& out)
 
 void ImRender::drawArc(const float x, const float y, float radius, const int points, float angleMin, float angleMax, const float thickness, const Color& color, const ImDrawFlags flags)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Arc>(ImVec2{ x, y }, radius, math::DEG2RAD(angleMin), math::DEG2RAD(angleMax), points, Color::U32(color), flags, thickness));
+	drawData.emplace_back(std::make_unique<drawing::Arc>(ImVec2{ x, y }, radius, math::DEG2RAD(angleMin), math::DEG2RAD(angleMax), points, Color::U32(color), flags, thickness));
 }
 
 void ImRender::drawProgressRing(const float x, const float y, const float radius, const int points, const float angleMin, float percent, const float thickness, const Color& color, const ImDrawFlags flags)
 {
 	float maxAngle = math::RAD2DEG(math::PI *2.0f * percent) + angleMin;
-	m_drawData.emplace_back(std::make_unique<drawing::Arc>(ImVec2{ x, y }, radius, math::DEG2RAD(angleMin), math::DEG2RAD(maxAngle), points, Color::U32(color), flags, thickness));
+	drawData.emplace_back(std::make_unique<drawing::Arc>(ImVec2{ x, y }, radius, math::DEG2RAD(angleMin), math::DEG2RAD(maxAngle), points, Color::U32(color), flags, thickness));
 }
 
 void ImRender::drawSphere(const Vec3& pos, float radius, float angleSphere, const Color& color)
@@ -1046,44 +1046,35 @@ void ImRender::drawCone(const Vec3& pos, const float radius, const int points, c
 
 void ImRender::drawImage(const ImTextureID img, const ImVec2& pos, const ImVec2& size, const Color& color, const float rounding, const ImDrawFlags flags)
 {
-	m_drawData.emplace_back(std::make_unique<drawing::Image>(img, pos, ImVec2{ pos.x + size.x, pos.y + size.y }, ImVec2{ 0.0f, 0.0f }, ImVec2{ 1.0f, 1.0f }, Color::U32(color), rounding, flags));
+	drawData.emplace_back(std::make_unique<drawing::Image>(img, pos, ImVec2{ pos.x + size.x, pos.y + size.y }, ImVec2{ 0.0f, 0.0f }, ImVec2{ 1.0f, 1.0f }, Color::U32(color), rounding, flags));
 }
 
-namespace
+namespace ImRender
 {
-	std::deque<std::unique_ptr<drawing::Draw>> m_drawDataSafe;
-	std::shared_mutex m_mutex;
+	std::deque<std::unique_ptr<drawing::Draw>> drawDataSafe{ };
+	std::shared_mutex mutexRender{ };
 }
 
-void clearData()
+void ImRender::beginThink()
 {
-	if (!m_drawData.empty())
-		m_drawData.clear();
+	if (!drawData.empty())
+		drawData.clear();
 }
 
-void swapData()
+void ImRender::endThink()
 {
-	std::unique_lock<std::shared_mutex> lock{ m_mutex };
-	m_drawData.swap(m_drawDataSafe);
-}
-
-#include <cheats/classes/renderableToSurface.hpp>
-
-void ImRender::think()
-{
-	clearData();
-	RenderableSurfaceType::runAll();
-	swapData();
+	std::unique_lock<std::shared_mutex> lock{ mutexRender };
+	drawData.swap(drawDataSafe);
 }
 
 void ImRender::present(ImDrawList* draw)
 {
-	std::unique_lock<std::shared_mutex> lock{ m_mutex };
+	std::unique_lock<std::shared_mutex> lock{ mutexRender };
 
-	if (m_drawDataSafe.empty())
+	if (drawDataSafe.empty())
 		return;
 
-	for (const auto& data : m_drawDataSafe)
+	for (const auto& data : drawDataSafe)
 		data->draw(draw);
 }
 

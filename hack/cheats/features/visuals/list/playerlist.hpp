@@ -1,15 +1,6 @@
 #pragma once
 
-#include <cheats/classes/renderableToPresent.hpp>
-
-class PlayerList : protected RenderablePresentType
+namespace playerList
 {
-public:
-	constexpr PlayerList() :
-		RenderablePresentType{}
-	{}
-protected:
-	virtual void draw() override;
-};
-
-GLOBAL_FEATURE(PlayerList);
+	void draw();
+}

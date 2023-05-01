@@ -10,10 +10,40 @@
 #include <config/vars.hpp>
 #include <config/config.hpp>
 
+#include <cheats/hooks/wndproc.hpp>
+#include <cheats/hooks/present.hpp>
+
+namespace
+{
+	struct MenuDraw : hooks::Present
+	{
+		MenuDraw()
+		{
+			this->registerRun(ImGuiMenu::draw);
+		}
+	} menuDraw;
+
+	struct MenuKeys : hooks::wndProcSys
+	{
+		MenuKeys()
+		{
+			this->registerRun(ImGuiMenu::updateKeys);
+		}
+	} menuKeys;
+}
+
+namespace ImGuiMenu
+{
+	void updateKeys();
+
+	std::string iniFile{ };
+	static constexpr auto menuTitle{ "csgo legit" };
+}
+
 void ImGuiMenu::updateKeys()
 {
 	if (vars::keys->menu.isPressed())
-		m_active = !m_active;
+		active = !active;
 }
 
 void ImGuiMenu::setStyles()
@@ -23,9 +53,9 @@ void ImGuiMenu::setStyles()
 
 	style = vars::styling->imStyle;
 
-	m_iniFile = std::filesystem::path{ config.getHackPath() / "window.ini" }.string();
+	iniFile = std::filesystem::path{ config.getHackPath() / "window.ini" }.string();
 
-	io.IniFilename = m_iniFile.c_str();
+	io.IniFilename = iniFile.c_str();
 	io.LogFilename = nullptr;
 }
 
@@ -38,9 +68,12 @@ static std::array allTabs =
 	TabRender{ "Editors", &tabs::editors::draw },
 };
 
-void ImGuiMenu::renderAll()
+void ImGuiMenu::draw()
 {
-	if (ImGui::Begin(m_menuTitle, &m_active, ImGuiWindowFlags_NoCollapse))
+	if (!active)
+		return;
+
+	if (ImGui::Begin(menuTitle, &active, ImGuiWindowFlags_NoCollapse))
 	{
 		ImGuiStyle& style = ImGui::GetStyle();
 		ImVec2 backupPadding = style.FramePadding;
@@ -69,11 +102,4 @@ void ImGuiMenu::renderAll()
 		}
 	}
 	ImGui::End();
-}
-
-
-void ImGuiMenu::draw()
-{
-	if (m_active)
-		renderAll();
 }

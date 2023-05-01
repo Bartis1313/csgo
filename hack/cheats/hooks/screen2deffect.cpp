@@ -1,10 +1,19 @@
-#include "hooks.hpp"
+#include "screen2dEffect.hpp"
 
-#include "../classes/screen2dEffects.hpp"
-
-hooks::screen2DEffect::value FASTCALL hooks::screen2DEffect::hooked(FAST_ARGS, CViewSetup* view)
+hooks::Screen2DEffect::value hooks::Screen2DEffect::hook(FAST_ARGS, CViewSetup* view)
 {
-	Screen2DEffectsType::runAll();
+	if (globals::isShutdown)
+	{
+		static std::once_flag onceFlag;
+		std::call_once(onceFlag, []() { Storage::shutdowns.run(); });
+
+		return original(thisptr, view);
+	}
+
+	static std::once_flag onceFlag;
+	std::call_once(onceFlag, []() { Storage::inits.run(); });
+
+	Storage::runs.run(view);
 
 	original(thisptr, view);
 }

@@ -18,8 +18,8 @@ class IGameEventListener
 public:
     virtual ~IGameEventListener() {}
 
-    virtual void FireGameEvent(IGameEvent* event) = 0;
-    virtual int GetEventDebugID(void) { return 42; };
+    virtual void fireGameEvent(IGameEvent* event) = 0;
+    virtual int getEventDebugID(void) { return 42; };
 };
 
 class IGameEventManager

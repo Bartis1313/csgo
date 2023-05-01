@@ -11,15 +11,45 @@
 #include <cheats/features/events/events.hpp>
 #include <cheats/game/globals.hpp>
 
-void Logger::add(const Log_t& log)
+#include <cheats/hooks/present.hpp>
+#include <cheats/hooks/unknownPlayerHurt.hpp>
+
+namespace logger
+{
+	void handleHits(IGameEvent* event);
+	void draw();
+
+	std::vector<Log_t> logs{ };
+}
+
+namespace
+{
+	struct LoggerDraw : hooks::Present
+	{
+		LoggerDraw()
+		{
+			this->registerRun(logger::draw);
+		}
+	} loggerDraw;
+
+	struct LoggerHits : hooks::UnknownPlayerHurt
+	{
+		LoggerHits()
+		{
+			this->registerRun(logger::handleHits);
+		}
+	} loggerHits;
+}
+
+void logger::add(const Log_t& log)
 {
 	if (!vars::misc->logs->enabled)
 		return;
 
-	m_logs.push_back(log);
+	logs.push_back(log);
 }
 
-void Logger::draw()
+void logger::draw()
 {
 	if (!vars::misc->logs->enabled)
 		return;
@@ -27,35 +57,35 @@ void Logger::draw()
 	constexpr float animation = 0.2f;
 	constexpr float fineClip = 10.0f;
 
-	for (size_t i = 0; const auto & el : m_logs)
+	for (size_t i = 0; const auto & el : logs)
 	{
-		float in = std::clamp((memory::interfaces::globalVars->m_curtime - el.m_timeLog) / animation, 0.10f, 1.0f);
-		float out = std::clamp((memory::interfaces::globalVars->m_curtime - el.m_timeLog - vars::misc->logs->time) / animation, 0.0f, 1.0f);
+		float in = std::clamp((memory::interfaces::globalVars->m_curtime - el.time) / animation, 0.10f, 1.0f);
+		float out = std::clamp((memory::interfaces::globalVars->m_curtime - el.time - vars::misc->logs->time) / animation, 0.0f, 1.0f);
 
 		float alpha = in * (1.0f - out);
 		if (alpha <= 0.0f)
 		{
-			m_logs.erase(m_logs.begin() + i);
+			logs.erase(logs.begin() + i);
 			continue;
 		}
 
 		float x = in * fineClip - out * fineClip;
-		float y = ((el.m_font->FontSize * i) + fineClip) * alpha;
+		float y = ((el.font->FontSize * i) + fineClip) * alpha;
 
 		if (y > globals::screenY * 0.3f)
 		{
-			m_logs.pop_back();
+			logs.pop_back();
 			break;
 		}
 
-		drawing::Text text{ el.m_font, ImVec2{ x, y }, Color::U32(el.m_color.getColorEditAlpha(alpha)), el.m_text, false, false };
+		drawing::Text text{ el.font, ImVec2{ x, y }, Color::U32(el.color.getColorEditAlpha(alpha)), el.text, false, false };
 		text.draw(ImGui::GetForegroundDrawList());
 
 		i++;
 	}
 }
 
-void Logger::handleHits(IGameEvent* event)
+void logger::handleHits(IGameEvent* event)
 {
 	auto attacker = memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("attacker")));
 	if (!attacker)
@@ -98,9 +128,9 @@ void Logger::handleHits(IGameEvent* event)
 
 	add(Log_t
 		{
-			.m_text = std::format("Hit {} for [{} hp {}hp left] dmg in {}", ent->getName(), dmg_health, health, hitGroupToStr()),
-			.m_color = Colors::Cyan,
-			.m_timeLog = memory::interfaces::globalVars->m_curtime,
-			.m_font = ImRender::fonts::tahoma14
+			.text = std::format("Hit {} for [{} hp {}hp left] dmg in {}", ent->getName(), dmg_health, health, hitGroupToStr()),
+			.color = Colors::Cyan,
+			.time = memory::interfaces::globalVars->m_curtime,
+			.font = ImRender::fonts::tahoma14
 		});
 }

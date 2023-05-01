@@ -4,5 +4,5 @@
 
 void chamsEditor::draw()
 {
-	g_MaterialEditor->draw();
+	materialEditor::draw();
 }

@@ -1,7 +1,6 @@
 #pragma once
 
-class ModulateColor
+namespace modulateColor
 {
-public:
-	static void run(void* thisptr, float* r, float* g, float* b);
+	void run(void* thisptr, float* r, float* g, float* b);
 };

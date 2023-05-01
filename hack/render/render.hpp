@@ -129,6 +129,7 @@ namespace ImRender
 	[[nodiscard]] ImVec2 getTextSize(ImFont* font, float size, const std::string& text, float wrap = 0.0f, float wrapMax = std::numeric_limits<float>::max());
 	[[nodiscard]] bool worldToScreen(const Vec3& in, ImVec2& out);
 
-	void think();
+	void beginThink();
+	void endThink();
 	void present(ImDrawList* draw);
 };

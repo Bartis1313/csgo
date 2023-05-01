@@ -24,7 +24,37 @@
 
 #include <d3dx9.h>
 
-ImVec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const float scale, bool clipRanges)
+#include <cheats/hooks/present.hpp>
+
+namespace
+{
+	struct RadarHandler : hooks::Present
+	{
+		RadarHandler()
+		{
+			this->registerRun(radar::draw);
+		}
+	} adarhandler;
+}
+
+namespace radar
+{
+	struct MapInfo
+	{
+		Vec2 pos;
+		float scale;
+	} mapInfo;
+
+	ImVec2 entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const float scale, bool clipRanges);
+	bool manuallyInitTexture();
+	void drawMap();
+	void manuallyInitPos();
+
+	bool inited{ false };
+	constexpr float MAP_SCALE_MULTIPLY_OK{ 1000.0f };
+}
+
+ImVec2 radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const float scale, bool clipRanges)
 {
 	float dotThickness = vars::misc->radar->thickness;
 
@@ -64,19 +94,19 @@ ImVec2 Radar::entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos
 	return ImVec2{ dotX, dotY };
 }
 
-void Radar::manuallyInitPos()
+void radar::manuallyInitPos()
 {
 	if (!game::isAvailable())
 		return;
 
 	const auto map = memory::Address<MapStruct*>{ game::findHudElement("CCSGO_MapOverview") }.sub(0x14);
-	m_pos = map->m_origin;
-	m_scale = map->m_scale;
+	mapInfo.pos = map->m_origin;
+	mapInfo.scale = map->m_scale * MAP_SCALE_MULTIPLY_OK;
 
-	m_inited = true;
+	inited = true;
 }
 
-bool Radar::manuallyInitTexture()
+bool radar::manuallyInitTexture()
 {
 	if (!game::isAvailable())
 		return false;
@@ -89,7 +119,7 @@ bool Radar::manuallyInitTexture()
 
 	const std::string path = std::format("csgo\\resource\\overviews\\{}_radar.dds", levelName);
 
-	if (auto hr = D3DXCreateTextureFromFileA(memory::interfaces::dx9Device(), path.c_str(), &m_mapTexture); hr == D3D_OK)
+	if (auto hr = D3DXCreateTextureFromFileA(memory::interfaces::dx9Device(), path.c_str(), &mapTexture); hr == D3D_OK)
 		console::info("Created map texture from path: {}", path);
 	else
 	{
@@ -100,26 +130,20 @@ bool Radar::manuallyInitTexture()
 	return true;
 }
 
-Radar::MapPos Radar::getMapPos() const
+void radar::drawMap()
 {
-	return MapPos{ m_pos, m_scale * 1000.0f };
-}
-
-void Radar::drawMap()
-{
-	if (!m_inited)
+	if (!inited)
 		manuallyInitPos();
 
-	const auto map = getMapPos();
-
 	// square
-	const float size = map.m_scale;
+	const auto size = mapInfo.scale;
+	const auto pos = mapInfo.pos;
 	const std::array poses =
 	{
-		Vec3{ m_pos[Coord::X], m_pos[Coord::Y], 0.0f },
-		Vec3{ m_pos[Coord::X] + size, m_pos[Coord::Y], 0.0f },
-		Vec3{ m_pos[Coord::X] + size, m_pos[Coord::Y] - size, 0.0f },
-		Vec3{ m_pos[Coord::X], m_pos[Coord::Y] - size, 0.0f },
+		Vec3{ pos[Coord::X], pos[Coord::Y], 0.0f },
+		Vec3{ pos[Coord::X] + size, pos[Coord::Y], 0.0f },
+		Vec3{ pos[Coord::X] + size, pos[Coord::Y] - size, 0.0f },
+		Vec3{ pos[Coord::X], pos[Coord::Y] - size, 0.0f },
 	};
 
 	const auto myEye = game::localPlayer->getEyePos();
@@ -131,10 +155,10 @@ void Radar::drawMap()
 	auto p3 = entToRadar(myEye, ang, poses.at(2), scale, false);
 	auto p4 = entToRadar(myEye, ang, poses.at(3), scale, false);
 
-	ImGui::GetWindowDrawList()->AddImageQuad(m_mapTexture, p1, p2, p3, p4);
+	ImGui::GetWindowDrawList()->AddImageQuad(mapTexture, p1, p2, p3, p4);
 }
 
-void Radar::draw()
+void radar::draw()
 {
 	if (!vars::misc->radar->enabled)
 		return;
@@ -232,10 +256,10 @@ void Radar::draw()
 }
 
 // important to call this after hook return
-void RadarSizeHelper::run(MapStruct* map)
+void radar::gatherMap(MapStruct* map)
 {
-	g_Radar->m_pos = map->m_origin;
-	g_Radar->m_scale = map->m_scale;
+	mapInfo.pos = map->m_origin;
+	mapInfo.scale = map->m_scale * MAP_SCALE_MULTIPLY_OK;
 
-	g_Radar->m_inited = true;
+	inited = true;
 }

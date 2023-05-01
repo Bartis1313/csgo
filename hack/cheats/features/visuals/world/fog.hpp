@@ -1,18 +1,9 @@
 #pragma once
 
-#include <cheats/classes/frameStage.hpp>
+enum FrameStage;
 
-class FogController_t;
-
-class FogController : protected FrameStageType
+namespace fogController
 {
-public:
-	constexpr FogController() :
-		FrameStageType{}
-	{}
-
-protected:
-	virtual void run(int frame) override;
-};
-
-GLOBAL_FEATURE(FogController);
+	void run(FrameStage stage);
+	void shutdown();
+}

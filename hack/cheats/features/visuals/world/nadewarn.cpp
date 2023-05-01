@@ -25,20 +25,81 @@
 
 #include <ranges>
 
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct NadeWarningHandler : hooks::PaintTraverse
+	{
+		NadeWarningHandler()
+		{
+			this->registerRender(grenadeWarning::draw);
+		}
+	} nadeWarningHandler;
+}
+
+// code not fully made by me
+// Uses much less math than predicting the full throw due to existance of networkable values
+class NadeTrace_t
+{
+public:
+	NadeTrace_t() = default;
+	constexpr NadeTrace_t(Player_t* owner, WeaponIndex index) :
+		nadeOwner{ owner }, weaponIndex{ index }
+	{}
+
+	void simulate(const Vec3& pos, const Vec3& velocity, float nadeThrowTime, uint32_t ticks);
+	bool draw(WeaponIndex idx);
+private:
+	void addGravityMove(Vec3& move, Vec3& vel, float frametime);
+	void physicsClipVelocity(const Vec3& in, const Vec3& normal, Vec3& out, float overbounce);
+	void destroyTrace();
+	void push();
+	void handleDetonates();
+	void handleDestroy();
+	bool step(float interval);
+	void traceHull(const Vec3& src, const Vec3& end, Entity_t* entity, Trace_t* tr);
+	void pushEntity(const Vec3& src, Trace_t& tr);
+	void resolveFlyCollisionCustom(Trace_t& tr, float interval);
+	std::optional<std::string_view> getConsoleName(WeaponIndex idx) const;
+
+	bool m_detonated{ false };
+	// nade index
+	WeaponIndex weaponIndex{ };
+	// current tick for nade loop
+	uint32_t nadeTick{ };
+	// next tick, based on passed addon, to make this more perfect with tick timing
+	uint32_t nextNadeTick{ };
+	// for decoy
+	size_t bouncesNadeCount{ 0 };
+
+	Player_t* nadeOwner{ };
+	Vec3 pos{ };
+	Vec3 velocity{ };
+	float nadeDetonateTime{ };
+	float nadeEndTime{ };
+	std::vector<Vec3> nadePath{ };
+};
+
+namespace grenadeWarning
+{
+	std::unordered_map<int, NadeTrace_t> nadeTraces;
+}
+
 bool NadeTrace_t::step(float interval)
 {
 	if (m_detonated)
 		return true;
 
 	Vec3 move;
-	addGravityMove(move, m_velocity, interval);
+	addGravityMove(move, velocity, interval);
 	Trace_t tr;
 	pushEntity(move, tr);
 
 	if (tr.didHit())
 		resolveFlyCollisionCustom(tr, interval);
 
-	m_pos = tr.m_end;
+	pos = tr.m_end;
 
 	return false;
 }
@@ -85,10 +146,10 @@ void NadeTrace_t::traceHull(const Vec3& src, const Vec3& end, Entity_t* entity, 
 
 void NadeTrace_t::pushEntity(const Vec3& src, Trace_t& tr)
 {
-	traceHull(m_pos, m_pos + src, m_nadeOwner, &tr);
+	traceHull(pos, pos + src, nadeOwner, &tr);
 
 	// lazy attempt... see nadepred check code
-	if (m_index == WEAPON_MOLOTOV || m_index == WEAPON_INCGRENADE)
+	if (weaponIndex == WEAPON_MOLOTOV || weaponIndex == WEAPON_INCGRENADE)
 	{
 		const static float weapon_molotov_maxdetonateslope = memory::interfaces::cvar->findVar("weapon_molotov_maxdetonateslope")->getFloat();
 
@@ -105,7 +166,7 @@ void NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float interval)
 		if (auto e = tr.m_entity; e->isPlayer()) // if player don't stop but make it bouned a lot slower
 		{
 			/*surfaceElasticity = 0.3f;*/
-			m_velocity *= 0.3f;
+			velocity *= 0.3f;
 			return;
 		}
 
@@ -113,7 +174,7 @@ void NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float interval)
 		{
 			if (!e->isAlive()) // any better solution?
 			{
-				m_velocity *= 0.4f;
+				velocity *= 0.4f;
 				return;
 			}
 		}
@@ -126,7 +187,7 @@ void NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float interval)
 	totalElascity = std::clamp(totalElascity, 0.0f, 0.9f);
 
 	Vec3 absVelocity;
-	physicsClipVelocity(m_velocity, tr.m_plane.m_normal, absVelocity, 2.0f);
+	physicsClipVelocity(velocity, tr.m_plane.m_normal, absVelocity, 2.0f);
 	absVelocity *= totalElascity;
 
 	constexpr float minSpeed = 20.0f * 20.0f;
@@ -137,82 +198,82 @@ void NadeTrace_t::resolveFlyCollisionCustom(Trace_t& tr, float interval)
 
 	if (tr.m_plane.m_normal[Coord::Z] > 0.7f)
 	{
-		m_velocity = absVelocity;
+		velocity = absVelocity;
 		absVelocity *= ((1.0f - tr.m_fraction) * interval);
 		pushEntity(absVelocity * ((1.0f - tr.m_fraction) * interval), tr);
 	}
 	else
-		m_velocity = absVelocity;
+		velocity = absVelocity;
 
 	// or velocity
-	if (m_bouncesCheck > 20)
+	if (bouncesNadeCount > 20)
 		return destroyTrace();
 
-	++m_bouncesCheck;
+	++bouncesNadeCount;
 }
 
 void NadeTrace_t::handleDestroy()
 {
-	if (m_index == WEAPON_DECOY || m_index == WEAPON_SMOKEGRENADE)
-		if (m_velocity.toVecPrev().length() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
+	if (weaponIndex == WEAPON_DECOY || weaponIndex == WEAPON_SMOKEGRENADE)
+		if (velocity.toVecPrev().length() <= 0.1f) // ghetto workaround, at least we can be sure this is accurate
 		{
 			//printf("did destroy\n");
 			destroyTrace();
 		}
 
-	if (game::ticksToTime(m_tick) > m_nadeDetonateTime)
+	if (game::ticksToTime(nadeTick) > nadeDetonateTime)
 		destroyTrace();
 
-	m_nextTick = m_tick + game::timeToTicks(0.2f);
+	nextNadeTick = nadeTick + game::timeToTicks(0.2f);
 }
 
 void NadeTrace_t::handleDetonates()
 {
-	switch (m_index)
+	switch (weaponIndex)
 	{
 	case WEAPON_SMOKEGRENADE:
 	{
-		m_nadeDetonateTime = 3.0f;
+		nadeDetonateTime = 3.0f;
 		break;
 	}
 	case WEAPON_DECOY:
 	{
-		m_nadeDetonateTime = 5.0f;
+		nadeDetonateTime = 5.0f;
 		break;
 	}
 	case WEAPON_FLASHBANG:
 	case WEAPON_HEGRENADE:
 	{
-		m_nadeDetonateTime = 1.5f;
+		nadeDetonateTime = 1.5f;
 		break;
 	}
 	case WEAPON_MOLOTOV:
 	case WEAPON_INCGRENADE:
 	{
 		const static auto molotov_throw_detonate_time = memory::interfaces::cvar->findVar("molotov_throw_detonate_time");
-		m_nadeDetonateTime = molotov_throw_detonate_time->getFloat();
+		nadeDetonateTime = molotov_throw_detonate_time->getFloat();
 		break;
 	}
 	default:
-		m_nadeDetonateTime = 0.0f;
+		nadeDetonateTime = 0.0f;
 		break;
 	}
 }
 
-void NadeTrace_t::simulate(const Vec3& pos, const Vec3& velocity, float nadeThrowTime, uint32_t ticks)
+void NadeTrace_t::simulate(const Vec3& _pos, const Vec3& _velocity, float nadeThrowTime, uint32_t ticks)
 {
-	m_pos = pos;
-	m_velocity = velocity;
+	pos = _pos;
+	velocity = _velocity;
 
 	handleDetonates();
 
 	float interval = memory::interfaces::globalVars->m_intervalPerTick;
-	for (; m_tick < game::timeToTicks(500.0f); m_tick++) // 500 = 500 * 2 about 1000+
+	for (; nadeTick < game::timeToTicks(500.0f); nadeTick++) // 500 = 500 * 2 about 1000+
 	{
-		if (m_nextTick <= m_tick)
+		if (nextNadeTick <= nadeTick)
 			handleDestroy();
 
-		if (m_tick < ticks)
+		if (nadeTick < ticks)
 			continue;
 
 		if (step(interval))
@@ -221,7 +282,7 @@ void NadeTrace_t::simulate(const Vec3& pos, const Vec3& velocity, float nadeThro
 		push();
 	}
 
-	m_nadeEndTime = nadeThrowTime + game::ticksToTime(m_tick);
+	nadeEndTime = nadeThrowTime + game::ticksToTime(nadeTick);
 }
 
 void NadeTrace_t::destroyTrace()
@@ -231,20 +292,20 @@ void NadeTrace_t::destroyTrace()
 
 void NadeTrace_t::push()
 {
-	m_path.push_back(m_pos);
+	nadePath.push_back(pos);
 }
 
 bool NadeTrace_t::draw(WeaponIndex idx)
 {
-	if (m_path.empty())
+	if (nadePath.empty())
 		return false;
 
 	ImVec2 start; // need access outside
-	if (float dist = m_path.back().distToMeters(game::localPlayer->absOrigin()); dist > vars::misc->nade->tracerDist)
+	if (float dist = nadePath.back().distToMeters(game::localPlayer->absOrigin()); dist > vars::misc->nade->tracerDist)
 		return false;
 
 	std::vector<ImVec2> points;
-	for (const auto & el : m_path)
+	for (const auto & el : nadePath)
 	{
 		if (ImRender::worldToScreen(el, start))
 			points.push_back(start);
@@ -252,8 +313,8 @@ bool NadeTrace_t::draw(WeaponIndex idx)
 	if (!points.empty())
 		ImRender::drawPolyLine(points, vars::misc->nade->colorTracer(), 0, 2.0f);
 
-	const float scale = ((m_nadeEndTime - memory::interfaces::globalVars->m_curtime) / game::ticksToTime(m_tick));
-	const float rad = game::getScaledFont(m_path.back(), game::localPlayer->absOrigin());
+	const float scale = ((nadeEndTime - memory::interfaces::globalVars->m_curtime) / game::ticksToTime(nadeTick));
+	const float rad = game::getScaledFont(nadePath.back(), game::localPlayer->absOrigin());
 
 	ImRender::drawCircleFilled(start.x, start.y, rad, 32, Colors::Black);
 	ImRender::drawProgressRing(start.x, start.y, rad, 32, -90, scale, 3.0f, Colors::Green);
@@ -279,17 +340,17 @@ bool NadeTrace_t::draw(WeaponIndex idx)
 		};
 
 		ImVec2 uselessVec;
-		if (vars::misc->nade->tracerWarn && !ImRender::worldToScreen(m_pos, uselessVec))
+		if (vars::misc->nade->tracerWarn && !ImRender::worldToScreen(pos, uselessVec))
 		{
 			const auto centre = Vec2{ globals::screenX / 2.0f, globals::screenY / 2.0f };
 
 			Vec3 localViewAngle;
 			memory::interfaces::engine->getViewAngles(localViewAngle);
 			const auto& localPos = game::localPlayer->absOrigin();
-			const auto angleToNade = math::calcAngleRelative(localPos, m_pos, localViewAngle);
+			const auto angleToNade = math::calcAngleRelative(localPos, pos, localViewAngle);
 
 			auto screenPosition = centre;
-			screenPosition[Coord::X] -= std::clamp(localPos.distTo(m_pos), 120.0f, centre[Coord::Y] - 12.0f); // 12.0f - min size possible here so wanna clip it
+			screenPosition[Coord::X] -= std::clamp(localPos.distTo(pos), 120.0f, centre[Coord::Y] - 12.0f); // 12.0f - min size possible here so wanna clip it
 
 			const auto pos = rotatePoint2D(centre, screenPosition, math::DEG2RAD(angleToNade[Coord::Y]));
 
@@ -304,10 +365,10 @@ bool NadeTrace_t::draw(WeaponIndex idx)
 
 #include "../../cache/cache.hpp"
 
-void GrenadeWarningPaint::draw()
+void grenadeWarning::draw()
 {
-	if (!m_datas.empty())
-		m_datas.clear();
+	if (!nadeTraces.empty())
+		nadeTraces.clear();
 
 	if (!vars::misc->nade->enabledTracer)
 		return;
@@ -331,7 +392,7 @@ void GrenadeWarningPaint::draw()
 		if (wpnIdx == WEAPON_NONE)
 			continue;
 
-		m_datas.emplace(std::make_pair(
+		nadeTraces.emplace(std::make_pair(
 			idx,
 			NadeTrace_t
 			{
@@ -340,7 +401,7 @@ void GrenadeWarningPaint::draw()
 			}));
 
 		// simulates, in this place because there is no much math related stuff needed for angles etc
-		m_datas.at(idx).simulate(
+		nadeTraces.at(idx).simulate(
 			ent->m_vecOrigin(),
 			reinterpret_cast<Player_t*>(ent)->m_vecVelocity(),
 			ent->m_flSpawnTime(),
@@ -348,8 +409,8 @@ void GrenadeWarningPaint::draw()
 		);
 
 		// if no path, then delete this owner from map
-		if (!m_datas.at(idx).draw(wpnIdx))
-			m_datas.erase(idx);
+		if (!nadeTraces.at(idx).draw(wpnIdx))
+			nadeTraces.erase(idx);
 	}
 }
 

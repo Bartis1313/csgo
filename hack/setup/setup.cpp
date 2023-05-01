@@ -13,7 +13,6 @@
 #include <menu/x88Menu/x88menu.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
 #include <cheats/hooks/hooks.hpp>
-#include <cheats/classes/base.hpp>
 #include <cheats/features/events/events.hpp>
 #include <cheats/features/discord/discord.hpp>
 #include <cheats/features/cache/cache.hpp>
@@ -23,6 +22,9 @@
 #include <utilities/res.hpp>
 #include <cheats/hooks/wndProc.hpp>
 
+#include <cheats/helper/initable.hpp>
+#include <cheats/helper/shutdownable.hpp>
+
 #include <discord_register.h>
 
 #include <chrono>
@@ -30,9 +32,7 @@
 
 #define STACK_TRACE 0
 
-DiscordPresence Setup::m_dc;
-
-bool Setup::init(void* instance)
+bool setup::init(void* instance)
 {
 #if STACK_TRACE == 1
 	AddVectoredExceptionHandler(TRUE, SEH::CATCH);
@@ -48,8 +48,8 @@ bool Setup::init(void* instance)
 	{
 		config.init("default.cfg", "load.LOAD", "utility");
 		memory::init();
-		wndProcSys::init();
-		BaseHack::initAll();
+		hooks::wndProcSys::init();
+		InitAble::Storage::runs.run();
 		hooks::init();
 		EntityCache::init();
 	}
@@ -62,12 +62,13 @@ bool Setup::init(void* instance)
 
 	initTimer.end();
 	console::info("Main thread took {:.5f}s", initTimer.getTime());
-	m_inited = true;
+
+	inited = true;
 
 	return true;
 }
 
-void Setup::shutdown(void* instance)
+void setup::shutdown(void* instance)
 {
 	globals::isShutdown = true;
 
@@ -75,8 +76,8 @@ void Setup::shutdown(void* instance)
 	RemoveVectoredExceptionHandler(globals::instance);
 #endif
 
-	wndProcSys::shutdown();
-	BaseHack::shutdownAll();
+	hooks::wndProcSys::shutdown();
+	ShutdownAble::Storage::shutdowns.run();
 	Resource::destroyAll();
 	events::shutdown();
 	hooks::shutdown();
@@ -84,21 +85,21 @@ void Setup::shutdown(void* instance)
 	renderbackend::shutdown();
 	console::info("Hack shutdown");
 	console::shutdown();
-	m_dc.shutdown();
+	discord::shutdown();
 
 	LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
 }
 
-void Setup::looper(void* instance)
+void setup::looper(void* instance)
 {
 	using namespace std::chrono_literals;
 
-	m_dc.init();
+	discord::init();
 	while (!vars::keys->panic.isPressed())
 	{
-		if (m_inited)
+		if (inited)
 		{
-			m_dc.run();
+			discord::run();
 			std::this_thread::sleep_for(1s);
 		}
 	}

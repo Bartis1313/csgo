@@ -1,8 +1,6 @@
-#include "hooks.hpp"
+#include "levelShutdown.hpp"
 
-#include <SDK/interfaces/interfaces.hpp>
-
-hooks::levelShutdown::value FASTCALL hooks::levelShutdown::hooked(FAST_ARGS)
+hooks::LevelShudown::value hooks::LevelShudown::hook(FAST_ARGS)
 {
 	original(thisptr);
 }
