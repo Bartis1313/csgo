@@ -176,7 +176,7 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
 * 2.0.3 - Added proper icon parsing, glow 1:1 to the game's code, constexpr signature to hex, less logging on release, fixed few crashes under visual features, and possible crashes with material system. What's left is cleaning up this code.
 * 2.0.4 - Dropped animations, it's useless to keep it updated all the time to newest lib version. Colorized the menu, and somewhat reworked look of it. render -> use namespace, and deprecate surface at all. Provided rendering backends for easier lookup. x88 menu now won't update keys if we don't want to. Control present / reset targets on own for streamproof method. Completely removed vectored handler - reason is because we can actually force memory leaks? That's happening eg: if you are the local host. Did some random cleanups.
 * 2.0.5 - menu recode, I hope it's "clean" now. Recode of bunch of classes, WIP chams editor cleanup, because it annoys me how complicated it is.
-* 3.0.0 - WIP refactor, making it as 3th version due to the hard cleanup / refactor (not finished yet). I basically removed stupid OOP forcing to some real abstraction with hook and feature.
+* 3.0.0 - WIP refactor, making it as 3rd version due to the hard cleanup / refactor (not finished yet). I basically removed stupid OOP forcing to some real abstraction with hook and feature.
 </details>
 
 # People who helped
