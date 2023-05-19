@@ -1,5 +1,8 @@
 #include "aimbotDraw.hpp"
 
+#include "helper.hpp"
+#include "aimbot.hpp"
+
 #include <SDK/IWeapon.hpp>
 #include <SDK/IEngineTrace.hpp>
 #include <SDK/structs/Entity.hpp>
@@ -10,9 +13,6 @@
 #include <utilities/math/math.hpp>
 #include <render/render.hpp>
 #include <utilities/tools/wrappers.hpp>
-
-#include "aimbot.hpp"
-#include "cmdCache.hpp"
 
 #include <cheats/hooks/paintTraverse.hpp>
 
@@ -29,17 +29,11 @@ namespace
 
 void AimbotDraw::draw()
 {
-	drawFov();
-	drawBestPoint();
-}
-
-void AimbotDraw::drawFov()
-{
-	auto maybeConfig = CUserCmdCache::getWeaponConfig();
-	if (!maybeConfig.has_value())
+	const auto maybecfg = configWeapon::get();
+	if (!maybecfg.has_value())
 		return;
 
-	auto cfg = maybeConfig.value();
+	const auto cfg = maybecfg.value();
 
 	if (!vars::aimPaint->enabledFov)
 		return;
@@ -98,20 +92,4 @@ void AimbotDraw::drawFov()
 	}
 
 	ImRender::drawCircle(globals::screenX / 2.0f, globals::screenY / 2.0f, radius, 32, vars::aimPaint->colorFov());
-}
-
-void AimbotDraw::drawBestPoint()
-{
-	if (!vars::aimPaint->enabledPoint)
-		return;
-
-	if (!game::isAvailable())
-		return;
-
-	const auto hitbox = Aimbot::getBestHibox();
-	if (hitbox.isZero())
-		return;
-
-	if (ImVec2 p; ImRender::worldToScreen(hitbox, p))
-		ImRender::drawCircleFilled(p.x, p.y, 5, 12, vars::aimPaint->colorPoint());
 }

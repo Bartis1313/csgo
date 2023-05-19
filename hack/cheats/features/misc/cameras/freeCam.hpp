@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SDK/math/Vector.hpp>
-
 class CViewSetup;
 
 namespace freecam

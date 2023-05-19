@@ -128,7 +128,6 @@ void x88Menu::draw()
 void x88Menu::setStyles()
 {
 	x88types.push("Chams", &vars::visuals->chams->indexPlayers, magic_enum::enum_count<ChamsType>() - 1);
-	x88types.push("ESP", &vars::visuals->esp->boxes->enabled);
 	x88types.push("FOV", &vars::misc->fov->value, { -50.0f, 50.0f} );
 	x88types.push("Backtrack", &vars::backtrack->enabled);
 	x88types.push("Backtrack MS", &vars::backtrack->time, { 0.0f, 200.0f });
@@ -170,7 +169,7 @@ void x88Menu::updateKeys()
 	if (!m_inited)
 		return;
 
-	if (KeysHandler::isKeyPressed(VK_DOWN))
+	if (inputSystem::isKeyPressed(VK_DOWN))
 	{
 		if (index != x88types.getVars().size() - 1)
 			index++;
@@ -178,7 +177,7 @@ void x88Menu::updateKeys()
 			index = 0;
 	}
 
-	if (KeysHandler::isKeyPressed(VK_UP))
+	if (inputSystem::isKeyPressed(VK_UP))
 	{
 		if (index != 0)
 			index--;
@@ -193,7 +192,7 @@ void x88Menu::updateKeys()
 	if (std::holds_alternative<bool*>(value))
 	{
 		// don't care, bools have 0 or 1
-		if (KeysHandler::isKeyPressed(VK_RIGHT) || KeysHandler::isKeyPressed(VK_LEFT))
+		if (inputSystem::isKeyPressed(VK_RIGHT) || inputSystem::isKeyPressed(VK_LEFT))
 		{
 			*std::get<bool*>(value) = !*std::get<bool*>(value);
 		}
@@ -203,7 +202,7 @@ void x88Menu::updateKeys()
 		// run on stack to make it safe for values changed by
 		auto valNow = *std::get<int*>(value);
 
-		if (KeysHandler::isKeyPressed(VK_RIGHT))
+		if (inputSystem::isKeyPressed(VK_RIGHT))
 		{
 			valNow++;
 			if (valNow > limits.m_intLimtis)
@@ -211,7 +210,7 @@ void x88Menu::updateKeys()
 
 			*std::get<int*>(value) = valNow;
 		}
-		if (KeysHandler::isKeyPressed(VK_LEFT))
+		if (inputSystem::isKeyPressed(VK_LEFT))
 		{
 			valNow--;
 			if (valNow < 0)
@@ -224,7 +223,7 @@ void x88Menu::updateKeys()
 	{
 		auto valNow = *std::get<float*>(value);
 
-		if (KeysHandler::isKeyDown(VK_RIGHT))
+		if (inputSystem::isKeyDown(VK_RIGHT))
 		{
 			valNow += 0.5f;
 			if (valNow > limits.m_floatLimits.second) // max
@@ -232,7 +231,7 @@ void x88Menu::updateKeys()
 
 			*std::get<float*>(value) = valNow;
 		}
-		if (KeysHandler::isKeyDown(VK_LEFT))
+		if (inputSystem::isKeyDown(VK_LEFT))
 		{
 			valNow -= 0.5f;
 			if (valNow < limits.m_floatLimits.first)

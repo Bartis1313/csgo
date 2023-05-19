@@ -24,6 +24,7 @@
 #include <mutex>
 
 #include <cheats/hooks/frameStageNotify.hpp>
+#include <cheats/hooks/levelInitPreEntity.hpp>
 
 namespace
 {
@@ -32,8 +33,17 @@ namespace
 		WeatherHandler()
 		{
 			this->registerRun(weatherController::run);
+			this->registerShutdown(weatherController::shutdown);
 		}
 	} weatherHandler;
+
+	struct WeatherHandlerReset : hooks::LevelInitPreEntity
+	{
+		WeatherHandlerReset()
+		{
+			this->registerReset(weatherController::reset);
+		}
+	} weatherReseter;
 }
 
 namespace weatherController
@@ -52,21 +62,6 @@ void weatherController::run(FrameStage stage)
 	if (!game::isAvailable())
 		return;
 
-	// when enable/shutdown
-	auto reset = []()
-	{
-		if (weatherFields.created)
-		{
-			weatherFields.created = false;
-			if (auto w = weatherFields.ent)
-			{
-				w->release();
-				w = nullptr;
-				weatherFields.networkable = nullptr;
-			}
-		}
-	};
-
 	auto getNetworkable = []() -> Entity_t*
 	{
 		auto ent = reinterpret_cast<Entity_t*>(memory::interfaces::preciptation->m_createFn(MAX_EDICTS - 1, 0));
@@ -77,10 +72,9 @@ void weatherController::run(FrameStage stage)
 		return ent;
 	};
 
-	// it will only actually reset when the rain is created
-	if (globals::isShutdown || !vars::visuals->world->weather->enabled)
+	if (!vars::visuals->world->weather->enabled)
 	{
-		reset();
+		shutdown();
 		return;
 	}
 
@@ -235,4 +229,18 @@ void weatherController::implMenu()
 void weatherController::reset()
 {
 	weatherFields.created = false;
+}
+
+void weatherController::shutdown()
+{
+	if (weatherFields.created)
+	{
+		weatherFields.created = false;
+		if (auto w = weatherFields.ent)
+		{
+			w->release();
+			w = nullptr;
+			weatherFields.networkable = nullptr;
+		}
+	}
 }

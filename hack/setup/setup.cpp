@@ -25,8 +25,6 @@
 #include <cheats/helper/initable.hpp>
 #include <cheats/helper/shutdownable.hpp>
 
-#include <discord_register.h>
-
 #include <chrono>
 #include <Windows.h>
 
@@ -41,12 +39,18 @@ bool setup::init(void* instance)
 	console::info("Hack start, {} {}", __DATE__, __TIME__);
 
 	TimeCount initTimer{};
-	// might need to rewrite this later with setting those names
-	config.setFolder(std::filesystem::path{ "Bartis_internal" } / "csgo");
 	console::setLogger("CSGO DEBUG", "hack.log");
 	try
 	{
-		config.init("default.cfg", "load.LOAD", "utility");
+		const config::Localization localization
+		{
+			.path = std::filesystem::path{ "Bartis_internal" } / "csgo",
+			.defaultConfigName = "default.cfg",
+			.utilityPath = "utility",
+			.defaultLoadName = "load.LOAD"
+		};
+
+		config::init(localization);
 		memory::init();
 		hooks::wndProcSys::init();
 		InitAble::Storage::runs.run();

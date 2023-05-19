@@ -1063,13 +1063,13 @@ void ImRender::beginThink()
 
 void ImRender::endThink()
 {
-	std::unique_lock<std::shared_mutex> lock{ mutexRender };
+	std::unique_lock lock{ mutexRender };
 	drawData.swap(drawDataSafe);
 }
 
 void ImRender::present(ImDrawList* draw)
 {
-	std::unique_lock<std::shared_mutex> lock{ mutexRender };
+	std::unique_lock lock{ mutexRender };
 
 	if (drawDataSafe.empty())
 		return;

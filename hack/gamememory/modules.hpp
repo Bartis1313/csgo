@@ -1,5 +1,32 @@
 #pragma once
 
+#include <Windows.h>
+
+#include <utilities/cStr.hpp>
+#include <utilities/tools/wrappers.hpp>
+
+#include <unordered_map>
+#include <lazy_importer.hpp>
+#include <string>
+
+namespace memory
+{
+	namespace modules
+	{
+		inline std::unordered_map<std::string_view, HMODULE> allmodules;
+
+		template<cStr str>
+		inline void addModule()
+		{
+			allmodules[std::string_view{ str.c_str() }] = reinterpret_cast<HMODULE>(::li::detail::lazy_module<hasher(str.c_str())>().cached());
+		}
+		inline HMODULE getModule(const std::string_view str)
+		{
+			return allmodules.at(str);
+		}
+	}
+}
+
 #define ENGINE_DLL					"engine.dll"
 #define CLIENT_DLL					"client.dll"
 #define VSTD_DLL					"vstdlib.dll"

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <functional>
-
 class CUserCmd;
 
 namespace prediction

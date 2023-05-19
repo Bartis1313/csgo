@@ -3,6 +3,7 @@
 #include <string_view>
 
 class IMaterial;
+class ITexture;
 
 enum class CreationType
 {
@@ -35,6 +36,8 @@ namespace material
 	namespace factory
 	{
 		IMaterial* createMaterial(const MaterialData& data);
+		IMaterial* findMaterial(char const* name, const char* group, bool complain = true, const char* prefix = nullptr);
+		ITexture* findTexture(char const* name, const char* group, bool complain = true, int additionalFlags = 0);
 		void shutdown();
 
 		inline std::vector<MaterialData> materials;

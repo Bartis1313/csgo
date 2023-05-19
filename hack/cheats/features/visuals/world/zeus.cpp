@@ -9,6 +9,21 @@
 #include <utilities/utilities.hpp>
 #include <render/render.hpp>
 
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct ZeusHandlder : hooks::PaintTraverse
+	{
+		ZeusHandlder()
+		{
+			this->registerInit(zeus::init);
+			this->registerRender(zeus::draw);
+			this->registerShutdown(zeus::shutdown);
+		}
+	} zeusHandler;
+}
+
 namespace zeus
 {
 	IConVar* sv_party_mode;
@@ -17,6 +32,11 @@ namespace zeus
 void zeus::init()
 {
 	sv_party_mode = memory::interfaces::cvar->findVar("sv_party_mode");
+}
+
+void zeus::shutdown()
+{
+	sv_party_mode->setValue(false);
 }
 
 void zeus::draw()
@@ -41,8 +61,8 @@ void zeus::draw()
 		Color color = vars::visuals->world->zeus->color();
 
 		if (vars::visuals->world->zeus->tracing)
-			ImRender::drawCircle3DTraced(abs, range, 32, game::localPlayer(), color, true, 2.5f);
+			ImRender::drawCircle3DTraced(abs, range, 64, game::localPlayer(), color, true, 2.5f);
 		else
-			ImRender::drawCircle3D(abs, range, 32, color, true, 2.0f);
+			ImRender::drawCircle3D(abs, range, 64, color, true, 2.0f);
 	}
 }

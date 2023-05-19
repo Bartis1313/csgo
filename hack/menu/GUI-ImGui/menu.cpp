@@ -9,6 +9,8 @@
 
 #include <config/vars.hpp>
 #include <config/config.hpp>
+#include <SDK/InputSystem.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 
 #include <cheats/hooks/wndproc.hpp>
 #include <cheats/hooks/present.hpp>
@@ -43,7 +45,12 @@ namespace ImGuiMenu
 void ImGuiMenu::updateKeys()
 {
 	if (vars::keys->menu.isPressed())
+	{
 		active = !active;
+
+		if (!active)
+			memory::interfaces::iSystem->resetState();
+	}
 }
 
 void ImGuiMenu::setStyles()
@@ -53,7 +60,7 @@ void ImGuiMenu::setStyles()
 
 	style = vars::styling->imStyle;
 
-	iniFile = std::filesystem::path{ config.getHackPath() / "window.ini" }.string();
+	iniFile = std::filesystem::path{ config::getHackPath() / "window.ini" }.string();
 
 	io.IniFilename = iniFile.c_str();
 	io.LogFilename = nullptr;

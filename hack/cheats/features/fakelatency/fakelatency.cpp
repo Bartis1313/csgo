@@ -10,6 +10,8 @@
 #include <cheats/hooks/sendDatagram.hpp>
 #include <cheats/hooks/createMove.hpp>
 
+#include <deque>
+
 namespace
 {
 	struct FakeLatencyCM : hooks::CreateMove
@@ -32,9 +34,9 @@ namespace fakeLatency
 		float m_curtime;
 	};
 
-	int m_lastSequence{ 0 };
-	std::deque<SequenceRecord> m_sequences;
-	IConVar* maxUnlag;
+	int lastSequence{ 0 };
+	std::deque<SequenceRecord> sequences;
+	IConVar* sv_maxunlag;
 
 	void addLatency(INetChannel* netChannel, float latency);
 	void updateSequences();
@@ -43,7 +45,7 @@ namespace fakeLatency
 
 void fakeLatency::init()
 {
-	maxUnlag = memory::interfaces::cvar->findVar("sv_maxunlag");
+	sv_maxunlag = memory::interfaces::cvar->findVar("sv_maxunlag");
 }
 
 int fakeLatency::runDatagram(INetChannel* netChannel, void* datagram)
@@ -51,7 +53,7 @@ int fakeLatency::runDatagram(INetChannel* netChannel, void* datagram)
 	int reliableStateBackup = netChannel->m_inReliableState;
 	int sequenceNrBackup = netChannel->m_inSequenceNr;
 
-	float maxLatency = std::max(0.0f, std::clamp(vars::misc->fakeLatency->amount / 1000.f, 0.f, maxUnlag->getFloat())
+	float maxLatency = std::max(0.0f, std::clamp(vars::misc->fakeLatency->amount / 1000.f, 0.f, sv_maxunlag->getFloat())
 		- netChannel->getLatency(FLOW_OUTGOING));
 	addLatency(netChannel, maxLatency);
 
@@ -83,13 +85,13 @@ void fakeLatency::updateSequences()
 	if (!network)
 		return;
 
-	if (m_lastSequence == 0)
-		m_lastSequence = network->m_inSequenceNr;
+	if (lastSequence == 0)
+		lastSequence = network->m_inSequenceNr;
 
-	if (network->m_inSequenceNr > m_lastSequence)
+	if (network->m_inSequenceNr > lastSequence)
 	{
-		m_lastSequence = network->m_inSequenceNr;
-		m_sequences.emplace_front(
+		lastSequence = network->m_inSequenceNr;
+		sequences.emplace_front(
 			SequenceRecord
 			{
 				.inReliableState = network->m_inReliableState,
@@ -100,22 +102,22 @@ void fakeLatency::updateSequences()
 		);
 	}
 
-	if (m_sequences.size() > 2048)
-		m_sequences.pop_back();
+	if (sequences.size() > 2048)
+		sequences.pop_back();
 }
 
 void fakeLatency::clearSequences()
 {
-	if (!m_sequences.empty())
+	if (!sequences.empty())
 	{
-		m_lastSequence = 0;
-		m_sequences.clear();
+		lastSequence = 0;
+		sequences.clear();
 	}
 }
 
 void fakeLatency::addLatency(INetChannel* netChannel, float latency)
 {
-	for (auto& el : m_sequences)
+	for (auto& el : sequences)
 	{
 		if (game::serverTime() - el.m_curtime >= latency)
 		{

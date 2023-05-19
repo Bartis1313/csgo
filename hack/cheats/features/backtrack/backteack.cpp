@@ -50,7 +50,8 @@ namespace backtrack
 	IConVar* sv_client_min_interp_ratio{ nullptr };
 	IConVar* sv_client_max_interp_ratio{ nullptr };
 	IConVar* sv_maxunlag{ nullptr };
-	
+	float correctTime{ };
+
 	float extraTicks();
 }
 
@@ -195,7 +196,7 @@ void backtrack::run(CUserCmd* cmd)
 
 void backtrack::updater::run(FrameStage stage)
 {
-	const auto correctTime = vars::backtrack->time / 1000.0f + extraTicks();
+	correctTime = vars::backtrack->time / 1000.0f + extraTicks();
 
 	if (stage != FRAME_RENDER_START)
 		return;
@@ -230,7 +231,7 @@ void backtrack::updater::run(FrameStage stage)
 	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
 		const auto ent = reinterpret_cast<Player_t*>(entity);
-		auto i = idx;
+		const auto i = idx;
 
 		if (!isGoodEnt(ent))
 		{
@@ -244,7 +245,7 @@ void backtrack::updater::run(FrameStage stage)
 		if (!isValid(ent->m_flSimulationTime() /*m_correct.at(i).m_correctSimtime*/))
 			continue;
 
-		StoredRecord record = {};
+		StoredRecord record{ };
 		record.origin = ent->absOrigin();
 		record.simtime = ent->m_flSimulationTime();
 		if (!ent->setupBonesShort(record.matrices.data(), ent->m_CachedBoneData().m_size,
@@ -257,7 +258,7 @@ void backtrack::updater::run(FrameStage stage)
 		while (records.at(i).size() > 3 && records.at(i).size() > static_cast<size_t>(game::timeToTicks(correctTime)))
 			records.at(i).pop_back();
 
-		auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [](const StoredRecord& rec)
+		const auto invalid = std::find_if(std::cbegin(records.at(i)), std::cend(records.at(i)), [](const StoredRecord& rec)
 			{
 				return !isValid(rec.simtime);
 			});

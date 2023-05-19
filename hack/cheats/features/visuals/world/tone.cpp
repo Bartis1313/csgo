@@ -22,7 +22,7 @@ namespace
 
 namespace toneController
 {
-	EnvTonemapController_t* ent;
+	EnvTonemapController_t* ent{ };
 }
 
 void toneController::run(FrameStage stage)
@@ -34,6 +34,9 @@ void toneController::run(FrameStage stage)
 		return;
 
 	ent = memory::interfaces::toneController();
+	if (!ent)
+		return;
+
 	const bool isOn = ent->m_bUseCustomAutoExposureMin() || ent->m_bUseCustomAutoExposureMax();
 
 	if (!ent) // not all maps support it by default

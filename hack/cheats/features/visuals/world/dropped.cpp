@@ -14,6 +14,7 @@
 #include <utilities/tools/wrappers.hpp>
 #include <render/render.hpp>
 #include <utilities/utilities.hpp>
+#include <cheats/features/visuals/player/boxes.hpp>
 
 #include <cheats/hooks/paintTraverse.hpp>
 
@@ -48,7 +49,6 @@ void dropped::draw()
 			continue;
 	
 		const float fontSize = game::getScaledFont(entity->absOrigin(), game::localPlayer()->absOrigin(), 60.0f, 11.0f, 16.0f);
-		using cont = std::vector<bool>;
 		float padding = 0.0f;
 
 		constexpr float maxDist = 25.0f;
@@ -66,9 +66,60 @@ void dropped::draw()
 
 		if (flags.at(E2T(DroppedFlags::BOX))) // startpoint - no pad
 		{
-			ImRender::drawRect(box.x - 1.0f, box.y - 1.0f, box.w + 2.0f, box.h + 2.0f, Colors::Black.getColorEditAlpha(alpha));
-			ImRender::drawRect(box.x + 1.0f, box.y + 1.0f, box.w - 2.0f, box.h - 2.0f, Colors::Black.getColorEditAlpha(alpha));
-			ImRender::drawRect(box.x, box.y, box.w, box.h, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
+			auto cfg = vars::visuals->esp->dropped->box;
+
+			if (cfg.mode == E2T(BoxTypes::BOX2D))
+			{
+				const bool outlined = cfg.outline;
+
+				if (outlined)
+				{
+					boxes::drawInnerOutline(box, alpha);
+					boxes::drawOuterOutline(box, alpha);
+				}
+
+				boxes::drawRect(box, cfg.color.getColor(), alpha);
+			}
+			else if (cfg.mode == E2T(BoxTypes::FILLED2D))
+			{
+				const bool outlined = cfg.outline;
+				const bool gradient = cfg.gradient;
+
+				const std::array allAlphasGradient
+				{
+					cfg.gradientCol1().a(),
+					cfg.gradientCol2().a(),
+					cfg.gradientCol3().a(),
+					cfg.gradientCol4().a(),
+					alpha
+				};
+
+				const float filledAlpha = *std::ranges::min_element(allAlphasGradient);
+				if (gradient)
+				{
+					ImRender::drawRectFilledMultiColor(box.x, box.y, box.w, box.h,
+						cfg.gradientCol1().getColorEditAlpha(filledAlpha),
+						cfg.gradientCol2().getColorEditAlpha(filledAlpha),
+						cfg.gradientCol3().getColorEditAlpha(filledAlpha),
+						cfg.gradientCol4().getColorEditAlpha(filledAlpha));
+				}
+				else
+					boxes::drawRectFilled(box, cfg.fill(), std::min(alpha, cfg.fill().a()));
+
+				if (outlined)
+				{
+					boxes::drawOuterOutline(box, alpha);
+				}
+			}
+			else if (cfg.mode == E2T(BoxTypes::BOX3D))
+			{
+				boxes::drawBox3D(box, cfg.color(), alpha);
+			}
+			else if (cfg.mode == E2T(BoxTypes::FILLED3D))
+			{
+				boxes::drawBoxFilled3D(box, cfg.fill(), std::min(alpha, cfg.fill().a()));
+				boxes::drawBox3D(box, cfg.fill(), alpha);
+			}
 		}
 		if (flags.at(E2T(DroppedFlags::AMMO)) && !wpn->isNonAimable()) // no pad font logic, we just draw extra box
 		{
@@ -76,7 +127,7 @@ void dropped::draw()
 
 			ImRender::drawRectFilled(box.x - 1.0f, box.y + box.h - 1.0f + startPad, box.w + 2.0f, 4.0f, Colors::Black.getColorEditAlpha(alpha));
 			ImRender::drawRectFilled(box.x, box.y + box.h + startPad,
-				wpn->m_iClip1() * box.w / wpn->getWpnInfo()->m_maxClip1, 2.0f, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
+				wpn->m_iClip1() * box.w / wpn->getWpnInfo()->m_maxClip1, 2.0f, vars::visuals->esp->dropped->ammoColor().getColorEditAlpha(alpha));
 
 			padding += 4.0f;
 		}
@@ -86,7 +137,7 @@ void dropped::draw()
 				? memory::interfaces::localize->findAsUTF8(wpn->getWpnInfo()->m_WeaponName)
 				: wpn->getWpnName();
 			ImRender::text(box.x + box.w / 2, box.y + box.h + 2 + padding, fontSize, ImRender::fonts::verdana12,
-				name, true, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
+				name, true, vars::visuals->esp->dropped->textColor().getColorEditAlpha(alpha));
 
 			auto textSize = getTextSize(name);
 			padding += textSize.y;
@@ -100,7 +151,7 @@ void dropped::draw()
 			goodSize = wpn->isGrenade() ? ImVec2{ 8.0f, 12.0f } : ImVec2{ 22.0f, 14.0f };
 
 			ImRender::drawImage(iconData.texture, ImVec2{ box.x + box.w / 2, box.y + box.h + 2 + padding },
-				goodSize, vars::visuals->esp->dropped->color().getColorEditAlpha(alpha));
+				goodSize, vars::visuals->esp->dropped->iconColor().getColorEditAlpha(alpha));
 
 			padding += goodSize.y;
 		}

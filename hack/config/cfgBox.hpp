@@ -4,18 +4,14 @@
 
 struct CfgBox
 {
-	bool enabled{ false };
-	bool fill{ false };
-	bool gradient{ false };
+	int mode{ 0 };
 	bool outline{ false };
-	float thickness{ 2.0f };
-
+	bool gradient{ false };
 	CfgColor color{ };
-	CfgColor fillColor{ };
-	CfgColor outlineColor{ };
+	CfgColor fill{ };
 
-	CfgColor gradientColor1{ };
-	CfgColor gradientColor2{ };
-	CfgColor gradientColor3{ };
-	CfgColor gradientColor4{ };
+	CfgColor gradientCol1{ };
+	CfgColor gradientCol2{ };
+	CfgColor gradientCol3{ };
+	CfgColor gradientCol4{ };
 };

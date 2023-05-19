@@ -5,13 +5,15 @@
 #include <stdexcept>
 
 using ImU32 = unsigned int;
-struct ImVec4;
 
 // 0.0 - 1.0, you can pass ints as 0-255 though
 class Color
 {
 public:
-	Color() = default;
+	constexpr Color()
+	{
+		setColor(1.0f, 1.0f, 1.0f, 1.0f); 
+	};
 	constexpr Color(float r, float g, float b, float a = 1.0f)
 	{
 		setColor(r, g, b, a);
@@ -51,7 +53,11 @@ public:
 	[[nodiscard]] constexpr float b() const { return m_color.at(2); }
 	[[nodiscard]] constexpr float a() const { return m_color.at(3); }
 
-	[[nodiscard]] static ImVec4 getImguiColor(const Color& color);
+	[[nodiscard]] constexpr float& r() { return m_color.at(0); }
+	[[nodiscard]] constexpr float& g() { return m_color.at(1); }
+	[[nodiscard]] constexpr float& b() { return m_color.at(2); }
+	[[nodiscard]] constexpr float& a() { return m_color.at(3); }
+
 	// edits alpha
 	[[nodiscard]] Color getColorEditAlpha(const float amount) const;
 	[[nodiscard]] Color getColorEditAlphaInt(const int amount) const;
@@ -63,13 +69,10 @@ public:
 
 	constexpr const float operator[](size_t index) const { return m_color.at(index); }
 	constexpr float& operator[](size_t index) { return m_color.at(index); }
-	constexpr const float at(size_t index) const { if (index >= m_color.size()) throw std::runtime_error("Out of range!"); return m_color.at(index); } // as std, at() is safe
+	constexpr const float at(size_t index) const { if (index >= m_color.size()) throw std::runtime_error("Out of range!"); return m_color.at(index); }
 	constexpr float& at(size_t index) { if (index >= m_color.size()) throw std::runtime_error("Out of range!"); return m_color.at(index); }
 	constexpr bool operator==(const Color& rhs) const { return (*((uintptr_t*)this) == *((uintptr_t*)&rhs)); }
 	constexpr bool operator!=(const Color& rhs) const { return !(operator==(rhs)); }
-	[[nodiscard]] static Color fromHSB(float hue, float saturation, float brightness);
-	//https://gist.github.com/mjackson/5311256
-	[[nodiscard]] static Color hslToRGB(float hue, float saturation, float lightness);
 	[[nodiscard]] static Color rainbowColor(const float gameTime, const float multiply = 0.5f); // http://basecase.org/env/on-rainbows
 	// health 0-100
 	[[nodiscard]] static Color healthBased(uint8_t health, uint8_t alpha = 255);
@@ -77,6 +80,26 @@ public:
 private:
 	std::array<float, 4> m_color;
 };
+
+namespace Colors
+{
+	inline Color White = Color{ 255, 255, 255, 255 };
+	inline Color Black = Color{ 0, 0, 0, 255 };
+	inline Color Red = Color{ 255, 0, 0, 255 };
+	inline Color Green = Color{ 0, 255, 0, 255 };
+	inline Color DarkBlue = Color{ 0, 0, 255, 255 };
+	inline Color LightBlue = Color{ 0, 140, 250, 255 };
+	inline Color Grey = Color{ 128, 128, 128, 128 };
+	inline Color Yellow = Color{ 255, 255, 0, 255 };
+	inline Color Purple = Color{ 140, 20, 252, 255 };
+	inline Color Turquoise = Color{ 60, 210, 200, 255 };
+	inline Color Palevioletred = Color{ 220, 110, 150, 255 };
+	inline Color Pink = Color{ 255, 100, 180, 255 };
+	inline Color Coral = Color{ 255, 127, 80, 255 };
+	inline Color Cyan = Color{ 0, 255, 255, 255 };
+	inline Color Blank = Color{ 0, 0, 0, 0 };
+	inline Color Orange = Color{ 255, 125, 0, 255 };
+}
 
 // 0-255 & 1byte type
 struct SDKColor
@@ -91,23 +114,3 @@ struct SDKColor
 
 	uint8_t r, g, b, a;
 };
-
-namespace Colors
-{
-	inline Color White = Color(255, 255, 255, 255);
-	inline Color Black = Color(0, 0, 0, 255);
-	inline Color Red = Color(255, 0, 0, 255);
-	inline Color Green = Color(0, 255, 0, 255);
-	inline Color DarkBlue = Color(0, 0, 255, 255);
-	inline Color LightBlue = Color(0, 140, 250, 255);
-	inline Color Grey = Color(128, 128, 128, 128);
-	inline Color Yellow = Color(255, 255, 0, 255);
-	inline Color Purple = Color(140, 20, 252, 255);
-	inline Color Turquoise = Color(60, 210, 200, 255);
-	inline Color Palevioletred = Color(220, 110, 150, 255);
-	inline Color Pink = Color(255, 100, 180, 255);
-	inline Color Coral = Color(255, 127, 80, 255);
-	inline Color Cyan = Color(0, 255, 255, 255);
-	inline Color Blank = Color(0, 0, 0, 0);
-	inline Color Orange = Color(255, 125, 0, 255);
-}

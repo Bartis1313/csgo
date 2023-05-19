@@ -1,9 +1,11 @@
 #include "editor.hpp"
 
+#include "factory/factory.hpp"
+#include "chams.hpp"
+
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/tools/tools.hpp>
 #include <menu/GUI-ImGui/imguiaddons.hpp>
-#include <imgui_stdlib.h>
 #include <deps/ImGui/imgui_markdown.h>
 #include <deps/magic_enum/prettyNames.hpp>
 #include <config/jsonExtended.hpp>
@@ -17,9 +19,12 @@
 
 #include <imgui.h>
 #include <imgui_internal.h>
+#include <imgui_stdlib.h>
 #include <ranges>
 #include <fstream>
 #include <Shellapi.h>
+#include <nlohmann/json.hpp>
+#include <deps/ImGui/editor/TextEditor.hpp>
 
 #include <cheats/helper/initable.hpp>
 
@@ -32,6 +37,37 @@ namespace
 			this->registerInit(materialEditor::initEditor);
 		}
 	} editorHandler;
+}
+
+namespace materialEditor
+{
+	bool loadCfg();
+	bool saveCfg();
+	bool saveCfgIndex();
+
+	bool isMaterialValid(MaterialData& data, bool updating = false);
+	std::filesystem::path getPathForConfig();
+
+	void renderHelpBar();
+	void renderAddMaterial();
+	void renderMaterialsList();
+	void renderMaterialsView();
+	void renderMaterialInfo(MaterialData& mat);
+
+	std::vector<MaterialData> editorMaterials;
+	size_t index{ 0 };
+
+	bool opened{ false };
+	bool subAddOpened{ false };
+
+	constexpr std::string_view folderName{ "materials" };
+	std::filesystem::path saveDir;
+
+	TextEditor mainEditor;
+	TextEditor subAddEditor;
+
+	MaterialData materialToAdd;
+	nlohmann::json m_json;
 }
 
 using json = nlohmann::json;
@@ -86,52 +122,52 @@ void materialEditor::renderHelpBar()
 {
 	const std::string text
 	{
-		"(First, read basics written [here](https://developer.valvesoftware.com/wiki/KeyValues)\n"
+		"First, read basics written [here](https://developer.valvesoftware.com/wiki/KeyValues)\n"
 		"Second, read about [materials](https://developer.valvesoftware.com/wiki/Material)\n"
-		"**CTRL-S as a shortcut adds / updates current material**)"
+		"**CTRL-S as a shortcut adds / updates current material**"
 	};
 	markdownEditor(text);
 }
 
 void materialEditor::renderAddMaterial()
 {
-	if (!m_subAddOpen)
+	if (!subAddOpened)
 		return;
 
-	if (ImGui::Begin("New material", &m_subAddOpen, ImGuiWindowFlags_NoCollapse))
+	if (ImGui::Begin("New material", &subAddOpened, ImGuiWindowFlags_NoCollapse))
 	{
-		renderMaterialInfo(m_materialToAdd);
+		renderMaterialInfo(materialToAdd);
 
 		if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S))
 		{
 			// override always on saving attempt only
-			m_materialToAdd.buffer = m_ImEdtorSubAdd.GetText();
-			if (isMaterialValid(m_materialToAdd))
+			materialToAdd.buffer = subAddEditor.GetText();
+			if (isMaterialValid(materialToAdd))
 			{
 				// everything provided, now update material
-				m_materialToAdd.material = material::factory::createMaterial(m_materialToAdd);
+				materialToAdd.material = material::factory::createMaterial(materialToAdd);
 				// update to general view
-				editorMaterials.push_back(m_materialToAdd);
+				editorMaterials.push_back(materialToAdd);
 				// update to chams too, because it's where whole texture render goes
-				chams::materials.push_back(m_materialToAdd);
+				chams::materials.push_back(materialToAdd);
 
 				// force new material to be selected in view child
 				index = editorMaterials.size() - 1;
 				// force new material buffer to be displayed in view
-				m_ImEditor.SetText(m_materialToAdd.buffer);
+				mainEditor.SetText(materialToAdd.buffer);
 
 				saveCfgIndex();
 
-				ImNotify::add(ImNotify{ 5.0f, "Added material", std::format("Name {} Key {}\nBuf length {}", m_materialToAdd.name, m_materialToAdd.key, m_materialToAdd.buffer.length()) });
+				ImNotify::add(ImNotify{ 5.0f, "Added material", std::format("Name {} Key {}\nBuf length {}", materialToAdd.name, materialToAdd.key, materialToAdd.buffer.length()) });
 
-				m_subAddOpen = false;
+				subAddOpened = false;
 				// after close, we could reset materialtoadd, I prefer to cache last added
 			}
 			else
 				ImNotify::add(ImNotify{ 5.0f, "Error adding material", "Please check duplication or you left inputs empty" });
 		}
 
-		m_ImEdtorSubAdd.Render("Material to add");
+		subAddEditor.Render("Material to add");
 
 		ImGui::End();
 	}
@@ -157,9 +193,9 @@ void materialEditor::renderMaterialsList()
 			if (ImGui::Selectable(editorMaterials.at(i).name.c_str(), index == i))
 			{
 				// cache text
-				editorMaterials.at(index).buffer = m_ImEditor.GetText();
+				editorMaterials.at(index).buffer = mainEditor.GetText();
 				index = i;
-				m_ImEditor.SetText(editorMaterials.at(index).buffer);
+				mainEditor.SetText(editorMaterials.at(index).buffer);
 			}
 		}
 
@@ -186,7 +222,7 @@ void materialEditor::renderMaterialsView()
 		{
 			if (ImGui::Button("Press to open Add-Window##material"))
 			{
-				m_subAddOpen = true;
+				subAddOpened = true;
 			}
 
 			if (ImGui::Button("Delete"))
@@ -202,9 +238,9 @@ void materialEditor::renderMaterialsView()
 					saveCfg();
 
 					if (editorMaterials.empty())
-						m_ImEditor.SetText("");
+						mainEditor.SetText("");
 					else
-						m_ImEditor.SetText(editorMaterials.at(index).buffer);
+						mainEditor.SetText(editorMaterials.at(index).buffer);
 
 					ImNotify::add(ImNotify{ 5.0f, "Deleted material", std::format("Name {}", backupName) });
 				}
@@ -250,7 +286,7 @@ void materialEditor::renderMaterialsView()
 				m_ImEditor.Paste(toCopy);*/
 			}
 
-			m_ImEditor.Render("Editor##mat");
+			mainEditor.Render("Editor##mat");
 		}
 
 		ImGui::EndChild();
@@ -274,26 +310,25 @@ bool materialEditor::isMaterialValid(MaterialData& _data, bool updating)
 
 void materialEditor::initEditor()
 {
-	m_folderName = "materials";
-	m_saveDir = config.getHackPath() / config.getExtraLoadPath() / m_folderName / getPathForConfig();
+	saveDir = config::getHackPath() / config::getExtraLoadPath() / folderName / getPathForConfig();
 
 	loadCfg();
 
-	m_ImEditor.SetText(editorMaterials.empty() ? "" : editorMaterials.front().buffer);
-	m_ImEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::ValveKeyValues());
-	m_ImEdtorSubAdd.SetLanguageDefinition(TextEditor::LanguageDefinition::ValveKeyValues());
+	mainEditor.SetText(editorMaterials.empty() ? "" : editorMaterials.front().buffer);
+	mainEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::ValveKeyValues());
+	subAddEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::ValveKeyValues());
 }
 
 bool materialEditor::loadCfg()
 {
-	if (auto path = config.getHackPath() / config.getExtraLoadPath() / m_folderName; !std::filesystem::exists(path))
+	if (auto path = config::getHackPath() / config::getExtraLoadPath() / folderName; !std::filesystem::exists(path))
 		std::filesystem::create_directories(path);
 
-	std::ifstream input{ m_saveDir };
+	std::ifstream input{ saveDir };
 	if (!input)
 		return false;
 
-	if (!std::filesystem::is_empty(m_saveDir))
+	if (!std::filesystem::is_empty(saveDir))
 	{
 		m_json = json::parse(input);
 
@@ -313,7 +348,7 @@ bool materialEditor::loadCfg()
 
 bool materialEditor::saveCfg()
 {
-	std::ofstream out{ m_saveDir };
+	std::ofstream out{ saveDir };
 	if (!out)
 		return false;
 
@@ -332,7 +367,7 @@ bool materialEditor::saveCfg()
 
 bool materialEditor::saveCfgIndex()
 {
-	std::ofstream out{ m_saveDir };
+	std::ofstream out{ saveDir };
 	if (!out)
 		return false;
 
@@ -350,7 +385,7 @@ bool materialEditor::saveCfgIndex()
 
 std::filesystem::path materialEditor::getPathForConfig()
 {
-	std::filesystem::path path{ m_folderName };
+	std::filesystem::path path{ folderName };
 	if (path.extension() != ".json")
 		path.replace_extension(".json");
 

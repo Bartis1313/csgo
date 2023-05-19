@@ -6,14 +6,15 @@
 
 hooks::IsHltv::value hooks::IsHltv::hook(FAST_ARGS)
 {
-	uintptr_t ent;
+	volatile uintptr_t ent{ };
 	__asm mov ent, edi
 
 	const static auto occlusion = memory::occlusion();
 	const static auto velocity = memory::velocity();
 	const static auto accumulate = memory::accumulate();
+	const uintptr_t ret = reinterpret_cast<uintptr_t>(_ReturnAddress());
 
-	if (memory::retAddr() == occlusion)
+	if (ret == occlusion)
 	{
 		// no need to set those values for normal view
 		if (vars::misc->mirrorCam->enabled && ent)
@@ -28,7 +29,7 @@ hooks::IsHltv::value hooks::IsHltv::hook(FAST_ARGS)
 	}
 
 	// skip layers & setup velocity -> or EFL_DIRTY_ABSANGVELOCITY and set direct vel not interpolated
-	if (memory::retAddr() == velocity || memory::retAddr() == accumulate)
+	if (ret == velocity || ret == accumulate)
 		return true;
 	
 	return original(thisptr);

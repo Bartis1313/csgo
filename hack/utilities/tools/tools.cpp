@@ -1,6 +1,6 @@
 #include "tools.hpp"
 
-#include <gamememory/memory.hpp>
+#include <gamememory/modules.hpp>
 
 uintptr_t spoof::getGadget(const std::string_view moduleName, const std::initializer_list<uint8_t>& jmpRbxBytes)
 {
@@ -8,7 +8,7 @@ uintptr_t spoof::getGadget(const std::string_view moduleName, const std::initial
 
     if (const auto itr = modulesPassed.find(moduleName); itr == modulesPassed.end())
     {
-        const auto _module = memory::getModule(moduleName);
+        const auto _module = memory::modules::getModule(moduleName);
         const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(_module);
         const auto ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<uint8_t*>(_module) + dosHeader->e_lfanew);
         const auto section = IMAGE_FIRST_SECTION(ntHeaders);

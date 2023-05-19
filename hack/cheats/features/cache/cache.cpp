@@ -72,7 +72,7 @@ bool EntityCache::checkRepeatable(Entity_t* ent)
 	if (!ent)
 		return false;
 
-	for (const auto& [cacheType, ents] : m_entCache)
+	for (const auto& [cacheType, ents] : entCacheMap)
 	{
 		if (auto itr = std::ranges::find_if(ents,
 			[ent](const HolderData& el)
@@ -98,23 +98,23 @@ void EntityCache::fill(const HolderData& data)
 	if (auto id = data.classID; id >= CWeaponAug && id <= CWeaponXM1014
 		|| std::ranges::find(specialWeaponIds, id) != specialWeaponIds.cend())
 	{
-		m_entCache[EntCacheType::WEAPON].push_back(data);
+		entCacheMap[EntCacheType::WEAPON].push_back(data);
 	}
 
 	switch (data.classID)
 	{
 	case CCSPlayer:
-		m_entCache[EntCacheType::PLAYER].push_back(data);
+		entCacheMap[EntCacheType::PLAYER].push_back(data);
 		break;
 	case CBaseCSGrenadeProjectile:
 	case CDecoyProjectile:
 	case CMolotovProjectile:
 	case CSmokeGrenadeProjectile:
 	case CInferno:
-		m_entCache[EntCacheType::GRENADE_PROJECTILES].push_back(data);
+		entCacheMap[EntCacheType::GRENADE_PROJECTILES].push_back(data);
 		break;
 	case CPlantedC4:
-		m_entCache[EntCacheType::WORLD_ENTS].push_back(data);
+		entCacheMap[EntCacheType::WORLD_ENTS].push_back(data);
 		break;
 	default:
 		break;
@@ -123,7 +123,7 @@ void EntityCache::fill(const HolderData& data)
 
 void EntityCache::erase(Entity_t* ent)
 {
-	for (auto& [cacheType, ents] : m_entCache)
+	for (auto& [cacheType, ents] : entCacheMap)
 	{
 		if (auto itr = std::ranges::find_if(ents,
 			[ent](const auto& el)
@@ -139,15 +139,15 @@ void EntityCache::erase(Entity_t* ent)
 
 void EntityCache::clear()
 {
-	for ([[maybe_unused]] auto& [type, vec] : m_entCache)
+	for ([[maybe_unused]] auto& [type, vec] : entCacheMap)
 		vec.clear();
 }
 
 #include <gamememory/memory.hpp>
 
-void CacheFields::update()
+void EntityCache::CacheFields::update()
 {
-	const auto hud = memory::Address<CCSGO_HudRadar*>{ game::findHudElement("CCSGO_HudRadar") };
+	const auto hud = memory::Address<CCSGO_HudRadar*>{ game::findHudElement<CCSGO_HudRadar*>("CCSGO_HudRadar") };
 	if (!hud())
 		return;
 
@@ -162,6 +162,6 @@ void CacheFields::update()
 		if (const auto idx = player.m_index; !idx)
 			continue;
 		else
-			m_players.at(player.m_index) = player;
+			cachedPlayers.at(player.m_index) = player;
 	}
 }

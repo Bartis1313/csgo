@@ -4,4 +4,5 @@ namespace zeus
 {
 	void draw();
 	void init();
+	void shutdown();
 }

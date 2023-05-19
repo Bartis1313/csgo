@@ -11,6 +11,31 @@
 
 #include <imgui_stdlib.h>
 
+static void boxesMenu(const char* uniqueID, CfgBox& box)
+{
+	ImGui::PushID(uniqueID);
+
+	ImGui::Combo("Boxes mode", &box.mode, magic_enum::enum_names_pretty<BoxTypes>());
+	ImGui::ColorPicker("color##box", &box.color);
+	ImGui::SameLine();
+	ImGui::ColorPicker("filled##box", &box.fill);
+	ImGui::SameLine();
+	ImGui::Checkbox("Outlined", &box.outline);
+	ImGui::Checkbox("Gradient", &box.gradient);
+	if (box.gradient)
+	{
+		ImGui::ColorPicker("##gradient1", &box.gradientCol1);
+		ImGui::SameLine();
+		ImGui::ColorPicker("##gradient2", &box.gradientCol2);
+		ImGui::SameLine();
+		ImGui::ColorPicker("##gradient3", &box.gradientCol3);
+		ImGui::SameLine();
+		ImGui::ColorPicker("##gradient4", &box.gradientCol4);
+	}
+
+	ImGui::PopID();
+}
+
 void tabs::visuals::draw()
 {
 	ImGui::Columns(2, nullptr, false);
@@ -18,18 +43,7 @@ void tabs::visuals::draw()
 	{
 		ImGui::BeginGroupPanel("Player", ImGui::GetContentRegionAvail());
 		{
-			ImGui::Combo("Boxes mode", &vars::visuals->esp->boxes->mode, magic_enum::enum_names_pretty<BoxTypes>());
-			if (auto type = vars::visuals->esp->boxes->mode; type == E2T(BoxTypes::FILLED2D) || type == E2T(BoxTypes::FILLED3D))
-			{
-				ImGui::Checkbox("Multicolor##visuals", &vars::visuals->esp->boxes->multiColor);
-				ImGui::SliderFloat("Speed##multicolor", &vars::visuals->esp->boxes->multiColorSpeed, 0.0f, 15.0f);
-			}
-			ImGui::ColorPicker("color##box", &vars::visuals->esp->boxes->color);
-			ImGui::SameLine();
-			ImGui::ColorPicker("filled##box", &vars::visuals->esp->boxes->fill);
-			ImGui::SameLine();
-			ImGui::Checkbox("Outlined", &vars::visuals->esp->boxes->outline);
-
+			boxesMenu("playerespbox", vars::visuals->esp->boxes->box);
 			ImGui::Checkbox("Health", &vars::visuals->esp->healthBar->enabled);
 			ImGui::SameLine();
 			ImGui::Checkbox("Armor", &vars::visuals->esp->armorBar->enabled);
@@ -43,6 +57,12 @@ void tabs::visuals::draw()
 			ImGui::SameLine();
 			ImGui::Checkbox("Debug##skelet", &vars::visuals->esp->skeleton->showDebug);
 #endif
+			ImGui::Checkbox("##esplaser", &vars::visuals->esp->lasers->enabled);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Lasers##esp", &vars::visuals->esp->lasers->color);
+			ImGui::Checkbox("##espsnap", &vars::visuals->esp->snapline->enabled);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Snapline##esp", &vars::visuals->esp->snapline->color);
 			ImGui::MultiCombo("Esp flags", magic_enum::enum_names_pretty<EspFlags>(), &vars::visuals->esp->flags->flags);
 			ImGui::Checkbox("Weapon bar", &vars::visuals->esp->weaponBar->enabled);
 			if (vars::visuals->esp->weaponBar->enabled)
@@ -176,7 +196,7 @@ void tabs::visuals::draw()
 			ImGui::Combo("Mode", &vars::misc->radar->mode, magic_enum::enum_names_pretty<RadarMode>());
 			if (ImGui::Button("Refresh texture manually"))
 			{
-			//
+				radar::manuallyInitTexture();
 			}
 			ImGui::SameLine();
 			ImGui::HelpMarker("Will not work for workshop maps\nYou can try forcing the engine to re-render by pressing escape few times");
@@ -190,7 +210,7 @@ void tabs::visuals::draw()
 			ImGui::Checkbox("Smoke check##Visuals", &vars::visuals->esp->checks->smoke);
 			ImGui::SliderFloat("Flash limit##Visuals", &vars::visuals->esp->checks->flashLimit, 0.0f, 255.0f);
 			ImGui::SliderFloat("Dormacy time##Visuals", &vars::visuals->dormacy->time, 0.0f, 15.0f);
-			ImGui::SliderFloat("Dormacy limit##Visuals", &vars::visuals->dormacy->limit, 0.0f, 15.0f);
+			//ImGui::SliderFloat("Dormacy limit##Visuals", &vars::visuals->dormacy->limit, 0.0f, 15.0f);
 		}
 		ImGui::EndGroupPanel();
 	}
@@ -200,7 +220,6 @@ void tabs::visuals::draw()
 
 	ImGui::BeginChild("##rightvisuals");
 	{
-
 		ImGui::BeginGroupPanel("World", ImGui::GetContentRegionAvail());
 		{
 			ImGui::Checkbox("##Bombenabled", &vars::visuals->world->bomb->enabled);
@@ -223,8 +242,13 @@ void tabs::visuals::draw()
 			if (vars::visuals->esp->dropped->enabled)
 			{
 				ImGui::MultiCombo("##Dropped flags", magic_enum::enum_names_pretty<DroppedFlags>(), &vars::visuals->esp->dropped->flags);
-				ImGui::SameLine();
-				ImGui::ColorPicker("Color##dropped", &vars::visuals->esp->dropped->color);
+				ImGui::ColorPicker("Ammo##dropped", &vars::visuals->esp->dropped->ammoColor);
+				ImGui::ColorPicker("Text##dropped", &vars::visuals->esp->dropped->textColor);
+				ImGui::ColorPicker("Icon##dropped", &vars::visuals->esp->dropped->iconColor);
+				if (vars::visuals->esp->dropped->flags.at(E2T(DroppedFlags::BOX)))
+				{
+					boxesMenu("droppedbox", vars::visuals->esp->dropped->box);
+				}
 			}
 			ImGui::Checkbox("##molotov polygon", &vars::visuals->world->molotov->enabled);
 			ImGui::SameLine();
@@ -247,6 +271,12 @@ void tabs::visuals::draw()
 			ImGui::Checkbox("Nade trail warn", &vars::misc->nade->tracerWarn);
 			ImGui::SameLine();
 			ImGui::HelpMarker("Draws scaled circles behind you where nade is");
+			ImGui::Checkbox("##Zeusenabl", &vars::visuals->world->zeus->enabled);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Zeus", &vars::visuals->world->zeus->color);
+			ImGui::Checkbox("Tracing##zeus", &vars::visuals->world->zeus->tracing);
+			ImGui::SameLine();
+			ImGui::Checkbox("Party##zeus", &vars::visuals->world->zeus->party);
 
 		}
 		ImGui::EndGroupPanel();

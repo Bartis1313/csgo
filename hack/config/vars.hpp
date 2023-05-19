@@ -5,6 +5,7 @@
 #include "cfgcolor.hpp"
 #include "key.hpp"
 #include "cfgBeam.hpp"
+#include "cfgBox.hpp"
 
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/utilities.hpp>
@@ -84,15 +85,16 @@ struct VarVisuals
 	{
 		struct VarBoxes
 		{
-			bool enabled{ false };
-			int mode{ 0 };
-			CfgColor color{ Colors::Purple };
-			CfgColor fill{ Color{ 0, 0, 0, 140 } };
-			bool multiColor{ false };
-			bool outline{ false };
-			float multiColorSpeed{ 1.0f };
+			CfgBox box{ };
 		};
 		ADD_MEMBER_PTR(VarBoxes, boxes);
+
+		struct VarSnapline
+		{
+			bool enabled{ false };
+			CfgColor color{ };
+		};
+		ADD_MEMBER_PTR(VarSnapline, snapline);
 
 		struct VarHealthBar
 		{
@@ -110,6 +112,7 @@ struct VarVisuals
 		{
 			bool enabled{ false };
 			bool translate{ false };
+			CfgBox box{ };
 			CfgColor text{ Colors::White };
 			CfgColor bar{ Colors::Turquoise };
 		};
@@ -155,6 +158,7 @@ struct VarVisuals
 		struct VarLasers
 		{
 			bool enabled{ false };
+			CfgColor color{ };
 		};
 		ADD_MEMBER_PTR(VarLasers, lasers);
 
@@ -170,7 +174,10 @@ struct VarVisuals
 		struct VarDropped
 		{
 			bool enabled{ false };
-			CfgColor color{ Colors::White };
+			CfgBox box{ };
+			CfgColor ammoColor{ Colors::White };
+			CfgColor textColor{ Colors::White };
+			CfgColor iconColor{ Colors::White };
 			std::array<bool, magic_enum::enum_count<DroppedFlags>()> flags{ false };
 		};
 		ADD_MEMBER_PTR(VarDropped, dropped);

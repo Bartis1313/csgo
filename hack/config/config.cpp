@@ -15,7 +15,17 @@
 #include <utilities/tools/wrappers.hpp>
 #include <render/Color.hpp>
 
-bool Config::save(const std::string& file)
+namespace config
+{
+	std::vector<std::string> allConfigFiles{ };
+	Localization localization{ };
+	std::string loadedCfgName{ };
+
+	std::filesystem::path getPathForConfig(const std::string& file);
+	std::filesystem::path getDocumentsPath();
+}
+
+bool config::save(const std::string& file)
 {
 	if (file.empty())
 	{
@@ -51,7 +61,7 @@ bool Config::save(const std::string& file)
 	return true;
 }
 
-bool Config::load(const std::string& file)
+bool config::load(const std::string& file)
 {
 	std::ifstream input{ getHackPath() / getPathForConfig(file) };
 	if (!input)
@@ -72,7 +82,7 @@ bool Config::load(const std::string& file)
 	return true;
 }
 
-std::filesystem::path Config::getPathForConfig(const std::string& file)
+std::filesystem::path config::getPathForConfig(const std::string& file)
 {
 	std::filesystem::path path(file);
 	if (path.extension() != ".cfg")
@@ -81,11 +91,9 @@ std::filesystem::path Config::getPathForConfig(const std::string& file)
 	return path;
 }
 
-bool Config::init(const std::string& defName, const std::string& defLoadFileName, const std::filesystem::path& loadPath)
+bool config::init(const Localization& _localization)
 {
-	m_defaultConfig = defName;
-	m_defaultFileNameLoad = defLoadFileName;
-	m_loadExtraPath = loadPath;
+	localization = _localization;
 
 	// check if the path to where save files is even a directory
 	if (auto path = getHackPath(); !std::filesystem::exists(path))
@@ -96,7 +104,7 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 	}
 
 	// same thing in load
-	if (auto path = getHackPath() / m_loadExtraPath; !std::filesystem::exists(path))
+	if (auto path = getHackPath() / localization.utilityPath; !std::filesystem::exists(path))
 	{
 		// after removal, create the folder, from there the path is possible to reach
 		if (!std::filesystem::create_directories(path))
@@ -104,20 +112,20 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 	}
 
 	// default file doesn't exist
-	if (auto path = getHackPath() / m_defaultConfig; !std::filesystem::exists(path))
+	if (auto path = getHackPath() / localization.defaultConfigName; !std::filesystem::exists(path))
 	{
 		console::warn("Creating default file, because it doesn't exist: {}", path.string());
 
-		if (!save(m_defaultConfig))
+		if (!save(localization.defaultConfigName))
 			return false;
 	}
 
 	// loading file doesnt exists
-	if (auto path = getHackPath() / m_loadExtraPath / m_defaultFileNameLoad ; !std::filesystem::exists(path))
+	if (auto path = getHackPath() / localization.utilityPath / localization.defaultLoadName; !std::filesystem::exists(path))
 	{
 		console::warn("Creating loading file, because it doesn't exist: {}", path.string());
 
-		if (!startSave(m_defaultConfig))
+		if (!startSave(localization.defaultConfigName))
 			return false;
 	}
 
@@ -142,9 +150,9 @@ bool Config::init(const std::string& defName, const std::string& defLoadFileName
 	return true;
 }
 
-bool Config::startLoad()
+bool config::startLoad()
 {
-	std::ifstream input{ getHackPath() / m_loadExtraPath / m_defaultFileNameLoad };
+	std::ifstream input{ getHackPath() / localization.utilityPath / localization.defaultLoadName };
 	if (!input)
 		return false;
 
@@ -155,12 +163,12 @@ bool Config::startLoad()
 	return true;
 }
 
-bool Config::startSave(const std::string& name)
+bool config::startSave(const std::string& name)
 {
 	json j;
 	j["Name"] = name;
 
-	std::ofstream out{ getHackPath() / m_loadExtraPath / m_defaultFileNameLoad };
+	std::ofstream out{ getHackPath() / localization.utilityPath / localization.defaultLoadName };
 	if (!out)
 		return false;
 
@@ -169,21 +177,50 @@ bool Config::startSave(const std::string& name)
 	return true;
 }
 
-void Config::reload()
+void config::reload()
 {
-	m_allFilesInFolder.clear();
+	allConfigFiles.clear();
 	auto iterator = std::filesystem::directory_iterator(getHackPath());
 	for (const auto& entry : iterator)
 	{
 		if (std::string name = entry.path().filename().string();
 			entry.path().extension() == ".cfg" && !name.empty())
 		{
-			m_allFilesInFolder.push_back(name);
+			allConfigFiles.push_back(name);
 		}
 	}
 }
 
-std::filesystem::path Config::getDocumentsPath()
+std::filesystem::path config::getHackPath()
+{
+	assert(getDocumentsPath().empty() == false && "hacks path was empty");
+
+	std::filesystem::path toReturn;
+	toReturn.assign(getDocumentsPath() / localization.path);
+	return toReturn;
+}
+
+std::string config::getDefaultConfigName()
+{
+	return localization.defaultConfigName;
+}
+
+std::string config::getCfgToLoad()
+{
+	return loadedCfgName;
+}
+
+std::vector<std::string> config::getAllConfigFiles()
+{
+	return allConfigFiles;
+}
+
+std::filesystem::path config::getExtraLoadPath()
+{
+	return localization.utilityPath;
+}
+
+std::filesystem::path config::getDocumentsPath()
 {
 	if (static CHAR documents[MAX_PATH]; SUCCEEDED(LI_FN_CACHED(SHGetFolderPathA)(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
 		return std::filesystem::path{ documents };
@@ -191,20 +228,12 @@ std::filesystem::path Config::getDocumentsPath()
 	return {};
 }
 
-std::filesystem::path Config::getHackPath() const
-{
-	assert(getDocumentsPath().empty() == false && "hacks path was empty");
 
-	std::filesystem::path toReturn;
-	toReturn.assign(getDocumentsPath() / m_path);
-	return toReturn;
-}
-
-void Config::deleteCfg(const std::string& file)
+void config::deleteCfg(const std::string& file)
 {
 	auto path = getPathForConfig(file);
 
-	if (path.string() == m_defaultConfig)
+	if (path.string() == localization.defaultConfigName)
 	{
 		console::error("Can't delete default config");
 		return;

@@ -9,5 +9,5 @@ namespace miscInfo
 	void draw();
 	void reset();
 
-	inline uint32_t m_allHits;
+	inline uint32_t allHits;
 }

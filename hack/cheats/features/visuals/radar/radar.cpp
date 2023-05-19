@@ -46,7 +46,6 @@ namespace radar
 	} mapInfo;
 
 	ImVec2 entToRadar(const Vec3& eye, const Vec3& angles, const Vec3& entPos, const float scale, bool clipRanges);
-	bool manuallyInitTexture();
 	void drawMap();
 	void manuallyInitPos();
 

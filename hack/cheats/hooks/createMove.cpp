@@ -3,7 +3,6 @@
 #include "../features/prediction/prediction.hpp"
 #include "../features/misc/movement/movement.hpp"
 #include "../features/misc/cameras/freeCam.hpp"
-#include "../features/aimbot/cmdCache.hpp"
 
 #include <SDK/CUserCmd.hpp>
 #include <SDK/Input.hpp>
@@ -41,20 +40,29 @@ hooks::CreateMove::value hooks::CreateMove::hook(FAST_ARGS, float inputFrame, CU
 		cmd->m_upmove = 0;
 	}
 
-	CUserCmdCache::run(cmd);
 	game::serverTime(cmd);
 
 	Storage::runsPrePrediction.run(cmd);
-	prediction::begin(cmd);
-	Storage::runsPrediction.run(cmd);
-	prediction::end();
-
+	{
+		prediction::begin(cmd);
+		Storage::runsPrediction.run(cmd);
+		prediction::end();
+	}
 	Storage::runsPostPrediction.run(cmd);
 
 	movement::fixMovement(cmd, oldAngle);
 
 	// don't get untrusted
-	cmd->m_viewangles.clamp();
+	cmd->m_viewangles[0] = std::clamp(cmd->m_viewangles[0], -89.0f, 89.0f);
+	cmd->m_viewangles[1] = std::clamp(cmd->m_viewangles[1], -180.0f, 180.0f);
+	cmd->m_viewangles[2] = 0.0f;
+
+	cmd->m_forwardmove = std::clamp(cmd->m_forwardmove, -450.0f, 450.0f);
+	cmd->m_sidemove = std::clamp(cmd->m_sidemove, -450.0f, 450.0f);
+	cmd->m_upmove = std::clamp(cmd->m_upmove, -320.0f, 320.0f);
+
+	cmd->m_viewAnglesCopy = cmd->m_viewangles;
+	cmd->m_buttonsCopy = cmd->m_buttons;
 
 	return false;
 }

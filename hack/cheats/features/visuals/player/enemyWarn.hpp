@@ -7,5 +7,6 @@ class Player_t;
 namespace enemyWarning
 {
 	void draw();
-	void think(Player_t* ent);
+	void beginThink(Player_t* ent);
+	void endThink();
 }

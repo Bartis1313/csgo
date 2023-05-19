@@ -49,6 +49,8 @@
 #include "unkownRoundEnd.hpp"
 #include "viewFade.hpp"
 #include "viewRender.hpp"
+#include "updatePostEffects.hpp"
+#include "drawSetColor.hpp"
 
 #define HOOK(target, _struct) \
 	hookHelper::MinHook::tryHook(target, &_struct::hook, hookHelper::ORIGINAL(_struct::original), #_struct);
@@ -62,7 +64,7 @@ void hooks::init()
 	**reinterpret_cast<void***>(memory::present()) = Present::hook;
 	**reinterpret_cast<void***>(memory::reset()) = Reset::hook;
 
-	HOOK(vfunc::getVFunc(memory::interfaces::dx9Device(), DRAW_IDX_PRIMITIVE), hooks::DrawIndexedPrimitive);
+	//HOOK(vfunc::getVFunc(memory::interfaces::dx9Device(), DRAW_IDX_PRIMITIVE), hooks::DrawIndexedPrimitive);
 	HOOK(vfunc::getVFunc(memory::interfaces::keyValuesSys(), ALLOC_KEYVALUE), hooks::AllocKeyValues);
 
 	HOOK(memory::isUsingPropDebug(), hooks::IsUsingStaticPropDebugModes);
@@ -101,6 +103,8 @@ void hooks::init()
 	HOOK(memory::chudIsHidden(), hooks::CHudIsHidden);
 	HOOK(memory::viewFade(), hooks::ViewFade);
 	HOOK(memory::unkRound(), hooks::UnknownPlayerHurt);
+	HOOK(memory::updatePostEffects(), hooks::UpdatePostEffects);
+	HOOK(vfunc::getVFunc(memory::interfaces::surface(), SET_DRAW_COLOR), hooks::setDrawColor);
 
 #undef HOOK
 

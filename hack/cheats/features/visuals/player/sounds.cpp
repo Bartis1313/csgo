@@ -17,9 +17,26 @@
 #include <utilities/tools/wrappers.hpp>
 
 #include <imgui_internal.h>
+#include <deque>
+
+namespace sound
+{
+	struct StepData_t
+	{
+		Player_t* player{ nullptr };
+		Vec3 pos;
+		float expire;
+		float maxPixels;
+		float timeToPrint;
+		float fontSize;
+	};
+
+	std::array<std::deque<StepData_t>, 65> steps;
+	StepData_t bestStep{ };
+}
 
 // https://www.unknowncheats.me/forum/counterstrike-global-offensive/333825-bloodhound-inspired-legit-csgo-esp.html
-void SoundDraw::findBest(Player_t* ent)
+void sound::findBest(Player_t* ent)
 {
 	if (!vars::visuals->sound->enabled)
 		return;
@@ -31,43 +48,43 @@ void SoundDraw::findBest(Player_t* ent)
 	const float maxDist = vars::visuals->sound->maxDist;
 	const float maxDistLine = vars::visuals->sound->maxDistLine;
 
-	for (size_t i = 0; const auto & el : m_steps.at(index))
+	for (size_t i = 0; const auto & el : steps.at(index))
 	{
-		float diff = el.m_expire - memory::interfaces::globalVars->m_curtime;
+		float diff = el.expire - memory::interfaces::globalVars->m_curtime;
 
 		if (diff < 0.0f)
 		{
-			m_steps.at(index).erase(m_steps.at(index).begin() + i);
+			steps.at(index).erase(steps.at(index).begin() + i);
 			continue;
 		}
 
 		ImVec2 elPos;
-		if (!ImRender::worldToScreen(el.m_pos, elPos))
+		if (!ImRender::worldToScreen(el.pos, elPos))
 			continue;
 
 		//float scale = diff / config.get<float>(vars.fStepTime); // ratio
-		float alpha = (maxDist - el.m_pos.distToMeters(game::localPlayer->absOrigin())) / maxDist; // alpha fading per distance
+		float alpha = (maxDist - el.pos.distToMeters(game::localPlayer->absOrigin())) / maxDist; // alpha fading per distance
 		if (alpha < 0.1f)
 			continue;
 
 		if (constexpr float maxDiff = 1.0f; diff < maxDiff) // fading effect
 			alpha = (diff / maxDiff) * alpha;
 
-		const float rad = game::getScaledFont(el.m_pos, game::localPlayer->absOrigin(), 50.0f, 3.0f, 8.0f);;
+		const float rad = game::getScaledFont(el.pos, game::localPlayer->absOrigin(), 50.0f, 3.0f, 8.0f);;
 		ImRender::drawCircleFilled(elPos.x, elPos.y, rad, 32,
 			vars::visuals->sound->color().getColorEditAlpha(alpha));
 
 		const ImVec2 fromScreen = ImVec2{ elPos.x - x,  elPos.y - y };
-		const float distFromMiddle = std::round(std::sqrt(ImLengthSqr(fromScreen)));
+		const float distFromMiddle = std::round(ImSqrt(ImLengthSqr(fromScreen)));
 
 		if (distFromMiddle < maxDistLine)
 		{
-			if (!m_bestStep.m_player || distFromMiddle < m_bestStep.m_maxPixels)
+			if (!bestStep.player || distFromMiddle < bestStep.maxPixels)
 			{
-				m_bestStep.m_player = el.m_player;
-				m_bestStep.m_pos = el.m_pos;
-				m_bestStep.m_timeToPrint = diff;
-				m_bestStep.m_maxPixels = distFromMiddle;
+				bestStep.player = el.player;
+				bestStep.pos = el.pos;
+				bestStep.timeToPrint = diff;
+				bestStep.maxPixels = distFromMiddle;
 				// better not
 				/*bestStep.m_fontSize = scaledFont(50.0f, 10.0f, 18.0f);*/
 			}
@@ -77,21 +94,21 @@ void SoundDraw::findBest(Player_t* ent)
 	}
 }
 
-void SoundDraw::draw()
+void sound::draw()
 {
 	float x = globals::screenX / 2.0f;
 	const float y = globals::screenY / 2.0f;
 
-	if (m_bestStep.m_player)
+	if (bestStep.player)
 	{
-		if (ImVec2 pos; ImRender::worldToScreen(m_bestStep.m_pos, pos))
+		if (ImVec2 pos; ImRender::worldToScreen(bestStep.pos, pos))
 		{
-			std::string_view place = m_bestStep.m_player->m_szLastPlaceName();
+			std::string_view place = bestStep.player->m_szLastPlaceName();
 			if (place.empty())
 				place = "Unknown";
-			const std::string nameText = std::format("{} -> {} [{:.1f}m]", m_bestStep.m_player->getName(),
-				place, game::localPlayer->absOrigin().distToMeters(m_bestStep.m_pos));
-			const std::string timeText = std::format("Time left {:.1f}s", m_bestStep.m_timeToPrint);
+			const std::string nameText = std::format("{} -> {} [{:.1f}m]", bestStep.player->getName(),
+				place, game::localPlayer->absOrigin().distToMeters(bestStep.pos));
+			const std::string timeText = std::format("Time left {:.1f}s", bestStep.timeToPrint);
 
 			x = globals::screenX / 2.5f;
 
@@ -107,15 +124,21 @@ void SoundDraw::draw()
 			ImRender::drawLine(x + textSize, y, pos.x, pos.y, vars::visuals->sound->colorLine());
 		}
 
-		m_bestStep.m_player = nullptr;
+		bestStep.player = nullptr;
 	}
 }
 
-void SoundDraw::pushSteps(Player_t* ent)
+void sound::pushSteps(Player_t* ent)
 {
 	if (!ent->isOtherTeam(game::localPlayer()))
 		return;
 
-	StepData_t step{ ent, ent->absOrigin(), memory::interfaces::globalVars->m_curtime + vars::visuals->sound->time };
-	m_steps.at(step.m_player->getIndex()).push_back(step);
+	const StepData_t step
+	{
+		.player =  ent,
+		.pos = ent->absOrigin(),
+		.expire = memory::interfaces::globalVars->m_curtime + vars::visuals->sound->time 
+	};
+
+	steps.at(step.player->getIndex()).push_back(step);
 }

@@ -12,7 +12,6 @@
 #include <cheats/game/globals.hpp>
 #include <config/vars.hpp>
 #include <render/render.hpp>
-#include <render/BBox.hpp>
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <cheats/features/events/events.hpp>
@@ -42,6 +41,23 @@ namespace
 	} hitmarkerHits;
 }
 
+namespace hitmarker
+{
+	struct Hitmark_t
+	{
+		float expireTime;
+		int damage;
+		int health;
+		bool wasHeadshot;
+		Player_t* player;
+		// dont touch those outside of loop
+		Vec3 pos;
+		float alpha;
+	};
+
+	inline std::vector<Hitmark_t> allHits;
+}
+
 void hitmarker::draw()
 {
 	if (!vars::misc->hitmarker->enabled)
@@ -63,7 +79,7 @@ void hitmarker::draw()
 
 	const auto bulletList = game::localPlayer->m_vecBulletVerifyListClient();
 
-	for (size_t i = 0; auto & [expire, damage, health, wasHeadhsot, player, hitPos, alpha] : m_hitmarkers)
+	for (size_t i = 0; auto & [expire, damage, health, wasHeadhsot, player, hitPos, alpha] : allHits)
 	{
 		// cant think of anything else, hitgroups are limited
 		if (const auto bulletPos = bulletList[bulletList.m_size - 2].m_pos; bulletPos != hitPos)
@@ -72,7 +88,7 @@ void hitmarker::draw()
 		const float diff = expire - memory::interfaces::globalVars->m_curtime;
 		if (diff <= 0.0f)
 		{
-			m_hitmarkers.erase(m_hitmarkers.begin() + i);
+			allHits.erase(allHits.begin() + i);
 			continue;
 		}
 
@@ -164,7 +180,7 @@ void hitmarker::handleHits(IGameEvent* event)
 		.player = ent
 	};
 
-	m_hitmarkers.push_back(hit);
+	allHits.push_back(hit);
 
 	if (vars::misc->hitmarker->play)
 		memory::interfaces::surface->playSound("buttons\\arena_switch_press_02.wav");

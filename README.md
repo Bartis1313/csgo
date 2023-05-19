@@ -21,9 +21,9 @@ After every config change it is required to delete the entry and let it create a
 
 ### About dependencies
 
-Dependencies folder IS NOT for dependencies themselves, if they are on vcpkg, do not include them manually! Otherwise add those
-<br />
-Some rare exceptions are edited libraries, but it is prefered to not.
+Dependencies folder IS NOT for dependencies themselves.
+If they are on vcpkg, do not include them manually!
+Rare exceptions are not supported libs, or custom addons.
 
 ## How to build
 Please follow the short read [here](https://github.com/Microsoft/vcpkg#getting-started)
@@ -35,8 +35,6 @@ If there are any errors, please open the issue.
 Default menu key is ``INSERT`` more options will be self explanained by viewing menu.
 
 ## Information
-Features marked ``(rebuild needed)`` need recode or better version.
-<br />
 This is a trianing software. No further actions taken by people are heeded.
 <br />
 <br />
@@ -47,50 +45,155 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
 # Features list: 
 <details>
 
- * Aimbot - smooth, delay, types, (mouse override)
- * RCS - control the recoil spray. Possible to smooth it. (mouse override)
- * Triggerbot - delay in ms.
- * Backtrack - manipulate ticks.
- * Fake latency - manipulate sequences in ms.
- * Bunnyhop - with chance%
- * Autostrafe - with few methods.
- * Callbacks - not really used, good example how to use them.
- * Events - listen game events, needed for some features for info. (Should avoid this if possible)
- * Thirdperson - 3rd person on key. Included with tracing, pretty much exactly what originally game does.
- * Crosshairs - custom crosshairs, 5 types.
- * Local info - ammo, pos etc... Bunch of local player informations.
- * Fps plot - collect fps and represent it in graphical resizable plot.
- * Velocity plot - collect local player speed and represent it in graphical resizable plot.
- * Hitmarker - ability to draw hitmarkers 2D/3D with dmg output.
- * No scope - removes scope black overlay.
- * Bullet tracer - draw bullets directions by line beams. Possible to also create own bullet tracer type.
- * Flashlight - use game effect flashlight.
- * Nade prediction - predicts endpoint of your nade throw. Also can predict incomming nades by same logic. Would need some rework for tracing specific things as water, glass, ents...
- * Engine prediction - useful to never skip tick and get correct server time.
- * Chams - uses engine's keyvalues to render it. 5 types and ability to draw backtrack records. Also possible to create your own.
- * Glow - highlight player ents, does not force memory glow vector, but controls it by own.
- * Sound Esp - apex legends like sound esp from passive skill of bloodhound character.
- * Esp - name, flags, boxes, health, armor, ammo, skeleton. 2D/3D.
- * DLight - highlights player by dlight. (Can't shortly fix the optimazation for them, it's due to overcomplication in how dlights are generated)
- * Enemy aiming at you warn. (Note that enemies using fov-changer hacks will not always be marked as "see you", it's physically impossible to gather fov from other clients by client)
- * 2D radar - overlay showing where enemy is, with background of the map texture. Renders rotated triangles that can be clipped with ranges or not.
- * Custom skybox - listed from game or custom, custom skybox is i 1st hierarchy.
- * Remove sky - removes props by forcing cvar, (rebuild needed - don't force, check retaddr or find if any function could be hooked for this)
- * Edit world colors - props/walls/sky (rebuild needed - transparency should be done in different way)
- * Movement trails - collect line frame by frame and draw from container
- * Bullet impacts - where the bullet has hit. Does not use events, instead gets client information of bullets list.
- * Custom smoke/molotov - color/remove/timer
- * Draw dropped weapons - box/icon/name/ammo. Fading alpha with distance
- * Bomb overlay with info. - draws infomation about bomb, where, what dmg, who planted.
- * Mirrorcam - show what is behind you on extra window (contains fixing setupbones occlusion problems)
- * Freecam - view any place without moving your model (dormant ents won't render)
- * Blacklist - blacklist bots and players, forces aimbot to fucus blacklisted players.
- * Playerlist - a playerlist that will give information of every player on the server, in one window. Does provide information for dormant ents.
- * Cache - not a feature, just escapes using same loops for(int i; 64)... everywhere.
- * Logger - log anything to left corner, with animated move + alpha when text duration reaches end.
- * Ambient - ambient light (colors are hard to set without convar - shaders api).
- * Fog - fog controller, color and intensity.
- * Weather - change weather, might cost a lot of performance drop, due to fact many particles will render.
+ * Aimbot 
+ 
+Aimbot works with coiuple of options such as: smoothing, delay, selecting hitboxes, visibility rules.
+It sets the position of the mouse, and gets data from createMove, due to huge amount of calls per frame in mouse override.
+The way it does it is locked, so we shouldn't get missed frames data. Configurable with hotkey.
+ * RCS
+ 
+Controlling your recoil punch, is comminicates in exactly same way as aimbot. Possible to match it with custom pitch / yaw.
+ * Triggerbot
+ 
+Shoot the target automatically when it's on our crosshair. Delay is configurable
+ * Backtrack
+ 
+Manipulate the client to send fake tickrate, which allows us to store records recognized as history, that we can completely fine shoot and hit.
+ * Fake latency
+ 
+Basically it sends fake latency amount, server understands it and we can use it as a extra tool for backtrack. 
+ * Bunnyhop
+ 
+Strafe automatically, it has also an autostrafers which help us to accelrate the sidemoves. Configurable with chance of hitting the bunnyhop in %.
+ * Thirdperson
+ 
+Tell the game to do thirdperson, tracing is included to close up the distance if we are close to walls. Configurable as a position and hotkey.
+ * Crosshairs
+ 
+Displays crosshair with various ways, or force the game to do so.
+ * Local info - ammo, pos etc... Bunch of local player informations
+ 
+Display the information of localplayer.
+ * Plots
+ 
+Displays fps and velocity with ImPlot, velocity data is gathered from prediction.
+ * Hitmarker
+ 
+Displays hit position with custom hitmark
+ * No scope
+ 
+Force the game blur scope shader to be nulled.
+ * Bullet tracer
+ 
+Use engine's beams to display source and destination of bullets.
+ * Flashlight
+ 
+Use game's flashlight effect.
+ * Nade prediction
+ 
+Predicts where nade lands, we also have a nade tracer which display the way of nades.
+ * Engine prediction
+ 
+1:1 prediction from the game, useful to gather accurate player datas.
+ * Chams
+ 
+Override model with custom materials, we can also add our own materials at runtime, with fancy editor.
+ * Glow
+ 
+1:1 game's glow handled on own. We could do something about stencils since they don't match with visible / non viisble.
+ * Sound Esp
+ 
+Copy of apex legends sound passive of bloodhound character.
+ * Esp
+ 
+Display ESP of player, boxes, dlights, health, armor, flags, and so on...
+ * Enemy aiming at you warning
+ 
+Basically just what it says, displays small warning text with info.
+ * 2D radar
+ 
+Displays custom radar with rotated background image, it hides game's radar to prevent overdraw look.
+ * Skybox
+ 
+Loads any skybox to the map
+ * Edit world colors
+ 
+Modulates the color of textures
+ * Movement trails
+ 
+Displays lines representing recent movement
+ * Bullet impacts
+ 
+Displays cubes representing bullet end positions
+ * Edit particle color
+ 
+Edits the color of molly, smoke, blood impact
+ * Draw dropped weapons
+ 
+Displays dropped weapons with few informations
+ * Bomb overlay with info
+ 
+Displays bomb information overlay
+ * Mirrorcam
+ 
+Displays mirrorcam overlay
+ * Freecam
+ 
+Usea freecam completely like in minecraft game.
+ * Blacklist
+ 
+Sets targets priority.
+ * Playerlist
+ 
+Store entities in one large map
+ * Logger
+ 
+Log game's actions
+ * Ambient
+ 
+Force the game to render ambient light
+ * Fog
+ 
+Control the fog on the map
+ * Tone
+ 
+Control the tone on the map
+ * Weather
+ 
+Draws rain effect from game.
+ * Interpolation
+ 
+Disables interpolation completely
+ * Flashbang reduce
+ 
+Reduces flash alpha
+ * Screen effects
+ 
+Force game to render selected effects
+ * Motion blur
+ 
+1:1 game's blur
+ * Molotov and smoke overlays
+ 
+For smoke - circle of its radius, for molotov polygon with possible triangulation.
+* Zeus display
+
+Draws a circle representing zeus range, possible to trace the polyline.
+
+
+Other things listed here are not features
+- threadsafe streamproof render, surface one is rather a deprecated solution
+- icon from the game to image, instead of premade fonts
+- game's callbacks
+- entity cache
+- discord rpc
+- hook-to-feature communication by handlers
+- logging console
+- game events (we currently need only one anyway)
+- compile-time sig to optional bytes
+- exports, memory class
+- netvars, with dumping
+- shutdown at runtime with leaving all features free'd or released
  </details>
 
 # Log
@@ -177,6 +280,7 @@ Good start is to: use any valid vac modules dumper (that will decode inputs), an
 * 2.0.4 - Dropped animations, it's useless to keep it updated all the time to newest lib version. Colorized the menu, and somewhat reworked look of it. render -> use namespace, and deprecate surface at all. Provided rendering backends for easier lookup. x88 menu now won't update keys if we don't want to. Control present / reset targets on own for streamproof method. Completely removed vectored handler - reason is because we can actually force memory leaks? That's happening eg: if you are the local host. Did some random cleanups.
 * 2.0.5 - menu recode, I hope it's "clean" now. Recode of bunch of classes, WIP chams editor cleanup, because it annoys me how complicated it is.
 * 3.0.0 - WIP refactor, making it as 3rd version due to the hard cleanup / refactor (not finished yet). I basically removed stupid OOP forcing to some real abstraction with hook and feature.
+* 3.0.1 - Fixed UB stuff, detailed in commit message.
 </details>
 
 # People who helped

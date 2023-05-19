@@ -32,7 +32,9 @@ public:
 		return crc;
 	}
 
-	PAD(4);
+private:
+	void* destroy;
+public:
 	int m_commandNumber;
 	int m_tickcount;
 	Vec3 m_viewangles;
@@ -48,8 +50,10 @@ public:
 	short m_mousedx;
 	short m_mousedy;
 	bool m_predicted;
-	PAD(24);
+	Vec3 m_viewAnglesCopy;
+	bool m_buttonsCopy;
 };
+static_assert(sizeof(CUserCmd) == 92);
 
 class CVerifiedUserCmd
 {

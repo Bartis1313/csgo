@@ -3,7 +3,6 @@
 #include <SDK/math/Vector.hpp>
 
 class CUserCmd;
-class IConVar;
 
 namespace movement
 {

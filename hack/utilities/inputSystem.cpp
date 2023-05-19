@@ -5,6 +5,8 @@
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 
+#include <bitset>
+
 enum class KeyState
 {
 	OFF,
@@ -13,9 +15,19 @@ enum class KeyState
 	PRESS
 };
 
-void KeysHandler::run(UINT message, WPARAM wparam)
+namespace inputSystem
+{
+	constexpr size_t KEYS_SIZE{ 256U };
+    std::bitset<KEYS_SIZE> m_keyStates;
+    std::bitset<KEYS_SIZE> m_keyPressStates;
+}
+
+void inputSystem::run(UINT message, WPARAM wparam)
 {
 	if (game::isChatOpen() || memory::interfaces::engine->isConsoleVisible())
+		return;
+
+	if (globals::isInHotkey)
 		return;
 
 	// init starting keys, undefined
@@ -92,12 +104,12 @@ void KeysHandler::run(UINT message, WPARAM wparam)
 	}
 }
 
-bool KeysHandler::isKeyDown(UINT vKey)
+bool inputSystem::isKeyDown(UINT vKey)
 {
 	return m_keyStates[vKey];
 }
 
-bool KeysHandler::isKeyPressed(UINT vKey)
+bool inputSystem::isKeyPressed(UINT vKey)
 {
 	if (m_keyPressStates[vKey])
 	{
@@ -107,7 +119,7 @@ bool KeysHandler::isKeyPressed(UINT vKey)
 	return false;
 }
 
-bool KeysHandler::isKeyDown(const std::initializer_list<UINT>& vKeys)
+bool inputSystem::isKeyDown(const std::initializer_list<UINT>& vKeys)
 {
 	for (const auto vKey : vKeys)
 	{
@@ -117,7 +129,7 @@ bool KeysHandler::isKeyDown(const std::initializer_list<UINT>& vKeys)
 	return true;
 }
 
-bool KeysHandler::isKeyPressed(const std::initializer_list<UINT>& vKeys)
+bool inputSystem::isKeyPressed(const std::initializer_list<UINT>& vKeys)
 {
 	for (const auto vKey : vKeys)
 	{

@@ -192,7 +192,7 @@ uintptr_t netvars::getDataMap(DataMap_t* map, const std::string_view name)
 
 void netvars::dump()
 {
-	file = std::ofstream{ config.getHackPath() / "netvarsDump.txt" };
+	file = std::ofstream{ config::getHackPath() / "netvarsDump.txt" };
 	file << std::format("Netvars from: {}", utilities::getTime()) << "\n\n";
 
 	TimeCount timer{};

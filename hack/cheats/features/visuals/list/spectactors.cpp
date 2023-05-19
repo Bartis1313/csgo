@@ -11,6 +11,7 @@
 #include <array>
 
 #include <cheats/hooks/present.hpp>
+#include <cheats/hooks/unkownRoundEnd.hpp>
 
 namespace
 {
@@ -21,11 +22,36 @@ namespace
 			this->registerRun(spectactor::draw);
 		}
 	} specHandler;
+
+	struct SpectactorReset : hooks::UnknownRoundEnd
+	{
+		SpectactorReset()
+		{
+			this->registerRun(spectactor::reset);
+		}
+	} specReset;
+}
+
+namespace spectactor
+{
+	std::unordered_map<ObserverTypes, std::string_view> modeToString
+	{
+		{ OBS_MODE_NONE, "None" },
+		{ OBS_MODE_DEATHCAM, "Deathcam" },
+		{ OBS_MODE_FREEZECAM, "Freezecam" },
+		{ OBS_MODE_FIXED, "Fixed" },
+		{ OBS_MODE_IN_EYE, "In-eye" },
+		{ OBS_MODE_CHASE, "Chase" },
+		{ OBS_MODE_POI, "Poi" },
+		{ OBS_MODE_ROAMING, "Roaming" }
+	};
+
+	std::vector<std::pair<std::string, ObserverTypes>> allSpecs;
 }
 
 void spectactor::reset()
 {
-	m_specs.clear();
+	allSpecs.clear();
 }
 
 void spectactor::draw()
@@ -36,7 +62,7 @@ void spectactor::draw()
 	if (!game::isAvailable())
 		return;
 
-	m_specs.clear();
+	allSpecs.clear();
 
 	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
@@ -50,18 +76,18 @@ void spectactor::draw()
 			continue;
 
 		if(const auto type = observer->m_iObserverMode() != ObserverTypes::OBS_MODE_NONE)
-			m_specs.emplace_back(observer->getName(), observer->m_iObserverMode());
+			allSpecs.emplace_back(observer->getName(), observer->m_iObserverMode());
 	}
 
-	if (m_specs.empty())
+	if (allSpecs.empty())
 		return;
 
 	if (ImGui::Begin("Spectactors", &vars::misc->spectactorList->enabled, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoDecoration))
 	{	
-		for (size_t i = 0; auto [name, mode] : m_specs)
+		for (size_t i = 0; auto [name, mode] : allSpecs)
 		{
-			ImGui::TextUnformatted(std::format("{} | {}", name, m_modeString.at(mode)).c_str());
-			if (i != m_specs.size())
+			ImGui::TextUnformatted(std::format("{} | {}", name, modeToString.at(mode)).c_str());
+			if (i != allSpecs.size())
 				ImGui::Separator();
 
 			i++;

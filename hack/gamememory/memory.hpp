@@ -1,5 +1,7 @@
 #pragma once
 
+#include "address.hpp"
+
 #include <SDK/math/Vector.hpp>
 #include <SDK/math/matrix.hpp>
 #include <SDK/interfaces/ifc.hpp>
@@ -39,107 +41,15 @@ class IMaterial;
 class EnvTonemapController_t;
 class FogController_t;
 class EnvAmbientLight_t;
-
+struct SDKColor;
 enum ClassID;
 
 using retaddr_t = uintptr_t;
 
 namespace memory
 {
-	enum class Dereference : size_t
-	{
-		ONCE = 1,
-		TWICE,
-		THREE
-	};
-
 	void init();
 	void postInit();
-
-	template<typename T>
-	struct Address
-	{
-		constexpr Address() = default;
-		// pass by offset
-		constexpr Address(uintptr_t addr) :
-			m_addr{ addr }
-		{}
-		constexpr Address(void* addr) :
-			m_addr{ reinterpret_cast<uintptr_t>(addr) }
-		{}
-
-		// raw place in memory as offset
-		constexpr auto getRawAddr() const { return m_addr; }
-		// cast to anything
-		template<typename K>
-		constexpr auto cast() const { return Address<K>{ m_addr }; }
-		constexpr auto add(uintptr_t extraOffset) const { return Address{ m_addr + extraOffset }; }
-		constexpr auto sub(uintptr_t extraOffset) const { return Address{ m_addr - extraOffset }; }
-		// dereference x times. Possible args are: 1, 2, 3. There will for sure won't be a case for 4 level dereference. 3rd is very rare.
-		constexpr auto deRef(Dereference times = Dereference::ONCE)
-		{
-			for ([[maybe_unused]] auto i : std::views::iota(0U, E2T(times)))
-				m_addr = *reinterpret_cast<uintptr_t*>(m_addr);
-
-			return Address<T>{ m_addr };
-		}
-		// get as rel32
-		constexpr auto rel(uintptr_t relOffset = 0x1, uintptr_t absOffset = 0x0) const
-		{
-			const auto jump = m_addr + relOffset;
-			const auto target = *reinterpret_cast<decltype(jump)*>(jump);
-			return Address<T>{ jump + absOffset + 0x4 + target };
-		}
-		// will work for classes types too
-		constexpr T operator()() const
-		{
-			if constexpr (std::is_class_v<T>)
-				return *reinterpret_cast<T*>(m_addr);
-			else
-				return (T)(m_addr);
-		}
-
-		constexpr T operator->() const
-		{
-			if constexpr (std::is_class_v<T>)
-				return *reinterpret_cast<T*>(m_addr);
-			else
-				return (T)(m_addr);
-		}
-
-		template<size_t N>
-		Address<T> scan(const std::string_view mod, const std::array<std::optional<uint8_t>, N>& sig);
-		template<li::detail::offset_hash_pair hash>
-		Address<T> byExport(const std::string_view module);
-		template<typename TT>
-		Address<T> byVFunc(const Interface<TT>& ifc, size_t index);
-		// static pointer
-		Address<T> findFromGame(ClassID id);
-		// anything that changes every round
-		Address<T> findFromGameLoop(ClassID id);
-
-		using value = T;
-		uintptr_t m_addr;
-		std::string_view m_module;
-	};
-
-	namespace detail
-	{
-		inline std::unordered_map<std::string_view, HMODULE> m_ModulesAddr;
-	}
-
-	inline HMODULE getModule(const std::string_view str) { return detail::m_ModulesAddr.at(str); }
-	template<typename T, li::detail::offset_hash_pair __hash>
-	T exportVar(const std::string_view _module)
-	{
-		return static_cast<T>(::li::detail::lazy_function<__hash, T>().in(getModule(_module)));
-	}
-
-	template<typename T = retaddr_t>
-	T retAddr()
-	{
-		return reinterpret_cast<T>(_ReturnAddress());
-	}
 };
 
 namespace memory
@@ -147,7 +57,7 @@ namespace memory
 	using loadSky_t = void(__fastcall*)(const char*);
 	using findHud_t = uintptr_t * (__thiscall*)(void* /*uintptr_t*/, const char*);
 	using sequenceActivity_t = int(__fastcall*)(void*, void*, int);
-	using inSmoke_t = bool(__cdecl*)(Vec3, Vec3);
+	using inSmoke_t = bool(__stdcall*)(Vec3, Vec3);
 	using isBreakable_t = bool(__thiscall*)(void*);
 	using flashlightDestroy_t = void(__thiscall*)(void*, void*);
 	using flashlightCreate_t = void* (__thiscall*)(void*, void*, float, float, float, float, int, const char*, float, float);
@@ -180,6 +90,8 @@ namespace memory
 	using setAbsVelocity_t = void(__thiscall*)(void*, const Vec3&);
 	using getParticleSystemIndex_t = int(__stdcall*)(const char*);
 	using dispatchParticleEffect_t = void(__stdcall*)(const char*, Vec3, Vec3, void*, int, void*);
+	using renderBoxInternal_t = void(__stdcall*)(const Vec3&, const Vec3&, const Vec3&, const Vec3&, SDKColor, IMaterial*, bool);
+	using renderLine_t = void(__stdcall*)(const Vec3&, const Vec3&, SDKColor, bool);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
@@ -247,6 +159,11 @@ namespace memory
 	inline Address<uintptr_t> nextMovePeer;
 	inline Address<getParticleSystemIndex_t> getParticleSystemIndex;
 	inline Address<dispatchParticleEffect_t> dispatchParticleEffect;
+	inline Address<renderBoxInternal_t> renderBoxInternal;
+	inline Address<renderLine_t> renderLine;
+	inline Address<float*> vignetteBlurStrengthPost;
+	inline Address<retaddr_t> scopeDust;
+	inline Address<retaddr_t> scopeArc;
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;
@@ -272,6 +189,7 @@ namespace memory
 	inline Address<void*> unkRound;
 	inline Address<void*> present;
 	inline Address<void*> reset;
+	inline Address<void*> updatePostEffects;
 
 	inline Address<teslaCreate_t> tesla;
 	inline Address<dispatchEffect_t> dispatchEffect;

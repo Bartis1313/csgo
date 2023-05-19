@@ -14,7 +14,7 @@ void console::setLogger(const std::string_view title, const std::string_view log
 	assert(title.empty() == false); // not needed in release, will make code ugly if we add #idfefs everywhere
 	assert(logName.empty() == false);
 
-	detail::m_fileStream = std::ofstream{ config.getHackPath() / detail::m_logName, std::ofstream::out | std::ofstream::app };
+	detail::m_fileStream = std::ofstream{ config::getHackPath() / detail::m_logName, std::ofstream::out | std::ofstream::app };
 
 #ifdef _DEBUG
 	AllocConsole();

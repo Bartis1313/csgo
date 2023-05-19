@@ -104,7 +104,8 @@ void bombOverlay::draw()
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/389530-bomb-damage-indicator.html
 	constexpr float bombRadius = 500.0f; // there is no info for this, run some map scanner
 	constexpr float sigma = (bombRadius * 3.5f) / 3.0f;
-	const float hypDist = (bombEnt->getEyePos() - game::localPlayer->getEyePos()).length();
+	const auto bombEyeEye = bombEnt->m_vecOrigin() + bombEnt->m_ViewOffset();
+	const float hypDist = (bombEyeEye - game::localPlayer->getEyePos()).length();
 	const float dmg = game::scaleDamageArmor((bombRadius * (std::exp(-hypDist * hypDist / (2.0f * sigma * sigma)))), static_cast<float>(game::localPlayer->m_ArmorValue()));
 	const bool isSafe = dmg < game::localPlayer->m_iHealth();
 

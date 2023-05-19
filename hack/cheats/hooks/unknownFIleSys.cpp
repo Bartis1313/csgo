@@ -15,7 +15,7 @@
 
 hooks::UnknownFileSysAlloc::value hooks::UnknownFileSysAlloc::hook(FAST_ARGS, void* image)
 {
-	uintptr_t thisptrStack;
+	volatile uintptr_t thisptrStack{ };
 	__asm mov thisptrStack, ebx;
 
 	if (image && _ReturnAddress() == memory::returnAddrRadarImage() && *reinterpret_cast<uintptr_t*>(image) == DDS_HEADER)

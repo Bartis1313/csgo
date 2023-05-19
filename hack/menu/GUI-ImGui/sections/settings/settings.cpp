@@ -6,8 +6,8 @@
 #include <config/config.hpp>
 #include <utilities/console/console.hpp>
 
-#include <mutex>
 #include <imgui_stdlib.h>
+#include <mutex>
 
 void tabs::settings::draw()
 {
@@ -17,9 +17,9 @@ void tabs::settings::draw()
 	std::once_flag onceFlag;
 	std::call_once(onceFlag, []
 		{
-			for (size_t i = 0; const auto & el : config.getAllConfigFiles())
+			for (size_t i = 0; const auto & el : config::getAllConfigFiles())
 			{
-				if (el == config.getCfgToLoad())
+				if (el == config::getCfgToLoad())
 					currentcfg = i;
 
 				i++;
@@ -30,17 +30,17 @@ void tabs::settings::draw()
 
 	ImGui::BeginChild("##leftconfig");
 	{
-		const auto allcfg = config.getAllConfigFiles();
+		const auto allcfg = config::getAllConfigFiles();
 
 		ImGui::BeginGroupPanel("Config", ImGui::GetContentRegionAvail());
 		{
 			if (ImGui::InputText("Config name", &text, ImGuiInputTextFlags_EnterReturnsTrue))
 			{
-				if (utilities::toLowerCase(text) != config.getDefaultConfigName())
+				if (utilities::toLowerCase(text) != config::getDefaultConfigName())
 				{
-					config.save(text);
+					config::save(text);
 					text.clear();
-					config.reload();
+					config::reload();
 				}
 				else
 					console::error("provided config name was same as default");
@@ -55,8 +55,8 @@ void tabs::settings::draw()
 			{
 				if (dontAskMe && delayedClose)
 				{
-					config.deleteCfg(allcfg.at(currentcfg));
-					config.reload();
+					config::deleteCfg(allcfg.at(currentcfg));
+					config::reload();
 				}
 				else
 					ImGui::OpenPopup("Delete?");
@@ -84,8 +84,8 @@ void tabs::settings::draw()
 
 				if (ImGui::Button("OK", { 120.0f, 0.0f }))
 				{
-					config.deleteCfg(allcfg.at(currentcfg));
-					config.reload();
+					config::deleteCfg(allcfg.at(currentcfg));
+					config::reload();
 					ImGui::CloseCurrentPopup();
 
 					if (dontAskMe)
@@ -110,17 +110,17 @@ void tabs::settings::draw()
 			ImGui::SameLine();
 			if (ImGui::Button("Save"))
 			{
-				config.save(allcfg.at(currentcfg));
+				config::save(allcfg.at(currentcfg));
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Load"))
 			{
-				config.load(allcfg.at(currentcfg));
+				config::load(allcfg.at(currentcfg));
 			}
 			if (ImGui::Button("Load on start"))
 			{
 				// this is only saving the load name, nothing more
-				config.startSave(allcfg.at(currentcfg));
+				config::startSave(allcfg.at(currentcfg));
 				console::info("{} will be now loaded config on the start", allcfg.at(currentcfg));
 			}
 			ImGui::SameLine();

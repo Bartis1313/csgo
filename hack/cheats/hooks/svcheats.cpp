@@ -5,7 +5,7 @@
 
 hooks::SvCheats::value hooks::SvCheats::hook(FAST_ARGS)
 {
-	if (memory::retAddr() == memory::camThink() && vars::misc->thirdp->enabled)
+	if (reinterpret_cast<uintptr_t>(_ReturnAddress()) == memory::camThink() && vars::misc->thirdp->enabled)
 		return true;
 
 	return original(thisptr);

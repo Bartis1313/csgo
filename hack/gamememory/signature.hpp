@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utilities/cStr.hpp>
+
 #include <array>
 #include <optional>
 #include <string_view>
@@ -40,22 +42,6 @@ namespace signature
                 return static_cast<char>(digit - 10 + 'A');
         }
     }
-
-    // is not a curent feature in std
-    // https://youtu.be/zRYlQGMdISI?t=145
-    template<size_t SIZE>
-    struct cStr : public std::array<char, SIZE + 1U>
-    {
-        constexpr cStr(const char* str)
-            : std::array<char, SIZE + 1U>()
-        {
-            for (size_t i = 0U; i != SIZE; ++i)
-                this->_Elems[i] = str[i];
-        }
-    };
-
-    template<size_t SIZE>
-    cStr(const char(&)[SIZE]) -> cStr<SIZE - 1U>;
 
     template <cStr str>
     struct cSig
@@ -144,4 +130,12 @@ namespace signature
     }
 }
 
+// old style
 #define SIG(_sig) signature::cSig<_sig>::sig()
+
+// new style
+template<cStr str>
+constexpr auto operator"" _sig()
+{
+    return signature::cSig<str>::sig();
+}

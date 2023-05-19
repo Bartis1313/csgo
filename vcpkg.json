@@ -10,8 +10,8 @@
     "implot",
     "stb",
     "magic-enum",
-    "discord-rpc",
     "freetype",
+    "discord-rpc",
     "nanosvg"
   ]
 }

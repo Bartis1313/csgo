@@ -30,6 +30,7 @@ enum hookIndexes
 	RENDER_VIEW_SCENE_END = 9,
 	OVERRIDE_MOUSE = 23,
 	ALLOC_KEYVALUE = 2,
+	SET_DRAW_COLOR = 15, // overloaded
 };
 
 namespace hooks

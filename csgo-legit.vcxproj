@@ -50,7 +50,7 @@
     <OutDir>.\build\debug\</OutDir>
     <TargetName>Debug_$(ProjectName)</TargetName>
     <SourcePath>$(SourcePath)</SourcePath>
-    <IntDir>.\build\Intermediate\</IntDir>
+    <IntDir>.\build\Intermediate\Debug\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>.\build\Release\</OutDir>
@@ -60,7 +60,7 @@
     <SourcePath>$(SourcePath)</SourcePath>
     <LinkIncremental>false</LinkIncremental>
     <GenerateManifest>false</GenerateManifest>
-    <IntDir>.\build\Intermediate\</IntDir>
+    <IntDir>.\build\Intermediate\Release\</IntDir>
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
@@ -70,8 +70,9 @@
   </PropertyGroup>
   <PropertyGroup Label="Vcpkg" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <VcpkgUseStatic>true</VcpkgUseStatic>
-    <VcpkgTriplet>
-    </VcpkgTriplet>
+    <VcpkgTriplet>x86-windows-static</VcpkgTriplet>
+    <VcpkgUseMD>
+    </VcpkgUseMD>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,16 +111,11 @@
       </IgnoreSpecificDefaultLibraries>
       <AdditionalDependencies>DbgHelp.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>WIN32;NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest /Gw %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <CreateHotpatchableImage>
@@ -134,13 +130,13 @@
       <LanguageStandard_C>Default</LanguageStandard_C>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
-      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DebugInformationFormat>None</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <StringPooling>false</StringPooling>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <StringPooling>true</StringPooling>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
@@ -149,7 +145,9 @@
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
     </ClCompile>
     <Link>
       <IgnoreSpecificDefaultLibraries>
@@ -159,15 +157,10 @@
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <ImageHasSafeExceptionHandlers />
+      <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
     </Link>
-    <PreBuildEvent>
-      <Command>
-      </Command>
-    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="hack\cheats\features\aimbot\cmdCache.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\chams\factory\factory.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\list\spectactors.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\bulletUpdater.cpp" />
@@ -183,6 +176,7 @@
     <ClCompile Include="hack\cheats\hooks\doPostScreenEffects.cpp" />
     <ClCompile Include="hack\cheats\hooks\drawIndexPrimitive.cpp" />
     <ClCompile Include="hack\cheats\hooks\drawModelExecute.cpp" />
+    <ClCompile Include="hack\cheats\hooks\drawSetColor.cpp" />
     <ClCompile Include="hack\cheats\hooks\filesCheck.cpp" />
     <ClCompile Include="hack\cheats\hooks\frameStageNotify.cpp" />
     <ClCompile Include="hack\cheats\hooks\getColorModulation.cpp" />
@@ -196,6 +190,7 @@
     <ClCompile Include="hack\cheats\hooks\levelInitPreEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\levelShutdown.cpp" />
     <ClCompile Include="hack\cheats\hooks\lockCursor.cpp" />
+    <ClCompile Include="hack\cheats\hooks\updatePostEffects.cpp" />
     <ClCompile Include="hack\cheats\hooks\overrideMouse.cpp" />
     <ClCompile Include="hack\cheats\hooks\overrideView.cpp" />
     <ClCompile Include="hack\cheats\hooks\paintTraverse.cpp" />
@@ -216,8 +211,8 @@
     <ClCompile Include="hack\cheats\hooks\viewRender.cpp" />
     <ClCompile Include="hack\cheats\hooks\wndproc.cpp" />
     <ClCompile Include="hack\cheats\features\prediction\prediction.cpp" />
-    <ClCompile Include="hack\cheats\features\RCS\RCS.cpp" />
-    <ClCompile Include="hack\cheats\features\triggerbot\triggerbot.cpp" />
+    <ClCompile Include="hack\cheats\features\combat\RCS\RCS.cpp" />
+    <ClCompile Include="hack\cheats\features\combat\triggerbot\triggerbot.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\chams\chams.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\chams\editor.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\glow\glow.cpp" />
@@ -252,8 +247,8 @@
     <ClCompile Include="hack\cheats\features\visuals\world\tone.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\world\weather.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\world\zeus.cpp" />
-    <ClCompile Include="hack\cheats\features\aimbot\aimbot.cpp" />
-    <ClCompile Include="hack\cheats\features\aimbot\aimbotDraw.cpp" />
+    <ClCompile Include="hack\cheats\features\combat\aimbot\aimbot.cpp" />
+    <ClCompile Include="hack\cheats\features\combat\aimbot\aimbotDraw.cpp" />
     <ClCompile Include="hack\cheats\features\backtrack\backteack.cpp" />
     <ClCompile Include="hack\cheats\features\blacklist\blacklist.cpp" />
     <ClCompile Include="hack\cheats\features\cache\cache.cpp" />
@@ -269,6 +264,7 @@
     <ClCompile Include="hack\cheats\features\misc\thirdperson\thirdperson.cpp" />
     <ClCompile Include="hack\cheats\features\particle\particle.cpp" />
     <ClCompile Include="hack\deps\ImGui\editor\LanguageDefinitions.cpp" />
+    <ClCompile Include="hack\gamememory\address.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\sections\combat\aim.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\sections\editors\chamsEditor.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\sections\editors\editors.cpp" />
@@ -322,9 +318,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="hack\cheats\features\aimbot\aimbot.hpp" />
-    <ClInclude Include="hack\cheats\features\aimbot\aimbotDraw.hpp" />
-    <ClInclude Include="hack\cheats\features\aimbot\cmdCache.hpp" />
+    <ClInclude Include="hack\cheats\features\combat\aimbot\aimbot.hpp" />
+    <ClInclude Include="hack\cheats\features\combat\aimbot\aimbotDraw.hpp" />
+    <ClInclude Include="hack\cheats\features\combat\aimbot\helper.hpp" />
     <ClInclude Include="hack\cheats\features\backtrack\backtrack.hpp" />
     <ClInclude Include="hack\cheats\features\blacklist\blacklist.hpp" />
     <ClInclude Include="hack\cheats\features\cache\cache.hpp" />
@@ -340,8 +336,8 @@
     <ClInclude Include="hack\cheats\features\misc\thirdperson\thirdperson.hpp" />
     <ClInclude Include="hack\cheats\features\particle\particle.hpp" />
     <ClInclude Include="hack\cheats\features\prediction\prediction.hpp" />
-    <ClInclude Include="hack\cheats\features\RCS\RCS.hpp" />
-    <ClInclude Include="hack\cheats\features\triggerbot\triggerbot.hpp" />
+    <ClInclude Include="hack\cheats\features\combat\RCS\RCS.hpp" />
+    <ClInclude Include="hack\cheats\features\combat\triggerbot\triggerbot.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\chams.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\editor.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\factory\factory.hpp" />
@@ -358,7 +354,6 @@
     <ClInclude Include="hack\cheats\features\visuals\misc\screenEffects.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\misc\trails.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\player\boxes.hpp" />
-    <ClInclude Include="hack\cheats\features\visuals\player\dormacy.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\player\enemyWarn.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\player\player.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\player\sounds.hpp" />
@@ -395,14 +390,19 @@
     <ClInclude Include="hack\cheats\hooks\doPostScreenEffects.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawIndexPrimitive.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawModelExecute.hpp" />
+    <ClInclude Include="hack\cheats\hooks\drawSetColor.hpp" />
     <ClInclude Include="hack\cheats\hooks\filesCheck.hpp" />
     <ClInclude Include="hack\cheats\hooks\frameStageNotify.hpp" />
     <ClInclude Include="hack\cheats\hooks\getColorModulation.hpp" />
     <ClInclude Include="hack\cheats\hooks\getUnverifiedFileHashes.hpp" />
     <ClInclude Include="hack\cheats\hooks\helpers\common.hpp" />
     <ClInclude Include="hack\cheats\hooks\helpers\helper.hpp" />
+    <ClInclude Include="hack\cheats\hooks\updatePostEffects.hpp" />
     <ClInclude Include="hack\cheats\hooks\svcheats.hpp" />
     <ClInclude Include="hack\config\cfgBox.hpp" />
+    <ClInclude Include="hack\gamememory\address.hpp" />
+    <ClInclude Include="hack\gamememory\modules.hpp" />
+    <ClInclude Include="hack\utilities\cStr.hpp" />
     <ClInclude Include="hack\utilities\runnable.hpp" />
     <ClInclude Include="hack\cheats\hooks\hooks.hpp" />
     <ClInclude Include="hack\cheats\hooks\isDepth.hpp" />
@@ -445,8 +445,7 @@
     <ClInclude Include="hack\deps\magic_enum\prettyNames.hpp" />
     <ClInclude Include="hack\deps\delaunator-cpp\delaunator.hpp" />
     <ClInclude Include="hack\gamememory\memory.hpp" />
-    <ClInclude Include="hack\gamememory\modules.hpp" />
-    <ClInclude Include="hack\gamememory\pattern.hpp" />
+    <ClInclude Include="hack\gamememory\signature.hpp" />
     <ClInclude Include="hack\gamememory\sigs.hpp" />
     <ClInclude Include="hack\menu\GUI-ImGui\sections\background.hpp" />
     <ClInclude Include="hack\menu\GUI-ImGui\imguiaddons.hpp" />

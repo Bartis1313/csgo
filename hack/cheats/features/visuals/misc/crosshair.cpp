@@ -13,6 +13,21 @@
 #include <utilities/math/math.hpp>
 #include <render/render.hpp>
 
+#include <cheats/hooks/paintTraverse.hpp>
+
+namespace
+{
+	struct CrosshairHandler : hooks::PaintTraverse
+	{
+		CrosshairHandler()
+		{
+			this->registerInit(crosshair::init);
+			this->registerRender(crosshair::draw);
+			this->registerShutdown(crosshair::shutdown);
+		}
+	} crosshairHandler;
+}
+
 namespace crosshair
 {
 	IConVar* m_crosshair;

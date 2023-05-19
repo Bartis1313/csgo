@@ -1,6 +1,6 @@
 #pragma once
 
-#include "pattern.hpp"
+#include "signature.hpp"
 
 // I found by strictly setting glow color in console and finding what exactly changed in reclass
 // or go EntityGlowEffects, list up xrefs. https://github.com/perilouswithadollarsign/cstrike15_src/blob/f82112a2388b841d72cb62ca48ab1846dfcc11c8/game/client/glow_outline_effect.cpp#L34
@@ -274,3 +274,18 @@
 #define GET_PARTICLE_SYSTEM_IDX		SIG("56 8B F1 85 F6 74 22 8B 0D ? ? ? ?")
 // #STR: "Client: Missing precache for particle system \"%s\"!\n"
 #define DISPATCH_PARTICLE_EFFECT	SIG("55 8B EC 83 E4 F8 81 EC ? ? ? ? 56 8B F1 85 F6")
+// spotted in the glow
+#define RENDER_BOX					SIG("55 8B EC 83 E4 F8 81 EC ? ? ? ? 53 56 57 E8 ? ? ? ? 8B 0D ? ? ? ? 8B 01 FF 90 ? ? ? ? 8B F0 89 74 24 2C 85 F6 74 07 8B 06")
+// close to render box
+#define RENDER_LINE					SIG("55 8B EC 81 EC ? ? ? ? 53 56 57 E8 ? ? ? ? 8B 0D ? ? ? ? 8B 01 FF 90 ? ? ? ? 8B F0 85 F6 74 07 8B 06")
+// CEnginePostMaterialProxy::OnBind
+#define MATERIALPROXY_ONBIND		SIG("56 8B F1 57 8B 4E 04 85 C9")
+// ClientModeCSNormal::UpdatePostProcessingEffects
+// https://www.unknowncheats.me/forum/2019182-post26.html
+#define BLURSCOPE_VIGNETTEPOST		SIG("0F 11 05 ? ? ? ? F3 0F 7E 87")
+// ClientModeCSNormal::UpdatePostProcessingEffects()
+#define UPDATEPOST_EFFECTS			SIG("55 8B EC 51 53 56 57 8B F9 8B 4D 04 E8 ? ? ? ? 8B 35 ? ? ? ? 85 F6")
+// https://www.unknowncheats.me/forum/counterstrike-global-offensive/331329-achieving-noscope-blurry-lines.html
+#define SCOPE_DUST_RET				SIG("FF 50 3C 8B 4C 24 20")
+// https://www.unknowncheats.me/forum/counterstrike-global-offensive/331329-achieving-noscope-blurry-lines.html
+#define SCOPE_ARC_RET				SIG("8B 0D ? ? ? ? FF B7 ? ? ? ? 8B 01 FF 90 ? ? ? ? 8B 7C 24 1C")

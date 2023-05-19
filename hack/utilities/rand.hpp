@@ -3,9 +3,6 @@
 #include <random>
 #include <type_traits>
 
-#include <random>
-#include <type_traits>
-
 class Random // sfinae rule simple template static class
 {
 public:

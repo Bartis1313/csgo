@@ -52,6 +52,22 @@ IMaterial* material::factory::createMaterial(const MaterialData& data)
 	return material;
 }
 
+IMaterial* material::factory::findMaterial(char const* name, const char* group, bool complain, const char* prefix)
+{
+	IMaterial* mat = memory::interfaces::matSys->findMaterial(name, group, complain, prefix);
+	assert(mat);
+
+	return mat;
+}
+
+ITexture* material::factory::findTexture(char const* name, const char* group, bool complain, int additionalFlags)
+{
+	ITexture* tex = memory::interfaces::matSys->findTexture(name, group, complain, additionalFlags);
+	assert(tex);
+
+	return tex;
+}
+
 void material::factory::shutdown()
 {
 	for (const auto& materialData : materials)

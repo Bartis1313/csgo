@@ -54,12 +54,18 @@ enemyWarning::checkType enemyWarning::check(Player_t* ent)
 	return std::pair{ check, checkAim };
 }
 
-void enemyWarning::think(Player_t* ent)
+void enemyWarning::beginThink(Player_t* ent)
 {
 	if (!vars::misc->aimWarn->enabled)
 		return;
 
 	spottedEnts.at(ent->getIndex()) = check(ent);
+}
+
+void enemyWarning::endThink()
+{
+	for (auto& spot : spottedEnts)
+		spot = std::nullopt;
 }
 
 void enemyWarning::draw()
@@ -77,7 +83,7 @@ void enemyWarning::draw()
 			if (vis)
 				visible = true;
 
-			if (aiming)
+			if (aim)
 				aiming = true;
 		}
 	}

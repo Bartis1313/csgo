@@ -98,7 +98,7 @@ void Key::update()
 
 bool Key::isPressed() const
 {
-	return KeysHandler::isKeyPressed(m_keyCode);
+	return inputSystem::isKeyPressed(m_keyCode);
 }
 
 bool Key::isDown() const
@@ -108,7 +108,7 @@ bool Key::isDown() const
 	if (msk >= 0 && msk <= 4)
 		return ImGui::IsMouseDown(msk);*/
 
-	return KeysHandler::isKeyDown(m_keyCode);
+	return inputSystem::isKeyDown(m_keyCode);
 }
 
 bool Key::isToggled() const

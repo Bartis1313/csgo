@@ -5,7 +5,7 @@
 
 hooks::IsFollowingEntity::value hooks::IsFollowingEntity::hook(FAST_ARGS)
 {
-	if (vars::misc->disableItems->interpolate && memory::retAddr() == memory::retAddrToInterpolation())
+	if (vars::misc->disableItems->interpolate && reinterpret_cast<uintptr_t>(_ReturnAddress()) == memory::retAddrToInterpolation())
 	{
 		return true;
 	}

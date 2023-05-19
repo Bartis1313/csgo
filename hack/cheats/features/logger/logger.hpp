@@ -5,7 +5,6 @@
 #include <string>
 
 struct ImFont;
-class IGameEvent;
 
 namespace logger
 {

@@ -8,16 +8,13 @@
 #include <array>
 
 class CUserCmd;
-class INetChannel;
-class IConVar;
-class BackTrackUpdater;
 enum FrameStage;
 
 namespace backtrack
 {
 	struct StoredRecord
 	{
-		float simtime{ 0.0f };
+		float simtime{ };
 		Vec3 head{ };
 		// use origin to set abs or for whatever need
 		Vec3 origin{ };

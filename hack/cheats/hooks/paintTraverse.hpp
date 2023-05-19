@@ -15,12 +15,17 @@ private:
 	inline static call original;
 
 	using clRun = std::function<void()>;
+	using clInit = std::function<void()>;
 protected:
 	void registerRender(const clRun& callback) { Storage::runs.push_back(callback); }
+	void registerInit(const clRun& callback) { Storage::inits.push_back(callback); }
+	void registerShutdown(const clRun& callback) { Storage::shutdowns.push_back(callback); }
 private:
 	struct Storage
 	{
 		inline static vectorRunnable<clRun> runs;
+		inline static vectorRunnable<clRun> inits;
+		inline static vectorRunnable<clRun> shutdowns;
 	};
 };
 _HOOK_END

@@ -7,6 +7,7 @@ struct IDirect3DTexture9;
 namespace radar
 {
 	void draw();
+	bool manuallyInitTexture();
 	void gatherMap(MapStruct* map);
 
 	inline IDirect3DTexture9* mapTexture{ nullptr };

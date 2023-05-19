@@ -7,6 +7,7 @@
 #include <SDK/Enums.hpp>
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/interfaces/interfaces.hpp>
+#include <SDK/CCSGO_HudRadar.hpp>
 #include <cheats/features/blacklist/blacklist.hpp>
 #include <render/Color.hpp>
 
@@ -114,7 +115,7 @@ void playerList::draw()
 				if (ImGui::TableNextColumn())
 				{
 					const auto health = ent->isDormant()
-						? CacheFields::getCachedFields().at(idx).m_health
+						? EntityCache::CacheFields::getCachedFields().at(idx).m_health
 						: ent->m_iHealth();
 					ImVec4 color;
 					std::memcpy(&color, Color::healthBased(health).data(), 4 * sizeof(float));

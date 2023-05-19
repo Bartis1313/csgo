@@ -7,7 +7,7 @@ hooks::ProcessSpottedEntityUpdate::value hooks::ProcessSpottedEntityUpdate::hook
 	//int size = *reinterpret_cast<int*>((uintptr_t)unk + 0xC);
 	//printf("size is %i\n", size);
 
-	CacheFields::update();
+	EntityCache::CacheFields::update();
 
 	return original(thisptr, unk);
 }

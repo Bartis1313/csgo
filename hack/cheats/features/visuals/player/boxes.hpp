@@ -1,12 +1,15 @@
 #pragma once
 
-struct Box;
+#include <render/BBox.hpp>
+#include <config/cfgBox.hpp>
 
-struct BoxesDraw
+namespace boxes
 {
-	static void drawBox2D(const Box& box, bool isDormant, float dormacyAlpha);
-	static void drawBox2DFilled(const Box& box, bool isDormant, float dormacyAlpha);
-	static void drawBox3D(const Box& box, bool isDormant, float dormacyAlpha, float thickness = 1.0f);
-	static void drawBox3DFilled(const Box& box, bool isDormant, float dormacyAlpha, float thickness = 1.0f);
-	static void drawBox3DFilledMultiColor(const Box& box, bool isDormant, float dormacyAlpha, float thickness = 1.0f);
+	void drawInnerOutline(const Box& box, float extraAlpha = 1.0f);
+	void drawOuterOutline(const Box& box, float extraAlpha = 1.0f);
+	void drawRect(const Box& box, const Color& color, float extraAlpha = 1.0f);
+	void drawRectFilled(const Box& box, const Color& color, float extraAlpha = 1.0f);
+	void drawRectGradient(const Box& box, const Color& color1, const Color& color2, const Color& color3, const Color& color4, float extraAlpha = 1.0f);
+	void drawBox3D(const Box& box, const Color& color, float extraAlpha = 1.0f);
+	void drawBoxFilled3D(const Box& box, const Color& color, float extraAlpha = 1.0f);
 };

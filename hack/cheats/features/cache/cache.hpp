@@ -5,8 +5,9 @@
 #include <utility>
 #include <optional>
 
+#include <SDK/CCSGO_HudRadar.hpp>
+
 class Entity_t;
-struct RadarEntity;
 enum ClassID;
 
 enum class EntCacheType // add more if needed, each group should contain many idx's, player is the exception
@@ -20,6 +21,18 @@ enum class EntCacheType // add more if needed, each group should contain many id
 class EntityCache final
 {
 public:
+	static auto getCache(const EntCacheType& type) { return entCacheMap[type]; }
+
+	// for playerlist for better access to dormant fields
+	class CacheFields final
+	{
+	public:
+		static void update();
+		static auto getCachedFields() { return cachedPlayers; }
+	private:
+		inline static std::array<RadarEntity, 65> cachedPlayers;
+	};
+
 	static void add(Entity_t* ent);
 	static void erase(Entity_t* ent);
 	static void clear();
@@ -37,26 +50,5 @@ private:
 	static void fill(const HolderData& data);
 	static bool checkRepeatable(Entity_t* ent);
 	static std::optional<std::pair<int, ClassID>> getIndexes(Entity_t* ent);
-public:
-	inline static auto getCache(const EntCacheType& type)
-	{
-		return m_entCache[type];
-	}
-private:
-	inline static std::unordered_map<EntCacheType, std::vector<HolderData>> m_entCache;
-};
-
-#include <SDK/CCSGO_HudRadar.hpp>
-
-// for playerlist for better access to dormant fields
-class CacheFields final
-{
-public:
-	static void update();
-	inline static auto getCachedFields()
-	{
-		return m_players;
-	}
-private:
-	inline static std::array<RadarEntity, 65> m_players;
+	inline static std::unordered_map<EntCacheType, std::vector<HolderData>> entCacheMap;
 };

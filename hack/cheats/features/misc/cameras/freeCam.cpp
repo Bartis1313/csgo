@@ -60,25 +60,23 @@ void freecam::run(CViewSetup* view)
 
 		const auto [forward, right, up] = math::angleVectors(view->m_angles);
 
-		bool anyPressed{ false };
-
-		if (anyPressed |= KeysHandler::isKeyDown(VK_SPACE))
+		if (inputSystem::isKeyDown(VK_SPACE))
 		{
 			viewAngles += up * vars::misc->freeCam->speed;
 		}
-		if (anyPressed |= KeysHandler::isKeyDown(0x57)) // w
+		if (inputSystem::isKeyDown(0x57)) // w
 		{
 			viewAngles += forward * vars::misc->freeCam->speed;
 		}
-		if (anyPressed |= KeysHandler::isKeyDown(0x41)) // a
+		if (inputSystem::isKeyDown(0x41)) // a
 		{
 			viewAngles -= right * vars::misc->freeCam->speed;
 		}
-		if (anyPressed |= KeysHandler::isKeyDown(0x53)) // s
+		if (inputSystem::isKeyDown(0x53)) // s
 		{
 			viewAngles -= forward * vars::misc->freeCam->speed;
 		}
-		if (anyPressed |= KeysHandler::isKeyDown(0x44)) // d
+		if (inputSystem::isKeyDown(0x44)) // d
 		{
 			viewAngles += right * vars::misc->freeCam->speed;
 		}

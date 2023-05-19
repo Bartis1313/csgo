@@ -14,6 +14,5 @@ namespace skybox
 	void shutdown();
 
 	inline std::vector<std::string> customSkyboxes;
-
 	inline bool changedState{ false };
 }

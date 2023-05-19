@@ -1,6 +1,6 @@
 #include "triggerbot.hpp"
 
-#include "../aimbot/cmdCache.hpp"
+#include "../aimbot/helper.hpp"
 
 #include <SDK/IVEngineClient.hpp>
 #include <SDK/CUserCmd.hpp>
@@ -31,7 +31,7 @@ namespace
 
 void triggerbot::run(CUserCmd* cmd)
 {
-	auto maybeConfig = CUserCmdCache::getWeaponConfig();
+	auto maybeConfig = configWeapon::get();
 	if (!maybeConfig.has_value())
 		return;
 

@@ -1,6 +1,5 @@
 #pragma once
 
-// handle on own!
 namespace discord
 {
 	void init();

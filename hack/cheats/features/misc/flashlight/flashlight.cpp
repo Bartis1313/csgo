@@ -49,6 +49,7 @@ namespace flashlight
 	const std::string_view flashlightSound{ "items\\flashlight1.wav" };
 }
 
+#pragma optimize("", off)
 void flashlight::run(FrameStage stage)
 {
 	if (globals::isShutdown)
@@ -125,7 +126,9 @@ void flashlight::run(FrameStage stage)
 
 	updateFlashlight(flashlightPtr, game::localPlayer->getEyePos(), forward, right, up);
 }
+#pragma optimize("", on)
 
+#pragma optimize("", off)
 CFlashlightEffect* flashlight::createFlashlight(float fov, Entity_t* ent, float farZ, float linearAtten)
 {
 	const auto flashlightMemory = reinterpret_cast<CFlashlightEffect*>(memory::interfaces::memAlloc->_alloc(sizeof(CFlashlightEffect)));
@@ -136,18 +139,24 @@ CFlashlightEffect* flashlight::createFlashlight(float fov, Entity_t* ent, float 
 
 	return flashlightMemory;
 }
+#pragma optimize("", on)
 
+#pragma optimize("", off)
 void flashlight::destroyFlashLight(CFlashlightEffect* flashlight)
 {
 	memory::flashlightDestroy()(flashlight, nullptr); // second arg is not even used there
 }
+#pragma optimize("", on)
 
+#pragma optimize("", off)
 void flashlight::updateFlashlight(CFlashlightEffect* flashlight, const Vec3& pos, const Vec3& forward, const Vec3& right, const Vec3& up)
 {
 	memory::flashlightUpdate()(flashlight, flashlight->m_entIndex, pos, forward, right, up, flashlight->m_fov,
 		flashlight->m_farZ, flashlight->m_LinearAtten, flashlight->m_castsShadows, flashlight->m_textureName);
 }
+#pragma optimize("", on)
 
+#pragma optimize("", off)
 void flashlight::shutdown()
 {
 	if (flashlightPtr)
@@ -156,6 +165,7 @@ void flashlight::shutdown()
 		flashlightPtr = nullptr;
 	}
 }
+#pragma optimize("", on)
 
 void flashlight::updateKeys()
 {

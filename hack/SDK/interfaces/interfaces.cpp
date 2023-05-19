@@ -19,9 +19,9 @@ template <typename T>
 static std::optional<Interface<T>> getInterface(const std::string_view moduleName, const std::string_view interfaceName)
 {
 	using fun = std::add_pointer_t<void* __cdecl(const char*, int*)>;
-	auto capture = memory::exportVar<fun, "CreateInterface"_hasher>(moduleName);
+	auto capture = memory::byExport<"CreateInterface"_hasher>(moduleName).cast<fun>();
 
-	const auto addr = memory::Address<std::add_pointer_t<InterfacesNode>>{ reinterpret_cast<uintptr_t>(capture) };
+	const auto addr = memory::Address<std::add_pointer_t<InterfacesNode>>{ capture.getAddr() };
 	const auto esi = addr.rel(0x5, 0x6).deRef(memory::Dereference::TWICE);
 
 	for (auto el = esi(); el; el = el->m_next)

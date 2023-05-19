@@ -95,8 +95,34 @@ void from_json(const json& j, Key& val)
 
 void to_json(json& j, const Key& val)
 {
-	j["Mode"] = (int)val.getKeyMode();
+	j["Mode"] = val.getKeyMode();
 	j["Code"] = val.getKeyCode();
+}
+
+void from_json(const json& j, CfgBox& val)
+{
+	from_json(j["Mode"], val.mode);
+	from_json(j["Outline"], val.outline);
+	from_json(j["Gradient"], val.gradient);
+	from_json(j["Color"], val.color);
+	from_json(j["Fill"], val.color);
+	from_json(j["Gradient1"], val.gradientCol1);
+	from_json(j["Gradient2"], val.gradientCol2);
+	from_json(j["Gradient3"], val.gradientCol3);
+	from_json(j["Gradient4"], val.gradientCol4);
+}
+
+void to_json(json& j, const CfgBox& val)
+{
+	j["Mode"] = val.mode;
+	j["Outline"] = val.outline;
+	j["Gradient"] = val.gradient;
+	j["Color"] = val.color;
+	j["Fill"] = val.fill;
+	j["Gradient1"] = val.gradientCol1;
+	j["Gradient2"] = val.gradientCol2;
+	j["Gradient3"] = val.gradientCol3;
+	j["Gradient4"] = val.gradientCol4;
 }
 
 void from_json(const json& j, VarAim& val)
@@ -112,17 +138,13 @@ void to_json(json& j, const VarAim& val)
 void from_json(const json& j, VarAimPaint& val)
 {
 	from_json(j, "Enabled fov", val.enabledFov);
-	from_json(j, "Enabled point", val.enabledPoint);
 	from_json(j["Color Fov"], val.colorFov);
-	from_json(j["Color paint"], val.colorPoint);
 }
 
 void to_json(json& j, const VarAimPaint& val)
 {
 	j["Enabled fov"] = val.enabledFov;
-	j["Enabled point"] = val.enabledPoint;
 	j["Color Fov"] = val.colorFov;
-	j["Color paint"] = val.colorPoint;
 }
 
 void from_json(const json& j, VarVisuals& val)
@@ -259,24 +281,24 @@ void to_json(json& j, const VarVisuals::VarEsp& val)
 
 void from_json(const json& j, VarVisuals::VarEsp::VarBoxes& val)
 {
-	from_json(j, "Enabled", val.enabled);
-	from_json(j, "Mode", val.mode);
-	from_json(j["Lines"], val.color);
-	from_json(j["Fill"], val.fill);
-	from_json(j, "Outlined", val.outline);
-	from_json(j, "Multicolor", val.multiColor);
-	from_json(j, "Speed", val.multiColorSpeed);
+	from_json(j, "Box", val.box);
 }
 
 void to_json(json& j, const VarVisuals::VarEsp::VarBoxes& val)
 {
+	j["Box"] = val.box;
+}
+
+void from_json(const json& j, VarVisuals::VarEsp::VarSnapline& val)
+{
+	from_json(j, "Enabled", val.enabled);
+	from_json(j["Color"], val.color);
+}
+
+void to_json(json& j, const VarVisuals::VarEsp::VarSnapline& val)
+{
 	j["Enabled"] = val.enabled;
-	j["Mode"] = val.mode;
-	j["Lines"] = val.color;
-	j["Fill"] = val.fill;
-	j["Outlined"] = val.outline;
-	j["Multicolor"] = val.multiColor;
-	j["Speed"] = val.multiColorSpeed;
+	j["Color"] = val.color;
 }
 
 void from_json(const json& j, VarVisuals::VarEsp::VarHealthBar& val)
@@ -408,14 +430,18 @@ void to_json(json& j, const VarVisuals::VarEsp::VarChecks& val)
 void from_json(const json& j, VarVisuals::VarEsp::VarDropped& val)
 {
 	from_json(j, "Enbaled", val.enabled);
-	from_json(j["Color"], val.color);
+	from_json(j["Ammo Color"], val.ammoColor);
+	from_json(j["Text Color"], val.textColor);
+	from_json(j["Icon Color"], val.iconColor);
 	from_json(j, "Flags", val.flags);
 }
 
 void to_json(json& j, const VarVisuals::VarEsp::VarDropped& val)
 {
 	j["Enabled"] = val.enabled;
-	j["Color"] = val.color;
+	j["Ammo Color"] = val.ammoColor;
+	j["Text Color"] = val.textColor;
+	j["Icon Color"] = val.iconColor;
 	j["Flags"] = val.flags;
 }
 

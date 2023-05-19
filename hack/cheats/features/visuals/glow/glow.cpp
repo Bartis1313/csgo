@@ -23,10 +23,15 @@
 #include <cheats/game/globals.hpp>
 #include <cheats/features/cache/cache.hpp>
 #include <config/vars.hpp>
+#include <utilities/math/math.hpp>
+#include <render/render.hpp>
+#include <cheats/features/visuals/player/boxes.hpp>
 
 #include <cheats/hooks/doPostScreenEffects.hpp>
 
 // recreation of: https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/glow_outline_effect.cpp
+// we can't get rid of the two pass glow in csgo. The stencils here are on very old api version.
+// what we could to is to play with visibility, TODO
 
 namespace
 {
@@ -40,9 +45,30 @@ namespace
 	} glowHandler;
 }
 
+#define GLOWBOX_PASS_COLOR 0
+#define GLOWBOX_PASS_STENCIL 1
+
 namespace glow
 {
+	struct GlowBoxDefinition_t
+	{
+		Vec3 m_position;
+		Vec3 m_angOrientation;
+		Vec3 m_mins;
+		Vec3 m_maxs;
+		float m_birthTimeIndex;
+		float m_terminationTimeIndex; //when to die
+		Color m_color;
+	};
+
+	enum class GLowBoxPass
+	{
+		COLOR,
+		STENCIL
+	};
+
 	void renderGlowModels(IMatRenderContext* ctx, int x, int y);
+	void renderGlowBoxes(int pass, IMatRenderContext* ctx);
 	void applyEntityGlowEffects(IMatRenderContext* ctx);
 	void downSampleAndBlurRT(IMatRenderContext* ctx);
 
@@ -58,6 +84,10 @@ namespace glow
 	IMaterial* glow_blur_y{ };
 	IMaterial* halo_add_to_screen{ };
 	IMaterial* glow_edge_highlight{ };
+	IMaterial* __utilVertexColor{ };
+	IMaterial* __utilVertexColorIgnoreZ{ };
+
+	std::vector<GlowBoxDefinition_t> glowBoxDefinitions{ };
 
 	constexpr int renderFlags{ STUDIO_RENDER | STUDIO_SKIP_FLEXES | STUDIO_DONOTMODIFYSTENCILSTATE | STUDIO_NOLIGHTING_OR_CUBEMAP | STUDIO_SKIP_DECALS };
 }
@@ -69,15 +99,27 @@ static void setRenderTargetAndViewPort(ITexture* rt, int w, int h)
 	ctx->viewport(0, 0, w, h);
 }
 
+static void renderBox(const Vec3& origin, const Vec3& angles, const Vec3& mins, const Vec3& maxs, const Color& color, bool zBuffer, bool insideOut)
+{
+	IMaterial* mat = zBuffer ? glow::__utilVertexColor : glow::__utilVertexColorIgnoreZ;
+	const SDKColor col{ color };
+
+	memory::renderBoxInternal()(origin, angles, mins, maxs, col, mat, insideOut);
+}
+
+static void renderLine(const Vec3& start, const Vec3& end, const Color& color, bool zBuffer)
+{
+	memory::renderLine()(start, end, SDKColor{ color }, zBuffer);
+}
+
 void glow::initMaterials()
 {
-	_rt_FullFrameFB = memory::interfaces::matSys->findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
-	_rt_FullScreen = memory::interfaces::matSys->findTexture("_rt_FullScreen", TEXTURE_GROUP_RENDER_TARGET);
-	_rt_SmallFB0 = memory::interfaces::matSys->findTexture("_rt_SmallFB0", TEXTURE_GROUP_RENDER_TARGET);
-	_rt_SmallFB1 = memory::interfaces::matSys->findTexture("_rt_SmallFB1", TEXTURE_GROUP_RENDER_TARGET);
+	_rt_FullFrameFB = material::factory::findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
+	_rt_FullScreen = material::factory::findTexture("_rt_FullScreen", TEXTURE_GROUP_RENDER_TARGET);
+	_rt_SmallFB0 = material::factory::findTexture("_rt_SmallFB0", TEXTURE_GROUP_RENDER_TARGET);
+	_rt_SmallFB1 = material::factory::findTexture("_rt_SmallFB1", TEXTURE_GROUP_RENDER_TARGET);
 
-
-	glow_color = memory::interfaces::matSys->findMaterial("dev/glow_color", TEXTURE_GROUP_OTHER);
+	glow_color = material::factory::findMaterial("dev/glow_color", TEXTURE_GROUP_OTHER);
 	MaterialData downSampleFixed
 	{
 		.name = "downsampleGlow_fixed",
@@ -86,11 +128,13 @@ void glow::initMaterials()
 		.createType = CreationType::FROM_STRING
 	};
 	glow_downsample = material::factory::createMaterial(downSampleFixed);
-	glow_rim3d = memory::interfaces::matSys->findMaterial("dev/glow_rim3d", TEXTURE_GROUP_OTHER);
-	glow_blur_x = memory::interfaces::matSys->findMaterial("dev/glow_blur_x", TEXTURE_GROUP_OTHER);
-	glow_blur_y = memory::interfaces::matSys->findMaterial("dev/glow_blur_y", TEXTURE_GROUP_OTHER);
-	halo_add_to_screen = memory::interfaces::matSys->findMaterial("dev/halo_add_to_screen", TEXTURE_GROUP_OTHER);
-	glow_edge_highlight = memory::interfaces::matSys->findMaterial("dev/glow_edge_highlight", TEXTURE_GROUP_OTHER);
+	glow_rim3d = material::factory::findMaterial("dev/glow_rim3d", TEXTURE_GROUP_OTHER);
+	glow_blur_x = material::factory::findMaterial("dev/glow_blur_x", TEXTURE_GROUP_OTHER);
+	glow_blur_y = material::factory::findMaterial("dev/glow_blur_y", TEXTURE_GROUP_OTHER);
+	halo_add_to_screen = material::factory::findMaterial("dev/halo_add_to_screen", TEXTURE_GROUP_OTHER);
+	glow_edge_highlight = material::factory::findMaterial("dev/glow_edge_highlight", TEXTURE_GROUP_OTHER);
+	__utilVertexColor = material::factory::findMaterial("__utilVertexColor", TEXTURE_GROUP_OTHER);
+	__utilVertexColorIgnoreZ = material::factory::findMaterial("__utilVertexColorIgnoreZ", TEXTURE_GROUP_OTHER);
 
 	console::debug("loaded all glow textures / materials");
 }
@@ -187,6 +231,8 @@ void glow::renderGlowModels(IMatRenderContext* ctx, int x, int y)
 		ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
 	}
 
+	renderGlowBoxes(GLOWBOX_PASS_COLOR, ctx);
+
 	memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 	memory::interfaces::renderView->modulateColor(originalColor.data());
 	memory::interfaces::renderView->setBlend(originalBlend);
@@ -196,6 +242,52 @@ void glow::renderGlowModels(IMatRenderContext* ctx, int x, int y)
 	ctx->setStencilState(stencilStateDisable);
 
 	ctx->popRenderTargetAndViewport();
+}
+
+void glow::renderGlowBoxes(int pass, IMatRenderContext* ctx)
+{
+	for (size_t i = 0; auto & glowBox : glowBoxDefinitions)
+	{
+		if (glowBox.m_terminationTimeIndex < memory::interfaces::globalVars->m_curtime)
+		{
+			glowBoxDefinitions.erase(glowBoxDefinitions.begin() + i);
+			continue;
+		}
+
+		float lifeLeft = (glowBox.m_terminationTimeIndex - memory::interfaces::globalVars->m_curtime) /
+			(glowBox.m_terminationTimeIndex - glowBox.m_birthTimeIndex);
+		if (lifeLeft > 0.95f)
+			lifeLeft = (0.05f - (lifeLeft - 0.95f)) / 0.05f; // fade in the first 5% of lifetime
+		else
+			lifeLeft = std::min(lifeLeft * 4.0f, 1.0f); // fade out the last 25% of lifetime
+
+		glowBox.m_color.a() = lifeLeft;
+
+		// on this statment, game currently just breaks the loop
+		if (pass == GLOWBOX_PASS_COLOR)
+		{
+			const Vec3 forward = math::angleVec(glowBox.m_angOrientation);
+			const Vec3 lineEnd = glowBox.m_position + (forward * glowBox.m_mins[0]);
+
+			renderLine(glowBox.m_position, lineEnd, glowBox.m_color, false);
+		}
+		else if (pass == GLOWBOX_PASS_STENCIL)
+		{
+			ShaderStencilState_t stencilState;
+			stencilState.m_bEnable = true;
+			stencilState.m_nReferenceValue = 1;
+			stencilState.m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
+			stencilState.m_PassOp = SHADER_STENCILOP_KEEP;
+			stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
+			stencilState.m_ZFailOp = SHADER_STENCILOP_SET_TO_REFERENCE;
+
+			ctx->setStencilState(stencilState);
+
+			renderBox(glowBox.m_position, glowBox.m_angOrientation, glowBox.m_mins, glowBox.m_maxs, glowBox.m_color, false, false);
+		}
+
+		++i;
+	}
 }
 
 void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
@@ -402,7 +494,9 @@ void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 		ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
 	}
 
-	// skipped all glowboxes stuff
+	renderGlowBoxes(GLOWBOX_PASS_STENCIL, ctx);
+	glowObjects += glowBoxDefinitions.size();
+
 	// skipped all health stuff
 
 	ctx->overrideDepthEnable(false, false);
@@ -445,6 +539,22 @@ void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 		_rt_SmallFB1->getActualHeight(), nullptr, 0, 0);
 
 	ctx->setStencilState(stencilStateDisable);
+}
+
+void glow::addGlowBox(const Vec3& origin, const Vec3& angOrientation, const Vec3& mins, const Vec3& maxs, const Color& color, float lifetime)
+{
+	GlowBoxDefinition_t glowBox
+	{
+		.m_position = origin,
+		.m_angOrientation = angOrientation,
+		.m_mins = mins,
+		.m_maxs = maxs,
+		.m_birthTimeIndex = memory::interfaces::globalVars->m_curtime,
+		.m_terminationTimeIndex = memory::interfaces::globalVars->m_curtime + lifetime,
+		.m_color = color
+	};
+
+	glowBoxDefinitions.push_back(glowBox);
 }
 
 void glow::run()

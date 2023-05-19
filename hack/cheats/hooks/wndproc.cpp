@@ -38,7 +38,7 @@ LRESULT hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARA
 {
 	renderbackend::createContext(hwnd);
 
-	KeysHandler::run(message, wparam);
+	inputSystem::run(message, wparam);
 	Storage::runs.run();
 
 	memory::interfaces::iSystem->enableInput(!ImGuiMenu::active);
@@ -46,5 +46,5 @@ LRESULT hooks::wndProcSys::wndproc(HWND hwnd, UINT message, WPARAM wparam, LPARA
 	if(ImGuiMenu::active && ImGui_ImplWin32_WndProcHandler(hwnd, message, wparam, lparam))
 		return TRUE;
 	
-	return LI_FN_CACHED(CallWindowProcA)(wndProcOriginal, hwnd, message, wparam, lparam);
+	return CallWindowProcA(wndProcOriginal, hwnd, message, wparam, lparam);
 }

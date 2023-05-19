@@ -11,7 +11,7 @@ hooks::PlayStepSound::value hooks::PlayStepSound::hook(FAST_ARGS, Vec3& origin, 
 	if(thisptr == game::localPlayer)
 		return original(thisptr, origin, surface, volume, force, unk);
 
-	SoundDraw::pushSteps(static_cast<Player_t*>(thisptr));
+	sound::pushSteps(static_cast<Player_t*>(thisptr));
 
 	return original(thisptr, origin, surface, volume, force, unk);
 }

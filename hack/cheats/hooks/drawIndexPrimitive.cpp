@@ -26,12 +26,12 @@
 // data[3] - world render list
 // data[4] - entity
 // ... many other heaps that pretty often are copies / post calls results. Don't need this here
-static void* getStack(void** data)
+static volatile void* getStack(volatile void** data)
 {
 	if (IsBadReadPtr(data, sizeof(void*)))
 		return nullptr;
 
-	void** next = data ? *reinterpret_cast<void***>(data) : nullptr;
+	auto next = data ? *(volatile void***)(data) : nullptr;
 
 	if(!next)
 		return nullptr;
@@ -61,7 +61,7 @@ hooks::DrawIndexedPrimitive::value hooks::DrawIndexedPrimitive::hook(IDirect3DDe
 		return original(device, primType, basevertexIndex, minVertexIndex, numVertices, startIndex, primCount);
 	}
 
-	void** data;
+	volatile void** data{ };
 	__asm mov data, ebp
 	
 	auto test = getStack(data);

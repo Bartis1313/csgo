@@ -1,10 +1,11 @@
 #include "seh.hpp"
 
-#include <DbgHelp.h>
-#include <Psapi.h>
-
 #include <utilities/console/console.hpp>
 #include <cheats/game/globals.hpp>
+
+#include <lazy_importer.hpp>
+#include <DbgHelp.h>
+#include <Psapi.h>
 
 #define PAIRED_FLAG(fl) std::make_pair(fl, #fl)
 

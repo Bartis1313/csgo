@@ -23,9 +23,18 @@
 
 #include <cheats/hooks/present.hpp>
 #include <cheats/hooks/createMove.hpp>
+#include <cheats/helper/initable.hpp>
 
 namespace
 {
+	struct PlotIniter : InitAble
+	{
+		PlotIniter()
+		{
+			this->registerInit(plots::init);
+		}
+	} plotsInit;
+
 	struct PlotHandler : hooks::Present
 	{
 		PlotHandler()
@@ -127,8 +136,8 @@ void plots::drawFps()
 		std::vector<double> fps{ fpsRecords.end() - vars::misc->plots->sizeFps, fpsRecords.end() };
 
 		ImPlot::SetNextAxesLimits(0, vars::misc->plots->sizeFps, 0, MAX_FPS, ImPlotCond_::ImPlotCond_Always);
-		ImPlot::PushStyleColor(ImPlotCol_Fill, Color::getImguiColor(vars::misc->plots->colorFPS().getColorEditAlpha(0.25f)));
-		ImPlot::PushStyleColor(ImPlotCol_Line, Color::getImguiColor(vars::misc->plots->colorFPS()));
+		ImPlot::PushStyleColor(ImPlotCol_Fill, Color::U32(vars::misc->plots->colorFPS().getColorEditAlpha(0.25f)));
+		ImPlot::PushStyleColor(ImPlotCol_Line, Color::U32(vars::misc->plots->colorFPS()));
 		ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 0,0,0,0 });
 		ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 0,0,0,0 });
 
@@ -204,8 +213,8 @@ void plots::drawVelocity()
 		std::vector<double> vel{ velocityRecords.end() - vars::misc->plots->sizeVelocity, velocityRecords.end() };
 
 		ImPlot::SetNextAxesLimits(0, vars::misc->plots->sizeVelocity, 0, MAX_SPEEED_MOVE + 20, ImPlotCond_::ImPlotCond_Always);
-		ImPlot::PushStyleColor(ImPlotCol_Fill, Color::getImguiColor(vars::misc->plots->colorVelocity().getColorEditAlpha(0.25f)));
-		ImPlot::PushStyleColor(ImPlotCol_Line, Color::getImguiColor(vars::misc->plots->colorVelocity()));
+		ImPlot::PushStyleColor(ImPlotCol_Fill, Color::U32(vars::misc->plots->colorVelocity().getColorEditAlpha(0.25f)));
+		ImPlot::PushStyleColor(ImPlotCol_Line, Color::U32(vars::misc->plots->colorVelocity()));
 		ImPlot::PushStyleColor(ImPlotCol_FrameBg, { 0,0,0,0 });
 		ImPlot::PushStyleColor(ImPlotCol_PlotBg, { 0,0,0,0 });
 

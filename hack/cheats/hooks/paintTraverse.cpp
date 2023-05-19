@@ -26,6 +26,16 @@ static void getMouse()
 
 hooks::PaintTraverse::value hooks::PaintTraverse::hook(FAST_ARGS, uint32_t panel, bool forceRepaint, bool allowForce)
 {
+	if (globals::isShutdown)
+	{
+		static std::once_flag onceFlag;
+		std::call_once(onceFlag, []() { Storage::shutdowns.run(); });
+		return original(thisptr, panel, forceRepaint, allowForce);
+	}
+
+	static std::once_flag onceFlag;
+	std::call_once(onceFlag, []() { Storage::inits.run(); });
+
 	getScreen();
 	getMouse();
 
