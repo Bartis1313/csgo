@@ -84,6 +84,7 @@ public:
 	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(const char*, getClassName, CLASS_NAME, (), (this));
 	VFUNC(int, getMaxHealth, GET_MAX_HEALTH, (), (this));
+	VFUNC(bool, shouldDraw, SHOULD_DRAW, (), (this + RENDERABLE));
 	
 	[[nodiscard]] CUtlVector<Matrix3x4> m_CachedBoneData();
 	[[nodiscard]] Vec3 getAimPunch();

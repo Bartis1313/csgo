@@ -114,3 +114,17 @@ struct SDKColor
 
 	uint8_t r, g, b, a;
 };
+
+// 0-255 & 4byte type
+struct SDKColorInt
+{
+	SDKColorInt() = default;
+	constexpr SDKColorInt(int r, int g, int b, int a = 255)
+		: r{ r }, g{ g }, b{ b }, a{ a }
+	{}
+	constexpr SDKColorInt(const Color& color)
+		: r{ color.rMultiplied() }, g{ color.gMultiplied() }, b{ color.bMultiplied() }, a{ color.aMultiplied() }
+	{}
+
+	int r, g, b, a;
+};

@@ -16,7 +16,18 @@ class ITexture
 public:
 	VFUNC(int, getActualWidth, 3, (), (this));
 	VFUNC(int, getActualHeight, 4, (), (this));
-	VFUNC(void, release, 11, (), (this));
+	void release()
+	{
+		if (!this)
+		{
+#ifdef _DEBUG
+			printf("can't release texture, fatal err");
+#endif
+			return;
+		}
+
+		return vfunc::callVFunc<void, 11>(this);
+	}
 	PAD(80);
 	TextureHandle_t** m_handle;
 };

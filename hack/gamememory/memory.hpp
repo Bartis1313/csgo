@@ -42,6 +42,7 @@ class EnvTonemapController_t;
 class FogController_t;
 class EnvAmbientLight_t;
 struct SDKColor;
+struct SDKColorInt;
 enum ClassID;
 
 using retaddr_t = uintptr_t;
@@ -92,6 +93,7 @@ namespace memory
 	using dispatchParticleEffect_t = void(__stdcall*)(const char*, Vec3, Vec3, void*, int, void*);
 	using renderBoxInternal_t = void(__stdcall*)(const Vec3&, const Vec3&, const Vec3&, const Vec3&, SDKColor, IMaterial*, bool);
 	using renderLine_t = void(__stdcall*)(const Vec3&, const Vec3&, SDKColor, bool);
+	using addGlowBox_t = int(__thiscall*)(void*, Vec3, Vec3, Vec3, Vec3, SDKColor, float);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
@@ -164,6 +166,7 @@ namespace memory
 	inline Address<float*> vignetteBlurStrengthPost;
 	inline Address<retaddr_t> scopeDust;
 	inline Address<retaddr_t> scopeArc;
+	inline Address<addGlowBox_t> addGlowBox;
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;

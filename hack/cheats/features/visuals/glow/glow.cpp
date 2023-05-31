@@ -29,9 +29,15 @@
 
 #include <cheats/hooks/doPostScreenEffects.hpp>
 
-// recreation of: https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/glow_outline_effect.cpp
-// we can't get rid of the two pass glow in csgo. The stencils here are on very old api version.
-// what we could to is to play with visibility, TODO
+#include "../streamproof/streamproof.hpp"
+
+// rebuild of: https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/glow_outline_effect.cpp
+// 1 - less drawModel calls
+// 2 - no occluded and unonccluded confusing shit
+// 3 - full bloom removed - useless
+// 4 - visible / zbuffer chams
+// 5 - actual blurred lines
+// 6 - THANK YOU tlxkjc2407 for the glow visibility
 
 namespace
 {
@@ -61,18 +67,19 @@ namespace glow
 		Color m_color;
 	};
 
-	enum class GLowBoxPass
-	{
-		COLOR,
-		STENCIL
-	};
-
-	void renderGlowModels(IMatRenderContext* ctx, int x, int y);
-	void renderGlowBoxes(int pass, IMatRenderContext* ctx);
-	void applyEntityGlowEffects(IMatRenderContext* ctx);
 	void downSampleAndBlurRT(IMatRenderContext* ctx);
+	void renderGlowModels(IMatRenderContext* ctx);
+	void renderGlowBoxes(int pass, IMatRenderContext* ctx);
+	void renderGlowMisc(IMatRenderContext* ctx);
+	void beginGlow(IMatRenderContext* ctx);
+	void endGlow(IMatRenderContext* ctx);
+	void addBackbufferGlow(IMatRenderContext* ctx);
+	void addHaloScreen(IMatRenderContext* ctx);
+	void applyEntityGlowEffects(IMatRenderContext* ctx);
+	void drawModel(Player_t* ent, float alpha);
 
 	ITexture* _rt_FullFrameFB{ };
+	ITexture* _rt_FullFrameFB1{ };
 	ITexture* _rt_FullScreen{ };
 	ITexture* _rt_SmallFB0{ };
 	ITexture* _rt_SmallFB1{ };
@@ -86,6 +93,10 @@ namespace glow
 	IMaterial* glow_edge_highlight{ };
 	IMaterial* __utilVertexColor{ };
 	IMaterial* __utilVertexColorIgnoreZ{ };
+	IMaterial* debugfbtexture1{ };
+
+	std::array<float, 3> originalColorBegin;
+	float originalBlendBegin;
 
 	std::vector<GlowBoxDefinition_t> glowBoxDefinitions{ };
 
@@ -102,9 +113,12 @@ static void setRenderTargetAndViewPort(ITexture* rt, int w, int h)
 static void renderBox(const Vec3& origin, const Vec3& angles, const Vec3& mins, const Vec3& maxs, const Color& color, bool zBuffer, bool insideOut)
 {
 	IMaterial* mat = zBuffer ? glow::__utilVertexColor : glow::__utilVertexColorIgnoreZ;
-	const SDKColor col{ color };
 
-	memory::renderBoxInternal()(origin, angles, mins, maxs, col, mat, insideOut);
+	// added this because alpha didn't seem to change, I missed something
+	// tho, this is fairly enough
+	mat->alphaModulate(color.a());
+
+	memory::renderBoxInternal()(origin, angles, mins, maxs, SDKColor{ color }, mat, insideOut);
 }
 
 static void renderLine(const Vec3& start, const Vec3& end, const Color& color, bool zBuffer)
@@ -115,6 +129,7 @@ static void renderLine(const Vec3& start, const Vec3& end, const Color& color, b
 void glow::initMaterials()
 {
 	_rt_FullFrameFB = material::factory::findTexture("_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET);
+	_rt_FullFrameFB1 = material::factory::findTexture("_rt_FullFrameFB1", TEXTURE_GROUP_RENDER_TARGET);
 	_rt_FullScreen = material::factory::findTexture("_rt_FullScreen", TEXTURE_GROUP_RENDER_TARGET);
 	_rt_SmallFB0 = material::factory::findTexture("_rt_SmallFB0", TEXTURE_GROUP_RENDER_TARGET);
 	_rt_SmallFB1 = material::factory::findTexture("_rt_SmallFB1", TEXTURE_GROUP_RENDER_TARGET);
@@ -124,7 +139,7 @@ void glow::initMaterials()
 	{
 		.name = "downsampleGlow_fixed",
 		.key = "Downsample_nohdr",
-		.buffer = "$bloomtintenable 1 $bloomtype 1 $basetexture _rt_FullFrameFB $bloomexp 2.5 $bloomsaturation 1.0",
+		.buffer = "$bloomtintenable 1 $bloomtype 1 $basetexture _rt_FullFrameFB $bloomexp 2.5 $bloomsaturation 1.0 $noToolTexture 1",
 		.createType = CreationType::FROM_STRING
 	};
 	glow_downsample = material::factory::createMaterial(downSampleFixed);
@@ -133,29 +148,49 @@ void glow::initMaterials()
 	glow_blur_y = material::factory::findMaterial("dev/glow_blur_y", TEXTURE_GROUP_OTHER);
 	halo_add_to_screen = material::factory::findMaterial("dev/halo_add_to_screen", TEXTURE_GROUP_OTHER);
 	glow_edge_highlight = material::factory::findMaterial("dev/glow_edge_highlight", TEXTURE_GROUP_OTHER);
-	__utilVertexColor = material::factory::findMaterial("__utilVertexColor", TEXTURE_GROUP_OTHER);
-	__utilVertexColorIgnoreZ = material::factory::findMaterial("__utilVertexColorIgnoreZ", TEXTURE_GROUP_OTHER);
+	MaterialData utilVertex
+	{
+		.name = "__utilVertex",
+		.key = "unlitgeneric",
+		.buffer = "$vertexcolor 1 vertexalpha 1",
+		.createType = CreationType::FROM_STRING
+	};
+	__utilVertexColor = material::factory::createMaterial(utilVertex);
+	MaterialData utilVertexIgnorez
+	{
+		.name = "__utilVertex",
+		.key = "unlitgeneric",
+		.buffer = "$vertexcolor 1 vertexalpha 1 $ignorez 1",
+		.createType = CreationType::FROM_STRING
+	};
+	__utilVertexColorIgnoreZ = material::factory::createMaterial(utilVertexIgnorez);
+	MaterialData debugmat
+	{
+		.name = "debugfbtexture1",
+		.key = "UnlitGeneric",
+		.buffer = "$basetexture _rt_FullFrameFB1 $noToolTexture 1",
+		.createType = CreationType::FROM_STRING
+	};
+	debugfbtexture1 = material::factory::createMaterial(debugmat);
+
+	streamProof.init();
 
 	console::debug("loaded all glow textures / materials");
 }
 
 void glow::downSampleAndBlurRT(IMatRenderContext* ctx)
 {
-	ctx->pushRenderTargetAndViewport();
-
 	const int srcWidth = globals::screenX;
 	const int srcHeight = globals::screenY;
 
 	if ((_rt_SmallFB0->getActualWidth() != (globals::screenX / 4)) || (_rt_SmallFB0->getActualHeight() != (globals::screenY / 4)))
 	{
-		ctx->setRenderTarget(_rt_SmallFB0);
-		ctx->viewport(0, 0, _rt_SmallFB0->getActualWidth(), _rt_SmallFB0->getActualHeight());
+		setRenderTargetAndViewPort(_rt_SmallFB0, _rt_SmallFB0->getActualWidth(), _rt_SmallFB0->getActualHeight());
 		ctx->clearColor3ub(0, 0, 0);
-		ctx->clearBuffers(true, false, false);
+		ctx->clearBuffers(true, false);
 	}
 
-	ctx->setRenderTarget(_rt_SmallFB0);
-	ctx->viewport(0, 0, globals::screenX / 4, globals::screenY / 4);
+	setRenderTargetAndViewPort(_rt_SmallFB0, globals::screenX / 4, globals::screenY / 4);
 
 	if (const auto var = glow_downsample->findVar("$bloomexp"))
 		var->setValue(vars::visuals->glow->exponent);
@@ -168,80 +203,67 @@ void glow::downSampleAndBlurRT(IMatRenderContext* ctx)
 
 	ctx->drawScreenSpaceRectangle(glow_downsample, 0, 0, srcWidth / 4, srcHeight / 4,
 		0, 0, fullFbWidth - 4.0f, fullFbHeight - 4.0f,
-		_rt_FullFrameFB->getActualWidth(), _rt_FullFrameFB->getActualHeight(), nullptr, 0, 0);
+		_rt_FullFrameFB->getActualWidth(), _rt_FullFrameFB->getActualHeight());
 
 	static bool first = true;
 	if (first || (_rt_SmallFB1->getActualWidth() != (globals::screenX / 4)) || (_rt_SmallFB1->getActualHeight() != (globals::screenY / 4)))
 	{
 		first = false;
-		ctx->setRenderTarget(_rt_SmallFB1);
-		ctx->viewport(0, 0, _rt_SmallFB1->getActualWidth(), _rt_SmallFB1->getActualHeight());
+		setRenderTargetAndViewPort(_rt_SmallFB1, _rt_SmallFB1->getActualWidth(), _rt_SmallFB1->getActualHeight());
 		ctx->clearColor3ub(0, 0, 0);
-		ctx->clearBuffers(true, false, false);
+		ctx->clearBuffers(true, false);
 	}
 
-	ctx->setRenderTarget(_rt_SmallFB1);
-	ctx->viewport(0, 0, globals::screenX / 4, globals::screenY / 4);
+	setRenderTargetAndViewPort(_rt_SmallFB1, globals::screenX / 4, globals::screenY / 4);
 
 	ctx->drawScreenSpaceRectangle(glow_blur_x, 0, 0, srcWidth / 4, srcHeight / 4,
 		0, 0, srcWidth / 4.0f - 1.0f, srcHeight / 4.0f - 1.0f,
-		_rt_SmallFB0->getActualWidth(), _rt_SmallFB0->getActualHeight(), nullptr, 0, 0);
+		_rt_SmallFB0->getActualWidth(), _rt_SmallFB0->getActualHeight());
 
-	ctx->setRenderTarget(_rt_SmallFB0);
-	ctx->viewport(0, 0, globals::screenX / 4, globals::screenY / 4);
+	setRenderTargetAndViewPort(_rt_SmallFB0, globals::screenX / 4, globals::screenY / 4);
 
 	if (const auto var = glow_blur_y->findVar("$bloomamount"))
 		var->setValue(vars::visuals->glow->thickness);
 
 	ctx->drawScreenSpaceRectangle(glow_blur_y, 0, 0, srcWidth / 4, srcHeight / 4,
 		0, 0, srcWidth / 4.0f - 1.0f, srcHeight / 4.0f - 1.0f,
-		_rt_SmallFB1->getActualWidth(), _rt_SmallFB1->getActualHeight(), nullptr, 0, 0);
-
-	ctx->popRenderTargetAndViewport();
+		_rt_SmallFB1->getActualWidth(), _rt_SmallFB1->getActualHeight());
 }
 
-void glow::renderGlowModels(IMatRenderContext* ctx, int x, int y)
+void glow::renderGlowModels(IMatRenderContext* ctx)
 {
-	ctx->pushRenderTargetAndViewport();
+	if (!vars::visuals->glow->enabled)
+		return;
 
-	auto originalColor = Colors::Blank.getRGB();
-	memory::interfaces::renderView->getcolor(originalColor.data());
-	const float originalBlend = memory::interfaces::renderView->getBlend();
+	if (!vars::visuals->glow->usedMats.at(E2T(GlowRenderStyle::DEFAULT)))
+		return;
 
-	setRenderTargetAndViewPort(_rt_FullFrameFB, x, y);
+	ShaderStencilState_t stencilState;
+	stencilState.m_bEnable = true;
+	stencilState.m_nReferenceValue = 1;
+	stencilState.m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
+	stencilState.m_PassOp = SHADER_STENCILOP_SET_TO_REFERENCE;
+	stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
+	stencilState.m_ZFailOp = SHADER_STENCILOP_SET_TO_REFERENCE;
 
-	ctx->clearColor3ub(0, 0, 0);
-	ctx->clearBuffers(true, false, false);
+	ctx->setStencilState(stencilState);
 
-	glow_color->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, vars::visuals->glow->ignorez.at(E2T(GlowRenderStyle::DEFAULT)));
-	memory::interfaces::studioRender->forcedMaterialOverride(glow_color);
+	ctx->overrideDepthEnable(vars::visuals->glow->visible, false);
+	memory::interfaces::renderView->setBlend(vars::visuals->glow->colorPlayer().a());
 
-	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
+	for (auto [ent, idx, classid] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
-		auto ent = reinterpret_cast<Player_t*>(entity);
+		const auto player = ent->cast<Player_t*>();
 
-		if (ent->isDormant())
+		if (player->isDormant())
 			continue;
 
-		if (!ent->isOtherTeam(game::localPlayer()))
+		if (!player->isOtherTeam(game::localPlayer()))
 			continue;
 
-		memory::interfaces::renderView->setBlend(vars::visuals->glow->colorPlayer().a());
 		memory::interfaces::renderView->modulateColor(vars::visuals->glow->colorPlayer().data());
-		ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
+		drawModel(player, vars::visuals->glow->colorPlayer().a());
 	}
-
-	renderGlowBoxes(GLOWBOX_PASS_COLOR, ctx);
-
-	memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
-	memory::interfaces::renderView->modulateColor(originalColor.data());
-	memory::interfaces::renderView->setBlend(originalBlend);
-
-	ShaderStencilState_t stencilStateDisable;
-	stencilStateDisable.m_bEnable = false;
-	ctx->setStencilState(stencilStateDisable);
-
-	ctx->popRenderTargetAndViewport();
 }
 
 void glow::renderGlowBoxes(int pass, IMatRenderContext* ctx)
@@ -263,7 +285,6 @@ void glow::renderGlowBoxes(int pass, IMatRenderContext* ctx)
 
 		glowBox.m_color.a() = lifeLeft;
 
-		// on this statment, game currently just breaks the loop
 		if (pass == GLOWBOX_PASS_COLOR)
 		{
 			const Vec3 forward = math::angleVec(glowBox.m_angOrientation);
@@ -279,7 +300,7 @@ void glow::renderGlowBoxes(int pass, IMatRenderContext* ctx)
 			stencilState.m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
 			stencilState.m_PassOp = SHADER_STENCILOP_KEEP;
 			stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
-			stencilState.m_ZFailOp = SHADER_STENCILOP_SET_TO_REFERENCE;
+			stencilState.m_ZFailOp = SHADER_STENCILOP_KEEP;
 
 			ctx->setStencilState(stencilState);
 
@@ -290,9 +311,15 @@ void glow::renderGlowBoxes(int pass, IMatRenderContext* ctx)
 	}
 }
 
-void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
+void glow::renderGlowMisc(IMatRenderContext* ctx)
 {
-	std::vector<Player_t*> rim3DGlows, edgeHighlightGlows, glows;
+	if (!vars::visuals->glow->enabled)
+		return;
+
+	if (std::ranges::all_of(vars::visuals->glow->usedMats, [](const bool b) { return !b; }))
+		return;
+
+	std::vector<Player_t*> rim3DGlows, edgeHighlightGlows;
 
 	for (auto [entity, idx, classID] : EntityCache::getCache(EntCacheType::PLAYER))
 	{
@@ -312,8 +339,6 @@ void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 		{
 			edgeHighlightGlows.push_back(ent);
 		}
-
-		glows.push_back(ent);
 	}
 
 	if (rim3DGlows.size())
@@ -321,7 +346,7 @@ void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 		const float pulse = 0.5f + 0.5f * std::sin(memory::interfaces::globalVars->m_curtime * vars::visuals->glow->pulseSpeeeds.at(E2T(GlowRenderPulse::RIM)));
 
 		memory::interfaces::studioRender->forcedMaterialOverride(glow_rim3d);
-		glow_rim3d->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, vars::visuals->glow->ignorez.at(E2T(GlowRenderStyle::RIMGLOW3D)));
+		glow_rim3d->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ, vars::visuals->glow->ignorez.at(E2T(GlowIgnorez::RIMGLOW3D)));
 
 		for (const auto& ent : rim3DGlows)
 		{
@@ -342,7 +367,7 @@ void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 				var->setVectorComponent(3.0f + pulse, 2);
 			}
 
-			ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
+			drawModel(ent, vars::visuals->glow->colorPlayer().a());
 		}
 
 		memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
@@ -368,19 +393,19 @@ void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 		memory::interfaces::renderView->modulateColor(overrideColor.data());
 
 		for (const auto& ent : edgeHighlightGlows)
-			ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
+			drawModel(ent, vars::visuals->glow->colorPlayer().a());
 
 		memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 
 		ctx->popRenderTargetAndViewport();
 
-		memory::interfaces::studioRender->forcedMaterialOverride(glow_color);
+		memory::interfaces::studioRender->forcedMaterialOverride(glow_edge_highlight);
 
 		ctx->overrideDepthEnable(true, false);
 
-		glow_color->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ,
-			vars::visuals->glow->ignorez.at(E2T(GlowRenderStyle::EDGE_HIGHLIGHT))
-			|| vars::visuals->glow->ignorez.at(E2T(GlowRenderStyle::EDGE_HIGHLIGHT_PULSE)));
+		glow_edge_highlight->setMaterialVarFlag(MATERIAL_VAR_IGNOREZ,
+			vars::visuals->glow->ignorez.at(E2T(GlowIgnorez::EDGE_HIGHLIGHT))
+			|| vars::visuals->glow->ignorez.at(E2T(GlowIgnorez::EDGE_HIGHLIGHT_PULSE)));
 
 		for (const auto& ent : edgeHighlightGlows)
 		{
@@ -394,138 +419,67 @@ void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 
 			memory::interfaces::renderView->modulateColor(vecTempColor.toArray().data());
 
-			ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
+			drawModel(ent, vars::visuals->glow->colorPlayer().a());
 		}
 
 		memory::interfaces::renderView->modulateColor(originalColor.data());
 	}
+}
+
+void glow::beginGlow(IMatRenderContext* ctx)
+{
+	ctx->copyRenderTargetToTexture(_rt_FullFrameFB1);
+	ctx->clearColor3ub(0, 0, 0);
+	ctx->clearBuffers(true, false);
+
+	originalColorBegin = Colors::Blank.getRGB();
+	memory::interfaces::renderView->getcolor(originalColorBegin.data());
+	originalBlendBegin = memory::interfaces::renderView->getBlend();
 
 	memory::interfaces::studioRender->forcedMaterialOverride(glow_color);
-	const float originalBlend = memory::interfaces::renderView->getBlend();
+}
 
-	memory::interfaces::renderView->setBlend(0.0f);
-	int glowObjects = 0;
-
-	for (const auto& ent : glows)
-	{
-		if (!vars::visuals->glow->usedMats.at(E2T(GlowRenderStyle::DEFAULT)))
-			continue;
-
-		if (vars::visuals->glow->fullBloom)
-		{
-			++glowObjects;
-			continue;
-		}
-
-		if (vars::visuals->glow->occluded || vars::visuals->glow->unoccluded)
-		{
-			if (vars::visuals->glow->occluded && vars::visuals->glow->unoccluded)
-			{
-				ShaderStencilState_t stencilState;
-				stencilState.m_bEnable = true;
-				stencilState.m_nReferenceValue = 1;
-				stencilState.m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
-				stencilState.m_PassOp = SHADER_STENCILOP_SET_TO_REFERENCE;
-				stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
-				stencilState.m_ZFailOp = SHADER_STENCILOP_SET_TO_REFERENCE;
-
-				ctx->setStencilState(stencilState);
-
-				ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
-			}
-			else if (vars::visuals->glow->occluded)
-			{
-				ShaderStencilState_t stencilState;
-				stencilState.m_bEnable = true;
-				stencilState.m_nReferenceValue = 1;
-				stencilState.m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
-				stencilState.m_PassOp = SHADER_STENCILOP_KEEP;
-				stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
-				stencilState.m_ZFailOp = SHADER_STENCILOP_SET_TO_REFERENCE;
-
-				ctx->setStencilState(stencilState);
-
-				ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
-			}
-			else if (vars::visuals->glow->unoccluded)
-			{
-				ShaderStencilState_t stencilState;
-				stencilState.m_bEnable = true;
-				stencilState.m_nReferenceValue = 2;
-				stencilState.m_nTestMask = 0x1;
-				stencilState.m_nWriteMask = 0x3;
-				stencilState.m_CompareFunc = SHADER_STENCILFUNC_EQUAL;
-				stencilState.m_PassOp = SHADER_STENCILOP_INCREMENT_CLAMP;
-				stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
-				stencilState.m_ZFailOp = SHADER_STENCILOP_SET_TO_REFERENCE;
-
-				ctx->setStencilState(stencilState);
-
-				ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
-			}
-		}
-
-		glowObjects++;
-	}
-
-	// 2nd pass
-
-	for (const auto& ent : glows)
-	{
-		if (!vars::visuals->glow->usedMats.at(E2T(GlowRenderStyle::DEFAULT)))
-			continue;
-
-		if (vars::visuals->glow->fullBloom)
-			continue;
-
-		if (vars::visuals->glow->occluded && !vars::visuals->glow->unoccluded)
-		{
-			ShaderStencilState_t stencilState;
-			stencilState.m_bEnable = true;
-			stencilState.m_nReferenceValue = 2;
-			stencilState.m_CompareFunc = SHADER_STENCILFUNC_ALWAYS;
-			stencilState.m_PassOp = SHADER_STENCILOP_SET_TO_REFERENCE;
-			stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
-			stencilState.m_ZFailOp = SHADER_STENCILOP_KEEP;
-
-			ctx->setStencilState(stencilState);
-		}
-
-		ent->drawModel(renderFlags, vars::visuals->glow->colorPlayer().aMultiplied());
-	}
-
-	renderGlowBoxes(GLOWBOX_PASS_STENCIL, ctx);
-	glowObjects += glowBoxDefinitions.size();
-
-	// skipped all health stuff
+void glow::endGlow(IMatRenderContext* ctx)
+{
+	memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
+	memory::interfaces::renderView->modulateColor(originalColorBegin.data());
+	memory::interfaces::renderView->setBlend(originalBlendBegin);
 
 	ctx->overrideDepthEnable(false, false);
-	memory::interfaces::renderView->setBlend(originalBlend);
-	ShaderStencilState_t stencilStateDisable;
-	stencilStateDisable.m_bEnable = false;
-	ctx->setStencilState(stencilStateDisable);
-	memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
+}
 
-	if (glowObjects <= 0)
-		return;
+void glow::addBackbufferGlow(IMatRenderContext* ctx)
+{
+	ctx->copyRenderTargetToTexture(_rt_FullFrameFB);
+	ctx->disableStencil();
 
-	PIXEVENT{ ctx, "RenderGlowModels" };
-	renderGlowModels(ctx, globals::screenX, globals::screenY);
+	const int srcWidth = globals::screenX;
+	const int srcHeight = globals::screenY;
+	int viewportX, viewportY, viewportW, viewportH;
+	ctx->getViewport(viewportX, viewportY, viewportW, viewportH);
 
-	downSampleAndBlurRT(ctx);
+	ctx->overrideDepthEnable(true, false);
+	ctx->drawScreenSpaceRectangle(debugfbtexture1,
+		0, 0, viewportW, viewportH,
+		0, 0, srcWidth - 1.0f, srcHeight - 1.0f,
+		_rt_FullFrameFB1->getActualWidth(), _rt_FullFrameFB1->getActualHeight());
+	ctx->overrideDepthEnable(false, false);
+}
 
+void glow::addHaloScreen(IMatRenderContext* ctx)
+{
 	if (const auto var = halo_add_to_screen->findVar("$C0_X"))
 		var->setValue(vars::visuals->glow->C0_X);
 
 	ShaderStencilState_t stencilState;
 	stencilState.m_bEnable = true;
-	stencilState.m_nWriteMask = 0x0; // We're not changing stencil
-	//stencilState.m_nTestMask = 0x3;
-	stencilState.m_nReferenceValue = 0x0;
-	stencilState.m_CompareFunc = SHADER_STENCILFUNC_EQUAL;
+	stencilState.m_nWriteMask = 0x1; // We're not changing stencil
+	stencilState.m_nReferenceValue = 1;
+	stencilState.m_nTestMask = 0x1;
+	stencilState.m_CompareFunc = SHADER_STENCILFUNC_NOTEQUAL;
 	stencilState.m_PassOp = SHADER_STENCILOP_KEEP;
 	stencilState.m_FailOp = SHADER_STENCILOP_KEEP;
-	stencilState.m_ZFailOp = SHADER_STENCILOP_ZERO;
+	stencilState.m_ZFailOp = SHADER_STENCILOP_KEEP;
 	ctx->setStencilState(stencilState);
 
 	const int srcWidth = globals::screenX;
@@ -536,13 +490,39 @@ void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
 	ctx->drawScreenSpaceRectangle(halo_add_to_screen, 0, 0, srcWidth, srcHeight,
 		0.0f, -0.5f, srcWidth / 4.0f - 1.0f, srcHeight / 4.0f - 1.0f,
 		_rt_SmallFB1->getActualWidth(),
-		_rt_SmallFB1->getActualHeight(), nullptr, 0, 0);
+		_rt_SmallFB1->getActualHeight());
 
-	ctx->setStencilState(stencilStateDisable);
+	ctx->disableStencil();
+}
+
+void glow::applyEntityGlowEffects(IMatRenderContext* ctx)
+{
+	if (!vars::visuals->glow->enabled && glowBoxDefinitions.empty())
+		return;
+
+	renderGlowMisc(ctx);
+
+	ctx->pushRenderTargetAndViewport();
+
+	beginGlow(ctx);
+	{
+		renderGlowBoxes(GLOWBOX_PASS_STENCIL, ctx);
+		renderGlowModels(ctx);
+	}
+	endGlow(ctx);
+
+	addBackbufferGlow(ctx);
+
+	downSampleAndBlurRT(ctx);
+
+	ctx->popRenderTargetAndViewport();
+
+	addHaloScreen(ctx);
 }
 
 void glow::addGlowBox(const Vec3& origin, const Vec3& angOrientation, const Vec3& mins, const Vec3& maxs, const Color& color, float lifetime)
 {
+#if USE_GLOWBOX_CUSTOM == true
 	GlowBoxDefinition_t glowBox
 	{
 		.m_position = origin,
@@ -555,18 +535,38 @@ void glow::addGlowBox(const Vec3& origin, const Vec3& angOrientation, const Vec3
 	};
 
 	glowBoxDefinitions.push_back(glowBox);
+#else
+	memory::interfaces::glowManager->addGlowBox(origin, angOrientation, mins, maxs, color, lifetime);
+#endif
 }
 
 void glow::run()
 {
-	if (!vars::visuals->glow->enabled)
-		return;
-
+#ifdef USE_GLOW_CUSTOM
 	if (!game::isAvailable())
 		return;
 
 	auto ctx = memory::interfaces::matSys->getRenderContext();
 
-	PIXEVENT{ ctx, "EntityGlowEffects" };
 	applyEntityGlowEffects(ctx);
+#else
+	// else run it from the interface, careful of register check
+#endif
+}
+
+void glow::drawModel(Player_t* ent, float alpha)
+{
+	const uint8_t instanceAlpha = static_cast<uint8_t>(alpha * 255);
+
+	ent->drawModel(renderFlags, instanceAlpha);
+	Entity_t* attachment = ent->firstMoveChild();
+
+	while (attachment)
+	{
+		if (attachment->shouldDraw())
+		{
+			attachment->drawModel(renderFlags, instanceAlpha);
+		}
+		attachment = attachment->nextMovePeer();
+	}
 }

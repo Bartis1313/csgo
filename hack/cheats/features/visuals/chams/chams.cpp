@@ -109,6 +109,8 @@ void chams::initMaterials()
 {
 	for (auto& materialData : materials)
 		materialData.material = material::factory::createMaterial(materialData);
+
+	//streamProof.init();
 }
 
 void chams::overrideChams(int styles, bool ignore, bool wireframe, const Color& color, bool force, bool call)
@@ -150,6 +152,8 @@ void chams::callOiriginal(const std::optional<Matrix3x4*>& data)
 
 void chams::run(void* result, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
 {
+	runningMyChams = false;
+
 	stored::result = result;
 	stored::state = state;
 	stored::info = info;
@@ -176,6 +180,9 @@ void chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 		}
 
 		overrideChams(vars::visuals->chams->indexPlayers, false, false, vars::visuals->chams->colorPlayers(), true, false);
+
+		runningMyChams = true;
+
 		return;
 
 	}
@@ -196,10 +203,16 @@ void chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 			{
 				mat->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
 				memory::interfaces::studioRender->forcedMaterialOverride(mat);
+
+				runningMyChams = true;
+
 				return;
 			}
 
 			overrideChams(vars::visuals->chams->indexArms, false, false, vars::visuals->chams->colorArms(), true, false);
+
+			runningMyChams = true;
+
 			return;
 		}
 		else if (name.find("fists") == std::string::npos &&
@@ -218,10 +231,16 @@ void chams::run(void* result, const DrawModelState_t& state, const ModelRenderIn
 			{
 				mat->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, true);
 				memory::interfaces::studioRender->forcedMaterialOverride(mat);
+
+				runningMyChams = true;
+
 				return;
 			}
 
 			overrideChams(vars::visuals->chams->indexWeapons, false, false, vars::visuals->chams->colorWeapons(), true, false);
+
+			runningMyChams = true;
+
 			return;
 		}
 	}
@@ -261,6 +280,9 @@ void chams::drawBackTrack(Player_t* ent)
 			callOiriginal(record.at(i).matrices.data());
 			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
+
+		runningMyChams = true;
+
 		break;
 	}
 	case E2T(BTChamsType::LAST_TICK):
@@ -285,6 +307,9 @@ void chams::drawBackTrack(Player_t* ent)
 			callOiriginal(record.at(i).matrices.data());
 			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
+
+		runningMyChams = true;
+
 		break;
 	}
 	case E2T(BTChamsType::COLOR_CHANGE):
@@ -303,6 +328,8 @@ void chams::drawBackTrack(Player_t* ent)
 			callOiriginal(record.at(i).matrices.data());
 			memory::interfaces::studioRender->forcedMaterialOverride(nullptr);
 		}
+		runningMyChams = true;
+
 		break;
 	}
 	default:

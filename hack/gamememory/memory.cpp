@@ -139,6 +139,7 @@ void memory::init()
 	present = scan(GAME_OVERLAY, DX9_PRESENT).add(0x2);
 	reset = scan(GAME_OVERLAY, DX9_RESET).add(0x9);
 	updatePostEffects = scan(CLIENT_DLL, UPDATEPOST_EFFECTS);
+	addGlowBox = scan(CLIENT_DLL, ADD_GLOW_BOX);
 
 	// REST
 

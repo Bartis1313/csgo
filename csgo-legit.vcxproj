@@ -165,6 +165,7 @@
     <ClCompile Include="hack\cheats\features\visuals\list\spectactors.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\bulletUpdater.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\noscope.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\streamproof\streamproof.cpp" />
     <ClCompile Include="hack\cheats\game\game.cpp" />
     <ClCompile Include="hack\cheats\hooks\addEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\allocKeyvalues.cpp" />
@@ -274,6 +275,7 @@
     <ClCompile Include="hack\menu\GUI-ImGui\sections\visuals\visuals.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\styles\styles.cpp" />
     <ClCompile Include="hack\render\backend\backend.cpp" />
+    <ClCompile Include="hack\SDK\CGlowManager.cpp" />
     <ClCompile Include="hack\SDK\IMatRenderContext.cpp" />
     <ClCompile Include="hack\SDK\material.cpp" />
     <ClCompile Include="hack\setup\seh.cpp" />
@@ -359,6 +361,7 @@
     <ClInclude Include="hack\cheats\features\visuals\player\sounds.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\plots\plots.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\radar\radar.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\streamproof\streamproof.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\tracer\tracer.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\ambient.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\bomb.hpp" />

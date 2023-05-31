@@ -53,7 +53,7 @@ void bulletTracer::draw()
 		return;
 
 	CfgBeam cfgbeam = vars::visuals->world->tracer->beamTracer;
-	
+
 	const Vec3 correctEnd = lastbullets.size() == 2 ? lastbullets.back() : lastbullets.front();
 	const Vec3 src{ game::localPlayer->getEyePos() };
 
@@ -80,6 +80,6 @@ void bulletTracer::draw()
 	info.m_vecEnd = correctEnd;
 	info.m_segments = cfgbeam.segments;
 	info.m_renderable = true;
-	
+
 	memory::interfaces::beams->createBeamPoints(info);
 }

@@ -40,6 +40,7 @@ public:
 			TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT,
 			CREATERENDERTARGETFLAGS_HDR);
 	}
+	VFUNC(ImageFormat, getBackBufferFormat, 36, (), (this));
 
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/234226-mirrorcam-ported-window.html
 

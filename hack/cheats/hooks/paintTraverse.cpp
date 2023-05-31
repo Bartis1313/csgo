@@ -43,7 +43,7 @@ hooks::PaintTraverse::value hooks::PaintTraverse::hook(FAST_ARGS, uint32_t panel
 		return;
 
 	const std::string_view panelName = memory::interfaces::panel->getName(panel);
-
+	
 	static uint32_t panelID = 0;
 
 	original(thisptr, panel, forceRepaint, allowForce);

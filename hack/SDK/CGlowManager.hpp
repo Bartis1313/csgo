@@ -2,6 +2,7 @@
 
 #include <render/Color.hpp>
 #include "helpers/pad.hpp"
+#include "math/Vector.hpp"
 
 class CGlowObject_t
 {
@@ -37,4 +38,6 @@ public:
 	CGlowObject_t* m_objects;
 	PAD(8);
 	int m_size;
+	
+	void addGlowBox(const Vec3& origin, const Vec3& angle, const Vec3& min, const Vec3& max, const Color& color, float lifetime);
 };

@@ -259,7 +259,7 @@ public:
 
 	constexpr auto operator<=>(const Vector&) const = default;
 
-	[[nodiscard]] constexpr auto toArray()
+	[[nodiscard]] constexpr auto toArray() const
 	{
 		return m_arr;
 	}

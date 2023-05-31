@@ -39,7 +39,6 @@ bool setup::init(void* instance)
 	console::info("Hack start, {} {}", __DATE__, __TIME__);
 
 	TimeCount initTimer{};
-	console::setLogger("CSGO DEBUG", "hack.log");
 	try
 	{
 		const config::Localization localization
@@ -51,6 +50,7 @@ bool setup::init(void* instance)
 		};
 
 		config::init(localization);
+		console::setLogger("CSGO DEBUG", "hack.log");
 		memory::init();
 		hooks::wndProcSys::init();
 		InitAble::Storage::runs.run();

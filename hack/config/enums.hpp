@@ -119,6 +119,12 @@ enum class GlowRenderStyle
 	EDGE_HIGHLIGHT_PULSE
 };
 
+enum class GlowIgnorez
+{
+	RIMGLOW3D,
+	EDGE_HIGHLIGHT,
+	EDGE_HIGHLIGHT_PULSE
+};
 
 enum class GlowRenderPulse
 {

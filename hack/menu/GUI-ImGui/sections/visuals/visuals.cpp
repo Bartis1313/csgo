@@ -98,7 +98,7 @@ void tabs::visuals::draw()
 		}
 		ImGui::EndGroupPanel();
 
-		ImGui::BeginGroupPanel("Chams & Glow", ImGui::GetContentRegionAvail());
+		ImGui::BeginGroupPanel("Chams", ImGui::GetContentRegionAvail());
 		{
 			const auto materials = chams::materials;
 			std::vector<std::string> names;
@@ -148,15 +148,14 @@ void tabs::visuals::draw()
 			ImGui::Checkbox("Glow##enabled", &vars::visuals->glow->enabled);
 			if (vars::visuals->glow->enabled)
 			{
-				const static auto names = magic_enum::enum_names_pretty<GlowRenderStyle>();
-				ImGui::MultiCombo("Type", names, &vars::visuals->glow->usedMats);
-				ImGui::MultiCombo("Ignorez", names, &vars::visuals->glow->ignorez);
-				ImGui::Checkbox("Full bloom", &vars::visuals->glow->fullBloom);
+				ImGui::Checkbox("Streamproof##glow", &vars::visuals->glow->streamProof);
+				ImGui::SameLine();
+				ImGui::HelpMarker("THIS IS AN ATTEMPT FOR QUEUED RENDER\nReally hard to track errors here!");
+				ImGui::MultiCombo("Type", magic_enum::enum_names_pretty<GlowRenderStyle>(), &vars::visuals->glow->usedMats);
+				ImGui::MultiCombo("Ignorez", magic_enum::enum_names_pretty<GlowIgnorez>(), &vars::visuals->glow->ignorez);
 				ImGui::SameLine();
 				ImGui::ColorPicker("Color", &vars::visuals->glow->colorPlayer);
-				ImGui::Checkbox("Occluded", &vars::visuals->glow->occluded);
-				ImGui::SameLine();
-				ImGui::Checkbox("UnOccluded", &vars::visuals->glow->unoccluded);
+				ImGui::Checkbox("Visible", &vars::visuals->glow->visible);
 				ImGui::SliderFloat("Exponent", &vars::visuals->glow->exponent, 0.0f, 10.0f);
 				ImGui::SliderFloat("Saturation", &vars::visuals->glow->saturation, 0.0f, 50.0f);
 				ImGui::SliderFloat("$C0_X (halo add screen)", &vars::visuals->glow->C0_X, 0.0f, 1.0f);

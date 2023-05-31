@@ -289,3 +289,5 @@
 #define SCOPE_DUST_RET				SIG("FF 50 3C 8B 4C 24 20")
 // https://www.unknowncheats.me/forum/counterstrike-global-offensive/331329-achieving-noscope-blurry-lines.html
 #define SCOPE_ARC_RET				SIG("8B 0D ? ? ? ? FF B7 ? ? ? ? 8B 01 FF 90 ? ? ? ? 8B 7C 24 1C")
+// refer to other glow sigs, or glow_outline code
+#define ADD_GLOW_BOX				SIG("55 8B EC 53 56 8D 59")

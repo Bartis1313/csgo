@@ -67,17 +67,17 @@ struct VarVisuals
 	struct VarGlow
 	{
 		bool enabled{ false };
+		bool streamProof{ false };
 		bool fullBloom{ false };
 		CfgColor colorPlayer{ Colors::Purple };
 		std::array<float, magic_enum::enum_count<GlowRenderPulse>()> pulseSpeeeds{ utilities::getFilledArray<float, magic_enum::enum_count<GlowRenderPulse>()>(12.0f) };
-		bool occluded{ false };
-		bool unoccluded{ false };
+		bool visible{ true };
 		float exponent{ 1.0f };
 		float saturation{ 1.0f };
 		float C0_X{ 1.0f };
 		float thickness{ 1.0f };
 		std::array<bool, magic_enum::enum_count<GlowRenderStyle>()> usedMats{ utilities::getFilledArray<bool, magic_enum::enum_count<GlowRenderStyle>()>(false) };
-		std::array<bool, magic_enum::enum_count<GlowRenderStyle>()> ignorez{ utilities::getFilledArray<bool, magic_enum::enum_count<GlowRenderStyle>()>(false) };
+		std::array<bool, magic_enum::enum_count<GlowIgnorez>()> ignorez{ utilities::getFilledArray<bool, magic_enum::enum_count<GlowIgnorez>()>(false) };
 	};
 	ADD_MEMBER_PTR(VarGlow, glow);
 

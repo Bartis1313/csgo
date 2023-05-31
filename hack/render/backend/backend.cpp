@@ -29,6 +29,9 @@ void renderbackend::createContext(HWND hwnd)
 	static std::once_flag once;
 	std::call_once(once, [hwnd]()
 		{
+#ifdef SURFACE_RENDER
+			SurfaceRender::init();
+#endif
 			ImGui::CreateContext();
 			ImPlot::CreateContext();
 			ImGui_ImplWin32_Init(hwnd);

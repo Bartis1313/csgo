@@ -1,200 +1,108 @@
 # Csgo
-Source aimed for visual aspects of the game.
-
-This is and was a part of me learning C++ and gamehacking.
 
 ![Bartis internal CSGO](https://user-images.githubusercontent.com/69613796/179428634-adf44410-4002-4e5d-9ac5-b794dcb1c35f.png)
 
-## How to build
+## Introduction
 
-Requirements:
+This project is and was a pert of my c++ and game-hacking journey. The biggest focus of this cheat is on the visual aspects of the game Counter-Strike: Global Offensive (CSGO).
 
- * [git](https://git-scm.com/download/win)
- * [vs](https://visualstudio.microsoft.com/)
- * [c++ redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
- * [directX](https://www.microsoft.com/en-us/download/details.aspx?id=35)
- * [vcpkg](https://vcpkg.io/en/index.html)
+Please note that this cheat is for educational purposes only, provided as a training software. To ensure your safety while using cheats, it is recommended to use a reliable VAC module dumper and debug any outputted files. It is important to also look what client does to the game. You can start by understanding the information provided in the [VAC GitHub repository](https://github.com/danielkrupinski/VAC).
 
-Note that git is very optional, it's suggested option to stay up to date.
-<br />
-After every config change it is required to delete the entry and let it create a new default config.
+## Features
 
-### About dependencies
-
-Dependencies folder IS NOT for dependencies themselves.
-If they are on vcpkg, do not include them manually!
-Rare exceptions are not supported libs, or custom addons.
-
-## How to build
-Please follow the short read [here](https://github.com/Microsoft/vcpkg#getting-started)
-After installing, open the project and click build.
-If there are any errors, please open the issue.
-
-## How to run
-
-Default menu key is ``INSERT`` more options will be self explanained by viewing menu.
-
-## Information
-This is a trianing software. No further actions taken by people are heeded.
-<br />
-<br />
-As you know or not, this is not going to ensure your safety in 100%. To do that, use any good vac module dumper, and debug outputed files.
-<br />
-Good start is to: use any valid vac modules dumper (that will decode inputs), and understand all [this](https://github.com/danielkrupinski/VAC)
-
-# Features list: 
 <details>
+<summary>List of Features</summary>
 
- * Aimbot 
- 
-Aimbot works with coiuple of options such as: smoothing, delay, selecting hitboxes, visibility rules.
-It sets the position of the mouse, and gets data from createMove, due to huge amount of calls per frame in mouse override.
-The way it does it is locked, so we shouldn't get missed frames data. Configurable with hotkey.
- * RCS
- 
-Controlling your recoil punch, is comminicates in exactly same way as aimbot. Possible to match it with custom pitch / yaw.
- * Triggerbot
- 
-Shoot the target automatically when it's on our crosshair. Delay is configurable
- * Backtrack
- 
-Manipulate the client to send fake tickrate, which allows us to store records recognized as history, that we can completely fine shoot and hit.
- * Fake latency
- 
-Basically it sends fake latency amount, server understands it and we can use it as a extra tool for backtrack. 
- * Bunnyhop
- 
-Strafe automatically, it has also an autostrafers which help us to accelrate the sidemoves. Configurable with chance of hitting the bunnyhop in %.
- * Thirdperson
- 
-Tell the game to do thirdperson, tracing is included to close up the distance if we are close to walls. Configurable as a position and hotkey.
- * Crosshairs
- 
-Displays crosshair with various ways, or force the game to do so.
- * Local info - ammo, pos etc... Bunch of local player informations
- 
-Display the information of localplayer.
- * Plots
- 
-Displays fps and velocity with ImPlot, velocity data is gathered from prediction.
- * Hitmarker
- 
-Displays hit position with custom hitmark
- * No scope
- 
-Force the game blur scope shader to be nulled.
- * Bullet tracer
- 
-Use engine's beams to display source and destination of bullets.
- * Flashlight
- 
-Use game's flashlight effect.
- * Nade prediction
- 
-Predicts where nade lands, we also have a nade tracer which display the way of nades.
- * Engine prediction
- 
-1:1 prediction from the game, useful to gather accurate player datas.
- * Chams
- 
-Override model with custom materials, we can also add our own materials at runtime, with fancy editor.
- * Glow
- 
-1:1 game's glow handled on own. We could do something about stencils since they don't match with visible / non viisble.
- * Sound Esp
- 
-Copy of apex legends sound passive of bloodhound character.
- * Esp
- 
-Display ESP of player, boxes, dlights, health, armor, flags, and so on...
- * Enemy aiming at you warning
- 
-Basically just what it says, displays small warning text with info.
- * 2D radar
- 
-Displays custom radar with rotated background image, it hides game's radar to prevent overdraw look.
- * Skybox
- 
-Loads any skybox to the map
- * Edit world colors
- 
-Modulates the color of textures
- * Movement trails
- 
-Displays lines representing recent movement
- * Bullet impacts
- 
-Displays cubes representing bullet end positions
- * Edit particle color
- 
-Edits the color of molly, smoke, blood impact
- * Draw dropped weapons
- 
-Displays dropped weapons with few informations
- * Bomb overlay with info
- 
-Displays bomb information overlay
- * Mirrorcam
- 
-Displays mirrorcam overlay
- * Freecam
- 
-Usea freecam completely like in minecraft game.
- * Blacklist
- 
-Sets targets priority.
- * Playerlist
- 
-Store entities in one large map
- * Logger
- 
-Log game's actions
- * Ambient
- 
-Force the game to render ambient light
- * Fog
- 
-Control the fog on the map
- * Tone
- 
-Control the tone on the map
- * Weather
- 
-Draws rain effect from game.
- * Interpolation
- 
-Disables interpolation completely
- * Flashbang reduce
- 
-Reduces flash alpha
- * Screen effects
- 
-Force game to render selected effects
- * Motion blur
- 
-1:1 game's blur
- * Molotov and smoke overlays
- 
-For smoke - circle of its radius, for molotov polygon with possible triangulation.
-* Zeus display
+* Aimbot: The aimbot feature provides various options such as smoothing, delay, and the ability to select hitboxes and define visibility rules. It sets the position of the mouse and retrieves data from the `createMove` function to ensure accuracy. It can be configured with a hotkey.
+* Recoil Control System (RCS): The RCS feature allows you to control recoil by communicating with the game in a similar manner as the aimbot. It can be matched with custom pitch and yaw settings.
+* Triggerbot: The triggerbot automatically shoots at targets when they are in your crosshair. It can be configured with a customizable delay.
+* Backtrack: This feature manipulates the client to send a fake tickrate, enabling the storage of historical records. This allows you to shoot and hit targets as if they were in the past.
+* Fake Latency: By sending fake latency to the server, this feature provides an additional tool for backtrack functionality.
+* Bunnyhop: The bunnyhop feature enables automatic strafing and includes an autostrafe function to help accelerate sidemoves. It can be configured with a chance of successful bunnyhops.
+* Thirdperson: This feature activates the third-person view in the game. It includes tracing to avoid clipping with walls. The position and hotkey can be customized.
+* Crosshairs: This feature displays crosshairs in various styles or forces the game to display its own crosshair.
+* Local Information: This feature provides information about the local player, such as ammunition, position, and more.
+* Plots: The plots feature displays frames per second (FPS) and velocity using ImPlot. Velocity data is gathered from prediction.
+* Hitmarker: When a hit occurs, this feature displays a hit position with a custom hitmark.
+* No Scope: This feature nullifies the game's blur scope shader.
+* Bullet Tracer: Bullet tracers use the game's engine beams to display the source and destination of bullets.
+* Flashlight: This feature utilizes the game's flashlight effect.
+* Nade Prediction: Predicts where grenades will land. A nade tracer displays the trajectory of grenades.
+* Engine Prediction: Provides 1:1 prediction from the game, allowing accurate gathering of player data.
+* Chams: Overrides the model with custom materials. It also allows the addition of custom materials at runtime using a user-friendly editor.
+* Glow: This feature is a rebuild of game's build in glow system. And exposes visibility stencil done correctly.
+* Sound Esp: A replica of the Apex Legends sound passive of the Bloodhound character.
+* ESP (Extra Sensory Perception): Displays information about players, such as boxes, dlights, health, armor, flags, and more.
+* Enemy Aiming at You Warning: Displays a small warning text when an enemy is aiming at you.
+* 2D Radar: Displays a custom radar with a rotated background image, hiding the game's default radar to prevent overdraw.
+* Skybox: Allows loading of any skybox into the game.
+* Edit World Colors: Modulates the color of textures in the game world.
+* Movement Trails: Displays lines representing recent player movement.
+* Bullet Impacts: Displays cubes representing the positions where bullets hit.
+* Edit Particle Color: Edits the color of effects such as molotov, smoke, and blood impacts.
+* Draw Dropped Weapons: Displays dropped weapons with additional information.
+* Bomb Overlay with Info: Displays bomb-related information as an overlay.
+* Mirrorcam: Displays a mirror camera overlay.
+* Freecam: Enables a freecam mode similar to Minecraft, allowing free movement.
+* Blacklist: Sets priority for targeting specific entities.
+* Playerlist: Stores entities in a centralized map.
+* Logger: Logs game actions.
+* Ambient: Forces the game to render ambient light.
+* Fog: Control the fog effect in the game.
+* Tone: Control the tone effect in the game.
+* Weather: Renders a rain effect in the game.
+* Interpolation: Disables interpolation completely.
+* Flashbang Reduce: Reduces the alpha of flashbang effects.
+* Screen Effects: Forces the game to render selected effects.
+* Motion Blur: Replicates the game's motion blur effect.
+* Molotov and Smoke Overlays: Displays circles or polygons representing the radius of smoke or molotov effects.
+* Zeus Display: Draws a circle representing the range of the Zeus taser and allows tracing of the polyline.
+</details>
 
-Draws a circle representing zeus range, possible to trace the polyline.
+<details>
+<summary>Extra</summary>
 
+* Threadsafe streamproof render wrapper, surface rendering is deprecated
+* Icon extraction from the game to image
+* Game callbacks
+* Entity cache
+* Discord Rich Presence (RPC)
+* Hook-to-feature communication using handlers
+* Logging console
+* Game events (only one is currently needed)
+* Compile-time signature to optional bytes conversion
+* Exports and memory class
+* Netvars with dumping
+* Interfaces with dumping
+* Runtime shutdown with proper release of features
+* Streamproof game's material rendering (some render states have problem)
+</details>
 
-Other things listed here are not features
-- threadsafe streamproof render, surface one is rather a deprecated solution
-- icon from the game to image, instead of premade fonts
-- game's callbacks
-- entity cache
-- discord rpc
-- hook-to-feature communication by handlers
-- logging console
-- game events (we currently need only one anyway)
-- compile-time sig to optional bytes
-- exports, memory class
-- netvars, with dumping
-- shutdown at runtime with leaving all features free'd or released
- </details>
+## Building Instructions
+
+### Requirements:
+
+* [Git](https://git-scm.com/download/win)
+* [Visual Studio](https://visualstudio.microsoft.com/)
+* [C++ Redistributables](https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170)
+* [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35)
+* [vcpkg](https://vcpkg.io/en/index.html)
+
+Note: Git is optional but recommended for staying up to date with the project.
+
+After making any configuration changes, delete the existing entry and let the program create a new default configuration.
+
+### Dependencies
+
+The dependencies folder is not for including dependencies themselves. If the dependencies are available in vcpkg, do not include them manually. Only include unsupported libraries or custom addons as rare exceptions.
+
+## Building the Project
+
+Please follow the steps outlined in the [Vcpkg Getting Started guide](https://github.com/Microsoft/vcpkg#getting-started). After installing the necessary dependencies, open the project in Visual Studio and click "Build". If any errors occur, please open an issue.
+
+## Running the Cheat
+
+The default key to open the cheat's menu is `INSERT`. Additional options within the menu will be self-explanatory.
 
 # Log
 <details>
@@ -281,6 +189,7 @@ Other things listed here are not features
 * 2.0.5 - menu recode, I hope it's "clean" now. Recode of bunch of classes, WIP chams editor cleanup, because it annoys me how complicated it is.
 * 3.0.0 - WIP refactor, making it as 3rd version due to the hard cleanup / refactor (not finished yet). I basically removed stupid OOP forcing to some real abstraction with hook and feature.
 * 3.0.1 - Fixed UB stuff, detailed in commit message.
+* 3.0.2 - Fixed the glow system, with better and more performant solution. I have also fixed the glow box lines with fading color. Added basic streamproof solution, which lacks some aspects and I couldn't force the game to understand some render states. Added interface names dumping.
 </details>
 
 # People who helped

@@ -14,6 +14,10 @@
 #include <d3d9.h>
 #include <mutex>
 
+#include <cheats/features/visuals/glow/glow.hpp>
+#include <cheats/features/visuals/chams/chams.hpp>
+#include <cheats/features/visuals/streamproof/streamproof.hpp>
+
 hooks::Present::value hooks::Present::hook(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region)
 {
 	// check if there is any context, needed when shutdown
@@ -29,6 +33,9 @@ hooks::Present::value hooks::Present::hook(IDirect3DDevice9* device, RECT* srcRe
 	{
 		ImRender::present(ImGui::GetBackgroundDrawList());
 
+		glow::streamProof.beginPresent(device);
+		//chams::streamProof.beginPresent(device);
+
 		Storage::runs.run();
 		ImNotify::handle();
 	}
@@ -43,6 +50,9 @@ hooks::Present::value hooks::Present::hook(IDirect3DDevice9* device, RECT* srcRe
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 		device->EndScene();
 	}
+
+	glow::streamProof.endPresent();
+	//chams::streamProof.endPresent();
 
 	return original(device, srcRect, dstRect, window, region);
 }

@@ -18,5 +18,6 @@ hooks::DrawModelExecute::value hooks::DrawModelExecute::hook(FAST_ARGS, void* re
 	Storage::runs.run(result, state, info, matrix);
 
 	original(thisptr, result, state, info, matrix);
+
 	memory::interfaces::modelRender->overrideMaterial(nullptr);
 }
