@@ -6,6 +6,7 @@
 #include <cheats/features/visuals/world/skybox.hpp>
 #include <cheats/features/visuals/world/weather.hpp>
 #include <cheats/features/visuals/world/ambient.hpp>
+#include <cheats/features/misc/disable/convars.hpp>
 
 void tabs::misc::draw()
 {
@@ -107,6 +108,8 @@ void tabs::misc::draw()
 			ImGui::Checkbox("No scope", &vars::misc->scope->enabled);
 			ImGui::Checkbox("Disable Interpolation", &vars::misc->disableItems->interpolate);
 			ImGui::SliderFloat("Flashbang %", &vars::misc->disableItems->flashPercentage, 0.0f, 1.0f);
+			if(ImGui::Button("Disable cvar locks"))
+				convars::run();
 		}
 		ImGui::EndGroupPanel();
 	}

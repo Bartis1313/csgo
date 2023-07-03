@@ -50,7 +50,6 @@ enum class BTChamsType
 {
 	STABLE,
 	LAST_TICK,
-	RAINBOW,
 	COLOR_CHANGE
 };
 

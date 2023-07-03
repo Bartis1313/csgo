@@ -4,5 +4,5 @@
 
 hooks::IsUsingStaticPropDebugModes::value hooks::IsUsingStaticPropDebugModes::hook()
 {
-	return vars::visuals->world->modulate->enabled;
+	return vars::visuals->world->modulate->enabledProp;
 }

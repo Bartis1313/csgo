@@ -33,8 +33,9 @@ hooks::Present::value hooks::Present::hook(IDirect3DDevice9* device, RECT* srcRe
 	{
 		ImRender::present(ImGui::GetBackgroundDrawList());
 
-		glow::streamProof.beginPresent(device);
-		//chams::streamProof.beginPresent(device);
+		glow::streamProof.beginPresent(device, D3DBLEND_INVSRCALPHA);
+		chams::streamProof.beginPresent(device, D3DBLEND_SRCCOLOR);
+		chams::streamProofDME.beginPresent(device, D3DBLEND_SRCCOLOR);
 
 		Storage::runs.run();
 		ImNotify::handle();
@@ -52,7 +53,8 @@ hooks::Present::value hooks::Present::hook(IDirect3DDevice9* device, RECT* srcRe
 	}
 
 	glow::streamProof.endPresent();
-	//chams::streamProof.endPresent();
+	chams::streamProof.endPresent();
+	chams::streamProofDME.endPresent();
 
 	return original(device, srcRect, dstRect, window, region);
 }

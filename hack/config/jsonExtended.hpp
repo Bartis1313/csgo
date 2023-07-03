@@ -20,6 +20,7 @@ void to_json(json& j, const CfgColor& val);
 void to_json(json& j, const CfgBeam& val);
 void to_json(json& j, const Key& val);
 void to_json(json& j, const CfgBox& val);
+void to_json(json& j, const CfgCham& val);
 
 void to_json(json& j, const VarAim& val);
 void to_json(json& j, const VarAimPaint& val);
@@ -93,6 +94,7 @@ void from_json(const json& j, CfgColor& val);
 void from_json(const json& j, CfgBeam& val);
 void from_json(const json& j, Key& val);
 void from_json(const json& j, CfgBox& val);
+void from_json(const json& j, CfgCham& val);
 
 void from_json(const json& j, VarAim& val);
 void from_json(const json& j, VarAimPaint& val);

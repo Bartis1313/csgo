@@ -85,7 +85,7 @@
 // check CTraceFilterOmitPlayers
 #define GOES_THROUGH_SMOKE			SIG("55 8B EC 83 EC 08 8B 15 ? ? ? ? 0F 57 C0")
 // #STR: "TempEntity", "TE_DispatchEffect %s %s", "originx", "originy", "originz", "startx", "starty", "startz", "normalx", "normaly"
-#define DISPATCH_EFFECT				SIG("55 8B EC 83 E4 F8 83 EC 20 56 57 8B F9 C7 44 24")
+#define DISPATCH_EFFECT				SIG("55 8B EC 83 E4 F8 83 EC 20 56 57 8B F9 C7 44 24 ? ? ? ? ? 8D 4C 24 08 C7 44 24 ? ? ? ? ? 8B F2 C7 44 24")
 // #STR: "effects/tesla_glow_noz"
 #define FX_TESLA					SIG("55 8B EC 81 EC ? ? ? ? 56 57 8B F9 8B 47 18")
 // #STR: "effects/flashlight001", "Other textures"
@@ -261,7 +261,7 @@
 #define CLIENT_THINK_PRECIPITATION	SIG("A1 ? ? ? ? 83 C1 F4")
 // very, very many places. I picked the one with this str ref:
 // #STR: "origin: <%d, %d, %d>\n", "light:  %d\n"
-#define HOST_STATE					SIG("A1 ? ? ? ? 0F 84 ? ? ? ? 33 C9")
+#define HOST_STATE					SIG("A1 ? ? ? ? 83 EC 08 56 BE ? ? ? ?")
 // found from glow DrawModel function
 #define FIRST_MOVE_CHILD			SIG("8B 80 0C 03 00 00 83 F8 FF 0F 84 C2 00 00 00")
 // found from glow DrawModel function
@@ -291,3 +291,37 @@
 #define SCOPE_ARC_RET				SIG("8B 0D ? ? ? ? FF B7 ? ? ? ? 8B 01 FF 90 ? ? ? ? 8B 7C 24 1C")
 // refer to other glow sigs, or glow_outline code
 #define ADD_GLOW_BOX				SIG("55 8B EC 53 56 8D 59")
+// #STR: "C_BaseAnimating::DrawModel"
+#define BASE_ANIMATING_DRAW_MODEL	SIG("55 8B EC 83 EC 10 53 56 8B F1 8B 0D ? ? ? ? 57 89 75 F8 8B 81 ? ? ? ?")
+// find any place in sdk that setString is used, often material inits
+#define KEY_VALUES_SET_STRING		SIG("55 8B EC A1 ? ? ? ? 53 56 57 8B F9 8B 08 8B 01 FF 77 04")
+// same...
+#define KEY_VALUES_FIND_KEY			SIG("55 8B EC 83 EC 1C 53 8B D9 85 DB")
+// follow refs as some effects, eg: embers
+#define GET_PMATERIAL				SIG("55 8B EC 83 EC 18 53 8B D9 56 57 83 7B 60 00 75 0B")
+// r_printdecalinfo
+#define S_ADECALPOOL				SIG("A1 ? ? ? ? 8B 0C B0")
+// "psurface NULL in R_DecalCreate!\n"
+#define R_DECAL_CREATE				SIG("53 8B DC 83 EC 08 83 E4 F8 83 C4 04 55 8B 6B 04 89 6C 24 04 8B EC 83 EC 38 8B C2 F3 0F 11 5D ? F3 0F 11 55 ? 89 45 FC")
+// reverse decal adding
+#define	R_DECAL_ADD_TO_SURFACE		SIG("55 8B EC 83 EC 08 53 56 8B D9 B9 ? ? ? ? 57")
+// reverse init decals
+#define G_ADECALSORTPOOL			SIG("B9 ? ? ? ? E8 ? ? ? ? A1 ? ? ? ? B9 ? ? ? ? FF 05 ? ? ? ?")
+// #STR: "Couldn't get trampoline region lock, will continue possibl
+#define VALVE_HOOK					SIG("55 8B EC 51 8B 45 10 C7")
+// #STR: "Aborting UnhookFunc because pRealFunctionAddr is null\n", "System page size: %u\n", "UnhookFunc not restoring original bytes - jump instruction, "UnhookFunc not restoring original bytes - jump target has , "Warning: VirtualProtect call failed during unhook\n", "Warning: VirtualProtect (2) call failed during unhook\n", "Warning: VirtualProtect (2) call failed to restore protect, "Warning: VirtualProtect call failed to restore protection , "UnhookFunc not restoring original bytes - function is unma, "Aborting UnhookFunc because pRealFunctionAddr is not hooke
+#define VALVE_UNHOOK				SIG("55 8B EC 64 A1 ? ? ? ? 6A FF 68 ? ? ? ? 50 64 89 25 ? ? ? ? 81 EC ? ? ? ? 56 8B 75 08 85 F6 75 26 80 7D 0C 00 0F 84 ? ? ? ?")
+// saw in the renderoverlaysmoke
+#define VIEW_FACE_SMOKE_RET			SIG("F3 0F 2C C0 88 45 FF 8B 01 FF 50 74")
+// r_flashlightdepthtexture check at end
+#define VIEW_DRAW_SCENE				SIG("53 8B DC 83 EC 08 83 E4 F8 83 C4 04 55 8B 6B 04 89 6C 24 04 8B EC 83 EC 10 A1 ? ? ? ? 56 8B F1 57 8B 40 04 48")
+// follow effects sode for precip
+#define CREATE_PARTICLE_PRECIP		SIG("55 8B EC 51 A1 ? ? ? ? 53 56 8B F1 B9 ? ? ? ?")
+// follow effects sode for precip
+#define INITIALIZE_PRECIP_PARTICLE	SIG("55 8B EC 83 EC 5C 8B C1")
+// #STR: "CEffectsList::DrawEffects", "Particle/Effect_Rendering"
+#define DRAW_EFFECTS				SIG("55 8B EC 83 EC 08 A1 ? ? ? ? 89 4D FC 8B 90 ? ? ? ?")
+// #STR: "$depth_feather"
+#define DRAW_WORLD_AND_ENTITIES		SIG("55 8B EC 83 EC 4C 53 56 57 8B 3D ? ? ? ? 8B F1 8B CF 89 75 F8 8B 07 FF 90 ? ? ? ? 8B 0D ? ? ? ? 8D 45 B8 8B 5D 0C 50 6A 00")
+// #STR: "DrawTranslucentEntities"
+#define DRAW_TRANSCULENT_RENDERABLE	SIG("55 8B EC 81 EC ? ? ? ? 83 3D ? ? ? ? ? 53 56 8B D9 57 89 5D E4 74 1C 8B 0D ? ? ? ? 8B 01 FF 90 ? ? ? ? 6A 00")

@@ -2,6 +2,7 @@
 
 #include <SDK/Enums.hpp>
 #include <SDK/clientHitVerify.hpp>
+#include <SDK/CUtlVector.hpp>
 #include <gamememory/memory.hpp>
 #include <cheats/game/game.hpp>
 

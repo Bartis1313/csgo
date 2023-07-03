@@ -39,8 +39,20 @@ void EntityCache::init()
 	}
 }
 
+#define CACHE_LOGGING false
+
 void EntityCache::add(Entity_t* ent)
 {
+#ifdef _DEBUG
+#if CACHE_LOGGING == true
+	auto cl = ent->clientClass();
+	if (!cl)
+		printf("couldn't get the entity clientclass\n");
+	else
+		printf("adding entity: %s enum: %i\n", cl->m_networkName, cl->m_classID);
+#endif
+#endif
+
 	if (!checkRepeatable(ent))
 		return;
 

@@ -57,14 +57,11 @@ namespace playerVisuals
 {
 	struct DormacyInfo_t
 	{
-		Vec3 lastPos;
 		float alpha;
-		float lastUpdate;
-		bool reset;
 
 		[[nodiscard]] bool isValid() const
 		{
-			if (this->reset)
+			if (alpha == 0.0f)
 				return false;
 
 			return true;
@@ -630,17 +627,7 @@ void playerVisuals::updateDormacy(VisualEntity& player)
 	const float ratio = 1.0f / vars::visuals->dormacy->time;
 	const float step = ratio * memory::interfaces::globalVars->m_frametime;
 
-	if (player.entity->isDormant())
-	{
-		dormacy.alpha -= step;
-		player.entity->setAbsOrigin(player.entity->absOrigin());
-	}
-	else
-	{
-		dormacy.lastPos = player.entity->absOrigin();
-		dormacy.alpha += step;
-		dormacy.lastUpdate = memory::interfaces::globalVars->m_curtime;
-	}
+	player.entity->isDormant() ? dormacy.alpha -= step : dormacy.alpha += step;
 
 	dormacy.alpha = std::clamp(dormacy.alpha, 0.0f, 1.0f);
 }
@@ -648,5 +635,5 @@ void playerVisuals::updateDormacy(VisualEntity& player)
 void playerVisuals::roundRestart()
 {
 	for (auto& player : players)
-		player.dormacyInfo.reset = true;
+		player.dormacyInfo.alpha = 0.0f;
 }

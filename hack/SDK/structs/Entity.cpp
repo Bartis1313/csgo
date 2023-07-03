@@ -104,9 +104,19 @@ int Entity_t::m_takedamage()
 	return *reinterpret_cast<int*>((uintptr_t)this + offset);
 }
 
+int Entity_t::baseAnimatingDrawModel(int flags, uint8_t alpha)
+{
+	return memory::baseAnimatingDrawModel()(this, flags, alpha);
+}
+
 void Entity_t::setAbsOrigin(const Vec3& origin)
 {
 	memory::setAbsOrigin()(this, std::cref(origin));
+}
+
+void Entity_t::setAbsAngle(const Vec3& angle)
+{
+	memory::setAbsAngle()(this, std::cref(angle));
 }
 
 void Entity_t::setAbsVelocity(const Vec3& velocity)
@@ -129,7 +139,7 @@ bool Entity_t::setupBonesShort(Matrix3x4* _out, int maxBones, int mask, float ti
 	}
 }
 
-CUtlVector<Matrix3x4> Entity_t::m_CachedBoneData()
+CUtlVector<Matrix3x4>& Entity_t::m_CachedBoneData()
 {
 	const auto offset = memory::cachedBones();
 	return *reinterpret_cast<CUtlVector<Matrix3x4>*>(uintptr_t(this) + offset);
@@ -578,14 +588,10 @@ AABB_t Player_t::getCameraBounds()
 bool Player_t::isOtherTeam(Player_t* player)
 {
 	const static auto mp_teammates_are_enemies = memory::interfaces::cvar->findVar("mp_teammates_are_enemies");
-	bool isDM = false;
-	if (mp_teammates_are_enemies && mp_teammates_are_enemies->getInt())
-		isDM = true;
-
-	if (isDM && this->m_iTeamNum() == player->m_iTeamNum())
-		return true;
-
+	
 	if (this->m_iTeamNum() != player->m_iTeamNum())
+		return true;
+	else if (mp_teammates_are_enemies->getInt())
 		return true;
 
 	return false;

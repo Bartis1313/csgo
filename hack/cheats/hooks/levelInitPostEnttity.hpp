@@ -13,5 +13,14 @@ private:
 
 	static value FASTCALL hook(FAST_ARGS);
 	inline static call original;
+
+	using clRun = std::function<void()>;
+protected:
+	void registerPostReset(const clRun& callback) { Storage::runs.push_back(callback); }
+private:
+	struct Storage
+	{
+		inline static vectorRunnable<clRun> runs;
+	};
 };
 _HOOK_END

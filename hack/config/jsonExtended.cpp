@@ -125,6 +125,28 @@ void to_json(json& j, const CfgBox& val)
 	j["Gradient4"] = val.gradientCol4;
 }
 
+void from_json(const json& j, CfgCham& val)
+{
+	from_json(j["Enabled"], val.enabled);
+	from_json(j["Hide"], val.hide);
+	from_json(j["Ignorez"], val.ignorez);
+	from_json(j["Wireframe"], val.wireframe);
+	from_json(j["Index"], val.index);
+	from_json(j["Color"], val.color);
+	from_json(j["ColorXQZ"], val.colorXQZ);
+}
+
+void to_json(json& j, const CfgCham& val)
+{
+	j["Enabled"] = val.enabled;
+	j["Hide"] = val.hide;
+	j["Ignorez"] = val.ignorez;
+	j["Wireframe"] = val.wireframe;
+	j["Index"] = val.index;
+	j["Color"] = val.color;
+	j["ColorXQZ"] = val.colorXQZ;
+}
+
 void from_json(const json& j, VarAim& val)
 {
 	from_json(j, "AimbotArr", val.weapons);
@@ -169,50 +191,32 @@ void to_json(json& j, const VarVisuals& val)
 
 void from_json(const json& j, VarVisuals::VarChams& val)
 {
-	from_json(j, "Enabled", val.enabled);
-	from_json(j, "Enabled Players", val.players);
-	from_json(j, "Index of Players", val.indexPlayers);
-	from_json(j["Color players"], val.colorPlayers);
-	from_json(j, "Enabled XQZ Players", val.enabledXQZPlayers);
-	from_json(j["Color XQZ players"], val.colorXQZPlayers);
-	from_json(j, "Enabled Weapons", val.enabledWeapons);
-	from_json(j, "Disable Weapons", val.weaponHide);
-	from_json(j, "Index of weapons", val.indexWeapons);
-	from_json(j["Color weapons"], val.colorWeapons);
-	from_json(j, "Enabled Arms", val.enabledArms);
-	from_json(j, "Disable Arms", val.armsHide);
-	from_json(j["Color arms"], val.colorArms);
-	from_json(j, "Index of arms", val.indexArms);
-	from_json(j, "Enable Backtrack Chams", val.enabledBacktrack);
-	from_json(j, "Index Backtrack Chams", val.indexBacktrack);
-	from_json(j["Color backtrack"], val.colorBacktrack);
-	from_json(j, "Backtrack chams mode", val.modeBacktrack);
-	from_json(j, "Backtrack chams rainbow", val.rainbowBacktrack);
-	from_json(j, "Backtrack chams speed", val.rainbowBacktrackSpeed);
+	from_json(j["Players"], val.players);
+	from_json(j["Local Weapon"], val.weapon);
+	from_json(j["Arms"], val.arms);
+	from_json(j["Attachment"], val.attachement);
+	from_json(j, "Backtrack enabled", val.backtrackEnabled);
+	from_json(j, "Backtrack index", val.backtrackIndex);
+	from_json(j, "Backtrack mode", val.backtrackMode);
+	from_json(j["Backtrack Color"], val.backtrackColor);
+	from_json(j["Attachment"], val.attachement);
+	from_json(j["Streamproof"], val.streamProof);
+	from_json(j["Ignore smoke"], val.ignoreSmoke);
 }
 
 void to_json(json& j, const VarVisuals::VarChams& val)
 {
-	j["Enabled"] = val.enabled;
-	j["Enabled Players"] = val.players;
-	j["Index of Players"] = val.indexPlayers;
-	j["Color players"] = val.colorPlayers;
-	j["Enabled XQZ Players"] = val.enabledXQZPlayers;
-	j["Color XQZ players"] = val.colorXQZPlayers;
-	j["Enabled Weapons"] = val.enabledWeapons;
-	j["Disable Weapons"] = val.weaponHide;
-	j["Index of weapons"] = val.indexWeapons;
-	j["Color weapons"] = val.colorWeapons;
-	j["Enabled Arms"] = val.enabledArms;
-	j["Disable Arms"] = val.armsHide;
-	j["Color arms"] = val.colorArms;
-	j["Index of arms"] = val.indexArms;
-	j["Enable Backtrack Chams"] = val.enabledBacktrack;
-	j["Index Backtrack Chams"] = val.indexBacktrack;
-	j["Color backtrack"] = val.colorBacktrack;
-	j["Backtrack chams mode"] = val.modeBacktrack;
-	j["Backtrack chams rainbow"] = val.rainbowBacktrack;
-	j["Backtrack chams speed"] = val.rainbowBacktrackSpeed;
+	j["Players"] = val.players;
+	j["Local Weapon"] = val.weapon;
+	j["Arms"] = val.arms;
+	j["Attachment"] = val.attachement;
+	j["Backtrack enabled"] = val.backtrackEnabled;
+	j["Backtrack index"] = val.backtrackIndex;
+	j["Backtrack mode"] = val.backtrackMode;
+	j["Backtrack Color"] = val.backtrackColor;
+	j["Attachment"] = val.attachement;
+	j["Streamproof"] = val.streamProof;
+	j["Ignore smoke"] = val.ignoreSmoke;
 }
 
 void from_json(const json& j, VarVisuals::VarGlow& val)
@@ -563,19 +567,31 @@ void to_json(json& j, const VarVisuals::VarWorld::VarSky& val)
 
 void from_json(const json& j, VarVisuals::VarWorld::VarModulate& val)
 {
-	from_json(j, "Enabled", val.enabled);
+	from_json(j, "EnabledTexture", val.enabledTexture);
 	from_json(j["Texture"], val.texture);
+	from_json(j, "EnabledProp", val.enabledProp);
 	from_json(j["Prop"], val.prop);
+	from_json(j, "EnabledSky", val.enabledSky);
 	from_json(j["Sky"], val.sky);
+	from_json(j, "EnabledLights", val.enabledLights);
+	from_json(j["Light"], val.lights);
+	from_json(j["LightStrenght"], val.lightsStrenght);
+	from_json(j, "EnabledShader", val.enabledShader);
 	from_json(j, "Shader param", val.shader);
 }
 
 void to_json(json& j, const VarVisuals::VarWorld::VarModulate& val)
 {
-	j["Enabled"] = val.enabled;
+	j["EnabledTexture"] = val.enabledTexture;
 	j["Texture"] = val.texture;
+	j["EnabledProp"] = val.enabledProp;
 	j["Prop"] = val.prop;
+	j["EnabledSky"] = val.enabledSky;
 	j["Sky"] = val.sky;
+	j["EnabledLights"] = val.enabledLights;
+	j["Light"] = val.lights;
+	j["LightStrenght"] = val.lightsStrenght;
+	j["EnabledShader"] = val.enabledShader;
 	j["Shader param"] = val.shader;
 }
 

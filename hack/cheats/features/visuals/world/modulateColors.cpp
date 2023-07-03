@@ -5,21 +5,17 @@
 #include <utilities/tools/tools.hpp>
 #include <cheats/game/globals.hpp>
 
-#include <unordered_map>
+#include <array>
+
+struct modulate_t
+{
+	bool* enabled;
+	std::string_view name;
+	CfgColor* color;
+};
 
 void modulateColor::run(void* thisptr, float* r, float* g, float* b)
 {
-	if (!vars::visuals->world->modulate->enabled)
-		return;
-
-	auto editColor = [=](CfgColor* color)
-	{
-		*r = color->getColor().r();
-		*g = color->getColor().g();
-		*b = color->getColor().b();
-		color->refresh();
-	};
-
 	const auto material = reinterpret_cast<IMaterial*>(thisptr);
 
 	if (!material)
@@ -28,27 +24,35 @@ void modulateColor::run(void* thisptr, float* r, float* g, float* b)
 	if (material->isError())
 		return;
 
-	static std::unordered_map<std::string_view, CfgColor*> mapped =
+	static std::array mats =
 	{
-		{ TEXTURE_GROUP_WORLD, &vars::visuals->world->modulate->texture },
-		{ TEXTURE_GROUP_STATIC_PROP, &vars::visuals->world->modulate->prop },
-		{ TEXTURE_GROUP_SKYBOX, &vars::visuals->world->modulate->sky },
+		modulate_t{ &vars::visuals->world->modulate->enabledTexture, TEXTURE_GROUP_WORLD, &vars::visuals->world->modulate->texture },
+		modulate_t{ &vars::visuals->world->modulate->enabledProp, TEXTURE_GROUP_STATIC_PROP, &vars::visuals->world->modulate->prop },
+		modulate_t{ &vars::visuals->world->modulate->enabledSky, TEXTURE_GROUP_SKYBOX, &vars::visuals->world->modulate->sky },
 	};
 
 	bool goodMat = false;
 	const std::string_view group = material->getTextureGroupName();
-	if (auto itr = mapped.find(group); itr != mapped.end())
+	if (auto itr = std::ranges::find_if(mats, [group](const auto& mat)
+		{
+			if (!(*mat.enabled))
+				return false;
+
+			return mat.name == group;
+		}); itr != mats.end())
 	{
-		editColor(itr->second);
+		*r = itr->color->getColor().r();
+		*g = itr->color->getColor().g();
+		*b = itr->color->getColor().b();
+
 		goodMat = true;
 	}
 
 	constexpr int shaderAlpha = 5;
+	auto shader = material->getShaderParams()[shaderAlpha];
+	if (vars::visuals->world->modulate->enabledShader)
+		shader->setValue(vars::visuals->world->modulate->shader / 100.0f);
 
-	if (auto shader = material->getShaderParams()[shaderAlpha]; goodMat)
-	{
-		!globals::isShutdown
-			? shader->setValue(vars::visuals->world->modulate->shader / 100.0f)
-			: shader->setValue(1.0f); // default val reset
-	}
+	if (globals::isShutdown)
+		shader->setValue(1.0f);
 }

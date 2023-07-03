@@ -51,9 +51,25 @@
 #include "viewRender.hpp"
 #include "updatePostEffects.hpp"
 #include "drawSetColor.hpp"
+#include "renderSmokeOverlay.hpp"
+#include "findMaterial.hpp"
+#include "getPMaterial.hpp"
+#include "decalAddToSurface.hpp"
+#include "decalCreate.hpp"
+#if UNLOCK_PRECIP_TESTING == false
+#include "createParticlePrecip.hpp"
+#include "getVCollide.hpp"
+#include "initializeParticlePrecip.hpp"
+#endif
+#include "drawEffects.hpp"
+#include "drawWorldAndEntities.hpp"
+#include "drawTranslucentRenderables.hpp"
 
 #define HOOK(target, _struct) \
 	hookHelper::MinHook::tryHook(target, &_struct::hook, hookHelper::ORIGINAL(_struct::original), #_struct);
+
+#define HOOK_VALVE(target, _struct) \
+	hookHelper::Valve::tryHook(target, &_struct::hook, hookHelper::ORIGINAL(_struct::original), #_struct);
 
 void hooks::init()
 {
@@ -82,7 +98,7 @@ void hooks::init()
 	HOOK(vfunc::getVFunc(memory::interfaces::client(), LEVEL_INIT_POSTENT), hooks::LevelInitPostEntity);
 	HOOK(vfunc::getVFunc(memory::interfaces::client(), LEVEL_SHUTDOWN), hooks::LevelShudown);
 	HOOK(vfunc::getVFunc(memory::interfaces::panel(), PAINTTRAVERSE), hooks::PaintTraverse);
-	HOOK(vfunc::getVFunc(memory::interfaces::modelRender(), DRAWMODEL), hooks::DrawModelExecute);
+	HOOK(vfunc::getVFunc(memory::interfaces::modelRender(), DRAWMODEL_EXECUTE), hooks::DrawModelExecute);
 	HOOK(vfunc::getVFunc(memory::interfaces::clientMode(), CREATEMOVE), hooks::CreateMove);
 	HOOK(vfunc::getVFunc(memory::interfaces::clientMode(), OVERRIDE), hooks::OverrideView);
 	HOOK(vfunc::getVFunc(memory::interfaces::clientMode(), OVERRIDE_MOUSE), hooks::OverrideMouse);
@@ -105,8 +121,24 @@ void hooks::init()
 	HOOK(memory::unkRound(), hooks::UnknownPlayerHurt);
 	HOOK(memory::updatePostEffects(), hooks::UpdatePostEffects);
 	HOOK(vfunc::getVFunc(memory::interfaces::surface(), SET_DRAW_COLOR), hooks::setDrawColor);
+	HOOK(vfunc::getVFunc(memory::interfaces::viewRender(), RENDER_SMOKE_OVERLAY), hooks::RenderSmokeOverlay);
+	HOOK(vfunc::getVFunc(memory::interfaces::matSys(), FIND_MATERIAL), hooks::FindMaterial);
+	HOOK(memory::getPMaterial(), hooks::GetPMaterial);
+#if UNLOCK_PRECIP_TESTING == true
+	HOOK(memory::createParticlePrecip(), hooks::CreateParticlePrecip);
+	HOOK(vfunc::getVFunc(memory::interfaces::modelInfo(), GET_VCOLLIDE), hooks::GetVCollide);
+	HOOK(memory::initializeParticlePrecip(), hooks::InitializeParticlePrecip);
+#endif
+	HOOK(memory::drawEffects(), hooks::DrawEffects);
+	HOOK(memory::drawWorldAndEntities(), hooks::DrawWorldAndEntities);
+	HOOK(memory::drawTransculentRenderables(), hooks::DrawTranslucentRenderables);
+
+	// figure out why tf they corrupt stack, incorrect args?
+	//HOOK(memory::decalAddToSurface(), hooks::R_AddDecalToSurface);
+	//HOOK(memory::createDecal(), hooks::R_DecalCreate);
 
 #undef HOOK
+#undef HOOK_VALVE
 
 	hookHelper::MinHook::checkAllHooks();
 
@@ -119,4 +151,6 @@ void hooks::shutdown()
 	**reinterpret_cast<void***>(memory::reset()) = hooks::Reset::original;
 
 	hookHelper::MinHook::shutdownAllHooks();
+
+	hookHelper::Valve::shutdownAllHooks();
 }

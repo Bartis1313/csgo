@@ -36,9 +36,12 @@ constexpr std::array bloodnames =
 
 hooks::ParticlesSimulations::value hooks::ParticlesSimulations::hook(FAST_ARGS)
 {
+	hooks::capture::particleEffects = thisptr;
+
 	original(thisptr);
 
 	const auto ptr = reinterpret_cast<CParticleCollection*>(thisptr);
+
 	CParticleCollection* root = ptr;
 	while (root->m_parent)
 		root = root->m_parent;

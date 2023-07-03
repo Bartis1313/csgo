@@ -7,6 +7,8 @@
 _HOOK_BEGIN
 class ViewFade
 {
+public:
+	static auto getOriginal() { return original; }
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;

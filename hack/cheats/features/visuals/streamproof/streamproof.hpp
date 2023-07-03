@@ -24,13 +24,15 @@ public:
 	void init();
 	void shutdown();
 	// force texture draw in the present
-	void beginPresent(IDirect3DDevice9* device);
+	void beginPresent(IDirect3DDevice9* device, _D3DBLEND srcBlend);
 	// cleanup with game's functions
 	void endPresent();
-	// before the original hook return
+	// before any render
 	void beginMaterialHook();
-	// call this AFTER original has been called
-	// store the original and return later
+	// after any render
+	// "any" can be used in mixed scenario as:
+	// 1. only game calls drawModel() and we want to proof it
+	// 2. game + us, this happens in the glow
 	void endMaterialHook();
 	void setActive(const bool var) { active = var; }
 

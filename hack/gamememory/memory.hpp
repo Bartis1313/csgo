@@ -6,6 +6,7 @@
 #include <SDK/math/matrix.hpp>
 #include <SDK/interfaces/ifc.hpp>
 #include <SDK/CPlayerResource.hpp>
+#include <SDK/CUtlVector.hpp>
 #include <utilities/tools/tools.hpp>
 
 #include <cstdint>
@@ -44,6 +45,9 @@ class EnvAmbientLight_t;
 struct SDKColor;
 struct SDKColorInt;
 enum ClassID;
+class KeyValues;
+class CCommonHostState;
+struct decal_t;
 
 using retaddr_t = uintptr_t;
 
@@ -64,6 +68,7 @@ namespace memory
 	using flashlightCreate_t = void* (__thiscall*)(void*, void*, float, float, float, float, int, const char*, float, float);
 	using flashlightUpdate_t = void(__thiscall*)(void*, int, const Vec3&, const Vec3&, const Vec3&, const Vec3&, float, float, float, bool, const char*);
 	using setAbsOrigin_t = void(__thiscall*)(void*, const Vec3&);
+	using setAbsAngle_t = void(__thiscall*)(void*, const Vec3&);
 	using isC4Owner_t = bool(__thiscall*)(void*);
 	using teslaCreate_t = void(__thiscall*)(CTeslaInfo&);
 	using dispatchEffect_t = int(__fastcall*)(const char*, const CEffectData&);
@@ -94,6 +99,11 @@ namespace memory
 	using renderBoxInternal_t = void(__stdcall*)(const Vec3&, const Vec3&, const Vec3&, const Vec3&, SDKColor, IMaterial*, bool);
 	using renderLine_t = void(__stdcall*)(const Vec3&, const Vec3&, SDKColor, bool);
 	using addGlowBox_t = int(__thiscall*)(void*, Vec3, Vec3, Vec3, Vec3, SDKColor, float);
+	using drawModel_t = int(__thiscall*)(void*, int, uint8_t);
+	using setString_t = void(__thiscall*)(const char*, const char*);
+	using findKey_t = KeyValues*(__thiscall*)(const char*, bool);
+	using valveHook_t = char(__cdecl*)(void*, void*, void*, int);
+	using valveUnHook_t = char(__cdecl*)(uintptr_t, char);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
@@ -115,6 +125,7 @@ namespace memory
 	inline Address<sequenceActivity_t> sequenceActivity;
 	inline Address<uintptr_t> cachedBones;
 	inline Address<setAbsOrigin_t> setAbsOrigin;
+	inline Address<setAbsAngle_t> setAbsAngle;
 	inline Address<isC4Owner_t> isC4Owner;
 	inline Address<isBreakable_t> isBreakable;
 	inline Address<CMoveData*> predictionData;
@@ -167,6 +178,14 @@ namespace memory
 	inline Address<retaddr_t> scopeDust;
 	inline Address<retaddr_t> scopeArc;
 	inline Address<addGlowBox_t> addGlowBox;
+	inline Address<drawModel_t> baseAnimatingDrawModel;
+	inline Address<retaddr_t> renderViewRet;
+	inline Address<setString_t> setString;
+	inline Address<findKey_t> findKey;
+	inline Address<CUtlVector<decal_t*>> decalPool;
+	inline Address<valveHook_t> valveHook;
+	inline Address<valveUnHook_t> valveUnHook;
+	inline Address<retaddr_t> viewFadeSmokeRet;
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;
@@ -193,6 +212,16 @@ namespace memory
 	inline Address<void*> present;
 	inline Address<void*> reset;
 	inline Address<void*> updatePostEffects;
+	inline Address<void*> getPMaterial;
+	inline Address<void*> decalAddToSurface;
+	inline Address<void*> createDecal;
+	inline Address<void*> drawSmokeFogOverlay;
+	inline Address<void*> createParticlePrecip;
+	inline Address<void*> initializeParticlePrecip;
+	inline Address<void*> viewDrawScene;
+	inline Address<void*> drawEffects;
+	inline Address<void*> drawWorldAndEntities;
+	inline Address<void*> drawTransculentRenderables;
 
 	inline Address<teslaCreate_t> tesla;
 	inline Address<dispatchEffect_t> dispatchEffect;
@@ -217,5 +246,6 @@ namespace memory
 		inline Address<EnvTonemapController_t*> toneController;
 		inline Address<FogController_t*> fogController;
 		inline Address<EnvAmbientLight_t*> ambientLight;
+		inline Address<CCommonHostState*> hostState;
 	}
 }

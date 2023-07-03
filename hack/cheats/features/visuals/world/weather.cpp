@@ -7,6 +7,7 @@
 #include <SDK/IBaseClientDll.hpp>
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/ICollideable.hpp>
+#include <SDK/IVModelInfo.hpp>
 #include <SDK/ICvar.hpp>
 #include <SDK/ConVar.hpp>
 #include <SDK/math/Vector.hpp>
@@ -17,6 +18,7 @@
 #include <config/vars.hpp>
 #include <utilities/utilities.hpp>
 #include <utilities/rand.hpp>
+#include <SDK/CUtlVector.hpp>
 
 #include <imgui.h>
 #include <utilities/console/console.hpp>
@@ -93,14 +95,22 @@ void weatherController::run(FrameStage stage)
 		constexpr float halfP = Vec3::MAX_ARG / 2.0f;
 		constexpr float halfM = -Vec3::MAX_ARG / 2.0f;
 
+		// 55 8B EC 83 EC 5C 8B C1
+		// UNLOCK_PRECIP_TESTING hoooks for more info for other types if you want to try things out
 		weatherFields.ent->m_nPrecipType() = PrecipitationType_t::PRECIPITATION_TYPE_SNOW;
 
 		// network streams
 		weatherFields.ent->preDataUpdate(DATA_UPDATE_CREATED);
 		weatherFields.ent->onPreDataChanged(DATA_UPDATE_CREATED);
 
-		weatherFields.ent->collideable()->OBBMins() = Vec3{ halfM, halfM, halfM };
-		weatherFields.ent->collideable()->OBBMaxs() = Vec3{ halfP, halfP, halfP };
+		weatherFields.ent->m_vecMins() = Vec3{ halfM, halfM, halfM };
+		weatherFields.ent->m_vecMaxs() = Vec3{ halfP, halfP, halfP };
+
+		if (weatherFields.ent->collideable())
+		{
+			weatherFields.ent->collideable()->OBBMins() = Vec3{ halfM, halfM, halfM };
+			weatherFields.ent->collideable()->OBBMaxs() = Vec3{ halfP, halfP, halfP };
+		}
 
 		// force this, reason why rain, snow work is due to CClient_Precipitation::OnDataChanged
 		weatherFields.ent->onDataChanged(DATA_UPDATE_CREATED);
@@ -108,23 +118,7 @@ void weatherController::run(FrameStage stage)
 
 		weatherFields.created = true;
 
-		// haven't tried those! just a quick lookup
-
-		// FF 35 ? ? ? ? 89 75 FC E8 ? ? ? ? 5F
-		// looks like g_Precipitations - and looks like there is more code for this
-		// E8 ? ? ? ? 8B 0D ? ? ? ? 85 C9 74 10 8B 01 6A 01 
-		// ^ draw global func
-		// 55 8B EC 51 53 56 57 8B F1 E8 ? ? ? ? 
-		// ^ constructor
-
-		memory::precipitationInit()(weatherFields.ent); // force creation
-
-		//printf("weather %p\n", m_weather.m_ent);
-	}
-
-	if (stage == FRAME_START && weatherFields.created)
-	{
-		memory::precipitationClientThink()((void*)((uintptr_t)weatherFields.ent + 12)); // make to thinkable
+		//printf("weather %p\n", weatherFields.ent);
 	}
 }
 

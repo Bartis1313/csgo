@@ -94,9 +94,25 @@ struct Studiohdr_t
 	}
 };
 
+class CPhysCollide;
+
+struct vcollide_t
+{
+	unsigned short solidCount : 15;
+	unsigned short isPacked : 1;
+	unsigned short descSize;
+	// VPhysicsSolids
+	CPhysCollide** solids;
+	char* pKeyValues;
+	void* pUserData;
+};
+
 class IVModelInfo
 {
 public:
+	VFUNC(Model_t*, getModel, 1, (int modelindex), (this, modelindex));
 	VFUNC(int, getModelIndex, 2, (const char* name), (this, name));
+	VFUNC(vcollide_t*, getVCollide, 5, (Model_t* model), (this, model));
+	VFUNC(vcollide_t*, getVCollide, 6, (int modelIdx), (this, modelIdx));
 	VFUNC(Studiohdr_t*, getStudioModel, 32, (const Model_t* model), (this, model));
 };

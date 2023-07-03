@@ -30,7 +30,8 @@ void StreamProof::shutdown()
 }
 
 // here, we render this backbuffer texture
-void StreamProof::beginPresent(IDirect3DDevice9* device)
+// srcBlend is usually D3DBLEND_SRCCOLOR correct
+void StreamProof::beginPresent(IDirect3DDevice9* device, _D3DBLEND srcBlend)
 {
 	std::lock_guard lock{ mutex };
 
@@ -75,7 +76,7 @@ void StreamProof::beginPresent(IDirect3DDevice9* device)
 
 	// be careful with those flags, as you can see we don't clear anything. We let the game do that.
 	device->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
-	device->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_INVSRCALPHA);
+	device->SetRenderState(D3DRS_SRCBLEND, srcBlend);
 	device->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCCOLOR);
 	//device->SetRenderState(D3DRS_ZENABLE, TRUE); // does not sync to texture
 

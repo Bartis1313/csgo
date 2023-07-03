@@ -8,6 +8,9 @@
 #include <cheats/features/visuals/world/weather.hpp>
 #include <cheats/features/visuals/world/ambient.hpp>
 #include <cheats/features/visuals/radar/radar.hpp>
+#include <cheats/features/visuals/world/lights.hpp>
+
+#include <SDK/CCommonHostState.hpp>
 
 #include <imgui_stdlib.h>
 
@@ -100,51 +103,58 @@ void tabs::visuals::draw()
 
 		ImGui::BeginGroupPanel("Chams", ImGui::GetContentRegionAvail());
 		{
-			const auto materials = chams::materials;
-			std::vector<std::string> names;
+			const auto& materials = chams::materials;
 			std::vector<std::string> matNames(materials.size());
 			for (size_t i = 0; const auto & mat : materials)
 				matNames[i++] = mat.name;
 
-			ImGui::Checkbox("Players##chams", &vars::visuals->chams->players);
-			if (vars::visuals->chams->players)
-			{
-				ImGui::SameLine();
-				ImGui::ColorPicker("Color##playercha", &vars::visuals->chams->colorPlayers);
-				ImGui::SameLine();
-				ImGui::Checkbox("XQZ##playercha", &vars::visuals->chams->enabledXQZPlayers);
-				if (vars::visuals->chams->enabledXQZPlayers)
-				{
-					ImGui::SameLine();
-					ImGui::ColorPicker("Color##playerchaxqz", &vars::visuals->chams->colorXQZPlayers);
-				}
-				ImGui::Combo("Type##playercha", &vars::visuals->chams->indexPlayers, matNames);
-			}
+			ImGui::Checkbox("Streamproof##chams", &vars::visuals->chams->streamProof);
+			ImGui::SameLine();
+			ImGui::HelpMarker("Switching cham type with streamproof turned on might end in UB :("
+				"\nMight look a bit overdrawn, that's because we call draw twice rather than once"
+				"\nI don't know solution for this");
+			ImGui::Checkbox("Ignore smoke##chams", &vars::visuals->chams->ignoreSmoke);
+			ImGui::SameLine();
+			ImGui::HelpMarker("Chams will render after transculents\nIf there are artifacts with color - just call it sceneend");
 
-			ImGui::Checkbox("Weapons##chams", &vars::visuals->chams->enabledWeapons);
-			if (vars::visuals->chams->enabledWeapons)
-			{
-				ImGui::SameLine();
-				ImGui::ColorPicker("Color##weapons", &vars::visuals->chams->colorWeapons);
-				ImGui::Combo("Type##weapons", &vars::visuals->chams->indexWeapons, matNames);
-				ImGui::Checkbox("Disable##weapon", &vars::visuals->chams->weaponHide);
-			}
-			ImGui::Checkbox("Arms##chams", &vars::visuals->chams->enabledArms);
-			if (vars::visuals->chams->enabledArms)
-			{
-				ImGui::SameLine();
-				ImGui::ColorPicker("Color##arms", &vars::visuals->chams->colorArms);
-				ImGui::Combo("Type##arms", &vars::visuals->chams->indexArms, matNames);
-				ImGui::Checkbox("Disable##arms", &vars::visuals->chams->armsHide);
-			}
-			ImGui::Checkbox("Backtrack##chams", &vars::visuals->chams->enabledBacktrack);
-			if (vars::visuals->chams->enabledBacktrack)
-			{
-				ImGui::SameLine();
-				ImGui::ColorPicker("Color##backtrack", &vars::visuals->chams->colorBacktrack);
-				ImGui::Combo("Type##backtrack", &vars::visuals->chams->modeBacktrack, matNames);
-				ImGui::Combo("Style##backtrack", &vars::visuals->chams->indexBacktrack, magic_enum::enum_names_pretty<BTChamsType>());
-			}
+			ImGui::Checkbox("Players##chamsp", &vars::visuals->chams->players.enabled);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Color##chamsp", &vars::visuals->chams->players.color);
+			ImGui::SameLine();
+			ImGui::ColorPicker("ColorXQZ##chamsp", &vars::visuals->chams->players.colorXQZ);
+			ImGui::Checkbox("Ignorez##chamsp", &vars::visuals->chams->players.ignorez);
+			ImGui::SameLine();
+			ImGui::Checkbox("Wireframe##chamsp", &vars::visuals->chams->players.wireframe);
+			ImGui::SameLine();
+			ImGui::Combo("##Indexchamsp", &vars::visuals->chams->players.index, matNames);
+
+			ImGui::Checkbox("Attachments##chamsa", &vars::visuals->chams->attachement.enabled);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Color##chamsa", &vars::visuals->chams->attachement.color);
+			ImGui::Checkbox("Wireframe##chamsa", &vars::visuals->chams->attachement.wireframe);
+			ImGui::SameLine();
+			ImGui::Combo("##Indexchamsa", &vars::visuals->chams->attachement.index, matNames);
+
+			ImGui::Checkbox("Local Weapon##chamsw", &vars::visuals->chams->weapon.enabled);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Color##chamsw", &vars::visuals->chams->weapon.color);
+			ImGui::Checkbox("Wireframe##chamsw", &vars::visuals->chams->weapon.wireframe);
+			ImGui::SameLine();
+			ImGui::Combo("##Indexchamsw", &vars::visuals->chams->weapon.index, matNames);
+
+			ImGui::Checkbox("Arms##chamsar", &vars::visuals->chams->arms.enabled);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Color##chamsar", &vars::visuals->chams->arms.color);
+			ImGui::Checkbox("Wireframe##chamsar", &vars::visuals->chams->arms.wireframe);
+			ImGui::SameLine();
+			ImGui::Combo("##Indexchamsar", &vars::visuals->chams->arms.index, matNames);
+
+			ImGui::Checkbox("Backtrack##chamsb", &vars::visuals->chams->backtrackEnabled);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Color##chamsb", &vars::visuals->chams->backtrackColor);
+			ImGui::Combo("##Modechamsb", &vars::visuals->chams->backtrackMode, magic_enum::enum_names_pretty<BTChamsType>());
+			ImGui::Combo("##Indexchamsb", &vars::visuals->chams->backtrackIndex, matNames);
+			
 			ImGui::Checkbox("Glow##enabled", &vars::visuals->glow->enabled);
 			if (vars::visuals->glow->enabled)
 			{
@@ -153,7 +163,6 @@ void tabs::visuals::draw()
 				ImGui::HelpMarker("THIS IS AN ATTEMPT FOR QUEUED RENDER\nReally hard to track errors here!");
 				ImGui::MultiCombo("Type", magic_enum::enum_names_pretty<GlowRenderStyle>(), &vars::visuals->glow->usedMats);
 				ImGui::MultiCombo("Ignorez", magic_enum::enum_names_pretty<GlowIgnorez>(), &vars::visuals->glow->ignorez);
-				ImGui::SameLine();
 				ImGui::ColorPicker("Color", &vars::visuals->glow->colorPlayer);
 				ImGui::Checkbox("Visible", &vars::visuals->glow->visible);
 				ImGui::SliderFloat("Exponent", &vars::visuals->glow->exponent, 0.0f, 10.0f);
@@ -283,15 +292,35 @@ void tabs::visuals::draw()
 		ImGui::BeginGroupPanel("Edits", ImGui::GetContentRegionAvail());
 		{
 			// FIX PERFORMANCE simply only colormodulate when color pickers state is true
-			ImGui::Checkbox("Modulate world", &vars::visuals->world->modulate->enabled);
-			if (vars::visuals->world->modulate->enabled)
+			
+			ImGui::Checkbox("Remove sky", &vars::visuals->world->sky->removeSky);
+			ImGui::Checkbox("##textureb", &vars::visuals->world->modulate->enabledTexture);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Texture", &vars::visuals->world->modulate->texture);
+			ImGui::Checkbox("##skyb", &vars::visuals->world->modulate->enabledSky);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Sky", &vars::visuals->world->modulate->sky);
+
+			ImGui::Checkbox("##propb", &vars::visuals->world->modulate->enabledProp);
+			ImGui::SameLine();
+			ImGui::ColorPicker("Prop", &vars::visuals->world->modulate->prop);
+
+			for (size_t i = 0; i < 6; ++i)
 			{
-				ImGui::Checkbox("Remove sky", &vars::visuals->world->sky->removeSky);
-				ImGui::ColorPicker("Texture", &vars::visuals->world->modulate->texture);
-				ImGui::ColorPicker("Prop", &vars::visuals->world->modulate->prop);
-				ImGui::ColorPicker("Sky", &vars::visuals->world->modulate->sky);
-				ImGui::SliderFloat("Shader Alpha", &vars::visuals->world->modulate->shader, 0.0f, 100.0f);
+				ImGui::Checkbox(std::format("##Enabled {}", i).c_str(), &vars::visuals->world->modulate->enabledLights.at(i));
+				ImGui::SameLine();
+				ImGui::ColorPicker(std::format("##Lights {}", i).c_str(), &vars::visuals->world->modulate->lights.at(i));
+				ImGui::SameLine();
+				ImGui::SliderFloat(std::format("{}##strenght", magic_enum::enum_name<emittype_t>(magic_enum::enum_value<emittype_t>(i))).c_str(), &vars::visuals->world->modulate->lightsStrenght.at(i), 0.0f, 10000.0f, "%.3f", ImGuiSliderFlags_Logarithmic);
 			}
+			if (ImGui::Button("Reset lights"))
+			{
+				lights::forceReset();
+			}
+			
+			ImGui::Checkbox("##shaderalp", &vars::visuals->world->modulate->enabledShader);
+			ImGui::SameLine();
+			ImGui::SliderFloat("Shader Alpha", &vars::visuals->world->modulate->shader, 0.0f, 100.0f);
 
 			ImGui::Checkbox("##Edit molotov", &vars::visuals->world->particles->enabledMolotov);
 			ImGui::SameLine();

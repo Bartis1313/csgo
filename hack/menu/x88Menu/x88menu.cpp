@@ -127,7 +127,7 @@ void x88Menu::draw()
 
 void x88Menu::setStyles()
 {
-	x88types.push("Chams", &vars::visuals->chams->indexPlayers, magic_enum::enum_count<ChamsType>() - 1);
+	//x88types.push("Chams", &vars::visuals->chams->indexPlayers, magic_enum::enum_count<ChamsType>() - 1);
 	x88types.push("FOV", &vars::misc->fov->value, { -50.0f, 50.0f} );
 	x88types.push("Backtrack", &vars::backtrack->enabled);
 	x88types.push("Backtrack MS", &vars::backtrack->time, { 0.0f, 200.0f });

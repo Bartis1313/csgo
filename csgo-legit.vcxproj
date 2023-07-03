@@ -161,11 +161,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="hack\cheats\features\misc\disable\convars.cpp" />
+    <ClCompile Include="hack\cheats\features\tests\test.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\chams\factory\factory.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\list\spectactors.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\bulletUpdater.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\misc\noscope.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\streamproof\streamproof.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\world\lights.cpp" />
     <ClCompile Include="hack\cheats\game\game.cpp" />
     <ClCompile Include="hack\cheats\hooks\addEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\allocKeyvalues.cpp" />
@@ -173,16 +176,24 @@
     <ClCompile Include="hack\cheats\hooks\chudIsHidden.cpp" />
     <ClCompile Include="hack\cheats\hooks\createEvent.cpp" />
     <ClCompile Include="hack\cheats\hooks\createMove.cpp" />
+    <ClCompile Include="hack\cheats\hooks\createParticlePrecip.cpp" />
+    <ClCompile Include="hack\cheats\hooks\decalCreate.cpp" />
     <ClCompile Include="hack\cheats\hooks\doExtraBonesProcessing.cpp" />
     <ClCompile Include="hack\cheats\hooks\doPostScreenEffects.cpp" />
     <ClCompile Include="hack\cheats\hooks\drawIndexPrimitive.cpp" />
     <ClCompile Include="hack\cheats\hooks\drawModelExecute.cpp" />
     <ClCompile Include="hack\cheats\hooks\drawSetColor.cpp" />
+    <ClCompile Include="hack\cheats\hooks\drawTranslucentRenderables.cpp" />
+    <ClCompile Include="hack\cheats\hooks\drawWorldAndEntities.cpp" />
     <ClCompile Include="hack\cheats\hooks\filesCheck.cpp" />
+    <ClCompile Include="hack\cheats\hooks\findMaterial.cpp" />
     <ClCompile Include="hack\cheats\hooks\frameStageNotify.cpp" />
     <ClCompile Include="hack\cheats\hooks\getColorModulation.cpp" />
+    <ClCompile Include="hack\cheats\hooks\getPMaterial.cpp" />
     <ClCompile Include="hack\cheats\hooks\getUnverifiedFileHashes.cpp" />
+    <ClCompile Include="hack\cheats\hooks\getVCollide.cpp" />
     <ClCompile Include="hack\cheats\hooks\hooks.cpp" />
+    <ClCompile Include="hack\cheats\hooks\initializeParticlePrecip.cpp" />
     <ClCompile Include="hack\cheats\hooks\isDepth.cpp" />
     <ClCompile Include="hack\cheats\hooks\isFollowingEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\isHltv.cpp" />
@@ -191,6 +202,7 @@
     <ClCompile Include="hack\cheats\hooks\levelInitPreEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\levelShutdown.cpp" />
     <ClCompile Include="hack\cheats\hooks\lockCursor.cpp" />
+    <ClCompile Include="hack\cheats\hooks\renderSmokeOverlay.cpp" />
     <ClCompile Include="hack\cheats\hooks\updatePostEffects.cpp" />
     <ClCompile Include="hack\cheats\hooks\overrideMouse.cpp" />
     <ClCompile Include="hack\cheats\hooks\overrideView.cpp" />
@@ -208,6 +220,7 @@
     <ClCompile Include="hack\cheats\hooks\unknownOverviewMap.cpp" />
     <ClCompile Include="hack\cheats\hooks\unknownPlayerHurt.cpp" />
     <ClCompile Include="hack\cheats\hooks\unkownRoundEnd.cpp" />
+    <ClCompile Include="hack\cheats\hooks\drawEffects.cpp" />
     <ClCompile Include="hack\cheats\hooks\viewFade.cpp" />
     <ClCompile Include="hack\cheats\hooks\viewRender.cpp" />
     <ClCompile Include="hack\cheats\hooks\wndproc.cpp" />
@@ -332,6 +345,7 @@
     <ClInclude Include="hack\cheats\features\fakelatency\fakelatency.hpp" />
     <ClInclude Include="hack\cheats\features\logger\logger.hpp" />
     <ClInclude Include="hack\cheats\features\misc\cameras\freeCam.hpp" />
+    <ClInclude Include="hack\cheats\features\misc\disable\convars.hpp" />
     <ClInclude Include="hack\cheats\features\misc\disable\interpolate.hpp" />
     <ClInclude Include="hack\cheats\features\misc\flashlight\flashlight.hpp" />
     <ClInclude Include="hack\cheats\features\misc\movement\movement.hpp" />
@@ -340,6 +354,7 @@
     <ClInclude Include="hack\cheats\features\prediction\prediction.hpp" />
     <ClInclude Include="hack\cheats\features\combat\RCS\RCS.hpp" />
     <ClInclude Include="hack\cheats\features\combat\triggerbot\triggerbot.hpp" />
+    <ClInclude Include="hack\cheats\features\tests\test.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\chams.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\editor.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\chams\factory\factory.hpp" />
@@ -368,6 +383,7 @@
     <ClInclude Include="hack\cheats\features\visuals\world\dropped.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\fog.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\impacts.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\world\lights.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\modulateColors.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\molotov.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\nadepred.hpp" />
@@ -386,6 +402,15 @@
     <ClInclude Include="hack\cheats\hooks\addEntity.hpp" />
     <ClInclude Include="hack\cheats\hooks\allocKeyvalues.hpp" />
     <ClInclude Include="hack\cheats\hooks\buildTransformations.hpp" />
+    <ClInclude Include="hack\cheats\hooks\decalAddToSurface.hpp" />
+    <ClInclude Include="hack\cheats\hooks\decalCreate.hpp" />
+    <ClInclude Include="hack\cheats\hooks\drawTranslucentRenderables.hpp" />
+    <ClInclude Include="hack\cheats\hooks\drawWorldAndEntities.hpp" />
+    <ClInclude Include="hack\cheats\hooks\getVCollide.hpp" />
+    <ClInclude Include="hack\cheats\hooks\createParticlePrecip.hpp" />
+    <ClInclude Include="hack\cheats\hooks\initializeParticlePrecip.hpp" />
+    <ClInclude Include="hack\cheats\hooks\drawEffects.hpp" />
+    <ClInclude Include="hack\SDK\CCommonHostState.hpp" />
     <ClInclude Include="hack\cheats\hooks\cHudIsHidden.hpp" />
     <ClInclude Include="hack\cheats\hooks\createEvent.hpp" />
     <ClInclude Include="hack\cheats\hooks\createMove.hpp" />
@@ -395,16 +420,22 @@
     <ClInclude Include="hack\cheats\hooks\drawModelExecute.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawSetColor.hpp" />
     <ClInclude Include="hack\cheats\hooks\filesCheck.hpp" />
+    <ClInclude Include="hack\cheats\hooks\findMaterial.hpp" />
     <ClInclude Include="hack\cheats\hooks\frameStageNotify.hpp" />
     <ClInclude Include="hack\cheats\hooks\getColorModulation.hpp" />
+    <ClInclude Include="hack\cheats\hooks\getPMaterial.hpp" />
     <ClInclude Include="hack\cheats\hooks\getUnverifiedFileHashes.hpp" />
     <ClInclude Include="hack\cheats\hooks\helpers\common.hpp" />
     <ClInclude Include="hack\cheats\hooks\helpers\helper.hpp" />
+    <ClInclude Include="hack\cheats\hooks\renderSmokeOverlay.hpp" />
     <ClInclude Include="hack\cheats\hooks\updatePostEffects.hpp" />
     <ClInclude Include="hack\cheats\hooks\svcheats.hpp" />
     <ClInclude Include="hack\config\cfgBox.hpp" />
+    <ClInclude Include="hack\config\cfgCham.hpp" />
     <ClInclude Include="hack\gamememory\address.hpp" />
     <ClInclude Include="hack\gamememory\modules.hpp" />
+    <ClInclude Include="hack\SDK\CUtlMemory.hpp" />
+    <ClInclude Include="hack\SDK\lightdesc.hpp" />
     <ClInclude Include="hack\utilities\cStr.hpp" />
     <ClInclude Include="hack\utilities\runnable.hpp" />
     <ClInclude Include="hack\cheats\hooks\hooks.hpp" />
@@ -584,9 +615,12 @@
   <ItemGroup>
     <Image Include="hack\deps\images\fatchad.png" />
     <Image Include="pictures\editor.png" />
+    <Image Include="pictures\fixedBlurryGlowLine.png" />
+    <Image Include="pictures\fixed_glow.png" />
     <Image Include="pictures\molotov.png" />
     <Image Include="pictures\nade1.png" />
     <Image Include="pictures\nade2.png" />
+    <Image Include="pictures\obsProofGameMaterials.png" />
     <Image Include="pictures\plots.png" />
     <Image Include="pictures\radar.png" />
   </ItemGroup>

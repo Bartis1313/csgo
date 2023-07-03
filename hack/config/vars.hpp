@@ -6,6 +6,7 @@
 #include "key.hpp"
 #include "cfgBeam.hpp"
 #include "cfgBox.hpp"
+#include "cfgCham.hpp"
 
 #include <utilities/tools/wrappers.hpp>
 #include <utilities/utilities.hpp>
@@ -41,26 +42,16 @@ struct VarVisuals
 {
 	struct VarChams
 	{
-		bool enabled{ false };
-		bool players{ false };
-		int indexPlayers{ 0 };
-		CfgColor colorPlayers{ Color{ 255, 0, 255, 255 } };
-		bool enabledXQZPlayers{ false };
-		CfgColor colorXQZPlayers{ { 0, 100, 255, 255 } };
-		bool enabledWeapons{ false };
-		bool weaponHide{ false };
-		int indexWeapons{ 0 };
-		CfgColor colorWeapons{ Color{ 255, 0, 255, 255 } };
-		bool armsHide{ false };
-		bool enabledArms{ false };
-		CfgColor colorArms{ Color{ 255, 0, 255, 255 } };
-		int indexArms{ 0 };
-		int indexBacktrack{ 0 };
-		bool enabledBacktrack{ false };
-		CfgColor colorBacktrack{ Color{ 255, 0, 255, 255 } };
-		int modeBacktrack{ 0 };
-		bool rainbowBacktrack{ false };
-		float rainbowBacktrackSpeed{ 0.5f };
+		CfgCham players{ };
+		CfgCham attachement{ };
+		CfgCham weapon{ };
+		CfgCham arms{ };
+		bool backtrackEnabled{ false };
+		int backtrackIndex{ };
+		int backtrackMode{ };
+		CfgColor backtrackColor{ };
+		bool streamProof{ false };
+		bool ignoreSmoke{ false };
 	};
 	ADD_MEMBER_PTR(VarChams, chams);
 
@@ -232,10 +223,16 @@ struct VarVisuals
 
 		struct VarModulate
 		{
-			bool enabled{ false };
+			bool enabledTexture{ false };
 			CfgColor texture{ Colors::White };
+			bool enabledProp{ false };
 			CfgColor prop{ Colors::White };
+			bool enabledSky{ false };
 			CfgColor sky{ Colors::White };
+			std::array<bool, 6> enabledLights;
+			std::array<CfgColor, 6> lights;
+			std::array<float, 6> lightsStrenght;
+			bool enabledShader{ false };
 			float shader{ 100.0f };
 		};
 		ADD_MEMBER_PTR(VarModulate, modulate);

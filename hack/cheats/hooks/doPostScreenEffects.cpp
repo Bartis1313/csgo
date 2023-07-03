@@ -4,6 +4,16 @@
 #include <cheats/features/visuals/glow/glow.hpp>
 #include <config/vars.hpp>
 #include <cheats/game/game.hpp>
+#include "viewFade.hpp"
+#include "particlesSimulation.hpp"
+
+#include <SDK/IViewRender.hpp>
+#include <SDK/IMaterialSystem.hpp>
+#include <SDK/material.hpp>
+#include <SDK/interfaces/interfaces.hpp>
+#include <SDK/CParticelCollection.hpp>
+#include <cheats/features/visuals/glow/glow.hpp>
+#include <gamememory/memory.hpp>
 
 hooks::DoPostScreenEffects::value hooks::DoPostScreenEffects::hook(FAST_ARGS, int val)
 {
@@ -17,15 +27,14 @@ hooks::DoPostScreenEffects::value hooks::DoPostScreenEffects::hook(FAST_ARGS, in
 	static std::once_flag onceFlag;
 	std::call_once(onceFlag, []() { Storage::inits.run(); });
 	
+	const auto ret = original(thisptr, val);
+
 	glow::streamProof.setActive(game::isAvailable() && vars::visuals->glow->streamProof);
 
 	glow::streamProof.beginMaterialHook();
 
 	Storage::runs.run();
 
-	const auto ret = original(thisptr, val);
-
 	glow::streamProof.endMaterialHook();
-
 	return ret;
 }

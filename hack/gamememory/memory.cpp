@@ -60,6 +60,7 @@ void memory::init()
 	sequenceActivity = scan(CLIENT_DLL, SEQUENCE_ACTIVITY);
 	cachedBones = scan(CLIENT_DLL, CACHED_BONE).add(0x2).deRef().add(0x4);
 	setAbsOrigin = scan(CLIENT_DLL, SETABSORIGIN);
+	setAbsAngle = scan(CLIENT_DLL, SETABSANGLES);
 	isC4Owner = scan(CLIENT_DLL, HASC4);
 	isBreakable = scan(CLIENT_DLL, IS_BREAKBLE);
 	predictionData = scan(CLIENT_DLL, PREDICTION_MOVE_DATA).add(0x1).deRef(Dereference::TWICE);
@@ -109,6 +110,13 @@ void memory::init()
 	vignetteBlurStrengthPost = scan(CLIENT_DLL, BLURSCOPE_VIGNETTEPOST).add(0x3).deRef().add(0x4);
 	scopeDust = scan(CLIENT_DLL, SCOPE_DUST_RET).add(0x3);
 	scopeArc = scan(CLIENT_DLL, SCOPE_ARC_RET);
+	addGlowBox = scan(CLIENT_DLL, ADD_GLOW_BOX);
+	setString = scan(ENGINE_DLL, KEY_VALUES_SET_STRING);
+	findKey = scan(ENGINE_DLL, KEY_VALUES_FIND_KEY);
+	decalPool = scan(ENGINE_DLL, S_ADECALPOOL).add(0x1).deRef();
+	valveHook = scan(GAME_OVERLAY, VALVE_HOOK);
+	valveUnHook = scan(GAME_OVERLAY, VALVE_UNHOOK);
+	viewFadeSmokeRet = scan(CLIENT_DLL, VIEW_FACE_SMOKE_RET).add(0xC);
 
 	// HOOKS
 
@@ -139,7 +147,15 @@ void memory::init()
 	present = scan(GAME_OVERLAY, DX9_PRESENT).add(0x2);
 	reset = scan(GAME_OVERLAY, DX9_RESET).add(0x9);
 	updatePostEffects = scan(CLIENT_DLL, UPDATEPOST_EFFECTS);
-	addGlowBox = scan(CLIENT_DLL, ADD_GLOW_BOX);
+	getPMaterial = scan(CLIENT_DLL, GET_PMATERIAL);
+	decalAddToSurface = scan(ENGINE_DLL, R_DECAL_ADD_TO_SURFACE);
+	createDecal = scan(ENGINE_DLL, R_DECAL_CREATE);
+	createParticlePrecip = scan(CLIENT_DLL, CREATE_PARTICLE_PRECIP);
+	initializeParticlePrecip = scan(CLIENT_DLL, INITIALIZE_PRECIP_PARTICLE);
+	viewDrawScene = scan(CLIENT_DLL, VIEW_DRAW_SCENE);
+	drawEffects = scan(CLIENT_DLL, DRAW_EFFECTS);
+	drawWorldAndEntities = scan(CLIENT_DLL, DRAW_WORLD_AND_ENTITIES);
+	drawTransculentRenderables = scan(CLIENT_DLL, DRAW_TRANSCULENT_RENDERABLE);
 
 	// REST
 
@@ -183,4 +199,6 @@ void memory::postInit()
 	toneController = findFromGameLoop(CEnvTonemapController);
 	fogController = findFromGameLoop(CFogController);
 	ambientLight = findFromGameLoop(CEnvAmbientLight);
+
+	hostState = scan(ENGINE_DLL, HOST_STATE).add(0x1).deRef(Dereference::TWICE);
 }

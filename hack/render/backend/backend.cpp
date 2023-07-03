@@ -17,6 +17,7 @@ void renderbackend::impl(IDirect3DDevice9* device)
 			ImRender::init(ImGui::GetIO());
 			ImGuiMenu::setStyles();
 			x88Menu::setStyles();
+
 			console::debug("renderbackend::impl success");
 		});
 }

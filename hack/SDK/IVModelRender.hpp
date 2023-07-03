@@ -6,6 +6,8 @@
 #include "helpers/pad.hpp"
 #include "helpers/vfunc.hpp"
 
+#include "lightdesc.hpp"
+
 struct Model_t;
 struct Studiohdr_t;
 class IMaterial;
@@ -45,6 +47,56 @@ struct DrawModelState_t
 	int m_lod;
 };
 
+struct DrawModelResults_t
+{
+	/*int m_ActualTriCount;
+	int m_TextureMemoryBytes;
+	int m_NumHardwareBones;
+	int m_NumBatches;
+	int m_NumMaterials;
+	int m_nLODUsed;
+	int m_flLODMetric;
+	CFastTimer m_RenderTime;
+	CUtlVectorFixed<IMaterial*, MAX_DRAW_MODEL_INFO_MATERIALS> m_Materials;*/
+};
+
+struct ColorMeshInfo_t
+{
+	// A given color mesh can own a unique Mesh, or it can use a shared Mesh
+	// (in which case it uses a sub-range defined by m_nVertOffset and m_nNumVerts)
+	void* m_mesh;
+	void* m_pooledVBAllocator;
+	int	m_vertOffsetInBytes;
+	int	m_numVerts;
+};
+
+enum
+{
+	MATERIAL_MAX_LIGHT_COUNT = 4,
+};
+
+struct MaterialLightingState_t
+{
+	Vec3 m_vecAmbientCube[6];		// ambient, and lights that aren't in locallight[]
+	Vec3 m_vecLightingOrigin;		// The position from which lighting state was computed
+	int	m_localLightCount;
+	LightDesc_t m_localLightDesc[MATERIAL_MAX_LIGHT_COUNT];
+};
+
+struct DrawModelInfo_t
+{
+	Studiohdr_t* m_studioHdr;
+	void* m_hardwareData;
+	void* m_Decals;
+	int	m_Skin;
+	int	m_Body;
+	int	m_HitboxSet;
+	void* m_pClientEntity;
+	int	m_Lod;
+	ColorMeshInfo_t* m_pColorMeshes;
+	bool m_bStaticLighting;
+	MaterialLightingState_t	m_LightingState;
+};
 
 class IVModelRender
 {

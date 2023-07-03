@@ -61,6 +61,7 @@ public:
 	NETVAR(PrecipitationType_t, m_nPrecipType, "DT_Precipitation", "m_nPrecipType");
 	PTRNETVAR(int, m_nNextThinkTick, "DT_BasePlayer", "m_nNextThinkTick");
 	NETVAR_ADDR(int, m_nCreationTick, "DT_BaseEntity", "m_hEffectEntity", 0xC);
+	NETVAR_ADDR(bool, m_bCanUseFastPath, "DT_BaseAnimating", "m_flRecoilIndex", 0x4);
 
 	VFUNC(Vec3&, absOrigin, ABS_ORIGIN, (), (this));
 	VFUNC(Vec3&, absAngles, ABS_ANGLE, (), (this));
@@ -73,6 +74,7 @@ public:
 	VFUNC(bool, setupBones, SETUP_BONES, (Matrix3x4* out, int maxBones, int mask, float time), (this + RENDERABLE, out, maxBones, mask, time));
 	bool setupBonesShort(Matrix3x4* out, int maxBones, int mask, float time);
 	VFUNC(Model_t*, getModel, GET_MODEL, (), (this + RENDERABLE));
+	VFUNC(int, getModelIndex, GET_MODEL_INDEX, (), (this + RENDERABLE));
 	VFUNC(int, drawModel, DRAW_MODEL, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
 	VFUNC(bool, isDormant, IS_DORMANT, (), (this + NETWORKABLE));
 	VFUNC(Matrix3x4&, renderableToWorldTransform, RENDERABLE_TO_WORLD, (), (this + RENDERABLE));
@@ -86,19 +88,19 @@ public:
 	VFUNC(int, getMaxHealth, GET_MAX_HEALTH, (), (this));
 	VFUNC(bool, shouldDraw, SHOULD_DRAW, (), (this + RENDERABLE));
 	
-	[[nodiscard]] CUtlVector<Matrix3x4> m_CachedBoneData();
+	[[nodiscard]] CUtlVector<Matrix3x4>& m_CachedBoneData();
 	[[nodiscard]] Vec3 getAimPunch();
 	[[nodiscard]] Vec3 getEyePos();
 	[[nodiscard]] AnimationLayer* getAnimOverlays();
 	[[nodiscard]] size_t getSequenceActivity(size_t sequence);
-
 	[[nodiscard]] bool isBreakable();
-
 	[[nodiscard]] Entity_t* firstMoveChild();
 	[[nodiscard]] Entity_t* nextMovePeer();
 	[[nodiscard]] int m_takedamage();
+	int baseAnimatingDrawModel(int flags, uint8_t alpha);
 
 	void setAbsOrigin(const Vec3& origin);
+	void setAbsAngle(const Vec3& angle);
 	void setAbsVelocity(const Vec3& velocity);
 
 	template<typename T>
@@ -337,5 +339,6 @@ public:
 
 #undef RENDERABLE
 #undef NETWORKABLE
+#undef THINKABLE
 
 ////////////////////////////////////////////////////////////////////////////////////////////

@@ -6,7 +6,7 @@
 #include "../streamproof/streamproof.hpp"
 
 #define USE_GLOWBOX_CUSTOM true
-// not recommended
+// not recommended to use not custom
 #define USE_GLOW_CUSTOM true
 
 namespace glow

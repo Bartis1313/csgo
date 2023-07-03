@@ -28,18 +28,36 @@ struct vectorRunnable : public std::vector<F>
 		std::vector<F>()
 	{}
 
-	template<typename... Args_t>
-	void run(Args_t&&... args)
+	template<typename T = void, typename... Args_t>
+	T run(Args_t&&... args)
 	{
 		static_assert(sizeof...(Args_t) == std::tuple_size_v<typename function_traits<F>::parameter_pack>,
 			"Number of arguments does not match stored function");
 
-		for (auto& element : *this)
-		{
-			static_assert(std::is_invocable_v<F, Args_t...>,
-				"Arguments do not match stored function");
-
-			element(std::forward<Args_t>(args)...);
-		}
+        if constexpr (std::is_same_v<T, bool>)
+        {
+            T ret{ false };
+            for (auto& element : *this)
+            {
+                ret |= element(std::forward<Args_t>(args)...);
+            }
+            return ret;
+        }
+        else if constexpr (std::is_void_v<T>)
+        {
+            for (auto& element : *this)
+            {
+                element(std::forward<Args_t>(args)...);
+            }
+        }
+        else // not handled, do this if needed
+        {
+            T ret{};
+            for (auto& element : *this)
+            {
+                element(std::forward<Args_t>(args)...);
+            }
+            return ret;
+        }
 	}
 };

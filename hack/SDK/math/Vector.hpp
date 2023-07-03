@@ -285,7 +285,7 @@ public:
 
 			return res;
 		}
-		
+
 		return Vector{};
 	}
 

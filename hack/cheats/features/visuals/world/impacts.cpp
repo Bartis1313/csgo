@@ -44,40 +44,40 @@ namespace bulletImpacts
 
 void bulletImpacts::draw()
 {
-	if (!vars::visuals->world->impacts->enabledClient)
-	{
-		if(!hits.empty())
-			hits.clear();
-		return;
-	}
+    if (!vars::visuals->world->impacts->enabledClient)
+    {
+        if (!hits.empty())
+            hits.clear();
+        return;
+    }
 
-	if (!game::isAvailable())
-		return;
+    if (!game::isAvailable())
+        return;
 
-	for (const auto& el : bulletUpdater::getLastBullets())
-	{
-		hits.emplace_back(HitStruct_t
-			{
-				el,
-				memory::interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeClient
-			});
-	}
+    for (const auto& el : bulletUpdater::getLastBullets())
+    {
+        hits.emplace_back(HitStruct_t
+            {
+                el,
+                memory::interfaces::globalVars->m_curtime + vars::visuals->world->impacts->timeClient
+            });
+    }
 
-	const Color outline = vars::visuals->world->impacts->colorClient();
-	const Color fill = vars::visuals->world->impacts->colorClientFill();
+    const Color outline = vars::visuals->world->impacts->colorClient();
+    const Color fill = vars::visuals->world->impacts->colorClientFill();
 
-	for (size_t i = 0; const auto [pos, expire] : hits)
-	{
-		float diff = expire - memory::interfaces::globalVars->m_curtime;
+    for (size_t i = 0; const auto [pos, expire] : hits)
+    {
+        float diff = expire - memory::interfaces::globalVars->m_curtime;
 
-		if (diff < 0.0f)
-		{
-			hits.erase(hits.begin() + i);
-			continue;
-		}
+        if (diff < 0.0f)
+        {
+            hits.erase(hits.begin() + i);
+            continue;
+        }
 
-		ImRender::drawBox3DFilled(pos, 4.0f, 4.0f, outline, fill);
+        ImRender::drawBox3DFilled(pos, 4.0f, 4.0f, outline, fill);
 
-		++i;
-	}
+        ++i;
+    }
 }

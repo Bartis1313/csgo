@@ -252,6 +252,7 @@ void backtrack::updater::run(FrameStage stage)
 			BONE_USED_MASK, memory::interfaces::globalVars->m_curtime))
 			continue;
 		record.head = record.matrices[8].origin();
+		record.angle = ent->absAngles();
 
 		records.at(i).push_front(record);
 

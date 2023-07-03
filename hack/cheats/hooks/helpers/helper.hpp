@@ -1,8 +1,12 @@
 #pragma once
 
 #include <Minhook.h>
+#include <gamememory/memory.hpp>
+
 #include <utilities/tools/tools.hpp>
 #include <utilities/console/console.hpp>
+
+#include <vector>
 
 namespace hookHelper
 {
@@ -40,6 +44,39 @@ namespace hookHelper
 			MH_DisableHook(MH_ALL_HOOKS);
 			MH_RemoveHook(MH_ALL_HOOKS);
 			MH_Uninitialize();
+		}
+	}
+
+	namespace Valve
+	{
+		namespace detail
+		{
+			inline std::vector<std::pair<void*, std::string_view>> allHooks;
+		}
+
+		inline void tryHook(void* target, void* detour, void* original, const std::string_view name)
+		{
+			const bool status = memory::valveHook()(target, detour, original, 0);
+			if(!status)
+				throw std::runtime_error(std::format("{} hook error", name));
+			console::debug("{} -> {} hooked at addr 0x{:X}", name, status, reinterpret_cast<uintptr_t>(target));
+
+			detail::allHooks.emplace_back(std::make_pair(target, name));
+		}
+
+		inline void tryUnhook(void* target, const std::string_view name)
+		{
+			const bool status = memory::valveUnHook()(reinterpret_cast<uintptr_t>(target), 0);
+			if (!status)
+				throw std::runtime_error(std::format("can't unhook! {}", name));
+		}
+
+		inline void shutdownAllHooks()
+		{
+			for (const auto& [target, name] : detail::allHooks)
+			{
+				tryUnhook(target, name);
+			}
 		}
 	}
 }

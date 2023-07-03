@@ -473,7 +473,7 @@ void glow::addHaloScreen(IMatRenderContext* ctx)
 
 	ShaderStencilState_t stencilState;
 	stencilState.m_bEnable = true;
-	stencilState.m_nWriteMask = 0x1; // We're not changing stencil
+	stencilState.m_nWriteMask = 0x1;
 	stencilState.m_nReferenceValue = 1;
 	stencilState.m_nTestMask = 0x1;
 	stencilState.m_CompareFunc = SHADER_STENCILFUNC_NOTEQUAL;

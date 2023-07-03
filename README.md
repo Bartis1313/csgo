@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This project is and was a pert of my c++ and game-hacking journey. The biggest focus of this cheat is on the visual aspects of the game Counter-Strike: Global Offensive (CSGO).
+This project is and was a part of my c++ and game-hacking journey. The biggest focus of this cheat is on the visual aspects of the game Counter-Strike: Global Offensive (CSGO).
 
 Please note that this cheat is for educational purposes only, provided as a training software. To ensure your safety while using cheats, it is recommended to use a reliable VAC module dumper and debug any outputted files. It is important to also look what client does to the game. You can start by understanding the information provided in the [VAC GitHub repository](https://github.com/danielkrupinski/VAC).
 
@@ -190,6 +190,7 @@ The default key to open the cheat's menu is `INSERT`. Additional options within 
 * 3.0.0 - WIP refactor, making it as 3rd version due to the hard cleanup / refactor (not finished yet). I basically removed stupid OOP forcing to some real abstraction with hook and feature.
 * 3.0.1 - Fixed UB stuff, detailed in commit message.
 * 3.0.2 - Fixed the glow system, with better and more performant solution. I have also fixed the glow box lines with fading color. Added basic streamproof solution, which lacks some aspects and I couldn't force the game to understand some render states. Added interface names dumping.
+* 3.0.3 - Streamproof chams added, world lights modulation added. Chams got somewhat better solutions to render them, especially see ignorez. Tried to mess with collide for weather particles, but failed to understand everything, code was left for testing usage only. Added alternative hooking method, in case anyone needs to mess with gameoverlay.dll. Fixed bug with round ends event. 
 </details>
 
 # People who helped

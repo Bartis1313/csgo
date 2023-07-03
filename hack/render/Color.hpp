@@ -113,6 +113,8 @@ struct SDKColor
 	{}
 
 	uint8_t r, g, b, a;
+	
+	[[nodiscard]] constexpr auto data() { return std::array{ r, g, b, a }.data(); }
 };
 
 // 0-255 & 4byte type

@@ -16,8 +16,8 @@ namespace backtrack
 	{
 		float simtime{ };
 		Vec3 head{ };
-		// use origin to set abs or for whatever need
 		Vec3 origin{ };
+		Vec3 angle{ };
 		std::array<Matrix3x4, BONE_USED_BY_HITBOX> matrices;
 	};
 

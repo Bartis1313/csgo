@@ -823,3 +823,37 @@ enum
 	EFL_NO_DAMAGE_FORCES = (1 << 31),	// Doesn't accept forces from physics damage
 };
 #pragma endregion
+
+#pragma region id_view
+// This identifies the view for certain systems that are unique per view (e.g. pixel visibility)
+// NOTE: This is identifying which logical part of the scene an entity is being redered in
+// This is not identifying a particular render target necessarily.  This is mostly needed for entities that
+// can be rendered more than once per frame (pixel vis queries need to be identified per-render call)
+enum view_id_t
+{
+	VIEW_ILLEGAL = -2,
+	VIEW_NONE = -1,
+	VIEW_MAIN = 0,
+	VIEW_3DSKY = 1,
+	VIEW_MONITOR = 2,
+	VIEW_REFLECTION = 3,
+	VIEW_REFRACTION = 4,
+	VIEW_INTRO_PLAYER = 5,
+	VIEW_INTRO_CAMERA = 6,
+	VIEW_SHADOW_DEPTH_TEXTURE = 7,
+	VIEW_SSAO = 8,
+	VIEW_ID_COUNT
+};
+#pragma endregion
+
+#pragma region skybox_vis_flags
+//-----------------------------------------------------------------------------
+// Skybox visibility
+//-----------------------------------------------------------------------------
+enum SkyboxVisibility_t
+{
+	SKYBOX_NOT_VISIBLE = 0,
+	SKYBOX_3DSKYBOX_VISIBLE,
+	SKYBOX_2DSKYBOX_VISIBLE,
+};
+#pragma endregion

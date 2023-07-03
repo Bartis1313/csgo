@@ -4,7 +4,7 @@
 
 #include <string>
 
-#define PARTICLE_MANUAL false
+#define PARTICLE_MANUAL true
 
 #if PARTICLE_MANUAL == true
 class Particle

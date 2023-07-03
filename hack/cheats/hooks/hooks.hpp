@@ -4,7 +4,8 @@ enum hookIndexes
 {
 	PAINTTRAVERSE = 41,
 	CREATEMOVE = 24,
-	DRAWMODEL = 21,
+	DRAWMODEL_EXECUTE = 21,
+	DRAWMODEL = 29,
 	OVERRIDE = 18,
 	POSTSCREENEFFECT = 44,
 	FRAMESTAGE = 37,
@@ -31,10 +32,25 @@ enum hookIndexes
 	OVERRIDE_MOUSE = 23,
 	ALLOC_KEYVALUE = 2,
 	SET_DRAW_COLOR = 15, // overloaded
+	RENDER_SMOKE_OVERLAY = 41,
+	FIND_MATERIAL = 84,
+	GET_VCOLLIDE = 6, // by index
 };
+
+#define UNLOCK_PRECIP_TESTING false
 
 namespace hooks
 {
 	void init();
 	void shutdown();
+
+	// if you lazy to find every pattern, and know your thisptr is some sort of interface or your wanted class, store those here
+	namespace capture
+	{
+		inline void* engineRenderer{ };
+		inline void* particleEffects{ };
+	}
+#if UNLOCK_PRECIP_TESTING == true
+	inline bool calledInitprecip = false;
+#endif
 }
