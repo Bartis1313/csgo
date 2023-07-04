@@ -7,13 +7,13 @@
    // MY_NAME -> My name
    // OKAYLONG -> Okaylong
 namespace magic_enum {
-    template <typename E>
+    template <typename E, detail::enum_subtype S = detail::subtype_v<E>>
     [[nodiscard]] constexpr auto enum_names_pretty() noexcept {
         constexpr auto ctoLower = [](char c) noexcept {
             return (c >= 'A' && c <= 'Z') ? static_cast<char>(c + ('a' - 'A')) : c;
         };
 
-        constexpr auto view_arr = detail::names_v<std::decay_t<E>>;
+        constexpr auto view_arr = detail::names_v<std::decay_t<E>, S>;
         std::array<std::string, view_arr.size()> pretty;
 
         for (size_t i = 0; i < view_arr.size(); i++) {
