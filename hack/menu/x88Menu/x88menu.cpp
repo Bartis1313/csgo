@@ -13,10 +13,25 @@
 #include <magic_enum.hpp>
 
 #include <cheats/hooks/wndproc.hpp>
+
+#define ORIGINAL_DRAW true
+#if ORIGINAL_DRAW == true
+#include <cheats/hooks/paintTraverse.hpp>
+#else
 #include <cheats/hooks/present.hpp>
+#endif
 
 namespace
 {
+#if ORIGINAL_DRAW == true
+	struct x88Draw : hooks::PaintTraverse
+	{
+		x88Draw()
+		{
+			this->registerRender(x88Menu::draw);
+		}
+	} x88Draw;
+#else
 	struct x88Draw : hooks::Present
 	{
 		x88Draw()
@@ -24,6 +39,7 @@ namespace
 			this->registerRun(x88Menu::draw);
 		}
 	} x88Draw;
+#endif
 
 	struct x88Keys : hooks::wndProcSys
 	{
@@ -33,11 +49,17 @@ namespace
 		}
 	} x88Keys;
 }
-
+#if ORIGINAL_DRAW == true
+static void drawText(float x, float y, unsigned long font, const std::string& text, const Color& color)
+{
+	SurfaceRender::text(static_cast<int>(x), static_cast<int>(y), font, text, false, color);
+}
+#else
 static void drawText(float x, float y, ImFont* font, const std::string& text, const Color& color)
 {
 	drawing::Text{ font, ImVec2{ x, y }, Color::U32(color), text, false, false }.draw(ImGui::GetBackgroundDrawList());
 }
+#endif
 
 namespace x88Menu
 {
@@ -60,7 +82,11 @@ void x88Menu::draw()
 
 	const static Color highlight = Colors::Grey.getColorEditAlpha(0.85f);
 	const static Color normal = Colors::White;
+#if ORIGINAL_DRAW == true
+	const static auto font = SurfaceRender::fonts::tahoma;
+#else
 	const static auto font = ImRender::fonts::csgoTahoma15;
+#endif
 
 	float x = globals::screenX * 0.2f;
 	float y = 20.0f;
@@ -68,12 +94,20 @@ void x88Menu::draw()
 	if (!game::localPlayer)
 	{
 		drawText(x, y, font, "Hello undefined :)", Colors::Yellow);
+#if ORIGINAL_DRAW == true
+		y += 14.0f; // size of tahoma
+#else
 		y += font->FontSize;
+#endif
 	}
 	else
 	{
 		drawText(x, y, font, std::format("Hello {} :) Local Player {:#0x}", game::localPlayer->getName(), game::localPlayer->getLiteralAddress()), Colors::Yellow);
+#if ORIGINAL_DRAW == true
+		y += 14.0f; // size of tahoma
+#else
 		y += font->FontSize;
+#endif
 	}
 
 	const float yBackup = y;
@@ -95,8 +129,12 @@ void x88Menu::draw()
 
 		const auto value = x88p.second;
 		const auto& name = x88p.first;
-
+#if ORIGINAL_DRAW == true
+		const auto __vSize = SurfaceRender::getTextSizeXY(font, name);
+		const auto vecSize = ImVec2{ __vSize[0], __vSize[1] };
+#else
 		const auto vecSize = ImRender::getTextSize(font, font->FontSize, name);
+#endif
 
 		if (std::holds_alternative<bool*>(value))
 		{
@@ -139,11 +177,19 @@ void x88Menu::setStyles()
 	x88types.push("Draw Info", &vars::misc->info->enabled);
 
 	size_t longest = 0;
+#if ORIGINAL_DRAW == true
+	for (const auto& [x88p, limits] : x88types.getVars())
+	{
+		if (auto size = static_cast<size_t>(SurfaceRender::getTextSize(SurfaceRender::fonts::tahoma, x88p.first)); size > longest)
+			longest = size;
+	}
+#else
 	for (const auto& [x88p, limits] : x88types.getVars())
 	{
 		if (auto size = static_cast<size_t>(ImRender::getTextSize(ImRender::fonts::csgoTahoma15, ImRender::fonts::csgoTahoma15->FontSize, x88p.first).x); size > longest)
 			longest = size;
 	}
+#endif
 	m_longestNameSize = longest;
 
 	m_inited = true;
@@ -152,8 +198,13 @@ void x88Menu::setStyles()
 size_t x88Menu::addSpaces(const std::string& text)
 {
 	// 5px added to align them well for max size
+#if ORIGINAL_DRAW == true
+	auto size = (m_longestNameSize + 5) - SurfaceRender::getTextSize(SurfaceRender::fonts::tahoma, text);
+	return static_cast<size_t>(size);
+#else
 	auto size = (m_longestNameSize + 5) - ImRender::getTextSize(ImRender::fonts::csgoTahoma15, ImRender::fonts::csgoTahoma15->FontSize, text).x;
 	return static_cast<size_t>(size);
+#endif
 }
 
 void x88Menu::updateKeys()

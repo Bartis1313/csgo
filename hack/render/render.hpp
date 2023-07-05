@@ -6,7 +6,7 @@
 #include <string>
 #include <SDK/math/Vector.hpp>
 
-//#define SURFACE_RENDER
+#define SURFACE_RENDER
 
 class Color;
 class Resource;
