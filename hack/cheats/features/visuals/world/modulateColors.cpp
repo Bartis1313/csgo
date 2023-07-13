@@ -41,6 +41,7 @@ void modulateColor::run(void* thisptr, float* r, float* g, float* b)
 			return mat.name == group;
 		}); itr != mats.end())
 	{
+		itr->color->refresh();
 		*r = itr->color->getColor().r();
 		*g = itr->color->getColor().g();
 		*b = itr->color->getColor().b();

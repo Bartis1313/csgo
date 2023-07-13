@@ -58,10 +58,10 @@ public:
 	NETVAR(int, moveparent, "DT_BaseEntity", "moveparent");
 	NETVAR(int, m_fEffects, "DT_BaseEntity", "m_fEffects");
 	NETVAR(int, m_nModelIndex, "DT_BaseEntity", "m_nModelIndex");
-	NETVAR(PrecipitationType_t, m_nPrecipType, "DT_Precipitation", "m_nPrecipType");
 	PTRNETVAR(int, m_nNextThinkTick, "DT_BasePlayer", "m_nNextThinkTick");
 	NETVAR_ADDR(int, m_nCreationTick, "DT_BaseEntity", "m_hEffectEntity", 0xC);
 	NETVAR_ADDR(bool, m_bCanUseFastPath, "DT_BaseAnimating", "m_flRecoilIndex", 0x4);
+	NETVAR_ADDR(bool, m_bDormant, "DT_BaseEntity", "m_fEffects", -0x3);
 
 	VFUNC(Vec3&, absOrigin, ABS_ORIGIN, (), (this));
 	VFUNC(Vec3&, absAngles, ABS_ANGLE, (), (this));
@@ -102,6 +102,7 @@ public:
 	void setAbsOrigin(const Vec3& origin);
 	void setAbsAngle(const Vec3& angle);
 	void setAbsVelocity(const Vec3& velocity);
+	void stopSound(const char* sample);
 
 	template<typename T>
 	T cast()
@@ -335,6 +336,25 @@ class EnvAmbientLight_t : public Entity_t
 public:
 	NETVAR(SDKColor, m_Color, "DT_EnvAmbientLight", "m_Color");
 	NETVAR(Vec3, m_vecColor, "DT_EnvAmbientLight", "m_vecColor");
+};
+
+class World_t : public Entity_t
+{
+public:
+	NETVAR(Vec3, m_WorldMins, "DT_World", "m_WorldMins");
+	NETVAR(Vec3, m_WorldMaxs, "DT_World", "m_WorldMaxs");
+};
+
+class Precipitation_t : public Entity_t
+{
+public:
+	NETVAR(PrecipitationType_t, m_nPrecipType, "DT_Precipitation", "m_nPrecipType");
+	OFFSET(const char*, m_pParticleOuterDef, 0xA70);
+	OFFSET(const char*, m_pParticleInnerNearDef, 0xA68);
+	OFFSET(const char*, m_pParticleInnerFarDef, 0xA6C);
+	OFFSET(bool, m_bParticlePrecipInitialized, 0xAA1);
+	OFFSET(float, m_flParticleInnerDist, 0xA64);
+	OFFSET(float, m_flDensity, 0xA08);
 };
 
 #undef RENDERABLE

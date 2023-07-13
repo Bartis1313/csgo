@@ -357,9 +357,9 @@ void tabs::visuals::draw()
 				ImGui::SliderFloat("Max##ton", &vars::visuals->world->tone->max, 0.0f, 1.0f);
 				ImGui::SliderFloat("Bloom##ton", &vars::visuals->world->tone->bloom, 0.0f, 16.0f);
 			}
-
-			ImGui::Checkbox("Weather", &vars::visuals->world->weather->enabled);
-			if (vars::visuals->world->weather->enabled)
+			
+			ImGui::Combo("Weather", &vars::visuals->world->weather->type, magic_enum::enum_names_pretty<PrecipitationConfig>());
+			if (vars::visuals->world->weather->type)
 			{
 				weatherController::implMenu();
 			}

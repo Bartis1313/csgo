@@ -34,6 +34,21 @@ constexpr std::array bloodnames =
 	"blood_impact_light_headshot"
 };
 
+struct WeatherParticleCfg { const char* name; bool* cfg; CfgColor* color; };
+
+const std::array weatherParticles
+{
+	WeatherParticleCfg{ "snow", &vars::visuals->world->weather->snowParticleEdit, &vars::visuals->world->weather->snowParticleInnerNearColor },
+	WeatherParticleCfg{ "snow_outer", &vars::visuals->world->weather->snowParticleEdit, &vars::visuals->world->weather->snowParticleOuterColor },
+
+	WeatherParticleCfg{ "rain", &vars::visuals->world->weather->rainParticleEdit, &vars::visuals->world->weather->rainParticleInnerNearColor },
+	WeatherParticleCfg{ "rain_outer", &vars::visuals->world->weather->rainParticleEdit, &vars::visuals->world->weather->rainParticleOuterColor },
+
+	WeatherParticleCfg{ "rain_storm", &vars::visuals->world->weather->rainStormParticleEdit, &vars::visuals->world->weather->rainStormParticleInnerNearColor },
+	WeatherParticleCfg{ "rain_storm_screen", &vars::visuals->world->weather->rainStormParticleEdit, &vars::visuals->world->weather->rainStormParticleInnerFarColor },
+	WeatherParticleCfg{ "rain_storm_outer", &vars::visuals->world->weather->rainStormParticleEdit, &vars::visuals->world->weather->rainStormParticleOuterColor }
+};
+
 hooks::ParticlesSimulations::value hooks::ParticlesSimulations::hook(FAST_ARGS)
 {
 	hooks::capture::particleEffects = thisptr;
@@ -51,13 +66,15 @@ hooks::ParticlesSimulations::value hooks::ParticlesSimulations::hook(FAST_ARGS)
 	const Color colorBlood = vars::visuals->world->particles->colorBlood();
 	const Color colorSmoke = vars::visuals->world->particles->colorSmoke();
 
+	// modulateColor() for alpha, but it can fuckup the render, because alpha is very often clamped with time etc...
+
 	if (vars::visuals->world->particles->enabledSmoke)
 	{
 		if (auto itr = std::ranges::find(smokenames, name); itr != smokenames.cend())
 		{
 			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{
-				ptr->m_particleAttributes.modulateColor(colorSmoke, i);
+				ptr->m_particleAttributes.modulateColorRGB(colorSmoke, i);
 			}
 		}
 	}
@@ -68,7 +85,7 @@ hooks::ParticlesSimulations::value hooks::ParticlesSimulations::hook(FAST_ARGS)
 		{
 			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{
-				ptr->m_particleAttributes.modulateColor(colorBlood, i);
+				ptr->m_particleAttributes.modulateColorRGB(colorBlood, i);
 			}
 		}
 	}
@@ -79,8 +96,19 @@ hooks::ParticlesSimulations::value hooks::ParticlesSimulations::hook(FAST_ARGS)
 		{
 			for (auto i : std::views::iota(0, ptr->m_activeParticles))
 			{
-				ptr->m_particleAttributes.modulateColor(colorMolly, i);
+				ptr->m_particleAttributes.modulateColorRGB(colorMolly, i);
 			}
+		}
+	}
+
+	auto weatherParticleIsFine = [name](const WeatherParticleCfg& wp) { return *wp.cfg && std::string_view{ wp.name } == name; };
+
+	if (auto itr = std::ranges::find_if(weatherParticles, weatherParticleIsFine); itr != weatherParticles.end())
+	{
+		for (auto i : std::views::iota(0, ptr->m_activeParticles))
+		{
+			itr->color->refresh();
+			ptr->m_particleAttributes.modulateColorRGB(itr->color->getColor(), i);
 		}
 	}
 }

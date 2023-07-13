@@ -42,3 +42,4 @@ namespace memory
 #define FILESYS_DLL					"filesystem_stdio.dll"
 #define DATACACHE_DLL				"datacache.dll"
 #define GAME_OVERLAY				"gameoverlayrenderer.dll"
+#define VPHYSICS_DLL				"vphysics.dll"

@@ -1,9 +1,6 @@
 #pragma once
 
 #include "helpers/common.hpp"
-#if UNLOCK_PRECIP_TESTING == true
-
-#include <SDK/EHandle.hpp>
 
 _HOOK_BEGIN
 class CreateParticlePrecip
@@ -17,5 +14,3 @@ private:
 	inline static call original;
 };
 _HOOK_END
-
-#endif

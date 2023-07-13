@@ -1,7 +1,5 @@
 #include "createParticlePrecip.hpp"
 
-#if UNLOCK_PRECIP_TESTING == true
-
 #include <SDK/interfaces/interfaces.hpp>
 #include <SDK/structs/Entity.hpp>
 #include <SDK/IVModelInfo.hpp>
@@ -10,10 +8,12 @@
 #include <gamememory/memory.hpp>
 
 #include <SDK/structs/Entity.hpp>
+#include <cheats/features/visuals/world/weather.hpp>
 
 hooks::CreateParticlePrecip::value hooks::CreateParticlePrecip::hook(FAST_ARGS)
 {
-	bool m_bParticlePrecipInitialized = *(bool*)((uintptr_t)thisptr + 0xAA1);
+	auto precip = reinterpret_cast<Precipitation_t*>(thisptr);
+	bool m_bParticlePrecipInitialized = precip->m_bParticlePrecipInitialized();
 
 	if (!m_bParticlePrecipInitialized)
 	{
@@ -26,4 +26,3 @@ hooks::CreateParticlePrecip::value hooks::CreateParticlePrecip::hook(FAST_ARGS)
 
 	original(thisptr);
 }
-#endif

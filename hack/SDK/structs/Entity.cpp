@@ -124,6 +124,11 @@ void Entity_t::setAbsVelocity(const Vec3& velocity)
 	memory::setAbsVelocity()(this, std::cref(velocity));
 }
 
+void Entity_t::stopSound(const char* sample)
+{
+	memory::stopSound()(this, sample);
+}
+
 bool Entity_t::setupBonesShort(Matrix3x4* _out, int maxBones, int mask, float time)
 {
 	__asm

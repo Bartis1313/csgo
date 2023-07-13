@@ -333,7 +333,6 @@ struct VarVisuals
 
 		struct VarWeather
 		{
-			bool enabled{ false };
 			float length{ 0.0f };
 			float rainSpeed{ 0.0f };
 			float radius{ 0.0f };
@@ -341,6 +340,21 @@ struct VarVisuals
 			float velocity{ 0.0f };
 			float alpha{ 0.0f };
 			float windSpeed{ 0.0f };
+			float particleDensity{ 0.0f };
+			int type{ 0 };
+			float volume{ 0.65f };
+			bool snowParticleEdit{ false };
+			CfgColor snowParticleInnerNearColor{ };
+			CfgColor snowParticleInnerFarColor{ };
+			CfgColor snowParticleOuterColor{ };
+			bool rainParticleEdit{ false };
+			CfgColor rainParticleInnerNearColor{ };
+			CfgColor rainParticleInnerFarColor{ };
+			CfgColor rainParticleOuterColor{ };
+			bool rainStormParticleEdit{ false };
+			CfgColor rainStormParticleInnerNearColor{ };
+			CfgColor rainStormParticleInnerFarColor{ };
+			CfgColor rainStormParticleOuterColor{ };
 		};
 		ADD_MEMBER_PTR(VarWeather, weather);
 

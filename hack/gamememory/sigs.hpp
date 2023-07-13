@@ -325,3 +325,22 @@
 #define DRAW_WORLD_AND_ENTITIES		SIG("55 8B EC 83 EC 4C 53 56 57 8B 3D ? ? ? ? 8B F1 8B CF 89 75 F8 8B 07 FF 90 ? ? ? ? 8B 0D ? ? ? ? 8D 45 B8 8B 5D 0C 50 6A 00")
 // #STR: "DrawTranslucentEntities"
 #define DRAW_TRANSCULENT_RENDERABLE	SIG("55 8B EC 81 EC ? ? ? ? 83 3D ? ? ? ? ? 53 56 8B D9 57 89 5D E4 74 1C 8B 0D ? ? ? ? 8B 01 FF 90 ? ? ? ? 6A 00")
+// saw in the renderview where precip loop is executed (inlined call though)
+#define PRECIPICATION_UNK_COUNTER	SIG("3B 35 ? ? ? ? 7C E9 A1 ? ? ? ? B9 ? ? ? ? 8B 40 34")
+// ^ like so
+#define G_PRECIPICATION				SIG("A1 ? ? ? ? 8B 0D ? ? ? ? 8B 04 B0 0F BF 90 ? ? ? ? 8B 01 52 FF 50 18 85 C0 0F 84 ? ? ? ? B9 ? ? ? ? 66 85 08 0F 86 ? ? ? ? 8B 0D ? ? ? ? 8D 5D F4 8B 40 04 53 8B 11")\
+// string ref "World" strcpy
+#define CLIENT_WORLD				SIG("A1 ? ? ? ? F3 0F 10 4D ? EB 71")
+// see the g_precips vec, when it removes element
+#define DESTRUCT_PRECIPICATION		SIG("55 8B EC 51 56 8B F1 8D 45 FC 57")
+// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/c_baseentity.cpp#L1189
+#define DORMANT_STATE				SIG("66 C7 86 ? ? ? ? ? ? C7 86 ? ? ? ? ? ? ? ? C7 86 ? ? ? ? ? ? ? ? C7 86 ? ? ? ? ? ? ? ? 66 89 86 ? ? ? ? 89 86 ? ? ? ?")
+// check strings used for stop in leak
+#define STOP_SOUND					SIG("55 8B EC 51 56 57 8B F9 8B 47 08 8D 4F 08 FF 50 28 83 F8 FF 75 1A 8B 07")
+// https://gitlab.com/KittenPopo/csgo-2018-source/-/blob/main/game/client/cstrike15/clientmode_csnormal.cpp#L2246
+// lot of events
+#define CLIENTMODE_CSNORMAL_EVENT	SIG("55 8B EC 83 E4 C0 B8 ? ? ? ? E8 ? ? ? ? 89 4C 24 08")
+// reversed rain draw
+#define TRACER_DRAW					SIG("55 8B EC 83 EC 40 8B C2 8B 55 08 0F 28 D3 56 8B F1 8D 4D C0 51 8B C8 E8 ? ? ? ? 83 C4 04")
+// reversed weather code
+#define WEATHER_GETVCOLLIDE_RET		SIG("83 0F 02 83 0B 02 39 35 ? ? ? ? 0F 8E ? ? ? ? A1 ? ? ? ? 8B 0D ? ? ? ? 8B 04 B0 0F BF 90 ? ? ? ? 8B 01 52 FF 50 18")

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "helpers/common.hpp"
-#if UNLOCK_PRECIP_TESTING == true
 
 _HOOK_BEGIN
 class InitializeParticlePrecip
@@ -15,4 +14,3 @@ private:
 	inline static call original;
 };
 _HOOK_END
-#endif

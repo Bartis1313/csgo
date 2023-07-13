@@ -52,6 +52,8 @@ class CGameRules
 {
 public:
 	NETVAR(int, m_iRoundTime, "DT_CSGameRulesProxy", "m_iRoundTime");
+	NETVAR(Vec3, m_vecPlayAreaMins, "DT_SurvivalGameRules", "m_vecPlayAreaMins");
+	NETVAR(Vec3, m_vecPlayAreaMaxs, "DT_SurvivalGameRules", "m_vecPlayAreaMaxs");
 
 	VFUNC(CViewVectors*, getViewVectors, 30, (), (this));
 };

@@ -136,3 +136,13 @@ enum class RadarMode
 	TRIANGLE,
 	CIRCLE
 };
+
+enum class PrecipitationConfig
+{
+	NONE,
+	RAIN,
+	SNOW,
+	PARTICLERAIN,
+	PARTICLERAINSTORM,
+	PARTICLESNOW
+};

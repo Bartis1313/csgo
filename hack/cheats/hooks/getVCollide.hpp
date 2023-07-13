@@ -1,7 +1,6 @@
 #pragma once
 
 #include "helpers/common.hpp"
-#if UNLOCK_PRECIP_TESTING == true
 
 #include <SDK/IVModelInfo.hpp>
 
@@ -17,4 +16,3 @@ private:
 	inline static call original;
 };
 _HOOK_END
-#endif

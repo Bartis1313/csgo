@@ -35,9 +35,10 @@ enum hookIndexes
 	RENDER_SMOKE_OVERLAY = 41,
 	FIND_MATERIAL = 84,
 	GET_VCOLLIDE = 6, // by index
+	VCOLLIDE_LOAD = 36,
 };
 
-#define UNLOCK_PRECIP_TESTING false
+#define DUMP_WEATHER false
 
 namespace hooks
 {
@@ -50,7 +51,6 @@ namespace hooks
 		inline void* engineRenderer{ };
 		inline void* particleEffects{ };
 	}
-#if UNLOCK_PRECIP_TESTING == true
+
 	inline bool calledInitprecip = false;
-#endif
 }

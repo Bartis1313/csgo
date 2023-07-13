@@ -35,6 +35,7 @@ void memory::init()
 	memory::modules::addModule<"filesystem_stdio.dll">();
 	memory::modules::addModule<"datacache.dll">();
 	memory::modules::addModule<"gameoverlayrenderer.dll">();
+	memory::modules::addModule<"vphysics.dll">();
 
 	using namespace memory;
 	using namespace memory::interfaces;
@@ -117,6 +118,10 @@ void memory::init()
 	valveHook = scan(GAME_OVERLAY, VALVE_HOOK);
 	valveUnHook = scan(GAME_OVERLAY, VALVE_UNHOOK);
 	viewFadeSmokeRet = scan(CLIENT_DLL, VIEW_FACE_SMOKE_RET).add(0xC);
+	gPrecipitations = scan(CLIENT_DLL, G_PRECIPICATION).add(0x1).deRef();
+	precipDestruct = scan(CLIENT_DLL, DESTRUCT_PRECIPICATION);
+	stopSound = scan(CLIENT_DLL, STOP_SOUND);
+	particleGetVCollideRet = scan(CLIENT_DLL, WEATHER_GETVCOLLIDE_RET).add(0x2D);
 
 	// HOOKS
 
@@ -156,6 +161,8 @@ void memory::init()
 	drawEffects = scan(CLIENT_DLL, DRAW_EFFECTS);
 	drawWorldAndEntities = scan(CLIENT_DLL, DRAW_WORLD_AND_ENTITIES);
 	drawTransculentRenderables = scan(CLIENT_DLL, DRAW_TRANSCULENT_RENDERABLE);
+	clientCsNormalEvent = scan(CLIENT_DLL, CLIENTMODE_CSNORMAL_EVENT);
+	tracerDraw = scan(CLIENT_DLL, TRACER_DRAW);
 
 	// REST
 
@@ -201,4 +208,5 @@ void memory::postInit()
 	ambientLight = findFromGameLoop(CEnvAmbientLight);
 
 	hostState = scan(ENGINE_DLL, HOST_STATE).add(0x1).deRef(Dereference::TWICE);
+	gameWorld = scan(CLIENT_DLL, CLIENT_WORLD).add(0x1).deRef(Dereference::TWICE);
 }

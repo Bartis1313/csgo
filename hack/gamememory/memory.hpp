@@ -48,6 +48,8 @@ enum ClassID;
 class KeyValues;
 class CCommonHostState;
 struct decal_t;
+class World_t;
+class Entity_t;
 
 using retaddr_t = uintptr_t;
 
@@ -104,6 +106,8 @@ namespace memory
 	using findKey_t = KeyValues*(__thiscall*)(const char*, bool);
 	using valveHook_t = char(__cdecl*)(void*, void*, void*, int);
 	using valveUnHook_t = char(__cdecl*)(uintptr_t, char);
+	using precipDestruct_t = void(__thiscall*)(void*);
+	using stopSound_t = void(__thiscall*)(void*, const char*);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
@@ -186,6 +190,10 @@ namespace memory
 	inline Address<valveHook_t> valveHook;
 	inline Address<valveUnHook_t> valveUnHook;
 	inline Address<retaddr_t> viewFadeSmokeRet;
+	inline Address<CUtlVector<Entity_t*>> gPrecipitations;
+	inline Address<precipDestruct_t> precipDestruct;
+	inline Address<stopSound_t> stopSound;
+	inline Address<retaddr_t> particleGetVCollideRet;
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;
@@ -222,6 +230,8 @@ namespace memory
 	inline Address<void*> drawEffects;
 	inline Address<void*> drawWorldAndEntities;
 	inline Address<void*> drawTransculentRenderables;
+	inline Address<void*> clientCsNormalEvent;
+	inline Address<void*> tracerDraw;
 
 	inline Address<teslaCreate_t> tesla;
 	inline Address<dispatchEffect_t> dispatchEffect;
@@ -247,5 +257,6 @@ namespace memory
 		inline Address<FogController_t*> fogController;
 		inline Address<EnvAmbientLight_t*> ambientLight;
 		inline Address<CCommonHostState*> hostState;
+		inline Address<World_t*> gameWorld;
 	}
 }

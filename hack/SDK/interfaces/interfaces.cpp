@@ -180,6 +180,8 @@ void memory::interfaces::init()
 	findInterface(sound, "IEngineSoundClient0");
 	findInterface(mdlCache, "MDLCache0");
 	findInterface(baseFileSystem, "VBaseFileSystem0");
+	findInterface(physicsCollision, "VPhysicsCollision0");
+	findInterface(engineSound, "IEngineSoundClient0");
 #else
 	CAP(engine, ENGINE_DLL, "VEngineClient0");
 	CAP(panel, VGUI_DLL, "VGUI_Panel0");
@@ -202,9 +204,10 @@ void memory::interfaces::init()
 	CAP(iSystem, INPUTSYSTEM_DLL, "InputSystemVersion0");
 	CAP(effects, CLIENT_DLL, "IEffects0");
 	CAP(fileSystem, FILESYS_DLL, "VFileSystem0");
-	CAP(sound, ENGINE_DLL, "IEngineSoundClient0");
 	CAP(mdlCache, DATACACHE_DLL, "MDLCache0");
 	CAP(baseFileSystem, FILESYS_DLL, "VBaseFileSystem0");
+	CAP(physicsCollision, VPHYSICS_DLL, "VPhysicsCollision0");
+	CAP(engineSound, ENGINE_DLL, "IEngineSoundClient0");
 #endif
 
 	console::debug("interfaces success");

@@ -85,3 +85,23 @@ void console::detail::addSigns(TypeLogs type)
 	reset();
 #endif
 }
+
+void console::detail::enableNewLine()
+{
+	newline = true;
+}
+
+void console::detail::disableNewLine()
+{
+	newline = false;
+}
+
+void console::detail::enablePrefix()
+{
+	prefix = true;
+}
+
+void console::detail::disablePrefix()
+{
+	prefix = false;
+}

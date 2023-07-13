@@ -28,6 +28,7 @@
 #include <cheats/hooks/present.hpp>
 #include <cheats/hooks/frameStageNotify.hpp>
 #include <cheats/hooks/unkownRoundEnd.hpp>
+#include <cheats/hooks/clientModeCSNormalEvent.hpp>
 
 namespace
 {
@@ -55,6 +56,14 @@ namespace
 			this->registerRun(bombOverlay::roundRestart);
 		}
 	} bombReset;
+
+	struct BombEvent : hooks::ClientModeCSNormalEvent
+	{
+		BombEvent()
+		{
+			this->registerEvent(bombOverlay::handleWhoPlanted);
+		}
+	} bombEvent;
 }
 
 namespace bombOverlay
@@ -68,9 +77,7 @@ void bombOverlay::init()
 {
 	c4Timer = memory::interfaces::cvar->findVar("mp_c4timer");
 
-	// if we seriously do not want to use events all
-	// then find a way to get planted bomb info, I was lazy to do so
-	events::add("bomb_planted", std::bind(&handleWhoPlanted, std::placeholders::_1));
+	//events::add("bomb_planted", std::bind(&handleWhoPlanted, std::placeholders::_1));
 }
 
 void bombOverlay::roundRestart()
@@ -172,6 +179,9 @@ void bombOverlay::draw()
 
 void bombOverlay::handleWhoPlanted(IGameEvent* event)
 {
+	if (std::string_view{ event->getName() } != "bomb_planted")
+		return;
+
 	auto who = reinterpret_cast<Player_t*>(memory::interfaces::entList->getClientEntity(memory::interfaces::engine->getPlayerID(event->getInt("userid"))));
 	if (!who)
 		return;

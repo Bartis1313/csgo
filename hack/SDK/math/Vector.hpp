@@ -257,6 +257,24 @@ public:
 		return res;
 	}
 
+	constexpr auto operator+(T val) const
+	{
+		Vector res = {};
+		for (auto i : std::views::iota(0U, SIZE))
+			res[i] = this->m_arr[i] + val;
+
+		return res;
+	}
+
+	constexpr auto operator-(T val) const
+	{
+		Vector res = {};
+		for (auto i : std::views::iota(0U, SIZE))
+			res[i] = this->m_arr[i] - val;
+
+		return res;
+	}
+
 	constexpr auto operator<=>(const Vector&) const = default;
 
 	[[nodiscard]] constexpr auto toArray() const

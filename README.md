@@ -50,13 +50,14 @@ Please note that this cheat is for educational purposes only, provided as a trai
 * Ambient: Forces the game to render ambient light.
 * Fog: Control the fog effect in the game.
 * Tone: Control the tone effect in the game.
-* Weather: Renders a rain effect in the game.
+* Weather: Renders precipitation effects in the game.
 * Interpolation: Disables interpolation completely.
 * Flashbang Reduce: Reduces the alpha of flashbang effects.
 * Screen Effects: Forces the game to render selected effects.
 * Motion Blur: Replicates the game's motion blur effect.
 * Molotov and Smoke Overlays: Displays circles or polygons representing the radius of smoke or molotov effects.
 * Zeus Display: Draws a circle representing the range of the Zeus taser and allows tracing of the polyline.
+* World lights: Edit world lights directly, with possibility to restore original values.
 </details>
 
 <details>
@@ -69,7 +70,7 @@ Please note that this cheat is for educational purposes only, provided as a trai
 * Discord Rich Presence (RPC)
 * Hook-to-feature communication using handlers
 * Logging console
-* Game events (only one is currently needed)
+* Game events (everything gathered from hooks, possible to create own though)
 * Compile-time signature to optional bytes conversion
 * Exports and memory class
 * Netvars with dumping
@@ -191,6 +192,7 @@ The default key to open the cheat's menu is `INSERT`. Additional options within 
 * 3.0.1 - Fixed UB stuff, detailed in commit message.
 * 3.0.2 - Fixed the glow system, with better and more performant solution. I have also fixed the glow box lines with fading color. Added basic streamproof solution, which lacks some aspects and I couldn't force the game to understand some render states. Added interface names dumping.
 * 3.0.3 - Streamproof chams added, world lights modulation added. Chams got somewhat better solutions to render them, especially see ignorez. Tried to mess with collide for weather particles, but failed to understand everything, code was left for testing usage only. Added alternative hooking method, in case anyone needs to mess with gameoverlay.dll. Fixed bug with round ends event. 
+* 3.0.4 - Weather works for more types. Removed all listened events, instead gather information from another hook. Particle editing doesn't touch alpha channel anymore.
 </details>
 
 # People who helped

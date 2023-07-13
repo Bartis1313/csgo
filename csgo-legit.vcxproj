@@ -179,6 +179,7 @@
     <ClCompile Include="hack\cheats\hooks\createEvent.cpp" />
     <ClCompile Include="hack\cheats\hooks\createMove.cpp" />
     <ClCompile Include="hack\cheats\hooks\createParticlePrecip.cpp" />
+    <ClCompile Include="hack\cheats\hooks\decalAddToSurface.cpp" />
     <ClCompile Include="hack\cheats\hooks\decalCreate.cpp" />
     <ClCompile Include="hack\cheats\hooks\doExtraBonesProcessing.cpp" />
     <ClCompile Include="hack\cheats\hooks\doPostScreenEffects.cpp" />
@@ -190,6 +191,7 @@
     <ClCompile Include="hack\cheats\hooks\filesCheck.cpp" />
     <ClCompile Include="hack\cheats\hooks\findMaterial.cpp" />
     <ClCompile Include="hack\cheats\hooks\frameStageNotify.cpp" />
+    <ClCompile Include="hack\cheats\hooks\clientModeCSNormalEvent.cpp" />
     <ClCompile Include="hack\cheats\hooks\getColorModulation.cpp" />
     <ClCompile Include="hack\cheats\hooks\getPMaterial.cpp" />
     <ClCompile Include="hack\cheats\hooks\getUnverifiedFileHashes.cpp" />
@@ -205,6 +207,7 @@
     <ClCompile Include="hack\cheats\hooks\levelShutdown.cpp" />
     <ClCompile Include="hack\cheats\hooks\lockCursor.cpp" />
     <ClCompile Include="hack\cheats\hooks\renderSmokeOverlay.cpp" />
+    <ClCompile Include="hack\cheats\hooks\tracerDraw.cpp" />
     <ClCompile Include="hack\cheats\hooks\updatePostEffects.cpp" />
     <ClCompile Include="hack\cheats\hooks\overrideMouse.cpp" />
     <ClCompile Include="hack\cheats\hooks\overrideView.cpp" />
@@ -223,6 +226,7 @@
     <ClCompile Include="hack\cheats\hooks\unknownPlayerHurt.cpp" />
     <ClCompile Include="hack\cheats\hooks\unkownRoundEnd.cpp" />
     <ClCompile Include="hack\cheats\hooks\drawEffects.cpp" />
+    <ClCompile Include="hack\cheats\hooks\vCollideLoad.cpp" />
     <ClCompile Include="hack\cheats\hooks\viewFade.cpp" />
     <ClCompile Include="hack\cheats\hooks\viewRender.cpp" />
     <ClCompile Include="hack\cheats\hooks\wndproc.cpp" />
@@ -408,10 +412,13 @@
     <ClInclude Include="hack\cheats\hooks\decalCreate.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawTranslucentRenderables.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawWorldAndEntities.hpp" />
+    <ClInclude Include="hack\cheats\hooks\clientModeCSNormalEvent.hpp" />
     <ClInclude Include="hack\cheats\hooks\getVCollide.hpp" />
     <ClInclude Include="hack\cheats\hooks\createParticlePrecip.hpp" />
     <ClInclude Include="hack\cheats\hooks\initializeParticlePrecip.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawEffects.hpp" />
+    <ClInclude Include="hack\cheats\hooks\tracerDraw.hpp" />
+    <ClInclude Include="hack\cheats\hooks\vCollideLoad.hpp" />
     <ClInclude Include="hack\SDK\CCommonHostState.hpp" />
     <ClInclude Include="hack\cheats\hooks\cHudIsHidden.hpp" />
     <ClInclude Include="hack\cheats\hooks\createEvent.hpp" />
@@ -437,6 +444,8 @@
     <ClInclude Include="hack\gamememory\address.hpp" />
     <ClInclude Include="hack\gamememory\modules.hpp" />
     <ClInclude Include="hack\SDK\CUtlMemory.hpp" />
+    <ClInclude Include="hack\SDK\IEngineSound.hpp" />
+    <ClInclude Include="hack\SDK\IPhysicsCollision.hpp" />
     <ClInclude Include="hack\SDK\lightdesc.hpp" />
     <ClInclude Include="hack\utilities\cStr.hpp" />
     <ClInclude Include="hack\utilities\runnable.hpp" />
@@ -510,7 +519,6 @@
     <ClInclude Include="hack\SDK\CClientEffectRegistration.hpp" />
     <ClInclude Include="hack\SDK\CCSGO_HudRadar.hpp" />
     <ClInclude Include="hack\SDK\CEffectData.hpp" />
-    <ClInclude Include="hack\SDK\CEngineSoundClient.hpp" />
     <ClInclude Include="hack\SDK\CFlashlightEffect.hpp" />
     <ClInclude Include="hack\SDK\CGameMovement.hpp" />
     <ClInclude Include="hack\SDK\CGameRules.hpp" />

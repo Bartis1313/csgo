@@ -47,6 +47,8 @@ class CGameRules;
 class CEngineSoundClient;
 class IMDLCache;
 class IBaseFileSystem;
+class IPhysicsCollision;
+class IEngineSound;
 #pragma endregion
 
 namespace memory::interfaces
@@ -72,9 +74,10 @@ namespace memory::interfaces
 	inline Interface<InputSystem*> iSystem;
 	inline Interface<IEffects*> effects;
 	inline Interface<IFileSystem*> fileSystem;
-	inline Interface<CEngineSoundClient*> sound;
 	inline Interface<IMDLCache*> mdlCache;
 	inline Interface<IBaseFileSystem*> baseFileSystem;
+	inline Interface<IPhysicsCollision*> physicsCollision;
+	inline Interface<IEngineSound*> engineSound;
 
 	void init();
 }

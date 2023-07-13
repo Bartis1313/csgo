@@ -9,10 +9,10 @@ class R_AddDecalToSurface
 {
 	ADD_HOOK_FRIEND;
 private:
-	using value = void;
-	using call = value(STDCALL*)(decal_t*, SurfaceHandle_t, decalinfo_t*);
+	using value = int*;
+	using call = value(__cdecl*)(void*, void*, void*, void*);
 
-	static value STDCALL hook(decal_t* pdecal, SurfaceHandle_t surfID, decalinfo_t* decalinfo);
+	static value __cdecl hook(void*, void*, void*, void*);
 	inline static call original;
 };
 _HOOK_END

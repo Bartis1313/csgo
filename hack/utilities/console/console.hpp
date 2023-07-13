@@ -37,11 +37,17 @@ namespace console
 		void addSigns(TypeLogs type);
 		void addLogToStream(TypeLogs type, const std::string& buf);
 		bool isPossibleToLog(TypeLogs type);
+		void enableNewLine();
+		void disableNewLine();
+		void enablePrefix();
+		void disablePrefix();
 		std::string generateTimeLog();
 
 		inline std::ofstream m_fileStream;
 		inline std::string m_logName;
 		inline std::mutex m_mutex;
+		inline bool newline{ true };
+		inline bool prefix{ true };
 
 		inline std::unordered_map<TypeLogs, ColorsConsole> colorsForConsole
 		{
@@ -89,14 +95,19 @@ inline void console::log(TypeLogs type, const std::string_view fmt, Args_t&&... 
 	if (fmt.empty())
 		return;
 
-	detail::addSigns(type);
-	std::string buffer = detail::generateTimeLog();
+	std::string buffer{ };
+	if (detail::prefix)
+	{
+		detail::addSigns(type);
+		buffer = detail::generateTimeLog();
+	}
 	if constexpr (sizeof...(args) > 0)
 		buffer += std::vformat(fmt, std::make_format_args(args...));
 	else
 		buffer += fmt;
-
-	buffer += '\n';
+	
+	if(detail::newline)
+		buffer += '\n';
 
 	detail::addLogToStream(type, buffer);
 }
