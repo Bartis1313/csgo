@@ -748,6 +748,7 @@ void from_json(const json& j, VarVisuals::VarWorld::VarWeather& val)
 	from_json(j, "Velocity", val.velocity);
 	from_json(j, "Alpha", val.alpha);
 	from_json(j, "Wind", val.windSpeed);
+	from_json(j, "Volume", val.volume);
 	from_json(j, "Snow Edit", val.snowParticleEdit);
 	from_json(j["Snow Particle Inner Near"], val.snowParticleInnerNearColor);
 	from_json(j["Snow Particle Inner Far"], val.snowParticleInnerFarColor);
@@ -772,6 +773,18 @@ void to_json(json& j, const VarVisuals::VarWorld::VarWeather& val)
 	j["Alpha"] = val.alpha;
 	j["Wind"] = val.windSpeed;
 	j["Volume"] = val.volume;
+	j["Snow Edit"] = val.snowParticleEdit;
+	j["Snow Particle Inner Near"] = val.snowParticleInnerNearColor;
+	j["Snow Particle Inner Far"] = val.snowParticleInnerFarColor;
+	j["Snow Particle Outer"] = val.snowParticleOuterColor;
+	j["Rain Edit"] = val.rainParticleEdit;
+	j["Rain Particle Inner Near"] = val.rainParticleInnerNearColor;
+	j["Rain Particle Inner Far"] = val.rainParticleInnerFarColor;
+	j["Rain Particle Outer"] = val.rainParticleOuterColor;
+	j["Rain Storm Edit"] = val.rainStormParticleEdit;
+	j["Rain Storm Particle Inner Near"] = val.rainStormParticleInnerNearColor;
+	j["Rain Storm Particle Inner Far"] = val.rainStormParticleInnerFarColor;
+	j["Rain Storm Particle Outer"] = val.rainStormParticleOuterColor;
 }
 
 void from_json(const json& j, VarVisuals::VarWorld::VarAmbient& val)
