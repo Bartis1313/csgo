@@ -5,7 +5,7 @@
 #include <SDK/IClientEntityList.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 
-hooks::RemoveEntity::value hooks::RemoveEntity::hook(FAST_ARGS, void* handleEnt, EHandle_t handle)
+hooks::RemoveEntity::value hooks::RemoveEntity::hook(FAST_ARGS, void* handleEnt, CBaseHandle handle)
 {
 	Entity_t* ent = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientFromHandle(handle));
 	EntityCache::erase(ent);

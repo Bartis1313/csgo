@@ -5,6 +5,8 @@
 
 #include "helpers/vfunc.hpp"
 
+class IPhysicsObject;
+
 class ICollideable
 {
 public:
@@ -14,4 +16,5 @@ public:
 	VFUNC(Matrix3x4&, collisionToWorldTransform, 10, (), (this));
 	VFUNC(int, getSolid, 11, (), (this));
 	VFUNC(int, getSolidFlags, 12, (), (this));
+	VFUNC(IPhysicsObject*, getPhysicsObject, 18, (), (this));
 };

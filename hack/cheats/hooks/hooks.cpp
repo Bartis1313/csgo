@@ -65,6 +65,11 @@
 #include "drawTranslucentRenderables.hpp"
 #include "clientModeCSNormalEvent.hpp"
 #include "tracerDraw.hpp"
+#include "dispatchInnerParticlePrecip.hpp"
+#include "getPhysicsProperties.hpp"
+#include "newParticleEffectSetControlPoint.hpp"
+#include "getVelocity.hpp"
+#include "overrideConfig.hpp"
 
 #define HOOK(target, _struct) \
 	hookHelper::MinHook::tryHook(target, &_struct::hook, hookHelper::ORIGINAL(_struct::original), #_struct);
@@ -133,6 +138,11 @@ void hooks::init()
 	HOOK(memory::drawTransculentRenderables(), hooks::DrawTranslucentRenderables);
 	HOOK(vfunc::getVFunc(memory::interfaces::physicsCollision(), VCOLLIDE_LOAD), hooks::VCollideLoad);
 	HOOK(memory::clientCsNormalEvent(), hooks::ClientModeCSNormalEvent);
+	HOOK(memory::dispatchInnerParticlePrecip(), hooks::DispatchInnerParticlePrecip);
+	HOOK(memory::newParticleSetControlPoint.cast<void*>()(), hooks::NewParticleEffectSetControlPoint);
+	//HOOK(memory::getVelocity(), hooks::GetVelocity);
+	HOOK(vfunc::getVFunc(memory::interfaces::matSys(), OVERRIDE_CONFIG), hooks::OverrideConfig);
+	//HOOK(vfunc::getVFunc(memory::interfaces::physicsProps(), 3), hooks::GetPhysicsProperties);
 
 	// figure out why tf they corrupt stack, incorrect args?
 	//HOOK(memory::decalAddToSurface(), hooks::R_AddDecalToSurface);

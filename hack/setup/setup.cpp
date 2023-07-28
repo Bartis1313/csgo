@@ -30,6 +30,8 @@
 
 #define STACK_TRACE 0
 
+using namespace std::chrono_literals;
+
 bool setup::init(void* instance)
 {
 #if STACK_TRACE == 1
@@ -72,8 +74,11 @@ bool setup::init(void* instance)
 	return true;
 }
 
+
 void setup::shutdown(void* instance)
 {
+	std::this_thread::sleep_for(100ms);
+
 	globals::isShutdown = true;
 
 #if STACK_TRACE == 1
@@ -96,8 +101,6 @@ void setup::shutdown(void* instance)
 
 void setup::looper(void* instance)
 {
-	using namespace std::chrono_literals;
-
 	discord::init();
 	while (!vars::keys->panic.isPressed())
 	{

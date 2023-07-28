@@ -34,3 +34,25 @@ memory::Address<uintptr_t> memory::findFromGameLoop(ClassID id)
 
 	return Address<uintptr_t>{ 0U };
 }
+
+
+std::optional<std::vector<memory::Address<uintptr_t>>> memory::findMultipleFromGameLoop(ClassID id)
+{
+	std::vector<memory::Address<uintptr_t>> possibleEnts;
+
+	for (auto i = memory::interfaces::engine->getMaxClients(); i <= memory::interfaces::entList->getHighestIndex(); i++)
+	{
+		auto entity = reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientEntity(i));
+		if (!entity)
+			continue;
+
+		auto idx = entity->clientClass()->m_classID;
+		if (idx == id)
+			possibleEnts.emplace_back(Address<uintptr_t>{ reinterpret_cast<uintptr_t>(entity) });
+	}
+
+	if (possibleEnts.empty())
+		return std::nullopt;
+
+	return possibleEnts;
+}

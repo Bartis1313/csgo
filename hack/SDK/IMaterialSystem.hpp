@@ -65,4 +65,11 @@ public:
 		const static auto disableTargetAlloc = memory::disableTargetAlloc();
 		return *reinterpret_cast<bool*>(uintptr_t(this) + disableTargetAlloc);
 	}
+
+	void forceSingleThreaded()
+	{
+		memory::forceSingleThreaded()(this);
+	}
+
+	VFUNC(bool, allowThreading, 138, (bool enabled, int thread), (this, enabled, thread));
 };

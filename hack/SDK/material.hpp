@@ -2,6 +2,7 @@
 
 #include <render/Color.hpp>
 #include "math/Vector.hpp"
+#include "KeyValues.hpp"
 
 #include "helpers/pad.hpp"
 #include "helpers/vfunc.hpp"
@@ -51,7 +52,67 @@ enum MaterialVarFlags_t
     MATERIAL_VAR_VERTEXFOG = (1 << 31),
 };
 
+//-----------------------------------------------------------------------------
+// Internal flags not accessible from outside the material system. Stored in Flags2
+//-----------------------------------------------------------------------------
+enum MaterialVarFlags2_t
+{
+    // NOTE: These are for $flags2!!!!!
+    //	UNUSED											= (1 << 0),
+
+    MATERIAL_VAR2_LIGHTING_UNLIT = 0,
+    MATERIAL_VAR2_LIGHTING_VERTEX_LIT = (1 << 1),
+    MATERIAL_VAR2_LIGHTING_LIGHTMAP = (1 << 2),
+    MATERIAL_VAR2_LIGHTING_BUMPED_LIGHTMAP = (1 << 3),
+    MATERIAL_VAR2_LIGHTING_MASK =
+    (MATERIAL_VAR2_LIGHTING_VERTEX_LIT |
+        MATERIAL_VAR2_LIGHTING_LIGHTMAP |
+        MATERIAL_VAR2_LIGHTING_BUMPED_LIGHTMAP),
+
+    // FIXME: Should this be a part of the above lighting enums?
+    MATERIAL_VAR2_DIFFUSE_BUMPMAPPED_MODEL = (1 << 4),
+    MATERIAL_VAR2_USES_ENV_CUBEMAP = (1 << 5),
+    MATERIAL_VAR2_NEEDS_TANGENT_SPACES = (1 << 6),
+    MATERIAL_VAR2_NEEDS_SOFTWARE_LIGHTING = (1 << 7),
+    // GR - HDR path puts lightmap alpha in separate texture...
+    MATERIAL_VAR2_BLEND_WITH_LIGHTMAP_ALPHA = (1 << 8),
+    MATERIAL_VAR2_NEEDS_BAKED_LIGHTING_SNAPSHOTS = (1 << 9),
+    MATERIAL_VAR2_USE_FLASHLIGHT = (1 << 10),
+    MATERIAL_VAR2_USE_FIXED_FUNCTION_BAKED_LIGHTING = (1 << 11),
+    MATERIAL_VAR2_NEEDS_FIXED_FUNCTION_FLASHLIGHT = (1 << 12),
+    MATERIAL_VAR2_USE_EDITOR = (1 << 13),
+    MATERIAL_VAR2_NEEDS_POWER_OF_TWO_FRAME_BUFFER_TEXTURE = (1 << 14),
+    MATERIAL_VAR2_NEEDS_FULL_FRAME_BUFFER_TEXTURE = (1 << 15),
+    MATERIAL_VAR2_IS_SPRITECARD = (1 << 16),
+    MATERIAL_VAR2_USES_VERTEXID = (1 << 17),
+    MATERIAL_VAR2_SUPPORTS_HW_SKINNING = (1 << 18),
+    MATERIAL_VAR2_SUPPORTS_FLASHLIGHT = (1 << 19),
+    MATERIAL_VAR2_USE_GBUFFER0 = (1 << 20),
+    MATERIAL_VAR2_USE_GBUFFER1 = (1 << 21),
+    MATERIAL_VAR2_SELFILLUMMASK = (1 << 22),
+    MATERIAL_VAR2_SUPPORTS_TESSELLATION = (1 << 23)
+};
+
 class IMaterialVar;
+
+enum ShaderMaterialVars_t
+{
+    FLAGS = 0,
+    FLAGS_DEFINED,	// mask indicating if the flag was specified
+    FLAGS2,
+    FLAGS_DEFINED2,
+    COLOR,
+    ALPHA,
+    BASETEXTURE,
+    FRAME,
+    BASETEXTURETRANSFORM,
+    FLASHLIGHTTEXTURE,
+    FLASHLIGHTTEXTUREFRAME,
+    COLOR2,
+    SRGBTINT,
+
+    NUM_SHADER_MATERIAL_VARS
+};
 
 class IMaterial
 {
@@ -69,6 +130,9 @@ public:
     VFUNC(bool, isError, 42, (), (this));
     VFUNC(void, addRefCount, 12, (), (this));
     VFUNC(void, removeRefCount, 13, (), (this));
+    VFUNC(float, getAlphaModulation, 44, (), (this));
+    VFUNC(void, getColorModulation, 45, (float* r, float* g, float* b), (this, r, g, b));
+    VFUNC(void, refreshPreservingMaterialVars, 53, (), (this));
 
     // goes for rgba
     void modulateAllColor(const Color& color)
@@ -78,6 +142,11 @@ public:
     }
 
     void destroy();
+    // crashing
+    bool precacheVars(void* vmtValues = nullptr, void* patchValues = nullptr, void* includes = nullptr);
+
+    PAD(124);
+    KeyValues* m_keyValues;
 };
 
 
@@ -91,4 +160,8 @@ public:
     VFUNC(void, setValues, 11, (const Color& val), (this, val.r(), val.g(), val.b()));
     VFUNC(void, setValues, 11, (float x, float y, float z), (this, x, y, z));
     VFUNC(void, setVectorComponent, 26, (float val, int component), (this, val, component));
+
+    VFUNC(const char*, getString, 7, (), (this));
+    VFUNC(int, getInt, 27, (), (this));
+    VFUNC(const float*, getVector, 30, (), (this));
 };

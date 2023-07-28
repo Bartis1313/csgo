@@ -63,7 +63,7 @@ public:
 	VFUNC(int, getMaxClients, 20, (), (this));
 	VFUNC(int, getPlayerInfo, 8, (int index, PlayerInfo_t* info), (this, index, info));
 	VFUNC(void, getScreenSize, 5, (int& width, int& height), (this, std::ref(width), std::ref(height)));
-	VFUNC(void, executeClientCMD, 114, (const char* cmd, char delay = 0), (this, cmd, delay));
+	VFUNC(void, executeClientCMD, 114, (const char* cmd, bool fromConsole = false), (this, cmd, fromConsole));
 	VFUNC(Matrix4x4&, worldToScreenMatrix, 37, (), (this));
 	VFUNC(const char*, getLevelName, 53, (), (this));
 	VFUNC(INetChannel*, getNameNetChannel, 78, (), (this));

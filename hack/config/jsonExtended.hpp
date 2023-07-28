@@ -5,6 +5,9 @@
 #include "vars.hpp"
 
 #include <nlohmann/json.hpp>
+#include <nlohmann/detail/macro_scope.hpp>
+
+// todo, change this all to NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE
 
 struct ImVec2;
 struct ImVec4;

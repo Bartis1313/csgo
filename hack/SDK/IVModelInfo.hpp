@@ -5,7 +5,7 @@
 #include "helpers/pad.hpp"
 #include "helpers/vfunc.hpp"
 
-struct Mstudiobone_t
+struct mstudiobone_t
 {
 	int m_nameIndex;
 	int m_parent;
@@ -14,7 +14,7 @@ struct Mstudiobone_t
 	PAD(52);
 };
 
-struct Mstudiobbox_t
+struct mstudiobbox_t
 {
 	int m_bone;
 	int m_group;
@@ -31,7 +31,7 @@ struct Mstudiobbox_t
 	}
 };
 
-struct Mstudiohitboxset_t
+struct mstudiohitboxset_t
 {
 	int m_nameIndex;
 	int m_hitboxesCount;
@@ -42,13 +42,13 @@ struct Mstudiohitboxset_t
 		return (!m_nameIndex) ? nullptr : reinterpret_cast<const char*>((uint8_t*)this + m_hitboxesIndex);
 	}
 
-	Mstudiobbox_t* getHitbox(int i) const
+	mstudiobbox_t* getHitbox(int i) const
 	{
-		return (i > m_hitboxesCount) ? nullptr : reinterpret_cast<Mstudiobbox_t*>((uint8_t*)this + m_hitboxesIndex) + i;
+		return (i > m_hitboxesCount) ? nullptr : reinterpret_cast<mstudiobbox_t*>((uint8_t*)this + m_hitboxesIndex) + i;
 	}
 };
 
-struct Model_t
+struct model_t
 {
 	void* m_handle;
 	char m_name[260];
@@ -62,7 +62,7 @@ struct Model_t
 	PAD(28);
 };
 
-struct Studiohdr_t
+struct studiohdr_t
 {
 	int m_id;
 	int m_version;
@@ -83,14 +83,14 @@ struct Studiohdr_t
 	int m_hitboxSetsCount;
 	int m_hitboxSetIndex;
 
-	Mstudiohitboxset_t* getHitboxSet(int i) const
+	mstudiohitboxset_t* getHitboxSet(int i) const
 	{
-		return (i > m_hitboxSetsCount) ? nullptr : reinterpret_cast<Mstudiohitboxset_t*>((uint8_t*)this + m_hitboxSetIndex) + i;
+		return (i > m_hitboxSetsCount) ? nullptr : reinterpret_cast<mstudiohitboxset_t*>((uint8_t*)this + m_hitboxSetIndex) + i;
 	}
 
-	Mstudiobone_t* getBone(int i) const
+	mstudiobone_t* getBone(int i) const
 	{
-		return (i > m_bonesCount) ? nullptr : reinterpret_cast<Mstudiobone_t*>((uint8_t*)this + m_boneIndex) + i;
+		return (i > m_bonesCount) ? nullptr : reinterpret_cast<mstudiobone_t*>((uint8_t*)this + m_boneIndex) + i;
 	}
 };
 
@@ -110,9 +110,9 @@ struct vcollide_t
 class IVModelInfo
 {
 public:
-	VFUNC(Model_t*, getModel, 1, (int modelindex), (this, modelindex));
+	VFUNC(model_t*, getModel, 1, (int modelindex), (this, modelindex));
 	VFUNC(int, getModelIndex, 2, (const char* name), (this, name));
-	VFUNC(vcollide_t*, getVCollide, 5, (Model_t* model), (this, model));
+	VFUNC(vcollide_t*, getVCollide, 5, (model_t* model), (this, model));
 	VFUNC(vcollide_t*, getVCollide, 6, (int modelIdx), (this, modelIdx));
-	VFUNC(Studiohdr_t*, getStudioModel, 32, (const Model_t* model), (this, model));
+	VFUNC(studiohdr_t*, getStudioModel, 32, (const model_t* model), (this, model));
 };

@@ -6,3 +6,8 @@ void IMaterial::destroy()
 {
 	memory::destroyMaterial()(this);
 }
+
+bool IMaterial::precacheVars(void* vmtValues, void* patchValues, void* includes)
+{
+	return memory::precacheVars()(this, vmtValues, patchValues, includes);
+}

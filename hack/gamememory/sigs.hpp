@@ -328,7 +328,7 @@
 // saw in the renderview where precip loop is executed (inlined call though)
 #define PRECIPICATION_UNK_COUNTER	SIG("3B 35 ? ? ? ? 7C E9 A1 ? ? ? ? B9 ? ? ? ? 8B 40 34")
 // ^ like so
-#define G_PRECIPICATION				SIG("A1 ? ? ? ? 8B 0D ? ? ? ? 8B 04 B0 0F BF 90 ? ? ? ? 8B 01 52 FF 50 18 85 C0 0F 84 ? ? ? ? B9 ? ? ? ? 66 85 08 0F 86 ? ? ? ? 8B 0D ? ? ? ? 8D 5D F4 8B 40 04 53 8B 11")\
+#define G_PRECIPICATION				SIG("A1 ? ? ? ? 8B 0D ? ? ? ? 8B 04 B0 0F BF 90 ? ? ? ? 8B 01 52 FF 50 18 85 C0 0F 84 ? ? ? ? B9 ? ? ? ? 66 85 08 0F 86 ? ? ? ? 8B 0D ? ? ? ? 8D 5D F4 8B 40 04 53 8B 11")
 // string ref "World" strcpy
 #define CLIENT_WORLD				SIG("A1 ? ? ? ? F3 0F 10 4D ? EB 71")
 // see the g_precips vec, when it removes element
@@ -344,3 +344,25 @@
 #define TRACER_DRAW					SIG("55 8B EC 83 EC 40 8B C2 8B 55 08 0F 28 D3 56 8B F1 8D 4D C0 51 8B C8 E8 ? ? ? ? 83 C4 04")
 // reversed weather code
 #define WEATHER_GETVCOLLIDE_RET		SIG("83 0F 02 83 0B 02 39 35 ? ? ? ? 0F 8E ? ? ? ? A1 ? ? ? ? 8B 0D ? ? ? ? 8B 04 B0 0F BF 90 ? ? ? ? 8B 01 52 FF 50 18")
+// reversed weather code
+#define DISPATCH_INNER_PRECIP		SIG("55 8B EC 83 EC 40 53 56 57 8B 7D 08 8B F1 57")
+// #STR: "Attempting to create unknown particle system '%s' \n"
+#define NEW_PARTICLE_EFFECT_CREATE	SIG("55 8B EC 51 53 56 8B 35 ? ? ? ? 57 8B 7D 08 89 4D FC 8B CE 57 E8 ? ? ? ? 84 C0")
+// #STR: "ParticleSystem_SetControlPointPosition"
+#define NEW_PARTICLE_SET_POINT		SIG("55 8B EC 53 8B 5D 0C 56 8B F1 F6 86 ? ? ? ? ? 0F 84 ? ? ? ?")
+// #STR: "ParticleSystem_SetControlPointObject"
+#define NEW_PARTICLE_SET_POINT_ENT	SIG("55 8B EC 53 56 8B F1 57 8B 7D 0C F6 86 ? ? ? ? ? 0F 84 ? ? ? ?")
+// reversed weather code, dispatch
+#define SET_CONTROL_POINT_WEATHER	SIG("8D 45 C0 50 6A 01 E8 ? ? ? ?")
+// reversed physics
+#define GET_VELOCITY				SIG("FF 90 ? ? ? ? F3 0F 10 8C 24 ? ? ? ? F3 0F 10 84 24 ? ? ? ?")
+// #STR: "CTempEnts::PhysicsProp: model index %i not found\n"
+#define VPHYSICS_GET_OBJ			SIG("8B 8E ? ? ? ? 85 C9 74 3A")
+// "Can't force single thread from within t"...
+#define FORCE_SINGLE_THREADED		SIG("53 56 57 8B F9 FF 15 ? ? ? ? 84 C0 75 0E")
+// reversed engine models
+#define RESTOTRE_MATERIALS			SIG("55 8B EC 83 E4 F8 83 EC 08 8B 0D ? ? ? ?")
+// "Mod_LoadCubemapSamples: funny lump size"
+#define CUBEMAP_LOAD				SIG("55 8B EC 81 EC ? ? ? ? 53 56 57 51 6A 2A 8D 8D ? ? ? ? E8 ? ? ? ?")
+// "CMaterial::PrecacheVars: error loading vmt file for %s\n"
+#define PRECACHE_VARS				SIG("55 8B EC 6A FF 68 ? ? ? ? 64 A1 ? ? ? ? 50 64 89 25 ? ? ? ? 83 EC 14 53 8B D9 56 8B 75 10 89 5D EC 57 8D 7B 50 85 F6")

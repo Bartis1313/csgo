@@ -193,6 +193,7 @@ The default key to open the cheat's menu is `INSERT`. Additional options within 
 * 3.0.2 - Fixed the glow system, with better and more performant solution. I have also fixed the glow box lines with fading color. Added basic streamproof solution, which lacks some aspects and I couldn't force the game to understand some render states. Added interface names dumping.
 * 3.0.3 - Streamproof chams added, world lights modulation added. Chams got somewhat better solutions to render them, especially see ignorez. Tried to mess with collide for weather particles, but failed to understand everything, code was left for testing usage only. Added alternative hooking method, in case anyone needs to mess with gameoverlay.dll. Fixed bug with round ends event. 
 * 3.0.4 - Weather works for more types. Removed all listened events, instead gather information from another hook. Particle editing doesn't touch alpha channel anymore.
+* 3.0.5 - Weather effects, and 2 bugs fixed. 1st is tone bug with default bloom, 2nd is wrapper for createMaterial missing loadFromBuffer.
 </details>
 
 # People who helped

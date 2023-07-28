@@ -8,8 +8,8 @@
 
 #include "lightdesc.hpp"
 
-struct Model_t;
-struct Studiohdr_t;
+struct model_t;
+struct studiohdr_t;
 class IMaterial;
 
 struct ModelRenderInfo_t
@@ -18,7 +18,7 @@ struct ModelRenderInfo_t
 	Vec3 m_angles;
 	PAD(4);
 	void* m_renderable;
-	const Model_t* m_model;
+	const model_t* m_model;
 	const Matrix3x4* m_modelWorld;
 	const Matrix3x4* m_lightOffset;
 	const Vec3* m_lightOrigin;
@@ -38,7 +38,7 @@ struct ModelRenderInfo_t
 
 struct DrawModelState_t
 {
-	Studiohdr_t* m_studioHdr;
+	studiohdr_t* m_studioHdr;
 	void* m_studioHWData;
 	void* m_renderable;
 	const Matrix3x4* m_modelToWorld;
@@ -85,7 +85,7 @@ struct MaterialLightingState_t
 
 struct DrawModelInfo_t
 {
-	Studiohdr_t* m_studioHdr;
+	studiohdr_t* m_studioHdr;
 	void* m_hardwareData;
 	void* m_Decals;
 	int	m_Skin;

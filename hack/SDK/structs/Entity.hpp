@@ -12,18 +12,20 @@
 
 #include "../helpers/netvars.hpp"
 #include "../helpers/vfunc.hpp"
+#include <render/Color.hpp>
 
 class Weapon_t;
 class Player_t;
 class ClientClass;
 class ICollideable;
 class AnimationLayer;
-struct Model_t;
+struct model_t;
 class WeaponInfo;
 struct DataMap_t;
 class CUserCmd;
 class CMoveData;
 struct ClientHitVerify_t;
+class IPhysicsObject;
 
 /*
 * This file is so far probably the easiest when it comes to netvar usage
@@ -38,19 +40,43 @@ struct ClientHitVerify_t;
 // TODO: create real interfaces like game has them stored
 #define RENDERABLE 0x4
 #define NETWORKABLE 0x8
-#define THINKABLE 0x12
+
+struct IClientAlphaProperty
+{
+	VFUNC(void, setAlphaModulation, SET_ALPHA, (uint8_t alpha), (this, alpha));
+};
 
 class Entity_t
 {
 public:
-	NETVAR(int, m_iTeamNum, "DT_CSPlayer", "m_iTeamNum");
-	NETVAR(Vec3, m_vecOrigin, "DT_BasePlayer", "m_vecOrigin");
-	NETVAR(EHandle_t, m_hOwnerEntity, "DT_BaseEntity", "m_hOwnerEntity");
-	NETVAR(EHandle_t, m_hVehicle, "DT_BaseEntity", "m_hVehicle");
-	NETVAR(int, m_CollisionGroup, "DT_BasePlayer", "m_CollisionGroup");
+	VFUNC(void, setRefEHandle, SET_HANDLE, (const CBaseHandle& ref), (this, std::cref(ref)));
+	VFUNC(const CBaseHandle&, getRefEHandle, GET_HANDLE, (), (this));
+
+	VFUNC(ICollideable*, getCollideable, COLLIDEABLE, (), (this));
+	VFUNC(IClientAlphaProperty*, getClientAlphaProperty, GET_CLIENT_ALPHA, (), (this));
+
+	VFUNC(bool, shouldDraw, SHOULD_DRAW, (), (this + RENDERABLE));
+	VFUNC(model_t*, getModel, GET_MODEL, (), (this + RENDERABLE));
+	VFUNC(int, drawModel, DRAW_MODEL, (int flags, const uint8_t& alpha), (this + RENDERABLE, flags, std::cref(alpha)));
+	VFUNC(void, getRenderBounds, RENDER_BOUNDS, (Vec3& mins, Vec3& maxs), (this + RENDERABLE, std::ref(mins), std::ref(maxs)));
+	VFUNC(Matrix3x4&, renderableToWorldTransform, RENDERABLE_TO_WORLD, (), (this + RENDERABLE));
+
+	VFUNC(void, release, RELEASE, (), (this + NETWORKABLE));
+	VFUNC(ClientClass*, clientClass, CLIENT_CLASS, (), (this + NETWORKABLE));
+	VFUNC(void, onPreDataChanged, PRE_DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
+	VFUNC(void, onDataChanged, DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
+	VFUNC(void, preDataUpdate, PRE_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
+	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
+	VFUNC(bool, isDormant, IS_DORMANT, (), (this + NETWORKABLE));
+	VFUNC(int, getIndex, GET_INDEX, (), (this + NETWORKABLE));
+
 	NETVAR(Vec3, m_ViewOffset, "DT_BasePlayer", "m_vecViewOffset[0]");
+	NETVAR(Vec3, m_vecOrigin, "DT_BaseEntity", "m_vecOrigin");
+	NETVAR(CBaseHandle, m_hOwnerEntity, "DT_BaseEntity", "m_hOwnerEntity");
+	NETVAR(CBaseHandle, m_hVehicle, "DT_BaseEntity", "m_hVehicle");
+	NETVAR(int, m_CollisionGroup, "DT_BaseEntity", "m_CollisionGroup");
 	NETVAR(bool, m_bSpotted, "DT_BaseEntity", "m_bSpotted");
-	NETVAR(float, m_flSimulationTime, "DT_BasePlayer", "m_flSimulationTime");
+	NETVAR(float, m_flSimulationTime, "DT_BaseEntity", "m_flSimulationTime");
 	NETVAR(float, m_flMaxspeed, "DT_BasePlayer", "m_flMaxspeed");
 	NETVAR_ADDR(int, m_MoveType, "DT_BasePlayer", "m_nRenderMode", 0x1);
 	NETVAR(Vec3, m_vecMins, "DT_BaseEntity", "m_vecMins");
@@ -62,31 +88,13 @@ public:
 	NETVAR_ADDR(int, m_nCreationTick, "DT_BaseEntity", "m_hEffectEntity", 0xC);
 	NETVAR_ADDR(bool, m_bCanUseFastPath, "DT_BaseAnimating", "m_flRecoilIndex", 0x4);
 	NETVAR_ADDR(bool, m_bDormant, "DT_BaseEntity", "m_fEffects", -0x3);
-
-	VFUNC(Vec3&, absOrigin, ABS_ORIGIN, (), (this));
-	VFUNC(Vec3&, absAngles, ABS_ANGLE, (), (this));
-	VFUNC(ClientClass*, clientClass, CLIENT_CLASS, (), (this + NETWORKABLE));
-	VFUNC(ICollideable*, collideable, COLLIDEABLE, (), (this));
-	VFUNC(int, getIndex, GET_INDEX, (), (this + NETWORKABLE));
-	VFUNC(void, getRenderBounds, RENDER_BOUNDS, (Vec3& mins, Vec3& maxs), (this + RENDERABLE, std::ref(mins), std::ref(maxs)));
+	NETVAR(SDKColor, m_clrRender, "DT_BaseEntity", "m_clrRender");
 	VFUNC(bool, isPlayer, ISPLAYER, (), (this));
 	VFUNC(bool, isWeapon, ISWEAPON, (), (this));
-	VFUNC(bool, setupBones, SETUP_BONES, (Matrix3x4* out, int maxBones, int mask, float time), (this + RENDERABLE, out, maxBones, mask, time));
-	bool setupBonesShort(Matrix3x4* out, int maxBones, int mask, float time);
-	VFUNC(Model_t*, getModel, GET_MODEL, (), (this + RENDERABLE));
-	VFUNC(int, getModelIndex, GET_MODEL_INDEX, (), (this + RENDERABLE));
-	VFUNC(int, drawModel, DRAW_MODEL, (int flags, uint8_t alpha), (this + RENDERABLE, flags, alpha));
-	VFUNC(bool, isDormant, IS_DORMANT, (), (this + NETWORKABLE));
-	VFUNC(Matrix3x4&, renderableToWorldTransform, RENDERABLE_TO_WORLD, (), (this + RENDERABLE));
-	VFUNC(void, release, RELEASE, (), (this + NETWORKABLE));
-	VFUNC(void, clientThink, CLIENT_THINK, (), (this + THINKABLE));
-	VFUNC(void, onPreDataChanged, PRE_DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
-	VFUNC(void, onDataChanged, DATA_CHANGED, (DataUpdateType_t type), (this + NETWORKABLE, type));
-	VFUNC(void, preDataUpdate, PRE_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
-	VFUNC(void, postDataUpdate, POST_DATA_UPDATE, (DataUpdateType_t type), (this + NETWORKABLE, type));
 	VFUNC(const char*, getClassName, CLASS_NAME, (), (this));
 	VFUNC(int, getMaxHealth, GET_MAX_HEALTH, (), (this));
-	VFUNC(bool, shouldDraw, SHOULD_DRAW, (), (this + RENDERABLE));
+	VFUNC(Vec3&, absOrigin, ABS_ORIGIN, (), (this));
+	VFUNC(Vec3&, absAngles, ABS_ANGLE, (), (this));
 	
 	[[nodiscard]] CUtlVector<Matrix3x4>& m_CachedBoneData();
 	[[nodiscard]] Vec3 getAimPunch();
@@ -97,7 +105,9 @@ public:
 	[[nodiscard]] Entity_t* firstMoveChild();
 	[[nodiscard]] Entity_t* nextMovePeer();
 	[[nodiscard]] int m_takedamage();
+	[[nodiscard]] IPhysicsObject* vPhysicsGetObject();
 	int baseAnimatingDrawModel(int flags, uint8_t alpha);
+	bool setupBonesShort(Matrix3x4* out, int maxBones, int mask, float time);
 
 	void setAbsOrigin(const Vec3& origin);
 	void setAbsAngle(const Vec3& angle);
@@ -172,7 +182,7 @@ class Nade_t : public Entity_t
 {
 public:
 	NETVAR_ADDR(float, m_flSpawnTime, "DT_BaseCSGrenadeProjectile", "m_vecExplodeEffectOrigin", 0xC);
-	NETVAR(EHandle_t, m_hThrower, "DT_BaseCSGrenadeProjectile", "m_hThrower");
+	NETVAR(CBaseHandle, m_hThrower, "DT_BaseCSGrenadeProjectile", "m_hThrower");
 	NETVAR(int, m_nExplodeEffectTickBegin, "DT_BaseCSGrenadeProjectile", "m_nExplodeEffectTickBegin");
 	NETVAR(Vec3, m_vecVelocity, "DT_BaseCSGrenadeProjectile", "m_vecVelocity");
 	NETVAR(Vec3, m_vecOrigin, "DT_BaseCSGrenadeProjectile", "m_vecOrigin");
@@ -193,7 +203,7 @@ class Bomb_t : public Entity_t
 {
 public:
 	NETVAR(float, m_flDefuseCountDown, "DT_PlantedC4", "m_flDefuseCountDown");
-	NETVAR(EHandle_t, m_hBombDefuser, "DT_PlantedC4", "m_hBombDefuser");
+	NETVAR(CBaseHandle, m_hBombDefuser, "DT_PlantedC4", "m_hBombDefuser");
 	NETVAR(float, m_flC4Blow, "DT_PlantedC4", "m_flC4Blow");
 	NETVAR(bool, m_bBombDefused, "DT_PlantedC4", "m_bBombDefused");
 	NETVAR(bool, m_nBombSite, "DT_PlantedC4", "m_nBombSite");
@@ -205,6 +215,7 @@ public:
 class Player_t : public Entity_t
 {
 public:
+	NETVAR(int, m_iTeamNum, "DT_CSPlayer", "m_iTeamNum");
 	NETVAR(Vec3, m_angEyeAngles, "DT_CSPlayer", "m_angEyeAngles");
 	NETVAR(Vec3, m_viewPunchAngle, "DT_BasePlayer", "m_viewPunchAngle");
 	NETVAR(Vec3, m_aimPunchAngle, "DT_BasePlayer", "m_aimPunchAngle");
@@ -217,7 +228,7 @@ public:
 	NETVAR(bool, m_bGunGameImmunity, "DT_CSPlayer", "m_bGunGameImmunity");
 	NETVAR(float, m_flNextAttack, "DT_CSPlayer", "m_flNextAttack");
 	NETVAR(bool, m_bHasDefuser, "DT_CSPlayer", "m_bHasDefuser");
-	NETVAR(EHandle_t, m_hViewModel, "DT_BasePlayer", "m_hViewModel[0]");
+	NETVAR(CBaseHandle, m_hViewModel, "DT_BasePlayer", "m_hViewModel[0]");
 	NETVAR(float, m_flLowerBodyYawTarget, "DT_CSPlayer", "m_flLowerBodyYawTarget");
 	NETVAR(float, m_flFlashDuration, "DT_CSPlayer", "m_flFlashDuration");
 	NETVAR_ADDR(float, m_flFlashBangTime, "DT_CSPlayer", "m_flFlashDuration", -0x10);
@@ -232,9 +243,9 @@ public:
 	NETVAR(bool, m_bDucked, "DT_CSPlayer", "m_bDucked");
 	NETVAR(bool, m_bDucking, "DT_CSPlayer", "m_bDucking");
 	NETVAR(float, m_flHealthShotBoostExpirationTime, "DT_CSPlayer", "m_flHealthShotBoostExpirationTime");
-	NETVAR(EHandle_t, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget");
+	NETVAR(CBaseHandle, m_hObserverTarget, "DT_BasePlayer", "m_hObserverTarget");
 	NETVAR(ObserverTypes, m_iObserverMode, "DT_BasePlayer", "m_iObserverMode");
-	NETVAR(EHandle_t, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
+	NETVAR(CBaseHandle, m_hActiveWeapon, "DT_CSPlayer", "m_hActiveWeapon");
 	NETVAR(int, m_iAccount, "DT_CSPlayer", "m_iAccount");
 	PTRNETVAR(const char, m_szLastPlaceName, "DT_BasePlayer", "m_szLastPlaceName");
 	NETVAR(float, m_flFallVelocity, "DT_BasePlayer", "m_flFallVelocity");
@@ -345,6 +356,8 @@ public:
 	NETVAR(Vec3, m_WorldMaxs, "DT_World", "m_WorldMaxs");
 };
 
+#include "../CUtlReference.hpp"
+
 class Precipitation_t : public Entity_t
 {
 public:
@@ -357,8 +370,50 @@ public:
 	OFFSET(float, m_flDensity, 0xA08);
 };
 
+class CascadeLight_t : public Entity_t
+{
+public:
+	// this field does nothing
+	NETVAR(bool, m_bEnabled, "DT_CascadeLight", "m_bEnabled");
+	NETVAR(int, m_LightColor, "DT_CascadeLight", "m_LightColor");
+	NETVAR(int, m_LightColorScale, "DT_CascadeLight", "m_LightColorScale");
+	NETVAR(float, m_flMaxShadowDist, "DT_CascadeLight", "m_flMaxShadowDist");
+};
+
+class DynamicLight_t : public Entity_t
+{
+public:
+	NETVAR(int, m_Flags, "DT_DynamicLight", "m_Flags");
+	NETVAR(int, m_LightStyle, "DT_DynamicLight", "m_LightStyle");
+	NETVAR(float, m_Radius, "DT_DynamicLight", "m_Radius");
+	NETVAR(int, m_Exponent, "DT_DynamicLight", "m_Exponent");
+	NETVAR(float, m_InnerAngle, "DT_DynamicLight", "m_InnerAngle");
+	NETVAR(float, m_OuterAngle, "DT_DynamicLight", "m_OuterAngle");
+	NETVAR(float , m_SpotRadius, "DT_DynamicLight", "m_SpotRadius");
+};
+
+// localplayer data
+class Skybox_t : public Entity_t
+{
+public:
+	NETVAR(int, m_skybox3dscale, "DT_Local", "m_skybox3d.scale");
+	NETVAR(Vec3, m_skybox3dorigin, "DT_Local", "m_skybox3d.origin");
+	NETVAR(int, m_skybox3darea, "DT_Local", "m_skybox3d.area");
+};
+
+class Sun_t : public Entity_t
+{
+public:
+	NETVAR(bool, m_bOn, "DT_Sun", "m_bOn");
+	NETVAR(int, m_nSize, "DT_Sun", "m_nSize");
+	NETVAR(int, m_clrOverlay, "DT_Sun", "m_clrOverlay");
+	NETVAR(int, m_nOverlaySize, "DT_Sun", "m_nOverlaySize");
+	NETVAR(float, HDRColorScale, "DT_Sun", "HDRColorScale");
+};
+
 #undef RENDERABLE
 #undef NETWORKABLE
 #undef THINKABLE
+#undef ALPHA_PROP
 
 ////////////////////////////////////////////////////////////////////////////////////////////

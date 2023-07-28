@@ -12,6 +12,8 @@ public:
 	static KeyValues* fromString(const char* name, const char* value = nullptr);
 	void fromBuffer(const char* name, const char* buffer, void* filesystem = nullptr, const char* pathId = nullptr, void* symbolProc = nullptr, int unk = 0);
 	void* operator new(size_t size);
+	void setString(const char* name, const char* value);
+	KeyValues* findKey(const char* name, bool create);
 
 	PAD(0x2C); // keep this updated to prevent calling size allocation yourself manually
 };

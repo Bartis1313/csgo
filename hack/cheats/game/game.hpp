@@ -4,7 +4,7 @@
 #include <gamememory/memory.hpp>
 
 class CUserCmd;
-struct Studiohdr_t;
+struct studiohdr_t;
 struct IDirect3DTexture9;
 using LPDIRECT3DTEXTURE9 = IDirect3DTexture9*;
 
@@ -51,7 +51,7 @@ namespace game
 	[[nodiscard]] float getScaledFont(const Vec3& source, const Vec3& destination, const float division = 80.0f, const float min = 12.0f, const float max = 30.0f);
 	// studio is special case arg - because henade and flashbang have exactly same class id
 	// and people who think definition index is ok are wrong, player ents DON'T hold the nade anymore in that case
-	[[nodiscard]] WeaponIndex getNadeByClass(int idx, Studiohdr_t* studio);
+	[[nodiscard]] WeaponIndex getNadeByClass(int idx, studiohdr_t* studio);
 	[[nodiscard]] Vec3 getViewAngles();
 	[[nodiscard]] BitMapData getWeaponIcon(const std::string_view weapon);
 	// not for svg, string_view is not passed due to high possibility of using std::format

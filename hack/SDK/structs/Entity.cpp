@@ -78,7 +78,7 @@ bool Entity_t::isBreakable()
 		return true;
 
 	// there we finally check actual entity
-	if (id == CBaseEntity && this->collideable()->getSolid() == 1) // can mess with masks, but it's the same
+	if (id == CBaseEntity && this->getCollideable()->getSolid() == 1) // can mess with masks, but it's the same
 		return true;
 
 	return false;
@@ -87,14 +87,14 @@ bool Entity_t::isBreakable()
 Entity_t* Entity_t::firstMoveChild()
 {
 	const auto offset = memory::firstMoveChild();
-	const auto handle = *reinterpret_cast<EHandle_t*>((uintptr_t)this + offset);
+	const auto handle = *reinterpret_cast<CBaseHandle*>((uintptr_t)this + offset);
 	return reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientFromHandle(handle));
 }
 
 Entity_t* Entity_t::nextMovePeer()
 {
 	const auto offset = memory::nextMovePeer();
-	const auto handle = *reinterpret_cast<EHandle_t*>((uintptr_t)this + offset);
+	const auto handle = *reinterpret_cast<CBaseHandle*>((uintptr_t)this + offset);
 	return reinterpret_cast<Entity_t*>(memory::interfaces::entList->getClientFromHandle(handle));
 }
 
@@ -102,6 +102,12 @@ int Entity_t::m_takedamage()
 {
 	const auto offset = memory::takeDmg();
 	return *reinterpret_cast<int*>((uintptr_t)this + offset);
+}
+
+IPhysicsObject* Entity_t::vPhysicsGetObject()
+{
+	const auto offset = memory::vPhysicsGetObject();
+	return reinterpret_cast<IPhysicsObject*>((uintptr_t)this + offset);
 }
 
 int Entity_t::baseAnimatingDrawModel(int flags, uint8_t alpha)
@@ -546,7 +552,7 @@ CUtlVector<ClientHitVerify_t> Player_t::m_vecBulletVerifyListClient()
 
 AABB_t Player_t::getOcclusionBounds()
 {
-	const auto col = this->collideable();
+	const auto col = this->getCollideable();
 	const auto& mins = col->OBBMins();
 	const auto& maxs = col->OBBMaxs();
 

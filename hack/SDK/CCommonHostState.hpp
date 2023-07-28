@@ -79,7 +79,7 @@ struct decalinfo_t
 {
 	Vec3		m_Position;			// world coordinates of the decal center
 	Vec3		m_SAxis;			// the s axis for the decal in world coordinates
-	Model_t *m_pModel;			// the model the decal is going to be applied in
+	model_t *m_pModel;			// the model the decal is going to be applied in
 	worldbrushdata_t* m_pBrush;		// The shared brush data for this model
 	IMaterial* m_pMaterial;		// The decal material
 	float		m_Size;				// Size of the decal (in world coords)
@@ -132,9 +132,31 @@ struct dworldlight_t
 };
 static_assert(sizeof(dworldlight_t) == 100U);
 
+struct mtexinfo_t
+{
+	Vec4	textureVecsTexelsPerWorldUnits[2];	// [s/t] unit vectors in world space. 
+	// [i][3] is the s/t offset relative to the origin.
+	Vec4	lightmapVecsLuxelsPerWorldUnits[2];
+	float		luxelsPerWorldUnit;
+	float		worldUnitsPerLuxel;
+	unsigned short flags;		// SURF_ flags.
+	unsigned short texinfoFlags;// TEXINFO_ flags.
+	IMaterial* material;
+
+	mtexinfo_t(mtexinfo_t const& src)
+	{
+		// copy constructor needed since Vector4D has no copy constructor
+		memcpy(this, &src, sizeof(mtexinfo_t));
+	}
+};
+
+
 struct worldbrushdata_t
 {
-	PAD(112);
+	PAD(92);
+	int numtexinfo;
+	mtexinfo_t* textinfo;
+	PAD(16);
 	int numsurfaces;
 	struct msurface1_t* surfaces1;
 	msurface2_t* surfaces2;
@@ -150,7 +172,6 @@ public:
 	// worlsmodel doesn't exist here, due to CModelLoader
 	//// cl_entitites[0].model
 	//Model_t* worldmodel;
-	PAD(4);
 	worldbrushdata_t worldbrush;
 	// Tick interval for game
 	float interval_per_tick;

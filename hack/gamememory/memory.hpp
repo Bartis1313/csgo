@@ -50,6 +50,10 @@ class CCommonHostState;
 struct decal_t;
 class World_t;
 class Entity_t;
+class CascadeLight_t;
+class Precipitation_t;
+enum ParticleAttachment_t;
+class CNewParticleEffect;
 
 using retaddr_t = uintptr_t;
 
@@ -97,17 +101,29 @@ namespace memory
 	using precipInit_t = int(__thiscall*)(void*);
 	using setAbsVelocity_t = void(__thiscall*)(void*, const Vec3&);
 	using getParticleSystemIndex_t = int(__stdcall*)(const char*);
-	using dispatchParticleEffect_t = void(__stdcall*)(const char*, Vec3, Vec3, void*, int, void*);
+	using dispatchParticleEffect_t = void(__stdcall*)(const char*, const Vec3&, const Vec3&, ParticleAttachment_t, void*, int);
 	using renderBoxInternal_t = void(__stdcall*)(const Vec3&, const Vec3&, const Vec3&, const Vec3&, SDKColor, IMaterial*, bool);
 	using renderLine_t = void(__stdcall*)(const Vec3&, const Vec3&, SDKColor, bool);
 	using addGlowBox_t = int(__thiscall*)(void*, Vec3, Vec3, Vec3, Vec3, SDKColor, float);
 	using drawModel_t = int(__thiscall*)(void*, int, uint8_t);
-	using setString_t = void(__thiscall*)(const char*, const char*);
-	using findKey_t = KeyValues*(__thiscall*)(const char*, bool);
+	using setString_t = void(__thiscall*)(void*, const char*, const char*);
+	using findKey_t = KeyValues*(__thiscall*)(void*, const char*, bool);
 	using valveHook_t = char(__cdecl*)(void*, void*, void*, int);
 	using valveUnHook_t = char(__cdecl*)(uintptr_t, char);
 	using precipDestruct_t = void(__thiscall*)(void*);
 	using stopSound_t = void(__thiscall*)(void*, const char*);
+	using newParticleCreate_t = CNewParticleEffect*(__stdcall*)(const char*, ParticleAttachment_t, int, Vec3, Matrix3x4*);
+	using newParticleSetControlPoint_t = void(__thiscall*)(void*, int, const Vec3&);
+	using newParticleSetControlPointEnt_t = void(__thiscall*)(void*, int, void*);
+	using restoreMaterialSystemObjects_t = void(*)(int);
+	using restoreMaterialSystemObjectsMdl_t = void(__thiscall*)(void*, int);
+	using loadgeo_t = void(*)(bool);
+	using releaseMaterialSystemObjects_t = void(*)();
+	using forceSingleThreaded_t = void(__thiscall*)(void*);
+	using restoreShaderObjects_t = void(__thiscall*)(void*, int, void*, int);
+	using releaseShaderObjects_t = void(__thiscall*)(void*, int);
+	using cubemapLoad_t = void(*)(void);
+	using precacheVars_t = bool(__thiscall*)(void*, void*, void*, void*);
 
 	inline Address<uintptr_t> traceFilterSimple;
 	inline Address<uintptr_t*> returnAddrRadarImage;
@@ -190,10 +206,19 @@ namespace memory
 	inline Address<valveHook_t> valveHook;
 	inline Address<valveUnHook_t> valveUnHook;
 	inline Address<retaddr_t> viewFadeSmokeRet;
-	inline Address<CUtlVector<Entity_t*>> gPrecipitations;
+	inline Address<CUtlVector<Precipitation_t*>> gPrecipitations;
 	inline Address<precipDestruct_t> precipDestruct;
 	inline Address<stopSound_t> stopSound;
 	inline Address<retaddr_t> particleGetVCollideRet;
+	inline Address<newParticleCreate_t> newParticleCreate;
+	inline Address<newParticleSetControlPoint_t> newParticleSetControlPoint;
+	inline Address<newParticleSetControlPointEnt_t> newParticleSetControlPointEnt;
+	inline Address<retaddr_t> setControlPointParticleWeatherRet;
+	inline Address<uintptr_t> vPhysicsGetObject;
+	inline Address<restoreMaterialSystemObjects_t> restoreMaterialSystemObjects;
+	inline Address<forceSingleThreaded_t> forceSingleThreaded;
+	inline Address<cubemapLoad_t> cubemapLoad;
+	inline Address<precacheVars_t> precacheVars;
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;
@@ -232,6 +257,8 @@ namespace memory
 	inline Address<void*> drawTransculentRenderables;
 	inline Address<void*> clientCsNormalEvent;
 	inline Address<void*> tracerDraw;
+	inline Address<void*> dispatchInnerParticlePrecip;
+	inline Address<void*> getVelocity;
 
 	inline Address<teslaCreate_t> tesla;
 	inline Address<dispatchEffect_t> dispatchEffect;
@@ -258,5 +285,6 @@ namespace memory
 		inline Address<EnvAmbientLight_t*> ambientLight;
 		inline Address<CCommonHostState*> hostState;
 		inline Address<World_t*> gameWorld;
+		inline Address<ClientClass*> dynamicLight;
 	}
 }

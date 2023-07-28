@@ -9,11 +9,11 @@ struct Virtualmodel_t;
 
 struct CStudioHdr
 {
-	const Studiohdr_t* m_studioHdr;
+	const studiohdr_t* m_studioHdr;
 	Virtualmodel_t* m_vModel;
 	/*const virtualmodel_t* ResetVModel(const virtualmodel_t* pVModel) const;
 	const studiohdr_t* GroupStudioHdr(int group);*/
-	CUtlVector<const Studiohdr_t*> m_studioHdrCache;
+	CUtlVector<const studiohdr_t*> m_studioHdrCache;
 	int m_sizeframeUnlockCounter;
 	int* m_frameUnlockCounter;
 	/*CThreadFastMutex	m_FrameUnlockCounterMutex;*/

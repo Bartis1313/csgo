@@ -355,6 +355,9 @@ struct VarVisuals
 			CfgColor rainStormParticleInnerNearColor{ };
 			CfgColor rainStormParticleInnerFarColor{ };
 			CfgColor rainStormParticleOuterColor{ };
+			float customNear{ 32.0f };
+			float customFar{ 100.0f };
+			bool useGround{ false };
 		};
 		ADD_MEMBER_PTR(VarWeather, weather);
 

@@ -246,7 +246,7 @@ void chams::manual::drawModel(Player_t* player, bool visible)
 {
 	const uint8_t instanceAlpha = 255;
 
-	if(vars::visuals->chams->players.enabled)
+	if (vars::visuals->chams->players.enabled)
 		player->drawModel(renderFlags, instanceAlpha);
 
 	if (vars::visuals->chams->attachement.enabled)

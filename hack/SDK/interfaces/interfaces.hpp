@@ -49,6 +49,7 @@ class IMDLCache;
 class IBaseFileSystem;
 class IPhysicsCollision;
 class IEngineSound;
+class IPhysicsSurfaceProps;
 #pragma endregion
 
 namespace memory::interfaces
@@ -78,6 +79,7 @@ namespace memory::interfaces
 	inline Interface<IBaseFileSystem*> baseFileSystem;
 	inline Interface<IPhysicsCollision*> physicsCollision;
 	inline Interface<IEngineSound*> engineSound;
+	inline Interface<IPhysicsSurfaceProps*> physicsProps;
 
 	void init();
 }

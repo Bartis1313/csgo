@@ -5,7 +5,7 @@
 
 #include <cheats/features/visuals/chams/chams.hpp>
 #include <cheats/features/visuals/world/skybox.hpp>
-#include <cheats/features/visuals/world/weather.hpp>
+#include <cheats/features/visuals/world/weather/_menu.hpp>
 #include <cheats/features/visuals/world/ambient.hpp>
 #include <cheats/features/visuals/radar/radar.hpp>
 #include <cheats/features/visuals/world/lights.hpp>
@@ -361,7 +361,7 @@ void tabs::visuals::draw()
 			ImGui::Combo("Weather", &vars::visuals->world->weather->type, magic_enum::enum_names_pretty<PrecipitationConfig>());
 			if (vars::visuals->world->weather->type)
 			{
-				weatherController::implMenu();
+				weather::menu::draw();
 			}
 
 			bool changedButton{ false };

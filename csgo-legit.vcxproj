@@ -171,6 +171,8 @@
     <ClCompile Include="hack\cheats\features\visuals\misc\noscope.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\streamproof\streamproof.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\world\lights.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\world\weather\ground.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\world\weather\_menu.cpp" />
     <ClCompile Include="hack\cheats\game\game.cpp" />
     <ClCompile Include="hack\cheats\hooks\addEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\allocKeyvalues.cpp" />
@@ -181,6 +183,7 @@
     <ClCompile Include="hack\cheats\hooks\createParticlePrecip.cpp" />
     <ClCompile Include="hack\cheats\hooks\decalAddToSurface.cpp" />
     <ClCompile Include="hack\cheats\hooks\decalCreate.cpp" />
+    <ClCompile Include="hack\cheats\hooks\dispatchInnerParticlePrecip.cpp" />
     <ClCompile Include="hack\cheats\hooks\doExtraBonesProcessing.cpp" />
     <ClCompile Include="hack\cheats\hooks\doPostScreenEffects.cpp" />
     <ClCompile Include="hack\cheats\hooks\drawIndexPrimitive.cpp" />
@@ -193,9 +196,11 @@
     <ClCompile Include="hack\cheats\hooks\frameStageNotify.cpp" />
     <ClCompile Include="hack\cheats\hooks\clientModeCSNormalEvent.cpp" />
     <ClCompile Include="hack\cheats\hooks\getColorModulation.cpp" />
+    <ClCompile Include="hack\cheats\hooks\getPhysicsProperties.cpp" />
     <ClCompile Include="hack\cheats\hooks\getPMaterial.cpp" />
     <ClCompile Include="hack\cheats\hooks\getUnverifiedFileHashes.cpp" />
     <ClCompile Include="hack\cheats\hooks\getVCollide.cpp" />
+    <ClCompile Include="hack\cheats\hooks\getVelocity.cpp" />
     <ClCompile Include="hack\cheats\hooks\hooks.cpp" />
     <ClCompile Include="hack\cheats\hooks\initializeParticlePrecip.cpp" />
     <ClCompile Include="hack\cheats\hooks\isDepth.cpp" />
@@ -206,6 +211,8 @@
     <ClCompile Include="hack\cheats\hooks\levelInitPreEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\levelShutdown.cpp" />
     <ClCompile Include="hack\cheats\hooks\lockCursor.cpp" />
+    <ClCompile Include="hack\cheats\hooks\newParticleEffectSetControlPoint.cpp" />
+    <ClCompile Include="hack\cheats\hooks\overrideConfig.cpp" />
     <ClCompile Include="hack\cheats\hooks\renderSmokeOverlay.cpp" />
     <ClCompile Include="hack\cheats\hooks\tracerDraw.cpp" />
     <ClCompile Include="hack\cheats\hooks\updatePostEffects.cpp" />
@@ -265,7 +272,7 @@
     <ClCompile Include="hack\cheats\features\visuals\world\skybox.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\world\smoke.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\world\tone.cpp" />
-    <ClCompile Include="hack\cheats\features\visuals\world\weather.cpp" />
+    <ClCompile Include="hack\cheats\features\visuals\world\weather\precipitation.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\world\zeus.cpp" />
     <ClCompile Include="hack\cheats\features\combat\aimbot\aimbot.cpp" />
     <ClCompile Include="hack\cheats\features\combat\aimbot\aimbotDraw.cpp" />
@@ -295,6 +302,7 @@
     <ClCompile Include="hack\menu\GUI-ImGui\styles\styles.cpp" />
     <ClCompile Include="hack\render\backend\backend.cpp" />
     <ClCompile Include="hack\SDK\CGlowManager.cpp" />
+    <ClCompile Include="hack\SDK\CNewParticleEffect.cpp" />
     <ClCompile Include="hack\SDK\IMatRenderContext.cpp" />
     <ClCompile Include="hack\SDK\material.cpp" />
     <ClCompile Include="hack\setup\seh.cpp" />
@@ -399,7 +407,10 @@
     <ClInclude Include="hack\cheats\features\visuals\world\skybox.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\smoke.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\tone.hpp" />
-    <ClInclude Include="hack\cheats\features\visuals\world\weather.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\world\weather\ground.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\world\weather\helper.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\world\weather\_menu.hpp" />
+    <ClInclude Include="hack\cheats\features\visuals\world\weather\precipitation.hpp" />
     <ClInclude Include="hack\cheats\features\visuals\world\zeus.hpp" />
     <ClInclude Include="hack\cheats\game\game.hpp" />
     <ClInclude Include="hack\cheats\game\globals.hpp" />
@@ -410,13 +421,18 @@
     <ClInclude Include="hack\cheats\hooks\buildTransformations.hpp" />
     <ClInclude Include="hack\cheats\hooks\decalAddToSurface.hpp" />
     <ClInclude Include="hack\cheats\hooks\decalCreate.hpp" />
+    <ClInclude Include="hack\cheats\hooks\dispatchInnerParticlePrecip.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawTranslucentRenderables.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawWorldAndEntities.hpp" />
     <ClInclude Include="hack\cheats\hooks\clientModeCSNormalEvent.hpp" />
+    <ClInclude Include="hack\cheats\hooks\getPhysicsProperties.hpp" />
     <ClInclude Include="hack\cheats\hooks\getVCollide.hpp" />
     <ClInclude Include="hack\cheats\hooks\createParticlePrecip.hpp" />
+    <ClInclude Include="hack\cheats\hooks\getVelocity.hpp" />
     <ClInclude Include="hack\cheats\hooks\initializeParticlePrecip.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawEffects.hpp" />
+    <ClInclude Include="hack\cheats\hooks\newParticleEffectSetControlPoint.hpp" />
+    <ClInclude Include="hack\cheats\hooks\overrideConfig.hpp" />
     <ClInclude Include="hack\cheats\hooks\tracerDraw.hpp" />
     <ClInclude Include="hack\cheats\hooks\vCollideLoad.hpp" />
     <ClInclude Include="hack\SDK\CCommonHostState.hpp" />
@@ -443,10 +459,16 @@
     <ClInclude Include="hack\config\cfgCham.hpp" />
     <ClInclude Include="hack\gamememory\address.hpp" />
     <ClInclude Include="hack\gamememory\modules.hpp" />
+    <ClInclude Include="hack\SDK\CNewParticleEffect.hpp" />
+    <ClInclude Include="hack\SDK\CutlBuffer.hpp" />
     <ClInclude Include="hack\SDK\CUtlMemory.hpp" />
     <ClInclude Include="hack\SDK\IEngineSound.hpp" />
+    <ClInclude Include="hack\SDK\IMaterialInternal.hpp" />
     <ClInclude Include="hack\SDK\IPhysicsCollision.hpp" />
+    <ClInclude Include="hack\SDK\IPhysicsObject.hpp" />
+    <ClInclude Include="hack\SDK\IPhysicsSurfaceProps.hpp" />
     <ClInclude Include="hack\SDK\lightdesc.hpp" />
+    <ClInclude Include="hack\SDK\structs\indexes.hpp" />
     <ClInclude Include="hack\utilities\cStr.hpp" />
     <ClInclude Include="hack\utilities\runnable.hpp" />
     <ClInclude Include="hack\cheats\hooks\hooks.hpp" />
@@ -514,7 +536,6 @@
     <ClInclude Include="hack\render\fonts\icon.hpp" />
     <ClInclude Include="hack\render\render.hpp" />
     <ClInclude Include="hack\render\structures.hpp" />
-    <ClInclude Include="hack\resources\resource.h" />
     <ClInclude Include="hack\SDK\animations.hpp" />
     <ClInclude Include="hack\SDK\CClientEffectRegistration.hpp" />
     <ClInclude Include="hack\SDK\CCSGO_HudRadar.hpp" />
@@ -593,7 +614,6 @@
     <ClInclude Include="hack\SDK\Recv.hpp" />
     <ClInclude Include="hack\SDK\stencil.hpp" />
     <ClInclude Include="hack\SDK\structs\Entity.hpp" />
-    <ClInclude Include="hack\SDK\structs\indexes.hpp" />
     <ClInclude Include="hack\SDK\varMapping.hpp" />
     <ClInclude Include="hack\SDK\vars.hpp" />
     <ClInclude Include="hack\setup\seh.hpp" />
@@ -611,16 +631,26 @@
     <ClInclude Include="hack\utilities\utilities.hpp" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="dependencies\interfaces\ienginetrace.hpp" />
+    <ClInclude Include="hack\resources\resource.h" />
     <ClInclude Include="utilities\csgo.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="hack\deps\missing\bluelight1.vmt" />
+    <None Include="hack\deps\missing\bluelight1.vtf" />
+    <None Include="hack\deps\missing\bluelightning.vmt" />
+    <None Include="hack\deps\missing\bluelightning.vtf" />
+    <None Include="hack\deps\missing\lgtning.vmt" />
+    <None Include="hack\deps\missing\lgtning.vtf" />
+    <None Include="hack\deps\missing\physcannon_bluelight1.vmt" />
+    <None Include="hack\deps\missing\physcannon_bluelight1.vtf" />
+    <None Include="hack\deps\missing\physcannon_bluelight1b.vmt" />
+    <None Include="hack\deps\missing\physcannon_bluelight1b.vtf" />
+    <None Include="hack\deps\missing\snowflake.vmt" />
+    <None Include="hack\deps\missing\snowflake.vtf" />
     <None Include="hack\deps\README.md" />
     <None Include="hack\menu\GUI-ImGui\sections\editors\styleEditor.hpp" />
     <None Include="hack\resources\csgo-legit.aps" />
     <None Include="vcpkg.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="hack\resources\csgo-legit.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="hack\deps\images\fatchad.png" />
@@ -633,6 +663,9 @@
     <Image Include="pictures\obsProofGameMaterials.png" />
     <Image Include="pictures\plots.png" />
     <Image Include="pictures\radar.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="hack\resources\csgo-legit.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

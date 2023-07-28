@@ -56,7 +56,7 @@ static std::optional<std::vector<std::pair<bool, ImVec2>>> grahamScanIndicies(st
 	);
 
 	std::vector<std::pair<size_t, ImVec2>> hull;
-	for (size_t i = 0; const auto& el : v)
+	for (size_t i = 0; const auto & el : v)
 	{
 		while (hull.size() > 1 && orient(hull[hull.size() - 2].second, hull[hull.size() - 1].second, el) >= 0.0f)
 			hull.pop_back();
@@ -83,22 +83,22 @@ static std::optional<std::vector<std::pair<bool, ImVec2>>> grahamScanIndicies(st
 static void removeClosePoints(std::vector<std::pair<bool, ImVec2>>& points, float threshold)
 {
 	// I hate the formatting of lambdas in vs, please don't reformat this
-	std::erase_if(points, [&](const auto& p1) 
-	{
-		if (p1.first) // skip outer
-			return false;
-
-		return std::ranges::any_of(points, [&](const auto& p2)
+	std::erase_if(points, [&](const auto& p1)
 		{
-			if (p2.first)
+			if (p1.first) // skip outer
 				return false;
 
-			const ImVec2 between = p2.second - p1.second;
-			const float dist = std::sqrt(ImLengthSqr(between));
+			return std::ranges::any_of(points, [&](const auto& p2)
+				{
+					if (p2.first)
+						return false;
 
-			return dist < threshold && &p1 != &p2;
+					const ImVec2 between = p2.second - p1.second;
+					const float dist = std::sqrt(ImLengthSqr(between));
+
+					return dist < threshold && &p1 != &p2;
+				});
 		});
-	});
 }
 
 void molotov::draw()
@@ -124,19 +124,19 @@ void molotov::draw()
 
 		std::vector<Vec3> molotovWorldPoints;
 		for (auto i = 0; i <= molotov->m_fireCount(); i++)
-		{		
+		{
 			auto pos = origin + molotov->getInfernoPos(i);
 			molotovWorldPoints.push_back(pos);
 		}
 
 		// applying a very general fix for every part of possible angle.
-		static const auto extraFlames = [] 
+		static const auto extraFlames = []
 		{
 			constexpr auto extraPoints = 4;
 			constexpr float step = math::PI_2 / extraPoints;
 
 			std::array<Vec3, extraPoints> points;
-			for (float angle = 0.0f; auto& el : points)
+			for (float angle = 0.0f; auto & el : points)
 			{
 				el = Vec3{ molotovRadius * std::cos(angle), molotovRadius * std::sin(angle), 0.0f };
 				angle += step;
@@ -146,15 +146,15 @@ void molotov::draw()
 		}();
 
 		std::vector<ImVec2> points;
-        for (const auto& el : molotovWorldPoints)
-        {
+		for (const auto& el : molotovWorldPoints)
+		{
 			for (const auto& flame : extraFlames)
 			{
 				if (ImVec2 s; ImRender::worldToScreen(el + flame, s))
 					points.push_back(s);
 			}
-        }
-		
+		}
+
 		auto hull = grahamScanIndicies(points);
 		if (!hull.has_value())
 			continue;
@@ -191,7 +191,7 @@ void molotov::draw()
 		{
 			for (std::size_t i = 0; i < d.triangles.size(); i += 3)
 			{
-				ImVec2 p1{ d.coords.at(2 * d.triangles.at(i)), d.coords.at(2 * d.triangles.at(i) + 1)};
+				ImVec2 p1{ d.coords.at(2 * d.triangles.at(i)), d.coords.at(2 * d.triangles.at(i) + 1) };
 				ImVec2 p2{ d.coords.at(2 * d.triangles.at(i + 1)), d.coords.at(2 * d.triangles.at(i + 1) + 1) };
 				ImVec2 p3{ d.coords.at(2 * d.triangles.at(i + 2)), d.coords.at(2 * d.triangles.at(i + 2) + 1) };
 
@@ -199,7 +199,7 @@ void molotov::draw()
 			}
 		}
 
-        ImRender::drawPolyGon(hullOuter, vars::visuals->world->molotov->color());
+		ImRender::drawPolyGon(hullOuter, vars::visuals->world->molotov->color());
 
 		auto centerPolygon = [hullOuter, hullsize = hullOuter.size()]()
 		{
@@ -209,10 +209,10 @@ void molotov::draw()
 				centre.x += el.x;
 				centre.y += el.y;
 			}
-	
+
 			return centre / static_cast<float>(hullsize);
 		};
-		
+
 		static float size = ImRender::fonts::tahoma14->FontSize;
 		const auto centerPoint = centerPolygon();
 		ImRender::drawProgressRing(centerPoint.x, centerPoint.y, 25, 32, -90.0f, scale, 5.0f, Colors::LightBlue);

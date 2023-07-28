@@ -6,12 +6,11 @@
 #include <utilities/utilities.hpp>
 #include <gamememory/memory.hpp>
 
-#if PARTICLE_MANUAL == true
-void* Particle::getCallAddr(const std::string& name)
+void* Particle::getCallAddr(const std::string_view name)
 {
 	int ret = -1;
-	if (memory::particleIsCached()(memory::particleSystem(), name.c_str()))
-		memory::particleFindStringIndex()(reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(memory::particleSystem()) + 0x14), &ret, name.c_str()); // esi+14h
+	if (memory::particleIsCached()(memory::particleSystem(), name.data()))
+		memory::particleFindStringIndex()(reinterpret_cast<int*>(reinterpret_cast<uintptr_t>(memory::particleSystem()) + 0x14), &ret, name.data()); // esi+14h
 
 	if (ret == -1)
 		return nullptr;
@@ -19,7 +18,7 @@ void* Particle::getCallAddr(const std::string& name)
 	return *reinterpret_cast<void**>(*reinterpret_cast<uintptr_t*>(memory::particleSystem()) + (0x4 * static_cast<uint16_t>(ret)));
 }
 
-void Particle::dispatchParticle(const std::string& name, const Vec3& pos)
+void Particle::dispatchParticleEffect(const std::string_view name, const Vec3& pos)
 {
 	Vec3 copyPos = pos;
 
@@ -56,22 +55,3 @@ __declspec(naked) void* Particle::createParticle(void* caller, void* addr, Vec3*
 		retn
 	}
 }
-#else
-
-void particle::dispatchParticleEffect(const std::string_view name, const Vec3& pos, const Vec3& angles)
-{
-	memory::dispatchParticleEffect()(name.data(), pos, angles, nullptr, -1, nullptr);
-}
-
-void particle::stopParticleEffect(const std::string_view name)
-{
-	CEffectData data{ };
-
-	// we skip entity index handling
-
-	data.m_hitBox = memory::getParticleSystemIndex()(name.data());
-
-	memory::dispatchEffect()("ParticleEffectStop", data);
-}
-
-#endif

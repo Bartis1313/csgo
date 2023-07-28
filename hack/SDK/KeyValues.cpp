@@ -44,3 +44,17 @@ void* KeyValues::operator new(size_t size)
 {
 	return memory::interfaces::keyValuesSys->allocKeysMemory(size);
 }
+
+void KeyValues::setString(const char* name, const char* value)
+{
+	auto key = findKey(name, true);
+	if (key)
+	{
+		memory::setString()(this, name, value);
+	}
+}
+
+KeyValues* KeyValues::findKey(const char* name, bool create)
+{
+	return memory::findKey()(this, name, create);
+}

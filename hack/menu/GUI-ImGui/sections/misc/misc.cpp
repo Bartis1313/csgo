@@ -4,7 +4,6 @@
 
 #include "../../selections.hpp"
 #include <cheats/features/visuals/world/skybox.hpp>
-#include <cheats/features/visuals/world/weather.hpp>
 #include <cheats/features/visuals/world/ambient.hpp>
 #include <cheats/features/misc/disable/convars.hpp>
 

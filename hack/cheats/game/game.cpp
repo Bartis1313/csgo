@@ -86,7 +86,7 @@ float game::getScaledFont(const Vec3& source, const Vec3& destination, const flo
 
 #include <SDK/CStudioHdr.hpp>
 
-WeaponIndex game::getNadeByClass(int idx, Studiohdr_t* studio)
+WeaponIndex game::getNadeByClass(int idx, studiohdr_t* studio)
 {
 	switch (std::string_view name = studio->m_name; idx)
 	{

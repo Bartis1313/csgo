@@ -8,7 +8,7 @@
 
 Box::Box(Entity_t* ent)
 {
-	const auto col = ent->collideable();
+	const auto col = ent->getCollideable();
 	if (!col)
 	{
 		m_isValid = false;

@@ -42,7 +42,6 @@ void memory::init()
 
 	traceFilterSimple = scan(CLIENT_DLL, CTRACE_FILTER_SIMPLE).add(0x3D);
 	returnAddrRadarImage = scan(PANORAMA_DLL, UNK_FILESYS);
-	returnAddrRadarImage = scan(PANORAMA_DLL, UNK_FILESYS);
 	viewMatrixAddr = scan(CLIENT_DLL, VIEW_MATRIX_CLIENT).add(0x3).deRef().add(0xB0);
 	drawScreenEffectMaterial = scan(CLIENT_DLL, DRAW_EFFECT_MATRIAL);
 	motionBlurVec = scan(CLIENT_DLL, BLUR_MATERIAL_ARR_1).add(0x1).deRef();
@@ -71,7 +70,7 @@ void memory::init()
 	flashlightDestroy = scan(CLIENT_DLL, FLASHLIGHT_DESTROY);
 	occlusion = scan(CLIENT_DLL, SETUP_OCCLUSION);
 	velocity = scan(CLIENT_DLL, SETUP_VELOCITY);
-	accumulate = scan(CLIENT_DLL, SETUP_VELOCITY);
+	accumulate = scan(CLIENT_DLL, ACCUMULATE_LAYERS);
 	particleIsCached = scan(CLIENT_DLL, IS_EFFECT_CACHED);
 	particleSystem = scan(CLIENT_DLL, PARTICLE_SYSTEM).add(0x7).deRef(Dereference::TWICE);
 	particleFindStringIndex = scan(CLIENT_DLL, FIND_STRING_INDEX);
@@ -122,6 +121,11 @@ void memory::init()
 	precipDestruct = scan(CLIENT_DLL, DESTRUCT_PRECIPICATION);
 	stopSound = scan(CLIENT_DLL, STOP_SOUND);
 	particleGetVCollideRet = scan(CLIENT_DLL, WEATHER_GETVCOLLIDE_RET).add(0x2D);
+	vPhysicsGetObject = scan(CLIENT_DLL, VPHYSICS_GET_OBJ).add(0x2).deRef();
+	restoreMaterialSystemObjects = scan(ENGINE_DLL, RESTOTRE_MATERIALS);
+	forceSingleThreaded = scan(MATERIAL_DLL, FORCE_SINGLE_THREADED);
+	cubemapLoad = scan(ENGINE_DLL, CUBEMAP_LOAD);
+	precacheVars = scan(MATERIAL_DLL, PRECACHE_VARS);
 
 	// HOOKS
 
@@ -163,6 +167,11 @@ void memory::init()
 	drawTransculentRenderables = scan(CLIENT_DLL, DRAW_TRANSCULENT_RENDERABLE);
 	clientCsNormalEvent = scan(CLIENT_DLL, CLIENTMODE_CSNORMAL_EVENT);
 	tracerDraw = scan(CLIENT_DLL, TRACER_DRAW);
+	dispatchInnerParticlePrecip = scan(CLIENT_DLL, DISPATCH_INNER_PRECIP);
+	newParticleCreate = scan(CLIENT_DLL, NEW_PARTICLE_EFFECT_CREATE);
+	newParticleSetControlPoint = scan(CLIENT_DLL, NEW_PARTICLE_SET_POINT);
+	newParticleSetControlPointEnt = scan(CLIENT_DLL, NEW_PARTICLE_SET_POINT_ENT);
+	getVelocity = scan(CLIENT_DLL, GET_VELOCITY).add(0x2);
 
 	// REST
 
@@ -196,6 +205,7 @@ void memory::init()
 	console::debug("memory init success");
 }
 
+
 void memory::postInit()
 {
 	using namespace memory::interfaces;
@@ -206,6 +216,7 @@ void memory::postInit()
 	toneController = findFromGameLoop(CEnvTonemapController);
 	fogController = findFromGameLoop(CFogController);
 	ambientLight = findFromGameLoop(CEnvAmbientLight);
+	dynamicLight = findFromGame(CDynamicLight);
 
 	hostState = scan(ENGINE_DLL, HOST_STATE).add(0x1).deRef(Dereference::TWICE);
 	gameWorld = scan(CLIENT_DLL, CLIENT_WORLD).add(0x1).deRef(Dereference::TWICE);

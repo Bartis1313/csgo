@@ -8,7 +8,6 @@
 #include <gamememory/memory.hpp>
 
 #include <SDK/structs/Entity.hpp>
-#include <cheats/features/visuals/world/weather.hpp>
 
 hooks::CreateParticlePrecip::value hooks::CreateParticlePrecip::hook(FAST_ARGS)
 {

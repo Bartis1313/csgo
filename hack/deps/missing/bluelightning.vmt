@@ -1,0 +1,6 @@
+Sprite
+{
+	$spriteorientation oriented
+	$spriteorigin "[ 0.50 0.50 ]"
+	$basetexture "sprites/store/trails/bluelightning"
+}

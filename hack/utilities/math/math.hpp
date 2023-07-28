@@ -15,11 +15,11 @@ struct ImVec2;
 // read: https://www.unknowncheats.me/forum/counterstrike-global-offensive/137492-math-behind-hack-1-coding-better-aimbot-stop-using-calcangle.html
 namespace math
 {
-	constexpr static float PI = std::numbers::pi_v<float>;
-	constexpr static float PI_2 = std::numbers::pi_v<float> * 2.0f;
+	constexpr float PI = std::numbers::pi_v<float>;
+	constexpr float PI_2 = std::numbers::pi_v<float> * 2.0f;
 
-	[[nodiscard]] constexpr static float DEG2RAD(float degrees) { return degrees * (PI / 180.0f); }
-	[[nodiscard]] constexpr static float RAD2DEG(float radians) { return radians * (180.0f / PI); }
+	[[nodiscard]] constexpr float DEG2RAD(float degrees) { return degrees * (PI / 180.0f); }
+	[[nodiscard]] constexpr float RAD2DEG(float radians) { return radians * (180.0f / PI); }
 
 	[[nodiscard]] Vec3 calcAngleRelative(const Vec3& src, const Vec3& dest, const Vec3& viewAngles);
 	// classic

@@ -24,6 +24,14 @@ template< class T, class I = int >
 class CUtlMemory
 {
 public:
+	CUtlMemory() = default;
+	CUtlMemory(T* pMemory, int numElements) : m_pMemory(pMemory),
+		m_nAllocationCount(numElements)
+	{
+		// Special marker indicating externally supplied modifyable memory
+		m_nGrowSize = -1; // EXTERNAL_BUFFER_MARKER 
+	}
+
 	T& operator[](I i)
 	{
 		return m_pMemory[i];
@@ -35,6 +43,11 @@ public:
 	}
 
 	T* Base()
+	{
+		return m_pMemory;
+	}
+
+	T* Base() const
 	{
 		return m_pMemory;
 	}
@@ -77,6 +90,25 @@ public:
 	bool IsExternallyAllocated() const
 	{
 		return m_nGrowSize < 0;
+	}
+
+	void ConvertToGrowableMemory(int nGrowSize)
+	{
+		if (!IsExternallyAllocated())
+			return;
+
+		m_nGrowSize = nGrowSize;
+		if (m_nAllocationCount) 
+		{
+			int nNumBytes = m_nAllocationCount * sizeof(T);
+			T* pMemory = (T*)malloc(nNumBytes);
+			memcpy(pMemory, m_pMemory, nNumBytes);
+			m_pMemory = pMemory;
+		}
+		else 
+		{
+			m_pMemory = NULL;
+		}
 	}
 
 public:

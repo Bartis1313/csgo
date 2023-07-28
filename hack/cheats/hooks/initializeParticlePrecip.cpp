@@ -9,11 +9,10 @@
 #include <SDK/CGameRules.hpp>
 
 #include <utilities/console/console.hpp>
-#include <cheats/features/visuals/world/weather.hpp>
 
 hooks::InitializeParticlePrecip::value hooks::InitializeParticlePrecip::hook(FAST_ARGS)
 {
-    using CClient_Precipitation = Entity_t;
+    using CClient_Precipitation = Precipitation_t;
 
 #if DUMP_WEATHER == true
     console::debug("PRECIP COORDS DUMP");

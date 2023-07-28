@@ -7,6 +7,7 @@
 #include <config/vars.hpp>
 
 #include <cheats/hooks/frameStageNotify.hpp>
+#include <cheats/hooks/levelInitPostEnttity.hpp>
 
 namespace
 {
@@ -18,11 +19,27 @@ namespace
 			this->registerShutdown(toneController::shutdown);
 		}
 	} toneHandler;
+
+	struct ToneGrabber : hooks::LevelInitPostEntity
+	{
+		ToneGrabber()
+		{
+			this->registerPostReset(toneController::grabberDefault);
+		}
+	} toneGrabber;
 }
 
 namespace toneController
 {
-	EnvTonemapController_t* ent{ };
+	struct Tone
+	{
+		bool useExposureMin;
+		bool useExposureMax;
+		bool useBloom;
+		float min;
+		float max;
+		float bloom;
+	} toneDefault;
 }
 
 void toneController::run(FrameStage stage)
@@ -33,11 +50,9 @@ void toneController::run(FrameStage stage)
 	if (!game::isAvailable())
 		return;
 
-	ent = memory::interfaces::toneController();
+	auto ent = memory::interfaces::toneController();
 	if (!ent)
 		return;
-
-	const bool isOn = ent->m_bUseCustomAutoExposureMin() || ent->m_bUseCustomAutoExposureMax();
 
 	if (!ent) // not all maps support it by default
 		return;
@@ -57,15 +72,30 @@ void toneController::run(FrameStage stage)
 	}
 }
 
-void toneController::shutdown()
+void toneController::grabberDefault()
 {
+	auto ent = memory::interfaces::toneController();
 	if (!ent)
 		return;
 
-	ent->m_bUseCustomAutoExposureMin() = false;
-	ent->m_bUseCustomAutoExposureMax() = false;
-	ent->m_bUseCustomBloomScale() = false;
-	ent->m_flCustomAutoExposureMin() = 0.0f;
-	ent->m_flCustomAutoExposureMax() = 0.0f;
-	ent->m_flCustomBloomScale() = 0.0f;
+	toneDefault.useExposureMin = ent->m_bUseCustomAutoExposureMin();
+	toneDefault.useExposureMax = ent->m_bUseCustomAutoExposureMax();
+	toneDefault.useBloom = ent->m_bUseCustomBloomScale();
+	toneDefault.min = ent->m_flCustomAutoExposureMin();
+	toneDefault.max = ent->m_flCustomAutoExposureMax();
+	toneDefault.bloom = ent->m_flCustomBloomScale();
+}
+
+void toneController::shutdown()
+{
+	auto ent = memory::interfaces::toneController();
+	if (!ent)
+		return;
+
+	ent->m_bUseCustomAutoExposureMin() = toneDefault.useExposureMin;
+	ent->m_bUseCustomAutoExposureMax() = toneDefault.useExposureMax;
+	ent->m_bUseCustomBloomScale() = toneDefault.useBloom;
+	ent->m_flCustomAutoExposureMin() = toneDefault.min;
+	ent->m_flCustomAutoExposureMax() = toneDefault.max;
+	ent->m_flCustomBloomScale() = toneDefault.bloom;
 }

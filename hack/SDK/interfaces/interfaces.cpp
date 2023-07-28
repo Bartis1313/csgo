@@ -182,6 +182,7 @@ void memory::interfaces::init()
 	findInterface(baseFileSystem, "VBaseFileSystem0");
 	findInterface(physicsCollision, "VPhysicsCollision0");
 	findInterface(engineSound, "IEngineSoundClient0");
+	findInterface(physicsProps, "VPhysicsSurfaceProps0");
 #else
 	CAP(engine, ENGINE_DLL, "VEngineClient0");
 	CAP(panel, VGUI_DLL, "VGUI_Panel0");
@@ -208,6 +209,7 @@ void memory::interfaces::init()
 	CAP(baseFileSystem, FILESYS_DLL, "VBaseFileSystem0");
 	CAP(physicsCollision, VPHYSICS_DLL, "VPhysicsCollision0");
 	CAP(engineSound, ENGINE_DLL, "IEngineSoundClient0");
+	CAP(physicsProps, VPHYSICS_DLL, "VPhysicsSurfaceProps0");
 #endif
 
 	console::debug("interfaces success");

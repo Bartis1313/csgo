@@ -23,7 +23,10 @@ IMaterial* material::factory::createMaterial(const MaterialData& data)
 {
 	KeyValues* keys{ nullptr };
 	if (data.createType == CreationType::BY_BUFFER)
+	{
 		keys = new KeyValues{ data.key.c_str() };
+		keys->fromBuffer(data.name.c_str(), data.buffer.c_str());
+	}
 	else
 	{
 		constexpr auto toRemove = [](char c) { return c == '\n' || c == '\t'; };

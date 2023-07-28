@@ -9,7 +9,7 @@
 #include <cheats/game/game.hpp>
 #include <utilities/console/console.hpp>
 
-#include <cheats/features/visuals/world/weather.hpp>
+#include <cheats/features/visuals/world/weather/precipitation.hpp>
 #include <utilities/console/console.hpp>
 
 // server modelinfo
@@ -36,8 +36,8 @@ hooks::GetVCollide::value hooks::GetVCollide::hook(FAST_ARGS, int modelIndex)
 
     if (reinterpret_cast<uintptr_t>(_ReturnAddress()) == memory::particleGetVCollideRet())
     {
-        if (modelIndex == weatherController::uniqueModelIndex)
-            return &weatherController::getCollide();
+        if (modelIndex == weather::precipitation::uniqueModelIndex)
+            return &weather::precipitation::getCollide();
     }
 
     return org;

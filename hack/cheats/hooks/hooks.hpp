@@ -36,6 +36,7 @@ enum hookIndexes
 	FIND_MATERIAL = 84,
 	GET_VCOLLIDE = 6, // by index
 	VCOLLIDE_LOAD = 36,
+	OVERRIDE_CONFIG = 21,
 };
 
 #define DUMP_WEATHER false

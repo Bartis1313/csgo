@@ -102,6 +102,8 @@ namespace memory
 	Address<uintptr_t> findFromGame(ClassID id);
 	// anything that changes every round
 	Address<uintptr_t> findFromGameLoop(ClassID id);
+	// for more objects with same id
+	std::optional<std::vector<Address<uintptr_t>>> findMultipleFromGameLoop(ClassID id);
 }
 
 #include "signature.hpp"
