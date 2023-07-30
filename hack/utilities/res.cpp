@@ -43,16 +43,16 @@ Resource::Resource(const std::string& path)
 
 Resource::Resource(int resID, const std::string_view type)
 {
-	HRSRC hResInfo = LI_FN_CACHED(FindResourceA)(globals::instance, MAKEINTRESOURCEA(resID), type.data());
+	HRSRC hResInfo = FindResourceA(globals::instance, MAKEINTRESOURCEA(resID), type.data());
 	if (!hResInfo)
 		throw std::runtime_error("Recource could not be found");
 
-	HGLOBAL hResData = LI_FN_CACHED(LoadResource)(globals::instance, hResInfo);
+	HGLOBAL hResData = LoadResource(globals::instance, hResInfo);
 	if(!hResData)
 		throw std::runtime_error("Recource data could not be found");
 
-	unsigned char* hResPtr = reinterpret_cast<unsigned char*>(LI_FN_CACHED(LockResource)(hResData));
-	size_t size = LI_FN_CACHED(SizeofResource)(globals::instance, hResInfo);
+	unsigned char* hResPtr = reinterpret_cast<unsigned char*>(LockResource(hResData));
+	size_t size = SizeofResource(globals::instance, hResInfo);
 
 	stbi_set_flip_vertically_on_load_thread(false);
 	m_buffer = stbi_load_from_memory(hResPtr, size, &m_width, &m_height, nullptr, 4);
@@ -66,7 +66,7 @@ Resource::Resource(int resID, const std::string_view type)
 	SurfaceRender::initNewTexture(m_textureID, m_buffer, m_width, m_height);
 #endif
 	stbi_image_free(m_buffer);
-	LI_FN_CACHED(FreeResource)(hResData);
+	FreeResource(hResData);
 
 	m_resBuf.push_back(*this);
 

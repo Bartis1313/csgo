@@ -23,7 +23,7 @@ std::string utilities::getTime()
 
 std::string utilities::getKeyName(const uint32_t virtualKey)
 {
-	uint32_t scanCode = LI_FN(MapVirtualKeyA).cached()(virtualKey, MAPVK_VK_TO_VSC);
+	uint32_t scanCode = MapVirtualKeyA(virtualKey, MAPVK_VK_TO_VSC);
 
 	// because MapVirtualKey strips the extended bit for some keys
 	switch (virtualKey)
@@ -55,7 +55,7 @@ std::string utilities::getKeyName(const uint32_t virtualKey)
 		break;
 	}
 
-	if (char keyName[50]; LI_FN_CACHED(GetKeyNameTextA)(scanCode << 16, keyName, sizeof(keyName)) != 0)
+	if (char keyName[50]; GetKeyNameTextA(scanCode << 16, keyName, sizeof(keyName)) != 0)
 		return keyName;
 	else
 		return "[None]";
@@ -95,7 +95,7 @@ std::vector<std::string> utilities::splitStr(const std::string& str, char limit)
 
 uint32_t utilities::getKey(const uint32_t vKey)
 {
-	return LI_FN_CACHED(GetAsyncKeyState)(vKey);
+	return GetAsyncKeyState(vKey);
 }
 
 std::string utilities::u8toStr(const std::u8string& u8str)

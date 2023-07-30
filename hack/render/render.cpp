@@ -530,7 +530,7 @@ namespace ImRender
 
 void ImRender::init(ImGuiIO& io)
 {
-	if (CHAR fontsPath[MAX_PATH]; SUCCEEDED(LI_FN_CACHED(SHGetFolderPathA)(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fontsPath)))
+	if (CHAR fontsPath[MAX_PATH]; SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_FONTS, NULL, SHGFP_TYPE_CURRENT, fontsPath)))
 	{
 		const std::filesystem::path path{ fontsPath };
 		const std::filesystem::path csFontsPath{ std::filesystem::current_path() / "platform" / "vgui" / "fonts" };

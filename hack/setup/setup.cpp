@@ -61,9 +61,9 @@ bool setup::init(void* instance)
 	}
 	catch (const std::exception& err)
 	{
-		LI_FN(MessageBoxA)(nullptr, err.what(), "Runtime hack error", MB_OK | MB_ICONERROR);
+		MessageBoxA(nullptr, err.what(), "Runtime hack error", MB_OK | MB_ICONERROR);
 		console::error("Runtime hack error {}", err.what());
-		LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_FAILURE);
+		FreeLibraryAndExitThread(static_cast<HMODULE>(instance), EXIT_FAILURE);
 	}
 
 	initTimer.end();
@@ -96,7 +96,7 @@ void setup::shutdown(void* instance)
 	console::shutdown();
 	discord::shutdown();
 
-	LI_FN(FreeLibraryAndExitThread)(static_cast<HMODULE>(instance), EXIT_SUCCESS);
+	FreeLibraryAndExitThread(static_cast<HMODULE>(instance), EXIT_SUCCESS);
 }
 
 void setup::looper(void* instance)

@@ -97,7 +97,7 @@ LONG WINAPI SEH::CATCH(EXCEPTION_POINTERS* pExceptionInfo)
 			console::error("ESP - 0x{:X}", pExceptionInfo->ContextRecord->Esp);
 
 			printStack();
-			const auto reply = LI_FN(MessageBoxA)(nullptr, "Continue?", "Fatal error!", MB_ICONERROR | MB_YESNO);
+			const auto reply = MessageBoxA(nullptr, "Continue?", "Fatal error!", MB_ICONERROR | MB_YESNO);
 			free(symbol);
 
 			if (reply == IDOK)

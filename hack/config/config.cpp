@@ -222,7 +222,7 @@ std::filesystem::path config::getExtraLoadPath()
 
 std::filesystem::path config::getDocumentsPath()
 {
-	if (static CHAR documents[MAX_PATH]; SUCCEEDED(LI_FN_CACHED(SHGetFolderPathA)(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
+	if (static CHAR documents[MAX_PATH]; SUCCEEDED(SHGetFolderPathA(NULL, CSIDL_PERSONAL, NULL, SHGFP_TYPE_CURRENT, documents)))
 		return std::filesystem::path{ documents };
 
 	return {};

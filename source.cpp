@@ -1,7 +1,6 @@
 #include "setup/setup.hpp"
 
 #include <cheats/game/globals.hpp>
-#include <utilities/tools/tools.hpp>
 
 BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID reserved)
 {
@@ -9,15 +8,15 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
     {
         // here this sometimes throw null on mm
         if (instance)
-            LI_FN(DisableThreadLibraryCalls)(instance);
+            DisableThreadLibraryCalls(instance);
 
         globals::instance = instance;
 
-        if (auto initThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::init), instance, NULL, nullptr))
-            LI_FN(CloseHandle)(initThread);
+        if (auto initThread = CreateThread(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::init), instance, NULL, nullptr))
+           CloseHandle(initThread);
 
-        if (auto looperThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::looper), instance, NULL, nullptr))
-            LI_FN(CloseHandle)(looperThread);
+        if (auto looperThread = CreateThread(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::looper), instance, NULL, nullptr))
+           CloseHandle(looperThread);
 
         return TRUE;
     }
@@ -25,8 +24,8 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
     {
         if (!globals::isShutdown) // then panic key forced shutdown
         {
-            if (auto shutdownThread = LI_FN(CreateThread)(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::shutdown), instance, NULL, nullptr))
-                LI_FN(CloseHandle)(shutdownThread);
+            if (auto shutdownThread = CreateThread(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::shutdown), instance, NULL, nullptr))
+                CloseHandle(shutdownThread);
         }
     }
 
