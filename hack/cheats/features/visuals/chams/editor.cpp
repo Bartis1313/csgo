@@ -16,6 +16,7 @@
 #include <SDK/KeyValues.hpp>
 #include <SDK/KeyValuesSys.hpp>
 #include <gamememory/memory.hpp>
+#include <cheats/game/game.hpp>
 
 #include <imgui.h>
 #include <imgui_internal.h>
@@ -27,6 +28,7 @@
 #include <deps/ImGui/editor/TextEditor.hpp>
 
 #include <cheats/helper/initable.hpp>
+#include <cheats/hooks/drawModelExecute.hpp>
 
 namespace
 {
@@ -37,6 +39,14 @@ namespace
 			this->registerInit(materialEditor::initEditor);
 		}
 	} editorHandler;
+
+	struct EditorDME : hooks::DrawModelExecute
+	{
+		EditorDME()
+		{
+			this->registerRun(materialEditor::passDME);
+		}
+	} editorDME;
 }
 
 namespace materialEditor
@@ -53,9 +63,11 @@ namespace materialEditor
 	void renderMaterialsList();
 	void renderMaterialsView();
 	void renderMaterialInfo(MaterialData& mat);
+	void passCreationDme(const MaterialData& data, int index, bool push);
 
 	std::vector<MaterialData> editorMaterials;
 	size_t index{ 0 };
+	size_t initialIndexChams{ 0 }; // manual chams are on top so 5 manual + edited... as example
 
 	bool opened{ false };
 	bool subAddOpened{ false };
@@ -68,6 +80,14 @@ namespace materialEditor
 
 	MaterialData materialToAdd;
 	nlohmann::json m_json;
+
+	namespace DME
+	{
+		MaterialData temp;
+		bool createdMaterial{ true };
+		int index{ 0 };
+		bool toPush{ false };
+	}
 }
 
 using json = nlohmann::json;
@@ -109,6 +129,12 @@ void markdownEditor(const std::string& markdown_)
 
 void materialEditor::draw()
 {
+	if (!game::isAvailable())
+	{
+		ImGui::TextUnformatted("Editor will show after you load to the map");
+		return;
+	}
+
 	ImGui::BeginChild("##editor");
 	{
 		renderAddMaterial();
@@ -145,11 +171,10 @@ void materialEditor::renderAddMaterial()
 			if (isMaterialValid(materialToAdd))
 			{
 				// everything provided, now update material
-				materialToAdd.material = material::factory::createMaterial(materialToAdd);
+				passCreationDme(materialToAdd, initialIndexChams + index + 1, true);
+
 				// update to general view
 				editorMaterials.push_back(materialToAdd);
-				// update to chams too, because it's where whole texture render goes
-				chams::materials.push_back(materialToAdd);
 
 				// force new material to be selected in view child
 				index = editorMaterials.size() - 1;
@@ -265,21 +290,6 @@ void materialEditor::renderMaterialsView()
 
 			renderMaterialInfo(materialNow);
 
-			// we update the material that already exists.
-			if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S))
-			{
-				if (isMaterialValid(materialNow, true))
-				{
-					// overwrite material
-					materialNow.material = material::factory::createMaterial(materialNow);
-					saveCfgIndex();
-
-					ImNotify::add(ImNotify{ 5.0f, "Updated material", std::format("Name {} Key {}\nBuf length {}", materialNow.name, materialNow.key, materialNow.buffer.length()) });
-				}
-				else
-					ImNotify::add(ImNotify{ 5.0f, "Error updating material", "Can't update material\nInvalid name / key" });
-			}
-
 			if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_D))
 			{
 				/*const auto toCopy = m_ImEditor.GetCurrentLineText();
@@ -287,10 +297,50 @@ void materialEditor::renderMaterialsView()
 			}
 
 			mainEditor.Render("Editor##mat");
+
+			// we update the material that already exists.
+			if (ImGui::Shortcut(ImGuiMod_Ctrl | ImGuiKey_S))
+			{
+				if (isMaterialValid(materialNow, true))
+				{
+					// overwrite material
+					materialNow.buffer = mainEditor.GetText();
+					passCreationDme(materialNow, initialIndexChams + index + 1, false);
+
+					saveCfgIndex();
+
+					ImNotify::add(ImNotify{ 5.0f, "Updated material", std::format("Name {} Key {}\nBuf length {}", materialNow.name, materialNow.key, materialNow.buffer.length()) });
+				}
+				else
+					ImNotify::add(ImNotify{ 5.0f, "Error updating material", "Can't update material\nInvalid name / key" });
+			}
 		}
 
 		ImGui::EndChild();
 	}
+}
+
+void materialEditor::passCreationDme(const MaterialData& data, int index, bool push)
+{
+	DME::temp = data;
+	DME::index = index;
+	DME::toPush = push;
+
+	DME::createdMaterial = false;
+}
+
+void materialEditor::passDME(IMatRenderContext* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
+{
+	if (DME::createdMaterial)
+		return;
+
+	DME::temp.material = material::factory::createMaterial(DME::temp);
+	if (DME::toPush)
+		chams::materials.push_back(DME::temp);
+	else
+		chams::materials.at(DME::index) = DME::temp;
+
+	DME::createdMaterial = true;
 }
 
 bool materialEditor::isMaterialValid(MaterialData& _data, bool updating)
@@ -311,6 +361,8 @@ bool materialEditor::isMaterialValid(MaterialData& _data, bool updating)
 void materialEditor::initEditor()
 {
 	saveDir = config::getHackPath() / config::getExtraLoadPath() / folderName / getPathForConfig();
+
+	initialIndexChams = chams::materials.size() - 1;
 
 	loadCfg();
 

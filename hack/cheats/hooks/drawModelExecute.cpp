@@ -1,6 +1,7 @@
 #include "drawModelExecute.hpp"
 
 #include <cheats/features/visuals/chams/chams.hpp>
+#include <cheats/features/visuals/chams/editor.hpp>
 #include <config/vars.hpp>
 
 #include <cheats/features/visuals/glow/glow.hpp>
@@ -32,6 +33,8 @@ hooks::DrawModelExecute::value hooks::DrawModelExecute::hook(FAST_ARGS, IMatRend
 
 	if (memory::interfaces::modelRender->isForcedMaterial())
 		return original(thisptr, ctx, state, info, matrix);
+
+	Storage::runs.run(ctx, state, info, matrix);
 
 	if (chams::DME::run(ctx, state, info, matrix))
 		return;

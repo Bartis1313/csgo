@@ -43,7 +43,7 @@ IMaterial* material::factory::createMaterial(const MaterialData& data)
 	assert(material);
 	assert(material->isError() == false); // handle on own?
 
-	material->addRefCount();
+	//material->addRefCount();
 
 	MaterialData dataToPush{ data };
 	dataToPush.material = material;
@@ -73,8 +73,8 @@ ITexture* material::factory::findTexture(char const* name, const char* group, bo
 
 void material::factory::shutdown()
 {
-	for (const auto& materialData : materials)
+	/*for (const auto& materialData : materials)
 	{
 		materialData.material->removeRefCount();
-	}
+	}*/
 }

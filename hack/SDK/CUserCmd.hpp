@@ -52,8 +52,9 @@ public:
 	bool m_predicted;
 	Vec3 m_viewAnglesCopy;
 	bool m_buttonsCopy;
+	PAD(8);
 };
-static_assert(sizeof(CUserCmd) == 92);
+static_assert(sizeof(CUserCmd) == 100);
 
 class CVerifiedUserCmd
 {
