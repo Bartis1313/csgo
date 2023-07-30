@@ -219,6 +219,7 @@ namespace memory
 	inline Address<forceSingleThreaded_t> forceSingleThreaded;
 	inline Address<cubemapLoad_t> cubemapLoad;
 	inline Address<precacheVars_t> precacheVars;
+	inline Address<char*> levelName; // sizeof here [actual address in first opcode] E8 ? ? ? ? 83 C4 08 83 3E 0A
 
 	inline Address<void*> isUsingPropDebug;
 	inline Address<void*> getColorModulation;

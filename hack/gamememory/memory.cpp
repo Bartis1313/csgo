@@ -126,6 +126,7 @@ void memory::init()
 	forceSingleThreaded = scan(MATERIAL_DLL, FORCE_SINGLE_THREADED);
 	cubemapLoad = scan(ENGINE_DLL, CUBEMAP_LOAD);
 	precacheVars = scan(MATERIAL_DLL, PRECACHE_VARS);
+	levelName = scan(ENGINE_DLL, LEVEL_NAME).add(0x2).deRef();
 
 	// HOOKS
 

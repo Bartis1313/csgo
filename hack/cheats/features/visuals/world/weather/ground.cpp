@@ -166,20 +166,7 @@ void weather::ground::applyManually()
 		shutdown();
 	}
 
-	static std::once_flag onceFlag;
-	bool dontGo = false;
-	std::call_once(onceFlag, [&dontGo]()
-		{
-			const auto type = helper::configToPrecip(vars::visuals->world->weather->type);
-			if (type == helper::CustomPrecipitationType_t::PRECIPITATION_TYPE_PARTICLESNOW && vars::visuals->world->weather->useGround)
-			{
-				calledCreate = true;
-				create();
-				dontGo = true;
-			}
-		});
-
-	if (dontGo)
+	if (!oldMaterialsFindMatVars.empty())
 		return;
 
 	create();
@@ -187,6 +174,9 @@ void weather::ground::applyManually()
 
 void weather::ground::create()
 {
+	if (!game::isAvailable())
+		return;
+
 	if (!calledCreate)
 		return;
 
@@ -253,7 +243,7 @@ IMaterial* weather::ground::applyFindMat(IMaterial* mat)
 	const auto& groundInfo = getGroundInfo();
 	const std::string_view materialName = mat->getName();
 
-	auto mapIt = groundInfo.find(memory::interfaces::engine->getLevelName());
+	auto mapIt = groundInfo.find(memory::levelName()); // fastest way
 	if (mapIt != groundInfo.end())
 	{
 		if (std::string_view{ mat->getTextureGroupName() } == TEXTURE_GROUP_WORLD)

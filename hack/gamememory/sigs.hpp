@@ -366,3 +366,5 @@
 #define CUBEMAP_LOAD				SIG("55 8B EC 81 EC ? ? ? ? 53 56 57 51 6A 2A 8D 8D ? ? ? ? E8 ? ? ? ?")
 // "CMaterial::PrecacheVars: error loading vmt file for %s\n"
 #define PRECACHE_VARS				SIG("55 8B EC 6A FF 68 ? ? ? ? 64 A1 ? ? ? ? 50 64 89 25 ? ? ? ? 83 EC 14 53 8B D9 56 8B 75 10 89 5D EC 57 8D 7B 50 85 F6")
+// find yourself, scan the game
+#define LEVEL_NAME					SIG("80 3D ? ? ? ? ? 74 ? 8A 08 80 F9 ? 74 ? 80 F9 ? 75 ? C6 00 ? 40 80 38 ? 75 ? 8A 45")
