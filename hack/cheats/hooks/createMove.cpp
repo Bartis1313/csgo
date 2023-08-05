@@ -15,7 +15,7 @@
 #include <cheats/game/game.hpp>
 #include <cheats/game/globals.hpp>
 
-hooks::CreateMove::value hooks::CreateMove::hook(FAST_ARGS, float inputFrame, CUserCmd* cmd)
+hooks::CreateMove::value hooks::CreateMove::hook(HACK_FAST_ARGS, float inputFrame, CUserCmd* cmd)
 {
 	original(thisptr, inputFrame, cmd);
 

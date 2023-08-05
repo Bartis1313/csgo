@@ -10,7 +10,7 @@
 
 size_t tempCallCounter = 0;
 
-hooks::NewParticleEffectSetControlPoint::value hooks::NewParticleEffectSetControlPoint::hook(FAST_ARGS, int whichPoint, const Vec3& vec)
+hooks::NewParticleEffectSetControlPoint::value hooks::NewParticleEffectSetControlPoint::hook(HACK_FAST_ARGS, int whichPoint, const Vec3& vec)
 {
 	const auto precip = weather::precipitation::getPrecip();
 	if (!precip)

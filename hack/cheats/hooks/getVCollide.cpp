@@ -19,7 +19,7 @@
 
 // if we get null, we can't get rain meshes working! this is for particle type case
 // so for own handling we need to provide generated vcollide
-hooks::GetVCollide::value hooks::GetVCollide::hook(FAST_ARGS, int modelIndex)
+hooks::GetVCollide::value hooks::GetVCollide::hook(HACK_FAST_ARGS, int modelIndex)
 {
     auto org = original(thisptr, modelIndex);
     

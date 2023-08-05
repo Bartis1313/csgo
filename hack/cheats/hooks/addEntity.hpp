@@ -10,9 +10,9 @@ class AddEntity
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, void*, CBaseHandle);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, void*, CBaseHandle);
 
-	static value FASTCALL hook(FAST_ARGS, void*, CBaseHandle handle);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, void*, CBaseHandle handle);
 	inline static call original;
 };
 _HOOK_END

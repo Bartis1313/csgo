@@ -10,9 +10,9 @@ class R_AddDecalToSurface
 	ADD_HOOK_FRIEND;
 private:
 	using value = int*;
-	using call = value(__cdecl*)(void*, void*, void*, void*);
+	using call = value(HACK_CDECL*)(void*, void*, void*, void*);
 
-	static value __cdecl hook(void*, void*, void*, void*);
+	static value HACK_CDECL hook(void*, void*, void*, void*);
 	inline static call original;
 };
 _HOOK_END

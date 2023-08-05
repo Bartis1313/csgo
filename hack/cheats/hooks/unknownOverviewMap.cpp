@@ -2,7 +2,7 @@
 
 #include <cheats/features/visuals/radar/radar.hpp>
 
-hooks::UnknownOverviewMap::value hooks::UnknownOverviewMap::hook(FAST_ARGS, int unk)
+hooks::UnknownOverviewMap::value hooks::UnknownOverviewMap::hook(HACK_FAST_ARGS, int unk)
 {
 	const int ret = original(thisptr, unk);
 

@@ -11,9 +11,9 @@ public:
 	ADD_HOOK_FRIEND;
 private:
 	using value = HRESULT;
-	using call = value(STDCALL*)(IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
+	using call = value(D3DAPI*)(IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
 
-	static value STDCALL hook(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region);
+	static value D3DAPI hook(IDirect3DDevice9* device, RECT* srcRect, RECT* dstRect, HWND window, RGNDATA* region);
 	inline static call original;
 	using clRun = std::function<void()>;
 protected:

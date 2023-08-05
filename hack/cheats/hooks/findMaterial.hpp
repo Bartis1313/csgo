@@ -11,9 +11,9 @@ class FindMaterial
 	ADD_HOOK_FRIEND;
 private:
 	using value = IMaterial*;
-	using call = value(THISCALL*)(THISPTR, char const* name, const char* group, bool complain, const char* prefix);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, char const* name, const char* group, bool complain, const char* prefix);
 
-	static value FASTCALL hook(FAST_ARGS, char const* name, const char* group, bool complain, const char* prefix);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, char const* name, const char* group, bool complain, const char* prefix);
 	inline static call original;
 };
 _HOOK_END

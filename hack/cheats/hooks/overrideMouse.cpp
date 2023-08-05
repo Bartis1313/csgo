@@ -2,7 +2,7 @@
 
 #include <menu/GUI-ImGui/menu.hpp>
 
-hooks::OverrideMouse::value hooks::OverrideMouse::hook(FAST_ARGS, float* x, float* y)
+hooks::OverrideMouse::value hooks::OverrideMouse::hook(HACK_FAST_ARGS, float* x, float* y)
 {
 	static std::once_flag onceFlag;
 	std::call_once(onceFlag, []() { Storage::intis.run(); });

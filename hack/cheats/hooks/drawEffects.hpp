@@ -11,9 +11,9 @@ class DrawEffects
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, double);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, double);
 
-	static value FASTCALL hook(FAST_ARGS, double framerate);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, double framerate);
 	inline static call original;
 };
 _HOOK_END

@@ -49,7 +49,7 @@ const std::array weatherParticles
 	WeatherParticleCfg{ "rain_storm_outer", &vars::visuals->world->weather->rainStormParticleEdit, &vars::visuals->world->weather->rainStormParticleOuterColor }
 };
 
-hooks::ParticlesSimulations::value hooks::ParticlesSimulations::hook(FAST_ARGS)
+hooks::ParticlesSimulations::value hooks::ParticlesSimulations::hook(HACK_FAST_ARGS)
 {
 	hooks::capture::particleEffects = thisptr;
 

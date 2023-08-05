@@ -8,9 +8,9 @@ class setDrawColor
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, int, int, int, int);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, int, int, int, int);
 
-	static value FASTCALL hook(FAST_ARGS, int r, int g, int b, int a);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, int r, int g, int b, int a);
 	inline static call original;
 };
 _HOOK_END

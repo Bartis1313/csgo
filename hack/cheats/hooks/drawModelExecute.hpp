@@ -15,9 +15,9 @@ public:
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, IMatRenderContext*, const DrawModelState_t&, const ModelRenderInfo_t&, Matrix3x4*);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, IMatRenderContext*, const DrawModelState_t&, const ModelRenderInfo_t&, Matrix3x4*);
 
-	static value FASTCALL hook(FAST_ARGS, IMatRenderContext* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, IMatRenderContext* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix);
 	inline static call original;
 
 	using clInit = std::function<void()>;

@@ -8,7 +8,7 @@
 #include <cheats/game/game.hpp>
 #include <config/vars.hpp>
 
-hooks::OverrideView::value hooks::OverrideView::hook(FAST_ARGS, CViewSetup* view)
+hooks::OverrideView::value hooks::OverrideView::hook(HACK_FAST_ARGS, CViewSetup* view)
 {	
 	if(!game::isAvailable())
 		return original(thisptr, view);

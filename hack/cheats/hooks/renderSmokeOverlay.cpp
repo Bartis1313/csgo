@@ -8,7 +8,7 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <config/vars.hpp>
 
-hooks::RenderSmokeOverlay::value hooks::RenderSmokeOverlay::hook(FAST_ARGS, bool enabled)
+hooks::RenderSmokeOverlay::value hooks::RenderSmokeOverlay::hook(HACK_FAST_ARGS, bool enabled)
 {
 	// edx+588h
 

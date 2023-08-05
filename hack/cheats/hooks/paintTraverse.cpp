@@ -24,7 +24,7 @@ static void getMouse()
 	globals::mouseY = y;
 }
 
-hooks::PaintTraverse::value hooks::PaintTraverse::hook(FAST_ARGS, uint32_t panel, bool forceRepaint, bool allowForce)
+hooks::PaintTraverse::value hooks::PaintTraverse::hook(HACK_FAST_ARGS, uint32_t panel, bool forceRepaint, bool allowForce)
 {
 	if (globals::isShutdown)
 	{

@@ -1,6 +1,6 @@
 #include "screen2dEffect.hpp"
 
-hooks::Screen2DEffect::value hooks::Screen2DEffect::hook(FAST_ARGS, CViewSetup* view)
+hooks::Screen2DEffect::value hooks::Screen2DEffect::hook(HACK_FAST_ARGS, CViewSetup* view)
 {
 	if (globals::isShutdown)
 	{

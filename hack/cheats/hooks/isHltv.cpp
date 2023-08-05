@@ -6,7 +6,7 @@
 
 #include <intrin.h>
 
-hooks::IsHltv::value hooks::IsHltv::hook(FAST_ARGS)
+hooks::IsHltv::value hooks::IsHltv::hook(HACK_FAST_ARGS)
 {
 	volatile uintptr_t ent{ };
 	__asm mov ent, edi

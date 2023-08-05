@@ -10,9 +10,9 @@ class CreateMove
 	ADD_HOOK_FRIEND;
 private:
 	using value = bool;
-	using call = value(THISCALL*)(THISPTR, float, CUserCmd*);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, float, CUserCmd*);
 
-	static value FASTCALL hook(FAST_ARGS, float inputFrame, CUserCmd* cmd);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, float inputFrame, CUserCmd* cmd);
 	inline static call original;
 
 	using clInit = std::function<void()>;

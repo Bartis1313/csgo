@@ -8,9 +8,9 @@ class RenderSmokeOverlay
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, bool);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, bool);
 
-	static value FASTCALL hook(FAST_ARGS, bool enabled);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, bool enabled);
 	inline static call original;
 };
 _HOOK_END

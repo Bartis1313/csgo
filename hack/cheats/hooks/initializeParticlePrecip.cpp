@@ -10,7 +10,7 @@
 
 #include <utilities/console/console.hpp>
 
-hooks::InitializeParticlePrecip::value hooks::InitializeParticlePrecip::hook(FAST_ARGS)
+hooks::InitializeParticlePrecip::value hooks::InitializeParticlePrecip::hook(HACK_FAST_ARGS)
 {
     using CClient_Precipitation = Precipitation_t;
 

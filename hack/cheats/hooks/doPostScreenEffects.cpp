@@ -15,7 +15,7 @@
 #include <cheats/features/visuals/glow/glow.hpp>
 #include <gamememory/memory.hpp>
 
-hooks::DoPostScreenEffects::value hooks::DoPostScreenEffects::hook(FAST_ARGS, int val)
+hooks::DoPostScreenEffects::value hooks::DoPostScreenEffects::hook(HACK_FAST_ARGS, int val)
 {
 	if (globals::isShutdown)
 	{

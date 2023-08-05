@@ -7,7 +7,7 @@
 #include <gamememory/memory.hpp>
 #include <cheats/game/game.hpp>
 
-hooks::UnknownPlayerHurt::value hooks::UnknownPlayerHurt::hook(FAST_ARGS, void* _event)
+hooks::UnknownPlayerHurt::value hooks::UnknownPlayerHurt::hook(HACK_FAST_ARGS, void* _event)
 {
 	const auto ev = reinterpret_cast<IGameEvent*>(_event);
 	const auto name = ev->getName();

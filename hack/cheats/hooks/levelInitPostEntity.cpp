@@ -2,7 +2,7 @@
 
 #include <gamememory/memory.hpp>
 
-hooks::LevelInitPostEntity::value hooks::LevelInitPostEntity::hook(FAST_ARGS)
+hooks::LevelInitPostEntity::value hooks::LevelInitPostEntity::hook(HACK_FAST_ARGS)
 {
 	original(thisptr);
 

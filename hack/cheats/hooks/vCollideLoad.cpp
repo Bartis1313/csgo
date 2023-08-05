@@ -1,7 +1,7 @@
 #include "vCollideLoad.hpp"
 
 #include <utilities/console/console.hpp>
-hooks::VCollideLoad::value hooks::VCollideLoad::hook(FAST_ARGS, vcollide_t* output, int solidCount, const char* buffer, int size, bool swap)
+hooks::VCollideLoad::value hooks::VCollideLoad::hook(HACK_FAST_ARGS, vcollide_t* output, int solidCount, const char* buffer, int size, bool swap)
 {
     original(thisptr, output, solidCount, buffer, size, swap);
 

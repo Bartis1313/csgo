@@ -9,9 +9,9 @@ public:
 	ADD_HOOK_FRIEND;
 private:
 	using value = bool;
-	using call = value(THISCALL*)(THISPTR, void*);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, void*);
 
-	static value FASTCALL hook(FAST_ARGS, void* unk);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, void* unk);
 	inline static call original;
 };
 _HOOK_END

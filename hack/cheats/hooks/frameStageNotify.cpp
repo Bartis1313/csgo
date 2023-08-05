@@ -1,6 +1,6 @@
 #include "frameStageNotify.hpp"
 
-hooks::FrameStageNotify::value hooks::FrameStageNotify::hook(FAST_ARGS, FrameStage stage)
+hooks::FrameStageNotify::value hooks::FrameStageNotify::hook(HACK_FAST_ARGS, FrameStage stage)
 {
 	if (globals::isShutdown)
 	{

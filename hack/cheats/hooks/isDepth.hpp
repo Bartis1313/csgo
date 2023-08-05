@@ -9,9 +9,9 @@ public:
 	ADD_HOOK_FRIEND;
 private:
 	using value = bool;
-	using call = value(STDCALL*)();
+	using call = value(HACK_STDCALL*)();
 
-	static value STDCALL hook();
+	static value HACK_STDCALL hook();
 	inline static call original;
 };
 _HOOK_END

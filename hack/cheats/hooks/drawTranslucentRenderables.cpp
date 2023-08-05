@@ -11,7 +11,7 @@ static void renderChams()
 	chams::streamProof.endMaterialHook();
 }
 
-hooks::DrawTranslucentRenderables::value hooks::DrawTranslucentRenderables::hook(FAST_ARGS, bool inSkybox, bool shadowDepth)
+hooks::DrawTranslucentRenderables::value hooks::DrawTranslucentRenderables::hook(HACK_FAST_ARGS, bool inSkybox, bool shadowDepth)
 {
 	const bool renderThroughSmoke = vars::visuals->chams->ignoreSmoke;
 

@@ -19,7 +19,7 @@
 #include <SDK/structs/Entity.hpp>
 #include <cheats/game/game.hpp>
 
-hooks::DrawModelExecute::value hooks::DrawModelExecute::hook(FAST_ARGS, IMatRenderContext* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
+hooks::DrawModelExecute::value hooks::DrawModelExecute::hook(HACK_FAST_ARGS, IMatRenderContext* ctx, const DrawModelState_t& state, const ModelRenderInfo_t& info, Matrix3x4* matrix)
 {
 	if (globals::isShutdown)
 	{

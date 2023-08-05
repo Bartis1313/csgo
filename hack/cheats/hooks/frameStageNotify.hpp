@@ -11,9 +11,9 @@ public:
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, FrameStage);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, FrameStage);
 
-	static value FASTCALL hook(FAST_ARGS, FrameStage stage);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, FrameStage stage);
 	inline static call original;
 
 	using clInit = std::function<void()>;

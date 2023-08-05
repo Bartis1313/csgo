@@ -3,7 +3,7 @@
 #include <cheats/game/game.hpp>
 #include <cheats/features/visuals/player/sounds.hpp>
 
-hooks::PlayStepSound::value hooks::PlayStepSound::hook(FAST_ARGS, Vec3& origin, void* surface, float volume, bool force, void* unk)
+hooks::PlayStepSound::value hooks::PlayStepSound::hook(HACK_FAST_ARGS, Vec3& origin, void* surface, float volume, bool force, void* unk)
 {
 	if (!thisptr)
 		return original(thisptr, origin, surface, volume, force, unk);

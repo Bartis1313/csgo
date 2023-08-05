@@ -8,9 +8,9 @@ class DoPostScreenEffects
 	ADD_HOOK_FRIEND;
 private:
 	using value = int;
-	using call = value(THISCALL*)(THISPTR, int);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, int);
 
-	static value FASTCALL hook(FAST_ARGS, int val);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, int val);
 	inline static call original;
 
 	using cl = std::function<void()>;

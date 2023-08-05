@@ -5,7 +5,7 @@
 
 #include <intrin.h>
 
-hooks::setDrawColor::value hooks::setDrawColor::hook(FAST_ARGS, int r, int g, int b, int a)
+hooks::setDrawColor::value hooks::setDrawColor::hook(HACK_FAST_ARGS, int r, int g, int b, int a)
 {
 	const auto ret = reinterpret_cast<uintptr_t>(_ReturnAddress());
 

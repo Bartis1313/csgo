@@ -13,7 +13,7 @@
 // A DWORD (magic number) containing the four character code value 'DDS ' (0x20534444).
 #define DDS_HEADER 0x20534444
 
-hooks::UnknownFileSysAlloc::value hooks::UnknownFileSysAlloc::hook(FAST_ARGS, void* image)
+hooks::UnknownFileSysAlloc::value hooks::UnknownFileSysAlloc::hook(HACK_FAST_ARGS, void* image)
 {
 	volatile uintptr_t thisptrStack{ };
 	__asm mov thisptrStack, ebx;

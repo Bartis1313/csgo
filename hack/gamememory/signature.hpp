@@ -127,9 +127,9 @@ namespace signature
             }
         }
 
-        buffer.end() = '\0';
+        buffer[i - 1] = '\0';
 
-        return std::string_view{ buffer.data(), buffer.size() };
+        return std::string_view{ buffer.data(), i };
     }
 }
 

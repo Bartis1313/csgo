@@ -9,9 +9,9 @@ public:
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, uint32_t, bool, bool);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, uint32_t, bool, bool);
 
-	static value FASTCALL hook(FAST_ARGS, uint32_t panel, bool forceRepaint, bool allowForce);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, uint32_t panel, bool forceRepaint, bool allowForce);
 	inline static call original;
 
 	using clRun = std::function<void()>;

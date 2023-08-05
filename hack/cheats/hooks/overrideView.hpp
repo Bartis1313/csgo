@@ -11,9 +11,9 @@ public:
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, CViewSetup*);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, CViewSetup*);
 
-	static value FASTCALL hook(FAST_ARGS, CViewSetup* view);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, CViewSetup* view);
 	inline static call original;
 
 	using clRun = std::function<void(CViewSetup*)>;

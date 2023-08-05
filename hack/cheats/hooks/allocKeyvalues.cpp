@@ -4,7 +4,7 @@
 
 #include <intrin.h>
 
-hooks::AllocKeyValues::value hooks::AllocKeyValues::hook(FAST_ARGS, size_t size)
+hooks::AllocKeyValues::value hooks::AllocKeyValues::hook(HACK_FAST_ARGS, size_t size)
 {
 	if (reinterpret_cast<uintptr_t>(_ReturnAddress()) == memory::allocKeyValuesEngine()
 		|| reinterpret_cast<uintptr_t>(_ReturnAddress()) == memory::allocKeyValuesClient())

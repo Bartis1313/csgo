@@ -8,9 +8,9 @@ class OverrideConfig
 	ADD_HOOK_FRIEND;
 private:
 	using value = bool;
-	using call = value(THISCALL*)(THISPTR, void*, bool);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, void*, bool);
 
-	static value FASTCALL hook(FAST_ARGS, void* config, bool update);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, void* config, bool update);
 	inline static call original;
 };
 _HOOK_END

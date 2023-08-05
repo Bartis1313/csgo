@@ -12,9 +12,9 @@ class CreateEvent
 	ADD_HOOK_FRIEND;
 private:
 	using value = IGameEvent*;
-	using call = value(THISCALL*)(THISPTR, const char*, bool, uint32_t);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, const char*, bool, uint32_t);
 
-	static value FASTCALL hook(FAST_ARGS, const char* name, bool allowed, uint32_t unk);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, const char* name, bool allowed, uint32_t unk);
 	inline static call original;
 };
 _HOOK_END

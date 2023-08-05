@@ -5,7 +5,7 @@
 
 #include <intrin.h>
 
-hooks::IsFollowingEntity::value hooks::IsFollowingEntity::hook(FAST_ARGS)
+hooks::IsFollowingEntity::value hooks::IsFollowingEntity::hook(HACK_FAST_ARGS)
 {
 	if (vars::misc->disableItems->interpolate && reinterpret_cast<uintptr_t>(_ReturnAddress()) == memory::retAddrToInterpolation())
 	{

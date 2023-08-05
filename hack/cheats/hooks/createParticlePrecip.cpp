@@ -9,7 +9,7 @@
 
 #include <SDK/structs/Entity.hpp>
 
-hooks::CreateParticlePrecip::value hooks::CreateParticlePrecip::hook(FAST_ARGS)
+hooks::CreateParticlePrecip::value hooks::CreateParticlePrecip::hook(HACK_FAST_ARGS)
 {
 	auto precip = reinterpret_cast<Precipitation_t*>(thisptr);
 	bool m_bParticlePrecipInitialized = precip->m_bParticlePrecipInitialized();

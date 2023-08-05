@@ -5,7 +5,7 @@
 #include <SDK/structs/Entity.hpp>
 
 // or hook CHudElement::ShouldDraw() and do this here, and set the field inside CHudElement stackptr
-hooks::CHudIsHidden::value hooks::CHudIsHidden::hook(FAST_ARGS, int flags)
+hooks::CHudIsHidden::value hooks::CHudIsHidden::hook(HACK_FAST_ARGS, int flags)
 {
 	if (vars::misc->radar->enabled && game::isAvailable())
 	{

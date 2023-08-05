@@ -5,7 +5,7 @@
 #include <cheats/features/visuals/chams/factory/factory.hpp>
 #include <cheats/game/game.hpp>
 
-hooks::UpdatePostEffects::value hooks::UpdatePostEffects::hook(FAST_ARGS)
+hooks::UpdatePostEffects::value hooks::UpdatePostEffects::hook(HACK_FAST_ARGS)
 {
 	IMaterial* blurOverlayMaterial{ };
 

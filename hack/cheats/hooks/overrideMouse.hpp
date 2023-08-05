@@ -9,9 +9,9 @@ public:
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, float*, float*);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, float*, float*);
 
-	static value FASTCALL hook(FAST_ARGS, float* x, float* y);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, float* x, float* y);
 	inline static call original;
 
 	using clRun = std::function<void(float*, float*)>;

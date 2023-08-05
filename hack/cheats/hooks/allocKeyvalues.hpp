@@ -8,9 +8,9 @@ class AllocKeyValues
 	ADD_HOOK_FRIEND;
 private:
 	using value = void*;
-	using call = value(THISCALL*)(THISPTR, size_t);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, size_t);
 
-	static value FASTCALL hook(FAST_ARGS, size_t size);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, size_t size);
 	inline static call original;
 };
 _HOOK_END

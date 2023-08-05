@@ -2,7 +2,7 @@
 
 #include <cheats/features/visuals/world/weather/ground.hpp>
 
-hooks::OverrideConfig::value hooks::OverrideConfig::hook(FAST_ARGS, void* config, bool update)
+hooks::OverrideConfig::value hooks::OverrideConfig::hook(HACK_FAST_ARGS, void* config, bool update)
 {
 	weather::ground::applyManually();
 

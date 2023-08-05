@@ -35,6 +35,9 @@
 #define HACK_STDCALL __stdcall
 #define HACK_CDECL __cdecl
 
+#define HACK_THISPTR void* thisptr
+#define HACK_FAST_ARGS [[maybe_unused]] HACK_THISPTR, [[maybe_unused]] void* edx
+
 // mark functions implicitly that will execute in dllmain
 #define HACK_INIT
 

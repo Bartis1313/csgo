@@ -8,9 +8,9 @@ class DrawTranslucentRenderables
 	ADD_HOOK_FRIEND;
 private:
 	using value = void;
-	using call = value(THISCALL*)(THISPTR, bool, bool);
+	using call = value(HACK_THISCALL*)(HACK_THISPTR, bool, bool);
 
-	static value FASTCALL hook(FAST_ARGS, bool inSkybox, bool shadowDepth);
+	static value HACK_FASTCALL hook(HACK_FAST_ARGS, bool inSkybox, bool shadowDepth);
 	inline static call original;
 };
 _HOOK_END

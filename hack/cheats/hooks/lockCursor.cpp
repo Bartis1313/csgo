@@ -4,7 +4,7 @@
 #include <SDK/interfaces/interfaces.hpp>
 #include <menu/GUI-ImGui/menu.hpp>
 
-hooks::LockCursor::value hooks::LockCursor::hook(FAST_ARGS)
+hooks::LockCursor::value hooks::LockCursor::hook(HACK_FAST_ARGS)
 {
 	if (ImGuiMenu::active)
 	{
