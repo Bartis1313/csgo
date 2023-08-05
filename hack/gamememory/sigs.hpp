@@ -368,3 +368,5 @@
 #define PRECACHE_VARS				SIG("55 8B EC 6A FF 68 ? ? ? ? 64 A1 ? ? ? ? 50 64 89 25 ? ? ? ? 83 EC 14 53 8B D9 56 8B 75 10 89 5D EC 57 8D 7B 50 85 F6")
 // find yourself, scan the game
 #define LEVEL_NAME					SIG("80 3D ? ? ? ? ? 74 ? 8A 08 80 F9 ? 74 ? 80 F9 ? 75 ? C6 00 ? 40 80 38 ? 75 ? 8A 45")
+// "ClientDll"
+#define INIT_GAME_SYSTEMS			SIG("55 8B EC 83 EC 08 57 8B F9 89 7D FC E8 ? ? ? ? 84 C0")

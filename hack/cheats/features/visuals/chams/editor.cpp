@@ -30,6 +30,8 @@
 #include <cheats/helper/initable.hpp>
 #include <cheats/hooks/drawModelExecute.hpp>
 
+//#define USE_IMGUI_VANILLA_EDITOR
+
 namespace
 {
 	struct EditorHandler : InitAble
@@ -48,6 +50,27 @@ namespace
 		}
 	} editorDME;
 }
+
+#if defined USE_IMGUI_VANILLA_EDITOR
+struct SimpleEditor
+{
+	void SetText(const std::string& text)
+	{
+		this->text = text;
+	}
+	std::string GetText() const
+	{
+		return text;
+	}
+
+	void Render(const std::string& title)
+	{
+		ImGui::InputTextMultiline(title.c_str(), &text, ImVec2(-FLT_MIN, -FLT_MIN), ImGuiInputTextFlags_AllowTabInput | ImGuiInputTextFlags_CtrlEnterForNewLine);
+	}
+
+	std::string text;
+};
+#endif
 
 namespace materialEditor
 {
@@ -75,8 +98,13 @@ namespace materialEditor
 	constexpr std::string_view folderName{ "materials" };
 	std::filesystem::path saveDir;
 
+#if defined USE_IMGUI_VANILLA_EDITOR
+	SimpleEditor mainEditor;
+	SimpleEditor subAddEditor;
+#else
 	TextEditor mainEditor;
 	TextEditor subAddEditor;
+#endif
 
 	MaterialData materialToAdd;
 	nlohmann::json m_json;
@@ -360,20 +388,25 @@ bool materialEditor::isMaterialValid(MaterialData& _data, bool updating)
 
 void materialEditor::initEditor()
 {
-	saveDir = config::getHackPath() / config::getExtraLoadPath() / folderName / getPathForConfig();
+	saveDir = api::getHackPath() / api::getExtraLoadPath() / folderName / getPathForConfig();
 
 	initialIndexChams = chams::materials.size() - 1;
 
 	loadCfg();
 
 	mainEditor.SetText(editorMaterials.empty() ? "" : editorMaterials.front().buffer);
+
+#if !defined USE_IMGUI_VANILLA_EDITOR
 	mainEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::ValveKeyValues());
 	subAddEditor.SetLanguageDefinition(TextEditor::LanguageDefinition::ValveKeyValues());
+#endif
+
+	console::debug("editor init");
 }
 
 bool materialEditor::loadCfg()
 {
-	if (auto path = config::getHackPath() / config::getExtraLoadPath() / folderName; !std::filesystem::exists(path))
+	if (auto path = api::getHackPath() / api::getExtraLoadPath() / folderName; !std::filesystem::exists(path))
 		std::filesystem::create_directories(path);
 
 	std::ifstream input{ saveDir };

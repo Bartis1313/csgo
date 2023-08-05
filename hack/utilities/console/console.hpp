@@ -17,7 +17,7 @@ struct SDKColor;
 
 namespace console
 {
-	void setLogger(const std::string_view title, const std::string_view logName);
+	HACK_INIT void setLogger(const std::string_view title, const std::string_view logName);
 	void shutdown();
 	template<typename... Args_t>
 	inline void log(TypeLogs type, const std::string_view fmt, Args_t&&... args);
@@ -87,8 +87,6 @@ namespace console
 template<typename... Args_t>
 inline void console::log(TypeLogs type, const std::string_view fmt, Args_t&&... args)
 {
-	std::scoped_lock lock{ detail::m_mutex };
-
 	if (!detail::isPossibleToLog(type))
 		return;
 

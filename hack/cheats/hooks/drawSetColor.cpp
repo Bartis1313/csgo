@@ -3,6 +3,8 @@
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
+#include <intrin.h>
+
 hooks::setDrawColor::value hooks::setDrawColor::hook(FAST_ARGS, int r, int g, int b, int a)
 {
 	const auto ret = reinterpret_cast<uintptr_t>(_ReturnAddress());

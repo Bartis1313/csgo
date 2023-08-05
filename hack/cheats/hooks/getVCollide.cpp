@@ -12,6 +12,8 @@
 #include <cheats/features/visuals/world/weather/precipitation.hpp>
 #include <utilities/console/console.hpp>
 
+#include <intrin.h>
+
 // server modelinfo
 // 8B 0D ? ? ? ? 8B 04 B0 0F BF 90 ? ? ? ? 8B 01 52 FF 50 18 85 C0 0F 84 ? ? ? ? B9 ? ? ? ? 66 85 08 0F 86 ? ? ? ? 8B 0D ? ? ? ? 8D 5D F4 8B 40 04 53 8B 11
 

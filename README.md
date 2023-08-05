@@ -104,6 +104,8 @@ Please follow the steps outlined in the [Vcpkg Getting Started guide](https://gi
 ## Running the Cheat
 
 The default key to open the cheat's menu is `INSERT`. Additional options within the menu will be self-explanatory.
+For debugging the cheat please use injection method that lets you fully load pdb. As simpliest is better.
+Debug build does allow exceptions, whereas release mode doesn't. Api will still take care to "simulate" the throws in the code.
 
 # Log
 <details>
@@ -193,7 +195,8 @@ The default key to open the cheat's menu is `INSERT`. Additional options within 
 * 3.0.2 - Fixed the glow system, with better and more performant solution. I have also fixed the glow box lines with fading color. Added basic streamproof solution, which lacks some aspects and I couldn't force the game to understand some render states. Added interface names dumping.
 * 3.0.3 - Streamproof chams added, world lights modulation added. Chams got somewhat better solutions to render them, especially see ignorez. Tried to mess with collide for weather particles, but failed to understand everything, code was left for testing usage only. Added alternative hooking method, in case anyone needs to mess with gameoverlay.dll. Fixed bug with round ends event. 
 * 3.0.4 - Weather works for more types. Removed all listened events, instead gather information from another hook. Particle editing doesn't touch alpha channel anymore.
-* 3.0.5 - Weather effects, and 2 bugs fixed. 1st is tone bug with default bloom, 2nd is wrapper for createMaterial missing loadFromBuffer.
+* 3.0.5 - Weather effects, and 2 bugs fixed. 1st is tone bug with default bloom, 2nd is wrapper for createMaterial missing loadFromBuffer. 
+* 3.0.6 - Introduced simple api, to still be able to use ``throw`` instruction. [Manual map errors](https://github.com/Bartis1313/csgo/issues/77) are fixed. Fixed dumped vmt files. Few crashes with few forgotten checks where fixed. Removed discord RPC, because it is deprecated (discord-rpc lib). Introduced own ntdll functions for memory (not used, as currently lazy importer does great job with exports and modules). Cleaned up DllMain. Switched the timer class to use lower level functions for timers (abi didn't change). 
 </details>
 
 # People who helped

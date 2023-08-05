@@ -7,7 +7,6 @@
 #include <utilities/console/console.hpp>
 
 #include <imgui_stdlib.h>
-#include <mutex>
 
 void tabs::settings::draw()
 {
@@ -36,7 +35,7 @@ void tabs::settings::draw()
 		{
 			if (ImGui::InputText("Config name", &text, ImGuiInputTextFlags_EnterReturnsTrue))
 			{
-				if (utilities::toLowerCase(text) != config::getDefaultConfigName())
+				if (utilities::toLowerCase(text) != api::getDefaultConfigName())
 				{
 					config::save(text);
 					text.clear();

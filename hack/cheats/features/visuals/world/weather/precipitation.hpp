@@ -17,7 +17,7 @@ namespace weather::precipitation
 	void run(FrameStage stage);
 	void reset();
 	void shutdown();
-	void handleSounds(IGameEvent* _event);
+	void preacheCustomFiles();
 	std::string_view pickSoundForPrecip(helper::CustomPrecipitationType_t precip);
 
 	Precipitation_t* getPrecip();

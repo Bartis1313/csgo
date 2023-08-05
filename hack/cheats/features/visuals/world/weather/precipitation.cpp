@@ -36,6 +36,7 @@
 #include <cheats/hooks/frameStageNotify.hpp>
 #include <cheats/hooks/levelInitPreEntity.hpp>
 #include <cheats/hooks/clientModeCSNormalEvent.hpp>
+#include <cheats/hooks/drawModelExecute.hpp>
 #include <cheats/features/visuals/chams/factory/factory.hpp>
 
 namespace
@@ -58,13 +59,13 @@ namespace
 		}
 	} weatherReseter;
 
-	struct WeatherSound : hooks::ClientModeCSNormalEvent
+	struct WeatherFiles : hooks::DrawModelExecute
 	{
-		WeatherSound()
+		WeatherFiles()
 		{
-			this->registerEvent(weather::precipitation::handleSounds);
+			this->registerInit(weather::precipitation::preacheCustomFiles);
 		}
-	} weatherSounds;
+	} weatherFiles;
 }
 
 namespace weather::precipitation
@@ -118,6 +119,8 @@ namespace weather::precipitation
 
 	bool done = false;
 	bool newMap = false;
+	float lastTimeStorm = 0.0f;
+	size_t lightRapidsCounter = 0;
 	DLight_t* lightStrike = nullptr;
 	
 	std::vector<std::pair<IMaterial*, std::string_view>> groundWorld;
@@ -155,6 +158,8 @@ std::vector<char> loadFile(HMODULE hModule, const int idRes, const char* resourc
 	if (!dataPtr)
 		return {};
 
+	UnlockResource(hGlobal);
+
 	return std::vector<char>(dataPtr, dataPtr + dataSize);
 }
 
@@ -171,6 +176,8 @@ void saveResourceToDest(const std::vector<char>& data, const std::filesystem::pa
 }
 
 #include <SDK/IBaseFileSystem.hpp>
+#include <SDK/INetworkStringTableContainer.hpp>
+#include <SDK/interfaces/interfaces.hpp>
 
 // something broken, they never show :(
 void weather::precipitation::init()
@@ -179,7 +186,7 @@ void weather::precipitation::init()
 
 	const auto bluelightningVMT = loadFile(globals::instance, IDR_VMT_FILE2, "VMT_FILE");
 	saveResourceToDest(bluelightningVMT, pathSprites / "bluelightning.vmt");
-
+	
 	const auto bluelightningVTF = loadFile(globals::instance, IDR_VTF_FILE2, "VTF_FILE");
 	saveResourceToDest(bluelightningVTF, pathSprites / "bluelightning.vtf");
 
@@ -206,6 +213,24 @@ void weather::precipitation::init()
 
 	const auto physcannon_bluelight1bVTF = loadFile(globals::instance, IDR_VTF_FILE6, "VTF_FILE");
 	saveResourceToDest(physcannon_bluelight1bVTF, pathSprites / "physcannon_bluelight1b.vtf");
+
+	const auto pathParticles = std::filesystem::current_path() / "csgo" / "materials" / "particle";
+
+	const auto snowflakeVMT = loadFile(globals::instance, IDR_VMT_FILE1, "VMT_FILE");
+	saveResourceToDest(snowflakeVMT, pathParticles / "snowflake.vmt");
+
+	const auto snowflakeVTF = loadFile(globals::instance, IDR_VTF_FILE1, "VTF_FILE");
+	saveResourceToDest(snowflakeVTF, pathParticles / "snowflake.vtf");
+}
+
+void weather::precipitation::preacheCustomFiles()
+{
+	precacheModel("materials/sprites/bluelightning.vmt");
+	precacheModel("materials/sprites/bluelight1.vmt");
+	precacheModel("materials/sprites/lgtning.vmt");
+	precacheModel("materials/sprites/physcannon_bluelight1.vmt");
+	precacheModel("materials/sprites/physcannon_bluelight1b.vmt");
+	precacheModel("materials/particle/snowflake.vmt");
 }
 
 void weather::precipitation::create(PrecipitationType_t precip)
@@ -334,13 +359,23 @@ void weather::precipitation::run(FrameStage stage)
 		}
 	}
 
-	static size_t lightRapidsCounter = 0;
+	if (!vars::visuals->world->weather->storm)
+	{
+		lightRapidsCounter = 0;
+		if (lightStrike)
+		{
+			lightStrike->m_die = memory::interfaces::globalVars->m_curtime;
+			lightStrike = nullptr;
+		}
+
+		return;
+	}
+
 	constexpr size_t maxRapids = 3;
 	constexpr float radius = 1200.0f;
 	if (precipType == helper::CustomPrecipitationType_t::PRECIPITATION_TYPE_PARTICLERAINSTORM)
 	{
-		static float lastTime = memory::interfaces::globalVars->m_curtime + Random::getRandom(2.0f, 5.0f);
-		if (memory::interfaces::globalVars->m_curtime > lastTime)
+		if (memory::interfaces::globalVars->m_curtime > lastTimeStorm)
 		{
 			const Vec3 directionVector = math::angleVec(game::localPlayer->absAngles());
 			const Vec3 localHead = game::localPlayer->getHitboxPos(HITBOX_HEAD);
@@ -351,28 +386,35 @@ void weather::precipitation::run(FrameStage stage)
 				localHead[2] + 200.0f // dont care, just add a lot
 			};
 
-			// this is far from proper, Clight seems better
-			lightStrike = memory::interfaces::efx->clAllocDLight(1337);
-			lightStrike->m_key = 1337;
-			//dynamic->m_style = 10; // DUMPED
-			lightStrike->m_radius = radius;
-			//dynamic->m_flags = 2563; // DUMPED
-			float m_OuterAngle = 0.0f;
-			float m_InnerAngle = 0.0f;
-			if (m_OuterAngle > 0.0f)
-				lightStrike->m_flags |= DLIGHT_NO_WORLD_ILLUMINATION;
-			lightStrike->m_color = Colors::White;
-			lightStrike->m_exponent = 7;
-			lightStrike->m_origin = newPosition;
-			lightStrike->m_innerAngle = m_InnerAngle;
-			lightStrike->m_outerAngle = m_OuterAngle;
-			lightStrike->m_die = memory::interfaces::globalVars->m_curtime + 1e6f;
-			lightStrike->m_direction = directionVector;
+			if (vars::visuals->world->weather->saveFpsStorm)
+			{
+				// do the fullbright, white ambient + forced tone
+			}
+			else
+			{
+				// this is far from proper, Clight seems better
+				lightStrike = memory::interfaces::efx->clAllocDLight(1337);
+				lightStrike->m_key = 1337;
+				//dynamic->m_style = 10; // DUMPED
+				lightStrike->m_radius = radius;
+				//dynamic->m_flags = 2563; // DUMPED
+				float m_OuterAngle = 0.0f;
+				float m_InnerAngle = 0.0f;
+				if (m_OuterAngle > 0.0f)
+					lightStrike->m_flags |= DLIGHT_NO_WORLD_ILLUMINATION;
+				lightStrike->m_color = Colors::White;
+				lightStrike->m_exponent = 7;
+				lightStrike->m_origin = newPosition;
+				lightStrike->m_innerAngle = m_InnerAngle;
+				lightStrike->m_outerAngle = m_OuterAngle;
+				lightStrike->m_die = memory::interfaces::globalVars->m_curtime + 1e6f;
+				lightStrike->m_direction = directionVector;
 
-			memory::interfaces::engineSound->emitAmbientSound(pickRandomSoundForThunder().data(),
-				vars::visuals->world->weather->volume, PITCH_NORM, SND_SPAWNING | SND_STOP_LOOPING);
+				memory::interfaces::engineSound->emitAmbientSound(pickRandomSoundForThunder().data(),
+					vars::visuals->world->weather->volume, PITCH_NORM, SND_SPAWNING | SND_STOP_LOOPING);
+			}
 
-			lastTime = memory::interfaces::globalVars->m_curtime + Random::getRandom<float>(2.0f, 5.0f);
+			lastTimeStorm = memory::interfaces::globalVars->m_curtime + Random::getRandom<float>(2.0f, 5.0f);
 		}
 	}
 
@@ -395,12 +437,12 @@ void weather::precipitation::run(FrameStage stage)
 				BeamInfo_t info{ };
 				info.m_type = TE_BEAMPOINTS;
 				info.m_flags = FBEAM_FADEOUT | FBEAM_ONLYNOISEONCE;
-				info.m_modelName = "sprites/physbeam.vmt";
-				info.m_modelIndex = -1;
+				info.m_modelName = "sprites/bluelightning.vmt";
+				info.m_modelIndex = memory::interfaces::modelInfo->getModelIndex("materials/sprites/bluelightning.vmt");
 				info.m_haloIndex = -1;
 				info.m_haloScale = 0.0f;
 				info.m_life = duration + 0.2f;
-				info.m_width = 12.0f;
+				info.m_width = 70.0f;
 				info.m_endWidth = 2.0f;
 				info.m_fadeLength = 1.0f;
 				info.m_amplitude = 20.0f;
@@ -446,22 +488,6 @@ void weather::precipitation::run(FrameStage stage)
 	}
 }
 
-void weather::precipitation::handleSounds(IGameEvent* _event)
-{
-	if (std::string_view{ _event->getName() } != "round_start")
-		return;
-
-	const helper::CustomPrecipitationType_t precipType = helper::configToPrecip(vars::visuals->world->weather->type);
-	if (precipType == helper::CustomPrecipitationType_t::PRECIPITATION_TYPE_NONE)
-		return;
-
-	if (!done) // highly unlikely
-		return;
-
-	memory::interfaces::engineSound->emitAmbientSound(pickSoundForPrecip(precipType).data(),
-		vars::visuals->world->weather->volume, PITCH_NORM, SND_SPAWNING | SND_STOP_LOOPING);
-}
-
 void weather::precipitation::reset()
 {
 	// engine does it
@@ -469,6 +495,9 @@ void weather::precipitation::reset()
 	weatherFields.ent = nullptr;
 
 	newMap = true;
+
+	lastTimeStorm = memory::interfaces::globalVars->m_curtime + Random::getRandom(2.0f, 5.0f);
+	lightRapidsCounter = 0;
 }
 
 void weather::precipitation::shutdown()

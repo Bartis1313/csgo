@@ -37,7 +37,6 @@ namespace
 	{
 		HandlerAim()
 		{
-			this->registerInit(Aimbot::init);
 			this->registerRun(Aimbot::runMouse);
 		}
 	} handlerAim;
@@ -54,6 +53,7 @@ namespace
 	{
 		HandlerAimCM()
 		{
+			this->registerInit(Aimbot::init);
 			this->registerRunPrediction(Aimbot::run);
 		}
 	} handlerAimCM;
@@ -87,6 +87,8 @@ namespace Aimbot
 	IConVar* weapon_recoil_scale{ };
 	IConVar* m_yaw{ };
 	IConVar* m_pitch{ };
+
+	bool inited{ false };
 }
 
 void Aimbot::init()
@@ -187,6 +189,9 @@ void Aimbot::runMouse(float* x, float* y)
 void Aimbot::run(CUserCmd* cmd)
 {
 	std::lock_guard lock{ mutex };
+
+	if (!inited)
+		return;
 
 	if (!game::isAvailable())
 		return;

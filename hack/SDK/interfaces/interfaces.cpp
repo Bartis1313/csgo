@@ -17,6 +17,8 @@
 #include <string>
 #include <optional>
 
+// #define CAPTURE_INTERFACES
+
 #ifdef CAPTURE_INTERFACES
 static std::unordered_map<std::string, std::vector<std::pair<std::string, void*>>> allInterfaces;
 
@@ -140,6 +142,7 @@ static std::optional<Interface<T>> findInterface(const std::string_view moduleNa
 }
 #endif
 
+#if !defined(CAPTURE_INTERFACES)
 // capture and log
 // var - var you want to init
 // _module - module name from the game, eg: engine.dll
@@ -150,6 +153,7 @@ static std::optional<Interface<T>> findInterface(const std::string_view moduleNa
 	else \
 		throw std::runtime_error(std::format("Interface {} was nullptr", _interface)); \
 	console::debug("found {} at addr: 0x{:X}", _interface, reinterpret_cast<uintptr_t>(var.base));
+#endif
 
 void memory::interfaces::init()
 {
@@ -177,12 +181,12 @@ void memory::interfaces::init()
 	findInterface(iSystem, "InputSystemVersion0");
 	findInterface(effects, "IEffects0");
 	findInterface(fileSystem, "VFileSystem0");
-	findInterface(sound, "IEngineSoundClient0");
 	findInterface(mdlCache, "MDLCache0");
 	findInterface(baseFileSystem, "VBaseFileSystem0");
 	findInterface(physicsCollision, "VPhysicsCollision0");
 	findInterface(engineSound, "IEngineSoundClient0");
 	findInterface(physicsProps, "VPhysicsSurfaceProps0");
+	findInterface(clientStringTableContainer, "VEngineClientStringTable0");
 #else
 	CAP(engine, ENGINE_DLL, "VEngineClient0");
 	CAP(panel, VGUI_DLL, "VGUI_Panel0");
@@ -210,6 +214,7 @@ void memory::interfaces::init()
 	CAP(physicsCollision, VPHYSICS_DLL, "VPhysicsCollision0");
 	CAP(engineSound, ENGINE_DLL, "IEngineSoundClient0");
 	CAP(physicsProps, VPHYSICS_DLL, "VPhysicsSurfaceProps0");
+	CAP(clientStringTableContainer, ENGINE_DLL, "VEngineClientStringTable0");
 #endif
 
 	console::debug("interfaces success");

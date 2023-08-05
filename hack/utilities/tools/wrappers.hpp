@@ -8,7 +8,7 @@
 
 template<typename T>
 [[nodiscard]] inline constexpr auto E2T(T en)
-{ 
+{
     return static_cast<std::underlying_type_t<T>>(en);
 }
 

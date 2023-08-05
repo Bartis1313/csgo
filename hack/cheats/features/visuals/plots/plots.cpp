@@ -71,6 +71,8 @@ void plots::init()
 	fpsRecords.reserve(MAX_ELEMENTS_PLOTS);
 
 	std::iota(sharedXS.begin(), sharedXS.end(), 0);
+
+	console::debug("plots init");
 }
 
 void plots::draw()

@@ -27,7 +27,6 @@ namespace
 	{
 		RcsHandler()
 		{
-			this->registerInit(rcs::init);
 			this->registerRun(rcs::runMouse);
 		}
 	} rcsHandler;
@@ -36,6 +35,7 @@ namespace
 	{
 		RcsHandlerCM()
 		{
+			this->registerInit(rcs::init);
 			this->registerRunPrediction(rcs::run);
 		}
 	} rcsHandlerCM;
@@ -52,6 +52,8 @@ namespace rcs
 	float scale{ };
 	std::mutex mutex{ };
 	CUserCmd* m_cmd{ };
+
+	bool inited{ false };
 }
 
 void rcs::init()
@@ -59,11 +61,16 @@ void rcs::init()
 	weapon_recoil_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
 	m_yaw = memory::interfaces::cvar->findVar("m_yaw");
 	m_pitch = memory::interfaces::cvar->findVar("m_pitch");
+
+	inited = true;
 }
 
 void rcs::runMouse(float* x, float* y)
 {
 	std::lock_guard lock{ mutex };
+
+	if (!inited)
+		return;
 
 	if (!shouldWork)
 		return;

@@ -43,6 +43,11 @@ namespace
 	} chamsInit;
 }
 
+namespace chams
+{
+	bool initedMats{ false };
+}
+
 void chams::init()
 {
 	MaterialData flat
@@ -88,6 +93,8 @@ void chams::init()
 		.createType = CreationType::FROM_STRING
 	};
 	materials.push_back(pearlescent);
+
+	console::debug("chams init");
 }
 
 void chams::initMaterials()
@@ -97,6 +104,8 @@ void chams::initMaterials()
 
 	streamProof.init();
 	streamProofDME.init();
+
+	initedMats = true;
 }
 
 namespace chams::manual
@@ -440,6 +449,9 @@ void chams::manual::drawBacktrack(Player_t* player)
 void chams::manual::run()
 {
 	DME::shouldDisable = false;
+
+	if (!initedMats)
+		return;
 
 	if (!game::isAvailable())
 		return;

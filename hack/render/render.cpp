@@ -342,7 +342,7 @@ void SurfaceRender::textf(const int x, const int y, const unsigned long font, co
 		return;
 
 	if (strlen(fmt) > BUFFER_SIZE)
-		return; // maybe throw warn
+		return;
 
 	va_list args;
 
@@ -446,7 +446,7 @@ void SurfaceRender::initNewTexture(int& id, Color* RGBA, const int w, const int 
 	if (id)
 		memory::interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
-		throw std::runtime_error(std::format("setTextureRGBA failed to create new texture, ID was: {}", id));
+		HACK_THROW(std::format("setTextureRGBA failed to create new texture, ID was: {}", id));
 }
 void SurfaceRender::initNewTexture(int& id, unsigned char* RGBA, const int w, const int h)
 {
@@ -454,7 +454,7 @@ void SurfaceRender::initNewTexture(int& id, unsigned char* RGBA, const int w, co
 	if (id)
 		memory::interfaces::surface->setTextureRGBA(id, RGBA, w, h);
 	else
-		throw std::runtime_error(std::format("setTextureRGBA failed to create new texture, ID was: {}", id));
+		HACK_THROW(std::format("setTextureRGBA failed to create new texture, ID was: {}", id));
 }
 
 void SurfaceRender::drawImage(const Resource& res, const int x, const int y, const int w, const int h, const Color& color)
@@ -579,7 +579,7 @@ void ImRender::init(ImGuiIO& io)
 #undef ADD_MERGED_ICONS
 	}
 	else
-		throw std::runtime_error("could not reach windows path");
+		api::messageBox("Could not reach windows path", "Render init");
 
 	console::debug("init imgui fonts success");
 }
@@ -942,7 +942,7 @@ void ImRender::textf(const float x, const float y, ImFont* font, const bool cent
 		return;
 
 	if (strlen(fmt) > BUFFER_SIZE)
-		return; // maybe throw warn
+		return;
 
 	va_list args;
 

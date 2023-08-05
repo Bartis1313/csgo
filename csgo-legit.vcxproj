@@ -51,6 +51,7 @@
     <TargetName>Debug_$(ProjectName)</TargetName>
     <SourcePath>$(SourcePath)</SourcePath>
     <IntDir>.\build\Intermediate\Debug\</IntDir>
+    <IgnoreImportLibrary>true</IgnoreImportLibrary>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>.\build\Release\</OutDir>
@@ -78,7 +79,6 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
       <PreprocessorDefinitions>WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest %(AdditionalOptions)</AdditionalOptions>
@@ -88,18 +88,12 @@
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <BufferSecurityCheck>true</BufferSecurityCheck>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
-      <WholeProgramOptimization>false</WholeProgramOptimization>
-      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
-      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
-      <IntrinsicFunctions>false</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <TreatWarningAsError>true</TreatWarningAsError>
-      <FloatingPointModel>Fast</FloatingPointModel>
       <BuildStlModules>false</BuildStlModules>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <ProjectReference>
       <UseLibraryDependencyInputs>false</UseLibraryDependencyInputs>
@@ -110,13 +104,14 @@
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>DbgHelp.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <EntryPointSymbol>DllMainEntry</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>NDEBUG;WIN32_LEAN_AND_MEAN;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_HAS_EXCEPTIONS=0;WIN32_LEAN_AND_MEAN;NOMINMAX;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalOptions>/std:c++latest /Gw %(AdditionalOptions)</AdditionalOptions>
       <LanguageStandard>stdcpplatest</LanguageStandard>
       <CreateHotpatchableImage>
@@ -124,45 +119,47 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <ForcedIncludeFiles>pch.h</ForcedIncludeFiles>
-      <EnforceTypeConversionRules>
-      </EnforceTypeConversionRules>
-      <RuntimeTypeInfo>
-      </RuntimeTypeInfo>
-      <LanguageStandard_C>Default</LanguageStandard_C>
       <UndefinePreprocessorDefinitions>
       </UndefinePreprocessorDefinitions>
       <DebugInformationFormat>None</DebugInformationFormat>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <StringPooling>true</StringPooling>
       <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
-      <OmitFramePointers>false</OmitFramePointers>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
       <TreatWarningAsError>true</TreatWarningAsError>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <BuildStlModules>false</BuildStlModules>
+      <ExceptionHandling>false</ExceptionHandling>
+      <SDLCheck>false</SDLCheck>
+      <OmitFramePointers>false</OmitFramePointers>
+      <ControlFlowGuard>false</ControlFlowGuard>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <LanguageStandard_C>Default</LanguageStandard_C>
+      <RuntimeTypeInfo>false</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>DbgHelp.lib;d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>d3dx9.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <GenerateDebugInformation>false</GenerateDebugInformation>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
+      <EntryPointSymbol>DllMainEntry</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="hack\api.cpp" />
     <ClCompile Include="hack\cheats\features\misc\disable\convars.cpp" />
     <ClCompile Include="hack\cheats\features\tests\test.cpp" />
     <ClCompile Include="hack\cheats\features\visuals\chams\factory\factory.cpp" />
@@ -211,6 +208,7 @@
     <ClCompile Include="hack\cheats\hooks\levelInitPreEntity.cpp" />
     <ClCompile Include="hack\cheats\hooks\levelShutdown.cpp" />
     <ClCompile Include="hack\cheats\hooks\lockCursor.cpp" />
+    <ClCompile Include="hack\cheats\hooks\mapLoaderInit.cpp" />
     <ClCompile Include="hack\cheats\hooks\newParticleEffectSetControlPoint.cpp" />
     <ClCompile Include="hack\cheats\hooks\overrideConfig.cpp" />
     <ClCompile Include="hack\cheats\hooks\renderSmokeOverlay.cpp" />
@@ -280,7 +278,6 @@
     <ClCompile Include="hack\cheats\features\blacklist\blacklist.cpp" />
     <ClCompile Include="hack\cheats\features\cache\cache.cpp" />
     <ClCompile Include="hack\cheats\features\callbacks\callbacks.cpp" />
-    <ClCompile Include="hack\cheats\features\discord\discord.cpp" />
     <ClCompile Include="hack\cheats\features\events\events.cpp" />
     <ClCompile Include="hack\cheats\features\fakelatency\fakelatency.cpp" />
     <ClCompile Include="hack\cheats\features\logger\logger.cpp" />
@@ -292,6 +289,7 @@
     <ClCompile Include="hack\cheats\features\particle\particle.cpp" />
     <ClCompile Include="hack\deps\ImGui\editor\LanguageDefinitions.cpp" />
     <ClCompile Include="hack\gamememory\address.cpp" />
+    <ClCompile Include="hack\gamememory\system\win.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\sections\combat\aim.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\sections\editors\chamsEditor.cpp" />
     <ClCompile Include="hack\menu\GUI-ImGui\sections\editors\editors.cpp" />
@@ -305,7 +303,6 @@
     <ClCompile Include="hack\SDK\CNewParticleEffect.cpp" />
     <ClCompile Include="hack\SDK\IMatRenderContext.cpp" />
     <ClCompile Include="hack\SDK\material.cpp" />
-    <ClCompile Include="hack\setup\seh.cpp" />
     <ClCompile Include="hack\utilities\tools\tools.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -347,6 +344,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="hack\api.hpp" />
     <ClInclude Include="hack\cheats\features\combat\aimbot\aimbot.hpp" />
     <ClInclude Include="hack\cheats\features\combat\aimbot\aimbotDraw.hpp" />
     <ClInclude Include="hack\cheats\features\combat\aimbot\helper.hpp" />
@@ -354,7 +352,6 @@
     <ClInclude Include="hack\cheats\features\blacklist\blacklist.hpp" />
     <ClInclude Include="hack\cheats\features\cache\cache.hpp" />
     <ClInclude Include="hack\cheats\features\callbacks\callbacks.hpp" />
-    <ClInclude Include="hack\cheats\features\discord\discord.hpp" />
     <ClInclude Include="hack\cheats\features\events\events.hpp" />
     <ClInclude Include="hack\cheats\features\fakelatency\fakelatency.hpp" />
     <ClInclude Include="hack\cheats\features\logger\logger.hpp" />
@@ -431,10 +428,12 @@
     <ClInclude Include="hack\cheats\hooks\getVelocity.hpp" />
     <ClInclude Include="hack\cheats\hooks\initializeParticlePrecip.hpp" />
     <ClInclude Include="hack\cheats\hooks\drawEffects.hpp" />
+    <ClInclude Include="hack\cheats\hooks\mapLoaderInit.hpp" />
     <ClInclude Include="hack\cheats\hooks\newParticleEffectSetControlPoint.hpp" />
     <ClInclude Include="hack\cheats\hooks\overrideConfig.hpp" />
     <ClInclude Include="hack\cheats\hooks\tracerDraw.hpp" />
     <ClInclude Include="hack\cheats\hooks\vCollideLoad.hpp" />
+    <ClInclude Include="hack\gamememory\system\win.hpp" />
     <ClInclude Include="hack\SDK\CCommonHostState.hpp" />
     <ClInclude Include="hack\cheats\hooks\cHudIsHidden.hpp" />
     <ClInclude Include="hack\cheats\hooks\createEvent.hpp" />
@@ -464,6 +463,7 @@
     <ClInclude Include="hack\SDK\CUtlMemory.hpp" />
     <ClInclude Include="hack\SDK\IEngineSound.hpp" />
     <ClInclude Include="hack\SDK\IMaterialInternal.hpp" />
+    <ClInclude Include="hack\SDK\INetworkStringTableContainer.hpp" />
     <ClInclude Include="hack\SDK\IPhysicsCollision.hpp" />
     <ClInclude Include="hack\SDK\IPhysicsObject.hpp" />
     <ClInclude Include="hack\SDK\IPhysicsSurfaceProps.hpp" />
@@ -616,7 +616,6 @@
     <ClInclude Include="hack\SDK\structs\Entity.hpp" />
     <ClInclude Include="hack\SDK\varMapping.hpp" />
     <ClInclude Include="hack\SDK\vars.hpp" />
-    <ClInclude Include="hack\setup\seh.hpp" />
     <ClInclude Include="hack\setup\setup.hpp" />
     <ClInclude Include="hack\utilities\console\console.hpp" />
     <ClInclude Include="hack\utilities\console\consoleDraw.hpp" />

@@ -3,14 +3,26 @@
 #include <SDK/IMaterialSystem.hpp>
 #include <config/vars.hpp>
 #include <cheats/features/visuals/chams/factory/factory.hpp>
+#include <cheats/game/game.hpp>
 
 hooks::UpdatePostEffects::value hooks::UpdatePostEffects::hook(FAST_ARGS)
 {
-	static IMaterial* blurOverlayMaterial = material::factory::findMaterial("dev/scope_bluroverlay", TEXTURE_GROUP_OTHER);
-	blurOverlayMaterial->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
+	IMaterial* blurOverlayMaterial{ };
+
+	if (game::isAvailable())
+	{
+		static std::once_flag onceFlag;
+		std::call_once(onceFlag, [&blurOverlayMaterial]() { blurOverlayMaterial = material::factory::findMaterial("dev/scope_bluroverlay", TEXTURE_GROUP_OTHER); });
+	}
+
+	if(blurOverlayMaterial)
+		blurOverlayMaterial->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, vars::misc->scope->enabled);
 
 	if (globals::isShutdown)
-		blurOverlayMaterial->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, false);
+	{
+		if(blurOverlayMaterial)
+			blurOverlayMaterial->setMaterialVarFlag(MATERIAL_VAR_NO_DRAW, false);
+	}
 
 	original(thisptr);
 

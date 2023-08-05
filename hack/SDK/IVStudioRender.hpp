@@ -5,6 +5,7 @@
 #include <utilities/tools/tools.hpp>
 #include "helpers/pad.hpp"
 #include "helpers/vfunc.hpp"
+#include "math/Vector.hpp"
 
 #include <string>
 
@@ -17,6 +18,9 @@ private:
 private:
     OverrideType_t m_type;
 public:
+    VFUNC(int, getNumAbientLightSamples, 18, (), (this));
+    VFUNC(void, setAmbientLightColors, 21, (const Vec3* colors), (this, colors));
+
     VFUNC(void, forcedMaterialOverride, 33, (IMaterial* mat, OverrideType_t type = OverrideType_t::OVERRIDE_NORMAL, int index = -1), (this, mat, type, index));
     bool isForced()
     {

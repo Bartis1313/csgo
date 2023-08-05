@@ -3,6 +3,8 @@
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
+#include <intrin.h>
+
 hooks::ViewFade::value hooks::ViewFade::hook(FAST_ARGS, uint8_t* color, IMaterial* material, bool t)
 {
 	hooks::capture::engineRenderer = thisptr;

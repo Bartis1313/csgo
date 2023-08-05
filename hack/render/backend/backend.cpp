@@ -41,11 +41,15 @@ void renderbackend::createContext(HWND hwnd)
 		});
 }
 
+#include <utilities/res.hpp>
+
 void renderbackend::shutdown()
 {
 	static std::once_flag once;
 	std::call_once(once, []()
 		{
+			Resource::destroyAll();
+
 			ImGui_ImplDX9_Shutdown();
 			ImGui_ImplWin32_Shutdown();
 			ImGui::DestroyContext();

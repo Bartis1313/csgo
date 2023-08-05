@@ -2,11 +2,11 @@
 
 #include <utilities/runnable.hpp>
 
-#include <setup/setup.hpp>
+#include <cheats/game/game.hpp>
 
 class InitAble
 {
-	friend bool setup::init(void* instance);
+	friend void game::init();
 protected:
 	static void registerInit(const std::function<void()>& func) { Storage::runs.push_back(func); }
 private:

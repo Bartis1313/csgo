@@ -38,7 +38,7 @@ public:
 	static void clear();
 	// we need to call this once
 	// manual init is a thing due to unload during the round
-	static void init();
+	HACK_INIT static void init();
 
 	struct HolderData
 	{

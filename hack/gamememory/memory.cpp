@@ -37,6 +37,8 @@ void memory::init()
 	memory::modules::addModule<"gameoverlayrenderer.dll">();
 	memory::modules::addModule<"vphysics.dll">();
 
+	memory::interfaces::init();
+
 	using namespace memory;
 	using namespace memory::interfaces;
 
@@ -52,7 +54,7 @@ void memory::init()
 	callbacksHead = scan(CLIENT_DLL, HEAD_OF_EFFECTS).add(0x2).deRef(Dereference::TWICE);
 	camThink = scan(CLIENT_DLL, CAM_THINK);
 	renderDrawPoints = scan(STUDIORENDER_DLL, R_STUDIODRAWPOINTS);
-	localPlayer = scan(CLIENT_DLL, LOCAL_PLAYER).add(0x2).deRef();
+	localPlayer = scan(CLIENT_DLL, LOCAL_PLAYER).add(0x2).deRef(); game::localPlayer.init();
 	csgoHud = scan(CLIENT_DLL, CSGO_HUD).add(0x1).deRef();
 	hudfindElement = scan(CLIENT_DLL, FIND_ELEMENT);
 	keyValuesFromString = scan(CLIENT_DLL, KEY_VALUES_FROM_STR);
@@ -124,7 +126,6 @@ void memory::init()
 	vPhysicsGetObject = scan(CLIENT_DLL, VPHYSICS_GET_OBJ).add(0x2).deRef();
 	restoreMaterialSystemObjects = scan(ENGINE_DLL, RESTOTRE_MATERIALS);
 	forceSingleThreaded = scan(MATERIAL_DLL, FORCE_SINGLE_THREADED);
-	cubemapLoad = scan(ENGINE_DLL, CUBEMAP_LOAD);
 	precacheVars = scan(MATERIAL_DLL, PRECACHE_VARS);
 	levelName = scan(ENGINE_DLL, LEVEL_NAME).add(0x2).deRef();
 
@@ -181,9 +182,6 @@ void memory::init()
 
 	// SDK INTERFACES
 
-	game::localPlayer.init();
-	memory::interfaces::init();
-
 	glowManager = scan(CLIENT_DLL, GLOWMANAGER).add(0x3).deRef();
 	weaponInterface = scan(CLIENT_DLL, WEAPONDATA).add(0x2).deRef();
 	moveHelper = scan(CLIENT_DLL, MOVEHELPER).add(0x2).deRef(Dereference::TWICE);
@@ -193,9 +191,10 @@ void memory::init()
 
 	keyValuesSys = byExport<"KeyValuesSystem"_hasher>(VSTD_DLL).cast<keyValuesSystem_t>()()();
 	memAlloc = byExport<"g_pMemAlloc"_hasher>(TIER_DLL).deRef();
+
 	moveHelper = scan(CLIENT_DLL, MOVEHELPER).add(0x2).deRef(Dereference::TWICE);
 	beams = scan(CLIENT_DLL, BEAMS).add(0x1).deRef();
-	
+
 	globalVars = byVFunc(memory::interfaces::client, 0).add(0x1F).deRef(Dereference::TWICE);
 	clientMode = byVFunc(memory::interfaces::client, 10).add(0x5).deRef(Dereference::TWICE);
 	input = byVFunc(memory::interfaces::client, 16).add(0x1).deRef();
@@ -221,4 +220,6 @@ void memory::postInit()
 
 	hostState = scan(ENGINE_DLL, HOST_STATE).add(0x1).deRef(Dereference::TWICE);
 	gameWorld = scan(CLIENT_DLL, CLIENT_WORLD).add(0x1).deRef(Dereference::TWICE);
+
+	console::debug("memory post init success");
 }

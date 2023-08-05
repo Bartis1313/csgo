@@ -7,6 +7,7 @@
 #include <config/config.hpp>
 #include <utilities/utilities.hpp>
 #include <utilities/tools/wrappers.hpp>
+#include <utilities/console/console.hpp>
 
 #include <array>
 #include <ranges>
@@ -40,6 +41,8 @@ void netvars::init()
 	}
 
 	dump();
+
+	console::debug("Netvars inited");
 }
 
 uintptr_t netvars::getNetvar(const std::string_view tableName, const std::string_view propName)
@@ -192,7 +195,7 @@ uintptr_t netvars::getDataMap(DataMap_t* map, const std::string_view name)
 
 void netvars::dump()
 {
-	file = std::ofstream{ config::getHackPath() / "netvarsDump.txt" };
+	file = std::ofstream{ api::getHackPath() / "netvarsDump.txt" };
 	file << std::format("Netvars from: {}", utilities::getTime()) << "\n\n";
 
 	TimeCount timer{};

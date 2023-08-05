@@ -134,6 +134,13 @@ void weather::menu::draw()
 				vars::visuals->world->weather->volume, PITCH_NORM, SND_SPAWNING | SND_STOP_LOOPING);
 		}
 
+		if (precipType == helper::CustomPrecipitationType_t::PRECIPITATION_TYPE_PARTICLERAINSTORM)
+		{
+			ImGui::Checkbox("Use storm effects", &vars::visuals->world->weather->storm);
+			ImGui::SameLine();
+			ImGui::HelpMarker("Emits dlight around localplayer and creates thunder lights");
+		}
+
 		auto drawGround = []()
 		{
 			ImGui::Checkbox("Use Ground", &vars::visuals->world->weather->useGround);

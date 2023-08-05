@@ -11,7 +11,6 @@
     "stb",
     "magic-enum",
     "freetype",
-    "discord-rpc",
     "nanosvg"
   ]
 }

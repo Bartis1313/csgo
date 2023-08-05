@@ -53,7 +53,7 @@ void console::detail::addLogToStream(TypeLogs type, const std::string& buf)
 	std::cout << buf;
 #endif
 
-	auto stream = std::ofstream{ config::getHackPath() / detail::m_logName, std::ofstream::out | std::ofstream::app };
+	auto stream = std::ofstream{ api::getHackPath() / detail::m_logName, std::ofstream::out | std::ofstream::app };
 	stream << buf;
 	logDrawer::log.add(type, buf);
 }

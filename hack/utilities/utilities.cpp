@@ -3,22 +3,26 @@
 #include "tools/tools.hpp"
 
 #include <Windows.h>
-#include <chrono>
+#include <ctime>
+#include <mutex>
 
 #pragma warning(disable: 6001) // memory unallocated
 #pragma warning(disable: 6054) // string terminated
 
 std::string utilities::getTime()
 {
-	const auto now = std::chrono::system_clock::now();
-	auto time = std::chrono::system_clock::to_time_t(now);
-	std::stringstream ss;
+	/*static std::mutex timeMtx;
+	std::lock_guard lock{ timeMtx };*/
 
-	std::tm bt = {};
-	localtime_s(&bt, &time);
+	std::time_t currentTime = std::time(nullptr);
 
-	ss << std::put_time(&bt, "%d:%m:%Y-%X"); 
-	return ss.str();
+	std::tm timeInfo;
+	localtime_s(&timeInfo, &currentTime);
+
+	char timeString[50];
+	std::strftime(timeString, sizeof(timeString), "%d:%m:%Y-%X", &timeInfo);
+
+	return timeString;
 }
 
 std::string utilities::getKeyName(const uint32_t virtualKey)

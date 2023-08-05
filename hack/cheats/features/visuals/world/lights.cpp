@@ -93,9 +93,9 @@ void lights::postReset()
 {
 	savedColors.clear();
 
-	for (int i = 0; i < memory::interfaces::hostState()->worldbrush.numworldlights; ++i)
+	for (int i = 0; i < memory::interfaces::hostState->worldbrush.numworldlights; ++i)
 	{
-		dworldlight_t* light = &memory::interfaces::hostState()->worldbrush.worldlights[i];
+		dworldlight_t* light = &memory::interfaces::hostState->worldbrush.worldlights[i];
 		const emittype_t type = light->type;
 
 		savedColors.emplace_back(light->intensity);
@@ -107,9 +107,9 @@ void lights::forceReset()
 	if (!game::isAvailable())
 		return;
 
-	for (int i = 0; i < memory::interfaces::hostState()->worldbrush.numworldlights; ++i)
+	for (int i = 0; i < memory::interfaces::hostState->worldbrush.numworldlights; ++i)
 	{
-		dworldlight_t* light = &memory::interfaces::hostState()->worldbrush.worldlights[i];
+		dworldlight_t* light = &memory::interfaces::hostState->worldbrush.worldlights[i];
 		const emittype_t type = light->type;
 
 		light->intensity = savedColors.at(i);

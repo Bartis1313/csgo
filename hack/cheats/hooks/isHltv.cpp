@@ -4,6 +4,8 @@
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
+#include <intrin.h>
+
 hooks::IsHltv::value hooks::IsHltv::hook(FAST_ARGS)
 {
 	volatile uintptr_t ent{ };

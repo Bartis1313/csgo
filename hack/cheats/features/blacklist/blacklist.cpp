@@ -71,9 +71,11 @@ void to_json(json& j, const blacklist::BlacklistedPlayer& val)
 
 void blacklist::init()
 {
-	saveDir = config::getHackPath() / config::getExtraLoadPath() / folderName / getPathForConfig();
+	saveDir = api::getHackPath() / api::getExtraLoadPath() / folderName / getPathForConfig();
 
 	loadCfg();
+
+	console::debug("blacklist init");
 }
 
 // we only erase bots after the whole match has ended, players are left untouched
@@ -97,7 +99,7 @@ void blacklist::reset()
 
 bool blacklist::loadCfg()
 {
-	if (auto path = config::getHackPath() / config::getExtraLoadPath() / folderName; !std::filesystem::exists(path))
+	if (auto path = api::getHackPath() / api::getExtraLoadPath() / folderName; !std::filesystem::exists(path))
 		std::filesystem::create_directories(path);
 
 	std::ifstream input{ saveDir };

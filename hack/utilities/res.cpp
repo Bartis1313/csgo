@@ -45,11 +45,11 @@ Resource::Resource(int resID, const std::string_view type)
 {
 	HRSRC hResInfo = FindResourceA(globals::instance, MAKEINTRESOURCEA(resID), type.data());
 	if (!hResInfo)
-		throw std::runtime_error("Recource could not be found");
+		HACK_THROW("Recource could not be found");
 
 	HGLOBAL hResData = LoadResource(globals::instance, hResInfo);
-	if(!hResData)
-		throw std::runtime_error("Recource data could not be found");
+	if (!hResData)
+		HACK_THROW("Recource data could not be found");
 
 	unsigned char* hResPtr = reinterpret_cast<unsigned char*>(LockResource(hResData));
 	size_t size = SizeofResource(globals::instance, hResInfo);

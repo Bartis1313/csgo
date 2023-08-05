@@ -1,6 +1,6 @@
 "Sprite"
 {
-	"$basetexture" "sprites/zlo/snowflake"
+	"$basetexture" "particle/snowflake"
 	"$spriterendermode" 5
 	"$vertexcolor"  1
 }

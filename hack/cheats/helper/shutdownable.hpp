@@ -2,11 +2,11 @@
 
 #include <utilities/runnable.hpp>
 
-#include <setup/setup.hpp>
+#include <cheats/game/game.hpp>
 
 class ShutdownAble
 {
-	friend void setup::shutdown(void* instance);
+	friend void game::shutdown();
 protected:
 	static void registerShutdown(const std::function<void()>& func) { Storage::shutdowns.push_back(func); }
 private:

@@ -4,9 +4,9 @@
 
 hooks::LevelInitPostEntity::value hooks::LevelInitPostEntity::hook(FAST_ARGS)
 {
+	original(thisptr);
+
 	memory::postInit();
 
 	Storage::runs.run();
-
-	original(thisptr);
 }

@@ -70,6 +70,7 @@
 #include "newParticleEffectSetControlPoint.hpp"
 #include "getVelocity.hpp"
 #include "overrideConfig.hpp"
+#include "mapLoaderInit.hpp"
 
 #define HOOK(target, _struct) \
 	hookHelper::MinHook::tryHook(target, &_struct::hook, hookHelper::ORIGINAL(_struct::original), #_struct);
@@ -79,6 +80,8 @@
 
 void hooks::init()
 {
+	hooks::wndProcSys::init();
+
 	hookHelper::MinHook::initMinhook();
 
 	hooks::Present::original = memory::Address<hooks::Present::call>{ memory::present() }.deRef(memory::Dereference::TWICE)();
@@ -127,22 +130,16 @@ void hooks::init()
 	HOOK(memory::unkRound(), hooks::UnknownPlayerHurt);
 	HOOK(memory::updatePostEffects(), hooks::UpdatePostEffects);
 	HOOK(vfunc::getVFunc(memory::interfaces::surface(), SET_DRAW_COLOR), hooks::setDrawColor);
-	HOOK(vfunc::getVFunc(memory::interfaces::viewRender(), RENDER_SMOKE_OVERLAY), hooks::RenderSmokeOverlay);
+	HOOK(vfunc::getVFunc(memory::interfaces::viewRender(), RENDER_SMOKE_OVERLAY), hooks::RenderSmokeOverlay); 
 	HOOK(vfunc::getVFunc(memory::interfaces::matSys(), FIND_MATERIAL), hooks::FindMaterial);
-	HOOK(memory::getPMaterial(), hooks::GetPMaterial);
 	HOOK(memory::createParticlePrecip(), hooks::CreateParticlePrecip);
 	HOOK(vfunc::getVFunc(memory::interfaces::modelInfo(), GET_VCOLLIDE), hooks::GetVCollide);
 	HOOK(memory::initializeParticlePrecip(), hooks::InitializeParticlePrecip);
-	HOOK(memory::drawEffects(), hooks::DrawEffects);
-	HOOK(memory::drawWorldAndEntities(), hooks::DrawWorldAndEntities);
 	HOOK(memory::drawTransculentRenderables(), hooks::DrawTranslucentRenderables);
 	HOOK(vfunc::getVFunc(memory::interfaces::physicsCollision(), VCOLLIDE_LOAD), hooks::VCollideLoad);
 	HOOK(memory::clientCsNormalEvent(), hooks::ClientModeCSNormalEvent);
-	HOOK(memory::dispatchInnerParticlePrecip(), hooks::DispatchInnerParticlePrecip);
 	HOOK(memory::newParticleSetControlPoint.cast<void*>()(), hooks::NewParticleEffectSetControlPoint);
-	//HOOK(memory::getVelocity(), hooks::GetVelocity);
 	HOOK(vfunc::getVFunc(memory::interfaces::matSys(), OVERRIDE_CONFIG), hooks::OverrideConfig);
-	//HOOK(vfunc::getVFunc(memory::interfaces::physicsProps(), 3), hooks::GetPhysicsProperties);
 
 	// figure out why tf they corrupt stack, incorrect args?
 	//HOOK(memory::decalAddToSurface(), hooks::R_AddDecalToSurface);
@@ -151,13 +148,13 @@ void hooks::init()
 #undef HOOK
 #undef HOOK_VALVE
 
-	hookHelper::MinHook::checkAllHooks();
-
 	console::debug("hooks success");
 }
 
 void hooks::shutdown()
 {
+	hooks::wndProcSys::shutdown();
+
 	**reinterpret_cast<void***>(memory::present()) = hooks::Present::original;
 	**reinterpret_cast<void***>(memory::reset()) = hooks::Reset::original;
 

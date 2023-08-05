@@ -358,6 +358,8 @@ struct VarVisuals
 			float customNear{ 32.0f };
 			float customFar{ 100.0f };
 			bool useGround{ false };
+			bool storm{ false };
+			bool saveFpsStorm{ false };
 		};
 		ADD_MEMBER_PTR(VarWeather, weather);
 
@@ -550,12 +552,6 @@ struct VarMisc
 		CfgColor colorLine{ Colors::Palevioletred };
 	};
 	ADD_MEMBER_PTR(VarHat, hat);
-
-	struct VarDiscord
-	{
-		bool enabled{ false };
-	};
-	ADD_MEMBER_PTR(VarDiscord, discord);
 
 	struct VarMotionBlur
 	{

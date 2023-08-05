@@ -2,25 +2,24 @@
 
 #include <cheats/game/globals.hpp>
 
-BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID reserved)
+BOOL APIENTRY DllMainEntry(CONST HMODULE instance, CONST ULONG reason, CONST PVOID reserved)
 {
+    if (!_CRT_INIT(instance, reason, reserved))
+        return FALSE;
+
     if (reason == DLL_PROCESS_ATTACH)
     {
-        // here this sometimes throw null on mm
-        if (instance)
-            DisableThreadLibraryCalls(instance);
-
         globals::instance = instance;
 
-        if (auto initThread = CreateThread(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::init), instance, NULL, nullptr))
-           CloseHandle(initThread);
+        if (!setup::init(instance))
+            return FALSE;
 
         if (auto looperThread = CreateThread(nullptr, NULL, reinterpret_cast<LPTHREAD_START_ROUTINE>(setup::looper), instance, NULL, nullptr))
-           CloseHandle(looperThread);
+            CloseHandle(looperThread);
 
         return TRUE;
     }
-    else if (reason == DLL_PROCESS_DETACH)
+    else if (DLL_PROCESS_DETACH)
     {
         if (!globals::isShutdown) // then panic key forced shutdown
         {
@@ -29,5 +28,5 @@ BOOL WINAPI DllMain(CONST HMODULE instance, CONST ULONG reason, CONST PVOID rese
         }
     }
 
-    return FALSE;
+    return TRUE;
 }

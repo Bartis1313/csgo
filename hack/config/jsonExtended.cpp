@@ -764,6 +764,7 @@ void from_json(const json& j, VarVisuals::VarWorld::VarWeather& val)
 	from_json(j, "CustomNear", val.customNear);
 	from_json(j, "CustomFar", val.customFar);
 	from_json(j, "UseGround", val.useGround);
+	from_json(j, "Storm Effects", val.storm);
 }
 
 void to_json(json& j, const VarVisuals::VarWorld::VarWeather& val)
@@ -791,6 +792,7 @@ void to_json(json& j, const VarVisuals::VarWorld::VarWeather& val)
 	j["CustomNear"] = val.customNear;
 	j["CustomFar"] = val.customFar;
 	j["UseGround"] = val.useGround;
+	j["Storm Effects"] = val.storm;
 }
 
 void from_json(const json& j, VarVisuals::VarWorld::VarAmbient& val)
@@ -865,7 +867,6 @@ void from_json(const json& j, VarMisc& val)
 	from_json(j["Radar"], *val.radar);
 	from_json(j["Trail"], *val.trail);
 	from_json(j["Nades"], *val.nade);
-	from_json(j["Discord"], *val.discord);
 	from_json(j["MotionBlur"], *val.motionBlur);
 	from_json(j["MirrorCam"], *val.mirrorCam);
 	from_json(j["FreeCam"], *val.freeCam);
@@ -891,7 +892,6 @@ void to_json(json& j, const VarMisc& val)
 	to_json(j["Radar"], *val.radar);
 	to_json(j["Trail"], *val.trail);
 	to_json(j["Nades"], *val.nade);
-	to_json(j["Discord"], *val.discord);
 	to_json(j["MotionBlur"], *val.motionBlur);
 	to_json(j["MirrorCam"], *val.mirrorCam);
 	to_json(j["FreeCam"], *val.freeCam);
@@ -1143,16 +1143,6 @@ void to_json(json& j, const VarMisc::VarNades& val)
 	j["TracerLine"] = val.colorTracer;
 	j["Tracer distance"] = val.tracerDist;
 	j["Tracer warning"] = val.tracerWarn;
-}
-
-void from_json(const json& j, VarMisc::VarDiscord& val)
-{
-	from_json(j, "Enable", val.enabled);
-}
-
-void to_json(json& j, const VarMisc::VarDiscord& val)
-{
-	j["Enable"] = val.enabled;
 }
 
 void from_json(const json& j, VarMisc::VarMotionBlur& val)

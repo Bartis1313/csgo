@@ -1,10 +1,12 @@
 #pragma once
 
+#include "system/win.hpp"
+
 #include <SDK/ClientClass.hpp>
 #include <utilities/tools/wrappers.hpp>
 #include <SDK/interfaces/ifc.hpp>
 
-#include <lazy_importer.hpp>
+#include <utilities/console/console.hpp>
 
 #include <array>
 #include <optional>
@@ -107,13 +109,7 @@ namespace memory
 }
 
 #include "signature.hpp"
-#include "modules.hpp"
-
 #include <SDK/helpers/vfunc.hpp>
-
-#include <optional>
-#include <ranges>
-#include <format>
 
 template <size_t N>
 memory::Address<uintptr_t> memory::scan(const std::string_view mod, const std::array<std::optional<uint8_t>, N>& sig)
@@ -142,7 +138,8 @@ memory::Address<uintptr_t> memory::scan(const std::string_view mod, const std::a
 		}
 	}
 
-	throw std::runtime_error{ std::format("Couldn't find signature, module {}, signature: {}", mod, signature::to_string(sig)) };
+	HACK_THROW(std::format("Couldn't find signature, module {}, signature: {}", mod, signature::to_string(sig)));
+	return Address<uintptr_t>{ 0U };
 }
 
 template<li::detail::offset_hash_pair hash>

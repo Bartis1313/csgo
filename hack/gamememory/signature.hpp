@@ -108,9 +108,10 @@ namespace signature
     template<size_t SIZE>
     constexpr std::string_view to_string(const std::array<std::optional<uint8_t>, SIZE>& s)
     {
-        constexpr size_t maxSize{ (SIZE * 3) - 1 };
+        constexpr size_t maxSize{ (SIZE * 3) + 1 }; // +1 for null-terminator
         std::array<char, maxSize> buffer{ };
-        for (size_t i = 0; const auto & sigByte : s)
+        size_t i = 0;
+        for (const auto & sigByte : s)
         {
             if (sigByte.has_value())
             {
@@ -126,7 +127,9 @@ namespace signature
             }
         }
 
-        return std::string_view{ buffer.data(), buffer.size() - 1 };
+        buffer.end() = '\0';
+
+        return std::string_view{ buffer.data(), buffer.size() };
     }
 }
 

@@ -39,6 +39,9 @@ namespace game
 		LPDIRECT3DTEXTURE9 texture;
 	};
 
+	HACK_INIT void init();
+	void shutdown();
+
 	inline LocalPlayer localPlayer;
 	[[nodiscard]] bool isAvailable();
 	float serverTime(CUserCmd* cmd = nullptr);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "hack/api.hpp"
+
 #include <Windows.h>
 #include <ShlObj.h>
 

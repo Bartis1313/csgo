@@ -79,7 +79,6 @@ void tabs::misc::draw()
 	{
 		ImGui::BeginGroupPanel("Extras", ImGui::GetContentRegionAvail());
 		{
-			ImGui::Checkbox("Discord RPC", &vars::misc->discord->enabled);
 			ImGui::Checkbox("Game logs", &vars::misc->logs->enabled);
 			ImGui::SameLine();
 			ImGui::SliderFloat("Time##Gamelogs", &vars::misc->logs->time, 1.0f, 10.0f);

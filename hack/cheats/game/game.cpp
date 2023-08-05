@@ -5,6 +5,24 @@
 #include <SDK/CGlobalVars.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 
+#include "../features/cache/cache.hpp"
+#include "../helper/initable.hpp"
+#include "../helper/shutdownable.hpp"
+#include "../features/events/events.hpp"
+
+void game::init()
+{
+	localPlayer.init();
+	EntityCache::init();
+	InitAble::Storage::runs.run();
+}
+
+void game::shutdown()
+{
+	ShutdownAble::Storage::shutdowns.run();
+	events::shutdown();
+}
+
 bool game::isAvailable()
 {
 	if (!localPlayer)
@@ -38,6 +56,8 @@ float game::serverTime(CUserCmd* cmd)
 void LocalPlayer::init()
 {
 	m_local = memory::localPlayer();
+
+	console::debug("Local player init");
 }
 
 uint32_t game::timeToTicks(float time)

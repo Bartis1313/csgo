@@ -3,6 +3,8 @@
 #include <gamememory/memory.hpp>
 #include <config/vars.hpp>
 
+#include <intrin.h>
+
 hooks::SvCheats::value hooks::SvCheats::hook(FAST_ARGS)
 {
 	if (reinterpret_cast<uintptr_t>(_ReturnAddress()) == memory::camThink() && vars::misc->thirdp->enabled)

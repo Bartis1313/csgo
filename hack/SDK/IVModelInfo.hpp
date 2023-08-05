@@ -115,4 +115,5 @@ public:
 	VFUNC(vcollide_t*, getVCollide, 5, (model_t* model), (this, model));
 	VFUNC(vcollide_t*, getVCollide, 6, (int modelIdx), (this, modelIdx));
 	VFUNC(studiohdr_t*, getStudioModel, 32, (const model_t* model), (this, model));
+	VFUNC(model_t*, findOrLoadModel, 43, (const char* name), (this, name));
 };

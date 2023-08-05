@@ -60,7 +60,7 @@ void ImGuiMenu::setStyles()
 
 	style = vars::styling->imStyle;
 
-	iniFile = std::filesystem::path{ config::getHackPath() / "window.ini" }.string();
+	iniFile = std::filesystem::path{ api::getHackPath() / "window.ini" }.string();
 
 	io.IniFilename = iniFile.c_str();
 	io.LogFilename = nullptr;
