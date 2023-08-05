@@ -4,6 +4,7 @@
 #include <render/Color.hpp>
 
 #include "helpers/vfunc.hpp"
+#include "helpers/pad.hpp"
 
 enum
 {
@@ -47,7 +48,9 @@ public:
 	Vec3 m_direction;
 	float m_innerAngle;
 	float m_outerAngle;
+	PAD(4);
 };
+static_assert(sizeof(DLight_t) == 68);
 
 class IVEfx
 {

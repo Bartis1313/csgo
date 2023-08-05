@@ -96,6 +96,8 @@ void Aimbot::init()
 	weapon_recoil_scale = memory::interfaces::cvar->findVar("weapon_recoil_scale");
 	m_yaw = memory::interfaces::cvar->findVar("m_yaw");
 	m_pitch = memory::interfaces::cvar->findVar("m_pitch");
+
+	inited = true;
 }
 
 void Aimbot::updateKeys()
