@@ -67,7 +67,6 @@ Please note that this cheat is for educational purposes only, provided as a trai
 * Icon extraction from the game to image
 * Game callbacks
 * Entity cache
-* Discord Rich Presence (RPC)
 * Hook-to-feature communication using handlers
 * Logging console
 * Game events (everything gathered from hooks, possible to create own though)
