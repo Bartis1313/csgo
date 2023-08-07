@@ -10,7 +10,7 @@ const unsigned short INVALID_STRING_INDEX = (unsigned short)-1;
 class INetworkStringTable
 {
 public:
-	VFUNC(int, addString, 8, (bool isServer, const char* value, int lenght = -1, const void* userdata = nullptr), (this, isServer, value, lenght, userdata));
+	VFUNC(int, addString, 8, (bool isServer, const char* value, int length = -1, const void* userdata = nullptr), (this, isServer, value, length, userdata));
 };
 
 class INetworkStringTableContainer

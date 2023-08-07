@@ -438,7 +438,7 @@ void tabs::visuals::draw()
 						ImGui::ColorPicker("Tracers color", &vars::misc->trail->beam.color);
 						ImGui::SliderFloat("Tracers life", &vars::misc->trail->beam.life, 0.0f, 10.0f);
 						ImGui::SliderFloat("Tracers width", &vars::misc->trail->beam.width, 0.0f, 20.0f);
-						ImGui::SliderFloat("Tracers fadeLenght", &vars::misc->trail->beam.fadeLength, 0.0f, 20.0f);
+						ImGui::SliderFloat("Tracers fadelength", &vars::misc->trail->beam.fadeLength, 0.0f, 20.0f);
 						ImGui::SliderFloat("Tracers amplitude", &vars::misc->trail->beam.amplitude, 0.0f, 20.0f);
 						ImGui::SliderFloat("Tracers speed", &vars::misc->trail->beam.speed, 0.0f, 200.0f);
 						ImGui::SliderFloat("Tracers startFrame", &vars::misc->trail->beam.startFrame, 0.0f, 300.0f);
@@ -472,7 +472,7 @@ void tabs::visuals::draw()
 					ImGui::ColorPicker("Tracers color", &vars::visuals->world->tracer->beamTracer.color);
 					ImGui::SliderFloat("Tracers life", &vars::visuals->world->tracer->beamTracer.life, 0.0f, 10.0f);
 					ImGui::SliderFloat("Tracers width", &vars::visuals->world->tracer->beamTracer.width, 0.0f, 20.0f);
-					ImGui::SliderFloat("Tracers fadeLenght", &vars::visuals->world->tracer->beamTracer.fadeLength, 0.0f, 20.0f);
+					ImGui::SliderFloat("Tracers fadelength", &vars::visuals->world->tracer->beamTracer.fadeLength, 0.0f, 20.0f);
 					ImGui::SliderFloat("Tracers amplitude", &vars::visuals->world->tracer->beamTracer.amplitude, 0.0f, 20.0f);
 					ImGui::SliderFloat("Tracers speed", &vars::visuals->world->tracer->beamTracer.speed, 0.0f, 200.0f);
 					ImGui::SliderFloat("Tracers startFrame", &vars::visuals->world->tracer->beamTracer.startFrame, 0.0f, 300.0f);

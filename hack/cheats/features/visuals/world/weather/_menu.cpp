@@ -24,7 +24,7 @@ struct ConfigWeather
 
 void weather::menu::draw()
 {
-	const static ConfigWeather cvarLenght
+	const static ConfigWeather cvarlength
 	{
 		.convar = memory::interfaces::cvar->findVar("r_rainlength"),
 		.defaultVal = memory::interfaces::cvar->findVar("r_rainlength")->getFloat(),
@@ -83,7 +83,7 @@ void weather::menu::draw()
 
 	static std::array allvarsNonParticle
 	{
-		cvarLenght,
+		cvarlength,
 			cvarRadius,
 			cvarWidth,
 			cvarSidevel,

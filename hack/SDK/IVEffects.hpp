@@ -6,6 +6,8 @@
 #include "helpers/vfunc.hpp"
 #include "helpers/pad.hpp"
 
+#define MAX_DLIGHTS 32
+
 enum
 {
 	DLIGHT_NO_WORLD_ILLUMINATION = 0x1,
@@ -57,5 +59,6 @@ class IVEfx
 public:
 	VFUNC(DLight_t*, clAllocDLight, 4, (int key), (this, key));
 	VFUNC(DLight_t*, clAllocElight, 5, (int key), (this, key));
+	VFUNC(int, clGetActiveDlights, 6, (DLight_t* list[MAX_DLIGHTS]), (this, list));
 	VFUNC(DLight_t*, getElightByKey, 8, (int key), (this, key));
 };

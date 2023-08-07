@@ -51,9 +51,6 @@ void toneController::run(FrameStage stage)
 		return;
 
 	auto ent = memory::interfaces::toneController();
-	if (!ent)
-		return;
-
 	if (!ent) // not all maps support it by default
 		return;
 
