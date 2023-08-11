@@ -98,6 +98,8 @@ namespace memory
 	Address<uintptr_t> scan(const std::string_view mod, const std::array<std::optional<uint8_t>, N>& sig);
 	template<li::detail::offset_hash_pair hash>
 	Address<uintptr_t> byExport(const std::string_view module);
+	// non template version, used to wrap nt stuff
+	Address<uintptr_t> byExport(const std::string_view module, const std::string_view exportName);
 	template<typename U>
 	Address<uintptr_t> byVFunc(const Interface<U>& ifc, size_t index);
 	// static pointer
@@ -146,6 +148,14 @@ template<li::detail::offset_hash_pair hash>
 memory::Address<uintptr_t> memory::byExport(const std::string_view _module)
 {
 	const auto addr = static_cast<uintptr_t>(::li::detail::lazy_function<hash, uintptr_t>().in(modules::getModule(_module)));
+
+	return Address<uintptr_t>{ addr };
+}
+
+inline memory::Address<uintptr_t> memory::byExport(const std::string_view _module, const std::string_view exportName)
+{
+	// windows::getModuleHandle caches modules, although we better don't use modules:: namespace here
+	const auto addr = reinterpret_cast<uintptr_t>(windows::getExportAddress(windows::getModuleHandle(_module), exportName));
 
 	return Address<uintptr_t>{ addr };
 }

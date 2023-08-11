@@ -4,7 +4,7 @@
 
 #include <array>
 #include <optional>
-#include <string_view>
+#include <string>
 
 namespace signature
 {
@@ -79,8 +79,8 @@ namespace signature
         constexpr static auto sig()
         {
             std::array<std::optional<uint8_t>, getSize()> result{};
-            std::size_t i{ 0U };
-            std::size_t j{ 0U };
+            size_t i{ 0U };
+            size_t j{ 0U };
             while (i < str.size() && j != result.size())
             {
                 if (str[i] == wildcard)
@@ -106,30 +106,25 @@ namespace signature
 
     // only for single wildcards
     template<size_t SIZE>
-    constexpr std::string_view to_string(const std::array<std::optional<uint8_t>, SIZE>& s)
+    std::string to_string(const std::array<std::optional<uint8_t>, SIZE>& s)
     {
-        constexpr size_t maxSize{ (SIZE * 3) + 1 }; // +1 for null-terminator
-        std::array<char, maxSize> buffer{ };
-        size_t i = 0;
-        for (const auto & sigByte : s)
+        std::string result;
+        result.reserve(SIZE * 3);
+
+        for (const auto& sigByte : s)
         {
             if (sigByte.has_value())
             {
-                const uint8_t byte{ sigByte.value() };
-                buffer[i++] = helpers::digitToHex(byte >> 4);
-                buffer[i++] = helpers::digitToHex(byte & 0x0F);
-                buffer[i++] = spaceSign;
+                result += helpers::digitToHex(sigByte.value() >> 4);
+                result += helpers::digitToHex(sigByte.value() & 0x0F);
+                result += spaceSign;
             }
             else
             {
-                buffer[i++] = wildcard;
-                buffer[i++] = spaceSign;
+                result += std::string{ wildcard } + spaceSign;
             }
         }
-
-        buffer[i - 1] = '\0';
-
-        return std::string_view{ buffer.data(), i };
+        return result;
     }
 }
 

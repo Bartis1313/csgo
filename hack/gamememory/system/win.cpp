@@ -51,8 +51,6 @@ FARPROC windows::getExportAddress(HMODULE hModule, const std::string_view export
 
 HMODULE windows::getModuleHandle(std::string_view moduleName)
 {
-	return GetModuleHandleA(moduleName.data());
-
 	if (auto it = cachedModules.find(moduleName); it != cachedModules.end())
 		return it->second;
 

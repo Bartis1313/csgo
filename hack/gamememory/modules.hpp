@@ -6,8 +6,9 @@
 #include <utilities/tools/wrappers.hpp>
 
 #include <unordered_map>
-#include <lazy_importer.hpp>
 #include <string>
+
+#include <lazy_importer.hpp>
 
 namespace memory
 {
