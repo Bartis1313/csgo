@@ -128,7 +128,6 @@ namespace memory
 	inline Address<Matrix4x4> viewMatrixAddr;
 	inline Address<uintptr_t> drawScreenEffectMaterial;
 	inline Address<float*> motionBlurVec;
-	inline Address<uintptr_t> disableTargetAlloc;
 	inline Address<inSmoke_t> throughSmoke;
 	inline Address<uintptr_t> smokeCount;
 	inline Address<loadSky_t> loadSky;

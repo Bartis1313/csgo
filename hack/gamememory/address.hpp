@@ -94,8 +94,7 @@ namespace memory
 		}
 	};
 
-	template<size_t N>
-	Address<uintptr_t> scan(const std::string_view mod, const std::array<std::optional<uint8_t>, N>& sig);
+	Address<uintptr_t> scan(const std::string_view mod, const std::string_view pattern);
 	template<li::detail::offset_hash_pair hash>
 	Address<uintptr_t> byExport(const std::string_view module);
 	// non template version, used to wrap nt stuff
@@ -110,38 +109,24 @@ namespace memory
 	std::optional<std::vector<Address<uintptr_t>>> findMultipleFromGameLoop(ClassID id);
 }
 
-#include "signature.hpp"
-#include <SDK/helpers/vfunc.hpp>
+#include <deps/mem/pattern.h>
 
-template <size_t N>
-memory::Address<uintptr_t> memory::scan(const std::string_view mod, const std::array<std::optional<uint8_t>, N>& sig)
+inline memory::Address<uintptr_t> memory::scan(const std::string_view mod, const std::string_view pattern)
 {
 	const auto _module = memory::modules::getModule(mod);
 	const auto dosHeader = reinterpret_cast<PIMAGE_DOS_HEADER>(_module);
 	const auto ntHeaders = reinterpret_cast<PIMAGE_NT_HEADERS>(reinterpret_cast<uint8_t*>(_module) + dosHeader->e_lfanew);
 	const auto sizeOfImage = ntHeaders->OptionalHeader.SizeOfImage;
 
-	auto check = [sig](uint8_t* data)
-	{
-		for (const auto& _byte : sig)
-		{
-			if (_byte && _byte.value() != *data)
-				return false;
-			data++;
-		}
-		return true;
-	};
+	mem::pattern pat{ pattern.data() };
+	mem::simd_scanner scanner{ pat };
+	const mem::pointer scanned = scanner.scan(mem::region{ _module, sizeOfImage });
+	const auto result = scanned.as<uintptr_t>();
+	
+	if(!scanned)
+		HACK_THROW(std::format("Couldn't find signature, module {}, signature: {}", mod, pattern));
 
-	for (size_t i = reinterpret_cast<size_t>(_module); i < static_cast<size_t>(sizeOfImage + reinterpret_cast<size_t>(_module)); ++i)
-	{
-		if (check(reinterpret_cast<uint8_t*>(i)))
-		{
-			return Address<uintptr_t>{ i };
-		}
-	}
-
-	HACK_THROW(std::format("Couldn't find signature, module {}, signature: {}", mod, signature::to_string(sig)));
-	return Address<uintptr_t>{ 0U };
+	return Address<uintptr_t>{ result };
 }
 
 template<li::detail::offset_hash_pair hash>
@@ -159,6 +144,8 @@ inline memory::Address<uintptr_t> memory::byExport(const std::string_view _modul
 
 	return Address<uintptr_t>{ addr };
 }
+
+#include <SDK/helpers/vfunc.hpp>
 
 template<typename TT>
 memory::Address<uintptr_t> memory::byVFunc(const Interface<TT>& ifc, size_t index)

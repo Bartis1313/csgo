@@ -12,6 +12,10 @@ class KeyValues;
 class IMatRenderContext;
 class ITexture;
 
+// we can make some leak, but enabling the allocation here might make a lag
+// game inits it always before the game, not a big deal to just see an error
+//#define DONT_IGNORE_MATSYS_ALLOCATION_ERRORS
+
 class IMaterialSystem
 {
 public:
@@ -44,26 +48,28 @@ public:
 
 	// https://www.unknowncheats.me/forum/counterstrike-global-offensive/234226-mirrorcam-ported-window.html
 
-	void forceBeginRenderTargetAllocation()
+	void beginRenderTargetAllocationEx()
 	{
-		bool old = disableRenderTargetAllocationForever();
-		disableRenderTargetAllocationForever() = false;
+#if defined DONT_IGNORE_MATSYS_ALLOCATION_ERRORS
+		bool old = m_disableRenderTargetAllocationForever;
+		m_disableRenderTargetAllocationForever = false;
+#endif
 		beginRenderTargetAllocation();
-		disableRenderTargetAllocationForever() = old;
+#if defined DONT_IGNORE_MATSYS_ALLOCATION_ERRORS
+		m_disableRenderTargetAllocationForever = old;
+#endif
 	}
 
-	void forceEndRenderTargetAllocation()
+	void endRenderTargetAllocationEx()
 	{
-		bool old = disableRenderTargetAllocationForever();
-		disableRenderTargetAllocationForever() = false;
+#if defined DONT_IGNORE_MATSYS_ALLOCATION_ERRORS
+		bool old = m_disableRenderTargetAllocationForever;
+		m_disableRenderTargetAllocationForever = false;
+#endif
 		endRenderTargetAllocation();
-		disableRenderTargetAllocationForever() = old;
-	}
-
-	bool& disableRenderTargetAllocationForever()
-	{
-		const static auto disableTargetAlloc = memory::disableTargetAlloc();
-		return *reinterpret_cast<bool*>(uintptr_t(this) + disableTargetAlloc);
+#if defined DONT_IGNORE_MATSYS_ALLOCATION_ERRORS
+		m_disableRenderTargetAllocationForever = old;
+#endif
 	}
 
 	void forceSingleThreaded()
@@ -72,4 +78,8 @@ public:
 	}
 
 	VFUNC(bool, allowThreading, 138, (bool enabled, int thread), (this, enabled, thread));
+
+	PAD(11288);
+	bool m_disableRenderTargetAllocationForever;
+	PAD(40);
 };

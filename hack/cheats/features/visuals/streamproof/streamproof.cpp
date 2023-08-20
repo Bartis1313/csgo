@@ -12,13 +12,13 @@
 void StreamProof::init()
 {
 	const auto backBuffer = memory::interfaces::matSys->getBackBufferFormat();
-	memory::interfaces::matSys->beginRenderTargetAllocation();
+	memory::interfaces::matSys->beginRenderTargetAllocationEx();
 	renderTarget = memory::interfaces::matSys->createNamedRenderTargetTextureEx(
 		targetName.data(), 1, 1, RT_SIZE_FULL_FRAME_BUFFER,
 		backBuffer, MATERIAL_RT_DEPTH_SHARED,
 		TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT,
 		CREATERENDERTARGETFLAGS_HDR);
-	memory::interfaces::matSys->endRenderTargetAllocation();
+	memory::interfaces::matSys->endRenderTargetAllocationEx();
 
 	console::debug("loaded streamproof texture {}", targetName);
 }

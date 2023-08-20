@@ -59,9 +59,9 @@ namespace mirrorcam
 
 void mirrorcam::initTexture()
 {
-	memory::interfaces::matSys->beginRenderTargetAllocation();
+	memory::interfaces::matSys->beginRenderTargetAllocationEx();
 	texture = memory::interfaces::matSys->createFullFrameRenderTarget("mirrorCam");
-	memory::interfaces::matSys->endRenderTargetAllocation();
+	memory::interfaces::matSys->endRenderTargetAllocationEx();
 }
 
 void mirrorcam::updateKeys()

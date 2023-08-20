@@ -2,7 +2,6 @@
 
 #include "sigs.hpp"
 #include "modules.hpp"
-#include "signature.hpp"
 
 #include <utilities/tools/tools.hpp>
 #include <utilities/tools/wrappers.hpp>
@@ -47,7 +46,6 @@ void memory::init()
 	viewMatrixAddr = scan(CLIENT_DLL, VIEW_MATRIX_CLIENT).add(0x3).deRef().add(0xB0);
 	drawScreenEffectMaterial = scan(CLIENT_DLL, DRAW_EFFECT_MATRIAL);
 	motionBlurVec = scan(CLIENT_DLL, BLUR_MATERIAL_ARR_1).add(0x1).deRef();
-	disableTargetAlloc = scan(MATERIAL_DLL, DISABLE_RENDER_TARGET_ALLOC).add(0x2);
 	throughSmoke = scan(CLIENT_DLL, GOES_THROUGH_SMOKE);
 	smokeCount = throughSmoke.add(0x8).deRef().cast<uintptr_t>();
 	loadSky = scan(ENGINE_DLL, LOAD_SKY);

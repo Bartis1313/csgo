@@ -128,7 +128,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <StringPooling>true</StringPooling>
-      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
       <FloatingPointModel>Fast</FloatingPointModel>
       <ForcedUsingFiles>
       </ForcedUsingFiles>
@@ -433,6 +433,30 @@
     <ClInclude Include="hack\cheats\hooks\overrideConfig.hpp" />
     <ClInclude Include="hack\cheats\hooks\tracerDraw.hpp" />
     <ClInclude Include="hack\cheats\hooks\vCollideLoad.hpp" />
+    <ClInclude Include="hack\deps\mem\aligned_alloc.h" />
+    <ClInclude Include="hack\deps\mem\arch.h" />
+    <ClInclude Include="hack\deps\mem\bitwise_enum.h" />
+    <ClInclude Include="hack\deps\mem\boyer_moore_scanner.h" />
+    <ClInclude Include="hack\deps\mem\char_queue.h" />
+    <ClInclude Include="hack\deps\mem\cmd_param-inl.h" />
+    <ClInclude Include="hack\deps\mem\cmd_param.h" />
+    <ClInclude Include="hack\deps\mem\data_buffer.h" />
+    <ClInclude Include="hack\deps\mem\defines.h" />
+    <ClInclude Include="hack\deps\mem\execution_handler.h" />
+    <ClInclude Include="hack\deps\mem\hasher.h" />
+    <ClInclude Include="hack\deps\mem\init_function.h" />
+    <ClInclude Include="hack\deps\mem\macros.h" />
+    <ClInclude Include="hack\deps\mem\mem.h" />
+    <ClInclude Include="hack\deps\mem\module.h" />
+    <ClInclude Include="hack\deps\mem\pattern.h" />
+    <ClInclude Include="hack\deps\mem\pattern_cache.h" />
+    <ClInclude Include="hack\deps\mem\protect.h" />
+    <ClInclude Include="hack\deps\mem\prot_flags.h" />
+    <ClInclude Include="hack\deps\mem\rtti.h" />
+    <ClInclude Include="hack\deps\mem\simd_scanner.h" />
+    <ClInclude Include="hack\deps\mem\slice.h" />
+    <ClInclude Include="hack\deps\mem\stub.h" />
+    <ClInclude Include="hack\deps\mem\utils.h" />
     <ClInclude Include="hack\gamememory\system\win.hpp" />
     <ClInclude Include="hack\SDK\CCommonHostState.hpp" />
     <ClInclude Include="hack\cheats\hooks\cHudIsHidden.hpp" />
@@ -512,7 +536,6 @@
     <ClInclude Include="hack\deps\magic_enum\prettyNames.hpp" />
     <ClInclude Include="hack\deps\delaunator-cpp\delaunator.hpp" />
     <ClInclude Include="hack\gamememory\memory.hpp" />
-    <ClInclude Include="hack\gamememory\signature.hpp" />
     <ClInclude Include="hack\gamememory\sigs.hpp" />
     <ClInclude Include="hack\menu\GUI-ImGui\sections\background.hpp" />
     <ClInclude Include="hack\menu\GUI-ImGui\imguiaddons.hpp" />
@@ -634,6 +657,7 @@
     <ClInclude Include="utilities\csgo.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="hack\deps\mem\cpp.hint" />
     <None Include="hack\deps\missing\bluelight1.vmt" />
     <None Include="hack\deps\missing\bluelight1.vtf" />
     <None Include="hack\deps\missing\bluelightning.vmt" />

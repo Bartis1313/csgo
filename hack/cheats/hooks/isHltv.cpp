@@ -11,28 +11,21 @@ hooks::IsHltv::value hooks::IsHltv::hook(HACK_FAST_ARGS)
 	volatile uintptr_t ent{ };
 	__asm mov ent, edi
 
-	const static auto occlusion = memory::occlusion();
-	const static auto velocity = memory::velocity();
-	const static auto accumulate = memory::accumulate();
-	const uintptr_t ret = reinterpret_cast<uintptr_t>(_ReturnAddress());
+	const retaddr_t ret = reinterpret_cast<retaddr_t>(_ReturnAddress());
 
-	if (ret == occlusion)
+	if (!ent)
+		return original(thisptr);
+
+	// 53 8B DC 83 EC 08 83 E4 F8 83 C4 04 55 8B 6B 04 89 6C 24 04 8B EC 83 EC 30 56 57 8B F9 8B 0D ? ? ? ? 8B 01 8B 80 ? ? ? ? FF D0 84 C0 0F 85 ? ? ? ?
+	if (ret == memory::occlusion() && vars::misc->mirrorCam->enabled)
 	{
-		// no need to set those values for normal view
-		if (vars::misc->mirrorCam->enabled && ent)
-		{
-			*reinterpret_cast<int*>(ent + 0xA24) = -1;
-			*reinterpret_cast<int*>(ent + 0xA30) = memory::interfaces::globalVars->m_frameCount;
-			*reinterpret_cast<int*>(ent + 0xA2C) = *reinterpret_cast<int*>(ent + 0xA28);
-			*reinterpret_cast<int*>(ent + 0xA28) = 0;
+		*reinterpret_cast<int*>(ent + 0xA24) = -1; // m_nCustomBlendingRuleMask
+		*reinterpret_cast<int*>(ent + 0xA30) = memory::interfaces::globalVars->m_frameCount; // m_nComputedLODframe
+		*reinterpret_cast<int*>(ent + 0xA2C) = *reinterpret_cast<int*>(ent + 0xA28); // m_nAnimLODflagsOld
+		*reinterpret_cast<int*>(ent + 0xA28) = 0; // m_nAnimLODflags
 
-			return true;
-		}
+		return true;
 	}
 
-	// skip layers & setup velocity -> or EFL_DIRTY_ABSANGVELOCITY and set direct vel not interpolated
-	if (ret == velocity || ret == accumulate)
-		return true;
-	
 	return original(thisptr);
 }
