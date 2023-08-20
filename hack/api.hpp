@@ -23,7 +23,7 @@
 #if defined WANT_EXCEPTIONS
 #define HACK_TRY try
 #define HACK_CATCH(exception) catch(exception)
-#define HACK_THROW(exception) throw std::runtime_error{ exception }
+#define HACK_THROW(exception) throw HACK_CATCH_TYPE{ exception }
 #else
 #define HACK_TRY if(true)
 #define HACK_CATCH(exception) if(false)
