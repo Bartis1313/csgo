@@ -55,8 +55,10 @@ hooks::PaintTraverse::value hooks::PaintTraverse::hook(HACK_FAST_ARGS, uint32_t 
 	}
 	else if (panelID == panel)
 	{
+		memory::interfaces::surface->pushMakeCurrent(panel, false);
 		ImRender::beginThink();
 		Storage::runs.run();
 		ImRender::endThink();
+		memory::interfaces::surface->popMakeCurrent(panel);
 	}
 }

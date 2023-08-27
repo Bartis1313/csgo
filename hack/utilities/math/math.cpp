@@ -11,7 +11,7 @@ Vec3 math::calcAngleRelative(const Vec3& source, const Vec3& destination, const 
 		0.0f
 	};
 
-	return angles.normalize();
+	return angles;
 }
 
 Vec3 math::calcAngle(const Vec3& source, const Vec3& destination)
@@ -25,7 +25,7 @@ Vec3 math::calcAngle(const Vec3& source, const Vec3& destination)
 		0.0f
 	};
 
-	return angles.normalize();
+	return angles;
 }
 
 float math::calcFov(const Vec3& source, const Vec3& destination, const Vec3& viewAngles)

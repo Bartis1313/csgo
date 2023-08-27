@@ -19,6 +19,8 @@ struct Vertex_t
 class ISurface
 {
 public:
+	VFUNC(void, pushMakeCurrent, 12, (unsigned long panel, bool useInsets), (this, panel, useInsets));
+	VFUNC(void, popMakeCurrent, 13, (unsigned long panel), (this, panel));
 	VFUNC(void, drawSetColor, 14, (SDKColor color), (this, color));
 	VFUNC(void, setTextColor, 24, (SDKColor color), (this, color));
 	VFUNC(void, drawTexturedPolygon, 106, (int n, Vertex_t* vertice, bool clip = true), (this, n, vertice, clip));

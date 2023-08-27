@@ -496,6 +496,8 @@ void weather::precipitation::reset()
 
 	newMap = true;
 
+	preacheCustomFiles(); // this needs to be run on everymap
+
 	lastTimeStorm = memory::interfaces::globalVars->m_curtime + Random::getRandom(2.0f, 5.0f);
 	lightRapidsCounter = 0;
 }

@@ -179,13 +179,10 @@ void Aimbot::runMouse(float* x, float* y)
 	if (!shouldWork)
 		return;
 
-	Vec2 mouse = Vec2{ *x, *y };
 	Vec2 mouseScreen = Vec2{ toAdd[1], -toAdd[0] };
 
-	mouseScreen += mouse;
-
-	*x = mouseScreen[0];
-	*y = mouseScreen[1];
+	*x += mouseScreen[0];
+	*y += mouseScreen[1];
 }
 
 void Aimbot::run(CUserCmd* cmd)
@@ -246,11 +243,12 @@ void Aimbot::run(CUserCmd* cmd)
 	const auto [player, fov, bestHitbox, bestpos] = targets.front();
 
 	const auto currentAngle = Vec3{ cmd->m_viewangles + punch };
-	const auto& angle = math::calcAngle(myEye, bestpos);
+	const auto angle = math::calcAngle(myEye, bestpos);
 	float smoothingFactor = std::min(memory::interfaces::globalVars->m_frametime * cfgWeapon.frametimeMulttiply, 1.0f);
-	const auto& lerpedAngle = currentAngle.lerp(angle, std::clamp(smoothingFactor, 0.01f, 1.0f)).normalize().clamp();
+	const float clampedSmooth = std::clamp(smoothingFactor, 0.01f, 1.0f);
+	const auto& lerpedAngle = currentAngle.lerp(angle, clampedSmooth);
 
-	toAdd = Vec3{ currentAngle - lerpedAngle };
+	toAdd = Vec3{ currentAngle - lerpedAngle }.normalize().clamp();
 
 	toAdd[0] /= m_pitch->getFloat();
 	toAdd[1] /= m_yaw->getFloat();
