@@ -160,14 +160,14 @@ std::vector<char> loadFile(HMODULE hModule, const int idRes, const char* resourc
 
 	UnlockResource(hGlobal);
 
-	return std::vector<char>(dataPtr, dataPtr + dataSize);
+	return std::vector<char>{ dataPtr, dataPtr + dataSize };
 }
 
 void saveResourceToDest(const std::vector<char>& data, const std::filesystem::path& path)
 {
 	if (data.empty())
 	{
-		std::cout << "Empty for " << path << "\n";
+		console::error("data for {} was empty, correct resource?", path.string());
 		return;
 	}
 
@@ -179,10 +179,11 @@ void saveResourceToDest(const std::vector<char>& data, const std::filesystem::pa
 #include <SDK/INetworkStringTableContainer.hpp>
 #include <SDK/interfaces/interfaces.hpp>
 
-// something broken, they never show :(
 void weather::precipitation::init()
 {
 	const auto pathSprites = std::filesystem::current_path() / "csgo" / "materials" / "sprites";
+	if (!std::filesystem::exists(pathSprites))
+		std::filesystem::create_directories(pathSprites);
 
 	const auto bluelightningVMT = loadFile(globals::instance, IDR_VMT_FILE2, "VMT_FILE");
 	saveResourceToDest(bluelightningVMT, pathSprites / "bluelightning.vmt");
@@ -215,6 +216,8 @@ void weather::precipitation::init()
 	saveResourceToDest(physcannon_bluelight1bVTF, pathSprites / "physcannon_bluelight1b.vtf");
 
 	const auto pathParticles = std::filesystem::current_path() / "csgo" / "materials" / "particle";
+	if (!std::filesystem::exists(pathParticles))
+		std::filesystem::create_directories(pathParticles);
 
 	const auto snowflakeVMT = loadFile(globals::instance, IDR_VMT_FILE1, "VMT_FILE");
 	saveResourceToDest(snowflakeVMT, pathParticles / "snowflake.vmt");
